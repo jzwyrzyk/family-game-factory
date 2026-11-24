@@ -26,3 +26,15 @@ jobs:
         run: node --import tsx tests/session-client.test.ts
       - name: Private family beta isolation and authorization
         run: node --import tsx --test tests/beta-*.test.ts
+      - name: Build private application and separately scoped feature files
+        run: npm run build:family-beta
+      - name: Prepare browsers for synthetic family journeys
+        run: npx playwright install --with-deps chromium webkit
+      - name: Chromium and WebKit private entry and responsive acceptance
+        run: node --import tsx tests/beta-browser.ts
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: private-family-synthetic-layouts-${{ github.sha }}
+          path: test-results/family-beta/*.png
+          retention-days: 7

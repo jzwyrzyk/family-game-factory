@@ -303,13 +303,14 @@
         "docs/brand/achievement-art/README.md",
         "docs/brand/achievement-art/*.json",
         "docs/brand/art-library/**",
-        "src/speech/**"
+        "src/speech/**",
+        "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T18:16:02.770Z",
-      "sourceDigest": "db4335d97b37dd6fe65cacd06c129b38bd120955bf3187df7c268f5d56f985c3",
+      "reviewedAt": "2026-11-24T23:48:28.468Z",
+      "sourceDigest": "ed01862b1637e54f94974c7efaf60fc2295348d8bbc16f9c0988ac0b47a34b3d",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented My Creations entry/cards, readable moved controls and shared native-host restoration; desktop and phone saved-variant journeys passed.",
+      "reviewReason": "Updated architecture and entry references for approved mining artwork, family-local profiles, private application delivery and disconnected session expiry.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -406,10 +407,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "046b2da4d3be2a0b8803de7689f7ac8daff903cc1c25a9e8ce18f26418dee6c3",
-      "reviewedAt": "2026-11-23T18:16:03.267Z",
+      "sourceDigest": "482735f18da73dc2717818519b69041157875e060d638d4286730881211c0c3a",
+      "reviewedAt": "2026-11-24T23:48:29.113Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated shared architecture for retained saved-variant routing; scene/art ownership, revision data and creation authority remain unchanged.",
+      "reviewReason": "Reviewed exposing the existing editor leave and save behavior to the reduced capability workshop without changing project serialization.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -677,10 +678,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:37:24.625Z",
-      "sourceDigest": "b6e36cf9d562c11bc4e0343e6ad494a100ba9b05044b82d3098bf7f366b9d496",
+      "reviewedAt": "2026-11-24T23:48:29.481Z",
+      "sourceDigest": "efc051d6406975382f3f9773b5055943f126c50c3100f74a6ad29406d4319ffc",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented invitation redemption, host-only cookies, recent parent authorization, operator and worker identity, and shared gateway routing.",
+      "reviewReason": "Documented the server-guarded public asset allowlist, first-party private app delivery, profile management and family-scoped artwork approvals.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -886,10 +887,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:37:25.378Z",
-      "sourceDigest": "1389e5cefb8121cb49b7dc72967e14e4824124c440b8a255e70dd07ca6e7f212",
+      "reviewedAt": "2026-11-24T23:48:29.888Z",
+      "sourceDigest": "8c152c72e23791670b35b7a88f66413995a34bfca0695e2e6f9cbab73a2b608c",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified synthetic invitation reuse, independent pairing, different families, concurrent limits, logout, suspension, recovery and callback job binding.",
+      "reviewReason": "Documented actual Chromium coverage, the WebKit CI journey and remaining independent real-device and deployed acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1125,13 +1126,14 @@
         "DELIVERY-STATE.md",
         "scripts/environments/**",
         "infra/nonproduction/**",
-        "scripts/environments/ci_evidence.py"
+        "scripts/environments/ci_evidence.py",
+        "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T23:37:25.783Z",
-      "sourceDigest": "475f885877253bea508c9df39b918238dcceb8341dbbfd154ce2b179c32a377c",
+      "reviewedAt": "2026-11-24T23:48:30.269Z",
+      "sourceDigest": "d19e6d067d5a0636159f6998a9d1c2cd8491e73abeb0da7650ee210c7e083249",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered beta authorization cases in the existing trusted-device contract job; kept the existing regression matrix and release triggers.",
+      "reviewReason": "Documented separate private build output, responsive fixture browser checks and timed screenshot retention in the existing auth workflow.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1385,10 +1387,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:29:19.876Z",
-      "sourceDigest": "61fb036b7331f0ea4dfbf0de47090b99bb3a6b96543cbaa2879e6f582b53e15f",
+      "reviewedAt": "2026-11-24T23:48:30.700Z",
+      "sourceDigest": "da1d6672017313f9719fa8f08a290ad4eddf18f170fc007c87fbf59a6c3b9a84",
       "reviewOutcome": "updated",
-      "reviewReason": "Routed family beta source and architecture references to the service documentation registry.",
+      "reviewReason": "Added the browser delivery and synthetic family acceptance contract to the documentation index and routed the private build and feature sources.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

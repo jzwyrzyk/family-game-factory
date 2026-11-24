@@ -1,14 +1,15 @@
+import {randomUUID} from 'node:crypto';
 import type {IncomingMessage,ServerResponse} from 'node:http';
 import {readJsonBody} from '../http-json';
 import {verifySession} from '../pipeline/auth';
 import {cookieValue,assertActiveTrustedDevice} from '../trusted-devices';
-import {acknowledge,exact,internalCookies,logout,redeem,requirePlay} from './access';
+import {acknowledge,exact,internalCookies,liveSession,logout,redeem,requirePlay} from './access';
 import {activeFamily,betaNotice,familyOrigin,participationNotice,uuid,type Capabilities} from './model';
 import {BetaAdministration,verifyAdministrator} from './admin';
 import type {FamilyDirectory} from './store';
 
 type Handler=(req:IncomingMessage,res:ServerResponse)=>Promise<void>;
-export type Surface=(req:IncomingMessage,res:ServerResponse,context:{path:string;family?:string;capabilities?:Capabilities;administrator?:boolean})=>Promise<boolean>;
+export type Surface=(req:IncomingMessage,res:ServerResponse,context:{path:string;family?:string;capabilities?:Capabilities;administrator?:boolean;expires?:number;idleUntil?:number;profiles?:string[]})=>Promise<boolean>;
 export function json(res:ServerResponse,status:number,data:unknown,cookies?:string[]){
  res.writeHead(status,{'Content-Type':'application/json; charset=utf-8',...(cookies?{'Set-Cookie':cookies}:{})});res.end(JSON.stringify(data));
 }
@@ -53,12 +54,17 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
       if(session.deviceId&&session.familyId===id){const s=await d.inWorkspace(tx,f,p,s=>s,false);
        assertActiveTrustedDevice(s,session);connected=true;}
      }catch{/* No authenticated device. */}
-     return {family:true,connected,status:connected?f.status:undefined,notice:betaNotice,terms:participationNotice};
+     return {family:true,connected,status:connected?f.status:undefined,needsProfile:connected&&!f.profiles?.length,notice:betaNotice,terms:participationNotice};
     });json(res,200,state);return;
    }
    if(req.method==='POST'&&!id&&path==='/entry/workshop'){
     const input:unknown=await read(req);exact(input,['code']);if(!uuid(input.code))throw Error('INVALID_REQUEST');
     json(res,200,{origin:familyOrigin(d.config,input.code)});return;
+   }
+   if(req.method==='GET'&&['/acknowledge','/grown-ups'].includes(path)){
+    if(!id)throw Error('NOT_FOUND');
+    try{await d.withFamily(id,async(tx,f,p)=>{activeFamily(f,p);await d.inWorkspace(tx,f,p,s=>liveSession(f,s,internalCookies(raw),key,Date.now()),false);});}
+    catch{res.writeHead(303,{Location:'/login'});res.end();return;}
    }
    if(req.method==='GET'&&!path.startsWith('/play/')&&!path.startsWith('/v1/')&&await options.surface?.(req,res,{path,family:id}))return;
    if(!id)throw Error('NOT_FOUND');
@@ -71,21 +77,38 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    if(req.method==='POST'&&(path==='/entry/logout'||path==='/entry/end')){
     exact(await read(req),[]);json(res,200,{ended:true},await logout(d,id,raw,key,path==='/entry/logout'));return;
    }
+   if(path==='/entry/profiles'||path==='/entry/review-art'){
+    const body=req.method==='POST'?await read(req):{};
+    exact(body,path==='/entry/review-art'?['digest']:[]);
+    const result=await d.withFamily(id,async(tx,f,p)=>{
+     activeFamily(f,p);
+     const cookies=internalCookies(raw),now=Date.now();
+     const session=await d.inWorkspace(tx,f,p,s=>liveSession(f,s,cookies,key,now),false);
+     const parent=verifySession(cookieValue(cookies,'factory_parent'),key,now);
+     if(parent.role!=='parent'||parent.familyId!==id||parent.deviceId!==session.deviceId)throw Error('FORBIDDEN');
+     if(path==='/entry/review-art'){
+      if(req.method!=='POST'||typeof body.digest!=='string'||!f.capabilities.artwork||!f.approvedArt?.includes(body.digest))throw Error('ART_REVIEW_REQUIRED');
+      return {approved:true};
+     }
+     if(req.method==='POST'){f.profiles??=[];if(f.profiles.length>=6)throw Error('PROFILE_LIMIT');f.profiles.push(randomUUID());tx.set(d.path(id),f);}
+     return {ids:f.profiles??[]};
+    });json(res,200,result);return;
+   }
    if(path.startsWith('/play/')&&req.method==='GET'){
     const access=await requirePlay(d,id,raw,key,path==='/play/'?'entry':'check');
-    if(await options.surface?.(req,res,{path,family:id,capabilities:access.capabilities}))return;
+    if(await options.surface?.(req,res,{path,family:id,capabilities:access.capabilities,profiles:access.profiles,expires:access.expires,idleUntil:access.idleUntil}))return;
     throw Error('NOT_FOUND');
    }
    if(path==='/entry/activity'&&req.method==='POST'||path==='/entry/check'&&req.method==='GET'){
     if(req.method==='POST')exact(await read(req),[]);
     const {expires,idleUntil,capabilities}=await requirePlay(d,id,raw,key,req.method==='POST'?'activity':'check');json(res,200,{expires,idleUntil,capabilities});return;
    }
-   const entryRoutes=['/v1/sessions/enroll','/v1/sessions/renew','/v1/sessions/status','/v1/devices/unlock','/v1/devices/privacy','/v1/devices/privacy/revoke'];
+   const entryRoutes=['/v1/sessions/enroll','/v1/sessions/renew','/v1/sessions/status','/v1/devices/unlock','/v1/devices/privacy','/v1/devices/privacy/revoke','/v1/devices','/v1/devices/invite','/v1/devices/revoke'];
    if(!path.startsWith('/v1/')||path==='/v1/sessions'||path.startsWith('/v1/sessions/adult/')||path.startsWith('/v1/worker/')||
     path.startsWith('/v1/internal/')||req.headers['x-factory-adult-session']!==undefined)throw Error('FORBIDDEN');
    if(entryRoutes.includes(path)){
     await d.withFamily(id,async(_tx,f,p)=>{if(path==='/v1/sessions/renew'&&f.status==='pending'&&p.participation)return;
-     activeFamily(f,p);if(path==='/v1/sessions/enroll'&&!p.invitations)throw Error('INVITATIONS_PAUSED');});
+     activeFamily(f,p);if(['/v1/sessions/enroll','/v1/devices/invite'].includes(path)&&!p.invitations)throw Error('INVITATIONS_PAUSED');});
    }else await requirePlay(d,id,raw,key,'check');
    req.headers.cookie=internalCookies(raw);
    await (await options.runtime(id))(req,res);

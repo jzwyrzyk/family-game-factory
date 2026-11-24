@@ -106,7 +106,7 @@ export class BetaAdministration {
     }else if(action==='policy'){
      exact(params,['capabilities','monthlyCents','paused','generationPaused']);exact(params.capabilities,[...scopes]);
      const caps=Object.fromEntries(scopes.map(k=>[k,bool((params.capabilities as Record<string,unknown>)[k])])) as Record<Capability,boolean>;
-     if(caps.adultPrivate||caps.adultImport||caps.artwork)throw Error('FEATURE_RELEASE_REQUIRED');
+     if(caps.adultPrivate||caps.adultImport)throw Error('FEATURE_RELEASE_REQUIRED');
      const paused=bool(params.paused),generationPaused=bool(params.generationPaused);
      if(paused||generationPaused||!caps.generation)await this.d.inWorkspace(tx,f,p,s=>stopJobs(s),true);
      f.capabilities=caps;f.allowance=cents(params.monthlyCents);f.paused=paused;f.generationPaused=generationPaused;f.plays=[];
@@ -114,6 +114,10 @@ export class BetaAdministration {
      exact(params,[]);if(f.status==='revoked'||(action==='resume'&&(f.status!=='suspended'||!f.guardian.verifiedAt)))throw Error('INVALID_LIFECYCLE');
      if(action!=='resume')await this.d.inWorkspace(tx,f,p,s=>{revokeConsent(s,f.id,now);if(action==='revoke')for(const d of s.devices??[])d.revokedAt=now;},true);
      f.status=action==='resume'?'active':action==='suspend'?'suspended':'revoked';f.plays=[];
+    }else if(action==='approve-art'){
+     exact(params,['digest']);if(typeof params.digest!=='string'||!/^[0-9a-f]{64}$/.test(params.digest))throw Error('INVALID_REQUEST');
+     f.approvedArt??=[];if(f.approvedArt.length>=32)throw Error('BETA_CAPACITY');
+     if(!f.approvedArt.includes(params.digest))f.approvedArt.push(params.digest);
     }else if(action==='withdraw'){
      exact(params,[]);await this.d.inWorkspace(tx,f,p,s=>revokeConsent(s,f.id,now),true);
     }else if(action==='verify-consent'){

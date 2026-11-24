@@ -1,6 +1,6 @@
 # jems documentation map
 
-[Private family beta architecture and trust boundaries](family-beta/ARCHITECTURE.md) covers the household baseline, independent family accounts and isolation.
+[Private family beta architecture and trust boundaries](family-beta/ARCHITECTURE.md) covers the household baseline, independent family accounts, protected browser delivery, approved entry artwork and the synthetic browser acceptance contract.
 
 CI and validation: [architecture, complete workflow audit, coverage, benchmarks and evidence reuse](evidence/README.md#ci-architecture-and-performance).
 

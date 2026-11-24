@@ -2,6 +2,7 @@ import {platformMode,validateBeta,familyOrigin,uuid,type BetaConfig} from './bet
 import {FamilyDirectory} from './beta/store';
 import {firestoreStore} from './beta/documents';
 import {betaRouter,type Surface} from './beta/router';
+import {betaHosting} from './beta/hosting';
 import {assertRunJob} from './beta/worker';
 import type {Repository} from './pipeline/types';
 import {CoachService} from './coach/service';
@@ -141,7 +142,7 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
   workflow:config.workerWorkflow??'',approvedSha:config.workerApprovedSha??'',privateWorker:true});
  const token=installationTokenProvider({appId:config.githubAppId,installationId:config.githubInstallationId,repositoryId:Number(config.workerRepositoryId)},()=>config.githubPrivateKey);
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
- return betaRouter(d,config.sessionKey,{surface,runtime:async id=>(await runtime(id)).handler,
+ return betaRouter(d,config.sessionKey,{surface:surface??betaHosting('dist-family-beta',beta,config.previewOrigin),runtime:async id=>(await runtime(id)).handler,
   worker:async(req,res)=>{
    const id=req.url?.match(/^\/v1\/worker\/jobs\/([a-f0-9-]+)\/(?:claim|report|status)$/)?.[1];
    const bearer=req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];

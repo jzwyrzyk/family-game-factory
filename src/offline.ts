@@ -2,7 +2,7 @@ import {setIconLabel} from './brand/icons';
 
 // Only the reviewed static shell is cached. Authenticated APIs/previews are never cached.
 export function installOffline(){
- if(!window.isSecureContext)return;
+ if(document.documentElement.hasAttribute('data-private-beta')||!window.isSecureContext)return;
  // Sandboxed game previews can throw on the serviceWorker getter itself.
  // Offline caching is optional and must never interrupt gameplay.
  let serviceWorker:ServiceWorkerContainer|undefined;

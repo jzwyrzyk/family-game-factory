@@ -24,7 +24,7 @@ export interface Play {digest:string;familyId:string;guardianId:string;deviceId:
 export interface Family {
  id:string;workspace:string;status:'invited'|'pending'|'active'|'suspended'|'revoked';
  guardian:Guardian;capabilities:Capabilities;allowance:number;paused:boolean;generationPaused:boolean;
- invitation?:Invitation;plays:Play[];createdAt:number;
+ invitation?:Invitation;plays:Play[];createdAt:number;profiles?:string[];approvedArt?:string[];
  request?:{id:string;kind:'export'|'deletion';at:number;state:'requested'|'completed'};
 }
 export interface Policy {version:1;invitations:boolean;participation:boolean;stop:boolean;monthlyLimit:number}

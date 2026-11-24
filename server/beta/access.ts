@@ -92,7 +92,7 @@ export async function requirePlay(directory:FamilyDirectory,id:string,raw:string
    action==='entry'&&!play.entryPending||action!=='entry'&&play.entryPending)throw Error('PLAY_REQUIRED');
   if(action==='entry'){play.entryPending=false;tx.set(directory.path(id),f);}
   if(action==='activity'&&now-play.lastActive>=60000){play.lastActive=now;tx.set(directory.path(id),f);}
-  return {familyId:id,capabilities:f.capabilities,expires:play.expires,idleUntil:play.lastActive+playIdle,session};
+  return {familyId:id,capabilities:f.capabilities,profiles:f.profiles??[],expires:play.expires,idleUntil:play.lastActive+playIdle,session};
  });
 }
 export async function logout(directory:FamilyDirectory,id:string,raw:string|undefined,key:string,forget:boolean,now=Date.now()){
