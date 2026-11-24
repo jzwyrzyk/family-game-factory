@@ -69,7 +69,8 @@
     "test:play-view": "node tests/play-view-browser.cjs",
     "test:studio-notifications": "node --import tsx --test tests/studio-notifications.test.ts && node tests/studio-notifications-browser.cjs",
     "test:creation-learner": "node tests/creation-learner-browser.cjs",
-    "test:bubble-gum": "node --import tsx --test tests/bubble-gum-rules.test.ts tests/bubble-gum-journey.test.ts && node tests/bubble-gum-builder-browser.cjs"
+    "test:bubble-gum": "node --import tsx --test tests/bubble-gum-rules.test.ts tests/bubble-gum-journey.test.ts && node tests/bubble-gum-builder-browser.cjs",
+    "test:ci": "node --test scripts/ci/*.test.mjs tests/ci-*.test.mjs tests/browser-scenarios.test.cjs"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",

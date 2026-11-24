@@ -6,7 +6,49 @@ concurrency:
   group: jems-visual-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 jobs:
+  selection:
+    # This is an optional visual lane. Arcade still owns the required docs,
+    # operations, provenance and aggregate checks for the same source.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      has-shards: ${{ steps.plan.outputs.has-shards }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Select visual coverage using the trusted base policy
+        id: plan
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/prepare-plan.mjs
+      - name: Explain optional visual coverage
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const plan = JSON.parse(fs.readFileSync('ci-plan.json', 'utf8'));
+          const reason = plan.requiredShards.length
+            ? 'All five visual jobs remain selected: application impact, full validation, or a conservative fallback requires their existing assertions.'
+            : 'The trusted base classifies this exact source as ' + plan.mode + '. Visual jobs are explicitly not required; release-intent reuse, when applicable, passed independent exact-evidence verification. Required documentation and operations checks remain in Arcade.';
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '\n### Optional visual lane\n\n' + reason + '\n');
+          JS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: visual-selection-${{ github.run_attempt }}
+          path: ci-plan.json
+          retention-days: 7
+          if-no-files-found: error
   screenshots:
+    needs: selection
+    if: needs.selection.outputs.has-shards == 'true'
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -29,6 +71,8 @@ jobs:
           path: test-results/brand-review/
           if-no-files-found: warn
   brand-contract:
+    needs: selection
+    if: needs.selection.outputs.has-shards == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -46,6 +90,8 @@ jobs:
       - name: Run isolated jems brand-browser contract
         run: node tests/brand-browser.cjs
   studio-journey:
+    needs: selection
+    if: needs.selection.outputs.has-shards == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -63,6 +109,8 @@ jobs:
       - name: Run isolated Studio save-play-iterate journey
         run: node tests/studio-journey.cjs
   joy-contract:
+    needs: selection
+    if: needs.selection.outputs.has-shards == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -80,6 +128,8 @@ jobs:
       - name: Test earned celebrations and Math-English accents
         run: node tests/jems-delight-browser.cjs
   gem-factory:
+    needs: selection
+    if: needs.selection.outputs.has-shards == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "baselineSource": "28fe3311036f8ef9f3bfc623c522432499c08113",
+  "legacyGroups": {
+    "notifications": [
+      "npm run test:studio-notifications"
+    ],
+    "browser": [
+      "npm run test:unit",
+      "npm run test:gem-progress",
+      "npm run test:rewards",
+      "npm run test:deployment",
+      "node tests/journeys.cjs",
+      "node tests/live-remix.cjs",
+      "node --import tsx tests/builder-browser.ts",
+      "node --import tsx tests/actions-e2e.ts",
+      "npm run test:intent-playtest",
+      "npm run test:intent-repair-browser",
+      "node --import tsx tests/generated-worker-security.ts",
+      "npm run test:generated-art",
+      "npm run test:quality-capture",
+      "node tests/restored-games.cjs",
+      "node tests/offline-shell.cjs",
+      "node tests/construction-touch.cjs",
+      "node tests/private-drawings.cjs",
+      "npm run test:real-agent"
+    ],
+    "learning": [
+      "npm run test:learning-ui",
+      "npm run test:learning-integration",
+      "npm run test:language-ui",
+      "npm run test:language-integration",
+      "node tests/learning-repair.cjs",
+      "npm run test:problem-solving",
+      "npm run test:problem-solving-browser"
+    ],
+    "creative": [
+      "npm run test:quality",
+      "npm run test:studio",
+      "npm run test:gem-journey",
+      "npm run test:navigation-continuity",
+      "npm run test:rewards-browser",
+      "npm run test:pals",
+      "npm run test:pals-browser",
+      "npm run test:creation",
+      "npm run test:art",
+      "npm run test:art-browser",
+      "npm run test:creation-browser",
+      "npm run test:coach",
+      "npm run test:child-journey"
+    ]
+  },
+  "shards": {
+    "browser-core": {
+      "group": "browser",
+      "commands": [
+        "npm run test:unit",
+        "npm run test:gem-progress",
+        "npm run test:rewards",
+        "npm run test:deployment",
+        "node tests/journeys.cjs",
+        "node tests/live-remix.cjs",
+        "node --import tsx tests/builder-browser.ts"
+      ]
+    },
+    "browser-generated": {
+      "group": "browser",
+      "commands": [
+        "node --import tsx tests/actions-e2e.ts",
+        "npm run test:intent-playtest",
+        "npm run test:intent-repair-browser",
+        "npm run test:generated-art",
+        "npm run test:quality-capture"
+      ]
+    },
+    "browser-storage": {
+      "group": "browser",
+      "commands": [
+        "node --import tsx tests/generated-worker-security.ts",
+        "node tests/restored-games.cjs",
+        "node tests/offline-shell.cjs",
+        "node tests/construction-touch.cjs",
+        "node tests/private-drawings.cjs",
+        "npm run test:real-agent"
+      ]
+    },
+    "learning-math": {
+      "group": "learning",
+      "commands": [
+        "npm run test:learning-ui",
+        "npm run test:learning-integration",
+        "node tests/learning-repair.cjs",
+        "npm run test:problem-solving",
+        "npm run test:problem-solving-browser"
+      ]
+    },
+    "learning-language": {
+      "group": "learning",
+      "commands": [
+        "npm run test:language-ui",
+        "npm run test:language-integration"
+      ]
+    },
+    "notifications": {
+      "group": "notifications",
+      "commands": [
+        "npm run test:studio-notifications"
+      ]
+    },
+    "studio-core": {
+      "group": "creative",
+      "commands": [
+        "npm run test:play-view",
+        "npm run test:brand-assets",
+        "node --import tsx tests/studio-unit.ts",
+        "node tests/homepage-entry.cjs",
+        "node tests/brand-browser.cjs",
+        "node tests/jems-delight-browser.cjs",
+        "node tests/studio-journey.cjs",
+        "node tests/favorites-browser.cjs",
+        "node tests/retained-games-browser.cjs",
+        "node tests/parent-privacy-browser.cjs",
+        "node tests/adult-profile-browser.cjs",
+        "npm run test:gem-journey",
+        "npm run test:navigation-continuity"
+      ]
+    },
+    "mining": {
+      "group": "creative",
+      "commands": [
+        "node tests/mind-your-jems-browser.cjs"
+      ]
+    },
+    "factory": {
+      "group": "creative",
+      "commands": [
+        "npm run test:gem-factory"
+      ]
+    },
+    "physical": {
+      "group": "creative",
+      "commands": [
+        "npm run test:quality"
+      ]
+    },
+    "creation-art": {
+      "group": "creative",
+      "commands": [
+        "npm run test:creation",
+        "npm run test:art",
+        "npm run test:art-browser",
+        "npm run test:creation-browser"
+      ]
+    },
+    "pals-rewards": {
+      "group": "creative",
+      "commands": [
+        "npm run test:rewards-browser",
+        "npm run test:pals",
+        "npm run test:pals-browser"
+      ]
+    },
+    "child-coach": {
+      "group": "creative",
+      "commands": [
+        "npm run test:coach",
+        "npm run test:child-journey"
+      ]
+    }
+  }
+}

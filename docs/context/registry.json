@@ -108,7 +108,8 @@
     "docs/pals/previews/*.md",
     "docs/operations/*.md",
     "docs/speech/*.md",
-    "docs/bubble-gum-builders/*.md"
+    "docs/bubble-gum-builders/*.md",
+    "docs/evidence/README.md"
   ],
   "areas": [
     {
@@ -858,13 +859,14 @@
         "tests/**",
         "tools/**",
         "scripts/verify-brand-assets.mjs",
-        "scripts/tests/verify-pal-assets.test.mjs"
+        "scripts/tests/verify-pal-assets.test.mjs",
+        "scripts/ci/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T18:54:44.529Z",
-      "sourceDigest": "9fb64a023aabdbdd877544ea349c9701605d964aa9fec17f18dd618c4c4f38fb",
+      "reviewedAt": "2026-11-24T03:38:29.617Z",
+      "sourceDigest": "e983fb1d566515af96a3d166e6aa652c81698b366d4a95e6a1445adeaeaf81d3",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the exact collection GET fixture and bounded observed-time countdown helper; retained strict unknown-request, paid-build, phase and duration assertions. Delivery state records the full child-journey pass and ten Bubble Gum cases with 22 launch receipts on supplemental Chromium 156, preserved original CI failures, and fresh hosted results pending.",
+      "reviewReason": "Reviewed all 96 original Arcade leaf commands, source-bound shard and aggregate contracts, conservative trusted-base selection, authenticated evidence verification, reporter and browser capture changes. The CI guide records negative tests, shadow targeting, unchanged assertions, fixture and runtime limits, retention tradeoffs and hosted benchmark still pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1038,7 +1040,8 @@
         "docs/assignment-006/*.md",
         "docs/operations/*.md",
         "docs/mind-your-jems/*.md",
-        "docs/bubble-gum-builders/*.md"
+        "docs/bubble-gum-builders/*.md",
+        "docs/evidence/README.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -1055,10 +1058,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T01:51:12.836Z",
-      "sourceDigest": "f999b0b1c8f5057391b2b9428aa98078728c96c474aa579696183732a017a44a",
+      "reviewedAt": "2026-11-24T03:38:53.760Z",
+      "sourceDigest": "f02ab6701fe641145f684c852cfc60eceeed9c1b2358a28faccb110b32de856a",
       "reviewOutcome": "updated",
-      "reviewReason": "Stacked the unchanged Gateway canary on the metadata-only release observer while preserving actual Coach promotion and Gateway stage evidence; fresh stage lifecycle inspection still gates canary merge.",
+      "reviewReason": "Reviewed final read-only workflow graph including first-attempt full validation receipt creation on PR/manual runs for producer testing; the API verifier still accepts only main-push receipts. Stable checks, complete coverage and production controls remain unchanged; audit and delivery state document pending hosted benchmark and approval hold.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1256,10 +1259,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T03:35:23.963Z",
-      "sourceDigest": "34da324f3f9445a8745fea1aa95bfc9a843045a98cac8979ec8c3139b92ab899",
+      "reviewedAt": "2026-11-24T03:38:30.414Z",
+      "sourceDigest": "0fe08eabc960a29e8de4c42dc4aad912143f936a18fc686aca0d4c19fba623ea",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed integration routing additions and existing required documents/link scope; the index now identifies PR134 as the single consolidated release vehicle. Historical review records and fingerprint enforcement remain intact.",
+      "reviewReason": "Registered scripts/ci in validation and the existing evidence guide in link checking and delivery review; added README/index/maintenance references. Preserved all original documentation routing and review history; new tests require explicit shard ownership and measured runner and first-attempt evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

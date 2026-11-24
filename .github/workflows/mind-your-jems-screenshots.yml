@@ -12,6 +12,7 @@ on:
       - 'tests/visual/mind-your-jems/**'
       - 'tests/visual/mind-your-jems-native/**'
       - 'tests/browser-server.cjs'
+      - 'tests/browser-scenarios*'
       - '.github/workflows/**'
       - 'index.html'
       - 'vite.config.ts'
