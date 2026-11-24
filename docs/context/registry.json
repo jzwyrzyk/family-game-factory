@@ -1102,10 +1102,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T16:21:36.149Z",
-      "sourceDigest": "311da611c421e23474cc9ccc490b933d1141829da752fb60f624cc2fe323b9c5",
-      "reviewOutcome": "updated",
-      "reviewReason": "Added the completed final-main first-attempt full receipt and actual elapsed/runner/queue measurements; preserved the live-status uncertainty, older failures and pending fast-path execution without changing policy or routing.",
+      "reviewedAt": "2026-11-24T16:24:25.380Z",
+      "sourceDigest": "8b40d6f6a46505a079fcaf8da1db4807bfc78d64d375aa5cd6caf06dc9c2b7c5",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Only the read-only performance comparison baseline changes to authoritative full main run45434168143 already recorded in delivery state; no test, release, runtime, identity or acceptance policy changes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
