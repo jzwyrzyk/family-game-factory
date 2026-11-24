@@ -677,10 +677,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:29:18.377Z",
-      "sourceDigest": "9226cbcb4f8f3e0f7f90729ab4a1f5180aff867dd37fb185a28bf4b5fb3d1a77",
+      "reviewedAt": "2026-11-24T23:37:24.625Z",
+      "sourceDigest": "b6e36cf9d562c11bc4e0343e6ad494a100ba9b05044b82d3098bf7f366b9d496",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented beta family and policy documents, isolated browser origins, artifact namespaces and reserved operating modes.",
+      "reviewReason": "Documented invitation redemption, host-only cookies, recent parent authorization, operator and worker identity, and shared gateway routing.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -826,10 +826,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "955a220d2c32d6174c28cafdce406cc3c63ca8c03fbd65148532fbc5cea1ef2d",
-      "reviewedAt": "2026-11-24T23:29:19.152Z",
+      "sourceDigest": "1e582ea62779abc9eb5acfb7650f7f743a101568fe00ff99ce845346661efcb5",
+      "reviewedAt": "2026-11-24T23:37:25.000Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified current guardian scope checks now also consult runtime beta scope and independently reviewed provider evidence.",
+      "reviewReason": "Reviewed separate participation pairing, verified consent, device trust, acknowledgment and conservative stop and recovery handling.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -886,10 +886,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:29:19.526Z",
-      "sourceDigest": "5096e7920bcd802f29a507cb99e5a64790a7585ffc3bf9347341240e885a16ad",
+      "reviewedAt": "2026-11-24T23:37:25.378Z",
+      "sourceDigest": "1389e5cefb8121cb49b7dc72967e14e4824124c440b8a255e70dd07ca6e7f212",
       "reviewOutcome": "updated",
-      "reviewReason": "Synthetic accounts and an unmapped owner workspace exercise separation and malformed mode and evidence rejection.",
+      "reviewReason": "Verified synthetic invitation reuse, independent pairing, different families, concurrent limits, logout, suspension, recovery and callback job binding.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1128,10 +1128,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T21:04:00.637Z",
-      "sourceDigest": "8b90caceaf316bd524c2af26e758dec86f03eb531bf59bf80f662f90d445477e",
+      "reviewedAt": "2026-11-24T23:37:25.783Z",
+      "sourceDigest": "475f885877253bea508c9df39b918238dcceb8341dbbfd154ce2b179c32a377c",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded source-specific local trials, standalone artifact hashes and downloaded clean hosted image evidence; preserved superseded run scope, current main production records and all external activation gates.",
+      "reviewReason": "Registered beta authorization cases in the existing trusted-device contract job; kept the existing regression matrix and release triggers.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

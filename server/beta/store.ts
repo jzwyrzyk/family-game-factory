@@ -40,6 +40,8 @@ export class FamilyDirectory {
   const total=await tx.get<Usage>(globalPath)??{used:0,reserved:0};
   s.ledgers[f.id]={...before,month:period,allowance:f.allowance,paidEnabled:!p.stop&&!f.paused&&p.participation&&f.status==='active'};
   s.betaScopes=Object.fromEntries(remoteScopes.map(scope=>[scope,remoteAllowed(f,p,this.config.providerEvidence,scope,now)])) as PipelineState['betaScopes'];
+  const deviceStatus=()=>(s.devices??[]).map(({id,familyId,expiresAt,lastSeenAt,revokedAt})=>({id,familyId,expiresAt,lastSeenAt,revokedAt:revokedAt??null}));
+  const devicesBefore=JSON.stringify(deviceStatus());
   const count=s.jobs.length,result=update(s);
   if(write){
    const ledger=s.ledgers[f.id],used=ledger.used-before.used,reserved=ledger.reserved-before.reserved;
@@ -56,6 +58,8 @@ export class FamilyDirectory {
     if(job.familyId!==f.id||!uuid(job.id))throw Error('JOB_OWNER_MISMATCH');
     tx.create(this.root+'/jobs/'+job.id,{familyId:f.id});
    }
+   const devices=deviceStatus();
+   if(JSON.stringify(devices)!==devicesBefore)tx.set(this.path(f.id)+'/metadata/devices',{devices});
    delete s.betaScopes;
    await writeWorkspace(tx,loaded,art);
   }

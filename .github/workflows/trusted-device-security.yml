@@ -24,3 +24,5 @@ jobs:
         run: node --import tsx tests/trusted-devices.test.ts
       - name: Browser-session renewal and paid POST idempotency
         run: node --import tsx tests/session-client.test.ts
+      - name: Private family beta isolation and authorization
+        run: node --import tsx --test tests/beta-*.test.ts

@@ -2,11 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {FamilyDirectory} from '../server/beta/store';
 import {FixtureDocuments} from '../server/beta/documents';
-import {closedPolicy,createFamily,platformMode,validateBeta,type BetaConfig} from '../server/beta/model';
+import {closedPolicy,createFamily,platformMode,validateBeta} from '../server/beta/model';
 
-export const fixtureConfig:BetaConfig={environment:'synthetic',hubOrigin:'https://workshop.example',ownerActivation:'private-family-beta-v1',
- administrator:{audience:'/projects/123/global/backendServices/456',subject:'test-owner',verifier:{salt:'a'.repeat(32),digest:'a'.repeat(64)}},
- operatorContact:'operator@example.invalid',providerEvidence:[]};
+import {fixtureConfig} from './beta-fixture';
 test('two invited workspaces and unmapped household retain independent records',async()=>{
  const db=new FixtureDocuments(),d=new FamilyDirectory(db,fixtureConfig);
  const a=createFamily('adult-a'),b=createFamily('adult-b');
