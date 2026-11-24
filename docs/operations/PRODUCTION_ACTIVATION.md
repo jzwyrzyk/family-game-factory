@@ -28,6 +28,16 @@ Existing owner credentials can query at most 501 projected log entries for each 
 
 Review the fresh observation before the separate 5% canary. Promotion still requires a candidate-specific, authorized conversation result and error review; a status GET or a request routed to the baseline is insufficient. Keep provider calls within existing approvals and spending controls, and do not automatically retry uncertain paid requests. The observer neither dispatches traffic changes nor proves pending work is drained or required saved games survive the later frontend cutover.
 
+## Observing the November 23 Coach canary
+
+The [canary receipt](../../DELIVERY-STATE.md) records baseline95/candidate5 under main `2765dc042bf8760e2b930b0f83f6759c63429a95` and successful release run45292002476. The earlier stage observer remains an immutable historical helper and intentionally stops after this main/traffic change.
+
+Use the supplied checksum-pinned [canary observation handoff](../../scripts/ops/handoffs/coach-canary-observe-20261123.sh) for the next owner read. It reuses unchanged runtime/request and release inspectors, verifies the exact main before/after and the observed Coach allocation, and reports the Gateway's current single-serving baseline/image/configuration for the next release intent. It emits sanitized explicit runtime settings and bounded request metadata, never messages, secret payloads or credentials. Keep its private receipt. A full query limit is marked; the request view covers two hours and returns at most the last 30 chat POSTs. Missing candidate requests, unknown settings or a successful HTTP status alone do not establish functional acceptance.
+
+Use the existing authenticated Adult profile and approved allowance for the bounded conversation check, keeping Build separate. Match a successful actual reply to the candidate's completion-request metadata; a reply served by the baseline cannot clear candidate acceptance. Do not automatically repeat an uncertain paid request. Review any errors before a separate promotion intent. The retained baseline and owner recovery permissions support the existing controller's traffic-only rollback if needed; this read-only handoff never invokes apply, promotion or rollback.
+
+The owner subsequently reported actual replies mixed with disconnects. The `2026-11-24T00:13:56.156152Z` observation recorded in [delivery state](../../DELIVERY-STATE.md) attributes both successful completion/Gateway pairs to the candidate and three failed pairs to the retained baseline. Two earlier Gateway-only failures remain unattributed. Use that bounded real-conversation evidence for the separate promotion review; do not count readiness GETs as model success or describe the failing baseline as a proven healthy fallback. Prioritize the Coach promotion before the prepared Gateway stage, then obtain fresh post-transition evidence. No additional paid retry is needed to repeat the already observed canary check.
+
 ## What is known, and what still needs a fresh read
 
 | Evidence | Scope and limit |

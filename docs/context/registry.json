@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T23:22:55.298Z",
-      "sourceDigest": "c75735793688b7ad4d4e57b0b3f8bdc8076992251610ba4140d99cf41111b4ae",
+      "reviewedAt": "2026-11-24T00:16:12.182Z",
+      "sourceDigest": "ac18d7e8a939909359896c0eb06405be1e8fe44442826b93018d37303e7b137e",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded successful owner stage observation and RETIRED zero-traffic lifecycle; prepared the same pinned Coach candidate for baseline95/candidate5 using the existing release controller and recovery route.",
+      "reviewReason": "Recorded owner-confirmed real replies and candidate 200/baseline 503 request pairs, retained unattributed Gateway failures and small-sample limits, and prepared Coach promotion ahead of the Gateway stage without changing release controls or spending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
