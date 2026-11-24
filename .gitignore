@@ -8,6 +8,12 @@ dist/
 *.key
 .factory-deployment/
 **/__pycache__/
+ci-build.tar
+ci-build.json
+ci-plan.json
+ci-reuse.json
+ci-receipts/
+validation-evidence.json
 
 # Local output from the production request-evidence client.
 /diagnostics-output/

@@ -1,5 +1,7 @@
 # jems documentation map
 
+CI and validation: [architecture, complete workflow audit, coverage, benchmarks and evidence reuse](evidence/README.md#ci-architecture-and-performance).
+
 Start with the canonical references below. Feature documents remain the detailed contracts; this index keeps them discoverable without copying all of their content into an engineering handbook.
 
 The current four-experience release is consolidated in [PR134](https://github.com/jzwyrzyk/family-game-factory/pull/134). Its scope combines the Bubble Gum, Mining, Factory and first-learner Coding contracts below with shared navigation, profile settings, reading and Notifications. Source-PR histories are preserved; read delivery state for the current integration gates and release evidence.

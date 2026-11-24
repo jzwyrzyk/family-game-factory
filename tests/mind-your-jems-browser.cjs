@@ -7,6 +7,7 @@ const {start}=require('./browser-server.cjs');
 const {createJourney}=require('./mind-your-jems-fixture.cjs');
 const {createReview}=require('./mind-your-jems-review.cjs');
 const {exploreWelcome}=require('./studio-entry.cjs');
+const {selectScenarios}=require('./browser-scenarios.cjs');
 
 const devices=[
  {name:'desktop',viewport:{width:1280,height:900},touch:false,mobile:false,motion:'reduce'},
@@ -530,11 +531,18 @@ async function recordGameplay(browser,base,review){
   await page.waitForTimeout(700);await journey.activate(arcade.locator('[data-myj="continue"]'));
   journey.state.status='ready';await journey.until(()=>journey.ready(),'recorded build is ready',{step:250,limit:16000});await page.waitForTimeout(1000);
   const video=page.video();await journey.finish();const filename='mind-your-jems-gameplay.webm';await video.saveAs(path.join(review.directory,filename));
+  // saveAs retains the original random-named recording. The named review file
+  // is complete now; delete only that duplicate, preserving failures as-is.
+  await video.delete();
   review.manifest.video={file:filename,viewport:device.viewport,motion:'normal',source:'real browser movement, collection, bank, held spill, unheld fall and retry; mocked build statuses'};
  }catch(error){await journey.context.close();throw error;}
 }
 
 (async()=>{
+ const selected=selectScenarios(devices,process.env.MYJ_DEVICES,'MYJ_DEVICES').filter(device=>
+  // Recovery fixtures intentionally start outside a fully loaded layout.
+  (process.env.MYJ_LAYOUT_ONLY!=='1'||!device.recoveryTerminal&&!device.profileReset));
+ assert.ok(selected.length,'MYJ_DEVICES must include a scenario compatible with MYJ_LAYOUT_ONLY');
  const server=start(),options={headless:true,args:['--no-sandbox']};
  await new Promise(resolve=>server.once('listening',resolve));
  // Pin renderer to the same Playwright Chromium in local acceptance and CI.
@@ -543,11 +551,6 @@ async function recordGameplay(browser,base,review){
  let browser,review;
  try{
   browser=await chromium.launch(options);review=await createReview(browser);
-  const requested=process.env.MYJ_DEVICES?.split(','),selected=devices.filter(device=>
-   (!requested||requested.includes(device.name))&&
-   // Recovery fixtures intentionally start outside a fully loaded layout.
-   (process.env.MYJ_LAYOUT_ONLY!=='1'||!device.recoveryTerminal&&!device.profileReset));
-  assert.ok(selected.length,'MYJ_DEVICES must name a supported viewport');
   const failures=[];
   for(const device of selected){
    review.manifest.viewports.push(device);const previousContexts=new Set(browser.contexts());let journey;

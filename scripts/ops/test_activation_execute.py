@@ -16,10 +16,13 @@ from test_production_activation import fixture
 
 
 FROZEN_ACTIVATION_INPUTS = {
+    'scripts/ops/release.py': (Path(__file__).with_name('fixtures') / 'activation-release-controller.py').read_bytes(),
     'ops/compatibility.json': b'{}\n',
     'ops/release.json': b'{}\n',
     '.github/workflows/jems-cloud-run-release.yml': (
         Path(__file__).with_name('fixtures') / 'activation-release-workflow.yml').read_bytes(),
+    '.github/workflows/test.yml': (
+        Path(__file__).with_name('fixtures') / 'activation-test-workflow.yml').read_bytes(),
 }
 
 
@@ -213,8 +216,8 @@ class Preparation(unittest.TestCase):
         self.assertTrue(FROZEN_ACTIVATION_INPUTS.keys() <= e.SOURCE_HASHES.keys())
         for path, expected in e.SOURCE_HASHES.items():
             # Preserve the originally approved activation bytes. Later release
-            # intents and the read-only observation mode cannot authorize a
-            # replay of the historical IAM activation executor.
+            # intents, read-only observation mode and sharded Arcade cannot
+            # authorize a replay of the historical IAM activation executor.
             data = FROZEN_ACTIVATION_INPUTS[path] if path in FROZEN_ACTIVATION_INPUTS else (e.review.ROOT / path).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(), expected, path)
 
@@ -234,6 +237,16 @@ class SourceGate(unittest.TestCase):
                         with self.assertRaisesRegex(SetupError, 'Reviewed workflow or access proof source changed'):
                             e.source_gate('c' * 40, 'c' * 40)
                         (root / path).write_bytes(original)
+
+                # Exercise the actual replacement policy, not just malformed
+                # test data: this CI redesign must not inherit the old IAM
+                # activation approval or refresh its reviewed source pins.
+                path = '.github/workflows/test.yml'
+                current_workflow = (Path(__file__).resolve().parents[2] / path).read_bytes()
+                self.assertNotEqual(current_workflow, FROZEN_ACTIVATION_INPUTS[path])
+                (root / path).write_bytes(current_workflow)
+                with self.assertRaisesRegex(SetupError, 'Reviewed workflow or access proof source changed'):
+                    e.source_gate('c' * 40, 'c' * 40)
 
 
 if __name__ == '__main__': unittest.main()

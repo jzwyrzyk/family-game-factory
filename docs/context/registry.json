@@ -115,7 +115,8 @@
     "docs/bubble-gum-builders/*.md",
     "docs/development/*.md",
     "infra/nonproduction/*.md",
-    "docs/development/evidence/*.md"
+    "docs/development/evidence/*.md",
+    "docs/evidence/README.md"
   ],
   "areas": [
     {
@@ -867,13 +868,14 @@
         "tests/**",
         "tools/**",
         "scripts/verify-brand-assets.mjs",
-        "scripts/tests/verify-pal-assets.test.mjs"
+        "scripts/tests/verify-pal-assets.test.mjs",
+        "scripts/ci/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T15:16:23.334Z",
-      "sourceDigest": "8f14843fdeba8eae8a2148870a621613d7eac86cbb58f86053816ee833178135",
+      "reviewedAt": "2026-11-24T15:28:44.106Z",
+      "sourceDigest": "37ec858adb0679161c9ad349cbfe1fa8109e56b5155ad294d039f245d5555cec",
       "reviewOutcome": "updated",
-      "reviewReason": "Applied and reviewed the full Arcade receipt adapter: exact PR merge parents/tree, main-owned CI policy, complete suite commands and hosted jobs, archive digest and expiration;112 environment tests and6 smoke tests pass. Derived preview bytes and deployed acceptance remain separate.",
+      "reviewReason": "Reconciled merged PR154 CI source with DEV/TEST receipt verification and retained exact main policy comparison, all96 commands,112 environment/6 browser-contract tests and99 CI tests; no deployed acceptance is inferred.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1035,6 +1037,13 @@
           "reviewOutcome": "updated",
           "reviewReason": "Integrated PR120 fixture correction 79ccb6f while preserving the Actions first-paint fix and all product source. Full combined unit passes 486/486; component notebook/workspace/backup 60/60 and art 24/24, build/typecheck/syntax checks pass. Stronger draft, compensation and legacy-art recovery assertions remain; Chromium is launch-blocked and corrected hosted browser gates are pending.",
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
+        },
+        {
+          "reviewedAt": "2026-11-24T03:54:39.791Z",
+          "sourceDigest": "577031884d07b5447321967f767506857e88cdb3f0d6817369986ee6e880c1cd",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed observed thirteen-shard coverage, bounded scheduling adjustment and corrected performance reporter cancellation accounting: a deliberately cancelled run remains cancelled while all failed aggregates remain visible. Guide records actual first hosted pass, queue delays, runner increase, artifact growth and byte-day reduction, preserving all failed/cancelled history.",
+          "sourceCommit": "3af84756050c0bb4dbb63ee47a2e8835183cfc68"
         }
       ]
     },
@@ -1049,7 +1058,8 @@
         "docs/mind-your-jems/*.md",
         "docs/bubble-gum-builders/*.md",
         "docs/development/*.md",
-        "infra/nonproduction/*.md"
+        "infra/nonproduction/*.md",
+        "docs/evidence/README.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -1068,10 +1078,10 @@
         "infra/nonproduction/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T15:16:23.842Z",
-      "sourceDigest": "10c5b26ae438243ac6b9558acf12e87ced51f3813ba36c80e981813df929ecbd",
+      "reviewedAt": "2026-11-24T15:28:44.514Z",
+      "sourceDigest": "4e0ef0d0db1c7ad336fd6c9e40e219559605bec175468142615cb03ae2ce5690",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated the prior compatibility patch as actual disabled DEV/TEST controller source, with candidate rechecks bound to CI evidence. Recorded112 Python and6 JS checks and retained unmerged main, unprovisioned cloud and missing live acceptance limits.",
+      "reviewReason": "Merged approved PR154 protected main into the compatibility branch, preserving PR161 completed cutover and all acceptance limitations alongside the disabled DEV/TEST source and actual112 environment/6 JavaScript/234 operations local results.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1247,6 +1257,20 @@
           "reviewOutcome": "updated",
           "reviewReason": "Added exact PR120 hosted failure evidence and narrow fixture corrections on integration base 2ccd585, preserving previous combined and Actions synchronization entries. Recorded full combined unit 486/486, scoped local verification and browser launch limitation. Hosted reruns and the separate baseline Pal decode issue remain unresolved; no merge or deployment is claimed.",
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
+        },
+        {
+          "reviewedAt": "2026-11-24T03:54:40.183Z",
+          "sourceDigest": "ac5ef10ca3de7dba141f3970d9585fee552398894c365e6996b74b214dcbe2cf",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded passing initial hosted Arcade45321205281 and measured55.27percent elapsed reduction with49.13 runner-minutes and explicit storage tradeoffs. Updated bounded concurrency10 based on observed second-wave queueing; initial Bubble Gum review still running. No production workflow or permission change and merge/activation remain held.",
+          "sourceCommit": "3af84756050c0bb4dbb63ee47a2e8835183cfc68"
+        },
+        {
+          "reviewedAt": "2026-11-24T03:35:44.656Z",
+          "sourceDigest": "181785b1cc9ec3bd8de726a6a289600718f744e7ec9df2c007bbbae47ba98268",
+          "reviewOutcome": "updated",
+          "reviewReason": "Restricted reflected dispatch revisions to supported public selector formats and five recorded historical names, retained service-wide platform revision attribution, and recorded the verified hosted fixture download in the delivery ledger.",
+          "sourceCommit": "2c4751611cbd40ef04a85432845cd260528f5a56"
         }
       ]
     },
@@ -1269,10 +1293,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T03:47:40.048Z",
-      "sourceDigest": "62b1bbf08af6269a0c8224748b3e9ad2d114b84dc25790e4677154664f3a8c54",
+      "reviewedAt": "2026-11-24T15:28:44.842Z",
+      "sourceDigest": "301da98bf29c55deca7afdcb1228c19ca369ef3595ba17ceb53f41b188039e53",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered environment source and infrastructure routing with current contracts and evidence; updated AGENTS, Project retrieval, maintenance and PR acceptance instructions without weakening existing review checks.",
+      "reviewReason": "Unioned CI evidence and DEV/TEST documentation routing and PR-template maintenance obligations; preserved current canonical contracts, historical evidence and explicit approval distinctions without weakening source-review coverage.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

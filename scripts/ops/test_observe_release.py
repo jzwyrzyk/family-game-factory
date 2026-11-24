@@ -78,6 +78,25 @@ class ObservationTests(unittest.TestCase):
                 f.gateway["traffic"] = f.gateway["trafficStatuses"] = [release.traffic_target(n, p) for n, p in allocation]
                 self.assertEqual(next(r for r in reader.observe(f, f.intent) if r["service"] == "factory-gateway")["intent_state_verified"], operation)
 
+    def test_acceptance_route_requires_exact_tag_and_preserved_allocation(self):
+        f = Fixture(); candidate = release.revision_name(f.intent)
+        active = [release.traffic_target(f.intent['baseline'], 95), release.traffic_target(candidate, 5)]
+        tag = dict(release.traffic_target(candidate, 0), tag='jems-test-'+candidate.rsplit('-r-',1)[1])
+        f.intent['operation'] = 'acceptance-route-add'
+        f.gateway['traffic'] = f.gateway['trafficStatuses'] = active + [tag]
+        reader.observe(f, f.intent)
+        f.gateway['traffic'] = f.gateway['trafficStatuses'] = active
+        with self.assertRaisesRegex(access.AccessError, 'TAG_MISMATCH'): reader.observe(f, f.intent)
+        f.intent['operation'] = 'acceptance-route-remove'
+        reader.observe(f, f.intent)
+        f.gateway['traffic'] = f.gateway['trafficStatuses'] = active + [tag]
+        with self.assertRaisesRegex(access.AccessError, 'TAG_MISMATCH'): reader.observe(f, f.intent)
+        f.intent['operation'] = 'promote'
+        f.gateway['traffic'] = f.gateway['trafficStatuses'] = [release.traffic_target(candidate,100),tag]
+        with self.assertRaisesRegex(access.AccessError, 'TAG_MISMATCH'): reader.observe(f, f.intent)
+        f.gateway['traffic'] = f.gateway['trafficStatuses'] = [release.traffic_target(candidate,100)]
+        reader.observe(f,f.intent)
+
     def test_changed_generation_traffic_configuration_or_revision_blocks(self):
         changes = [lambda f: f.gateway.update(observedGeneration="2"),
                    lambda f: f.gateway.update(reconciling=True),
