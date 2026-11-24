@@ -1126,10 +1126,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T21:04:00.637Z",
-      "sourceDigest": "8b90caceaf316bd524c2af26e758dec86f03eb531bf59bf80f662f90d445477e",
+      "reviewedAt": "2026-11-24T23:17:42.895Z",
+      "sourceDigest": "91c85376d81627f229a97f6c31ea2ff914b7fe9d68e2180c5d309cca466a9c90",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded source-specific local trials, standalone artifact hashes and downloaded clean hosted image evidence; preserved superseded run scope, current main production records and all external activation gates.",
+      "reviewReason": "Reviewed manual main-only publisher ordering, selected candidate SHA, actual packaged-byte and digest binding, and separate isolated smoke in the publisher handoff.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

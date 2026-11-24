@@ -1,5 +1,9 @@
 # Rebuild the accepted sandbox contract — manual GHCR publication
 
+## November 26 premium candidate
+
+Issue #167 prepares a separate draft rotation to public candidate `d1a0996edd3f2e70b64c41a1e9edc1aeb676b8f4`. Refresh the pin and its offline test to the final integrated application source after review. Match it to the private worker and compatible gateway/preview image inputs. The main-only publisher verifies ancestry, compares actual package bytes and runs both legacy and premium desktop/touch protocols against the image before push. After pulling the immutable digest, it compares the image ID and source to the verified package receipt. Retain the publication JSON, package hashes, GitHub run/attempt and artifact digest in the release record. GitHub artifact retention is 30 days. These are package and publication receipts. Runtime acceptance requires a separate authorized gVisor smoke with cleanup. Hold publication and release until reviewed. [Budget and activation PR](https://github.com/jzwyrzyk/family-game-factory/pull/168)
+
 ## Current handoff — production image accepted; adult activation next
 
 Corrected production [smoke 44855232144](https://github.com/family-game-factory-lab/family-game-factory-worker/actions/runs/44855232144) passed on November 20, 2026, at **9:28:36 p.m. America/New_York** (`2026-11-21T02:28:36Z`). All nine required jobs passed: the actual isolated gVisor/no-egress/full sandbox job and all eight hosted application regression shards. The owner also supplied `SMOKE_STATUS=PASSED`, `CLEANUP_STATUS=VERIFIED`, `SMOKE_AUTH_STATUS=VERIFIED`, `SMOKE_CANCEL_STATUS=NOT_NEEDED`, and `FINAL_STATUS=SUCCESS`. [Delivery state](../../DELIVERY-STATE.md) records the complete identities and evidence scope.
