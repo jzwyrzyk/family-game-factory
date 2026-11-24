@@ -863,10 +863,10 @@
         "scripts/ci/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T15:30:12.422Z",
+      "reviewedAt": "2026-11-24T15:35:33.859Z",
       "sourceDigest": "8fdbe2887987cce7df71db5ec9f8a5be58bd064502218c066a50ae412a09a6fb",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed118 integrated CI contracts including actual installed numeric-only reporting configuration; exact authenticated source/artifact/command/expiry gates, dependency shadow and synchronous cancellation assertions remain intact.",
+      "reviewReason": "Recorded actual protected-main full validation and preserved PR157 first-attempt documentation failure; executable selection remains advisory and approval pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1100,10 +1100,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T15:27:29.450Z",
-      "sourceDigest": "baa82686b0e559adf583ce7ab5ac34f1581df488a2448bd485c814f21f6ea4c5",
+      "reviewedAt": "2026-11-24T15:35:34.240Z",
+      "sourceDigest": "2b99064682418d30b12c2ac6a27fa0d8f0c4f85e95b2e700203df404a5b56b94",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded explicit owner-approved PR154 merge and identical tested/main tree,14 passing first-attempt workflows with595second/52.02runner-minute Arcade sample, and pending integrated main validation. Reviewed PR157 plan-only privilege delta,239 operations tests including acceptance-route evidence failures, expiry and independent activation approval.",
+      "reviewReason": "Reviewed added installed performance-baseline contract and current operation coverage; delivery records main success, unactivated PR157, unchanged cutover gaps, and failed stale-review attempt.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
