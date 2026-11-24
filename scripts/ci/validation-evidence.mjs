@@ -23,8 +23,11 @@ const MAX_ARCHIVE_BYTES = 256 * 1024 * 1024;
 // Normative/security documents stay in the identity even when PR impact is
 // documentation-only: changed requirements invalidate earlier acceptance.
 const evidenceNarrative = new Set(['DELIVERY-STATE.md']);
-const operationalRecords = new Set(['ops/release.json', 'ops/compatibility.json']);
+const operationalRecords = new Set(['ops/release.json', 'ops/compatibility.json', 'ops/ci-performance.json']);
 const identityKeys = ['applicationSha256', 'testPolicySha256', 'dependenciesSha256', 'operationsSha256', 'validationSha256'];
+// Manual full validation on main can refresh evidence without an empty source
+// commit. Both event types still require every full-regression job and receipt.
+const trustedEvent = run => ['push', 'workflow_dispatch'].includes(run.event) && run.head_branch === 'main';
 function requireThat(condition, message) { if (!condition) throw new Error(message); }
 export function sha256(bytes) { return `sha256:${createHash('sha256').update(bytes).digest('hex')}`; }
 export function canonical(value) {
@@ -103,7 +106,7 @@ export function verifyEvidence(receipt, { identity, sourceIdentity, run, jobs, r
   requireThat(run.repository?.full_name === REPOSITORY && run.repository?.id === REPOSITORY_ID && run.head_repository?.full_name === REPOSITORY && run.head_repository?.id === REPOSITORY_ID, 'Untrusted source repository');
   requireThat(run.id === receipt.runId && run.run_attempt === 1 && receipt.runAttempt === 1, 'Wrong run or rerun attempt');
   requireThat(!revokedRunIds.includes(run.id), 'Evidence run revoked');
-  requireThat(run.path === WORKFLOW && run.event === 'push' && run.head_branch === 'main', 'Evidence must be the approved main-push workflow');
+  requireThat(run.path === WORKFLOW && trustedEvent(run), 'Evidence must be the approved full main workflow');
   requireThat(run.status === 'completed' && run.conclusion === 'success', 'Evidence run did not succeed');
   requireThat(shaPattern.test(receipt.sourceSha) && run.head_sha === receipt.sourceSha, 'Run source mismatch');
   requireThat(receipt.configurationSha256 === FIXTURE_CONFIGURATION, 'Fixture runtime configuration mismatch');
@@ -130,7 +133,7 @@ export function verifyEvidence(receipt, { identity, sourceIdentity, run, jobs, r
   checkArtifact(buildArtifact, buildArchive, `arcade-build-${receipt.sourceSha}-1`);
   requireThat(sha256(buildBytes) === receipt.buildSha256, 'Build payload digest mismatch');
   verifySuites(receipt, requiredSuites);
-  return { reusable: true, scope: receipt.scope, sourceSha: receipt.sourceSha, candidateSha: identity.sourceSha, runId: run.id, runAttempt: 1, buildSha256: receipt.buildSha256, receiptArtifactId: receiptArtifact.id, buildArtifactId: buildArtifact.id, expiresAt: new Date(Math.min(started + MAX_AGE_MS, Date.parse(receiptArtifact.expires_at), Date.parse(buildArtifact.expires_at))).toISOString(), firstAttemptPassed: true, releaseAuthorized: false };
+  return { reusable: true, scope: receipt.scope, sourceSha: receipt.sourceSha, candidateSha: identity.sourceSha, runId: run.id, runAttempt: 1, workflowEvent: run.event, buildSha256: receipt.buildSha256, receiptArchiveSha256: receiptArtifact.digest, buildArchiveSha256: buildArtifact.digest, manifestSha256: receipt.manifestSha256, validationSha256: identity.validationSha256, receiptArtifactId: receiptArtifact.id, buildArtifactId: buildArtifact.id, expiresAt: new Date(Math.min(started + MAX_AGE_MS, Date.parse(receiptArtifact.expires_at), Date.parse(buildArtifact.expires_at))).toISOString(), firstAttemptPassed: true, releaseAuthorized: false };
 }
 
 async function github(path, token, binary = false) {
@@ -171,7 +174,7 @@ export async function verifyHostedEvidence({ repoRoot, candidateSha, runId, rece
     github(`${prefix}/runs/${runId}`, token), allJobs(runId, token),
     github(`${prefix}/artifacts/${receiptArtifactId}`, token), github(`${prefix}/artifacts/${buildArtifactId}`, token),
   ]);
-  requireThat(run.repository?.full_name === REPOSITORY && run.event === 'push' && run.head_branch === 'main' && run.path === WORKFLOW && run.status === 'completed' && run.conclusion === 'success' && run.run_attempt === 1 && shaPattern.test(run.head_sha), 'Run is not eligible for reuse');
+  requireThat(run.repository?.full_name === REPOSITORY && trustedEvent(run) && run.path === WORKFLOW && run.status === 'completed' && run.conclusion === 'success' && run.run_attempt === 1 && shaPattern.test(run.head_sha), 'Run is not eligible for reuse');
   git(repoRoot, ['merge-base', '--is-ancestor', run.head_sha, candidateSha]);
   const identity = computeSourceIdentity(repoRoot, candidateSha), sourceIdentity = computeSourceIdentity(repoRoot, run.head_sha);
   for (const key of identityKeys) requireThat(identity[key] === sourceIdentity[key], `${key} differs from validated source`);
@@ -217,7 +220,7 @@ export async function discoverExactSourceEvidence({ repoRoot, sourceSha, candida
   requireThat(token && shaPattern.test(sourceSha) && Number.isSafeInteger(runId) && runId > 0, 'Invalid exact-source evidence request');
   const prefix = `/repos/${REPOSITORY}/actions`;
   const run = await github(`${prefix}/runs/${runId}`, token);
-  requireThat(run.head_sha === sourceSha && run.run_attempt === 1 && run.repository?.full_name === REPOSITORY && run.path === WORKFLOW && run.event === 'push' && run.head_branch === 'main' && run.status === 'completed' && run.conclusion === 'success', 'Run is not successful exact-source evidence');
+  requireThat(run.head_sha === sourceSha && run.run_attempt === 1 && run.repository?.full_name === REPOSITORY && run.path === WORKFLOW && trustedEvent(run) && run.status === 'completed' && run.conclusion === 'success', 'Run is not successful exact-source evidence');
   const listing = await github(`${prefix}/runs/${runId}/artifacts?per_page=100`, token);
   requireThat(Array.isArray(listing.artifacts) && listing.total_count === listing.artifacts.length, 'Incomplete artifact inventory');
   const find = name => {
@@ -239,18 +242,33 @@ export async function discoverExactSourceEvidence({ repoRoot, sourceSha, candida
 
 export async function findReusableEvidence({ repoRoot, base, head, token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN }) {
   requireThat(shaPattern.test(base) && shaPattern.test(head), 'Exact base and head required');
-  const running = readFileSync(fileURLToPath(import.meta.url));
-  requireThat(sha256(running) === sha256(git(repoRoot, ['show', `${base}:scripts/ci/validation-evidence.mjs`])), 'Evidence policy is not the trusted base version');
+  git(repoRoot, ['merge-base', '--is-ancestor', base, head]);
+  // The copied verifier must import only the adjacent, reviewed base modules.
+  // Checking this file alone would leave its classifier/command parser mutable.
+  for (const file of ['validation-evidence.mjs', 'classify-impact.mjs', 'suites.mjs']) {
+    const running = readFileSync(fileURLToPath(new URL(`./${file}`, import.meta.url)));
+    requireThat(sha256(running) === sha256(git(repoRoot, ['show', `${base}:scripts/ci/${file}`])), `Evidence policy is not the trusted base version: ${file}`);
+  }
   const classification = classifyImpact({ cwd: repoRoot, base, head, event: 'pull_request' });
-  requireThat(classification.mode === 'release-intent' && classification.trustedPolicy && classification.requiresEvidenceReuse, 'Only strictly equivalent operational transitions may reuse application evidence');
+  requireThat(['release-intent', 'documentation'].includes(classification.mode) && classification.trustedPolicy, 'Only strictly equivalent documentation or operational transitions may reuse application evidence');
+  // This function establishes equivalence, not permission to omit a main gate.
+  // The trusted prepare caller separately verifies protected-main event identity
+  // and explicit migration opt-in. Normative documentation still changes the
+  // source identity, so only delivery narration/review metadata can actually reuse.
   requireThat(token, 'GitHub read token unavailable');
   const policy = loadSuitePolicy(repoRoot);
-  const listing = await github(`/repos/${REPOSITORY}/actions/workflows/test.yml/runs?branch=main&event=push&status=success&per_page=5`, token);
+  const listing = await github(`/repos/${REPOSITORY}/actions/workflows/test.yml/runs?branch=main&status=success&per_page=20`, token);
   requireThat(Array.isArray(listing.workflow_runs), 'Invalid evidence candidate inventory');
+  // Narrow runs never mint full receipts. Look through a bounded release
+  // sequence without chaining their reuse claims or accepting older evidence.
   const failures = [];
   for (const run of listing.workflow_runs) {
-    if (run.run_attempt !== 1 || Date.now() - Date.parse(run.run_started_at) > MAX_AGE_MS) continue;
-    try { return await discoverExactSourceEvidence({ ...policy, repoRoot, sourceSha: run.head_sha, candidateSha: head, runId: run.id, token }); }
+    if (!trustedEvent(run) || run.run_attempt !== 1 || Date.now() - Date.parse(run.run_started_at) > MAX_AGE_MS) continue;
+    try {
+      requireThat(shaPattern.test(run.head_sha), 'Invalid historical source');
+      git(repoRoot, ['merge-base', '--is-ancestor', run.head_sha, base]);
+      return await discoverExactSourceEvidence({ ...policy, repoRoot, sourceSha: run.head_sha, candidateSha: head, runId: run.id, token });
+    }
     catch (error) { failures.push({ runId: run.id, reason: error.message }); }
   }
   return { reusable: false, releaseAuthorized: false, reason: 'No recent complete authenticated equivalent full regression; run full.', candidates: failures };

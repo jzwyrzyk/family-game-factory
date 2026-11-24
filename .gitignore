@@ -11,6 +11,7 @@ dist/
 ci-build.tar
 ci-build.json
 ci-plan.json
+ci-dependency-shadow.json
 ci-reuse.json
 ci-receipts/
 validation-evidence.json

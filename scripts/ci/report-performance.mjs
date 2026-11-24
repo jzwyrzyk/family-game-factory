@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { parsePerformanceBaseline } from './classify-impact.mjs';
 
 const seconds = (start, end) => {
   if (!start || !end) return null;
@@ -187,7 +188,7 @@ function main(argv) {
   const args = {};
   for (let index = 0; index < argv.length; index += 2) {
     const key = argv[index];
-    if (!['--repository', '--runs', '--out', '--baseline', '--summary', '--selection'].includes(key) || !argv[index + 1] || args[key]) throw new Error('Usage: report-performance.mjs --repository OWNER/REPO --runs ID[,ID] --out FILE [--baseline FILE] [--summary FILE] [--selection FILE]');
+    if (!['--repository', '--runs', '--out', '--baseline', '--baseline-config', '--summary', '--selection'].includes(key) || !argv[index + 1] || args[key]) throw new Error('Usage: report-performance.mjs --repository OWNER/REPO --runs ID[,ID] --out FILE [--baseline FILE | --baseline-config FILE] [--summary FILE] [--selection FILE]');
     args[key] = argv[index + 1];
   }
   const repository = args['--repository'];
@@ -196,8 +197,12 @@ function main(argv) {
   if (!ids.length || ids.length > 100 || ids.some(id => !/^\d+$/.test(id)) || new Set(ids).size !== ids.length || !args['--out']) throw new Error('One to 100 unique numeric run IDs and --out are required');
   const api = endpoint => JSON.parse(execFileSync('gh', ['api', endpoint], { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 }));
   const runs = ids.map(id => collectRun(repository, id, api));
+  if (args['--baseline'] && args['--baseline-config']) throw new Error('Choose one performance baseline source');
+  const baseline = args['--baseline-config'] ? buildReport(repository,
+    parsePerformanceBaseline(readFileSync(args['--baseline-config'], 'utf8')).runIds.map(id => collectRun(repository, id, api)))
+    : args['--baseline'] ? JSON.parse(readFileSync(args['--baseline'], 'utf8')) : null;
   const report = buildReport(repository, runs, {
-    baseline: args['--baseline'] ? JSON.parse(readFileSync(args['--baseline'], 'utf8')) : null,
+    baseline,
     selection: args['--selection'] ? JSON.parse(readFileSync(args['--selection'], 'utf8')) : null,
   });
   mkdirSync(dirname(resolve(args['--out'])), { recursive: true });
