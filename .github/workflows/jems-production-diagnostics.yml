@@ -1,0 +1,111 @@
+name: Jems production request diagnostics
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: Cloud Run request log service
+        type: choice
+        options: [factory-gateway, factory-preview, factory-coach-private]
+        default: factory-gateway
+        required: true
+      revision:
+        description: Exact revision, or clear for a service-wide query
+        type: string
+        default: factory-gateway-r-eaf5effa06d031818f52
+      start_utc:
+        description: Inclusive UTC start (YYYY-MM-DDTHH:MM:SSZ)
+        type: string
+        required: true
+        default: '2026-11-24T02:19:00Z'
+      end_utc:
+        description: Exclusive UTC end, at most one hour after start
+        type: string
+        required: true
+        default: '2026-11-24T03:19:00Z'
+  schedule:
+    - cron: '37 * * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: jems-production-request-diagnostics
+  cancel-in-progress: false
+
+jobs:
+  evidence:
+    if: >-
+      github.repository == 'jzwyrzyk/family-game-factory' &&
+      github.repository_id == '1458033181' && github.repository_owner_id == '356692244' &&
+      github.ref == 'refs/heads/main' && github.ref_protected &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'schedule' && vars.JEMS_DIAGNOSTICS_HOURLY_ENABLED == 'true'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    environment: jems-production-diagnostics
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Select last settled UTC hour for the scheduled gateway query
+        if: github.event_name == 'schedule'
+        run: |
+          python3 - <<'PY'
+          from datetime import datetime, timedelta, timezone
+          import os
+
+          settled = datetime.now(timezone.utc) - timedelta(minutes=15)
+          end = settled.replace(minute=0, second=0, microsecond=0)
+          start = end - timedelta(hours=1)
+          with open(os.environ["GITHUB_ENV"], "a") as env:
+              print("INPUT_SERVICE=factory-gateway", file=env)
+              print("INPUT_REVISION=", file=env)
+              print(f"INPUT_START_UTC={start:%Y-%m-%dT%H:%M:%SZ}", file=env)
+              print(f"INPUT_END_UTC={end:%Y-%m-%dT%H:%M:%SZ}", file=env)
+          PY
+      - name: Validate diagnostic scope
+        id: scope
+        run: python3 scripts/ops/request_evidence.py validate
+      - name: Verify current main before requesting a Google credential
+        id: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_WORKFLOW_REF" = 'jzwyrzyk/family-game-factory/.github/workflows/jems-production-diagnostics.yml@refs/heads/main'
+          test "$RUNNER_ENVIRONMENT" = github-hosted
+          test "$GITHUB_WORKFLOW_SHA" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(gh api repos/jzwyrzyk/family-game-factory/git/ref/heads/main --jq '.object.sha')" = "$GITHUB_SHA"
+      - name: Obtain an ID token for the private diagnostics broker
+        id: auth
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2.1.13
+        with:
+          project_id: family-game-factory-jzw
+          workload_identity_provider: projects/1054529152893/locations/global/workloadIdentityPools/jems-github-diagnostics/providers/github-main
+          service_account: jems-github-log-reader@family-game-factory-jzw.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://jems-request-evidence-1054529152893.us-east5.run.app
+          id_token_include_email: true
+          create_credentials_file: false
+          export_environment_variables: false
+      - name: Read sanitized request evidence
+        if: >-
+          !cancelled() && steps.source.outcome == 'success' &&
+          (steps.auth.outcome == 'success' || steps.auth.outcome == 'failure')
+        env:
+          DIAGNOSTICS_ID_TOKEN: ${{ steps.auth.outcome == 'success' && steps.auth.outputs.id_token || '' }}
+        run: python3 scripts/ops/request_evidence.py query
+      - name: Retain the sanitized report
+        if: ${{ !cancelled() && (steps.scope.outcome == 'success' || steps.scope.outcome == 'failure') }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: jems-request-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: diagnostics-output/report.json
+          if-no-files-found: error
+          include-hidden-files: false
+          retention-days: 7

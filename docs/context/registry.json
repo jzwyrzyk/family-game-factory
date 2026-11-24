@@ -1068,10 +1068,10 @@
         "infra/nonproduction/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T04:09:39.866Z",
-      "sourceDigest": "5ca0ea940a1583b1af945f6c50b5bb56183ea0f3aa10a7808fbb89671713aac3",
+      "reviewedAt": "2026-11-24T04:25:50.315Z",
+      "sourceDigest": "3c14f2d785e7457d718048fc06ae6158e97cc2d8de30a920c79dcf40b09a2184",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed deployed DEV source comparisons to replace stale previews after reversions, recorded the owners approved 15 dollar fixture setup scope, and retained disabled activation until actual scoped access is verified.",
+      "reviewReason": "Reviewed the integration with main 2c47516 and retained PR153 diagnostics source and live-access limits. Reconciled both delivery receipts, recorded enforced restricted network access and pending Google sign-in, and kept nonproduction provisioning, AI activation, and the production cutover separate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

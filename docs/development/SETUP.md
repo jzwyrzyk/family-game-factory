@@ -10,6 +10,8 @@ The assessment started from main `28fe3311036f8ef9f3bfc623c522432499c08113`. Aut
 
 The current managed environment reports no outbound identities, secrets or runtime variables. `gcloud` is not installed. Installing a CLI would not create an authorized Google identity. No live project/IAM inventory or nonproduction provisioning is claimed. The existing restricted production WIF identities are not a bootstrap identity and must not be broadened to make this task easier.
 
+The owner subsequently authorized adding the five Console/browser hosts to this task's restricted network allowlist. The updated policy was observed enforced, and Console reached the Google sign-in page. User-controlled account sign-in remains pending; the network change establishes no Google identity or resource permissions.
+
 These are genuine additional-access/setup blockers. They do not prevent source preparation, contract tests, reviewed PR creation or architecture review. Do not ask the owner to paste credentials, tokens, private signing keys or Cloud Shell output into chat.
 
 ## Consolidated owner decisions

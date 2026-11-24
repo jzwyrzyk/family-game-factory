@@ -38,6 +38,10 @@ Use the existing authenticated Adult profile and approved allowance for the boun
 
 The owner subsequently reported actual replies mixed with disconnects. The `2026-11-24T00:13:56.156152Z` observation recorded in [delivery state](../../DELIVERY-STATE.md) attributes both successful completion/Gateway pairs to the candidate and three failed pairs to the retained baseline. Two earlier Gateway-only failures remain unattributed. Use that bounded real-conversation evidence for the separate promotion review; do not count readiness GETs as model success or describe the failing baseline as a proven healthy fallback. Prioritize the Coach promotion before the prepared Gateway stage, then obtain fresh post-transition evidence. No additional paid retry is needed to repeat the already observed canary check.
 
+## Gateway canary request attribution
+
+The [request-evidence investigation](PRODUCTION_DIAGNOSTICS.md) pins the November 23 local-time Gateway canary to its UTC start and candidate revision. Match the actual POST path and status, check every candidate 5xx in the same interval and retain the separate release observation for allocation. The request reader has its own account setup and acceptance criteria. A production release approval does not authorize those grants.
+
 ## Preparing the November 23 Gateway stage
 
 The owner completed the canary handoff at `2026-11-24T00:01:05.156354Z`; its receipt and fresh Gateway inputs are recorded in [delivery state](../../DELIVERY-STATE.md). Coach remained at 95/5, while that initial bounded request query contained no matching chat POSTs or status GETs. The later conversation and revision-specific request evidence above supersede that initial absence of functional evidence.
