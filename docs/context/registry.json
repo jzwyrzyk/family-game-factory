@@ -1102,10 +1102,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T16:24:25.380Z",
-      "sourceDigest": "8b40d6f6a46505a079fcaf8da1db4807bfc78d64d375aa5cd6caf06dc9c2b7c5",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Only the read-only performance comparison baseline changes to authoritative full main run45434168143 already recorded in delivery state; no test, release, runtime, identity or acceptance policy changes.",
+      "reviewedAt": "2026-11-24T16:30:59.216Z",
+      "sourceDigest": "3652880bff39fb358959f8fbdab540e0ef48ad769336f8e3dd2e16bb44423e5b",
+      "reviewOutcome": "updated",
+      "reviewReason": "Recorded completed protected-main documentation and reporting-only selections, downloaded exact reuse plans with unchanged expiry, actual runtime/runner totals and working automatic baseline report; kept failures, full fallback and unproven executable narrowing explicit.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
