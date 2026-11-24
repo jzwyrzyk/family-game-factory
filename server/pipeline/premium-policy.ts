@@ -38,7 +38,9 @@ export function requirePinnedPremium(job:Job,pilot?:PremiumPilot):PremiumApprova
    pin.fingerprint!==job.premiumPolicy.fingerprint)throw Error('MODEL_POLICY_CHANGED');
  return pilot.approval;
 }
-export function premiumReservation(pilot:PremiumPilot,ceiling:number){
+// Admission only. In-flight work and settlement use the job's persisted maxUnits.
+export function premiumReservation(pilot:PremiumPilot,ceiling:number|undefined){
+ if(typeof ceiling!=='number'||!Number.isSafeInteger(ceiling)||ceiling<1||ceiling>5_000_000)throw Error('MODEL_POLICY_UNAVAILABLE');
  const units=premiumJobReserve(pilot.approval);
  if(!Number.isSafeInteger(units)||units<1||units>ceiling)throw Error('SPENDING_CUTOFF');
  return units;

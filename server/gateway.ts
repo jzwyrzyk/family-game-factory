@@ -33,7 +33,7 @@ export interface GatewayConfig {
  repository:string;repositoryId:string;workflow:string;approvedSha:string;
  workerRepository?:string;workerRepositoryId?:string;workerWorkflow?:string;workerApprovedSha?:string;
  githubAppId:string;githubInstallationId:string;githubPrivateKey:string;githubPrivateKeyFile?:string;
- premiumApproval?:PremiumApproval;premiumWorkerApprovedSha?:string;
+ premiumApproval?:PremiumApproval;premiumWorkerApprovedSha?:string;premiumMaxJobMicroUsd?:number;
  approval:AgentApproval;maxJobMicroUsd:number;workspace:string;projectId?:string;artifactBucket?:string;localFile?:string;schedulerEmail?:string;
  /** Optional private identity-authenticated coach executor URL, never the OpenAI API URL. */
  coachPrivateOrigin?:string;
@@ -73,7 +73,7 @@ export async function createGateway(config:GatewayConfig){
  const repo=config.localFile?await FileRepository.open(config.localFile):new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace,config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,config.workspace):undefined);
  await reconcilePaidReceipts(repo);
  const agent={kind:'metered-api' as const,available:paidEnabled,generate:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}};
- const service=new JobService(repo,agent,{test:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}},{allowMock:false,maxUnits:config.maxJobMicroUsd,timeoutMs:900000,maxRetries:2,requireVerifiedParentPrivacy:!adult.enabled,adultPilotMode:adult.enabled,premiumPilot,premiumConfigured:!!config.premiumApproval,premiumUnavailable});
+ const service=new JobService(repo,agent,{test:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}},{allowMock:false,maxUnits:config.maxJobMicroUsd,premiumMaxJobMicroUsd:config.premiumMaxJobMicroUsd,timeoutMs:900000,maxRetries:2,requireVerifiedParentPrivacy:!adult.enabled,adultPilotMode:adult.enabled,premiumPilot,premiumConfigured:!!config.premiumApproval,premiumUnavailable});
  const privateWorker=Boolean(config.workerRepository||config.workerRepositoryId||config.workerWorkflow||config.workerApprovedSha);
  if(privateWorker&&(!config.workerRepository||!config.workerRepositoryId||!config.workerWorkflow||!config.workerApprovedSha||config.workerRepository===config.repository||config.repository!=='jzwyrzyk/family-game-factory'||config.repositoryId!=='1458033181'||config.approvedSha!=='dcb887e6a51ba000fda1ccc42b9d198f8b9895f9'||config.workerRepositoryId!=='1458899834'||!Number.isSafeInteger(Number(config.workerRepositoryId))||Number(config.workerRepositoryId)<1||config.workerRepository!=='family-game-factory-lab/family-game-factory-worker'||config.workerWorkflow!=='factory-private.yml'||config.workerApprovedSha.length!==40||![...config.workerApprovedSha].every(c=>'0123456789abcdef'.includes(c))))throw Error('PRIVATE_WORKER_CONFIG_REQUIRED');
  if(config.active&&!privateWorker)throw Error('PRIVATE_WORKER_REQUIRED_FOR_ACTIVATION');

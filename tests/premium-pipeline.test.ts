@@ -23,20 +23,21 @@ const legacy:AgentApproval={enabled:true,approvalId:'existing-approval',model:'l
 function settings(stage:ModelStage){
  const model=INITIAL_PREMIUM_MODELS[stage],astra=model==='gpt-6.2-astra';
  return {model,reasoningEffort:'high' as const,zdrApproved:true as const,priceReviewedOn:day,providerAccessReviewedOn:day,
-  maxInputTokens:stage==='review'?48000:20000,maxOutputTokens:astra?3000:2000,lowDetailImageTokens:4096,
+  maxInputTokens:{planning:40000,construction:48000,review:64000,repair:64000}[stage],maxOutputTokens:astra?24000:stage==='review'?8000:6000,lowDetailImageTokens:4096,
   inputUsdPerMillion:astra?8:2,outputUsdPerMillion:astra?40:10};
 }
 const approval:PremiumApproval={version:PREMIUM_POLICY_VERSION,enabled:true,approvalId:'synthetic-premium-approval',
+ images:{enabled:true,approvalId:'synthetic-art',model:'fixture-art',maxImages:2,maxMicroUsdPerImage:50000,priceReviewedOn:day,sheetFormat:'rgba8-png-grid-v1'},
  maxRepairAttempts:1,stages:{planning:settings('planning'),construction:settings('construction'),review:settings('review'),repair:settings('repair')}};
 const pilot={approval,workerSha};
 const agent={available:true,kind:'metered-api' as const,generate:async()=>{throw Error('NO_PAID_TRANSPORT_IN_TEST');}};
-const options={allowMock:false,maxUnits:1_000_000,timeoutMs:5000,maxRetries:2,adultPilotMode:true};
+const options={allowMock:false,maxUnits:120_000,premiumMaxJobMicroUsd:5_000_000,timeoutMs:5000,maxRetries:2,adultPilotMode:true};
 const gate={test:async()=>{throw Error('NO_EXTERNAL_SANDBOX_IN_TEST');}};
 async function setup(){
  const repo=new MemoryRepository(),service=new JobService(repo,agent,gate,{...options,premiumPilot:pilot});
  await repo.transaction(s=>{
   s.devices=[{id:child.deviceId,familyId,name:'fixture',secretHash:'a'.repeat(64),rotation:0,createdAt:Date.now()-1000,lastSeenAt:Date.now(),expiresAt:Date.now()+86400000}];
-  s.ledgers[familyId]={month:day.slice(0,7),allowance:1_000_000,used:0,reserved:0,paidEnabled:true};return true;
+  s.ledgers[familyId]={month:day.slice(0,7),allowance:5_000_000,used:0,reserved:0,paidEnabled:true};return true;
  });
  await grantAdultPilot(repo,{familyId,deviceId:child.deviceId,receipt:'synthetic-receipt',operatorConfirmedAdult:true,expiresAt:Date.now()+86400000});
  const grant=await repo.transaction(s=>beginAdultPilotSession(s,child));
@@ -72,7 +73,7 @@ test('only an unlocked adult can see the selected policy or reserve a job; ceili
  assert.equal((await service.readiness(child)).modelPolicy,undefined);
  await assert.rejects(service.submit(child,request),/ADULT_PILOT_ACCESS_REQUIRED/);
  await assert.rejects(service.submit(adult,{...request,premiumPolicy:pilot}),/INVALID_REQUEST/);
- const ceiling=new JobService(repo,agent,gate,{...options,maxUnits:premiumJobReserve(approval)-1,premiumPilot:pilot});
+ const ceiling=new JobService(repo,agent,gate,{...options,premiumMaxJobMicroUsd:premiumJobReserve(approval)-1,premiumPilot:pilot});
  assert.equal((await ceiling.readiness(adult)).modelPolicy?.activeVersion,null);
  await assert.rejects(ceiling.submit(adult,request),/SPENDING_CUTOFF/);
  const inaccessible=new JobService(repo,agent,gate,{...options,premiumConfigured:true,premiumUnavailable:true});
@@ -88,6 +89,46 @@ test('only an unlocked adult can see the selected policy or reserve a job; ceili
  const stopped=await service.cancel(adult,state.jobs[0].id);assert.equal(stopped.status,'cancelled');
  assert.equal((await repo.snapshot()).ledgers[familyId].used,0,'no paid claim took place');
 });
+test('only new premium admissions need a valid explicit ceiling and fresh approval',async()=>{
+ const {repo,service,adult}=await setup();
+ assert.equal(premiumJobReserve(approval),3_712_000);
+ const {jobId}=await service.submit(adult,request);
+ for(const cap of [undefined,null,false,'5000000',NaN,Infinity,0,-1,1.5,5_000_001]){
+  const closed=new JobService(repo,agent,gate,{...options,premiumMaxJobMicroUsd:cap as number,premiumPilot:pilot});
+  assert.equal((await closed.readiness(adult)).available,false);
+  await assert.rejects(closed.submit(adult,{...request,clientRequestId:'new'}),/MODEL_POLICY_UNAVAILABLE/);
+  assert.equal((await closed.submit(adult,request)).jobId,jobId);
+ }
+ const stale=structuredClone(pilot);
+ stale.approval.stages.repair.priceReviewedOn='2000-01-01';
+ const expired=new JobService(repo,agent,gate,{...options,premiumPilot:stale});
+ await assert.rejects(expired.submit(adult,{...request,clientRequestId:'expired'}),/MODEL_POLICY_UNAVAILABLE/);
+ assert.equal((await repo.snapshot()).ledgers[familyId].reserved,3_712_000);
+ await expired.cancel(adult,jobId);
+ assert.equal((await repo.snapshot()).ledgers[familyId].reserved,0);
+});
+test('a five-dollar envelope competes atomically for the remaining family allowance',async()=>{
+ const {repo,adult}=await setup(),maximal=structuredClone(pilot);
+ for(const [stage,policy] of Object.entries(maximal.approval.stages)){
+  policy.maxInputTokens=64000;
+  policy.maxOutputTokens=['construction','repair'].includes(stage)?32000:16000;
+ }
+ maximal.approval.images!.maxMicroUsdPerImage=66000;
+ assert.equal(premiumJobReserve(maximal.approval),5_000_000);
+ const service=new JobService(repo,agent,gate,{...options,premiumPilot:maximal});
+ const outcomes=await Promise.allSettled(['one','two'].map(clientRequestId=>service.submit(adult,{...request,clientRequestId})));
+ assert.equal(outcomes.filter(x=>x.status==='fulfilled').length,1);
+ const denied=outcomes.find(x=>x.status==='rejected');
+ assert.match(String(denied?.reason),/SPENDING_CUTOFF/);
+ const state=await repo.snapshot();
+ assert.equal(state.jobs.length,1);
+ assert.equal(state.ledgers[familyId].reserved,5_000_000);
+ await service.cancel(adult,state.jobs[0].id);
+ maximal.approval.images!.maxMicroUsdPerImage++;
+ assert.equal((await service.readiness(adult)).available,false);
+ await assert.rejects(service.submit(adult,{...request,clientRequestId:'oversize'}),/SPENDING_CUTOFF/);
+ assert.equal((await repo.snapshot()).ledgers[familyId].reserved,0);
+});
 test('old worker handshake, drift and disabled policy fail before inference; premium retry never downgrades',async()=>{
  const h=await admitted(),id=identity('generate');
  await assert.rejects(h.coordinator.claim(h.id,0,'generate',id),/MODEL_POLICY_WORKER_MISMATCH/);
@@ -101,6 +142,7 @@ test('old worker handshake, drift and disabled policy fail before inference; pre
  await changed.tick();assert.equal((await h.repo.snapshot()).jobs.at(-1)?.errorCode,'MODEL_POLICY_CHANGED');
  const old=await legacyService.submit(h.adult,{...request,clientRequestId:'existing-legacy'});
  await h.coordinator.enqueue(old.jobId);
+ assert.equal((await h.repo.snapshot()).jobs.find(job=>job.id===old.jobId)?.maxUnits,120_000);
  assert.deepEqual((await h.coordinator.claim(old.jobId,0,'generate',id)).approval,legacy);
 });
 for(const usageComplete of [true,false])test('an interrupted paid report preserves measured usage and '+(usageComplete?'settles actual text cost':'accounts for unknown charges'),async()=>{

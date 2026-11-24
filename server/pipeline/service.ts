@@ -37,7 +37,7 @@ interface BuilderReadiness {
 export interface ArtifactGate { test(game:PlayableGame,context?:{signal?:AbortSignal;independentIntentPlan?:FunctionalGameContract;captureQuality?:boolean}):Promise<QualityTestedGame|void> }
 export class JobService {
  private controllers=new Map<string,AbortController>();
- constructor(private repo:Repository,private agent:AgentAdapter,private gate:ArtifactGate,private options:{allowMock:boolean;maxUnits:number;timeoutMs:number;maxRetries:number;maxRepairAttempts?:number;requireVerifiedParentPrivacy?:boolean;adultPilotMode?:boolean;premiumPilot?:PremiumPilot;premiumConfigured?:boolean;premiumUnavailable?:boolean}={allowMock:false,maxUnits:10,timeoutMs:30000,maxRetries:2}){
+ constructor(private repo:Repository,private agent:AgentAdapter,private gate:ArtifactGate,private options:{allowMock:boolean;maxUnits:number;premiumMaxJobMicroUsd?:number;timeoutMs:number;maxRetries:number;maxRepairAttempts?:number;requireVerifiedParentPrivacy?:boolean;adultPilotMode?:boolean;premiumPilot?:PremiumPilot;premiumConfigured?:boolean;premiumUnavailable?:boolean}={allowMock:false,maxUnits:10,timeoutMs:30000,maxRetries:2}){
   if(options.premiumPilot&&(!options.adultPilotMode||agent.kind!=='metered-api'||agent.testFixture))throw Error('ADULT_PILOT_ACCESS_REQUIRED');
  }
  private async authorized(session:VerifiedSession,id:string){const state=await this.repo.snapshot(),job=state.jobs.find(j=>j.id===id);if(!job)throw Error('NOT_FOUND');requireResourceAudience(state,session,job);return job;}
@@ -83,7 +83,7 @@ export class JobService {
   if(!eligible||this.options.premiumUnavailable)return {...unavailable,...diagnostic(false)};
   let maxUnits=this.agent.kind==='mock'?0:this.options.maxUnits;
   if(pilot){
-   try{pinPremiumPolicy(pilot);maxUnits=premiumReservation(pilot,this.options.maxUnits);}
+   try{pinPremiumPolicy(pilot);maxUnits=premiumReservation(pilot,this.options.premiumMaxJobMicroUsd);}
    catch(error){
     if((error as Error).message==='SPENDING_CUTOFF')return {available:false,reason:'ALLOWANCE_REQUIRED' as const,...diagnostic(false)};
     return {...unavailable,...diagnostic(false)};
@@ -158,7 +158,7 @@ export class JobService {
    if(pilot){
     try{premiumPolicy=pinPremiumPolicy(pilot);}catch{throw Error('MODEL_POLICY_UNAVAILABLE');}
    }
-   const maxUnits=pilot?premiumReservation(pilot,this.options.maxUnits):this.agent.kind==='mock'?0:this.options.maxUnits;
+   const maxUnits=pilot?premiumReservation(pilot,this.options.premiumMaxJobMicroUsd):this.agent.kind==='mock'?0:this.options.maxUnits;
    if(maxUnits&&(!ledger.paidEnabled||ledger.used+ledger.reserved+maxUnits>ledger.allowance))throw Error('SPENDING_CUTOFF');
    const qualityRequired=this.agent.kind==='metered-api'&&!this.agent.testFixture&&needsCurrentQuality(base?.game)?'game-quality-v1' as const:undefined;
    ledger.reserved+=maxUnits;const job:Job={...r,...(premiumPolicy?{premiumPolicy}:{}),...(qualityRequired?{qualityRequired}:{}),...(this.options.adultPilotMode?{adultPilotDeviceId:session.deviceId,adultPilotSessionId:session.adultSessionId,adultPilotProfileId:session.adultProfileId}:{}),id:uuid(),familyId:session.familyId,status:'draft',adapter:this.agent.testFixture?'mock':this.agent.kind,maxUnits,usedUnits:0,retryCount};s.jobs.push(job);audit(s,job,'queued');return {jobId:job.id,status:'queued' as JobStatus,adapter:job.adapter};
