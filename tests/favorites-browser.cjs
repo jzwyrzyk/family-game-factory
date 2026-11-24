@@ -1,4 +1,4 @@
-const {exploreWelcome,navigate}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,openRetainedGame}=require('./studio-entry.cjs');
 /* Curated shelves and saved legacy games run in the actual game lifecycle. */
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -36,7 +36,7 @@ function savedLegacyGames(){
     const favorites=page.locator('#studioStarters [data-starter]');
     assert.equal(await favorites.count(),4,'four current Ready to Play games');
     assert.deepEqual((await favorites.evaluateAll(nodes=>nodes.map(node=>node.dataset.starter))).sort(),['factory','gum','hill','mining']);
-    assert.deepEqual((await page.locator('#studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter))).sort(),['buckets','dragon']);
+    assert.deepEqual((await page.locator('#page-creations #studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter))).sort(),['buckets','dragon']);
     assert.equal(await page.locator('[data-starter="moon"], [data-starter="robot"]').count(),0,'retired starters are absent from both curated shelves');
     assert.equal(await page.locator('#studioLibrary [data-session]').count(),2,'meaningful saved legacy games remain accessible');
     assert.equal((await page.locator('#studioStarterTitle').textContent()).trim(),'Ready to Play jems','favorites shelf uses the approved child-facing heading');
@@ -82,7 +82,7 @@ function savedLegacyGames(){
      assert.equal(saved.owner,original.owner);assert.deepEqual(saved.messages,original.messages,'authored legacy intent survives native play');
     }
     assert.deepEqual(errors,[],device+' native favorites have no page errors');
-    console.log('PASS '+device+': four Ready to Play and two Original games, saved Moon movement, saved Robot route, safe checkpoints and durable legacy intent');
+    console.log('PASS '+device+': four Ready to Play and two retained games in My Creations, saved Moon movement, saved Robot route, safe checkpoints and durable legacy intent');
    }finally{await context.close();}
   }
  }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

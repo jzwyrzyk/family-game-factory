@@ -129,10 +129,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T14:33:14.658Z",
-      "sourceDigest": "109eb451d901427e8febf3fbe514e1d758b0a48bbcefeb9a4b385cd2e3453bec",
+      "reviewedAt": "2026-11-24T14:25:06.000Z",
+      "sourceDigest": "a2b674e124a188be2d394f5c77895271de95374fc3b21b6cd2d67d403951ceff",
       "reviewOutcome": "updated",
-      "reviewReason": "Compared the owner's November 23 adult-private high-capability game-builder direction with the existing child-authorship/playable-quality doctrine and ADR0006; added a distinct sourced future-model decision without changing product policy, child consent or acceptance criteria.",
+      "reviewReason": "Reviewed the owner's November 23 construction-model target and PR139 draft scope against existing child-led, adult/private and quality doctrine; only the bounded decision and its reference are added.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -247,10 +247,18 @@
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         },
         {
-          "reviewedAt": "2026-11-23T05:43:12.254Z",
+          "sourceCommit": "cc3da7ef0cdd371f628f9bc51d32d6296f575f8e",
+          "reviewedAt": "2026-11-23T18:16:02.638Z",
+          "sourceDigest": "a2b674e124a188be2d394f5c77895271de95374fc3b21b6cd2d67d403951ceff",
+          "reviewOutcome": "updated",
+          "reviewReason": "Recorded the owner-specific retained-game placement and cutover retention exception in a decision; general preserve-work doctrine is unchanged."
+        },
+        {
+          "sourceCommit": "c79714b4090d8e08b74ab636c55ad6fc253e6823",
+          "reviewedAt": "2026-11-23T14:33:14.658Z",
           "sourceDigest": "109eb451d901427e8febf3fbe514e1d758b0a48bbcefeb9a4b385cd2e3453bec",
-          "reviewOutcome": "unchanged",
-          "reviewReason": "Reviewed retained-history, evidence-capacity, owner/head and paid-recovery safeguards against current doctrine including Coach v2 and the four experiences. No new product policy, retention deletion, earning rule or Build authority; F06 limits and source-only authorization remain explicit."
+          "reviewOutcome": "updated",
+          "reviewReason": "Compared the owner's November 23 adult-private high-capability game-builder direction with the existing child-authorship/playable-quality doctrine and ADR0006; added a distinct sourced future-model decision without changing product policy, child consent or acceptance criteria."
         }
       ]
     },
@@ -298,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:12.647Z",
-      "sourceDigest": "d52d9e1b0c95b09478b7e24cd84d47c8873aca22f93f576dc9b84b5e8c74a28f",
+      "reviewedAt": "2026-11-23T18:16:02.770Z",
+      "sourceDigest": "db4335d97b37dd6fe65cacd06c129b38bd120955bf3187df7c268f5d56f985c3",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the combined five-component matrix, durable Notifications recovery, full transcript provenance through chapters, atomic v2 creation, compensated native creation and truthful capacity notices. Preserved all four experiences, current visible navigation, reading and ownership guards.",
+      "reviewReason": "Documented My Creations entry/cards, readable moved controls and shared native-host restoration; desktop and phone saved-variant journeys passed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -398,10 +406,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fe6facdb555a348abc3ab99ef75ab2b7e6cfeab75e39f654adc92d03055727ba",
-      "reviewedAt": "2026-11-23T05:34:31.892Z",
+      "sourceDigest": "046b2da4d3be2a0b8803de7689f7ac8daff903cc1c25a9e8ce18f26418dee6c3",
+      "reviewedAt": "2026-11-23T18:16:03.267Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed v2 readiness coverage against the merged First steps source; the architecture preserves seven-source first-build gates separately from Coding scene practice, saved references and recovery.",
+      "reviewReason": "Updated shared architecture for retained saved-variant routing; scene/art ownership, revision data and creation authority remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -716,10 +724,10 @@
         "docs/game-intelligence/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T14:33:14.658Z",
-      "sourceDigest": "228a95f6404da011443bc3a9fe8be784ada6e823f8e0f4ab27f1660416f82095",
+      "reviewedAt": "2026-11-24T14:25:06.000Z",
+      "sourceDigest": "d2661ce6b7e634a63c4a16570e513779527343d3ad463673241220da96ccf216",
       "reviewOutcome": "updated",
-      "reviewReason": "Inspected merged server/agent/openai.ts approval type, planning/source/repair and review flow, worker main dddf53db hard-coded public b472c224 checkout, and game-quality contract; documented the owner-selected future model target without asserting an API identity, entitlement, cost or current model activation.",
+      "reviewReason": "Reviewed current Responses approval type, private workflow checkout pin and draft PR139 stage/policy code; presentation contract distinguishes branch implementation from merged and effective provider state.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -729,10 +737,18 @@
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         },
         {
+          "sourceCommit": "cc3da7ef0cdd371f628f9bc51d32d6296f575f8e",
           "reviewedAt": "2026-11-23T05:43:13.962Z",
           "sourceDigest": "d2661ce6b7e634a63c4a16570e513779527343d3ad463673241220da96ccf216",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed fixed coordinator phase/global leases, immutable report receipts, one execution plus bounded report reconciliation, nonblocking status and dispatch deadlines. Retained existing quality/budget gates and private pins; original-month narration usage is content-free accounting only. Matrix states gateway-first rollout and drain-before-rollback constraints."
+        },
+        {
+          "sourceCommit": "c79714b4090d8e08b74ab636c55ad6fc253e6823",
+          "reviewedAt": "2026-11-23T14:33:14.658Z",
+          "sourceDigest": "228a95f6404da011443bc3a9fe8be784ada6e823f8e0f4ab27f1660416f82095",
+          "reviewOutcome": "updated",
+          "reviewReason": "Inspected merged server/agent/openai.ts approval type, planning/source/repair and review flow, worker main dddf53db hard-coded public b472c224 checkout, and game-quality contract; documented the owner-selected future model target without asserting an API identity, entitlement, cost or current model activation."
         }
       ]
     },
@@ -873,10 +889,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T14:33:14.658Z",
-      "sourceDigest": "b1590536a4098d1901d6df2659319875fc089c17db5043a9e6d1daef058e1fe1",
+      "reviewedAt": "2026-11-24T14:25:06.000Z",
+      "sourceDigest": "9fb64a023aabdbdd877544ea349c9701605d964aa9fec17f18dd618c4c4f38fb",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed existing quality-capture contract, four-axis reviewer and bounded repair/worker sources against the proposed game-construction model choice; no executable test, captured benchmark, provider approval, physical-device evidence or success rate was changed or asserted by this documentation-only update.",
+      "reviewReason": "Reviewed PR152 release workflow receipts, independent metadata observation, pending Pages studio shard and PR139 synthetic policy tests. No fixture or metadata evidence is treated as authenticated functional acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1040,10 +1056,18 @@
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         },
         {
-          "reviewedAt": "2026-11-23T05:43:15.018Z",
-          "sourceDigest": "b1590536a4098d1901d6df2659319875fc089c17db5043a9e6d1daef058e1fe1",
+          "sourceCommit": "cc3da7ef0cdd371f628f9bc51d32d6296f575f8e",
+          "reviewedAt": "2026-11-23T18:54:44.529Z",
+          "sourceDigest": "9fb64a023aabdbdd877544ea349c9701605d964aa9fec17f18dd618c4c4f38fb",
           "reviewOutcome": "updated",
-          "reviewReason": "Recorded source and fixture evidence without replacing final exact-head hosted gates. Retained all five component tests; reproduced and corrected PROFILE_CHANGED expectation, current navigation locators and cross-chapter provenance. Added narration rollover/admission and real backup coverage; Pal decode gate/art/baselines remain unchanged and historical failure retained."
+          "reviewReason": "Reviewed the exact collection GET fixture and bounded observed-time countdown helper; retained strict unknown-request, paid-build, phase and duration assertions. Delivery state records the full child-journey pass and ten Bubble Gum cases with 22 launch receipts on supplemental Chromium 156, preserved original CI failures, and fresh hosted results pending."
+        },
+        {
+          "sourceCommit": "c79714b4090d8e08b74ab636c55ad6fc253e6823",
+          "reviewedAt": "2026-11-23T14:33:14.658Z",
+          "sourceDigest": "b1590536a4098d1901d6df2659319875fc089c17db5043a9e6d1daef058e1fe1",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Reviewed existing quality-capture contract, four-axis reviewer and bounded repair/worker sources against the proposed game-construction model choice; no executable test, captured benchmark, provider approval, physical-device evidence or success rate was changed or asserted by this documentation-only update."
         }
       ]
     },
@@ -1073,10 +1097,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T14:33:14.658Z",
-      "sourceDigest": "0b20f7eef1cc6d4a14e9ff756aac8655a30cc4d2187b2f4c2129b5d1e2e7995c",
+      "reviewedAt": "2026-11-24T14:25:06.000Z",
+      "sourceDigest": "bccedbc8ffd7bcfd2ff15ef1a553c77c619ded1a3707c100ec732bfb7ea3f8a4",
       "reviewOutcome": "updated",
-      "reviewReason": "Rechecked protected main f60f3b8, PR59/87/107/126/137 merged states and their exact heads, Nov23 main and documentation CI, worker generation-source pin and Nov21 Pages publication receipt; corrected current delivery intent and archived draft-only operations language while retaining the blocked-production-cutover receipt and live configuration unknowns.",
+      "reviewReason": "Inspected merged PR152 intent, actual transition and read-only observation logs, Pages build and per-shard status, current private worker runs and prior acceptance exception. Recorded dated promotion and publication limits without changing authorization.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1254,10 +1278,18 @@
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         },
         {
-          "reviewedAt": "2026-11-23T08:08:28.213Z",
-          "sourceDigest": "13d90c6dc309c9f72282b63d93ee1e0e827a1163ba59cb049e9fa134213166ad",
+          "sourceCommit": "cc3da7ef0cdd371f628f9bc51d32d6296f575f8e",
+          "reviewedAt": "2026-11-24T13:38:56.079Z",
+          "sourceDigest": "bccedbc8ffd7bcfd2ff15ef1a553c77c619ded1a3707c100ec732bfb7ea3f8a4",
           "reviewOutcome": "updated",
-          "reviewReason": "Recorded authorized frozen-source cutover evidence and blocked live baseline; preserved initial local packaging DNS failures and documented recovery using Docker-managed proxy defaults with CA trust, all three non-root network-disabled imports passing; no production action or runtime source change."
+          "reviewReason": "Record actual PR160 tag activation and independent 95/5 observation, preserve unresolved request/data evidence, and document owner-approved risk-accepted cutover with all automated/protected release gates retained; refresh only the pinned Gateway promotion intent."
+        },
+        {
+          "sourceCommit": "c79714b4090d8e08b74ab636c55ad6fc253e6823",
+          "reviewedAt": "2026-11-23T14:33:14.658Z",
+          "sourceDigest": "0b20f7eef1cc6d4a14e9ff756aac8655a30cc4d2187b2f4c2129b5d1e2e7995c",
+          "reviewOutcome": "updated",
+          "reviewReason": "Rechecked protected main f60f3b8, PR59/87/107/126/137 merged states and their exact heads, Nov23 main and documentation CI, worker generation-source pin and Nov21 Pages publication receipt; corrected current delivery intent and archived draft-only operations language while retaining the blocked-production-cutover receipt and live configuration unknowns."
         }
       ]
     },
@@ -1280,10 +1312,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T14:33:14.658Z",
+      "reviewedAt": "2026-11-24T14:25:06.000Z",
       "sourceDigest": "34da324f3f9445a8745fea1aa95bfc9a843045a98cac8979ec8c3139b92ab899",
       "reviewOutcome": "updated",
-      "reviewReason": "Inspected AGENTS, canonical documentation index, decisions index, docs/context/MAINTENANCE and registry routing; linked the new owner-approved builder-model ADR and corrected the historical PR107-unmerged navigation statement without modifying review policy or existing source routes.",
+      "reviewReason": "Reconciled diverged documentation PR138 against protected main; preserved current registry policy, owner decision and historical records while linking current release and proposed premium implementation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1370,10 +1402,18 @@
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         },
         {
+          "sourceCommit": "cc3da7ef0cdd371f628f9bc51d32d6296f575f8e",
           "reviewedAt": "2026-11-23T03:35:23.963Z",
           "sourceDigest": "34da324f3f9445a8745fea1aa95bfc9a843045a98cac8979ec8c3139b92ab899",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed integration routing additions and existing required documents/link scope; the index now identifies PR134 as the single consolidated release vehicle. Historical review records and fingerprint enforcement remain intact."
+        },
+        {
+          "sourceCommit": "c79714b4090d8e08b74ab636c55ad6fc253e6823",
+          "reviewedAt": "2026-11-23T14:33:14.658Z",
+          "sourceDigest": "34da324f3f9445a8745fea1aa95bfc9a843045a98cac8979ec8c3139b92ab899",
+          "reviewOutcome": "updated",
+          "reviewReason": "Inspected AGENTS, canonical documentation index, decisions index, docs/context/MAINTENANCE and registry routing; linked the new owner-approved builder-model ADR and corrected the historical PR107-unmerged navigation statement without modifying review policy or existing source routes."
         }
       ]
     },
@@ -1509,10 +1549,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "925ba2415c4e93d79d88f42bd14a0c7c8de30cbcabf335381630131d3e7c812c",
-      "reviewedAt": "2026-11-23T05:43:15.787Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed original-drawing, rig identity and native/notebook staging with current four-experience main. Art source contract and recovery test require exact two-store restoration after quota failure and one linked Rally on retry; optional usage indexing remains nonblocking and original assets/pins are unchanged.",
+      "sourceDigest": "38e5940ba3f7e89ed9353f01f65b9702bb3b04792db98f4db9c377158730dd8c",
+      "reviewedAt": "2026-11-23T18:16:03.593Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed art ownership and immutable reference contract; only native-game navigation in fixture setup changes, with no artwork store, adapter, export or dependency mutation.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1553,10 +1593,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "196be53f4cfde1416f0ad008d1ae06dde293f1455ce336fad7b1b4b2b952f22e",
-      "reviewedAt": "2026-11-22T18:39:36.408Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed shared bounded image readiness and cancellation, conservative scene-only paper compositing and all 48 approved source identities; originals and saved form keys remain unchanged.",
+      "sourceDigest": "56651655d4d633e4b13f6f648dde41b07155523146b067d4e85bb0ac8e3a45a4",
+      "reviewedAt": "2026-11-23T18:16:03.677Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed Pal ownership and recovery contract; browser fixture enters moved native cards through My Creations, without changing Pal assets, collection, growth or rewards.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",

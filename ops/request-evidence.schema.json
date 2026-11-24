@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:jems:production-request-evidence:v1",
+  "title": "Jems bounded production request log evidence, version 1",
+  "description": "UTC intervals are half-open. Counts are present only for complete reads. An INCOMPLETE/COVERAGE_UNVERIFIED report retains confirmed individual rows as lower bounds without reporting totals. Each row represents one distinct logged request after private insert-ID deduplication. Identical six-field rows may represent distinct requests.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","project","region","query_status","reason","scope","observed_at_utc","workflow","coverage","completeness","requests","counts"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "project": {"const": "family-game-factory-jzw"},
+    "region": {"const": "us-east5"},
+    "query_status": {"enum": ["COMPLETE","INCOMPLETE","UNAVAILABLE","NOT_CHECKED"]},
+    "reason": {"type": "string"},
+    "scope": {
+      "description": "Requested selection. An empty result does not establish that the selected revision existed. Null revision selects all service revisions.",
+      "oneOf": [{"type": "null"}, {
+        "type": "object", "additionalProperties": false,
+        "required": ["service","revision","start_utc","end_utc"],
+        "properties": {
+          "service": {"$ref":"#/$defs/service"},
+          "revision": {"oneOf":[{"$ref":"#/$defs/selector"},{"type":"null"}]},
+          "start_utc": {"$ref":"#/$defs/second"},
+          "end_utc": {"$ref":"#/$defs/second"}
+        },
+        "oneOf": [
+          {"properties":{"service":{"const":"factory-gateway"},"revision":{"pattern":"^factory-gateway-"}}},
+          {"properties":{"service":{"const":"factory-preview"},"revision":{"pattern":"^factory-preview-"}}},
+          {"properties":{"service":{"const":"factory-coach-private"},"revision":{"pattern":"^factory-coach-private-"}}}
+        ]
+      }]
+    },
+    "observed_at_utc": {"$ref":"#/$defs/second"},
+    "workflow": {
+      "oneOf": [{"type":"null"}, {
+        "type":"object", "additionalProperties":false, "required":["run_id","attempt","workflow_source_sha"],
+        "properties": {
+          "run_id":{"type":"string","pattern":"^[1-9][0-9]{0,19}$"},
+          "attempt":{"type":"string","pattern":"^[1-9][0-9]{0,19}$"},
+          "workflow_source_sha":{"type":"string","pattern":"^[0-9a-f]{40}$"}
+        }
+      }]
+    },
+    "coverage": {
+      "description": "Finite bounds of owner-reviewed Logging source coverage, when verified by the broker.",
+      "oneOf":[{"type":"null"}, {
+        "type":"object","additionalProperties":false,"required":["start_utc","end_utc"],
+        "properties":{"start_utc":{"$ref":"#/$defs/second"},"end_utc":{"$ref":"#/$defs/second"}}
+      }]
+    },
+    "completeness": {
+      "type":"object", "additionalProperties":false,
+      "required":["pagination_exhausted","truncated","permissions_verified","coverage_verified","ingestion_delay_assessed"],
+      "description":"Null flags mean the client received no verified broker result. permissions_verified records reviewed access and a successful scoped read. ingestion_delay_assessed checks a conservative lag, not an absolute future-delivery guarantee.",
+      "properties": {
+        "pagination_exhausted":{"type":["boolean","null"]}, "truncated":{"type":["boolean","null"]},
+        "permissions_verified":{"type":["boolean","null"]}, "coverage_verified":{"type":["boolean","null"]},
+        "ingestion_delay_assessed":{"type":["boolean","null"]}
+      }
+    },
+    "requests": {
+      "type":"array","maxItems":1000,
+      "items":{
+        "type":"object","additionalProperties":false,"required":["timestamp_utc","service","revision","method","route","status"],
+        "properties":{
+          "timestamp_utc":{"type":"string","format":"date-time","pattern":"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]{1,9})?Z$"},
+          "service":{"$ref":"#/$defs/service"},"revision":{"$ref":"#/$defs/revision"},"method":{"$ref":"#/$defs/method"},
+          "route":{"$ref":"#/$defs/route"},"status":{"$ref":"#/$defs/status"}
+        },
+        "allOf":[{"$ref":"#/$defs/serviceFields"}]
+      }
+    },
+    "counts": {
+      "oneOf":[{"type":"null"}, {
+        "type":"object","additionalProperties":false,
+        "required":["total","http_1xx","http_2xx","http_3xx","http_4xx","http_5xx","coach_2xx","coach_4xx","coach_5xx","by_route_and_status"],
+        "properties":{
+          "total":{"$ref":"#/$defs/count"},"http_1xx":{"$ref":"#/$defs/count"},"http_2xx":{"$ref":"#/$defs/count"},
+          "http_3xx":{"$ref":"#/$defs/count"},"http_4xx":{"$ref":"#/$defs/count"},"http_5xx":{"$ref":"#/$defs/count"},
+          "coach_2xx":{"$ref":"#/$defs/count"},"coach_4xx":{"$ref":"#/$defs/count"},"coach_5xx":{"$ref":"#/$defs/count"},
+          "by_route_and_status":{
+            "type":"array","maxItems":1000,
+            "items":{
+              "type":"object","additionalProperties":false,"required":["service","revision","method","route","status","count"],
+              "properties":{
+                "service":{"$ref":"#/$defs/service"},"revision":{"$ref":"#/$defs/revision"},"method":{"$ref":"#/$defs/method"},
+                "route":{"$ref":"#/$defs/route"},"status":{"$ref":"#/$defs/status"},"count":{"type":"integer","minimum":1,"maximum":1000}
+              },
+              "allOf":[{"$ref":"#/$defs/serviceFields"}]
+            }
+          }
+        }
+      }]
+    }
+  },
+  "allOf":[
+    {
+      "if":{"properties":{"query_status":{"const":"COMPLETE"}}},
+      "then":{"properties":{
+        "reason":{"const":"OK"}, "counts":{"type":"object"}, "scope":{"type":"object"}, "coverage":{"type":"object"},
+        "completeness":{"const":{"pagination_exhausted":true,"truncated":false,"permissions_verified":true,"coverage_verified":true,"ingestion_delay_assessed":true}}
+      }},
+      "else":{"properties":{"counts":{"type":"null"}}}
+    },
+    {"if":{"properties":{"query_status":{"const":"INCOMPLETE"}}},"then":{"properties":{
+      "scope":{"type":"object"},"reason":{"enum":["COVERAGE_UNVERIFIED","INGESTION_DELAY","ROW_LIMIT","PAGINATION_INVALID","INVALID_METADATA","TIMEOUT","INVALID_BROKER_RESPONSE"]}
+    }}},
+    {"if":{"properties":{"query_status":{"const":"UNAVAILABLE"}}},"then":{"properties":{
+      "scope":{"type":"object"},"reason":{"enum":["COVERAGE_UNVERIFIED","CONFIG_UNVERIFIED","PERMISSION_DENIED","SOURCE_UNAVAILABLE","BROKER_UNAVAILABLE","IDENTITY_UNAVAILABLE"]}
+    }}},
+    {"if":{"properties":{"query_status":{"const":"NOT_CHECKED"}}},"then":{"properties":{"reason":{"enum":["INVALID_SCOPE","NOT_STARTED"]}}}},
+    {
+      "if":{"properties":{"query_status":{"const":"INCOMPLETE"},"reason":{"const":"COVERAGE_UNVERIFIED"}}},
+      "then":{"properties":{
+        "coverage":{"type":"null"},
+        "completeness":{"const":{"pagination_exhausted":true,"truncated":false,"permissions_verified":true,"coverage_verified":false,"ingestion_delay_assessed":true}}
+      }},
+      "else":{
+        "if":{"properties":{"query_status":{"enum":["NOT_CHECKED","UNAVAILABLE","INCOMPLETE"]}}},
+        "then":{"properties":{"requests":{"maxItems":0}}}
+      }
+    }
+  ],
+  "$defs":{
+    "second":{"type":"string","format":"date-time","pattern":"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+    "count":{"type":"integer","minimum":0,"maximum":1000},
+    "status":{"type":"integer","minimum":100,"maximum":599},
+    "service":{"enum":["factory-gateway","factory-preview","factory-coach-private"]},
+    "revision":{"type":"string","maxLength":63,"not":{"pattern":"[^a-z0-9-]"},"pattern":"^factory-(gateway|preview|coach-private)-[a-z0-9]([a-z0-9-]*[a-z0-9])?$"},
+    "selector":{
+      "type":"string","maxLength":63,"not":{"pattern":"[^a-z0-9-]"},
+      "oneOf":[
+        {"pattern":"^factory-(gateway|preview|coach-private)-(r-[0-9a-f]{20}|[0-9]{5}-[a-z0-9]{3})$"},
+        {"enum":["factory-gateway-pr115-19f5e46ae114-fb5fa6","factory-gateway-workerpin-dddf53db-mwq1mbz7-e99f",
+                 "factory-coach-private-chatready-1996c1b382a7-9c98a0","factory-coach-private-chatdiag-b4734b1323de-a14b8b",
+                 "factory-coach-private-pr115-19f5e46ae114-fb5fa6"]}
+      ]
+    },
+    "method":{"enum":["GET","HEAD","POST","PUT","DELETE","OPTIONS","PATCH","CONNECT","TRACE"]},
+    "route":{"oneOf":[{"$ref":"#/$defs/gatewayRoute"},{"$ref":"#/$defs/privateRoute"},{"enum":["/preview/{id}","[other]"]}]},
+    "gatewayRoute":{"enum":["/health","/v1/coach","/v1/coach/status","/v1/coach/erase","/v1/coach/audio","/v1/coach/audio/status","/v1/coach/narration","/v1/coach/narration/status"]},
+    "privateRoute":{"enum":["/v1/private-coach/complete","/v1/private-coach/status","/v1/private-coach/audio","/v1/private-coach/audio/status","/v1/private-coach/narration","/v1/private-coach/narration/status"]},
+    "serviceFields":{
+      "oneOf":[
+        {"properties":{"service":{"const":"factory-gateway"},"revision":{"pattern":"^factory-gateway-"},"route":{"anyOf":[{"$ref":"#/$defs/gatewayRoute"},{"const":"[other]"}]}}},
+        {"properties":{"service":{"const":"factory-preview"},"revision":{"pattern":"^factory-preview-"},"route":{"enum":["/health","/preview/{id}","[other]"]}}},
+        {"properties":{"service":{"const":"factory-coach-private"},"revision":{"pattern":"^factory-coach-private-"},"route":{"anyOf":[{"$ref":"#/$defs/privateRoute"},{"const":"[other]"}]}}}
+      ]
+    }
+  }
+}

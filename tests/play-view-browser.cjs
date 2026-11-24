@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const { chromium } = require('playwright');
 const { start } = require('./browser-server.cjs');
-const { exploreWelcome } = require('./studio-entry.cjs');
+const { exploreWelcome, openRetainedGame } = require('./studio-entry.cjs');
 require('tsx/cjs');
 const { RevisionStore, WORKSPACE_KEY } = require('../src/factory/workspace.ts');
 const { StudioNotebook, STUDIO_KEY } = require('../src/studio/notebook.ts');
@@ -372,16 +372,19 @@ async function checkPlayerMenu(page, label) {
         let canContinue = true;
         for (const game of ['factory', 'mining', 'gum', 'hill', 'buckets', 'dragon', 'moon', 'robot']) {
           try {
-            const entry = ['moon', 'robot'].includes(game) ?
-              page.locator(`#studioLibrary [data-session="${legacy.sessions[game]}"] .studio-saved-open`) : page.locator(`[data-starter="${game}"]`);
-            await entry.scrollIntoViewIfNeeded();
-            if (game === 'factory') {
-              // Exercise the real presentation event, without inventing a grant
-              // or altering saved achievements. Entry must remove an old toast.
-              await page.evaluate(() => window.dispatchEvent(new CustomEvent('jems:milestone', { detail: { kind: 'practice' } })));
-              await page.locator('#jems-delight-host .jems-delight-toast[data-kind="practice"]').waitFor({ state: 'visible' });
+            if (['buckets', 'dragon'].includes(game)) await openRetainedGame(page, game);
+            else {
+              const entry = ['moon', 'robot'].includes(game) ?
+                page.locator(`#studioLibrary [data-session="${legacy.sessions[game]}"] .studio-saved-open`) : page.locator(`[data-starter="${game}"]`);
+              await entry.scrollIntoViewIfNeeded();
+              if (game === 'factory') {
+                // Exercise the real presentation event, without inventing a grant
+                // or altering saved achievements. Entry must remove an old toast.
+                await page.evaluate(() => window.dispatchEvent(new CustomEvent('jems:milestone', { detail: { kind: 'practice' } })));
+                await page.locator('#jems-delight-host .jems-delight-toast[data-kind="practice"]').waitFor({ state: 'visible' });
+              }
+              await entry.click();
             }
-            await entry.click();
             await checkFrame(page, `${device} ${game}`);
             if (game === 'factory') {
               assert.equal(await page.locator('#jems-delight-host').evaluate(host => host.childElementCount), 0,

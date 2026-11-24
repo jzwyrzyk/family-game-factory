@@ -5,7 +5,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {chromium}=require('playwright');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome}=require('./studio-entry.cjs');
+const {exploreWelcome,openRetainedGame}=require('./studio-entry.cjs');
 
 const session=page=>page.evaluate(()=>{
  const notebook=FG.studio.exportNotebook();
@@ -31,6 +31,8 @@ async function fixture(browser,url,replyFor){
   if(path==='/v1/sessions/status')body={connected:true,trusted:true,expiresAt:Date.now()+60000};
   else if(path==='/v1/builder/status'||path==='/v1/coach/status')body={available:true};
   else if(path==='/v1/coach/audio/status')body={available:false};
+  // Opening the retained games through My Creations also reads its private list.
+  else if(path==='/v1/creations'&&request.method()==='GET')body=[];
   else if(path==='/v1/coach'&&request.method()==='POST'){
    const coachContext=request.postDataJSON().context;coachRequests.push(coachContext);
    body={mode:'model',reply:await replyFor(coachContext.message,coachContext)};
@@ -57,7 +59,7 @@ async function localProposal(browser,url){
  const f=await fixture(browser,url,message=>message.includes('fewer')?proposal('Fewer buckets','Give me two buckets'):proposal('More buckets','Give me four buckets'));
  const {page}=f;
  try{
-  await page.click('[data-starter="buckets"]');await page.waitForSelector('#game-mount canvas#game');
+  await openRetainedGame(page,'buckets');await page.waitForSelector('#game-mount canvas#game');
   const initial=await page.evaluate(()=>FG.runtime.snapshot().config.bucketCount);
   await page.click('#studioChange');await askForProposal(page,'Help me think about bucket choices.','More buckets');
   const draft='After this, make the buckets blue.';
@@ -96,7 +98,7 @@ async function remoteProposal(browser,url){
  const f=await fixture(browser,url,()=>proposal('Flying doughnut',request,'redesign'));
  const {page}=f;
  try{
-  await page.click('[data-starter="buckets"]');await page.waitForSelector('#game-mount canvas#game');
+  await openRetainedGame(page,'buckets');await page.waitForSelector('#game-mount canvas#game');
   await page.click('#studioChange');await askForProposal(page,'Suggest a new way to play.','Flying doughnut');
   const draft='Save a rainbow trail for my next version.';
   await page.fill('#studioPrompt',draft);

@@ -29,3 +29,7 @@ The intended implementation is deferred to a separate, reviewed Codex PR; no run
 - [Private worker pinned workflow](https://github.com/family-game-factory-lab/family-game-factory-worker/blob/dddf53dbc76796be19782c1bb5bbb99b86e99909/.github/workflows/factory-private.yml) — repository checkout pin only; effective variables and released revisions must be observed independently.
 - [Presentation and playable-quality contract](../game-intelligence/PRESENTATION-QUALITY.md) — plan, art, code, separate review and repair acceptance.
 - [Current architecture](../../ARCHITECTURE-CURRENT.md) and [delivery evidence](../../DELIVERY-STATE.md) — source-to-production boundaries and dated operational limits.
+
+## November 24 implementation status (not a new decision)
+
+[Draft PR139 at e262e032](https://github.com/jzwyrzyk/family-game-factory/pull/139) implements a proposed default-off Adult Private premium policy, separate planning/construction/review/repair approvals, policy/worker pinning and bounded reservation. The PR's stage labels and configured model strings are not evidence of provider availability, entitlements or owner approval of additional spend or separate stage choices. Main and the private worker checkout pin remain unchanged for model selection. See current delivery state; do not treat the implementation proposal as a superseding accepted decision.

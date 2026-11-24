@@ -8,6 +8,7 @@ These records explain durable choices without turning chat history into another 
 
 | Record | Decision | Status | Source |
 | --- | --- | --- | --- |
+| [Retained games in My Creations](2026-11-23-retained-games-in-my-creations.md) | Move Dragon/Buckets cards into My Creations, preserve every variant and retain four Home games; scope the owner's retention exception to this cutover | Accepted for implementation; source and live acceptance separate | Owner's November 23 retained-games and production-cutover direction |
 | [Direct operations](2026-11-20-direct-operations.md) | Eliminate routine command/output relay through a reusable cloud identity; brief notice for larger in-scope fixes | Accepted operating intent; reconciled diagnostic source, prior environment evidence separate from current access; no-merge preparation hold | Owner's November 20 access-efficiency discussion and November 21 preparation-only continuation |
 | [0001](0001-child-led-creation.md) | Child-led creation and explicit version promotion | Accepted, retrospectively documented | Owner-approved coaching standard |
 | [0002](0002-intent-faithful-game-forms.md) | Choose intent-faithful game forms using independent axes | Accepted, retrospectively documented | Game Intelligence standards and Bubble Gum decision |
@@ -38,7 +39,7 @@ These records explain durable choices without turning chat history into another 
 
 | [Bubble Gum assembly](2026-11-22-bubble-gum-assembly.md) | Recognizable objects, structural gum joins, varied puzzles and extended replayable adventures in the shared player | Accepted owner direction; initial tuning awaits play review | Owner's November 22 comprehensive overhaul request |
 
-| [Private game-construction model direction](2026-11-23-game-construction-model-direction.md) | Owner-selected “Astra High” capability target for adult-private game construction; provider model ID, supported effort, budget, and separate review-model scope require verification | Accepted intent for later implementation; not a source or production activation | Owner's November 23 game-generation comparison and Codex handoff; executable source and worker links in the record |
+| [Private game-construction model direction](2026-11-23-game-construction-model-direction.md) | Owner-selected “Astra High” capability target for adult-private game construction; provider model ID, effort, budget and separate review scope require verification | Accepted intent; PR139 branch implementation only, not merged or activated | Owner's November 23 game-generation comparison and Codex handoff; executable source and worker links in the record |
 
 **Accepted describes the choice, not a deployment, feature completion or universal validation.** The first records summarize decisions already present in the repository. They do not invent a new approval. Dates distinguish when a record was written from when a decision was made.
 

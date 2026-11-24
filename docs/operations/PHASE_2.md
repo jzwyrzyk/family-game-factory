@@ -1,5 +1,7 @@
 # Jems operational access and release controls
 
+**Current status (November 24, 2026):** [PR126](https://github.com/jzwyrzyk/family-game-factory/pull/126) merged the reconciled PR107/100 workflow definitions. [PR152](https://github.com/jzwyrzyk/family-game-factory/pull/152) subsequently completed a guarded Gateway promotion, independently observed through the existing release identity. See [delivery state](../../DELIVERY-STATE.md) for exact receipts and outstanding functional/data checks. The earlier draft/setup descriptions below are historical; do not replay them. This does not establish broader effective IAM, working managed diagnostics, broker/log access, provider/consent settings, or permission to expand scope.
+
 This change adds a release controller and scoped diagnostic clients. Each production
 operation requires a maintainer-reviewed intent on protected main. The repository opt-ins and
 Google grants are initially absent. Existing Pages, sandbox publication, smoke,
@@ -14,8 +16,6 @@ Cloud Logging access, an isolated paid drill, release flags or production traffi
 The seven inactive GCP resources were created and verified; the read-only
 verification receipt was recovered under temporary /tmp storage. Live effective
 permissions and end-to-end assistant access remain unverified.
-
-**Current-source status (November 23, 2026):** The split description below preserves its original draft-stage rationale. [PR126](https://github.com/jzwyrzyk/family-game-factory/pull/126) later merged the reconciled PR107/100 source, including `.github/workflows/jems-service-images.yml` and `.github/workflows/jems-cloud-run-release.yml`, at `34eb40a27ce47a3a740d05cd0e8d6a00f98480bc`; [PR107](https://github.com/jzwyrzyk/family-game-factory/pull/107) was marked merged through that same integration. These definitions are now on main. The source-only merge did **not** establish enabled identities, approved production flags, working Cloud Shell/managed connection, live permission readback, claimed traffic, or a successful production rollout. The November 23 authorized cutover remained blocked before promotion; check [delivery state](../../DELIVERY-STATE.md) for the observed limits. Any later administrative step requires a newly reviewed current-source plan, not the historical draft head or stale receipt.
 
 ## Integration split: policy checks and game fixes
 
@@ -47,6 +47,10 @@ separation to Cloud Run image publication and traffic control. It uses the curre
 service publication archive and existing repositories. [Issue #46](https://github.com/jzwyrzyk/family-game-factory/issues/46)
 also tracks coordinated Pages restoration, protocol probes, authenticated synthetic
 journeys and real-device acceptance. Those remain distinct gates.
+
+## Additional request-evidence reader
+
+The [GitHub request-evidence workflow](PRODUCTION_DIAGNOSTICS.md) uses a separately approved broker and a dedicated caller. The ERROR sink and its whole-field restrictions below remain specific to the managed error-count client. The [request broker setup](PRODUCTION_DIAGNOSTICS_SETUP.md) explains why a request URL must be sanitized within Google Cloud and why only the broker may read its scoped source view.
 
 ## Diagnostics
 

@@ -1,11 +1,15 @@
 # Review the remaining Jems access setup
 
+**Current status (November 24, 2026):** [PR126](https://github.com/jzwyrzyk/family-game-factory/pull/126) merged the reconciled PR107/100 workflow definitions. [PR152](https://github.com/jzwyrzyk/family-game-factory/pull/152) subsequently completed a guarded Gateway promotion, independently observed through the existing release identity. See [delivery state](../../DELIVERY-STATE.md) for exact receipts and outstanding functional/data checks. The earlier draft/setup descriptions below are historical; do not replay them. This does not establish broader effective IAM, working managed diagnostics, broker/log access, provider/consent settings, or permission to expand scope.
+
+**Current production handoff:** use [Production activation and exact-source release](PRODUCTION_ACTIVATION.md). The owner has authorized the cutover but has explicitly withheld approval of the additional IAM/provider activation scope until fresh live IAM evidence and an exact diff are reviewed. The new collector is read-only; the release operator supplies one immutable, tested Cloud Shell command. Do not run the historical placeholder command or old PR107 apply pathway below as the current production procedure.
+
+## Historical PR107 preparation
+
 This is preparation for the operational access in draft [PR107](https://github.com/jzwyrzyk/family-game-factory/pull/107).
 It does not authorize a merge, install permissions, enable a workflow or change
 production. The [policy foundation](POLICY_FOUNDATION.md) is source validation;
 its passing checks do not establish that the accounts are configured.
-
-**Current-source status (November 23, 2026):** This runbook originally accompanied draft PR107. [PR126](https://github.com/jzwyrzyk/family-game-factory/pull/126) merged its reconciled source and workflow definitions at `34eb40a27ce47a3a740d05cd0e8d6a00f98480bc`; PR107 is also closed as merged. References to an *open* draft head and the placeholder handoff below remain historical examples, **not** an executable current approval or instruction to replay an older account plan. The [latest delivery record](../../DELIVERY-STATE.md) reports that current operator/cloud identity and production baselines could not be read during the authorized November 23 cutover. A fresh inspected main and private read-only baseline are required before future account actions; no new permission, approval or activation is conferred by this note.
 
 ## One read-only handoff
 
