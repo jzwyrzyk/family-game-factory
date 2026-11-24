@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T00:06:21.346Z",
-      "sourceDigest": "13dadca286116e913d8997a194491af26169aa4666d3c13b1179c3be045b206a",
+      "reviewedAt": "2026-11-24T00:17:46.500Z",
+      "sourceDigest": "e020c0dd7df099860a86599af1dda37f45db3663da30400a791d350129849ec2",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner canary receipt and absent request evidence; prepared the pinned zero-traffic Gateway stage from fresh baseline and matching configuration while retaining separate Coach acceptance and promotion gates.",
+      "reviewReason": "Integrated the Coach promotion evidence and preserved fresh Gateway stage pins; documented PR147 sequencing after successful PR148 promotion while allowing exact-head source checks to run concurrently.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
