@@ -1102,10 +1102,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T16:13:38.999Z",
-      "sourceDigest": "30e39e844b89c02ed2d64770c4db8012b7b717feb57203bbfd328138a3eb183c",
+      "reviewedAt": "2026-11-24T16:21:36.149Z",
+      "sourceDigest": "311da611c421e23474cc9ccc490b933d1141829da752fb60f624cc2fe323b9c5",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded approved CI and shared-verifier merges, independently verified full main receipt, actual setup/retention measurements and unchanged acceptance gaps; protected-main fast-path execution remains pending.",
+      "reviewReason": "Added the completed final-main first-attempt full receipt and actual elapsed/runner/queue measurements; preserved the live-status uncertainty, older failures and pending fast-path execution without changing policy or routing.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
