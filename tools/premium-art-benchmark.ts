@@ -27,6 +27,9 @@ export function fixtureApproval():PremiumApproval{
   images:{approvalId:'synthetic-images',enabled:true,model:'offline-image-fixture',maxImages:2,maxMicroUsdPerImage:50000,priceReviewedOn:today,sheetFormat:'rgba8-png-grid-v1'}};
 }
 async function trial(id:ArtCase,directory:string) {
+ const sourceCommit=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+ const verifySource=()=>execFileSync('git',['diff','--quiet',sourceCommit,'--','server','src','tools','package.json','package-lock.json']);
+ verifySource();
  const start=performance.now(),sample=authoredCase(id),approval=fixtureApproval();
  const input={gameManifest:{id:'new',allowedMechanics:['generated-module-v2']},baseRevision:{id:'new'},childIntent:sample.request,
   allowedCapabilities:['generated-module-v2'],signal:new AbortController().signal,budget:{maxUnits:premiumJobReserve(approval),timeoutMs:300000}};
@@ -86,7 +89,8 @@ async function trial(id:ArtCase,directory:string) {
   const policy=approval.stages[b.stage];
   return total+b.inputBound*policy.inputUsdPerMillion+policy.maxOutputTokens*policy.outputUsdPerMillion;
  },100000);
- const receipt={schedules,firstPassMicroUsd,workerTimingsMs:raw.timings,version:'premium-art-trial-v1',sourceCommit:execFileSync('git',['rev-parse','HEAD']).toString().trim(),id,
+ verifySource();
+ const receipt={schedules,firstPassMicroUsd,workerTimingsMs:raw.timings,version:'premium-art-trial-v1',sourceCommit,id,
   pairedCase:sample.pairedCase,requestHash:sha(sample.request),fixtureHash:sha(JSON.stringify(sample.proposal)),sourceHash:e.sourceHash,
   codeHash:e.codeHash,runtimeHash:e.runtimeHash,artifactHash:e.artifactHash,assetsHash:tested.compiled!.assetsHash,htmlHash:sha(html),
   dependencies:sha(readFileSync('package-lock.json')),sandboxDependencies:sha(readFileSync('server/sandbox/package-lock.json')),
@@ -99,7 +103,7 @@ async function trial(id:ArtCase,directory:string) {
  console.log(id,receipt.wholeJobReservationMicroUsd,receipt.sessions.map(s=>s.outcome).join('/'));
 }
 async function main(){
- const requested=process.argv[2];for(const id of artCases)if(!requested||requested===id)await trial(id,'test-results/premium-art');
+ const requested=process.argv[2];if(requested&&!artCases.includes(requested as ArtCase))throw Error('UNKNOWN_AUTHORED_FIXTURE');
+ for(const id of artCases)if(!requested||requested===id)await trial(id,'test-results/premium-art');
 }
 if(process.argv[1]?.endsWith('premium-art-benchmark.ts'))void main().catch(e=>{console.error(e);process.exitCode=1;});
-

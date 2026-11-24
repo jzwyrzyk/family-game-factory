@@ -89,6 +89,9 @@ test('offline join rejects interrupted art, stale code and timeout without publi
   const aborted=AbortSignal.timeout(1);await new Promise(resolve=>setTimeout(resolve,5));
   await assert.rejects(compareSchedule('horse',mode,aborted),e=>(e as Error).name==='TimeoutError');
  }
+ const cancellation=new AbortController();
+ const inFlight=compareSchedule('fox','overlap',cancellation.signal);cancellation.abort();
+ await assert.rejects(inFlight,e=>(e as Error).name==='AbortError');
  for(const id of artCases){
   const raw=authoredCase(id);
   assert.ok(assetPackHash(validateAssetPack({version:'game-assets-v1',style:raw.proposal.presentationStyle,assets:extractSheet(raw.sheet,raw.proposal.artDirection,origin,'smooth')})));

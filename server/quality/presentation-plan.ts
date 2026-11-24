@@ -127,8 +127,11 @@ export function permitsNewArt(input:AgentInput):boolean {
  if(!game||!('assets'in game)||!game.assets||validateAssetPack(game.assets).assets.length===0)return true;
  const brief=presentationBrief(input),savedStyle=validateAssetPack(game.assets).style;
  if(brief.preferredStyle&&brief.preferredStyle!==savedStyle)return true;
- return /\b(?:art|artwork|appearance|visuals?|style|palette|colou?rs?|texture|background|scenery|redraw|draw|paint|recolou?r|illustrat\w*|theme|replace\s+(?:the\s+)?(?:actor|character|sprite|background)|transform|turn\b.{0,40}\binto|add\s+(?:(?:a|an|new)\s+){1,2}(?:actor|character|sprite|background))\b/i.test(input.childIntent)||
-  /\b(?:make|turn|change)\b.{0,60}\b(?:red|orange|yellow|green|blue|purple|pink|black|white)\s*(?:[.!?]|$|and\b)/i.test(input.childIntent);
+ const request=input.childIntent;
+ return /\b(?:redraw|recolou?r|repaint|paint|illustrate|reskin)\b/i.test(request)||
+  /\b(?:add|replace|change|redo|draw)\s+(?:(?:a|an|the|my|our|new|room)\s+){0,3}(?:artwork|art|palette|colou?rs?|texture|scenery|background|style|illustration|portrait)\b/i.test(request)||
+  /\b(?:replace|add|draw)\s+(?:(?:a|an|the|my|new)\s+){0,3}(?:character|actor|sprite)\b/i.test(request)||
+  /\b(?:make|turn|change)\b.{0,60}\b(?:red|orange|yellow|green|blue|purple|pink|black|white)\s*(?:[.!?]|$|and\b)/i.test(request);
 }
 
 export function validateGameProductionPlan(value:unknown):GameProductionPlan {

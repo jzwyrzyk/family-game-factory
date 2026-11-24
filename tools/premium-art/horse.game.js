@@ -35,7 +35,7 @@ export function createGame(api) {
             {type:'circle',key:'petal'+i,x:x-7,y:y-10,radius:9+i,color:'#f1c6ad'});
         }
       }
-      for(let i=0;i<2;i++){
+      for(let i=0;s.node!==4&&i<2;i++){
         const signX=206+i*300-drift*33, signY=214+phase*18;
         items.push({type:'rect',key:'post'+i,x:signX,y:signY,width:7,height:47,color:'#7b604f'},
           {type:'rect',key:'board'+i,x:signX-43,y:signY-12,width:97,height:26,color:'#564b48'},
