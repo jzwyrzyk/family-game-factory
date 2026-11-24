@@ -1,5 +1,9 @@
 # jems delivery state
 
+## November 23, 2026 — synthetic documentation-only CI benchmark fixture
+
+This isolated benchmark changes only this delivery note and its required documentation-review metadata. It is based on PR154 candidate `3af84756050c0bb4dbb63ee47a2e8835183cfc68` and targets that unmerged CI branch, not protected main. The purpose is to measure the candidate policy's documentation-only path through real GitHub Actions. This provisional branch-local observation does not activate policy on main, establish production acceptance, change release intent or authorize a merge. Close the benchmark PR after recording its exact hosted results; retain its branch and evidence for audit.
+
 ## November 23, 2026 — CI architecture implementation prepared; cutover unchanged
 
 A dedicated CI overhaul branch starts from main `28fe3311036f8ef9f3bfc623c522432499c08113`. The [CI architecture/audit guide](docs/evidence/README.md#ci-architecture-and-performance) inventories 19 workflows and 51 npm test entry points, records the six actual required check names, and compares seven representative Arcade runs. Baseline PR141 takes 21.68 minutes and 37.63 runner-minutes; PR148's duplicate PR/push pair consumes 81.95 runner-minutes. Creative's artifact is 187,351,289 bytes. These are measured GitHub metadata, not estimates or billed charges.
