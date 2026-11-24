@@ -1115,10 +1115,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T16:01:22.780Z",
-      "sourceDigest": "6d8906f0b7c5b9ddb8df4330cf4d6a0d2b53e741b4bfdae849e9ed17c94d6740",
+      "reviewedAt": "2026-11-24T16:32:25.359Z",
+      "sourceDigest": "ed005d7dbb9b6a1a76816e696a4bf36e00ba090579a5f25bdac74ef43ea69f45",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded approved PR157 main full pass and shared verifier integration while preserving disabled environment setup, original foundation evidence and all deployed acceptance gaps.",
+      "reviewReason": "Reconciled existing PR155 consumers with merged shared verifier, actual main full and reuse receipts and operational baseline; preserved disabled setup/deployed acceptance and clarified historical pre-approval wording without changing production controls.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
