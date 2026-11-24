@@ -1,5 +1,11 @@
 # jems delivery state
 
+## November 23, 2026 — Gateway canary prepared behind the ordered backend transitions
+
+A separate Gateway canary intent is prepared on top of staged-release head `c2176c0d557f8751ec71f1263d2adc726dd5d0c0`. It changes only the Gateway operation from stage to canary, retaining the same source, signed image, baseline image/revision, configuration fingerprint and exact compatibility receipt. It targets baseline95/candidate5 through the unchanged controller. This is preparation only: Coach promotion PR148 and Gateway stage PR147 must each merge and complete their live transition successfully before this canary intent may merge. Exact-head source checks can run in advance; neither their success nor this entry establishes staging, canary readiness, a traffic change or functional acceptance.
+
+Before merge, review the actual predecessor receipts, any stage/lifecycle errors and current main/head/tree. The controller must still verify the exact single-serving Gateway baseline, ready candidate, immutable images/configuration, tags and etag at execution. Stop on drift or an unresolved stage error. After a successful canary transition, obtain candidate-specific Gateway request/response evidence and review errors before preparing promotion. No automatic paid replay, Pages publication, provider/budget/IAM/worker change or data cleanup is included. Existing Coach promotion evidence remains bounded to the actual replies and request metadata recorded below.
+
 ## November 23, 2026 — real Coach replies reach candidate; failing baseline drives promotion priority
 
 The owner reported alternating reconnect/reply and disconnect-on-send behavior during an actual Adult conversation. The subsequent checksum-pinned read-only observation at **7:13 p.m. America/New_York (`2026-11-24T00:13:56.156152Z`)** completed with zero mutations, main `2765dc042bf8760e2b930b0f83f6759c63429a95`, Coach baseline95/candidate5 and unchanged Gateway baseline/configuration. Its private completion receipt SHA-256 is `95036c5f2fbea06a74637a3be83c3e297c8be3d04a6c128d0d04eafa6625958b`.

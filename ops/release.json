@@ -1,5 +1,5 @@
 {
-  "operation": "stage",
+  "operation": "canary",
   "source": "aa56b60abe152e750f9f0b5e8949bdb44be53196",
   "service": "factory-gateway",
   "image": "us-east5-docker.pkg.dev/family-game-factory-jzw/jems-release-images/gateway@sha256:18c62e421f5a8c4f6fbf4223b2121f979e64cdf7a9d3821ddf03379dad082436",

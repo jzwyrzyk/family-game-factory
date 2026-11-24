@@ -44,6 +44,8 @@ The owner completed the canary handoff at `2026-11-24T00:01:05.156354Z`; its rec
 
 The Gateway stage intent binds that observation's single 100% baseline and matching configuration to the already published Gateway image from source `aa56b60abe152e750f9f0b5e8949bdb44be53196`. Gateway staging preserves candidate0/baseline100. Following the later candidate-success/baseline-failure evidence above, sequence PR147 after the successful Coach promotion in PR148; concurrent source checks do not authorize concurrent production transitions. It uses the existing reviewed provenance and etag-guarded release workflow; it neither changes Coach traffic nor advances Gateway to canary. Recheck the exact source, required CI and current main before merge, then observe the actual workflow result. A successful stage proves pinned revision metadata, not functional request handling. After main advances, preserve the older canary handoff as historical evidence and use a separately reviewed observation for the new release state.
 
+A subsequent Gateway canary intent may be prepared and source-tested in advance, but it must remain unmerged until Coach promotion and Gateway staging each have a successful observed receipt and stage/lifecycle review has no unresolved error. The existing controller then requires baseline100/candidate0 before shifting to baseline95/candidate5. Review fresh candidate-specific Gateway requests before any promotion; advance source checks do not substitute for these live predecessor and acceptance gates.
+
 ## What is known, and what still needs a fresh read
 
 | Evidence | Scope and limit |

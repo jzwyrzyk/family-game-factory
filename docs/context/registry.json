@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T00:17:46.500Z",
-      "sourceDigest": "e020c0dd7df099860a86599af1dda37f45db3663da30400a791d350129849ec2",
+      "reviewedAt": "2026-11-24T00:21:22.734Z",
+      "sourceDigest": "3812e221c158a42ee934e0de50d7be4e1b55d115ba63a7e7a22ef9672fc50d5b",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated the Coach promotion evidence and preserved fresh Gateway stage pins; documented PR147 sequencing after successful PR148 promotion while allowing exact-head source checks to run concurrently.",
+      "reviewReason": "Prepared the exact-pinned Gateway canary behind successful Coach promotion and Gateway staging; documented live predecessor, lifecycle review and candidate acceptance requirements while running source checks in advance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
