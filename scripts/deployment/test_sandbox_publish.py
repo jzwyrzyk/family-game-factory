@@ -68,6 +68,19 @@ class ManualSandboxPublisherTests(unittest.TestCase):
         self.assertIn('github.ref_protected',text)
         self.assertIn('if-no-files-found: error',text)
 
+    def test_attestation_job_only_signs_verified_manifest_after_publication(self):
+        publisher, attestation = self.source().split('\n  attest-reviewed-sandbox:')
+        self.assertNotIn('id-token: write', publisher)
+        self.assertNotIn('attestations: write', publisher)
+        self.assertLess(publisher.index('.imageId == $id and .source == $source'),
+                        publisher.index('echo "digest=$digest" >> "$GITHUB_OUTPUT"'))
+        self.assertIn('needs: publish-reviewed-sandbox', attestation)
+        self.assertIn('subject-digest: ${{ needs.publish-reviewed-sandbox.outputs.digest }}', attestation)
+        self.assertIn('subject-name: ghcr.io/jzwyrzyk/family-game-factory-sandbox', attestation)
+        self.assertNotIn('packages: write', attestation)
+        self.assertNotIn('actions/checkout', attestation)
+        self.assertNotIn('run:', attestation)
+
     def test_fixture_loader_from_real_typescript_package(self):
         # Regression for run 44837433067: named ESM import of a TS fixture
         # compiled as CommonJS failed before the Docker envelope test.

@@ -1126,10 +1126,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T23:17:42.895Z",
-      "sourceDigest": "91c85376d81627f229a97f6c31ea2ff914b7fe9d68e2180c5d309cca466a9c90",
+      "reviewedAt": "2026-11-24T23:20:09.639Z",
+      "sourceDigest": "bc31b345eed05b98eab72cf64d2a3c994973b6b8a223e136f3ef90203bb20f27",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed manual main-only publisher ordering, selected candidate SHA, actual packaged-byte and digest binding, and separate isolated smoke in the publisher handoff.",
+      "reviewReason": "Reviewed publisher digest verification, signed manifest provenance via the existing pinned action, separated job permissions, and the acceptance runbook.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
