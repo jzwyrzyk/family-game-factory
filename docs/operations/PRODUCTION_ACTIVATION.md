@@ -38,6 +38,12 @@ Use the existing authenticated Adult profile and approved allowance for the boun
 
 The owner subsequently reported actual replies mixed with disconnects. The `2026-11-24T00:13:56.156152Z` observation recorded in [delivery state](../../DELIVERY-STATE.md) attributes both successful completion/Gateway pairs to the candidate and three failed pairs to the retained baseline. Two earlier Gateway-only failures remain unattributed. Use that bounded real-conversation evidence for the separate promotion review; do not count readiness GETs as model success or describe the failing baseline as a proven healthy fallback. Prioritize the Coach promotion before the prepared Gateway stage, then obtain fresh post-transition evidence. No additional paid retry is needed to repeat the already observed canary check.
 
+## Preparing the November 23 Gateway stage
+
+The owner completed the canary handoff at `2026-11-24T00:01:05.156354Z`; its receipt and fresh Gateway inputs are recorded in [delivery state](../../DELIVERY-STATE.md). Coach remained at 95/5, while that initial bounded request query contained no matching chat POSTs or status GETs. The later conversation and revision-specific request evidence above supersede that initial absence of functional evidence.
+
+The Gateway stage intent binds that observation's single 100% baseline and matching configuration to the already published Gateway image from source `aa56b60abe152e750f9f0b5e8949bdb44be53196`. Gateway staging preserves candidate0/baseline100. Following the later candidate-success/baseline-failure evidence above, sequence PR147 after the successful Coach promotion in PR148; concurrent source checks do not authorize concurrent production transitions. It uses the existing reviewed provenance and etag-guarded release workflow; it neither changes Coach traffic nor advances Gateway to canary. Recheck the exact source, required CI and current main before merge, then observe the actual workflow result. A successful stage proves pinned revision metadata, not functional request handling. After main advances, preserve the older canary handoff as historical evidence and use a separately reviewed observation for the new release state.
+
 ## What is known, and what still needs a fresh read
 
 | Evidence | Scope and limit |

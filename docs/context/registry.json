@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T00:16:12.182Z",
-      "sourceDigest": "ac18d7e8a939909359896c0eb06405be1e8fe44442826b93018d37303e7b137e",
+      "reviewedAt": "2026-11-24T00:17:46.500Z",
+      "sourceDigest": "e020c0dd7df099860a86599af1dda37f45db3663da30400a791d350129849ec2",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded owner-confirmed real replies and candidate 200/baseline 503 request pairs, retained unattributed Gateway failures and small-sample limits, and prepared Coach promotion ahead of the Gateway stage without changing release controls or spending.",
+      "reviewReason": "Integrated the Coach promotion evidence and preserved fresh Gateway stage pins; documented PR147 sequencing after successful PR148 promotion while allowing exact-head source checks to run concurrently.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
