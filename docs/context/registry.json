@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T01:51:12.836Z",
-      "sourceDigest": "f999b0b1c8f5057391b2b9428aa98078728c96c474aa579696183732a017a44a",
+      "reviewedAt": "2026-11-24T02:23:30.547Z",
+      "sourceDigest": "e16b27a3aabe646f9d6d7227d9b66d271f7b4a2e26fbc250d3e257d4ef8aa68b",
       "reviewOutcome": "updated",
-      "reviewReason": "Stacked the unchanged Gateway canary on the metadata-only release observer while preserving actual Coach promotion and Gateway stage evidence; fresh stage lifecycle inspection still gates canary merge.",
+      "reviewReason": "Recorded verified metadata access and Gateway95/5 canary receipts, and prepared a distinct promotion intent held for candidate-specific functional/error evidence; metadata success is explicitly insufficient and all provider/IAM/data boundaries remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

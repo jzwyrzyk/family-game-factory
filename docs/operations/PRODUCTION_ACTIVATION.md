@@ -1,5 +1,13 @@
 # Jems production activation and exact-source release
 
+## Current observation after Cloud Shell quota exhaustion
+
+[Delivery state](../../DELIVERY-STATE.md) records the completed Coach100 promotion, successful owner reply, Gateway95/5 canary and two successful metadata-only GitHub observations. The original activation procedure below is historical and must not be replayed to regain a terminal or log access. Its approved workflow hashes remain fixed.
+
+Use `observe=true`, `verify_identity=false`, `verify_access=false` on the existing `jems-cloud-run-release.yml` workflow at protected main for current service/revision metadata. The reader requires current source, effective release identity and matching intent/traffic/configuration; all mutation jobs are excluded. It reads no logs, paid endpoints, private secret payloads, pending work or saved games. A fresh observation is appropriate after each actual transition; an old fixed-main Cloud Shell handoff is not current evidence after main advances.
+
+Gateway promotion still requires candidate-specific functional and error review. The existing release identity has no log-reading permission, and this change adds none. The owner can inspect existing request metadata through Google Cloud Console Logs Explorer independently of Cloud Shell's quota. Starting at the successful canary completion (`2026-11-24T02:19:14Z`), restrict to the production project, `cloud_run_revision`, service `factory-gateway`, revision `factory-gateway-r-eaf5effa06d031818f52`, and `run.googleapis.com/requests`. Report methods, paths, statuses and bounded-query coverage only; do not collect conversation bodies or credentials. No entries or only readiness GETs do not establish successful candidate chat. Do not automatically replay a paid request to manufacture evidence. Pending-work/data continuity, Preview compatibility and dependent Pages/browser acceptance remain separate gates.
+
 ## Current gate: execute the approved scope after release checks
 
 The owner's explicit “merge, deploy and cutover whenever ready” approval covers the reviewed activation scope `783768e228e50411c9fada4f9a7c5867e9a8553fe6ff25a2e8af9f511fe1ea34`, pinned procedure and historical manifest. [PR140](https://github.com/jzwyrzyk/family-game-factory/pull/140) is merged as IAM setup source `31ec7c82d017cb34591ae779344d47d879d9100c`. The earlier additional-IAM approval hold is superseded; fresh source checks, strict state matching, federation/access proofs and the remaining release gates still apply. No new approval is needed for routine execution within that unchanged scope. Keep release flags absent until the actual access proofs pass; merge and claims-only success do not establish activation or deployment.
