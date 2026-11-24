@@ -869,13 +869,14 @@
         "tools/**",
         "scripts/verify-brand-assets.mjs",
         "scripts/tests/verify-pal-assets.test.mjs",
-        "scripts/ci/**"
+        "scripts/ci/**",
+        "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T15:40:40.410Z",
-      "sourceDigest": "fdd961fda0a2b26d44c4a27d4fc44aaaa2ffbe91998cb647eb566551e22abb29",
+      "reviewedAt": "2026-11-24T16:01:22.332Z",
+      "sourceDigest": "45d277bdfa6c48204f2717a41806fb9c19b9a0b5c8b783391f41f4067796d38e",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled DEV/TEST full-receipt verifier with PR157 protected-main reuse and shadow reports: reused green runs remain ineligible for TEST, exact current policy remains required, and all96 regression commands remain assigned.",
+      "reviewReason": "Reconciled PR155 consumers with the shared adapter and mandatory CI contract from PR162; source policy equality, exact current merge parents/tree and full TEST receipt requirements remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1110,13 +1111,14 @@
         ".gitignore",
         "DELIVERY-STATE.md",
         "scripts/environments/**",
-        "infra/nonproduction/**"
+        "infra/nonproduction/**",
+        "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T15:40:40.855Z",
-      "sourceDigest": "fb1d6d1d217d06ebe6682f45e19dc4f5baec5a634a666df2b89f5eefd60c14bf",
+      "reviewedAt": "2026-11-24T16:01:22.780Z",
+      "sourceDigest": "6d8906f0b7c5b9ddb8df4330cf4d6a0d2b53e741b4bfdae849e9ed17c94d6740",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved main154 full pass and PR157 failed first attempt; integrated DEV/TEST adapter with candidate157 source while keeping cloud setup and all deployed acceptance outstanding.",
+      "reviewReason": "Recorded approved PR157 main full pass and shared verifier integration while preserving disabled environment setup, original foundation evidence and all deployed acceptance gaps.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1370,10 +1372,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T15:28:44.842Z",
-      "sourceDigest": "301da98bf29c55deca7afdcb1228c19ca369ef3595ba17ceb53f41b188039e53",
+      "reviewedAt": "2026-11-24T16:01:23.151Z",
+      "sourceDigest": "a6c5efb8df842dd483e273abb70927eefa6e87176e939e518b11ab222a2f5f08",
       "reviewOutcome": "updated",
-      "reviewReason": "Unioned CI evidence and DEV/TEST documentation routing and PR-template maintenance obligations; preserved current canonical contracts, historical evidence and explicit approval distinctions without weakening source-review coverage.",
+      "reviewReason": "Preserved the union of CI and DEV/TEST source routing, templates and maintenance instructions; shared verifier source is reviewed in both validation and delivery.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
