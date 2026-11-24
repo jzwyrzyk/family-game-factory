@@ -1,5 +1,5 @@
 {
-  "operation": "canary",
+  "operation": "promote",
   "source": "aa56b60abe152e750f9f0b5e8949bdb44be53196",
   "service": "factory-coach-private",
   "image": "us-east5-docker.pkg.dev/family-game-factory-jzw/jems-release-images/coach@sha256:67cf3b3b92f83ecf5f107b68c00606cf5bbc946561d13104d37ad929c80575e3",

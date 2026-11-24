@@ -36,6 +36,8 @@ Use the supplied checksum-pinned [canary observation handoff](../../scripts/ops/
 
 Use the existing authenticated Adult profile and approved allowance for the bounded conversation check, keeping Build separate. Match a successful actual reply to the candidate's completion-request metadata; a reply served by the baseline cannot clear candidate acceptance. Do not automatically repeat an uncertain paid request. Review any errors before a separate promotion intent. The retained baseline and owner recovery permissions support the existing controller's traffic-only rollback if needed; this read-only handoff never invokes apply, promotion or rollback.
 
+The owner subsequently reported actual replies mixed with disconnects. The `2026-11-24T00:13:56.156152Z` observation recorded in [delivery state](../../DELIVERY-STATE.md) attributes both successful completion/Gateway pairs to the candidate and three failed pairs to the retained baseline. Two earlier Gateway-only failures remain unattributed. Use that bounded real-conversation evidence for the separate promotion review; do not count readiness GETs as model success or describe the failing baseline as a proven healthy fallback. Prioritize the Coach promotion before the prepared Gateway stage, then obtain fresh post-transition evidence. No additional paid retry is needed to repeat the already observed canary check.
+
 ## What is known, and what still needs a fresh read
 
 | Evidence | Scope and limit |

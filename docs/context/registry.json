@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-23T23:51:00.533Z",
-      "sourceDigest": "d170978ac2c017080a68e440a0a1a46002949e0ae18220a7b68219d79f86092b",
+      "reviewedAt": "2026-11-24T00:16:12.182Z",
+      "sourceDigest": "ac18d7e8a939909359896c0eb06405be1e8fe44442826b93018d37303e7b137e",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the protected merge and successful production 5% Coach canary, preserved stage history, and documented the read-only candidate-request and Gateway-input handoff with remaining functional acceptance.",
+      "reviewReason": "Recorded owner-confirmed real replies and candidate 200/baseline 503 request pairs, retained unattributed Gateway failures and small-sample limits, and prepared Coach promotion ahead of the Gateway stage without changing release controls or spending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
