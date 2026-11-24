@@ -14,23 +14,24 @@ class Memory {
  setItem(k:string,v:string){this.mutate(()=>this.values.set(k,v));}
  removeItem(k:string){this.mutate(()=>this.values.delete(k));}
 }
-const changes:Change[]=[{key:'game',before:'{"old":1}',after:'{"old":1,"new":2}'},{key:'chat',before:null,after:'{"reply":1}'}];
-const journal=(s:Memory,scope='family',guard=()=>{})=>localJournal(s,scope,['game','chat'],guard,cs=>cs.forEach(c=>{if(c.before!==null)JSON.parse(c.before);JSON.parse(c.after);}));
-for(const after of [false,true])for(let boundary=1;boundary<=5;boundary++)test(`termination ${after?'after':'before'} mutation ${boundary} restores a coherent outcome`,()=>{
+const changes:Change[]=[{key:'game',before:'{"old":1}',after:'{"old":1,"new":2}'},{key:'chat',before:null,after:'{"reply":1}'},{key:'profile',before:null,after:'{"slot":"reserved"}'}];
+const journal=(s:Memory,scope='family',guard=()=>{})=>localJournal(s,scope,['game','chat','profile'],guard,cs=>cs.forEach(c=>{if(c.before!==null)JSON.parse(c.before);JSON.parse(c.after);}));
+for(const after of [false,true])for(let boundary=1;boundary<=changes.length+3;boundary++)test(`termination ${after?'after':'before'} mutation ${boundary} restores a coherent outcome`,()=>{
  const s=new Memory();s.values.set('game',changes[0].before!);s.fault=boundary;s.after=after;
  try{journal(s).commit(changes);}catch{}
  s.fault=Infinity;const outcome=journal(s).recover();
- const committed=boundary>4||boundary===4&&after;
+ const committed=boundary>5||boundary===5&&after;
  assert.equal(s.getItem('game'),committed?changes[0].after:changes[0].before);
  assert.equal(s.getItem('chat'),committed?changes[1].after:null);
+ assert.equal(s.getItem('profile'),committed?changes[2].after:null);
  assert.equal(s.getItem(LOCAL_JOURNAL_KEY),null);
  assert.equal(journal(s).recover(),'none');
 });
-for(let boundary=1;boundary<=3;boundary++)test(`interrupted rollback boundary ${boundary} resumes without replay`,()=>{
- const s=new Memory();s.values.set('game',changes[0].before!);s.fault=4;
+for(let boundary=1;boundary<=4;boundary++)test(`interrupted rollback boundary ${boundary} resumes without replay`,()=>{
+ const s=new Memory();s.values.set('game',changes[0].before!);s.fault=5;
  assert.throws(()=>journal(s).commit(changes));s.step=0;s.fault=boundary;s.after=true;
  try{journal(s).recover();}catch{}
- s.fault=Infinity;journal(s).recover();assert.equal(s.getItem('game'),changes[0].before);assert.equal(s.getItem('chat'),null);
+ s.fault=Infinity;journal(s).recover();assert.equal(s.getItem('game'),changes[0].before);assert.equal(s.getItem('chat'),null);assert.equal(s.getItem('profile'),null);
 });
 test('newer bytes, wrong namespace, lost lock and malformed intents fail before any write',()=>{
  const s=new Memory();s.values.set('game',changes[0].before!);s.fault=3;assert.throws(()=>journal(s).commit(changes));s.fault=Infinity;

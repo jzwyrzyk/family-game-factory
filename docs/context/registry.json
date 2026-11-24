@@ -885,10 +885,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T22:40:02.310Z",
-      "sourceDigest": "2430f4734528bdead4e8ca2de02d759a5a525ec4405e2d16c262d1fe16cc3201",
+      "reviewedAt": "2026-11-24T22:45:13.973Z",
+      "sourceDigest": "c429accb8fadbd51e9dbf1847511a56670b6728d3a3896fc5d55d95d10db513d",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded built-app desktop/tablet/phone remote-copy loss, reload, missing-receipt and local-quota recovery tests; existing storage shard runs the new journey, with contrast and 48px controls checked. Hosted evidence remains exact-source scoped.",
+      "reviewReason": "Expanded the local fault matrix to all six three-source journal mutations, before/after faults and interrupted rollback, and recorded 620 passing unit cases plus the complete desktop/tablet/phone storage and copy journeys.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1127,10 +1127,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T22:40:33.089Z",
-      "sourceDigest": "007645249c04cfb8e370cd094a57c2e91c5364c0d94ec55880b73717a91ea123",
+      "reviewedAt": "2026-11-24T22:45:15.217Z",
+      "sourceDigest": "7361d0fcfee94f306afd5573f2a7e6e5b565a837006df7a59af1fccfc101f28e",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the copy-recovery built-app fixture results and original hosted CI registration corrections, without claiming the pending final source is merged, deployed or accepted on live family devices.",
+      "reviewReason": "Recorded stronger three-source crash coverage and 620 unit passes; final hosted source verification remains pending and no merge, deployment, cloud activation or actual-family acceptance is claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1688,10 +1688,10 @@
         "docs/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "10792febea3fbfe71eb432dc67702a00e2d2cab25a865a933efa8a84c50bda70",
-      "reviewedAt": "2026-11-24T22:40:03.022Z",
+      "sourceDigest": "8b376cd6f135b4fbd1f410d3e6197414f1a19d3309ac220b8109fa2fc277916e",
+      "reviewedAt": "2026-11-24T22:45:14.633Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Closed pending remote-copy discoverability with Notifications and Check my copy; documented integrated read-only recovery and synthetic lost-acknowledgment/quota browser evidence while preserving the separate unfinished continuity/migration boundaries."
+      "reviewReason": "Recorded all six durable boundaries for the three-source journal and retained prior five-boundary benchmark evidence. Updated current IndexedDB samples without claiming app migration, stable latency SLA or live reliability."
     }
   ]
 }

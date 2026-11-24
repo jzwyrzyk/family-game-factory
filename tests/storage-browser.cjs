@@ -11,17 +11,17 @@ const {build}=require('esbuild'),{chromium}=require('playwright');
   for(const [device,width,height] of [['desktop',1280,800],['tablet',820,1180],['phone',390,844]]){
    const context=await browser.newContext({viewport:{width,height}});let page=await context.newPage();const url=`http://127.0.0.1:${server.address().port}`;
    await page.goto(url);
-   for(let boundary=1;boundary<=5;boundary++){
+   for(let boundary=1;boundary<=6;boundary++){
     await page.evaluate(boundary=>{
      localStorage.clear();let step=0;
      const port={getItem:k=>localStorage.getItem(k),setItem:(k,v)=>{localStorage.setItem(k,v);if(++step===boundary)throw Error('Stop renderer');},removeItem:k=>{localStorage.removeItem(k);if(++step===boundary)throw Error('Stop renderer');}};
-     const journal=storageTest.localJournal(port,'family',['a','b'],()=>{},()=>{});
+     const journal=storageTest.localJournal(port,'family',['a','b','profile'],()=>{},()=>{});
      localStorage.setItem('a','original');
-     try{journal.commit([{key:'a',before:'original',after:'new-a'},{key:'b',before:null,after:'new-b'}]);}catch{}
+     try{journal.commit([{key:'a',before:'original',after:'new-a'},{key:'b',before:null,after:'new-b'},{key:'profile',before:null,after:'new-profile'}]);}catch{}
     },boundary);
     const cdp=await context.newCDPSession(page);await Promise.race([cdp.send('Page.crash').catch(()=>{}),new Promise(resolve=>setTimeout(resolve,1500))]);await page.close();page=await context.newPage();await page.goto(url);
-    const state=await page.evaluate(()=>{const j=storageTest.localJournal(localStorage,'family',['a','b'],()=>{},()=>{});j.recover();return [localStorage.getItem('a'),localStorage.getItem('b'),localStorage.getItem(storageTest.LOCAL_JOURNAL_KEY)];});
-    assert.deepEqual(state,boundary>=4?['new-a','new-b',null]:['original',null,null]);
+    const state=await page.evaluate(()=>{const j=storageTest.localJournal(localStorage,'family',['a','b','profile'],()=>{},()=>{});j.recover();return [localStorage.getItem('a'),localStorage.getItem('b'),localStorage.getItem('profile'),localStorage.getItem(storageTest.LOCAL_JOURNAL_KEY)];});
+    assert.deepEqual(state,boundary>=5?['new-a','new-b','new-profile',null]:['original',null,null,null]);
    }
    await page.evaluate(()=>localStorage.clear());
    assert.equal(await page.evaluate(()=>storageTest.installRewardWriteGuard()),true);
@@ -47,7 +47,7 @@ const {build}=require('esbuild'),{chromium}=require('playwright');
     await store.acceptRemote([{...page[0],version:2,value:{title:'Remote'}}]);await store.acceptRemote(page);if((await store.page('games'))[0].value.title!=='Remote')throw Error('stale overwrite');
     allowed=false;try{await store.page('games');}catch{checks.push('profile revoked');}allowed=true;store.close();
     const reopened=await storageTest.IndexedRecords.open(scope,()=>{});if((await reopened.page('games'))[0].value.title!=='Remote')throw Error('reopen');reopened.close();return checks;
-   });assert.equal(indexed.length,3);results.push({device,rendererBoundaries:5,writerLock:true,indexed});await context.close();
+   });assert.equal(indexed.length,3);results.push({device,rendererBoundaries:6,writerLock:true,indexed});await context.close();
   }
   // Multi-year synthetic metadata: 5 profiles × 5 years × 2,000 records/year.
   const context=await browser.newContext(),page=await context.newPage();await page.goto(`http://127.0.0.1:${server.address().port}`);

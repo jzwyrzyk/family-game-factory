@@ -89,10 +89,10 @@ The arrows beyond the current host are a target, not a deployed capability. Brow
 | Recovery image encoding | 9,078,695 bytes | 4,539,411 bytes | Common-content sharing; UTF-8 measurement, browser accounting varies |
 | 50 revisions with identical 450 KB artwork/code | 23,928,030 object bytes | 525,358 object bytes | Opt-in encoder; synthetic bytes, 97.8% less; objects increase 50→52 |
 | Same encoding CPU | 222.00 ms | 316.96 ms | Cold synthetic encoding; savings trade off more puts/hashing; not network latency |
-| 100-record IndexedDB page, 1k→50k records | Whole-store design not applicable | 9.8 / 3.9 / 4.6 ms median (1k / 10k / 50k) | Isolated browser adapter; latest exact samples in JSON |
-| Small IndexedDB save, 1k→50k records | Whole-store design not applicable | 9.1 / 1.1 / 1.3 ms (1k / 10k / 50k) | Isolated browser adapter, not current production saves |
+| 100-record IndexedDB page, 1k→50k records | Whole-store design not applicable | 7.4 / 4.2 / 4.2 ms median (1k / 10k / 50k) | Isolated browser adapter; latest exact samples in JSON |
+| Small IndexedDB save, 1k→50k records | Whole-store design not applicable | 2.2 / 1.3 / 1.4 ms (1k / 10k / 50k) | Isolated browser adapter, not current production saves |
 | Application conversation capacity | 80 sessions/chapters; 200/page | Same | No caps inflated and no history silently discarded |
-| Recovery reliability | 19 offline prototype cases | Additional fault tests and 15 renderer boundaries | Passing fixtures are not a field reliability percentage |
+| Recovery reliability | 19 offline prototype cases | Additional fault tests and 18 renderer boundaries | Passing fixtures are not a field reliability percentage |
 
 The 4.31 MB notebook plus even the compact journal can exceed a browser's localStorage budget. A smaller journal reduces amplification; it does **not** close structural capacity. The indexed adapter can store 50,000 independent records without scanning all of them for a page, but the application has not been migrated to it. Multi-year fixture counts model five profiles × five years × 2,000 metadata records; the separate conversation fixture models retained text. They do not substitute for a realistic entire family import with large decoded images and every domain.
 
@@ -106,4 +106,4 @@ The main drivers are original/derived artwork accumulation, revision duplication
 
 Gross projected end-of-year-five storage/operations/network monthly subtotals are **$0.02 / $0.30 / $2.58** for low/typical/high, before the excluded services. These unusually small storage-only figures must not be presented as the total Jems bill. Typical retained assets are 4.69 GiB and metadata 0.41 GiB; high assets are 42.19 GiB and metadata 2.36 GiB. A full independent asset copy per revision would multiply the asset portion by 5 / 20 / 50 in the model. Actual duplication rates are unknown.
 
-Chromium measurements overlap other local work: the [prior run](evidence/browser-prior.json) includes a 10k-record latency spike, and the final run includes a 1k-record spike. Both are retained rather than selecting favorable samples. No stable throughput SLA or complete-application startup claim follows from this single run.
+Chromium measurements overlap other local work: the [prior run](evidence/browser-prior.json) includes a 10k-record latency spike, and the [five-boundary run](evidence/browser-five-boundaries.json) includes a 1k-record spike. The final six-boundary run is also retained rather than selecting favorable samples. No stable throughput SLA or complete-application startup claim follows from this single run.

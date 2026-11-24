@@ -3,7 +3,7 @@
   "results": [
     {
       "device": "desktop",
-      "rendererBoundaries": 5,
+      "rendererBoundaries": 6,
       "writerLock": true,
       "indexed": [
         "stale rejected",
@@ -13,7 +13,7 @@
     },
     {
       "device": "tablet",
-      "rendererBoundaries": 5,
+      "rendererBoundaries": 6,
       "writerLock": true,
       "indexed": [
         "stale rejected",
@@ -23,7 +23,7 @@
     },
     {
       "device": "phone",
-      "rendererBoundaries": 5,
+      "rendererBoundaries": 6,
       "writerLock": true,
       "indexed": [
         "stale rejected",
@@ -35,21 +35,21 @@
   "benchmark": [
     {
       "records": 1000,
-      "page100MedianMs": 9.800000000046566,
-      "page100P95Ms": 14.599999999860302,
-      "saveMs": 9.100000000093132
+      "page100MedianMs": 7.400000000372529,
+      "page100P95Ms": 18.399999999906868,
+      "saveMs": 2.1999999997206032
     },
     {
       "records": 10000,
-      "page100MedianMs": 3.8999999999068677,
-      "page100P95Ms": 11,
-      "saveMs": 1.0999999998603016
+      "page100MedianMs": 4.199999999720603,
+      "page100P95Ms": 5.399999999906868,
+      "saveMs": 1.2999999998137355
     },
     {
       "records": 50000,
-      "page100MedianMs": 4.600000000093132,
-      "page100P95Ms": 9.200000000186265,
-      "saveMs": 1.2999999998137355
+      "page100MedianMs": 4.199999999720603,
+      "page100P95Ms": 5.5,
+      "saveMs": 1.3999999999068677
     }
   ]
 }
