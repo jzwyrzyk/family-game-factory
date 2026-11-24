@@ -5,7 +5,7 @@ import {execFileSync} from 'node:child_process';
 import {mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync, renameSync, chmodSync, symlinkSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname, join} from 'node:path';
-import {ALL_SHARDS, classifyImpact, isInertDocumentation, normalizedReviewRegistry} from '../scripts/ci/classify-impact.mjs';
+import {ALL_SHARDS, classifyImpact, isInertDocumentation, normalizedReviewRegistry, parsePerformanceBaseline} from '../scripts/ci/classify-impact.mjs';
 
 const policy = readFileSync(new URL('../scripts/ci/classify-impact.mjs', import.meta.url), 'utf8');
 const registry = {version: 1, coverageExcludes: ['docs/**'], requiredDocuments: ['README.md'],
@@ -28,6 +28,7 @@ function fixture(t) {
   put('DELIVERY-STATE.md', '# Delivery\n'); put('docs/context/registry.json', registry);
   put('docs/new-guide.md', '# Unknown guide\n'); put('docs/pals/art/character-references.json', {source: 'old'});
   put(RELEASE, release); put(COMPATIBILITY, compatibility);
+  put('ops/ci-performance.json', {schemaVersion: 1, runIds: [123]});
   put('src/games/gem-factory-cut.ts', 'export const cut = 0.26;\n');
   put('src/games/gem-factory-pattern.ts', "import type { FactoryGemColor } from './gem-factory-physics';\nexport const palette = ['ruby'];\n");
   put('src/games/mind-your-jems-rules.ts', 'export const BAG_CAPACITY = 10;\n');
@@ -42,6 +43,21 @@ function fixture(t) {
 }
 const RELEASE = 'ops/release.json', COMPATIBILITY = 'ops/compatibility.json';
 function full(plan) { assert.equal(plan.mode, 'full'); assert.deepEqual(plan.requiredShards, ALL_SHARDS); assert.equal(plan.requiredImage, true); }
+
+test('read-only baseline updates require authenticated operational evidence; schema drift remains full', t => {
+  const f = fixture(t); f.put('ops/ci-performance.json', {schemaVersion: 1, runIds: [456]});
+  const plan = f.classify(); assert.equal(plan.mode, 'release-intent'); assert.equal(plan.requiresEvidenceReuse, true);
+  f.put('ops/ci-performance.json', {schemaVersion: 1, runIds: [456], skipTests: true}); full(f.classify());
+});
+test('performance baseline rejects arbitrary endpoints, duplicate fields and unbounded IDs', () => {
+  assert.deepEqual(parsePerformanceBaseline('{"schemaVersion":1,"runIds":[123]}').runIds, [123]);
+  for (const raw of ['{"schemaVersion":1,"schemaVersion":1,"runIds":[123]}',
+    '{"schemaVersion":1,"runIds":[]}', '{"schemaVersion":1,"runIds":[1,1]}',
+    '{"schemaVersion":1,"runIds":["https://example.invalid"]}',
+    '{"schemaVersion":1,"runIds":[-1]}', '{"schemaVersion":2,"runIds":[123]}']) {
+    assert.throws(() => parsePerformanceBaseline(raw));
+  }
+});
 
 test('documentation-only change is exact allowlist and keeps integrity + operations checks', t => {
   const f = fixture(t); f.put('README.md', '# Updated documentation\n');

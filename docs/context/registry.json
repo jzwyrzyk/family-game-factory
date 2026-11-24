@@ -1100,10 +1100,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T15:20:22.806Z",
-      "sourceDigest": "1a7a38a874540003d3575d9c2e02aea523c48a8ca42199ef33f934de1e28addc",
+      "reviewedAt": "2026-11-24T15:24:33.337Z",
+      "sourceDigest": "fe7dd7add49835fae6ed77976922cbdd8bf0e8cc6e380249d2427d1d54b28793",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded prepared duplicate contract-run removal, dependency-shadow limits and actual local Factory validation; PR-merge/main checks and all production controls remain unchanged, and hosted activation/reliability are not claimed.",
+      "reviewReason": "Documented the read-only reporting baseline as a genuine operational update without production intent mutation, pending full hosted evidence and separately approved PR157 main reuse. Retained first-attempt failures, full fallback and local-only browser limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

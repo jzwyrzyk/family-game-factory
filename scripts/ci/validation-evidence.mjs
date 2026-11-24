@@ -23,7 +23,7 @@ const MAX_ARCHIVE_BYTES = 256 * 1024 * 1024;
 // Normative/security documents stay in the identity even when PR impact is
 // documentation-only: changed requirements invalidate earlier acceptance.
 const evidenceNarrative = new Set(['DELIVERY-STATE.md']);
-const operationalRecords = new Set(['ops/release.json', 'ops/compatibility.json']);
+const operationalRecords = new Set(['ops/release.json', 'ops/compatibility.json', 'ops/ci-performance.json']);
 const identityKeys = ['applicationSha256', 'testPolicySha256', 'dependenciesSha256', 'operationsSha256', 'validationSha256'];
 // Manual full validation on main can refresh evidence without an empty source
 // commit. Both event types still require every full-regression job and receipt.
