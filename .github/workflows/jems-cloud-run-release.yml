@@ -136,28 +136,43 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       - name: Validate reviewed intent and source
-        id: plan
-        env:
-          GH_TOKEN: ${{ github.token }}
+        id: intent
         run: |
           set -euo pipefail
           if jq -e '. == {}' ops/release.json >/dev/null; then exit 0; fi
-          plan="$(python3 scripts/ops/release.py ops/release.json)"
+          plan="$(python3 scripts/ops/release.py ops/release.json | jq -ce .)"
           source="$(jq -er .source <<<"$plan")"
           operation="$(jq -er .operation <<<"$plan")"
           git merge-base --is-ancestor "$source" HEAD
-          # A rollback must remain available even when current application CI is red.
-          if [[ "$operation" != rollback ]]; then
-            gh api "repos/$GITHUB_REPOSITORY/actions/workflows/test.yml/runs?branch=main&event=push&head_sha=$source&status=success"               --jq '.total_count' | awk '($1 > 0) {passed=1} END {exit !passed}'
-            evidence="$(jq -er '.evidence | split("/") | last' ops/compatibility.json)"
-            gh api "repos/$GITHUB_REPOSITORY/actions/runs/$evidence" |
-              jq -e --arg source "$source" --arg repo "$GITHUB_REPOSITORY" '
-                .head_sha == $source and .head_branch == "main" and .conclusion == "success"
-                and .head_repository.full_name == $repo and .path == ".github/workflows/test.yml"
-              ' >/dev/null
-          fi
+          echo "source=$source" >> "$GITHUB_OUTPUT"
           echo "operation=$operation" >> "$GITHUB_OUTPUT"
-          echo "$plan" >> "$GITHUB_STEP_SUMMARY"
+          echo "plan=$plan" >> "$GITHUB_OUTPUT"
+          if [[ "$operation" != rollback ]]; then
+            evidence="$(jq -er '.evidence | split("/") | last' ops/compatibility.json)"
+            echo "evidence=$evidence" >> "$GITHUB_OUTPUT"
+          fi
+      # Rollback retains its existing independence from application CI, including
+      # avoiding a new Node setup dependency when recovering traffic.
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        if: steps.intent.outputs.operation != '' && steps.intent.outputs.operation != 'rollback'
+        with:
+          node-version: 22
+      - name: Require complete source-bound validation before release
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SOURCE: ${{ steps.intent.outputs.source }}
+          RELEASE_OPERATION: ${{ steps.intent.outputs.operation }}
+          RELEASE_EVIDENCE: ${{ steps.intent.outputs.evidence }}
+          RELEASE_PLAN: ${{ steps.intent.outputs.plan }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$RELEASE_OPERATION" ]]; then exit 0; fi
+          if [[ "$RELEASE_OPERATION" != rollback ]]; then
+            node scripts/ci/verify-release-validation.mjs "$RELEASE_SOURCE" "$RELEASE_EVIDENCE" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "operation=$RELEASE_OPERATION" >> "$GITHUB_OUTPUT"
+          echo "$RELEASE_PLAN" >> "$GITHUB_STEP_SUMMARY"
   transition:
     needs: plan
     if: needs.plan.outputs.operation != '' && vars.JEMS_CLOUD_RUN_RELEASE_ENABLED == 'true'

@@ -51,6 +51,19 @@ const POLICY_PATH = 'scripts/ci/classify-impact.mjs';
 const REGISTRY = 'docs/context/registry.json';
 const RELEASE = 'ops/release.json';
 const COMPATIBILITY = 'ops/compatibility.json';
+const PERFORMANCE = 'ops/ci-performance.json';
+// Read-only reporting data: never a test-selection or release configuration.
+// Exact schema and bounded same-repository numeric IDs exclude executable input.
+export function parsePerformanceBaseline(raw) {
+  const value = JSON.parse(raw);
+  if (!value || Array.isArray(value) || canonicalJson(Object.keys(value).sort()) !== '["runIds","schemaVersion"]'
+    || (raw.match(/"(?:[^"\\]|\\.)*"\s*:/g) ?? []).length !== 2
+    || value.schemaVersion !== 1 || !Array.isArray(value.runIds) || !value.runIds.length || value.runIds.length > 20
+    || value.runIds.some(id => !Number.isSafeInteger(id) || id <= 0) || new Set(value.runIds).size !== value.runIds.length) {
+    throw new Error('Invalid read-only performance baseline');
+  }
+  return value;
+}
 const CORE = ['browser-core', 'browser-storage', 'notifications', 'studio-core'];
 // These exact leaf modules have no persistence/authentication ownership. Their
 // shared consumers are covered by core, player and learning integration suites.
@@ -160,6 +173,13 @@ export function classifyImpact({cwd = process.cwd(), base, head, forceFull = fal
       if (path === RELEASE || path === COMPATIBILITY) {
         if (operationOnly(cwd, base, head)) { categories.add('release-intent'); reasons.push({path, reason: 'Only release operation or JSON formatting changed; exact source, images, runtime configuration and compatibility values are unchanged. Separate reuse and transition verification required.'}); continue; }
         full = true; categories.add('release-identity-or-configuration'); reasons.push({path, reason: 'Release identity/configuration changed or strict intent equivalence failed.'}); continue;
+      }
+      if (path === PERFORMANCE) {
+        parsePerformanceBaseline(blob(cwd, base, path));
+        parsePerformanceBaseline(blob(cwd, head, path));
+        categories.add('release-intent');
+        reasons.push({path, reason: 'Read-only CI reporting baseline IDs only; no test, runtime or release control. Operational reuse still requires authenticated full evidence.'});
+        continue;
       }
       const target = TARGETS.get(path);
       if (target && safeLeaf(blob(cwd, base, path), blob(cwd, head, path), target)) {

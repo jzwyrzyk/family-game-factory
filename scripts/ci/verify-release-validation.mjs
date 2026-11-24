@@ -7,7 +7,7 @@ import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { expandCommands, verifyCoverage } from './suites.mjs';
-import { REPOSITORY, REPOSITORY_ID, WORKFLOW } from './validation-evidence.mjs';
+import { MAX_AGE_MS, REPOSITORY, REPOSITORY_ID, WORKFLOW } from './validation-evidence.mjs';
 
 // Finite migration receipt for the already-published cutover candidate. This is
 // deliberately not an allowlist of arbitrary historical successful workflows.
@@ -23,7 +23,7 @@ const requireThat = (condition, message) => { if (!condition) throw new Error(me
 
 // Pure verifier: the adapter supplies the digest of the exact Git blob and
 // authenticated API responses. These are not accepted from a receipt file.
-export function verifyLegacyReleaseEvidence({ sourceSha, runId, workflowSha256, run, jobs }) {
+export function verifyLegacyReleaseEvidence({ sourceSha, runId, workflowSha256, run, jobs, now = Date.now() }) {
   requireThat(sourceSha === LEGACY_RECEIPT.sourceSha && runId === LEGACY_RECEIPT.runId, 'Historical evidence is not the approved migration receipt');
   requireThat(workflowSha256 === LEGACY_RECEIPT.workflowSha256, 'Historical full-regression policy changed');
   requireThat(run?.id === runId && run.head_sha === sourceSha && run.run_attempt === 1, 'Historical run identity changed');
@@ -31,6 +31,12 @@ export function verifyLegacyReleaseEvidence({ sourceSha, runId, workflowSha256, 
     && run.repository.id === REPOSITORY_ID && run.head_repository.id === REPOSITORY_ID, 'Historical repository mismatch');
   requireThat(run.path === WORKFLOW && run.event === 'push' && run.head_branch === 'main', 'Historical evidence is not a main-push Arcade run');
   requireThat(run.status === 'completed' && run.conclusion === 'success', 'Historical full regression did not succeed');
+  // The finite migration exception must not keep pre-policy evidence usable
+  // forever. Removing this pinned receipt revokes it immediately; its original
+  // authenticated run start also imposes the normal seven-day ceiling.
+  const started = Date.parse(run.run_started_at), completed = Date.parse(run.updated_at);
+  requireThat(Number.isFinite(started) && Number.isFinite(completed) && started <= completed
+    && completed <= now && now - started <= MAX_AGE_MS, 'Historical migration evidence expired or has invalid timestamps');
   requireThat(Array.isArray(jobs) && jobs.length === LEGACY_JOBS.length, 'Historical job set is incomplete or unexpected');
   for (const name of LEGACY_JOBS) {
     const matches = jobs.filter(job => job.name === name);
@@ -42,7 +48,8 @@ export function verifyLegacyReleaseEvidence({ sourceSha, runId, workflowSha256, 
       && !job.labels?.includes('self-hosted'), `Historical job was not on the approved hosted runner: ${name}`);
   }
   return { policy: 'explicit-cutover-migration', sourceSha, runId, runAttempt: 1,
-    workflowSha256: LEGACY_RECEIPT.workflowSha256, requiredJobs: [...LEGACY_JOBS], releaseAuthorized: false };
+    workflowSha256: LEGACY_RECEIPT.workflowSha256, requiredJobs: [...LEGACY_JOBS],
+    expiresAt: new Date(started + MAX_AGE_MS).toISOString(), releaseAuthorized: false };
 }
 
 export function fullRegressionPolicy(manifest, packageJSON) {
