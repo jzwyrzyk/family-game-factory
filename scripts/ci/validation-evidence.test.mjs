@@ -30,12 +30,30 @@ test('complete authenticated equivalent-source fixture evidence is reusable but 
   assert.equal(result.releaseAuthorized, false);
   assert.equal(result.sourceSha, A);
   assert.equal(result.candidateSha, B);
+  assert.equal(result.receiptArchiveSha256, context.receiptArtifact.digest);
+  assert.equal(result.buildArchiveSha256, context.buildArtifact.digest);
+  assert.equal(result.manifestSha256, receipt.manifestSha256);
+  assert.equal(result.validationSha256, context.identity.validationSha256);
+});
+
+test('reviewed main manual full run can refresh evidence without a dummy source commit', () => {
+  const { receipt, context } = fixture();
+  context.run.event = 'workflow_dispatch';
+  const result = verifyEvidence(receipt, context);
+  assert.equal(result.reusable, true);
+  assert.equal(result.workflowEvent, 'workflow_dispatch');
+  assert.equal(result.releaseAuthorized, false);
 });
 
 const invalidCases = {
   'arbitrary historical workflow success': (r, c) => { c.run.path = '.github/workflows/unrelated.yml'; },
   'repository identity replacement': (r, c) => { c.run.repository.id = 99; },
   'fork source': (r, c) => { c.run.head_repository.full_name = 'attacker/family-game-factory'; },
+  'manual feature branch cannot seed trusted evidence': (r, c) => { c.run.event = 'workflow_dispatch'; c.run.head_branch = 'feature'; },
+  'manual partial suite cannot seed trusted evidence': (r, c) => { c.run.event = 'workflow_dispatch'; r.suites.pop(); },
+  'manual skipped full job cannot seed trusted evidence': (r, c) => { c.run.event = 'workflow_dispatch'; c.jobs[0].conclusion = 'skipped'; },
+  'manual fork cannot seed trusted evidence': (r, c) => { c.run.event = 'workflow_dispatch'; c.run.head_repository.id = 9; },
+  'schedule cannot seed trusted evidence': (r, c) => { c.run.event = 'schedule'; },
   'PR run cannot seed trusted evidence': (r, c) => { c.run.event = 'pull_request'; },
   'branch run cannot seed trusted evidence': (r, c) => { c.run.head_branch = 'feature'; },
   'failed workflow': (r, c) => { c.run.conclusion = 'failure'; },
@@ -180,9 +198,45 @@ test('hosted reader authenticates API metadata and both ZIP payloads end to end 
   const result = await verifyHostedEvidence(request);
   assert.equal(result.reusable, true);
   assert.equal(result.releaseAuthorized, false);
+  context.run.event = 'workflow_dispatch';
   const discovered = await discoverExactSourceEvidence({ ...request, sourceSha });
   assert.equal(discovered.receiptArtifactId, 11);
+  assert.equal(discovered.workflowEvent, 'workflow_dispatch');
   corruptDownload = true;
   await assert.rejects(verifyHostedEvidence(request), /integrity/);
   assert.ok(requests.length > 10);
+});
+
+test('delivery-only changes may seek authenticated reuse; changed imported base policy cannot', async t => {
+  const { readFileSync } = await import('node:fs');
+  const repo = mkdtempSync(join(tmpdir(), 'jems-reuse-policy-'));
+  t.after(() => rmSync(repo, { recursive: true, force: true }));
+  const git = (...args) => execFileSync('git', ['-C', repo, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  git('init', '--quiet'); git('config', 'user.email', 'ci@example.invalid'); git('config', 'user.name', 'CI');
+  mkdirSync(join(repo, 'scripts/ci'), { recursive: true });
+  for (const file of ['validation-evidence.mjs', 'classify-impact.mjs', 'suites.mjs', 'suites.json']) writeFileSync(join(repo, 'scripts/ci', file), readFileSync(new URL(`./${file}`, import.meta.url)));
+  writeFileSync(join(repo, 'package.json'), readFileSync(new URL('../../package.json', import.meta.url)));
+  writeFileSync(join(repo, 'DELIVERY-STATE.md'), 'Original receipt');
+  const commit = () => { git('add', '.'); git('commit', '--quiet', '-m', 'fixture'); return git('rev-parse', 'HEAD'); };
+  const base = commit();
+  writeFileSync(join(repo, 'DELIVERY-STATE.md'), 'Updated receipt');
+  const head = commit();
+  const originalFetch = globalThis.fetch;
+  t.after(() => { globalThis.fetch = originalFetch; });
+  let reads = 0;
+  globalThis.fetch = async url => {
+    reads++;
+    assert.match(url, /api\.github\.com\/repos\/jzwyrzyk\/family-game-factory\/actions\/workflows\/test\.yml\/runs\?/);
+    return new Response(JSON.stringify({ workflow_runs: [] }), { headers: { 'Content-Type': 'application/json' } });
+  };
+  const result = await findReusableEvidence({ repoRoot: repo, base, head, token: 'synthetic-read-token' });
+  assert.equal(reads, 1, 'Inert delivery change is eligible to seek authoritative evidence');
+  assert.equal(result.reusable, false, 'No receipt never becomes an omission approval');
+  assert.match(result.reason, /No recent complete authenticated/);
+  writeFileSync(join(repo, 'scripts/ci/suites.mjs'), readFileSync(new URL('./suites.mjs', import.meta.url), 'utf8') + '\n// changed imported policy\n');
+  const changedBase = commit();
+  writeFileSync(join(repo, 'DELIVERY-STATE.md'), 'Another receipt');
+  const changedHead = commit();
+  await assert.rejects(findReusableEvidence({ repoRoot: repo, base: changedBase, head: changedHead, token: 'synthetic-read-token' }), /trusted base version: suites\.mjs/);
+  assert.equal(reads, 1, 'Unmatched policy must fail before reading potential evidence');
 });

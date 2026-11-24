@@ -2,14 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { REPOSITORY, REPOSITORY_ID, WORKFLOW } from './validation-evidence.mjs';
+import { MAX_AGE_MS, REPOSITORY, REPOSITORY_ID, WORKFLOW } from './validation-evidence.mjs';
 import { LEGACY_RECEIPT, LEGACY_JOBS, verifyLegacyReleaseEvidence, fullRegressionPolicy, verifyReleaseValidation } from './verify-release-validation.mjs';
 
 function legacy() {
   const { sourceSha, runId, workflowSha256 } = LEGACY_RECEIPT;
-  return { sourceSha, runId, workflowSha256,
+  const now = Date.UTC(2026, 10, 24, 0, 0, 0);
+  return { sourceSha, runId, workflowSha256, now,
     run: { id: runId, head_sha: sourceSha, run_attempt: 1, repository: {full_name: REPOSITORY, id: REPOSITORY_ID},
-      head_repository: {full_name: REPOSITORY, id: REPOSITORY_ID}, path: WORKFLOW, event: 'push', head_branch: 'main', status: 'completed', conclusion: 'success' },
+      head_repository: {full_name: REPOSITORY, id: REPOSITORY_ID}, path: WORKFLOW, event: 'push', head_branch: 'main', status: 'completed', conclusion: 'success',
+      run_started_at: new Date(now - 60_000).toISOString(), updated_at: new Date(now - 1000).toISOString() },
     jobs: LEGACY_JOBS.map(name => ({name, run_id: runId, run_attempt: 1, head_sha: sourceSha,
       status: 'completed', conclusion: 'success', runner_group_name: 'GitHub Actions', labels: ['ubuntu-24.04']})),
   };
@@ -20,6 +22,17 @@ test('the one reviewed legacy cutover receipt preserves full coverage without au
   assert.equal(result.policy, 'explicit-cutover-migration');
   assert.equal(result.releaseAuthorized, false);
   assert.deepEqual(result.requiredJobs, LEGACY_JOBS);
+});
+
+test('legacy migration receipt expires after seven days and cannot claim future or missing timing', () => {
+  for (const mutate of [
+    x => {x.now += MAX_AGE_MS;},
+    x => {delete x.run.run_started_at;},
+    x => {x.run.updated_at = new Date(x.now + 1000).toISOString();},
+    x => {x.run.run_started_at = new Date(x.now + 2000).toISOString();},
+  ]) { const value = legacy(); mutate(value); assert.throws(() => verifyLegacyReleaseEvidence(value), /expired|timestamps/); }
+  const value = legacy(), result = verifyLegacyReleaseEvidence(value);
+  assert.equal(Date.parse(result.expiresAt), Date.parse(value.run.run_started_at) + MAX_AGE_MS);
 });
 
 test('arbitrary old successes, changed source and changed workflow cannot use migration policy', () => {
