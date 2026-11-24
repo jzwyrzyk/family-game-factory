@@ -62,9 +62,11 @@ const patterns:readonly [GameFormSignal, readonly RegExp[]][]=[
     /\b(?:faux|fake)\s*3[\s-]?d\b/gi
   ]],
   ['3d-avoided',[
+    /\b(?:no|without|avoid|skip) (?:a |any )?(?:free[- ]orbit camera|3d physics)\b/gi,
     /\b(?:no|without|avoid|skip|don't\s+use|do\s+not\s+use|not\s+(?:a|in))\s+(?:(?:a|an|the|any|true|real|full)\s+){0,3}(?:3[\s-]?d|three[- ]dimensional)(?:\s+(?:game|world|movement|navigation))?\b/gi
   ]],
   ['explicit-3d',[
+    /\b(?:free[- ]orbit camera|orbit (?:the camera )?freely (?:around|in)|(?:free|unrestricted) flight (?:on|in) (?:all )?three axes|3d physics)\b/gi,
     /\b(?:true|real|full)\s*3[\s-]?d(?:imensional)?\b/gi,
     /\b(?:3[\s-]?d|three[- ]dimensional)\s+(?:game|world|space|camera|environment|movement|navigation|maze)\b/gi,
     /\b(?:fly|move|walk|navigate|travel)\s+(?:freely\s+)?(?:in|through)\s+(?:all\s+)?(?:three|3)\s+(?:dimensions|axes)\b/gi,

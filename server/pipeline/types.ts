@@ -1,3 +1,4 @@
+import type {PremiumPolicyPin,PremiumUsage} from './premium-policy';
 import type {CoachReceipt} from '../coach/service';
 import type {FamilyCoachConsent} from '../coach/consent';
 import type {ParentPrivacyChoice} from '../privacy/parent-consent';
@@ -30,6 +31,9 @@ export interface BuildRequest { gameId:string; baseRevisionId:string|null; promp
 export interface Job extends BuildRequest {
  /** Server-owned acceptance policy. Public submissions cannot set or disable it. */
  qualityRequired?:'game-quality-v1';
+ /** Pinned at transactional admission. Absence preserves the legacy worker contract. */
+ premiumPolicy?:PremiumPolicyPin;
+ premiumUsage?:PremiumUsage;
  execution?:ActionExecution;
   /** Internal-only, independently authored and source-validated O5 probe;
    * BuildRequest rejects this field from clients, so it is never user-supplied.

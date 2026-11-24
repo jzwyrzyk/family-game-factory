@@ -67,6 +67,8 @@ Remote Google speech still requires `FACTORY_COACH_AUDIO_APPROVED`, `FACTORY_COA
 
 Game generation retains private worker source/image pins, WIF identities, gVisor isolation, replay/idempotency controls, approvals and spend reservation. Jobs retain their adult authorization binding so later dispatch and completion cannot borrow an unrelated session. Adult-generated games are separated from child access, including reads and previews. Model, speech and infrastructure spending are reviewed separately.
 
+Adult Private can also select the separately approved premium builder. Unlocking the adult session grants access only to the configured route. Its status is available through the existing authenticated builder endpoint. To revert just the builder, disable premium admission, drain and settle premium jobs, and retain readers for their saved revisions. The private coach, speech and other adult functions keep their own controls. See the [premium configuration, UAT and rollback sequence](../game-intelligence/PREMIUM-BUILDER.md#post-cutover-activation-and-rollback).
+
 ## Acceptance on the existing site
 
 1. Run build, unit/security and relevant browser suites at the exact PR commit. Verify child local journeys and parent consent still work.

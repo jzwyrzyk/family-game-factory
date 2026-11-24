@@ -1,0 +1,306 @@
+{
+  "origin": "offline-fixtures",
+  "paidCalls": 0,
+  "actualProviderCharges": null,
+  "unit": 583,
+  "premium": 47,
+  "ci": 118,
+  "environment": 112,
+  "deployment": 83,
+  "operations": 239,
+  "privateWorkerTests": 175,
+  "privateWorkerSource": "dddf53dbc76796be19782c1bb5bbb99b86e99909",
+  "trials": [
+    {
+      "id": "fox",
+      "sourceCommit": "685f3b4d9faba3e25581df7e7e498a34327cc541",
+      "firstPassMicroUsd": 763714,
+      "wholeJobReservationMicroUsd": 1819748,
+      "workerTimingsMs": {
+        "compileAndValidate": 84,
+        "browserSetup": 329,
+        "playtest": 12430,
+        "captureAndClose": 54819
+      },
+      "marks": [
+        {
+          "stage": "fixture setup",
+          "elapsedMs": 3
+        },
+        {
+          "stage": "mock planning",
+          "elapsedMs": 22
+        },
+        {
+          "stage": "mock image 1",
+          "elapsedMs": 42
+        },
+        {
+          "stage": "mock image 2",
+          "elapsedMs": 44
+        },
+        {
+          "stage": "mock construction",
+          "elapsedMs": 175
+        },
+        {
+          "stage": "assembled candidate",
+          "elapsedMs": 197
+        },
+        {
+          "stage": "isolated browser test and capture",
+          "elapsedMs": 68691
+        },
+        {
+          "stage": "mock review",
+          "elapsedMs": 68784
+        },
+        {
+          "stage": "mock repair",
+          "elapsedMs": 68959
+        },
+        {
+          "stage": "mock planning",
+          "elapsedMs": 69033
+        },
+        {
+          "stage": "fixture repair and replan complete",
+          "elapsedMs": 69034
+        }
+      ],
+      "schedules": [
+        {
+          "mode": "serial",
+          "contract": "842aa88c018cd896ec67cbdd2c2d5763e2512d21fe93248853f10d8527dccb4c",
+          "codeHash": "cfdb02a550461dc5555c39f4bee64f1498d58a79a71fd752fe26e66d04ca1757",
+          "assetsHash": "f173e4e3fbf9fb11647958ad056c12a7ab1ddef899a1b15e6db7633b3e807e50",
+          "compileMs": 15.121386999991955,
+          "extractMs": 108.17256300000008,
+          "wallMs": 128.83272900000156
+        },
+        {
+          "mode": "overlap",
+          "contract": "842aa88c018cd896ec67cbdd2c2d5763e2512d21fe93248853f10d8527dccb4c",
+          "codeHash": "cfdb02a550461dc5555c39f4bee64f1498d58a79a71fd752fe26e66d04ca1757",
+          "assetsHash": "f173e4e3fbf9fb11647958ad056c12a7ab1ddef899a1b15e6db7633b3e807e50",
+          "extractMs": 78.18995200000063,
+          "compileMs": 83.91010800001095,
+          "wallMs": 84.16901300000609
+        },
+        {
+          "mode": "overlap",
+          "contract": "842aa88c018cd896ec67cbdd2c2d5763e2512d21fe93248853f10d8527dccb4c",
+          "codeHash": "cfdb02a550461dc5555c39f4bee64f1498d58a79a71fd752fe26e66d04ca1757",
+          "assetsHash": "f173e4e3fbf9fb11647958ad056c12a7ab1ddef899a1b15e6db7633b3e807e50",
+          "extractMs": 68.12824099999852,
+          "compileMs": 72.49509799999942,
+          "wallMs": 72.70562000000791
+        },
+        {
+          "mode": "serial",
+          "contract": "842aa88c018cd896ec67cbdd2c2d5763e2512d21fe93248853f10d8527dccb4c",
+          "codeHash": "cfdb02a550461dc5555c39f4bee64f1498d58a79a71fd752fe26e66d04ca1757",
+          "assetsHash": "f173e4e3fbf9fb11647958ad056c12a7ab1ddef899a1b15e6db7633b3e807e50",
+          "compileMs": 2.003326999998535,
+          "extractMs": 74.76251000000047,
+          "wallMs": 80.41132899999502
+        }
+      ],
+      "htmlHash": "eda196065a361f2dc2d8795e8f01e85d49a90d184720af05d31ee82010454c4a"
+    },
+    {
+      "id": "factory",
+      "sourceCommit": "685f3b4d9faba3e25581df7e7e498a34327cc541",
+      "firstPassMicroUsd": 749986,
+      "wholeJobReservationMicroUsd": 1780604,
+      "workerTimingsMs": {
+        "compileAndValidate": 67,
+        "browserSetup": 199,
+        "playtest": 12043,
+        "captureAndClose": 11928
+      },
+      "marks": [
+        {
+          "stage": "fixture setup",
+          "elapsedMs": 0
+        },
+        {
+          "stage": "mock planning",
+          "elapsedMs": 2
+        },
+        {
+          "stage": "mock image 1",
+          "elapsedMs": 3
+        },
+        {
+          "stage": "mock image 2",
+          "elapsedMs": 5
+        },
+        {
+          "stage": "mock construction",
+          "elapsedMs": 86
+        },
+        {
+          "stage": "assembled candidate",
+          "elapsedMs": 93
+        },
+        {
+          "stage": "isolated browser test and capture",
+          "elapsedMs": 24939
+        },
+        {
+          "stage": "mock review",
+          "elapsedMs": 25009
+        },
+        {
+          "stage": "mock repair",
+          "elapsedMs": 25129
+        },
+        {
+          "stage": "mock planning",
+          "elapsedMs": 25177
+        },
+        {
+          "stage": "fixture repair and replan complete",
+          "elapsedMs": 25177
+        }
+      ],
+      "schedules": [
+        {
+          "mode": "serial",
+          "contract": "0bcfe98838ce31bccf5007b66ea6baf96c3eb53a33f17158a124f4f040c8e1fa",
+          "codeHash": "b1290d577280006423f129968bd7cc9f885440e75e1366d5cc9df5a16cabeae1",
+          "assetsHash": "53b566d278e39ca0e9fc61fee8764be45b4455e27d5e1350018d6bcd3d3312c0",
+          "compileMs": 10.037888000006205,
+          "extractMs": 68.97190299999784,
+          "wallMs": 82.53167399999802
+        },
+        {
+          "mode": "overlap",
+          "contract": "0bcfe98838ce31bccf5007b66ea6baf96c3eb53a33f17158a124f4f040c8e1fa",
+          "codeHash": "b1290d577280006423f129968bd7cc9f885440e75e1366d5cc9df5a16cabeae1",
+          "assetsHash": "53b566d278e39ca0e9fc61fee8764be45b4455e27d5e1350018d6bcd3d3312c0",
+          "extractMs": 85.30265800000052,
+          "compileMs": 110.29608500000904,
+          "wallMs": 110.41901300000609
+        },
+        {
+          "mode": "overlap",
+          "contract": "0bcfe98838ce31bccf5007b66ea6baf96c3eb53a33f17158a124f4f040c8e1fa",
+          "codeHash": "b1290d577280006423f129968bd7cc9f885440e75e1366d5cc9df5a16cabeae1",
+          "assetsHash": "53b566d278e39ca0e9fc61fee8764be45b4455e27d5e1350018d6bcd3d3312c0",
+          "extractMs": 90.45750000000407,
+          "compileMs": 96.97163400000136,
+          "wallMs": 98.82268199999817
+        },
+        {
+          "mode": "serial",
+          "contract": "0bcfe98838ce31bccf5007b66ea6baf96c3eb53a33f17158a124f4f040c8e1fa",
+          "codeHash": "b1290d577280006423f129968bd7cc9f885440e75e1366d5cc9df5a16cabeae1",
+          "assetsHash": "53b566d278e39ca0e9fc61fee8764be45b4455e27d5e1350018d6bcd3d3312c0",
+          "compileMs": 9.833929999993416,
+          "extractMs": 90.45911799999885,
+          "wallMs": 104.85425400000531
+        }
+      ],
+      "htmlHash": "f02f39c4159dbd6259132a95d371e62893512ba9ae8caff7b2194877d0fbd318"
+    },
+    {
+      "id": "horse",
+      "sourceCommit": "685f3b4d9faba3e25581df7e7e498a34327cc541",
+      "firstPassMicroUsd": 751942,
+      "wholeJobReservationMicroUsd": 1790520,
+      "workerTimingsMs": {
+        "compileAndValidate": 81,
+        "browserSetup": 387,
+        "playtest": 23625,
+        "captureAndClose": 12188
+      },
+      "marks": [
+        {
+          "stage": "fixture setup",
+          "elapsedMs": 3
+        },
+        {
+          "stage": "mock planning",
+          "elapsedMs": 25
+        },
+        {
+          "stage": "mock image 1",
+          "elapsedMs": 30
+        },
+        {
+          "stage": "mock image 2",
+          "elapsedMs": 33
+        },
+        {
+          "stage": "mock construction",
+          "elapsedMs": 178
+        },
+        {
+          "stage": "assembled candidate",
+          "elapsedMs": 184
+        },
+        {
+          "stage": "isolated browser test and capture",
+          "elapsedMs": 37198
+        },
+        {
+          "stage": "mock review",
+          "elapsedMs": 37277
+        },
+        {
+          "stage": "mock repair",
+          "elapsedMs": 37410
+        },
+        {
+          "stage": "mock planning",
+          "elapsedMs": 37467
+        },
+        {
+          "stage": "fixture repair and replan complete",
+          "elapsedMs": 37468
+        }
+      ],
+      "schedules": [
+        {
+          "mode": "serial",
+          "contract": "0743e6ddceed2d04c1e30be92e5b3668e232f0fec310b8056f097d9e02ed8d89",
+          "codeHash": "76260af8b1623cd82e1c2ec96bf74a02b79b1e8eaac5127c43c315a554e4c09b",
+          "assetsHash": "fa13f91be80b4781878600dfb1fe376d51035322267034dbf4c4d2b07df99ba1",
+          "compileMs": 3.6625699999858625,
+          "extractMs": 72.84253300001728,
+          "wallMs": 79.55841800000053
+        },
+        {
+          "mode": "overlap",
+          "contract": "0743e6ddceed2d04c1e30be92e5b3668e232f0fec310b8056f097d9e02ed8d89",
+          "codeHash": "76260af8b1623cd82e1c2ec96bf74a02b79b1e8eaac5127c43c315a554e4c09b",
+          "assetsHash": "fa13f91be80b4781878600dfb1fe376d51035322267034dbf4c4d2b07df99ba1",
+          "extractMs": 73.9782750000013,
+          "compileMs": 78.33165499998722,
+          "wallMs": 78.52004199998919
+        },
+        {
+          "mode": "overlap",
+          "contract": "0743e6ddceed2d04c1e30be92e5b3668e232f0fec310b8056f097d9e02ed8d89",
+          "codeHash": "76260af8b1623cd82e1c2ec96bf74a02b79b1e8eaac5127c43c315a554e4c09b",
+          "assetsHash": "fa13f91be80b4781878600dfb1fe376d51035322267034dbf4c4d2b07df99ba1",
+          "extractMs": 69.93041199998697,
+          "compileMs": 73.575256000011,
+          "wallMs": 73.83741199999349
+        },
+        {
+          "mode": "serial",
+          "contract": "0743e6ddceed2d04c1e30be92e5b3668e232f0fec310b8056f097d9e02ed8d89",
+          "codeHash": "76260af8b1623cd82e1c2ec96bf74a02b79b1e8eaac5127c43c315a554e4c09b",
+          "assetsHash": "fa13f91be80b4781878600dfb1fe376d51035322267034dbf4c4d2b07df99ba1",
+          "compileMs": 1.937326999992365,
+          "extractMs": 75.07731000002241,
+          "wallMs": 80.01490900001954
+        }
+      ],
+      "htmlHash": "abcb7f5c1aa7f45f184463f912b78ca239198951610d1f4b6a3f43a0f47d7d39"
+    }
+  ]
+}

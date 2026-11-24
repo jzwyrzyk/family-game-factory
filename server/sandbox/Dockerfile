@@ -5,7 +5,9 @@ COPY --chmod=644 server/sandbox/package.json server/sandbox/package-lock.json se
 COPY --chmod=644 server/agent/game-assets.cjs ../agent/
 COPY --chmod=644 server/quality/game-quality-evidence.cjs ../quality/
 COPY --chmod=644 server/sandbox/trusted/ ./trusted/
-RUN find trusted -type d -exec chmod 755 {} + \
+RUN --mount=type=secret,id=build_ca \
+    if [ -f /run/secrets/build_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/build_ca; fi \
+ && find trusted -type d -exec chmod 755 {} + \
  && npm ci --ignore-scripts --no-audit --no-fund \
  && npx playwright install --with-deps --only-shell chromium \
  && rm -rf /ms-playwright/chromium-* /var/lib/apt/lists/* \

@@ -4,7 +4,7 @@
 const {createHash}=require('node:crypto');
 const {renderGeneratedV2}=require('./preview-v2.cjs');
 const {touchGesture}=require('./playtest-v2.cjs');
-const {qualityArtifactHash,validateQualityEvidence}=require('../quality/game-quality-evidence.cjs');
+const {qualityArtifactHash,validateQualityEvidence,captureLimits,captureHorizon,usesPremiumCapture}=require('../quality/game-quality-evidence.cjs');
 const digest=value=>createHash('sha256').update(value).digest('hex');
 const keys={left:'ArrowLeft',right:'ArrowRight',up:'ArrowUp',down:'ArrowDown',action:'Space'};
 function safeActions(game){
@@ -13,7 +13,8 @@ function safeActions(game){
   {type:'tap',x:180,y:200,frames:30},{type:'drag',x:180,y:200,x2:480,y2:200,frames:45},
   {type:'tap',x:360,y:200,frames:30},{type:'wait',frames:120}
  ];
- if(!Array.isArray(proposed)||proposed.length<1||proposed.length>16)throw Error('QUALITY_PLAYTHROUGH_INVALID');
+ const limits=captureLimits(usesPremiumCapture(game));
+ if(!Array.isArray(proposed)||proposed.length<1||proposed.length>limits.actions)throw Error('QUALITY_PLAYTHROUGH_INVALID');
  let total=0;
  const actions=proposed.map(a=>{
   const fields=a?.type==='tap'?['type','x','y','frames']:a?.type==='drag'?['type','x','y','x2','y2','frames']:a?.type==='hold'?['type','control','frames']:a?.type==='wait'?['type','frames']:[];
@@ -23,7 +24,7 @@ function safeActions(game){
   if(a.type==='hold'&&(!Object.hasOwn(keys,a.control)||!game.controls.includes(a.control)))throw Error('QUALITY_PLAYTHROUGH_CONTROL_MISSING');
   total+=a.frames;return {...a};
  });
- if(total>600)throw Error('QUALITY_PLAYTHROUGH_INVALID');return actions;
+ if(total>limits.frames)throw Error('QUALITY_PLAYTHROUGH_INVALID');return actions;
 }
 async function read(frame,diagnostics){
  if(frame.isDetached())throw Error('QUALITY_CAPTURE_FRAME_DETACHED');
@@ -44,12 +45,12 @@ async function waitTicks(page,frame,target,diagnostics){
  while(Date.now()<limit){const state=await read(frame,diagnostics);if(state.tick>=target||state.state!=='playing')return state;await page.waitForTimeout(30);}
  throw Error('QUALITY_CAPTURE_STALLED');
 }
-async function ordinaryInput(page,frame,action,touch,session,diagnostics){
+async function ordinaryInput(page,frame,action,touch,session,diagnostics,horizon,premium){
  const before=await read(frame,diagnostics),canvas=frame.locator('#game'),box=await canvas.boundingBox();
  if(!box)throw Error('QUALITY_CAPTURE_CANVAS_MISSING');
  const at=(x,y)=>({x:box.x+x/720*box.width,y:box.y+y/400*box.height});
  const ms=Math.max(90,Math.min(3000,action.frames*1000/60));
- if(action.type==='wait'){await waitTicks(page,frame,Math.min(600,before.tick+action.frames),diagnostics);return;}
+ if(action.type==='wait'){await waitTicks(page,frame,Math.min(horizon,before.tick+action.frames),diagnostics);return;}
  if(action.type==='tap'){
   const point=at(action.x,action.y);
   if(touch){await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...point,id:1}]});await page.waitForTimeout(90);await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}
@@ -61,15 +62,21 @@ async function ordinaryInput(page,frame,action,touch,session,diagnostics){
  }else{
   const control=frame.locator('[data-control="'+action.control+'"]'),bounds=await control.boundingBox();
   if(!bounds||bounds.width<44||bounds.height<44)throw Error('QUALITY_CAPTURE_CONTROL_INACCESSIBLE');
+  // Measure the requested held duration *after* dispatching the real key or
+  // touch. Resolving a control and focusing the canvas can consume ticks.
+  const hold=async()=>{
+   const held=premium?await read(frame,diagnostics):before;
+   await waitTicks(page,frame,Math.min(horizon,held.tick+action.frames),diagnostics);
+  };
   if(touch){
    await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:bounds.x+bounds.width/2,y:bounds.y+bounds.height/2,id:1}]});
-   try{await waitTicks(page,frame,Math.min(600,before.tick+action.frames),diagnostics);}finally{await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}
+   try{await hold();}finally{await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}
   }else{
    await canvas.focus();await page.keyboard.down(keys[action.control]);
-   try{await waitTicks(page,frame,Math.min(600,before.tick+action.frames),diagnostics);}finally{await page.keyboard.up(keys[action.control]);}
+   try{await hold();}finally{await page.keyboard.up(keys[action.control]);}
   }
  }
- await waitTicks(page,frame,Math.min(600,before.tick+action.frames),diagnostics);
+ await waitTicks(page,frame,Math.min(horizon,before.tick+action.frames),diagnostics);
  // Let the released pointer reach the real worker before a new action.
  await page.waitForTimeout(40);
 }
@@ -84,6 +91,7 @@ async function capture(page,frame,device,phase,index,diagnostics){
   width:bytes.readUInt32BE(16),height:bytes.readUInt32BE(20),sha256:digest(bytes),data:bytes.toString('base64')};
 }
 async function captureSession(browser,game,device){
+ const actions=safeActions(game),horizon=captureHorizon(game),premium=usesPremiumCapture(game);
  const touch=device==='tablet',viewport=touch?{width:600,height:1000}:{width:1000,height:1000};
  const context=await browser.newContext({viewport,hasTouch:touch,reducedMotion:'no-preference'}),page=await context.newPage();
  page.setDefaultTimeout(4000);let external=0,consoleErrors=0;
@@ -94,7 +102,7 @@ async function captureSession(browser,game,device){
  page.on('pageerror',()=>consoleErrors++);
  const session=touch?await context.newCDPSession(page):null;
  try{
-  const artifact=renderGeneratedV2(game,'quality-capture','quality-capture-channel',{auditTicks:600});
+  const artifact=renderGeneratedV2(game,'quality-capture','quality-capture-channel',{auditTicks:horizon});
   await page.setContent('<style>body{margin:0;background:#fff}iframe{display:block;width:100%;max-width:720px;height:950px;border:0;margin:0 auto}</style><iframe title="Game quality capture" sandbox="allow-scripts"></iframe>');
   await page.locator('iframe').evaluate((iframe,html)=>iframe.srcdoc=html,artifact.html);
   // Bind polling to this exact sandbox frame. Re-resolving a FrameLocator on
@@ -108,19 +116,25 @@ async function captureSession(browser,game,device){
   diagnostics.phase='initial';
   const first=await read(frame,diagnostics);if(first.state!=='playing')throw Error('QUALITY_INITIAL_STATE_INVALID');
   const captures=[await capture(page,frame,device,'initial',0,diagnostics)],actionTrace=[];
-  const actions=safeActions(game);
+  const targets=premium?game.productionPlan.design.interactions.map(i=>i.input):[];
   for(let index=0;index<actions.length;index++){
    diagnostics.phase='action';diagnostics.actionIndex=index;
-   const before=await read(frame,diagnostics);if(before.state!=='playing'||before.tick>=600)break;
-   await ordinaryInput(page,frame,actions[index],touch,session,diagnostics);
+   const before=await read(frame,diagnostics);if(before.state!=='playing'||before.tick>=horizon)break;
+   await ordinaryInput(page,frame,actions[index],touch,session,diagnostics,horizon,premium);
    const after=await read(frame,diagnostics);
    actionTrace.push({action:actions[index],index:actionTrace.length,startTick:before.tick,endTick:after.tick,beforeHash:before.sceneHash,afterHash:after.sceneHash});
-   if(captures.length===1&&actions[index].type!=='wait'&&before.sceneHash!==after.sceneHash)
-    captures.push(await capture(page,frame,device,'interaction',1,diagnostics));
+   const action=actions[index],input=action.type==='hold'?action.control:action.type;
+   // With the same eight-image budget, premium sessions can include a second
+   // distinct ordinary control (e.g. jump AND duck) and still show the payoff.
+   const targetIndex=targets.indexOf(input);
+   if(input!=='wait'&&before.sceneHash!==after.sceneHash&&captures.length<(premium?3:2)&&(!premium||targetIndex>=0)){
+    if(premium)targets.splice(targetIndex,1);
+    captures.push(await capture(page,frame,device,'interaction',captures.length,diagnostics));
+   }
   }
   diagnostics.phase='progress';
   let final=await read(frame,diagnostics);
-  while(final.state==='playing'&&final.tick<600){await waitTicks(page,frame,Math.min(600,final.tick+180),diagnostics);final=await read(frame,diagnostics);}
+  while(final.state==='playing'&&final.tick<horizon){await waitTicks(page,frame,Math.min(horizon,final.tick+180),diagnostics);final=await read(frame,diagnostics);}
   captures.push(await capture(page,frame,device,final.state==='playing'?'progress':'outcome',captures.length,diagnostics));
   // Independent technical acceptance is required for this exact compiled game.
   // Also check fresh ordinary pause/replay here; no generated callback is trusted.
@@ -132,7 +146,7 @@ async function captureSession(browser,game,device){
   const paused=await read(frame,diagnostics);await page.waitForTimeout(100);const still=await read(frame,diagnostics);
   if(paused.tick!==still.tick||still.paused!=='true')throw Error('QUALITY_PAUSE_FAILED');
   await frame.getByRole('button',{name:'Resume',exact:true}).click();
-  await waitTicks(page,frame,Math.min(600,still.tick+3),diagnostics);
+  await waitTicks(page,frame,Math.min(horizon,still.tick+3),diagnostics);
   diagnostics.phase='verify';
   const isolated=await frame.locator('body').evaluate(()=>{try{return !parent.document.body;}catch{return true;}});
   const layout=await frame.locator('body').evaluate(body=>({scroll:body.scrollWidth,width:innerWidth,

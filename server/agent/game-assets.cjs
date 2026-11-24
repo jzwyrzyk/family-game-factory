@@ -107,4 +107,4 @@ function makeRasterAsset(options){
  const {bytes,...metadata}=options;const info=inspectRaster(bytes,metadata.mime);
  return {id:metadata.id,role:metadata.role,mime:metadata.mime,width:info.width,height:info.height,sha256:info.sha256,data:Buffer.from(bytes).toString('base64'),sampling:metadata.sampling||'smooth',provenance:metadata.provenance};
 }
-module.exports={ASSET_LIMITS,VISUAL_STYLES,validateAssetPack,assetPackHash,inspectRaster,makeRasterAsset};
+module.exports={crc32,ASSET_LIMITS,VISUAL_STYLES,validateAssetPack,assetPackHash,inspectRaster,makeRasterAsset};

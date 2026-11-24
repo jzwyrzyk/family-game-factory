@@ -80,6 +80,16 @@ The gateway's existing coordinator owns dispatch, retries and acceptance. New re
 
 Actions repair feedback preserves all allowlisted quality findings and the validated review's four axis statuses within the existing worker's 1,500-character limit. The optional private execution `lastFailure` record retains the latest test/review rejection's stage, attempt, stable category/code, finding enums and review axes before retry advancement or final exhaustion. It contains no source, prompt, capture or free-form error, and is not exposed through the browser job response. Earlier repair feedback and this rejection record have separate provenance; a later Ready result or unrelated terminal error must be read from the current job status. The [quality contract](docs/game-intelligence/PRESENTATION-QUALITY.md#four-independent-review-judgments) describes the unchanged acceptance and retention boundaries.
 
+### Adult Private premium game builder
+
+PR139 now integrates the disabled DEV/TEST foundation and shared exact-source CI verifier. Premium image labels avoid repeated metadata while preserving original evidence and all captures. Staged admission, durable scheduling and contact sheets remain offline feasibility tools, never production import paths. The clean hosted sandbox package check uses no publication permission. [Completion and activation boundaries](docs/game-intelligence/premium-benchmark/COMPLETION.md)
+
+New premium plans carry source-bound art-direction-v1. The private producer can extract a separately approved transparent sheet into independently decodable game-assets-v1 sprites. The renderer consumes the same IDs and raster format as older saved games. One scene and one sheet occupy two provider slots, even when a sheet has several poses. The staged benchmark joins exact code and art identities offline. Paid stages remain serial. [Artwork pilot and release gates](docs/game-intelligence/premium-benchmark/ARTWORK-PILOT.md)
+
+After explicit Build, the existing authenticated coordinator selects and records the approved generation policy for the job. Under `adult-astra-high-v1`, the private planning stage proposes a source-bound specification. Astra High builds the v2 game from the agreed intent, the specification, approved assets and the verified base revision. The credential-free sandbox exercises the actual game with ordinary inputs and returns captures and action receipts. A separate private review judges the observed result. Bounded Astra High repair returns through the same test and review gates. Only a passing candidate can enter isolated preview. Keep remains the creator's explicit decision.
+
+The conversation coach retains its own model, credential and spending boundary. Local edits continue through their deterministic handlers. Premium construction and repair use the exact model `gpt-6.2-astra` with `reasoning.effort` set to `high`. Planning and review have independent approved policies initially targeting `gpt-6.2-sol` at high effort. The selection belongs to the private worker and the authenticated Adult Private admission path. The gateway holds the allowance and the job's policy identity. A merge grants no model access. See the [pilot contract and post-cutover sequence](docs/game-intelligence/PREMIUM-BUILDER.md).
+
 ## Component and source map
 
 | Component | Responsibility and source of truth |

@@ -56,17 +56,21 @@ const basic='Preserve the child-authored premise, essential actions, and payoff.
 
 // This optional context comes from a bound review, not a sandbox exception.
 // Copy only exact enum data; malformed runtime objects never become feedback.
-function qualityContext(value:unknown):{axes:QualityRepairAxes;findings:QualityFinding[]}|undefined {
+interface MissingInteraction {interaction:number;device:'desktop'|'tablet'}
+function qualityContext(value:unknown):{axes:QualityRepairAxes;findings:QualityFinding[];missingInteractions:MissingInteraction[]}|undefined {
  const record=(v:unknown):v is Record<string,unknown>=>!!v&&typeof v==='object'&&!Array.isArray(v)&&
   [Object.prototype,null].includes(Object.getPrototypeOf(v))&&Object.values(Object.getOwnPropertyDescriptors(v)).every(d=>'value'in d);
- if(!record(value)||Object.keys(value).length!==2||!Object.hasOwn(value,'axes')||!Object.hasOwn(value,'findings'))return;
+ if(!record(value)||Object.keys(value).some(key=>!['axes','findings','missingInteractions'].includes(key))||!Object.hasOwn(value,'axes')||!Object.hasOwn(value,'findings'))return;
  const axes=value.axes,findings=value.findings;
  if(!record(axes)||Object.keys(axes).length!==QUALITY_AXES.length||QUALITY_AXES.some(axis=>!Object.hasOwn(axes,axis)||!['pass','fail','not-tested'].includes(axes[axis] as string)))return;
  if(!Array.isArray(findings)||findings.length>QUALITY_FINDINGS.length||findings.some(f=>!QUALITY_FINDINGS.includes(f))||new Set(findings).size!==findings.length)return;
+ const missing=value.missingInteractions??[];
+ if(!Array.isArray(missing)||missing.length>16||missing.some(x=>!record(x)||Object.keys(x).length!==2||
+  !Number.isInteger(x.interaction)||Number(x.interaction)<0||Number(x.interaction)>7||x.device!=='desktop'&&x.device!=='tablet'))return;
  const statuses=QUALITY_AXES.map(axis=>axes[axis]);
  if(statuses.every(s=>s==='pass')||statuses.includes('not-tested')&&!findings.includes('QUALITY_EVIDENCE_INCOMPLETE')||statuses.includes('fail')&&!findings.length)return;
  if(findings.some(f=>{const axis=f.startsWith('VISUAL_')?'visual':f.startsWith('INTENT_')?'intent':f.startsWith('GAMEPLAY_')?'gameplay':f.startsWith('INPUT_')?'input':undefined;return axis&&axes[axis]==='pass';}))return;
- return {axes:{visual:axes.visual as QualityStatus,intent:axes.intent as QualityStatus,gameplay:axes.gameplay as QualityStatus,input:axes.input as QualityStatus},findings:QUALITY_FINDINGS.filter(f=>findings.includes(f))};
+ return {missingInteractions:missing as MissingInteraction[],axes:{visual:axes.visual as QualityStatus,intent:axes.intent as QualityStatus,gameplay:axes.gameplay as QualityStatus,input:axes.input as QualityStatus},findings:QUALITY_FINDINGS.filter(f=>findings.includes(f))};
 }
 
 export function safeRepairDiagnostic(raw:unknown,plan?:FunctionalGameContract,reviewContext?:unknown):SafeRepairDiagnostic {
@@ -82,6 +86,11 @@ export function safeRepairDiagnostic(raw:unknown,plan?:FunctionalGameContract,re
   const category:RepairCategory=visual?'presentation-failed':gameplay?'gameplay-shallow':intent?'intent-missing':inputFinding?'input-unresponsive':'quality-unverified';
   const code:RepairCode=visual?'GAME_PRESENTATION_FAILED':gameplay?'GAMEPLAY_DESIGN_FAILED':intent?'INTENT_REQUIREMENT_FAILED':inputFinding?'INPUT_PRESENTATION_FAILED':'GAME_QUALITY_UNVERIFIED';
   const advice:string[]=[];
+  for(const device of ['desktop','tablet'] as const){
+   const missing=context?.missingInteractions.filter(item=>item.device===device).map(item=>item.interaction)||[];
+   if(missing.length)advice.push('No verified input/consequence for design.interactions indices '+missing.join(',')+' on '+device+'.');
+  }
+  if(context?.missingInteractions.length)advice.push('Keep the demonstrated interactions and fix the missing paths first.');
   if(visual||context&&context.axes.visual!=='pass')advice.push('Address the identified art, style, layout and readability criteria; show the requested art family clearly on both devices and preserve successful assets.');
   if(gameplay||context&&context.axes.gameplay!=='pass')advice.push('Demonstrate consequential choices and the required variation or recovery through ordinary play; counters and reskins are insufficient.');
   if(intent||context&&context.axes.intent!=='pass')advice.push('Expose the requested essential action and payoff with ordinary input; labels or claimed wins are insufficient.');

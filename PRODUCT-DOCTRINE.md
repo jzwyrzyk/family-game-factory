@@ -53,6 +53,8 @@ The owner's [November 22 Bubble Gum correction](docs/decisions/2026-11-22-bubble
 
 ## 3. Choose the simplest method that preserves the intent
 
+The premium builder plans the artwork and its playable roles together. Side, top-down, isometric and guided perspective use a bounded 2D canvas. Preserve the chosen view, action and payoff. Ask the creator about an indispensable spatial action the runtime cannot represent. [Artwork-first pilot](docs/game-intelligence/premium-benchmark/ARTWORK-PILOT.md)
+
 Choose a game's form from its actions and consequences. Rendering (2D or true 3D), input, simulation, visual style and goal/free-play mode are independent decisions. A robot does not imply 3D; a launch animation does not imply physical simulation.
 
 Use actual physics when weight, contact, balance, momentum, suspension or another physical cause materially determines the requested experience, or when it is an explicit requirement. Preserve verified existing mechanics when editing a saved game. If an essential requirement exceeds the runtime's capabilities, explain the gap or resolve the choice; do not silently substitute an easier experience and claim completion. Reusable game families should support invention rather than confine every idea to the same game.

@@ -75,6 +75,10 @@
     "docs/decisions/2026-11-21-profile-play-and-reading.md",
     "docs/bubble-gum-builders/README.md",
     "docs/decisions/2026-11-22-bubble-gum-assembly.md",
+    "docs/game-intelligence/PREMIUM-BUILDER.md",
+    "docs/game-intelligence/premium-benchmark/README.md",
+    "docs/decisions/2026-11-23-premium-builder.md",
+    "docs/game-intelligence/premium-benchmark/ARTWORK-PILOT.md",
     "docs/development/DEV-TEST-PROD.md",
     "docs/development/SETUP.md",
     "docs/development/COSTS.md",
@@ -113,10 +117,12 @@
     "docs/operations/*.md",
     "docs/speech/*.md",
     "docs/bubble-gum-builders/*.md",
+    "docs/evidence/README.md",
+    "docs/game-intelligence/PREMIUM-BUILDER.md",
+    "docs/game-intelligence/premium-benchmark/*.md",
     "docs/development/*.md",
     "infra/nonproduction/*.md",
-    "docs/development/evidence/*.md",
-    "docs/evidence/README.md"
+    "docs/development/evidence/*.md"
   ],
   "areas": [
     {
@@ -669,10 +675,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:13.636Z",
-      "sourceDigest": "d05a7f29c35d5896f75e73d04a67f1515cf32cca6237444b3a180a01353af9cc",
+      "reviewedAt": "2026-11-23T14:41:57.748Z",
+      "sourceDigest": "cb61afbc5c3fabd5edbfea8848b8dcc04ef11de5b4af798554270944eb3fb562",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed shared UTF-8 reader, authenticated read-only request lookup, packaging, paid receipt reconciliation and worker HTTP guards together. Architecture and service contracts preserve auth/privacy and distinguish unavailable lookup from replay permission; no production service activation.",
+      "reviewReason": "Reviewed the default-off Adult Private policy, existing status/job API diagnostics and private claim header against gateway admission and OpenAPI. Invalid premium settings preserve saved-revision/service routes. Architecture and premium contract separate configured, active and observed provider states; no credential, endpoint or live service change.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -706,7 +712,8 @@
         "docs/assignment-005/*.md",
         "docs/assignment-006/*.md",
         "docs/adult-pilot/*.md",
-        "docs/privacy/*.md"
+        "docs/privacy/*.md",
+        "docs/game-intelligence/premium-benchmark/*.md"
       ],
       "sources": [
         "server/actions/**",
@@ -715,13 +722,16 @@
         "server/quality/**",
         "server/sandbox/**",
         "server/testing/**",
-        "docs/game-intelligence/*.md"
+        "docs/game-intelligence/*.md",
+        "tools/premium-*",
+        "docs/game-intelligence/premium-benchmark/*.md",
+        "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:13.962Z",
-      "sourceDigest": "d2661ce6b7e634a63c4a16570e513779527343d3ad463673241220da96ccf216",
+      "reviewedAt": "2026-11-24T21:03:59.475Z",
+      "sourceDigest": "a7748aa2cc821639c57f194a3393e9938b763f708217921d7acfd51afc79fb2f",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed fixed coordinator phase/global leases, immutable report receipts, one execution plus bounded report reconciliation, nonblocking status and dispatch deadlines. Retained existing quality/budget gates and private pins; original-month narration usage is content-free accounting only. Matrix states gateway-first rollout and drain-before-rollback constraints.",
+      "reviewReason": "Reviewed atomic normal-motion evidence sampling after the offline paused-frame race; preserved source/frame/state identities and originals, and explicitly retained production eight-image policy and paid serial/full-job behavior.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -814,10 +824,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "b31a76a4c31f7d2153f469876672f32d4bda96c9dbcb70999102eb6d3122f2ab",
-      "reviewedAt": "2026-11-24T03:47:38.745Z",
+      "sourceDigest": "ee30422a65cfbeff27ec88eb03a1bc4b9d25de6034ed1012e09cbbff664b847b",
+      "reviewedAt": "2026-11-24T20:54:52.440Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Added the superseding environment acceptance contract while preserving same-site adult permits, tab proof and child isolation; disconnected previews cannot satisfy funded live TEST acceptance.",
+      "reviewReason": "Reconciled merged DEV TEST rollout guidance with premium Adult Private approval and saved-reader preservation; no child scope, grants, provider retention or authorization policy changes.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -861,6 +871,7 @@
         "docs/pals/*.md",
         "docs/pals/previews/*.md",
         "docs/bubble-gum-builders/*.md",
+        "docs/game-intelligence/premium-benchmark/*.md",
         "docs/development/*.md",
         "infra/nonproduction/*.md"
       ],
@@ -873,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T16:01:22.332Z",
-      "sourceDigest": "45d277bdfa6c48204f2717a41806fb9c19b9a0b5c8b783391f41f4067796d38e",
+      "reviewedAt": "2026-11-24T21:04:00.001Z",
+      "sourceDigest": "98447857529890e9cbb50fe3661a63b4f4c487a4c3257304148cee1263d19186",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled PR155 consumers with the shared adapter and mandatory CI contract from PR162; source policy equality, exact current merge parents/tree and full TEST receipt requirements remain unchanged.",
+      "reviewReason": "Verified final offline adversarial matrix detects 15 broken sessions with three working controls, keeps 108 original PNG identities and compares full/lossy sheets; recorded clean hosted image actual-byte and legacy/premium proof without claiming gVisor/provider acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1115,10 +1126,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T16:34:24.036Z",
-      "sourceDigest": "19eac7de58712ebb02a1619762da727bb8d86529d8901e4fba8069095733d81a",
+      "reviewedAt": "2026-11-24T21:04:00.637Z",
+      "sourceDigest": "8b90caceaf316bd524c2af26e758dec86f03eb531bf59bf80f662f90d445477e",
       "reviewOutcome": "updated",
-      "reviewReason": "Removed the observed duplicate environment-contract branch push while retaining PR/main checks, all paths/assertions and deployment triggers; recorded superseded b45798a runs without treating them as final-source evidence.",
+      "reviewReason": "Recorded source-specific local trials, standalone artifact hashes and downloaded clean hosted image evidence; preserved superseded run scope, current main production records and all external activation gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1372,10 +1383,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T16:01:23.151Z",
-      "sourceDigest": "a6c5efb8df842dd483e273abb70927eefa6e87176e939e518b11ab222a2f5f08",
+      "reviewedAt": "2026-11-24T20:54:53.956Z",
+      "sourceDigest": "0bbbe4a7991101120d756bb7410ec66b372b46aa53313cf249bd7aeb584d7cb9",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved the union of CI and DEV/TEST source routing, templates and maintenance instructions; shared verifier source is reviewed in both validation and delivery.",
+      "reviewReason": "Reconciled both registry source maps and documentation histories; routed new premium offline Python tools and completion handoff while preserving current maintenance requirements.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
