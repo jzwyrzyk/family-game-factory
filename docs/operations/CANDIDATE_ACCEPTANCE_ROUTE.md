@@ -1,8 +1,8 @@
-# Gateway candidate acceptance route — proposed, not activated
+# Gateway candidate acceptance route — approved, not yet activated
 
 The existing 5% Gateway canary has observed status/unlock successes but no attributed conversation POST in the owner-supplied evidence. The successful November 24 07:06 EST conversation reached the baseline. This proposal makes one authenticated candidate conversation deterministic. It does not accept the candidate, install diagnostics, promote traffic or publish Pages.
 
-## Exact additional scope requiring owner approval
+## Exact additional scope approved by the owner
 
 | Item | Proposed value |
 | --- | --- |
@@ -15,11 +15,11 @@ The existing 5% Gateway canary has observed status/unlock successes but no attri
 | Paid action | One explicit Adult conversation turn using a new synthetic game idea, under the current allowance; no Build, automatic replay or budget increase |
 | Cleanup | Disable local override, revoke only the new test device, and remove only the fixed tag through protected-main release intent |
 
-The tag exposes another HTTPS address for the already-public Gateway candidate, with the existing application authentication and Origin checks. It accepts direct requests independently of the service's percentage split. Existing IAM, federation, secret access, runtime images/configuration, other tags, original device grants and production Pages origins stay unchanged. Do not activate until the owner approves this specific routing and temporary-device scope. The original instruction to escalate new trust/routing changes is the reason for this approval; paid-testing approval alone did not install this path.
+The tag exposes another HTTPS address for the already-public Gateway candidate, with the existing application authentication and Origin checks. It accepts direct requests independently of the service's percentage split. Existing IAM, federation, secret access, runtime images/configuration, other tags, original device grants and production Pages origins stay unchanged. The owner explicitly approved this specific routing and temporary-device scope on November 24, 2026; activation still requires successful protected-main checks and a verified workflow result. The original instruction to escalate new trust/routing changes is the reason for this approval; paid-testing approval alone did not install this path.
 
 ## Reviewed controller behavior
 
-The inactive implementation adds `acceptance-route-add` and `acceptance-route-remove` intent operations to the existing protected-main Cloud Run workflow. No workflow trust changes are needed. The operations retain the exact source/image/configuration/compatibility fields and signed-image validation. The new tag name is derived from the pinned candidate identity, not supplied freely.
+The implementation adds `acceptance-route-add` and `acceptance-route-remove` intent operations to the existing protected-main Cloud Run workflow. No workflow trust changes are needed. The operations retain the exact source/image/configuration/compatibility fields and signed-image validation. The new tag name is derived from the pinned candidate identity, not supplied freely.
 
 Adding requires Gateway, baseline95/candidate5, matching declared/effective allocation, current latest candidate, both pinned ready revisions, configuration fingerprint, reconciled tags and an etag. A conflicting existing tag fails closed. The PATCH changes only the traffic array to append a zero-percent tagged target while retaining normal percentages and every other tag. Postchecks require the same normal allocation/configuration and exact expected tag set. Repeating the same operation is idempotent.
 
@@ -29,8 +29,8 @@ The read-only observer recognizes both intents and verifies tag presence/absence
 
 ## Execution after approval and successful hosted checks
 
-1. Merge the inactive controller PR through protected main. This does not alter `ops/release.json`, which is the release workflow's push trigger. Read fresh service metadata and ensure the pinned predecessor still holds.
-2. Prepare a separate protected-main intent PR changing only `operation` to `acceptance-route-add`, retaining every other current pin. Review its concrete diff, pass required checks and merge. Verify the actual workflow receipt, unchanged95/5 and the exact tag mapping. Obtain the actual tagged HTTPS URL from Cloud Run; do not rely on a guessed hostname.
+1. Read fresh service metadata and ensure the pinned predecessor still holds. PR160 combines controller support, the existing PR159 receipts and the approved `acceptance-route-add` intent to avoid an additional full CI cycle; every other release pin is unchanged. Review the combined exact-head diff and pass all protected-main checks before merging.
+2. The merge changes `ops/release.json` and triggers the existing protected release workflow. Verify its actual receipt, unchanged95/5 and exact tag mapping. Obtain the actual tagged HTTPS URL from Cloud Run; do not rely on a guessed hostname.
 3. In the owner's original production browser, use Parent Controls to issue one existing ten-minute device invitation. Keep the invitation and parent passphrase out of chat, GitHub, logs and screenshots.
 4. Use a separate temporary browser profile with no saved Jems work. Open the existing production Pages URL. In its developer tools, use a local response override for **only** `factory-config.json`, preserving its existing JSON fields and changing only `apiBaseUrl` to the observed candidate tag URL. This is an owner-side local browser setting; do not deploy the override or alter production Pages. Reload with the override active and verify the config response and outgoing Gateway hostname before entering credentials. Do not override scripts, cookies, headers, Origin, CORS, CSP or authentication failures. If the browser cannot apply this supported override, stop and reassess.
 5. Use the existing Trust this device form with device name `Jems candidate acceptance`. The owner enters the invitation and existing parent passphrase directly. Unlock Adult using the normal UI. Do not copy cookies or the in-memory Adult proof between hosts. Host-only cookies are why the original trusted-device session cannot automatically authenticate the new hostname.

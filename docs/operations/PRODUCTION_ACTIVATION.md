@@ -170,6 +170,6 @@ Pages subsequently dispatches from current main with input `source_sha` equal to
 
 The [Coach/reliability release control](COACH_RELIABILITY_RELEASE_CONTROL.md), [continuity contract](../assignment-006/RELEASE-CONTINUITY.md), [Coach evaluation gate](../design-coach/RELEASE_AND_EVALUATION.md) and [storage/rollback contract](../child-continuity/RELIABILITY-2026-11-23.md) remain applicable. This runbook neither expands the private-worker release scope nor authorizes PR106, provider activation, additional spending or destructive storage changes.
 
-## Proposed deterministic Gateway acceptance
+## Approved deterministic Gateway acceptance
 
-The [candidate acceptance route proposal](CANDIDATE_ACCEPTANCE_ROUTE.md) adds inactive controller support for a fixed temporary tag and its cleanup, preserving the normal canary split. Activation and one temporary trusted-device enrollment require the separate concrete owner approval described there. No release intent changes with this source preparation.
+The [candidate acceptance route proposal](CANDIDATE_ACCEPTANCE_ROUTE.md) adds controller support for a fixed temporary tag and its cleanup, preserving the normal canary split. The owner approved the exact temporary routing and one trusted test-device enrollment on November 24. PR160 includes the add-route intent while preserving all source/image/configuration pins; activation remains gated on protected-main checks and the observed workflow result.

@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T12:35:29.331Z",
-      "sourceDigest": "c578b562c0bcd3c2342aabd67313fa16daac11fc61b821fd93fb83f73dbd82c4",
+      "reviewedAt": "2026-11-24T12:39:02.935Z",
+      "sourceDigest": "96f246d8eca666878114f9514e8307b904aaac2be16ba87009c7e750553f7631",
       "reviewOutcome": "updated",
-      "reviewReason": "Review inactive Gateway-only acceptance tag lifecycle and read-only observer, unchanged historical activation pins, exact scope, authentication and cleanup limits.",
+      "reviewReason": "Integrate PR159 actual receipts, record explicit owner route/device approval, and bind add-route activation to unchanged pins and protected-main checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
