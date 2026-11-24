@@ -9,6 +9,9 @@ on:
       - 'server/agent/generation-contract.ts'
       - 'server/agent/premium-production.ts'
       - 'tools/premium-*.ts'
+      - 'tools/premium-art/**'
+      - 'server/agent/sprite-sheet.ts'
+      - 'server/agent/illustrations.ts'
       - 'tests/premium-*'
       - 'server/sandbox/intent-playtest-v2.cjs'
       - 'server/sandbox/playtest-v2.cjs'
@@ -38,6 +41,9 @@ on:
       - 'server/agent/generation-contract.ts'
       - 'server/agent/premium-production.ts'
       - 'tools/premium-*.ts'
+      - 'tools/premium-art/**'
+      - 'server/agent/sprite-sheet.ts'
+      - 'server/agent/illustrations.ts'
       - 'tests/premium-*'
       - 'server/actions/coordinator.ts'
       - 'server/actions/worker-cli.ts'
@@ -73,10 +79,14 @@ jobs:
         run: npm run test:premium
       - name: Produce offline paired benchmark manifest
         run: npm run --silent benchmark:premium > premium-benchmark.json
+      - name: Exercise seven matched concepts and both policy routes offline
+        run: npm run --silent benchmark:premium -- --mock > premium-mock.json
       - uses: actions/upload-artifact@v4
         with:
           name: premium-offline-comparison
-          path: premium-benchmark.json
+          path: |
+            premium-benchmark.json
+            premium-mock.json
 # This workflow has no browser installer, privileged credentials, paid calls,
 # deployment permissions or worker trust configuration. Full Arcade/creative/
 # learning/visual and private-runner security gates remain separate and mandatory.

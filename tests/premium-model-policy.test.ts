@@ -204,8 +204,8 @@ test('an interrupted second approved image retains the first flat image allowanc
    const bytes=readFileSync(new URL('../public/gem-factory-helper.webp',import.meta.url));
    return Response.json({data:[{b64_json:bytes.toString('base64')}]});
   }
-  const design={...fixturePremiumPlanProposal(wire),artRequests:['rocket','sticker'].map(id=>({
-   id,role:'object',sampling:'smooth',prompt:'Isolated bright cutout to use as a separate game object.'
+  const design={...fixturePremiumPlanProposal(wire),artRequests:['sky','sticker'].map((id,index)=>({
+   id,role:index===0?'background':'object',sampling:'smooth',prompt:index===0?'Open sky over the launch pad.':'Isolated bright cutout to use as a separate game object.'
   }))};
   return reply(wire,{output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(design)}]}]});
  });

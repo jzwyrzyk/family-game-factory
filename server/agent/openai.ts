@@ -1,6 +1,7 @@
 import type { AgentAdapter,AgentInput,CandidateArtifact } from '../pipeline/types';
 import { privateGenerationPreflight } from '../quality/private-generation-preflight';
 import { isGeneratedGame,validateGenerated,type GeneratedGame } from './generated';
+import {requirePlannedAssets} from '../quality/art-direction';
 import {validateAssetPack,type GameAssetPack} from './game-assets';
 import {produceGameArt,validateImageApproval} from './illustrations';
 import {presentationBrief,permitsNewArt,bindGameProductionPlan,assertProductionPlanBinding,productionPlanSchema,premiumProductionPlanSchema,type GameProductionPlan} from '../quality/presentation-plan';
@@ -137,9 +138,10 @@ export class OpenAIResponsesAgent implements AgentAdapter {
   if(options.qualityEvidence&&!evidence)throw Error('QUALITY_EVIDENCE_BINDING_MISMATCH');
   const images=evidence?(['desktop','tablet'] as const).map(device=>evidence.captures.filter(c=>c.device===device&&c.phase!=='initial').at(-1)!):undefined;
   const findings=options.findings?.filter(f=>QUALITY_FINDINGS.includes(f))||[];
-  const result=await this.structured(input,{stage:'planning',instructions:planningInstructions+(premium?premiumPlanningInstructions:''),data:{idea:input.childIntent,base:existing,gameDesignPreflight:preflight.brief,presentationBrief:brief,imagesAvailable,maxImages,preserveApprovedArt:!permitsNewArt(input)&&options.assetRepair!==true,assetRepair:options.assetRepair===true,
+  const result=await this.structured(input,{stage:'planning',instructions:planningInstructions+(premium?premiumPlanningInstructions:''),data:{idea:input.childIntent,base:existing,gameDesignPreflight:preflight.brief,presentationBrief:brief,imagesAvailable,maxImages,...(premium?{sheetRouteAvailable:imagesAvailable&&this.approval.images?.sheetFormat==='rgba8-png-grid-v1'}:{}),preserveApprovedArt:!permitsNewArt(input)&&options.assetRepair!==true,assetRepair:options.assetRepair===true,
    assetRepairEvidence:options.assetRepair?{findings,failedAssets:options.previous?.assets?.assets.map(({data,...metadata})=>metadata)||[],captures:images?.map(({data,...metadata})=>metadata)||[]}:null},schema:premium?premiumProductionPlanSchema:productionPlanSchema,name:'family_game_plan',outputTokens:premium?undefined:2400,images},meter);
   const plan=bindGameProductionPlan(result.value,input,premium);
+  if(plan.version==='game-production-plan-v2'&&plan.artDirection?.sheetId&&this.approval.images?.sheetFormat!=='rgba8-png-grid-v1')throw Error('ART_PLAN_UNAVAILABLE');
   requireReviewCapacity(plan);
   if(plan.artRequests.length>maxImages)throw Error('ART_PLAN_UNAVAILABLE');
   return {plan,usageUnits:result.usageUnits};
@@ -182,7 +184,8 @@ export class OpenAIResponsesAgent implements AgentAdapter {
      onImageCharge:charge=>{meter.imageUsageUnits+=charge;meter.unsettled=false;}});
     assets=produced.assets;used+=produced.usageUnits;
    }
-   if(plan.artRequests.some(request=>!assets!.assets.some(asset=>asset.id===request.id&&asset.role===request.role)))throw Error('ART_PLAN_ASSET_MISSING');
+   const direction=plan.version==='game-production-plan-v2'?plan.artDirection:undefined;
+   requirePlannedAssets(plan.artRequests,direction,assets.assets);
   }
   const base=isGeneratedGame(original)?{kind:original.kind,title:original.title,instructions:original.instructions,source:original.source,controls:original.controls}:original||input.baseRevision.config||null;
   const verified=input.baseRevision.game;

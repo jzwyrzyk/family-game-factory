@@ -5,6 +5,7 @@ import type {WorkerStage} from '../server/actions/identity';
 import {grantAdultPilot,beginAdultPilotSession,authenticateAdultPilotSession} from '../server/adult-pilot';
 import {approvedPremiumPilot,type GatewayConfig} from '../server/gateway';
 import {PREMIUM_POLICY_VERSION,INITIAL_PREMIUM_MODELS,premiumJobReserve,type AgentApproval,type PremiumApproval,type ModelStage,type StageUsage} from '../server/agent/model-policy';
+import {illustratedGame} from './generated-art-fixtures';
 import {MemoryRepository} from '../server/pipeline/repository';
 import {JobService} from '../server/pipeline/service';
 import {bindGameProductionPlan} from '../server/quality/presentation-plan';
@@ -198,4 +199,16 @@ for(const pass of [true,false])test('hosted premium candidate is '+(pass?'accept
   }
   assert.equal((await h.repo.snapshot()).ledgers[familyId].reserved,0);
  }
+});
+
+test('approved art on a saved revision stays within its immutable family and adult profile',async()=>{
+ const {repo,service,adult}=await setup();
+ const original=illustratedGame();
+ for(const [id,family,profile] of [['foreign-family','other',adult.adultProfileId],['foreign-profile',familyId,'other-profile']] as const){
+  await repo.transaction(state=>{state.revisions.push({id,familyId:family,adultPilotProfileId:profile,parentId:null,projectId:'art',game:original});return true;});
+  await assert.rejects(service.submit(adult,{...request,gameId:'generated-module',baseRevisionId:id,clientRequestId:id}),/forbidden|not_found/i);
+ }
+ const state=await repo.snapshot();
+ assert.equal(state.jobs.length,0);assert.equal(state.ledgers[familyId].reserved,0);
+ assert.equal(state.revisions.length,2);
 });

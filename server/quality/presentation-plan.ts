@@ -5,6 +5,7 @@ import type {AgentInput} from '../pipeline/types';
 import {validateAssetPack,type VisualStyle,type RasterAsset} from '../agent/game-assets';
 
 import {choiceSources,validateChoiceSources,validateProductionDesign,productionDesignSchema,type ProductionDesign,type ChoiceSource} from './production-design';
+import {artDirectionSchema,readArtDirection,type ArtDirection} from './art-direction';
 import {captureLimits} from './game-quality-evidence.cjs';
 
 export const PRESENTATION_STYLES=['pixel','flat-2d','illustrated','dimensional','realistic'] as const;
@@ -24,7 +25,7 @@ interface CommonProductionPlan {
 }
 export type GameProductionPlan=CommonProductionPlan&(
  | {version:'game-production-plan-v1'}
- | {version:'game-production-plan-v2'; design:ProductionDesign; choiceSources:ChoiceSource[]}
+ | {version:'game-production-plan-v2'; design:ProductionDesign; artDirection?:ArtDirection; choiceSources:ChoiceSource[]}
 );
 export interface PresentationBrief {
  version:'presentation-brief-v1';requestHash:string;
@@ -94,7 +95,9 @@ export function presentationBrief(input:AgentInput):PresentationBrief {
    hits.push({style,quote:match[0],index:at});
   }
  }
- const distinct=[...new Set(hits.map(x=>x.style))];
+ // Layout terms may suggest a dimensional treatment when no art style was chosen.
+ const styleHits=hits.filter(h=>!/^isometric$|^2\.5d$/i.test(h.quote));
+ const distinct=[...new Set((styleHits.length?styleHits:hits).map(x=>x.style))];
  // Multiple explicit styles are not forced into a guessed family. The full
  // literal request reaches both planner and reviewer for the requested blend.
  let preferredStyle:VisualStyle|null=distinct.length===1?distinct[0]:null;
@@ -124,13 +127,13 @@ export function permitsNewArt(input:AgentInput):boolean {
  if(!game||!('assets'in game)||!game.assets||validateAssetPack(game.assets).assets.length===0)return true;
  const brief=presentationBrief(input),savedStyle=validateAssetPack(game.assets).style;
  if(brief.preferredStyle&&brief.preferredStyle!==savedStyle)return true;
- return /\b(?:art|artwork|appearance|visuals?|style|palette|colou?rs?|texture|background|scenery|character|sprite|look|redraw|draw|paint|recolou?r|illustrat\w*|theme|replace|instead|transform|turn\b.{0,40}\binto|add\s+(?:a|an|new))\b/i.test(input.childIntent)||
+ return /\b(?:art|artwork|appearance|visuals?|style|palette|colou?rs?|texture|background|scenery|redraw|draw|paint|recolou?r|illustrat\w*|theme|replace\s+(?:the\s+)?(?:actor|character|sprite|background)|transform|turn\b.{0,40}\binto|add\s+(?:(?:a|an|new)\s+){1,2}(?:actor|character|sprite|background))\b/i.test(input.childIntent)||
   /\b(?:make|turn|change)\b.{0,60}\b(?:red|orange|yellow|green|blue|purple|pink|black|white)\s*(?:[.!?]|$|and\b)/i.test(input.childIntent);
 }
 
 export function validateGameProductionPlan(value:unknown):GameProductionPlan {
  const p=own(value),premium=p.version==='game-production-plan-v2';
- exact(p,['version','requestHash','baseRevisionId','presentationStyle','styleOrigin','playerAction','payoff','variation','openEnded','artRequests',...(premium?['design','choiceSources']:[])]);
+ exact(p,['version','requestHash','baseRevisionId','presentationStyle','styleOrigin','playerAction','payoff','variation','openEnded','artRequests',...(premium?['design','choiceSources',...(Object.hasOwn(p,'artDirection')?['artDirection']:[])]:[])]);
  if(!premium&&p.version!=='game-production-plan-v1'||typeof p.requestHash!=='string'||!HASH.test(p.requestHash)||typeof p.baseRevisionId!=='string'||!/^[\w-]{1,100}$/.test(p.baseRevisionId)||
   !PRESENTATION_STYLES.includes(p.presentationStyle as VisualStyle)||!['explicit','saved','chosen'].includes(String(p.styleOrigin))||typeof p.openEnded!=='boolean'||!Array.isArray(p.artRequests)||p.artRequests.length>2)throw Error('PRODUCTION_PLAN_INVALID');
  const ids=new Set<string>();
@@ -139,14 +142,20 @@ export function validateGameProductionPlan(value:unknown):GameProductionPlan {
   if(typeof a.id!=='string'||!ID.test(a.id)||ids.has(a.id)||!['background','actor','object','effect'].includes(String(a.role))||!['pixelated','smooth'].includes(String(a.sampling)))throw Error('PRODUCTION_PLAN_INVALID');
   ids.add(a.id);return {id:a.id,role:a.role as ArtRequest['role'],prompt:bounded(a.prompt,1200),sampling:a.sampling as ArtRequest['sampling']};
  });
- const contract=premium?{version:'game-production-plan-v2' as const,design:validateProductionDesign(p.design),choiceSources:validateChoiceSources(p.choiceSources)}:{version:'game-production-plan-v1' as const};
+ const contract=premium?{version:'game-production-plan-v2' as const,design:validateProductionDesign(p.design),...(p.artDirection!==undefined?{artDirection:readArtDirection(p.artDirection)}:{}),choiceSources:validateChoiceSources(p.choiceSources)}:{version:'game-production-plan-v1' as const};
+ if(contract.version==='game-production-plan-v2'&&contract.artDirection&&artRequests.length===2&&artRequests.filter(r=>r.role==='background').length!==1)throw Error('ART_DIRECTION_INVALID');
+ if(contract.version==='game-production-plan-v2'&&contract.artDirection?.sheetId){
+  const d=contract.artDirection,sheet=artRequests.find(r=>r.id===d.sheetId);
+  if(!sheet||!['actor','object'].includes(sheet.role)||artRequests.some(r=>r!==sheet&&r.role!=='background')||
+     d.subjects.some(s=>ids.has(s.id)))throw Error('ART_DIRECTION_INVALID');
+ }
  if(contract.version==='game-production-plan-v2'&&p.openEnded&&contract.design.payoffState==='won')throw Error('PRODUCTION_PLAN_INVALID');
  return {...contract,requestHash:p.requestHash,baseRevisionId:p.baseRevisionId,presentationStyle:p.presentationStyle as VisualStyle,styleOrigin:p.styleOrigin as GameProductionPlan['styleOrigin'],playerAction:bounded(p.playerAction,500),payoff:bounded(p.payoff,500),variation:bounded(p.variation,500),openEnded:p.openEnded,artRequests};
 }
 
 /** Bind a model proposal to independently sourced request/base metadata. */
 export function bindGameProductionPlan(value:unknown,input:AgentInput,premium=false):GameProductionPlan {
- const raw=own(value);exact(raw,['presentationStyle','playerAction','payoff','variation','openEnded','artRequests',...(premium?['design']:[])]);
+ const raw=own(value);exact(raw,['presentationStyle','playerAction','payoff','variation','openEnded','artRequests',...(premium?['design','artDirection']:[])]);
  const brief=presentationBrief(input);
  if(brief.preferredStyle&&raw.presentationStyle!==brief.preferredStyle)throw Error('PRESENTATION_STYLE_CHANGED');
  const binding=premium?{version:'game-production-plan-v2',choiceSources:choiceSources(input.childIntent)}:{version:'game-production-plan-v1'};
@@ -172,5 +181,5 @@ export const productionPlanSchema={type:'object',additionalProperties:false,requ
  artRequests:{type:'array',maxItems:2,items:{type:'object',additionalProperties:false,required:['id','role','prompt','sampling'],properties:{id:{type:'string'},role:{type:'string',enum:['background','actor','object','effect']},prompt:{type:'string'},sampling:{type:'string',enum:['pixelated','smooth']}}}}
 }};
 
-export const premiumProductionPlanSchema={...productionPlanSchema,required:[...productionPlanSchema.required,'design'],properties:{...productionPlanSchema.properties,design:productionDesignSchema}};
+export const premiumProductionPlanSchema={...productionPlanSchema,required:[...productionPlanSchema.required,'design','artDirection'],properties:{...productionPlanSchema.properties,design:productionDesignSchema,artDirection:artDirectionSchema}};
 export const premiumPlaythroughSchema={...suggestedPlaythroughSchema,maxItems:captureLimits(true).actions};

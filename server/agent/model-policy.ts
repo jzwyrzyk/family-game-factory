@@ -90,7 +90,7 @@ export function validatePremiumApproval(approval:PremiumApproval):void {
   if(policy.maxInputTokens<=minimumInput)throw Error('PREMIUM_PRICING_OR_LIMIT_INVALID');
  }
  if(approval.images!==undefined){
-  if(!hasOnlyKeys(approval.images,['enabled','approvalId','model','maxImages','maxMicroUsdPerImage','priceReviewedOn'])||
+  if(!hasOnlyKeys(approval.images,['enabled','approvalId','model','maxImages','maxMicroUsdPerImage','priceReviewedOn','sheetFormat'])||
      typeof approval.images.enabled!=='boolean')throw Error('IMAGE_APPROVAL_REQUIRED');
   // Validate even a dormant block before forwarding the private configuration.
   validateImageApproval({...approval.images,enabled:true});

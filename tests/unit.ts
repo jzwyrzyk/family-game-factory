@@ -61,6 +61,7 @@ import './premium-model-policy.test';
 import './premium-pipeline.test';
 import './premium-production.test';
 import './premium-benchmark.test';
+import './premium-art.test';
 import './gem-factory-physics.test';
 import './gem-factory-pattern.test';
 import './gem-factory-cut.test';

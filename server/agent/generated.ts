@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { runtimeBundle } from '../sandbox/bundle-v2.cjs';
 import type { CreationProject } from '../../src/creation/model';
 import { validateGeneratedCreationManifest } from '../../src/creation/projects';
+import {requirePlannedAssets} from '../quality/art-direction';
 import {assetPackHash,validateAssetPack,type GameAssetPack} from './game-assets';
 import type {GameQualityReview} from '../quality/game-quality';
 import {validateSuggestedPlaythrough,validateGameProductionPlan,type SuggestedPlaythrough,type GameProductionPlan} from '../quality/presentation-plan';
@@ -31,6 +32,7 @@ export function validateGenerated(value:unknown):GeneratedGame {
  if(premium&&g.kind!=='generated-module-v2')throw Error('PREMIUM_PLAN_REQUIRES_V2');
  const playthrough=g.playthrough===undefined?undefined:validateSuggestedPlaythrough(g.playthrough,premium);
  if(assets&&productionPlan&&assets.style!==productionPlan.presentationStyle)throw Error('ASSET_STYLE_MISMATCH');
+ if(premium&&productionPlan.artDirection)requirePlannedAssets(productionPlan.artRequests,productionPlan.artDirection,assets?.assets||[]);
  const creationManifest=g.creationManifest==null?undefined:validateGeneratedCreationManifest(g.creationManifest);
  return {kind:g.kind,title:g.title,instructions:g.instructions,source:g.source,controls:[...g.controls],...(assets?{assets}:{}),...(playthrough?{playthrough}:{}),...(productionPlan?{productionPlan}:{}),...(creationManifest?{creationManifest}:{})};
 }
