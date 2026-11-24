@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T04:17:56.979Z",
-      "sourceDigest": "048b48334c86fe516d29b62654d01b6b1a1a0ba890547719107864b4254a3097",
+      "reviewedAt": "2026-11-24T12:05:03.148Z",
+      "sourceDigest": "d48af1a696e99197decb327452ccc1f6e83ec8ec110e6a478999c0b26d92fb00",
       "reviewOutcome": "updated",
-      "reviewReason": "Superseded the initial network block with approved applied specification2 and direct live old-source manifests/assets; recorded manual Console sign-in requirement and separately blocked dynamic artifact hosts while preserving actual diagnostics failure, rollout receipts and acceptance gates.",
+      "reviewReason": "Record owner-supplied candidate request rows, absence of conversation evidence, and paid acceptance authorization without claiming promotion.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
