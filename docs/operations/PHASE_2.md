@@ -317,3 +317,7 @@ inert source and proving the exact GitHub claims. Reinspect the private coach's
 actual serving/template state before enrollment; earlier observed speech and
 spending drift is a historical finding, not a current live read. Any remaining
 configuration difference blocks the affected service until separately reconciled.
+
+## DEV and TEST integration boundary
+
+[DEV → TEST → PROD](../development/DEV-TEST-PROD.md) is the authoritative new environment method. Reuse this merged production controller, provenance, configuration, compatibility and traffic safeguards. The new source foundation does not alter the active cutover intent or production workflow. A later reviewed integration must add exact TEST-manifest/owner-approval prerequisites and reuse immutable artifacts; current source validation alone does not establish that integration. DEV/TEST deployment identities belong in a separate project, and routine operations must not depend on Cloud Shell.

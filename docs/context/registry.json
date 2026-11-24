@@ -74,7 +74,11 @@
     "docs/speech/NATURAL_NARRATION.md",
     "docs/decisions/2026-11-21-profile-play-and-reading.md",
     "docs/bubble-gum-builders/README.md",
-    "docs/decisions/2026-11-22-bubble-gum-assembly.md"
+    "docs/decisions/2026-11-22-bubble-gum-assembly.md",
+    "docs/development/DEV-TEST-PROD.md",
+    "docs/development/SETUP.md",
+    "docs/development/COSTS.md",
+    "docs/decisions/2026-11-23-dev-test-prod.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -108,7 +112,10 @@
     "docs/pals/previews/*.md",
     "docs/operations/*.md",
     "docs/speech/*.md",
-    "docs/bubble-gum-builders/*.md"
+    "docs/bubble-gum-builders/*.md",
+    "docs/development/*.md",
+    "infra/nonproduction/*.md",
+    "docs/development/evidence/*.md"
   ],
   "areas": [
     {
@@ -806,10 +813,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "b5a2a570fc92fafa428dd532e1caf7ac1428605b1e7384de292406bed856ae8c",
-      "reviewedAt": "2026-11-23T05:43:14.662Z",
+      "sourceDigest": "b31a76a4c31f7d2153f469876672f32d4bda96c9dbcb70999102eb6d3122f2ab",
+      "reviewedAt": "2026-11-24T03:47:38.745Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed exact owner/API/request binding, awaited acknowledgment persistence and profile cancellation with existing trusted/adult session boundaries. Delivery records synthetic reconnect/backup evidence, preserves default-off services and requires separately authorized real-provider Adult acceptance; no consent or audience expansion.",
+      "reviewReason": "Added the superseding environment acceptance contract while preserving same-site adult permits, tab proof and child isolation; disconnected previews cannot satisfy funded live TEST acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -852,7 +859,9 @@
         "docs/mind-your-jems/*.md",
         "docs/pals/*.md",
         "docs/pals/previews/*.md",
-        "docs/bubble-gum-builders/*.md"
+        "docs/bubble-gum-builders/*.md",
+        "docs/development/*.md",
+        "infra/nonproduction/*.md"
       ],
       "sources": [
         "tests/**",
@@ -861,10 +870,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T18:54:44.529Z",
-      "sourceDigest": "9fb64a023aabdbdd877544ea349c9701605d964aa9fec17f18dd618c4c4f38fb",
+      "reviewedAt": "2026-11-24T03:47:39.155Z",
+      "sourceDigest": "c98aec0c78a258daa739866c6cb7051b31d2056e11c7d915743c648035459b66",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the exact collection GET fixture and bounded observed-time countdown helper; retained strict unknown-request, paid-build, phase and duration assertions. Delivery state records the full child-journey pass and ten Bubble Gum cases with 22 launch receipts on supplemental Chromium 156, preserved original CI failures, and fresh hosted results pending.",
+      "reviewReason": "Reviewed bounded package and identity attack tests, origin-confined deployed smoke and exact-release evidence gates; recorded three viewport local captures, full acceptance gaps and unchanged complete regression partition.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1038,7 +1047,9 @@
         "docs/assignment-006/*.md",
         "docs/operations/*.md",
         "docs/mind-your-jems/*.md",
-        "docs/bubble-gum-builders/*.md"
+        "docs/bubble-gum-builders/*.md",
+        "docs/development/*.md",
+        "infra/nonproduction/*.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -1052,13 +1063,15 @@
         "vite.config.ts",
         ".dockerignore",
         ".gitignore",
-        "DELIVERY-STATE.md"
+        "DELIVERY-STATE.md",
+        "scripts/environments/**",
+        "infra/nonproduction/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T01:51:12.836Z",
-      "sourceDigest": "f999b0b1c8f5057391b2b9428aa98078728c96c474aa579696183732a017a44a",
+      "reviewedAt": "2026-11-24T03:47:39.655Z",
+      "sourceDigest": "7fa1e6a1487e3d0dc84bcf3369f5eeef3ab52b2a6139d01052ce6d3a56c72d56",
       "reviewOutcome": "updated",
-      "reviewReason": "Stacked the unchanged Gateway canary on the metadata-only release observer while preserving actual Coach promotion and Gateway stage evidence; fresh stage lifecycle inspection still gates canary merge.",
+      "reviewReason": "Reviewed disabled nonproduction workflows, trusted artifact isolation, separate project IAM and cleanup, retention and sealed approval interface; documented missing live setup and preserved active production intents and workflows.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1256,10 +1269,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T03:35:23.963Z",
-      "sourceDigest": "34da324f3f9445a8745fea1aa95bfc9a843045a98cac8979ec8c3139b92ab899",
+      "reviewedAt": "2026-11-24T03:47:40.048Z",
+      "sourceDigest": "62b1bbf08af6269a0c8224748b3e9ad2d114b84dc25790e4677154664f3a8c54",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed integration routing additions and existing required documents/link scope; the index now identifies PR134 as the single consolidated release vehicle. Historical review records and fingerprint enforcement remain intact.",
+      "reviewReason": "Registered environment source and infrastructure routing with current contracts and evidence; updated AGENTS, Project retrieval, maintenance and PR acceptance instructions without weakening existing review checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

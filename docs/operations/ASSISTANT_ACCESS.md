@@ -135,3 +135,7 @@ The end-state acceptance criterion is an ordinary investigation and permitted re
 - [Cloud Run roles and permissions](https://docs.cloud.google.com/run/docs/reference/iam/roles)
 - [Nonmutating Cloud Run permission test](https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/testIamPermissions)
 - [Accepted operating decision](../decisions/2026-11-20-direct-operations.md)
+
+## Development environment operations
+
+The [DEV → TEST → PROD contract](../development/DEV-TEST-PROD.md) supersedes owner-run Cloud Shell as a routine environment operating method. The existing diagnostic or production release identities are not nonproduction bootstrap credentials. [The setup assessment](../development/SETUP.md) records the current missing managed identity/settings capability and the required separate-project, narrowly scoped graphical setup. Preserve historical access receipts above as evidence for their original environment; do not assume they apply to a new session or silently expand production grants.

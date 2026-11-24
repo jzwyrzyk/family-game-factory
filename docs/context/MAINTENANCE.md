@@ -17,6 +17,12 @@ The development author owns the documentation impact of a change; the reviewer c
 
 Make code and document changes in the same PR where possible. Post-merge or external operational facts necessarily arise later: add a small documentation follow-up promptly rather than pretending a premerge record knew the outcome. Do not rewrite historical test results or old deployment evidence to look current.
 
+## Environment evidence and automatic status
+
+The [DEV → TEST → PROD contract](../development/DEV-TEST-PROD.md) governs preview, TEST, approval and release reporting. Route environment scripts, workflows, tests, infrastructure and these contracts through the review registry. Automated summaries may update factual deployment states only from validated run, artifact and resource receipts for the exact source. They must not infer owner acceptance from CI, approval from a merge, or production deployment from integration. Keep failed, expired, stale and unknown states visible. A generated directory/PR summary complements delivery state; it does not silently rewrite doctrine or historical receipts.
+
+After setup, two-preview acceptance, complete TEST acceptance, production promotion or recovery, record the actual observation and remaining definition-of-done gaps. Do not mark the method complete merely because source or infrastructure exists.
+
 ## 2. Use the review registry
 
 The problem-solving feature has a dedicated review area for its evidence schema, deterministic practice, reports and tests. Its standards/claim contract is linked from product and experience reviews, while source hooks remain in their existing subject, Creation and Studio areas.

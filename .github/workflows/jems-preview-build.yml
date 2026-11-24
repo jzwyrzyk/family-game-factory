@@ -1,0 +1,79 @@
+name: Jems preview bundle
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'server/**'
+      - 'index.html'
+      - 'package*.json'
+      - 'vite.config.ts'
+      - 'tsconfig.json'
+      - 'tools/offline-build.ts'
+      - 'scripts/environments/**'
+      - 'ops/environments.json'
+      - '.github/workflows/jems-preview-build.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'server/**'
+      - 'index.html'
+      - 'package*.json'
+      - 'vite.config.ts'
+      - 'tsconfig.json'
+      - 'tools/offline-build.ts'
+      - 'scripts/environments/**'
+      - 'ops/environments.json'
+      - '.github/workflows/jems-preview-build.yml'
+
+# Untrusted application/dependency code runs only in this credential-free lane.
+permissions:
+  contents: read
+concurrency:
+  group: jems-preview-build-${{ github.event.pull_request.number || 'test' }}
+  cancel-in-progress: true
+jobs:
+  bundle:
+    if: github.repository == 'jzwyrzyk/family-game-factory' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Report affected DEV checks without reducing required CI
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          [[ "$BASE_SHA" =~ ^[a-f0-9]{40}$ && "$SOURCE_SHA" =~ ^[a-f0-9]{40}$ ]]
+          git diff --name-only "$BASE_SHA" "$SOURCE_SHA" > "$RUNNER_TEMP/changed-paths.txt"
+          python3 scripts/environments/selection.py --changed-paths-file "$RUNNER_TEMP/changed-paths.txt" >> "$GITHUB_STEP_SUMMARY"
+      - run: npm run build
+      - name: Package disconnected application bytes
+        env:
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          args=(--dist dist --source "$SOURCE_SHA" --out "$RUNNER_TEMP/bundle.tgz")
+          if [[ -n "$PR_NUMBER" ]]; then args+=(--environment dev --pr "$PR_NUMBER"); else args+=(--environment test); fi
+          python3 scripts/environments/bundle.py pack "${args[@]}"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: jems-site-bundle
+          path: ${{ runner.temp }}/bundle.tgz
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error

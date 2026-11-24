@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "enabled": false,
+  "projectId": null,
+  "projectNumber": null,
+  "region": "us-east5",
+  "runtimeServiceAccount": null,
+  "deployServiceAccount": null,
+  "uatServiceAccount": null,
+  "wifProvider": null,
+  "iapAudience": null,
+  "registry": null,
+  "ownerIapMembers": [],
+  "previewTtlHours": 72,
+  "maxPreviews": 10,
+  "minInstances": 0,
+  "maxInstances": 1,
+  "directoryIssue": null
+}

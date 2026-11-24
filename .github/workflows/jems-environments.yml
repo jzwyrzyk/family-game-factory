@@ -1,0 +1,192 @@
+name: Jems private environments
+on:
+  workflow_run:
+    workflows: ['Jems preview bundle', 'Arcade journeys', 'Documentation context', 'Jems operations contracts']
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Successful source workflow run to reconcile; empty means cleanup only
+        required: false
+        type: string
+  schedule:
+    - cron: '17,47 * * * *'
+
+permissions:
+  contents: read
+concurrency:
+  group: jems-nonproduction-controller
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+      checks: read
+      pull-requests: read
+    outputs:
+      enabled: ${{ steps.prepare.outputs.enabled }}
+      eligible: ${{ steps.prepare.outputs.eligible }}
+      source: ${{ steps.prepare.outputs.source }}
+      kind: ${{ steps.prepare.outputs.kind }}
+      pr: ${{ steps.prepare.outputs.pr }}
+      run: ${{ steps.prepare.outputs.run }}
+      bundle: ${{ steps.prepare.outputs.bundle }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - id: prepare
+        name: Verify source, successful checks and artifact provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_RUN: ${{ github.event.workflow_run.id || inputs.run_id }}
+        run: python3 scripts/environments/automation.py prepare
+      - name: Build fixed trusted server around validated data only
+        if: steps.prepare.outputs.eligible == 'true'
+        run: |
+          set -euo pipefail
+          docker build --network none -t jems-site:ci "$RUNNER_TEMP/jems-context"
+          docker save jems-site:ci | gzip -1 > "$RUNNER_TEMP/jems-site-image.tar.gz"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: steps.prepare.outputs.eligible == 'true'
+        with:
+          name: trusted-environment-image
+          path: |
+            ${{ runner.temp }}/jems-site-image.tar.gz
+            ${{ runner.temp }}/jems-candidate.json
+          retention-days: 1
+          if-no-files-found: error
+
+  deploy:
+    needs: prepare
+    if: needs.prepare.outputs.eligible == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: jems-nonproduction
+    permissions:
+      contents: read
+      actions: read
+      checks: read
+      pull-requests: write
+      deployments: write
+      issues: write
+      id-token: write
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+      identity: ${{ steps.deploy.outputs.identity }}
+      source: ${{ needs.prepare.outputs.source }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: trusted-environment-image
+          path: ${{ runner.temp }}
+      - name: Recheck current source before authentication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/environments/automation.py recheck
+      - id: config
+        run: python3 scripts/environments/automation.py config
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          workload_identity_provider: ${{ steps.config.outputs.provider }}
+          service_account: ${{ steps.config.outputs.deployer }}
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f
+      - id: deploy
+        name: Publish immutable image and verify private service
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/environments/automation.py deploy
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: environment-deployment-receipt
+          path: ${{ runner.temp }}/jems-deployment.json
+          if-no-files-found: ignore
+          retention-days: 30
+
+  deployed-browser:
+    needs: deploy
+    if: needs.deploy.outputs.url != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: jems-nonproduction-uat
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - id: config
+        run: python3 scripts/environments/automation.py config
+      - id: auth
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          workload_identity_provider: ${{ steps.config.outputs.provider }}
+          service_account: ${{ steps.config.outputs.uat }}
+          token_format: id_token
+          id_token_audience: ${{ steps.config.outputs.audience }}
+          id_token_include_email: true
+          create_credentials_file: false
+          export_environment_variables: false
+      - name: Test actual deployed disconnected application
+        env:
+          JEMS_UAT_BASE_URL: ${{ needs.deploy.outputs.url }}
+          JEMS_UAT_ALLOWED_ORIGIN: ${{ needs.deploy.outputs.url }}
+          JEMS_UAT_SOURCE_SHA: ${{ needs.deploy.outputs.source }}
+          JEMS_UAT_MANIFEST_SHA256: ${{ needs.deploy.outputs.identity }}
+          JEMS_UAT_IAP_TOKEN: ${{ steps.auth.outputs.id_token }}
+        run: node tests/environments/deployed-smoke.cjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: deployed-browser-evidence
+          path: test-results/environments/
+          if-no-files-found: error
+          retention-days: 14
+
+  cleanup:
+    needs: prepare
+    if: needs.prepare.outputs.enabled == 'true' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.run_id == ''))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: jems-nonproduction
+    permissions:
+      contents: read
+      pull-requests: read
+      deployments: write
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - id: config
+        run: python3 scripts/environments/automation.py config
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          workload_identity_provider: ${{ steps.config.outputs.provider }}
+          service_account: ${{ steps.config.outputs.deployer }}
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f
+      - name: Reconcile closed or expired owned previews
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/environments/automation.py cleanup
