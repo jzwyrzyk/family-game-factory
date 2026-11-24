@@ -48,6 +48,8 @@ jobs:
           cache: npm
       - name: Prove complete coverage and failure-closed orchestration
         run: npm run test:ci
+      - name: Verify shared DEV and TEST full-evidence contract
+        run: python3 -m unittest discover -s tests -p test_environment_ci_evidence.py -v
       - name: Classify exact source using trusted base policy
         id: plan
         env:

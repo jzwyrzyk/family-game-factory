@@ -18,6 +18,20 @@
 
 <!-- For child-facing UI, apply docs/brand/CHILD_INTERFACE.md: remove redundant copy, retain 18px labels / 20px task text, verify actual-surface contrast at phone sizes and in help/error states, and preserve explicit friendly narration and cancellation. State observed coverage, not a site-wide claim from one screenshot. -->
 
+## Preview and acceptance
+
+<!-- Follow docs/development/DEV-TEST-PROD.md. Applicable application changes need an interactive private DEV preview; documentation-only changes may state not applicable. Automated status must bind the current PR head and actual deployment receipt. A merged PR is not necessarily deployed. -->
+
+- DEV preview URL, deployment status and exact deployed source:
+- Affected user journeys and suggested manual acceptance steps:
+- Before/after screenshots, when relevant:
+- Owner visual/interactive acceptance and exact reviewed source, or pending:
+- Known limitations and integration readiness:
+- TEST release identity / included changes / deployed UAT evidence, when available:
+- Remaining production approval, deployment verification or recovery evidence:
+
+<!-- Keep mocked-provider, real-provider, real-device and owner acceptance separate. Any relevant source/artifact/configuration change invalidates prior release approval. Never paste secrets, private transcripts or family data into this public PR. -->
+
 ## Documentation review
 
 <!-- Run npm run docs:check. Inspect each affected area; update its documents or record a specific no-impact reason with npm run docs:review -- <area> --outcome updated|unchanged --reason "...". Commit the registry change. A generic checkbox or fresh timestamp is not a review. -->

@@ -29,6 +29,11 @@ For a substantive project answer, consult the applicable references before reaso
 
 For diagnostics, merges or releases, use the authenticated execution tools already available before asking the owner to relay terminal commands. Follow [Direct diagnostic access](docs/operations/ASSISTANT_ACCESS.md) for connection setup and limits. Within the owner's authorized scope, investigate routine failures, prepare permitted fixes and verify the outcome. For a larger in-scope change, give a brief heads-up and continue; do not turn each command into a new approval request. A request to prepare or review work does not authorize a merge, deployment or expanded access; preserve explicit holds. Engage the owner for initial authentication or an actual decision about expanded authority/trust, spending, destructive production data, sensitive-data exposure or product direction. Bring a diagnosis and recommended action when escalating. A configured/merged script is not evidence of a working cloud connection.
 
+## DEV → TEST → PROD
+
+Read [the environment contract](docs/development/DEV-TEST-PROD.md) for development, previews, integration, UAT and release work. It supersedes earlier standalone DEV/staging proposals while preserving useful source and historical evidence. Applicable application PRs need an interactive private DEV preview; changes to visible behavior need owner visual/interactive acceptance. Documentation-only work does not require a preview. Approved integration enters permanent TEST after CI. Production approval binds the exact tested source, frontend/backend artifacts, worker/runtime identities and applicable configuration; deployment verification is separate from merge and CI.
+
+Use GitHub Actions and scoped identities for routine operations. Never make Cloud Shell an ordinary owner prerequisite for previews, release, diagnostics, recovery or cleanup. Preserve the active production cutover and existing release-intent controller. Additional privilege or spending needs a concrete reviewed setup decision; routine implementation within existing authorization does not need repeated confirmation. Missing deployed TEST, live-provider, device or owner acceptance must remain explicit.
 ## Invariants to preserve
 
 The [doctrine](PRODUCT-DOCTRINE.md) and feature contracts provide the detail. In particular:

@@ -17,6 +17,12 @@ The development author owns the documentation impact of a change; the reviewer c
 
 Make code and document changes in the same PR where possible. Post-merge or external operational facts necessarily arise later: add a small documentation follow-up promptly rather than pretending a premerge record knew the outcome. Do not rewrite historical test results or old deployment evidence to look current.
 
+## Environment evidence and automatic status
+
+The [DEV → TEST → PROD contract](../development/DEV-TEST-PROD.md) governs preview, TEST, approval and release reporting. Route environment scripts, workflows, tests, infrastructure and these contracts through the review registry. Automated summaries may update factual deployment states only from validated run, artifact and resource receipts for the exact source. They must not infer owner acceptance from CI, approval from a merge, or production deployment from integration. Keep failed, expired, stale and unknown states visible. A generated directory/PR summary complements delivery state; it does not silently rewrite doctrine or historical receipts.
+
+After setup, two-preview acceptance, complete TEST acceptance, production promotion or recovery, record the actual observation and remaining definition-of-done gaps. Do not mark the method complete merely because source or infrastructure exists.
+
 ## 2. Use the review registry
 
 The problem-solving feature has a dedicated review area for its evidence schema, deterministic practice, reports and tests. Its standards/claim contract is linked from product and experience reviews, while source hooks remain in their existing subject, Creation and Studio areas.
@@ -54,6 +60,8 @@ An **updated** review for an impacted area must have an applicable document chan
 ## 3. Automatic repository checks
 
 CI policy and test assignment are maintained with application contracts. Changes to the test manifest, classifier, aggregate checks or evidence verifier require validation and delivery reviews. New suites must have an explicit shard assignment; the coverage check rejects missing, duplicated and unassigned commands. Compare elapsed time, cumulative runner minutes, queue time and first-attempt outcomes before claiming a speed improvement. Preserve failure receipts and distinguish fixture regression from visual, device, provider and owner acceptance. See the [CI evidence guide](../evidence/README.md#ci-architecture-and-performance).
+
+The shared DEV/TEST evidence adapter is maintained with CI at `scripts/environments/ci_evidence.py`; run `python3 -m unittest discover -s tests -p test_environment_ci_evidence.py -v` after changing it. Mandatory Arcade preparation runs the same negative checks. Keep PR155 consumers on this implementation, preserve fresh exact-main TEST eligibility, and treat preview archive identity and deployed acceptance as separate evidence. Do not duplicate a weaker success-only check in an environment controller.
 
 [Documentation workflow](../../.github/workflows/documentation.yml) runs on pull requests, pushes to main, a weekly schedule and manual dispatch. It checks canonical file/link integrity, source coverage, content fingerprints and review records. It warns when an area has not been reviewed within its declared interval; routine age warnings do not block unrelated development. Content mismatches or invalid required records fail the check.
 

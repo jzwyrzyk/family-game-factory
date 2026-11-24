@@ -78,7 +78,11 @@
     "docs/game-intelligence/PREMIUM-BUILDER.md",
     "docs/game-intelligence/premium-benchmark/README.md",
     "docs/decisions/2026-11-23-premium-builder.md",
-    "docs/game-intelligence/premium-benchmark/ARTWORK-PILOT.md"
+    "docs/game-intelligence/premium-benchmark/ARTWORK-PILOT.md",
+    "docs/development/DEV-TEST-PROD.md",
+    "docs/development/SETUP.md",
+    "docs/development/COSTS.md",
+    "docs/decisions/2026-11-23-dev-test-prod.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -115,7 +119,10 @@
     "docs/bubble-gum-builders/*.md",
     "docs/evidence/README.md",
     "docs/game-intelligence/PREMIUM-BUILDER.md",
-    "docs/game-intelligence/premium-benchmark/*.md"
+    "docs/game-intelligence/premium-benchmark/*.md",
+    "docs/development/*.md",
+    "infra/nonproduction/*.md",
+    "docs/development/evidence/*.md"
   ],
   "areas": [
     {
@@ -817,10 +824,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "321032521ff7272d9d7ca4f1c90b32b63264e024518448e133bb55c55324cd70",
-      "reviewedAt": "2026-11-23T14:41:58.509Z",
+      "sourceDigest": "b31a76a4c31f7d2153f469876672f32d4bda96c9dbcb70999102eb6d3122f2ab",
+      "reviewedAt": "2026-11-24T03:47:38.745Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed safe optional status/job metadata and the separate premium switch with existing family, trusted-device and adult-grant gates. Adult release guide links policy-only disable/drain; child behavior, consent and private provider eligibility remain separately enforced and unverified live.",
+      "reviewReason": "Added the superseding environment acceptance contract while preserving same-site adult permits, tab proof and child isolation; disconnected previews cannot satisfy funded live TEST acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -864,20 +871,23 @@
         "docs/pals/*.md",
         "docs/pals/previews/*.md",
         "docs/bubble-gum-builders/*.md",
-        "docs/game-intelligence/premium-benchmark/*.md"
+        "docs/game-intelligence/premium-benchmark/*.md",
+        "docs/development/*.md",
+        "infra/nonproduction/*.md"
       ],
       "sources": [
         "tests/**",
         "tools/**",
         "scripts/verify-brand-assets.mjs",
         "scripts/tests/verify-pal-assets.test.mjs",
-        "scripts/ci/**"
+        "scripts/ci/**",
+        "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T15:54:11.654Z",
-      "sourceDigest": "8ddef37891dfbde956f75642032aa07954a11a6bcaca215043b9ae23a12e22b5",
+      "reviewedAt": "2026-11-24T16:01:22.332Z",
+      "sourceDigest": "45d277bdfa6c48204f2717a41806fb9c19b9a0b5c8b783391f41f4067796d38e",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated merged PR157's dependency reports and protected-main evidence checks with 99 required leaf commands. Verified both horse routes and recorded all five independent rendered checkpoints.",
+      "reviewReason": "Reconciled PR155 consumers with the shared adapter and mandatory CI contract from PR162; source policy equality, exact current merge parents/tree and full TEST receipt requirements remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1094,6 +1104,8 @@
         "docs/operations/*.md",
         "docs/mind-your-jems/*.md",
         "docs/bubble-gum-builders/*.md",
+        "docs/development/*.md",
+        "infra/nonproduction/*.md",
         "docs/evidence/README.md"
       ],
       "sources": [
@@ -1108,13 +1120,16 @@
         "vite.config.ts",
         ".dockerignore",
         ".gitignore",
-        "DELIVERY-STATE.md"
+        "DELIVERY-STATE.md",
+        "scripts/environments/**",
+        "infra/nonproduction/**",
+        "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T15:54:12.203Z",
-      "sourceDigest": "724348d9fa5046d72ced8dead581f40e97eb625a9bbd87b5b1ed35825be6b656",
+      "reviewedAt": "2026-11-24T16:34:24.036Z",
+      "sourceDigest": "19eac7de58712ebb02a1619762da727bb8d86529d8901e4fba8069095733d81a",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the actual merged PR157 baseline and the separate draft DEV/TEST initiative. Reviewed protected release selection, equivalent evidence constraints, rollback and the November 26 funding hold.",
+      "reviewReason": "Removed the observed duplicate environment-contract branch push while retaining PR/main checks, all paths/assertions and deployment triggers; recorded superseded b45798a runs without treating them as final-source evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1368,10 +1383,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T15:54:12.646Z",
-      "sourceDigest": "00eeb1b8cf149d66a24507ad24a675eded9831e49b7062c95546ba72b320dce8",
+      "reviewedAt": "2026-11-24T16:01:23.151Z",
+      "sourceDigest": "a6c5efb8df842dd483e273abb70927eefa6e87176e939e518b11ab222a2f5f08",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the validation and delivery sources with protected main and recorded the updated pilot receipts.",
+      "reviewReason": "Preserved the union of CI and DEV/TEST source routing, templates and maintenance instructions; shared verifier source is reviewed in both validation and delivery.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

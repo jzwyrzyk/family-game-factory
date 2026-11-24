@@ -1,6 +1,6 @@
 # Jems operational access and release controls
 
-**Prepared CI evidence integration, November 23, 2026:** the separate CI follow-up replaces generic successful-main Arcade acceptance in the read-only release plan with complete source-bound receipt verification. The current cutover has one exact, finite migration receipt; future sources require authenticated full first-attempt evidence and immutable build identity. The operation output is emitted only after verification. Rollback retains its application-CI independence and avoids the added Node setup step; auth, permissions, provenance, concurrency and the actual transition remain unchanged. See the [CI evidence guide](../evidence/README.md#exact-validation-reuse-and-release-integration). This privileged workflow edit requires explicit owner approval after cutover; it has not been merged, dispatched or activated.
+**Historical prepared CI evidence integration, November 23, 2026:** the separate CI follow-up replaces generic successful-main Arcade acceptance in the read-only release plan with complete source-bound receipt verification. The current cutover has one exact, finite migration receipt; future sources require authenticated full first-attempt evidence and immutable build identity. The operation output is emitted only after verification. Rollback retains its application-CI independence and avoids the added Node setup step; auth, permissions, provenance, concurrency and the actual transition remain unchanged. See the [CI evidence guide](../evidence/README.md#exact-validation-reuse-and-release-integration). At that observation, the privileged edit awaited explicit owner approval and was unmerged. The later owner-approved PR157 merge installs the gate; current full and reuse execution is recorded in delivery state. CI activation did not dispatch a production transition.
 
 This change adds a release controller and scoped diagnostic clients. Each production
 operation requires a maintainer-reviewed intent on protected main. The repository opt-ins and
@@ -323,3 +323,7 @@ inert source and proving the exact GitHub claims. Reinspect the private coach's
 actual serving/template state before enrollment; earlier observed speech and
 spending drift is a historical finding, not a current live read. Any remaining
 configuration difference blocks the affected service until separately reconciled.
+
+## DEV and TEST integration boundary
+
+[DEV → TEST → PROD](../development/DEV-TEST-PROD.md) is the authoritative new environment method. Reuse this merged production controller, provenance, configuration, compatibility and traffic safeguards. The new source foundation does not alter the active cutover intent or production workflow. A later reviewed integration must add exact TEST-manifest/owner-approval prerequisites and reuse immutable artifacts; current source validation alone does not establish that integration. DEV/TEST deployment identities belong in a separate project, and routine operations must not depend on Cloud Shell.
