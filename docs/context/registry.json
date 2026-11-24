@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T01:51:12.836Z",
-      "sourceDigest": "f999b0b1c8f5057391b2b9428aa98078728c96c474aa579696183732a017a44a",
+      "reviewedAt": "2026-11-24T03:35:44.656Z",
+      "sourceDigest": "181785b1cc9ec3bd8de726a6a289600718f744e7ec9df2c007bbbae47ba98268",
       "reviewOutcome": "updated",
-      "reviewReason": "Stacked the unchanged Gateway canary on the metadata-only release observer while preserving actual Coach promotion and Gateway stage evidence; fresh stage lifecycle inspection still gates canary merge.",
+      "reviewReason": "Restricted reflected dispatch revisions to supported public selector formats and five recorded historical names, retained service-wide platform revision attribution, and recorded the verified hosted fixture download in the delivery ledger.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -46,6 +46,10 @@ service publication archive and existing repositories. [Issue #46](https://githu
 also tracks coordinated Pages restoration, protocol probes, authenticated synthetic
 journeys and real-device acceptance. Those remain distinct gates.
 
+## Additional request-evidence reader
+
+The [GitHub request-evidence workflow](PRODUCTION_DIAGNOSTICS.md) uses a separately approved broker and a dedicated caller. The ERROR sink and its whole-field restrictions below remain specific to the managed error-count client. The [request broker setup](PRODUCTION_DIAGNOSTICS_SETUP.md) explains why a request URL must be sanitized within Google Cloud and why only the broker may read its scoped source view.
+
 ## Diagnostics
 
 `python3 scripts/ops/log_summary.py --hours 2 --identity-alias jems-diagnostics`

@@ -1,5 +1,9 @@
 # Direct Jems diagnostic access
 
+## Production HTTP request evidence through GitHub
+
+Use the [production diagnostics guide](PRODUCTION_DIAGNOSTICS.md) for the separate protected-main workflow, scoped source, report interpretation and ChatGPT retrieval procedure. It uses GitHub Actions federation to a private request-metadata broker. Its browser-based setup is independent of the managed Codex identity and Cloud Shell. See the [delivery ledger](../../DELIVERY-STATE.md) for the last verified state.
+
 ## November 23: existing GitHub release route for metadata
 
 The owner confirmed exhaustion of Cloud Shell's 50-hour weekly terminal quota after successful Coach promotion. This does not stop deployed Cloud Run services. The enabled production release identity already has service/revision GET access on the three reviewed services. A new mutually exclusive `observe` input on [the existing release workflow](../../.github/workflows/jems-cloud-run-release.yml) provides those reads through the same protected-main workflow, environment, federation provider and service account. It adds no IAM, trust, spending or runtime scope. See [delivery state](../../DELIVERY-STATE.md) for actual execution evidence; source preparation alone does not establish a working connection.
