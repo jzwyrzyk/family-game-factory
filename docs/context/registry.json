@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T12:39:02.935Z",
-      "sourceDigest": "96f246d8eca666878114f9514e8307b904aaac2be16ba87009c7e750553f7631",
+      "reviewedAt": "2026-11-24T12:48:50.180Z",
+      "sourceDigest": "db2b653ba10f62b988c60c20b87fd1ccba05d68e9016c2876eb200549719f89f",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrate PR159 actual receipts, record explicit owner route/device approval, and bind add-route activation to unchanged pins and protected-main checks.",
+      "reviewReason": "Review fixed candidate route plus atomic cleanup during promotion, observer tag absence checks and preserved baseline/other tags; all original acceptance gates remain.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

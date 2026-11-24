@@ -67,6 +67,35 @@ class AcceptanceRouteTests(unittest.TestCase):
             self.assertEqual(release.traffic(f.state),before)
             self.assertEqual(release.pinned_tags(f.state),[])
 
+    def test_promotion_removes_only_own_tag_atomically_and_retry_is_idempotent(self):
+        f=self.fixture(); f.transition('acceptance-route-add')
+        old=dict(release.traffic_target(f.baseline,0), tag='recovery')
+        for field in ('traffic','trafficStatuses'): f.state[field]=[*f.state[field],copy.deepcopy(old)]
+        count=len(f.patches); f.transition('promote')
+        self.assertEqual(len(f.patches),count+1)
+        self.assertEqual(release.traffic(f.state),{f.candidate:100})
+        self.assertEqual(release.pinned_tags(f.state),[old])
+        self.assertIn(f.baseline,f.revisions)
+        count=len(f.patches); f.transition('promote')
+        self.assertEqual(len(f.patches),count)
+
+    def test_promotion_refuses_conflicting_acceptance_tag_before_write(self):
+        f=self.fixture()
+        tag=dict(release.traffic_target(f.baseline,0),tag='jems-acceptance-'+f.candidate.rsplit('-r-',1)[1])
+        for field in ('traffic','trafficStatuses'): f.state[field]=[*f.state[field],copy.deepcopy(tag)]
+        count=len(f.patches)
+        with self.assertRaisesRegex(release.ReleaseError,'another revision'): f.transition('promote')
+        self.assertEqual(len(f.patches),count)
+
+    def test_already_promoted_cleanup_preserves_allocation(self):
+        f=self.fixture(); f.transition('acceptance-route-add')
+        tagged=release.pinned_tags(f.state)
+        for field in ('traffic','trafficStatuses'):
+            f.state[field]=[release.traffic_target(f.candidate,100),*copy.deepcopy(tagged)]
+        f.transition('promote')
+        self.assertEqual(release.traffic(f.state),{f.candidate:100})
+        self.assertEqual(release.pinned_tags(f.state),[])
+
     def test_other_service_is_rejected(self):
         f=CloudRunFixture(); f.transition('stage'); f.transition('canary')
         count=len(f.patches)

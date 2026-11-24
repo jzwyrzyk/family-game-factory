@@ -220,9 +220,18 @@ def rollout(intent, api, *, location=LOCATION):
             "promote": (promoted, (staged_canary,)),
             "rollback": (original, (staged_canary, promoted)),
         }[operation]
-        if serving == target:
+        removed_acceptance_tag = False
+        if operation == "promote" and service == "factory-gateway":
+            tag_name = "jems-acceptance-" + candidate.rsplit("-r-", 1)[1]
+            matching = [entry for entry in tags if entry["tag"] == tag_name]
+            require(not matching or matching[0]["revision"] == candidate,
+                    "Acceptance tag points to another revision")
+            removed_acceptance_tag = bool(matching)
+            tags = [entry for entry in tags if entry["tag"] != tag_name]
+        if serving == target and not removed_acceptance_tag:
             return statuses[operation]
-        require(serving in allowed, "Serving allocation differs from the expected predecessor")
+        require(serving in allowed or (serving == target and removed_acceptance_tag),
+                "Serving allocation differs from the expected predecessor")
         fields = "traffic"
         patch = {"traffic": [traffic_target(name, percent) for name, percent in target.items()]}
 

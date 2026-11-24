@@ -91,6 +91,11 @@ class ObservationTests(unittest.TestCase):
         reader.observe(f, f.intent)
         f.gateway['traffic'] = f.gateway['trafficStatuses'] = active + [tag]
         with self.assertRaisesRegex(access.AccessError, 'TAG_MISMATCH'): reader.observe(f, f.intent)
+        f.intent['operation'] = 'promote'
+        f.gateway['traffic'] = f.gateway['trafficStatuses'] = [release.traffic_target(candidate,100),tag]
+        with self.assertRaisesRegex(access.AccessError, 'TAG_MISMATCH'): reader.observe(f, f.intent)
+        f.gateway['traffic'] = f.gateway['trafficStatuses'] = [release.traffic_target(candidate,100)]
+        reader.observe(f,f.intent)
 
     def test_changed_generation_traffic_configuration_or_revision_blocks(self):
         changes = [lambda f: f.gateway.update(observedGeneration="2"),
