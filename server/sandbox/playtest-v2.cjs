@@ -52,7 +52,26 @@ async function playtestV2(page,game,options={}){
  if(await frame.locator('#status').getAttribute('data-state')!=='playing'||await canvas.getAttribute('data-initial')!==initial)throw Error('REPLAY_DID_NOT_RESET');
  await activate(frame.getByRole('button',{name:'Pause',exact:true}));await page.waitForTimeout(100);const pausedTicks=await canvas.getAttribute('data-ticks');await page.waitForTimeout(160);
  if(await canvas.getAttribute('data-ticks')!==pausedTicks||await canvas.getAttribute('data-paused')!=='true')throw Error('PAUSE_DID_NOT_STOP');
- await activate(frame.getByRole('button',{name:'Resume',exact:true}));await page.waitForTimeout(150);const resumed=Number(await canvas.getAttribute('data-ticks'))-Number(pausedTicks);if(resumed<1||resumed>16)throw Error('RESUME_CATCHUP');
+ // Measure inside the frame from the real Resume click. Touch synthesis and
+ // driver round trips can consume much of a second before activate() returns.
+ const resume=frame.getByRole('button',{name:'Resume',exact:true});
+ const clock=await resume.evaluateHandle((button,baseline)=>({
+  result:new Promise(resolve=>button.addEventListener('click',()=>{
+   const game=document.getElementById('game'),start=performance.now();
+   const observer=new MutationObserver(sample),timer=setTimeout(()=>finish(false),1500);
+   function finish(ok){observer.disconnect();clearTimeout(timer);resolve(ok);}
+   function sample(){
+    const elapsed=performance.now()-start,advanced=Number(game.dataset.ticks)-baseline;
+    if(advanced<0||advanced>Math.ceil(elapsed*60/1000)+1)return finish(false);
+    if(elapsed>=150&&advanced>=1&&game.dataset.paused==='false')finish(true);
+   }
+   observer.observe(game,{attributes:true,attributeFilter:['data-ticks']});
+  },{once:true,capture:true}))
+ }),Number(pausedTicks));
+ try{
+  await activate(resume);
+  if(!await clock.evaluate(measurement=>measurement.result))throw Error('RESUME_CATCHUP');
+ }finally{await clock.dispose();}
  const accessible=await frame.locator('body').evaluate(()=>{try{return !!parent.document.body}catch{return false}});if(accessible)throw Error('ISOLATION_FAILED');
  const bounds=await canvas.boundingBox();if(!bounds||bounds.width>page.viewportSize().width)throw Error('RESPONSIVE_LAYOUT_FAILED');
  return {input:true,resources:true,pause:true,replay:true,isolation:true};
