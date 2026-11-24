@@ -721,10 +721,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T15:46:36.267Z",
-      "sourceDigest": "72818192810dbedc86c63aa0e316002c4f193b7dc4698a4311de21b4e62a825c",
+      "reviewedAt": "2026-11-24T15:54:11.039Z",
+      "sourceDigest": "0416e3e65368c9a8951bd7983468de4091cd3484f3e32a1ec42185eb542d694e",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the source-bound art plan, original raster reader, scoped revision reuse, serial sheet accounting, decoder rejection paths, released CI integration and fixture costs against the documented premium timing and activation gates.",
+      "reviewReason": "Reviewed original and current sandbox worker dependencies, measured pause ticks from rendered Resume input and verified the independent bridge, return, orchard and ribbon checkpoints on desktop and touch.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -874,10 +874,10 @@
         "scripts/ci/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T15:35:33.859Z",
-      "sourceDigest": "8fdbe2887987cce7df71db5ec9f8a5be58bd064502218c066a50ae412a09a6fb",
+      "reviewedAt": "2026-11-24T15:54:11.654Z",
+      "sourceDigest": "8ddef37891dfbde956f75642032aa07954a11a6bcaca215043b9ae23a12e22b5",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded actual protected-main full validation and preserved PR157 first-attempt documentation failure; executable selection remains advisory and approval pending.",
+      "reviewReason": "Integrated merged PR157's dependency reports and protected-main evidence checks with 99 required leaf commands. Verified both horse routes and recorded all five independent rendered checkpoints.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1111,10 +1111,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T15:35:34.240Z",
-      "sourceDigest": "2b99064682418d30b12c2ac6a27fa0d8f0c4f85e95b2e700203df404a5b56b94",
+      "reviewedAt": "2026-11-24T15:54:12.203Z",
+      "sourceDigest": "724348d9fa5046d72ced8dead581f40e97eb625a9bbd87b5b1ed35825be6b656",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed added installed performance-baseline contract and current operation coverage; delivery records main success, unactivated PR157, unchanged cutover gaps, and failed stale-review attempt.",
+      "reviewReason": "Recorded the actual merged PR157 baseline and the separate draft DEV/TEST initiative. Reviewed protected release selection, equivalent evidence constraints, rollback and the November 26 funding hold.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1368,10 +1368,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T15:46:37.803Z",
+      "reviewedAt": "2026-11-24T15:54:12.646Z",
       "sourceDigest": "00eeb1b8cf149d66a24507ad24a675eded9831e49b7062c95546ba72b320dce8",
       "reviewOutcome": "updated",
-      "reviewReason": "Routed authored fixture sources and the November artwork runbook to generation and verified the existing canonical evidence and release indexes retain prior CI and production records.",
+      "reviewReason": "Reconciled the validation and delivery sources with protected main and recorded the updated pilot receipts.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
