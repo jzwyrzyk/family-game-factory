@@ -154,6 +154,13 @@ export async function installStudio(){
  const studioGemBadge=el('span','jems-gem-status');studioGemBadge.id='studioGemBadge';studioGemBadge.hidden=true;
  page.querySelector('#studioVersion')!.after(studioGemBadge);
  document.querySelector('main')!.append(page);
+ const copyRecovery=el('section','studio-copy-recovery');copyRecovery.id='studioCopyRecovery';copyRecovery.hidden=true;
+ copyRecovery.setAttribute('aria-label','Saved copy');
+ const checkCopy=iconEl('button','studio-button','clock','Check my copy') as HTMLButtonElement;
+ checkCopy.id='studioCheckCopy';checkCopy.type='button';
+ checkCopy.onclick=()=>act(()=>{const pending=current().pendingCopy;if(pending)return copyGame(pending.name);});
+ copyRecovery.append(el('p','','Your copy needs a check. Your original is safe.'),checkCopy);
+ page.querySelector('.studio-topbar')!.after(copyRecovery);
  const studioGuideHost=el('div');studioGuideHost.id='studioGuideHost';studioGuideHost.hidden=true;
  page.querySelector('.studio-mobile-tabs')!.after(studioGuideHost);
  studioGuideHost.addEventListener('keydown',event=>event.stopPropagation());
@@ -1078,7 +1085,8 @@ export async function installStudio(){
   $<HTMLButtonElement>('studioKeep').disabled=!s.candidate||showing!=='candidate'||saving||!!s.candidate.remoteId&&!previewLearning?.ready;$('studioKeep').hidden=!s.candidate||showing!=='candidate';$('studioReady').hidden=!readyExperiment(s);setIconLabel($('studioReady'),'play',s.projectId||s.remoteId?'Try your ready test':'Play my game');$<HTMLButtonElement>('studioHelp').disabled=!(s.projectId||s.remoteId||s.candidate);setIconLabel($('studioPlay'),'play',pausedForTools?'Back to my game':'Play');
   $<HTMLButtonElement>('studioUndo').disabled=!s.candidate&&!working?.parentId&&!s.remoteId;
   $<HTMLButtonElement>('studioRedo').disabled=!!s.candidate||(!s.undone&&(!working||!games.history(s.projectId!,s.owner).some(r=>r.parentId===working.id)));
-  $<HTMLButtonElement>('studioCopy').disabled=!(working||s.remoteId||s.candidate)||saving;
+  copyRecovery.hidden=!s.pendingCopy;checkCopy.disabled=saving;
+  $<HTMLButtonElement>('studioCopy').disabled=!(working||s.remoteId||s.candidate)||saving||!!s.pendingCopy;
   refreshBuildAction();
   const chatPage=notebook.conversationPage(s.id,s.owner);
   continueChat.hidden=chatPage.available>=4;

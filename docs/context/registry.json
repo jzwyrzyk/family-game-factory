@@ -307,10 +307,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T22:24:27.006Z",
-      "sourceDigest": "021bfd5719985277c2ddfa26257b1d752c7a576d52ab2ff8ec908b400b087cb2",
+      "reviewedAt": "2026-11-24T22:40:01.162Z",
+      "sourceDigest": "52a602e3cb92d340fb3c9ebbddb4fd6a0288002610d8c6020c9ab0a6f14fd104",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed Studio create/copy, construction and learning-format staging, atomic reply messages/evidence, exact-byte cache reads, and backend-first pending copy recovery; documented capacity and UI recovery gaps.",
+      "reviewReason": "Added owner-scoped pending-copy reminders and visible Check my copy recovery. Notification and architecture contracts explain lookup-only recovery, retained originals and no implicit retry, cancel or Keep.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -885,10 +885,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T22:26:37.433Z",
-      "sourceDigest": "29898afe0492f7987d651c5e4a44a24f2d3ed4237c1d07d0eb8a0505d831c749",
+      "reviewedAt": "2026-11-24T22:40:02.310Z",
+      "sourceDigest": "2430f4734528bdead4e8ca2de02d759a5a525ec4405e2d16c262d1fe16cc3201",
       "reviewOutcome": "updated",
-      "reviewReason": "Retained mandatory original suites and added storage unit/Chromium coverage through browser-storage; reviewed interrupted private backup and cross-family asset-identity negatives, with system browser versus hosted pinned-browser limits.",
+      "reviewReason": "Recorded built-app desktop/tablet/phone remote-copy loss, reload, missing-receipt and local-quota recovery tests; existing storage shard runs the new journey, with contrast and 48px controls checked. Hosted evidence remains exact-source scoped.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1127,10 +1127,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T22:33:17.818Z",
-      "sourceDigest": "82f37d8f45b76fea7f097ecb8dac66596d51d9c0fc10d4ab9ea7f331b4320ca8",
+      "reviewedAt": "2026-11-24T22:40:33.089Z",
+      "sourceDigest": "007645249c04cfb8e370cd094a57c2e91c5364c0d94ec55880b73717a91ea123",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the mandatory storage browser test in both Arcade and the release regression partition; documented 41 commands and retained all eight release shards, original suites and exact-source evidence gates.",
+      "reviewReason": "Recorded the copy-recovery built-app fixture results and original hosted CI registration corrections, without claiming the pending final source is merged, deployed or accepted on live family devices.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1688,10 +1688,10 @@
         "docs/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "e68a1d1899fbf3b7d9e6a69ec1b4e7b3273b33228f3648bf0d41b2f4c83c7f3b",
-      "reviewedAt": "2026-11-24T22:33:41.962Z",
+      "sourceDigest": "10792febea3fbfe71eb432dc67702a00e2d2cab25a865a933efa8a84c50bda70",
+      "reviewedAt": "2026-11-24T22:40:03.022Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the first hosted registration failures, the additive release-shard correction and supplemental restored-game browser passes. Runtime recovery and default-disabled adapters remain scoped separately from unfinished application migration and synchronization."
+      "reviewReason": "Closed pending remote-copy discoverability with Notifications and Check my copy; documented integrated read-only recovery and synthetic lost-acknowledgment/quota browser evidence while preserving the separate unfinished continuity/migration boundaries."
     }
   ]
 }

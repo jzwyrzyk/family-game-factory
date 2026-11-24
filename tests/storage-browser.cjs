@@ -58,5 +58,6 @@ const {build}=require('esbuild'),{chromium}=require('playwright');
    }
    store.close();return rows;
   });await context.close();fs.mkdirSync('test-results',{recursive:true});fs.writeFileSync('test-results/storage-browser.json',JSON.stringify({scope:'Synthetic Chromium; renderer termination, not power-loss or physical-device acceptance',results,benchmark},null,2));console.log(JSON.stringify({results,benchmark}));
+  await require('./storage-copy-browser.cjs')(browser);
  }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});

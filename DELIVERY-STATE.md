@@ -6,6 +6,8 @@ Continued original PR166 `1743c9e6560ae9416ec08a23cb660eb06af68351` from refresh
 
 Local production build/typecheck and 617 unit cases passed. Navigation/continuity, coach desktop/mobile and Adult desktop/mobile built-app fixtures passed. Chromium recovery tested five renderer-termination boundaries at desktop/tablet/phone layouts and actual IndexedDB conflict/receipt/paging behavior; 50k-record benchmarks include the observed noisy mid-size sample. [Synthetic exact measurements](docs/storage/evidence/baseline.json) compare original PR166 validation/journal/asset encoding; they are not real-device or live family acceptance. Hosted final-source CI, owner review and deployed TEST remain separate gates, recorded on PR166 when observed. Source adapters do not imply production readiness or completion of all F06 requirements.
 
+The follow-up adds owner-scoped copy reminders and a visible **Check my copy** action. Built-app desktop/tablet/phone fixtures confirm durable identity before the single POST, GET-only recovery after reload, missing receipts retained, quota-failed local completion recoverable, and exact original/transcript preservation. Contrast and 48px touch-target checks passed; the phone capture was inspected. The dedicated notification suite passed 30 cases. First hosted failures in the documentation outcome and release command registration were corrected; their successor gates passed on `af7c054`. The follow-up still requires its own final-source hosted evidence.
+
 
 ## November 24 — premium completion continuation, PR139
 
