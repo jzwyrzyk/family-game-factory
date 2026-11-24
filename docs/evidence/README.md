@@ -23,6 +23,25 @@ One clean production build is packaged with its exact commit, Git tree, dependen
 
 Every leaf command records duration and first exit code. Independent commands continue after an earlier failure to collect useful evidence, without converting that failure into success or automatically retrying it. Aggregates require a successful preparation job, exactly the selected shard receipt set, matching source/build/manifest/run attempt, the complete expected commands and successful matrix execution. Missing, duplicate, failed, cancelled or unexpectedly skipped work fails closed. A genuinely excluded group can pass only with an explicit authenticated selection reason and successful mandatory preparation.
 
+### Hosted benchmark and tuning
+
+[First implementation run45321205281](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45321205281), PR head `319f252f493e1a7a3869dc0c1c431c71368a99fb` / prospective merge `af7a60bc290174369258dde3e5945ad3706e5a8c`, passed every shard, aggregate and full receipt producer on its first attempt. The other completed PR workflows passed; the separate Bubble Gum review was still running at this observation. Against baseline PR141:
+
+| Metric | Baseline | First implementation | Interpretation |
+| --- | ---: | ---: | --- |
+| Entire Arcade elapsed | 1,301 sec (21.68 min) | 582 sec (9.70 min) | 55.27% reduction, including queue/setup/evidence |
+| Creative gate | 1,298-sec original job | 514 sec from workflow creation to aggregate pass | About60.4% shorter; the new figure includes preparation and shared matrix waiting |
+| Cumulative executed runner time | 37.63 min | 49.13 min | +30.56% per full run; extra isolated setup and aggregation have a cost |
+| PR148 duplicate-pair runner time | 81.95 min | 49.13 min for one full PR run | About40% less than the measured duplicate pair; different sources/runs, not a billing claim |
+| All artifact bytes | 214,351,519 | 456,736,389 | +113.08%; the shared build adds238,377,531 bytes |
+| Browser evidence bytes | 214,351,519 | 218,345,544 | +1.86%; required captures retained and former Factory overwrites repaired |
+| Scheduled retained byte-days | 19.2887 billion | 3.19745 billion | 83.42% less, using actual API creation/expiry timestamps; not billed storage |
+| First-attempt outcome | Successful selected baseline | All required work successful | One new successful run does not establish a statistical reliability trend |
+
+The eight-slot matrix queued storage for221 seconds and Math for260 seconds; storage then ran222 seconds and determined the last shard finish. The full-evidence producer itself took19 seconds (identity computation5 seconds), plus39 seconds queue. The revised bounded limit is **10**, prioritizing the ten longer shards before Pals/rewards, Language and Notifications. This retains the same13 jobs and every command; it is a measured scheduling adjustment, with its realized gain still requiring the next hosted run. Account-wide capacity and actual charges remain unavailable. A separately dispatched comparison run45321282535 was deliberately cancelled early to avoid competing with the first benchmark; it is preserved as a cancellation, not counted as a test pass or hidden retry.
+
+The report is reproducible with `node scripts/ci/report-performance.mjs --repository jzwyrzyk/family-game-factory --runs 45243576623,45321205281 --out report.json --summary summary.md`. The completed-run reporting workflow will publish this metadata automatically after approved merge. Shard summaries add leaf-command timings. This measures fixture CI, not provider latency or production acceptance.
+
 ### Change classification and trust
 
 The [classifier](../../scripts/ci/classify-impact.mjs) compares exact base and prospective-merge source trees, using policy read from the PR's trusted base. Bootstrap without that policy, policy edits, unknown paths, renames, deletions, additions, mode changes, dependencies, test infrastructure, shared code, authentication, persistence, configuration and ambiguous mixed changes require full regression. PR titles, messages and labels never determine mandatory coverage. Manual full regression remains available.
@@ -59,7 +78,7 @@ Required success screenshots and visual-review videos remain available, as do fa
 
 Run `npm run test:ci` after orchestration edits, and the actual affected feature commands after behavior changes. Add a suite to its public npm entry point and the explicit shard manifest. Keep all desktop/tablet/phone, accessibility, normal-motion, persistence, recovery and profile-isolation obligations discoverable. A new shared dependency defaults full until its consumer closure is reviewed. Preserve the existing source/test documentation review process.
 
-For a failed run, read the classification reasons and failing aggregate first, then the named shard's command receipts and evidence. An incomplete receipt is a failure, not permission to skip. Investigate the first attempt; a later pass does not erase an earlier failure or identify its cause. Use the performance reporter below to sort slow commands and compare queue time and runner consumption alongside wall time.
+For a failed run, read the classification reasons and failing aggregate first, then the named shard's command receipts and evidence. An incomplete receipt is a failure, not permission to skip. Investigate the first attempt; a later pass does not erase an earlier failure or identify its cause. Rerun the entire Arcade workflow after a failure: attempt-specific plan/build/receipt binding intentionally refuses to combine old successful shards with a failed-job-only rerun. Use the performance reporter below to sort slow commands and compare queue time and runner consumption alongside wall time.
 
 Rollback is a reviewed source revert of the CI architecture, restoring the previous full `test.yml` and its public npm commands while retaining the same required check names. Do not change branch protection or replay production workflows as part of that rollback. Privileged evidence integration, if later approved, must be reverted or kept compatible separately. Before any merge, recheck current main, cutover completion, PR106 overlap, all required checks and owner approval.
 

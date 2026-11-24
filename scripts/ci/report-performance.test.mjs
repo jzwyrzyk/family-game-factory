@@ -57,6 +57,7 @@ test('pagination and every attempt are read without silently dropping job 101', 
   const api = endpoint => {
     visited.push(endpoint);
     if (endpoint.endsWith('/123')) return run({ run_attempt: 2 });
+    if (endpoint.endsWith('/attempts/1')) return run({ conclusion: 'failure' });
     if (endpoint.includes('/artifacts?')) return { artifacts: [] };
     if (endpoint.includes('/attempts/1/jobs?') && endpoint.endsWith('page=1')) return { jobs: Array.from({ length: 100 }, (_, i) => job(`j${i}`, i === 0 ? 'failure' : 'success')) };
     if (endpoint.includes('/attempts/1/jobs?')) return { jobs: [job('j100')] };
@@ -67,7 +68,7 @@ test('pagination and every attempt are read without silently dropping job 101', 
   assert.equal(result.attempts[0].jobs.length, 101);
   assert.equal(result.attempts.length, 2);
   assert.deepEqual(result.recoveredJobNames, ['j0']);
-  assert.equal(visited.length, 5);
+  assert.equal(visited.length, 6);
 });
 
 test('API failures and malformed pagination fail the report instead of inventing zero cost', () => {
@@ -84,4 +85,17 @@ test('baseline comparisons reject unrelated repository and preserve estimate war
   assert.equal(report.selection.category, 'docs');
   assert.match(markdown(report), /actual charges are unknown/);
   assert.match(markdown(report), /does not establish the cause/);
+});
+
+
+test('authoritative cancellation remains separate when fail-closed aggregate jobs fail', () => {
+  const cancelled = run({ conclusion: 'cancelled' });
+  const attempt = summarizeAttempt(1, [job('shard', 'cancelled'), job('aggregate', 'failure')], cancelled);
+  assert.equal(attempt.outcome, 'cancelled');
+  assert.deepEqual(attempt.failedJobNames, ['aggregate']);
+  assert.equal(attempt.jobs[1].conclusion, 'failure');
+  const report = buildReport('owner/repo', [summarizeRun(cancelled, [attempt], [])]);
+  assert.equal(report.summary.cancelledFirstAttempts, 1);
+  assert.equal(report.summary.firstAttemptEligible, 0);
+  assert.equal(report.summary.firstAttemptPassRate, null);
 });

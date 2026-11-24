@@ -64,7 +64,7 @@ export function preparePlan(env = process.env) {
   }
   if (plan.head !== head || plan.requiredShards.some(id => !manifest.shards[id])) throw new Error('CI_CLASSIFIER_MANIFEST_MISMATCH');
   if (plan.mode !== 'full' && (authority !== 'trusted-base' || plan.trustedPolicy !== true)) throw new Error('CI_UNTRUSTED_NARROWING');
-  const priority = ['mining', 'factory', 'physical', 'child-coach', 'creation-art', 'browser-generated', 'browser-core', 'studio-core', 'browser-storage', 'pals-rewards', 'learning-math', 'learning-language', 'notifications'];
+  const priority = ['mining', 'browser-generated', 'studio-core', 'browser-storage', 'factory', 'physical', 'child-coach', 'creation-art', 'learning-math', 'browser-core', 'pals-rewards', 'learning-language', 'notifications'];
   plan.requiredShards.sort((a, b) => priority.indexOf(a) - priority.indexOf(b));
   fs.writeFileSync('ci-plan.json', JSON.stringify(plan, null, 2) + '\n');
   if (env.GITHUB_OUTPUT) fs.appendFileSync(env.GITHUB_OUTPUT, `matrix=${JSON.stringify({ shard: plan.requiredShards.length ? plan.requiredShards : ['not-selected'] })}\nhas-shards=${plan.requiredShards.length > 0}\nimage=${plan.requiredImage}\nmode=${plan.mode}\n`);

@@ -21,7 +21,7 @@ const latest = values => values.filter(Boolean).sort().at(-1) ?? null;
 const earliest = values => values.filter(Boolean).sort()[0] ?? null;
 const terminalFailures = new Set(['failure', 'timed_out', 'action_required', 'startup_failure', 'stale']);
 
-export function summarizeAttempt(attempt, jobs) {
+export function summarizeAttempt(attempt, jobs, metadata = null) {
   const measured = jobs.map(job => ({
     id: job.id, name: job.name, conclusion: job.conclusion, status: job.status,
     queueSeconds: seconds(job.created_at, job.started_at),
@@ -36,14 +36,22 @@ export function summarizeAttempt(attempt, jobs) {
   }));
   const conclusions = measured.map(job => job.conclusion);
   // Skipped jobs are not counted as passing tests. They can be intentional conditional jobs.
-  const outcome = conclusions.some(value => terminalFailures.has(value)) ? 'failure'
+  const inferredOutcome = conclusions.some(value => terminalFailures.has(value)) ? 'failure'
     : conclusions.includes('cancelled') ? 'cancelled'
     : measured.length === 0 || measured.some(job => job.status !== 'completed') ? 'incomplete'
     : conclusions.some(value => !['success', 'skipped'].includes(value)) ? 'unknown'
     : conclusions.includes('success') ? 'success' : 'skipped';
+  // always-evaluated aggregate jobs can fail because a workflow was cancelled.
+  // Preserve their failures while using GitHub's attempt-level cancellation.
+  const outcome = metadata
+    ? metadata.status !== 'completed' ? 'incomplete'
+      : terminalFailures.has(metadata.conclusion) ? 'failure'
+      : ['success', 'cancelled', 'skipped'].includes(metadata.conclusion) ? metadata.conclusion : 'unknown'
+    : inferredOutcome;
   const durations = measured.map(job => job.durationSeconds);
   return {
-    attempt, outcome, jobs: measured,
+    attempt, outcome, workflowConclusion: metadata?.conclusion ?? null, jobs: measured,
+    failedJobNames: measured.filter(job => terminalFailures.has(job.conclusion)).map(job => job.name),
     executedRunnerMinutes: round(sum(durations) / 60),
     roundedJobMinutes: sum(durations.filter(Number.isFinite).map(value => Math.ceil(value / 60))),
     jobWindowSeconds: seconds(earliest(measured.map(job => job.startedAt)), latest(measured.map(job => job.completedAt))),
@@ -119,6 +127,8 @@ export function buildReport(repository, runs, { baseline = null, selection = nul
       'A failed attempt followed by a successful retry is reported separately; it does not establish the cause or a test-level flake rate.',
       'Artifacts describe those still listed by GitHub at observation time; deletion and retention affect historical size comparisons.',
       'Selection receipts are reported as supplied and confer no authority to skip required checks.',
+      'First-attempt outcome uses GitHub attempt status; failed aggregate jobs caused by cancellation remain visible in failedJobNames.',
+      'headSha is the API event head; a prospective merge checkout and build identity must be established separately from validation receipts.',
     ],
   };
   if (baseline) {
@@ -167,7 +177,8 @@ export function collectRun(repository, id, api) {
   };
   const attempts = [];
   for (let attempt = 1; attempt <= run.run_attempt; attempt++) {
-    attempts.push(summarizeAttempt(attempt, pages(`${base}/attempts/${attempt}/jobs`, 'jobs')));
+    const metadata = attempt === run.run_attempt ? run : api(`${base}/attempts/${attempt}`);
+    attempts.push(summarizeAttempt(attempt, pages(`${base}/attempts/${attempt}/jobs`, 'jobs'), metadata));
   }
   return summarizeRun(run, attempts, pages(`${base}/artifacts`, 'artifacts'));
 }

@@ -863,10 +863,10 @@
         "scripts/ci/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T03:38:29.617Z",
-      "sourceDigest": "e983fb1d566515af96a3d166e6aa652c81698b366d4a95e6a1445adeaeaf81d3",
+      "reviewedAt": "2026-11-24T03:54:39.791Z",
+      "sourceDigest": "577031884d07b5447321967f767506857e88cdb3f0d6817369986ee6e880c1cd",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed all 96 original Arcade leaf commands, source-bound shard and aggregate contracts, conservative trusted-base selection, authenticated evidence verification, reporter and browser capture changes. The CI guide records negative tests, shadow targeting, unchanged assertions, fixture and runtime limits, retention tradeoffs and hosted benchmark still pending.",
+      "reviewReason": "Reviewed observed thirteen-shard coverage, bounded scheduling adjustment and corrected performance reporter cancellation accounting: a deliberately cancelled run remains cancelled while all failed aggregates remain visible. Guide records actual first hosted pass, queue delays, runner increase, artifact growth and byte-day reduction, preserving all failed/cancelled history.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1058,10 +1058,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T03:40:23.658Z",
-      "sourceDigest": "5520f34e71b66e1b4d518a6726d799b074df25be2b8c11fadf23e35d35a074b5",
+      "reviewedAt": "2026-11-24T03:54:40.183Z",
+      "sourceDigest": "ac5ef10ca3de7dba141f3970d9585fee552398894c365e6996b74b214dcbe2cf",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the immutable original Arcade workflow fixture and activation tests: all191 operations tests pass while the original executor explicitly rejects this redesigned workflow. Frozen activation hashes and executable remain unchanged; the guide preserves the separate approval boundary and pending hosted evidence.",
+      "reviewReason": "Recorded passing initial hosted Arcade45321205281 and measured55.27percent elapsed reduction with49.13 runner-minutes and explicit storage tradeoffs. Updated bounded concurrency10 based on observed second-wave queueing; initial Bubble Gum review still running. No production workflow or permission change and merge/activation remain held.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
