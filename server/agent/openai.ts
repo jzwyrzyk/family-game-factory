@@ -15,6 +15,12 @@ export {generationInstructions,generationInstructionsForForm} from './generation
 
 interface StructuredRequest {stage:ModelStage;instructions:string;data:unknown;schema:unknown;name:string;images?:GameQualityEvidence['captures'];outputTokens?:number}
 interface RequestMeter {stageUsage:StageUsage[];imageUsageUnits:number;unsettled:boolean}
+// Premium request data already carries the full validated capture metadata.
+// Label each adjacent image by that identity without repeating its dimensions,
+// device and tick. Legacy requests retain their existing wire representation.
+function imageLabel(image:GameQualityEvidence['captures'][number],premium:boolean){
+ return JSON.stringify(premium?{captureId:image.id}:{captureId:image.id,device:image.device,phase:image.phase,tick:image.tick,width:image.width,height:image.height});
+}
 export interface GenerationContext {plan?:GameProductionPlan;assets?:GameAssetPack;qualityEvidence?:GameQualityEvidence}
 export interface ProductionPlanOptions {imagesAvailable?:boolean;maxImages?:number;assetRepair?:boolean;previous?:GeneratedGame;qualityEvidence?:GameQualityEvidence;findings?:QualityFinding[]}
 // Eight retained captures include an initial frame on each device. Every
@@ -70,8 +76,8 @@ export class OpenAIResponsesAgent implements AgentAdapter {
   const policy=stagePolicy(this.approval,options.stage);
   const user=JSON.stringify(options.data),instructions=options.instructions,images=options.images||[];
   const perImage='lowDetailImageTokens' in policy?policy.lowDetailImageTokens:4096;
-  const imageMetadataBytes=isPremiumApproval(this.approval)?images.reduce((bytes,{id,device,phase,tick,width,height})=>
-   bytes+Buffer.byteLength(JSON.stringify({captureId:id,device,phase,tick,width,height})),0):0;
+  const imageMetadataBytes=isPremiumApproval(this.approval)?images.reduce((bytes,image)=>
+   bytes+Buffer.byteLength(imageLabel(image,true)),0):0;
   const inputBound=Buffer.byteLength(user)+fixedInputBound(instructions,options.schema)+images.length*perImage+imageMetadataBytes;
   const outputTokens=Math.min(policy.maxOutputTokens,options.outputTokens??policy.maxOutputTokens);
   const worst=Math.ceil(inputBound*policy.inputUsdPerMillion+outputTokens*policy.outputUsdPerMillion);
@@ -85,7 +91,7 @@ export class OpenAIResponsesAgent implements AgentAdapter {
   if(!Number.isInteger(input.budget.timeoutMs)||input.budget.timeoutMs<1000||input.budget.timeoutMs>900000)throw Error('REQUEST_TIMEOUT_REQUIRED');
   const secret=this.key();if(!secret||secret.length<16)throw Error('PROVIDER_KEY_MISSING');
   const signal=AbortSignal.any([input.signal,AbortSignal.timeout(Math.min(input.budget.timeoutMs,600000))]);
-  const content=images.flatMap(image=>[{type:'input_text',text:JSON.stringify({captureId:image.id,device:image.device,phase:image.phase,tick:image.tick,width:image.width,height:image.height})},{type:'input_image',image_url:'data:image/png;base64,'+image.data,detail:'low'}]);
+  const content=images.flatMap(image=>[{type:'input_text',text:imageLabel(image,isPremiumApproval(this.approval))},{type:'input_image',image_url:'data:image/png;base64,'+image.data,detail:'low'}]);
   const providerInput=images.length?[{role:'user',content:[{type:'input_text',text:user},...content]}]:user;
   const premium=isPremiumApproval(this.approval);
   const body=JSON.stringify({model:policy.model,store:false,instructions,input:providerInput,max_output_tokens:outputTokens,

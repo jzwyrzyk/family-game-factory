@@ -723,15 +723,15 @@
         "server/sandbox/**",
         "server/testing/**",
         "docs/game-intelligence/*.md",
-        "tools/premium-*.ts",
+        "tools/premium-*",
         "docs/game-intelligence/premium-benchmark/*.md",
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T15:54:11.039Z",
-      "sourceDigest": "0416e3e65368c9a8951bd7983468de4091cd3484f3e32a1ec42185eb542d694e",
+      "reviewedAt": "2026-11-24T20:56:02.378Z",
+      "sourceDigest": "07ac045ad1ddcbac26ae164046c04fe73a39a629cbacc8e7e2894231eb03c8eb",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed original and current sandbox worker dependencies, measured pause ticks from rendered Resume input and verified the independent bridge, return, orchard and ribbon checkpoints on desktop and touch.",
+      "reviewReason": "Reviewed final sandbox byte-check file list, preserved immutable runtime archives and source-label verification; all admission, serial execution and capture-policy changes remain offline except lossless screenshot-label deduplication.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -824,10 +824,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "b31a76a4c31f7d2153f469876672f32d4bda96c9dbcb70999102eb6d3122f2ab",
-      "reviewedAt": "2026-11-24T03:47:38.745Z",
+      "sourceDigest": "ee30422a65cfbeff27ec88eb03a1bc4b9d25de6034ed1012e09cbbff664b847b",
+      "reviewedAt": "2026-11-24T20:54:52.440Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Added the superseding environment acceptance contract while preserving same-site adult permits, tab proof and child isolation; disconnected previews cannot satisfy funded live TEST acceptance.",
+      "reviewReason": "Reconciled merged DEV TEST rollout guidance with premium Adult Private approval and saved-reader preservation; no child scope, grants, provider retention or authorization policy changes.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T16:01:22.332Z",
-      "sourceDigest": "45d277bdfa6c48204f2717a41806fb9c19b9a0b5c8b783391f41f4067796d38e",
+      "reviewedAt": "2026-11-24T20:55:36.466Z",
+      "sourceDigest": "e3cd6d4e8c545d745a564a26ab91275d8eb802a3a3e98bff4170c3ce85dcd73b",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled PR155 consumers with the shared adapter and mandatory CI contract from PR162; source policy equality, exact current merge parents/tree and full TEST receipt requirements remain unchanged.",
+      "reviewReason": "Preserved all 99 prior Arcade commands and added the independent adversarial/contact-sheet prototype as command 100; validated exact original-group coverage plus clean unpublished sandbox source-byte/protocol proof.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1126,10 +1126,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T16:34:24.036Z",
-      "sourceDigest": "19eac7de58712ebb02a1619762da727bb8d86529d8901e4fba8069095733d81a",
+      "reviewedAt": "2026-11-24T20:55:36.904Z",
+      "sourceDigest": "4d2137e29b52a6f631896e3d867339658c845ca2fcc32d9be0c07c20c10cc4d7",
       "reviewOutcome": "updated",
-      "reviewReason": "Removed the observed duplicate environment-contract branch push while retaining PR/main checks, all paths/assertions and deployment triggers; recorded superseded b45798a runs without treating them as final-source evidence.",
+      "reviewReason": "Reviewed added clean sandbox workflow and command 100 against unchanged stable aggregates, disabled DEV TEST and production release policy; completion handoff distinguishes local failures, offline evidence and pending hosted source.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1383,10 +1383,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T16:01:23.151Z",
-      "sourceDigest": "a6c5efb8df842dd483e273abb70927eefa6e87176e939e518b11ab222a2f5f08",
+      "reviewedAt": "2026-11-24T20:54:53.956Z",
+      "sourceDigest": "0bbbe4a7991101120d756bb7410ec66b372b46aa53313cf249bd7aeb584d7cb9",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved the union of CI and DEV/TEST source routing, templates and maintenance instructions; shared verifier source is reviewed in both validation and delivery.",
+      "reviewReason": "Reconciled both registry source maps and documentation histories; routed new premium offline Python tools and completion handoff while preserving current maintenance requirements.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

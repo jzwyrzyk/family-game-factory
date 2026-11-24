@@ -8,7 +8,9 @@ on:
       - 'server/agent/model-policy.ts'
       - 'server/agent/generation-contract.ts'
       - 'server/agent/premium-production.ts'
-      - 'tools/premium-*.ts'
+      - 'tools/premium-*'
+      - 'server/sandbox/Dockerfile'
+      - 'server/sandbox/package*.json'
       - 'tools/premium-art/**'
       - 'server/agent/sprite-sheet.ts'
       - 'server/agent/illustrations.ts'
@@ -40,7 +42,9 @@ on:
       - 'server/agent/model-policy.ts'
       - 'server/agent/generation-contract.ts'
       - 'server/agent/premium-production.ts'
-      - 'tools/premium-*.ts'
+      - 'tools/premium-*'
+      - 'server/sandbox/Dockerfile'
+      - 'server/sandbox/package*.json'
       - 'tools/premium-art/**'
       - 'server/agent/sprite-sheet.ts'
       - 'server/agent/illustrations.ts'
@@ -87,6 +91,26 @@ jobs:
           path: |
             premium-benchmark.json
             premium-mock.json
-# This workflow has no browser installer, privileged credentials, paid calls,
-# deployment permissions or worker trust configuration. Full Arcade/creative/
-# learning/visual and private-runner security gates remain separate and mandatory.
+  sandbox-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Clean unpublished sandbox build
+        run: docker build --no-cache --label "org.opencontainers.image.revision=$GITHUB_SHA" --file server/sandbox/Dockerfile --tag jems-premium-sandbox:ci .
+      - name: Verify packaged bytes and legacy/premium envelope in bounded Docker
+        run: node --import tsx tools/premium-sandbox-check.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: premium-clean-sandbox-proof
+          path: test-results/premium-sandbox/
+          retention-days: 14
+# Read-only hosted testing. No publication, cloud identity, provider credentials,
+# paid inference or production pin changes. Production gVisor acceptance remains separate.

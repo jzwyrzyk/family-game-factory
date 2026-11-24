@@ -250,6 +250,9 @@ test('review admits all 128 actual input receipts per device and all eight captu
  const wire=h.sent.at(-1)!.input as Array<{content:Array<{type:string;text?:string}>}>;
  assert.equal(wire[0].content.filter(row=>row.type==='input_image').length,8);
  const payload=JSON.parse(wire[0].content[0].text!).evidence;
+ assert.deepEqual(payload.captures,evidence.captures.map(({data,...metadata})=>metadata));
+ assert.deepEqual(wire[0].content.filter(row=>row.type==='input_text').slice(1).map(row=>JSON.parse(row.text!)),
+  evidence.captures.map(image=>({captureId:image.id})));
  assert.deepEqual(payload.observedActions,playthrough);
  assert.deepEqual(payload.traceColumns,['actionIndex','startTick','endTick','sceneChanged']);
  for(const session of payload.sessions){

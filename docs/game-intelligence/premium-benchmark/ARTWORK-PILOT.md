@@ -1,5 +1,7 @@
 # Artwork-first pilot and November 26 activation gates
 
+**Historical implementation receipt.** The [completion handoff](COMPLETION.md) supersedes this report’s pending PR155 integration and unimplemented offline-experiment status. Original measurements and approval boundaries below retain their recorded source scope.
+
 The November 24 assignment extends PR #139 on application main `81a05ae8aca0576be3a56911ed8beec431e36de5`. The previous PR head `e262e03272d3d2e6a2aa5088cc2a9d76c8185fb9` is an ancestor. The integrated tree uses #154's 13 shards and stable required aggregates. It incorporates #157's merged protected-main evidence policy. #155's disconnected DEV preview and integrated TEST foundation remain a separate draft. Private main `dddf53dbc76796be19782c1bb5bbb99b86e99909` still selects public worker source `b472c224f7e8ef8ab0986ce6f755728d7cc63d46` in its workflow. An effective serving pin requires authenticated verification. [Owner assignment](https://github.com/jzwyrzyk/family-game-factory/pull/139#issuecomment-7136037549)
 
 ## Implemented and reproducible

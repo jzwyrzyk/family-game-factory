@@ -430,3 +430,7 @@ CI diagnosis: the runner had unpinned Chromium 157 installed at the system path,
 After merging Gem Pal expression assets and the learning-surface fixes, the exact-main Arcade `creative` job reproduced an intermittent assertion in `tests/pals-expressions-browser.cjs`: Playwright changed `prefers-reduced-motion` but the test checked Web Animations **before** Chromium's asynchronous `matchMedia` change event had reached the Pal controller. The production portrait already listens for that event and cancels its transition.
 
 [PR #92](https://github.com/jzwyrzyk/family-game-factory/pull/92) now waits up to three seconds for the controller's observed reduced-motion state and its completed visual reset before asserting zero remaining animations. This retains the behavioral assertion and changes no game, artwork, stylesheet, approval or runtime animation policy. Source-only tests, even when green, do not validate physical-device motion or authorize deployment.
+
+## Premium completion evidence
+
+[PR139 completion](../game-intelligence/premium-benchmark/COMPLETION.md) retains all existing premium suites and adds offline fault injection to the same contract/browser lanes. The Game Intelligence workflow adds a clean unpublished sandbox build and actual-byte/legacy/premium envelope proof. This is separate from the stable Arcade aggregates and from production gVisor/paid-provider acceptance. Source fingerprints and full CI evidence include the added scripts; no existing command is omitted.

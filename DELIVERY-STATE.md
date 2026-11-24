@@ -1,5 +1,9 @@
 # jems delivery state
 
+## November 24 — premium completion continuation, PR139
+
+Integrated premium head `b2a7317b64b19d4b0b1c533223ff363361f8152a` with protected main `af80df765f7d808c5b9a5a08e7bd0b6402c8d1a1`, preserving the newer DEV/TEST, CI and production-cutover records below. Local premium47, CI118 and environment112 checks passed on the continuation working tree. Eight offline SQLite fault cases cover staged aggregate accounting and restart/no-replay behavior. Authored adversarial browser and clean hosted packaging evidence are recorded with their final source in the [completion handoff](docs/game-intelligence/premium-benchmark/COMPLETION.md) and PR. Hosted final-source checks are pending at this writing. The certificate-trust build correction reached the browser download; local official mirrors denied that download. Premium remains disabled; no paid calls, cloud mutations, image publication or live pin changes occurred. Full-job $1.876 versus $1 and missing provider/TEST/owner acceptance remain activation blockers.
+
 ## November 24 — premium artwork builder, draft PR #139
 
 Reconciled PR #139 with protected main after #154 and #157 (merge `81a05ae8aca0576be3a56911ed8beec431e36de5`). PR #155 remains a separate draft. Three original illustrated fixtures run in the existing renderer through a mock private adapter and the real Chromium worker. The pilot report records the rendered evidence, scope of the scheduling experiment and the economic blocker. The proposed one-repair envelope reserves $1.876 against a $1 maximum. Premium activation, provider access and release approval remain pending. The production cutover receipts below retain their original scope. [Pilot report and November 26 checklist](docs/game-intelligence/premium-benchmark/ARTWORK-PILOT.md)
