@@ -25,7 +25,7 @@ run verified a stable manifest before/after; expected remote manifest pinning is
 separately exercised by negative contracts and wired into the trusted workflow.
 These captures are simulated viewports, not physical phone/tablet acceptance.
 
-The current foundation also passed 91 Python environment tests, six JavaScript
+The current foundation also passed 96 Python environment tests, six JavaScript
 browser guard tests, 191 existing production operations tests, actionlint, and
 the unchanged regression partition check (40 commands, 26 suites, eight shards).
 Terraform 1.9.8 provider validation passed with locked Google/Google Beta 7.46.2;

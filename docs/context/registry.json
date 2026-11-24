@@ -870,10 +870,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T03:56:55.963Z",
-      "sourceDigest": "d08e4bd0791064980ebaa4ec36f0a45947fce7a707c349b63ef0d9760ac5af9a",
+      "reviewedAt": "2026-11-24T04:09:39.430Z",
+      "sourceDigest": "8359e76b40cea19109df23613df1be84cbb239f4637fb2a9824ceb506b32c4fe",
       "reviewOutcome": "updated",
-      "reviewReason": "Added real Git regression cases for documentation commits racing application builds and owned deployment baseline validation; existing browser evidence and incomplete live acceptance statements remain accurate.",
+      "reviewReason": "Reviewed complete-revert preview regressions in addition to docs-during-build cases; local 96 environment tests pass, with prior viewport evidence and all live acceptance limitations retained.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1068,10 +1068,10 @@
         "infra/nonproduction/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T03:56:56.562Z",
-      "sourceDigest": "25bc0f57c9d46882b71a7ccb6f3f0ea5c130918d46e46d19cea06250597d20df",
+      "reviewedAt": "2026-11-24T04:09:39.866Z",
+      "sourceDigest": "5ca0ea940a1583b1af945f6c50b5bb56183ea0f3aa10a7808fbb89671713aac3",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed cumulative PR and last deployed TEST build planning so documentation advances cannot strand code; recorded draft PR and directory, actual scheduled cleanup cadence and unchanged production cutover.",
+      "reviewReason": "Reviewed deployed DEV source comparisons to replace stale previews after reversions, recorded the owners approved 15 dollar fixture setup scope, and retained disabled activation until actual scoped access is verified.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

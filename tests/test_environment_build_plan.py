@@ -59,6 +59,55 @@ class BuildPlanTests(unittest.TestCase):
     def inventory(self, source=None, state="success"):
         return {"environments": [] if source is None else [{"environment": "test", "sourceSha": source, "state": state}]}
 
+    def dev_inventory(self, source=None, state="success"):
+        return {"environments": [] if source is None else [{"environment": "dev-pr-12", "sourceSha": source, "state": state}]}
+
+    def test_dev_previously_deployed_application_is_replaced_after_complete_revert(self):
+        deployed = self.commit("src/pals/example.ts", "deployed app A")
+        self.git("rm", "src/pals/example.ts")
+        current = self.commit("docs/example.md", "revert A and retain documentation")
+        with patch.object(build_plan.github, "inventory", return_value=self.dev_inventory(deployed)):
+            result = build_plan.plan(source=current, base=self.initial, kind="dev", repo=self.repo,
+                                     api=object(), pr_number=12)
+        self.assertTrue(result["previewRequired"])
+        self.assertEqual(result["sourceSha"], current)
+        self.assertEqual(result["baselineSha"], deployed)
+        self.assertEqual(result["reason"], "DEV_PREVIEW_REVERSION_REQUIRES_CURRENT_SOURCE")
+
+    def test_dev_genuine_docs_only_without_previous_preview_skips(self):
+        docs = self.commit("docs/example.md", "genuine docs-only PR")
+        with patch.object(build_plan.github, "inventory", return_value=self.dev_inventory()):
+            result = build_plan.plan(source=docs, base=self.initial, kind="dev", repo=self.repo,
+                                     api=object(), pr_number=12)
+        self.assertFalse(result["previewRequired"])
+
+    def test_dev_docs_only_with_unchanged_previously_deployed_app_skips(self):
+        prior = self.commit("docs/example.md", "previously deployed docs source")
+        current = self.commit("docs/example.md", "new docs with same app")
+        with patch.object(build_plan.github, "inventory", return_value=self.dev_inventory(prior)):
+            result = build_plan.plan(source=current, base=self.initial, kind="dev", repo=self.repo,
+                                     api=object(), pr_number=12)
+        self.assertFalse(result["previewRequired"])
+
+    def test_dev_unknown_or_failed_prior_preview_does_not_leave_potentially_stale_app(self):
+        docs = self.commit("docs/example.md", "docs-only with unknown serving state")
+        for inventory in (self.dev_inventory(self.initial, "failure"), self.dev_inventory("f" * 40)):
+            with patch.object(build_plan.github, "inventory", return_value=inventory):
+                result = build_plan.plan(source=docs, base=self.initial, kind="dev", repo=self.repo,
+                                         api=object(), pr_number=12)
+                self.assertTrue(result["previewRequired"])
+        with patch.object(build_plan.github, "inventory", side_effect=build_plan.github.GitHubError("GITHUB_API_FAILED")):
+            self.assertTrue(build_plan.plan(source=docs, base=self.initial, kind="dev", repo=self.repo,
+                                            api=object(), pr_number=12)["previewRequired"])
+
+    def test_dev_invalid_pr_rejected_before_inventory(self):
+        with patch.object(build_plan.github, "inventory") as inventory:
+            for pr in (0, -1, True, "12"):
+                with self.assertRaisesRegex(build_plan.BuildPlanError, "INVALID_PR_NUMBER"):
+                    build_plan.plan(source=self.initial, base=self.initial, kind="dev", repo=self.repo,
+                                    api=object(), pr_number=pr)
+            inventory.assert_not_called()
+
     def test_test_app_a_then_docs_b_builds_b_when_a_never_deployed(self):
         application = self.commit("src/pals/example.ts", "app A")
         docs = self.commit("docs/example.md", "docs B cancels earlier A workflow")

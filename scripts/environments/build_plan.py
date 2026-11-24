@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Decide preview work cumulatively, never from only the last pushed commit.
 
-DEV compares the whole PR to its merge base. TEST compares the current source
+DEV compares the whole PR to its merge base and replaces previously deployed
+application changes even when they have all been reverted. TEST compares the current source
 to the last observed successful, owned TEST deployment. An unknown, failed,
 unavailable or nonancestor deployment baseline always builds; a docs commit
 therefore cannot strand an application commit whose earlier CI was cancelled.
@@ -51,10 +52,18 @@ def changes(repo: Path, baseline: str, source: str) -> list[str]:
         raise BuildPlanError("UNSUPPORTED_SOURCE_PATH") from None
 
 
-def plan(*, source: str, base: str, kind: str, repo: Path = Path.cwd(), api=None) -> dict:
+def plan(*, source: str, base: str, kind: str, repo: Path = Path.cwd(), api=None,
+         pr_number: int | None = None) -> dict:
     source = commit(repo, source)
     if kind not in ("dev", "test"):
         raise BuildPlanError("INVALID_ENVIRONMENT_KIND")
+    if pr_number is not None:
+        try:
+            github.positive_int(pr_number, "PR_NUMBER")
+        except github.GitHubError:
+            raise BuildPlanError("INVALID_PR_NUMBER") from None
+        if kind != "dev":
+            raise BuildPlanError("PR_NUMBER_REQUIRES_DEV")
     baseline = None
     if kind == "dev":
         base = commit(repo, base)
@@ -83,6 +92,27 @@ def plan(*, source: str, base: str, kind: str, repo: Path = Path.cwd(), api=None
         selected = selection.select(paths)
     except ValueError:
         raise BuildPlanError("INVALID_CHANGED_SOURCE_PATH") from None
+    if kind == "dev" and not selected["previewRequired"] and pr_number is not None:
+        # A cumulative docs-only diff can be the result of reverting an app
+        # change already served by this PR's preview. Compare with that actual
+        # deployment before deciding to leave the old website in place.
+        try:
+            state = github.inventory(api or github.GitHub())
+            entries = [row for row in state["environments"] if row.get("environment") == f"dev-pr-{pr_number}"]
+            if entries:
+                if len(entries) != 1 or entries[0].get("state") != "success":
+                    raise BuildPlanError("DEV_PREVIEW_BASELINE_UNVERIFIED")
+                previous = commit(repo, entries[0].get("sourceSha"))
+                git(repo, "merge-base", "--is-ancestor", previous, source)
+                previous_paths = changes(repo, previous, source)
+                previous_selection = selection.select(previous_paths)
+                if previous_selection["previewRequired"]:
+                    baseline, paths, selected = previous, previous_paths, previous_selection
+                    selected["reason"] = "DEV_PREVIEW_REVERSION_REQUIRES_CURRENT_SOURCE"
+        except (github.GitHubError, BuildPlanError, KeyError, TypeError, ValueError):
+            return {"version": 1, "kind": kind, "sourceSha": source, "baselineSha": None,
+                    "previewRequired": True, "reason": "DEV_PREVIEW_BASELINE_UNVERIFIED_BUILD_CURRENT_SOURCE",
+                    "requiredCiUnchanged": True}
     return {"version": 1, "kind": kind, "sourceSha": source, "baselineSha": baseline,
             "previewRequired": selected["previewRequired"], "reason": selected["reason"],
             "mode": selected["mode"], "changedPathCount": len(paths), "requiredCiUnchanged": True}
@@ -93,10 +123,11 @@ def main() -> int:
     parser.add_argument("--source", required=True)
     parser.add_argument("--base", required=True, help="PR base SHA; TEST ignores push-before as a deployment baseline")
     parser.add_argument("--kind", required=True, choices=("dev", "test"))
+    parser.add_argument("--pr", type=int, help="DEV PR number used to replace a stale preview after app changes are reverted")
     parser.add_argument("--out", type=Path)
     args = parser.parse_args()
     try:
-        result = plan(source=args.source, base=args.base, kind=args.kind)
+        result = plan(source=args.source, base=args.base, kind=args.kind, pr_number=args.pr)
         if args.out:
             args.out.parent.mkdir(parents=True, exist_ok=True)
             args.out.write_text(json.dumps(result, indent=2) + "\n")

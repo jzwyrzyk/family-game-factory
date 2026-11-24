@@ -30,7 +30,12 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
           KIND: ${{ github.event_name == 'pull_request' && 'dev' || 'test' }}
-        run: python3 scripts/environments/build_plan.py --source "$SOURCE_SHA" --base "$BASE_SHA" --kind "$KIND"
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          args=(--source "$SOURCE_SHA" --base "$BASE_SHA" --kind "$KIND")
+          if [[ "$KIND" == dev ]]; then args+=(--pr "$PR_NUMBER"); fi
+          python3 scripts/environments/build_plan.py "${args[@]}"
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         if: steps.plan.outputs.needed == 'true'
         with:

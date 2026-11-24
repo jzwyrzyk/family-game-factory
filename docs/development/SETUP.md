@@ -2,6 +2,8 @@
 
 **Status:** reviewable setup plan, not provisioned infrastructure. The [environment contract](DEV-TEST-PROD.md) governs the result. The foundation is disabled until the actual project, identities, browser audience, costs and trusted workflow bindings are configured and independently verified. No routine operation requires Cloud Shell.
 
+**Owner authorization received:** November 23, 2026, the owner approved the one-time dedicated nonproduction project, restricted GitHub WIF/IAP setup and a $15/month initial disconnected-preview planning budget, with live AI off. The budget is an alert target, not a hard billing cap. Do not request this setup-scope approval again; actual account access, billing selection and scoped activation evidence are still required. This approval does not enable paid AI or production changes.
+
 ## What the current access can do
 
 The assessment started from main `28fe3311036f8ef9f3bfc623c522432499c08113`. Authenticated GitHub source and PR access work. The repository-environments read returned the existing generation, sandbox, Pages, image-publication and production-release environments; no nonproduction environment was observed. Reading repository Actions variables returned HTTP 403, `Resource not accessible by integration`. That result does not prove that any particular variable is absent.
