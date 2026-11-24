@@ -190,6 +190,9 @@ Pages subsequently dispatches from current main with input `source_sha` equal to
 
 The [Coach/reliability release control](COACH_RELIABILITY_RELEASE_CONTROL.md), [continuity contract](../assignment-006/RELEASE-CONTINUITY.md), [Coach evaluation gate](../design-coach/RELEASE_AND_EVALUATION.md) and [storage/rollback contract](../child-continuity/RELIABILITY-2026-11-23.md) remain applicable. This runbook neither expands the private-worker release scope nor authorizes PR106, provider activation, additional spending or destructive storage changes.
 
+## Subsequent DEV → TEST → PROD releases
+
+The [environment contract](../development/DEV-TEST-PROD.md) governs subsequent releases and supersedes unimplemented standalone staging/controller proposals. Complete the currently authorized cutover under its existing exact evidence and holds. Afterwards, connect sealed TEST evidence and authenticated exact-release owner approval to this controller rather than creating a competing production lane. Preserve compatible frontend readers, runtime/worker identities, job-drain requirements and retained data during recovery. The new environment foundation does not itself automate complete promotion or functional rollback; [delivery state](../../DELIVERY-STATE.md) must record the actual integration and drill. Routine Cloud Shell is prohibited by the new operating requirement.
 ## Approved deterministic Gateway acceptance
 
 The [candidate acceptance route proposal](CANDIDATE_ACCEPTANCE_ROUTE.md) adds controller support for a fixed temporary tag and its cleanup, preserving the normal canary split. The owner approved the exact temporary routing and one trusted test-device enrollment on November 24. PR160 includes the add-route intent while preserving all source/image/configuration pins; activation remains gated on protected-main checks and the observed workflow result.

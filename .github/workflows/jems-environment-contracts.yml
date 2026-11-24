@@ -1,0 +1,29 @@
+name: Jems environment contracts
+on:
+  push:
+    branches: [main]
+    paths: ['scripts/environments/**', 'tests/test_environment_*.py', 'tests/environments/**', 'infra/nonproduction/**', 'ops/environments.json', '.github/workflows/jems-*', 'package.json']
+  pull_request:
+    paths: ['scripts/environments/**', 'tests/test_environment_*.py', 'tests/environments/**', 'infra/nonproduction/**', 'ops/environments.json', '.github/workflows/jems-*', 'package.json']
+permissions:
+  contents: read
+concurrency:
+  group: jems-environment-contracts-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+      - run: python3 -m unittest discover -s tests -p 'test_environment_*.py'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: node --test tests/environments/*.test.cjs
+      - name: Existing complete regression partition remains intact
+        run: python3 scripts/deployment/regressions.py --check

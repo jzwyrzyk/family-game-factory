@@ -1,0 +1,65 @@
+name: Jems preview bundle
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+
+# Untrusted application/dependency code runs only in this credential-free lane.
+permissions:
+  contents: read
+  deployments: read
+concurrency:
+  group: jems-preview-build-${{ github.event.pull_request.number || 'test' }}
+  cancel-in-progress: true
+jobs:
+  bundle:
+    if: github.repository == 'jzwyrzyk/family-game-factory' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Decide from complete PR change or last deployed TEST source
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          KIND: ${{ github.event_name == 'pull_request' && 'dev' || 'test' }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          args=(--source "$SOURCE_SHA" --base "$BASE_SHA" --kind "$KIND")
+          if [[ "$KIND" == dev ]]; then args+=(--pr "$PR_NUMBER"); fi
+          python3 scripts/environments/build_plan.py "${args[@]}"
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        if: steps.plan.outputs.needed == 'true'
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+        if: steps.plan.outputs.needed == 'true'
+      - run: npm run build
+        if: steps.plan.outputs.needed == 'true'
+      - name: Package disconnected application bytes
+        if: steps.plan.outputs.needed == 'true'
+        env:
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          args=(--dist dist --source "$SOURCE_SHA" --out "$RUNNER_TEMP/bundle.tgz")
+          if [[ -n "$PR_NUMBER" ]]; then args+=(--environment dev --pr "$PR_NUMBER"); else args+=(--environment test); fi
+          python3 scripts/environments/bundle.py pack "${args[@]}"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: steps.plan.outputs.needed == 'true'
+        with:
+          name: jems-site-bundle
+          path: ${{ runner.temp }}/bundle.tgz
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error

@@ -2,6 +2,10 @@
 
 **Code integration; deployment and paid-provider acceptance are separate.** This feature uses the existing Jems frontend, gateway, preview service and private AI execution. It does not need another website or an adult-only frontend hostname.
 
+## Environment acceptance
+
+The [DEV → TEST → PROD method](../development/DEV-TEST-PROD.md) now governs development and release environments. Preserve this document's same-site adult profile, permit, tab-proof and child-isolation contracts within each applicable installation. A separate nonproduction TEST installation does not authorize an adult-only production hostname or copy production grants. TEST acceptance must exercise the real authorized conversation → Build → Test/Review → Play → Edit → Keep → Reload journey with synthetic profiles and its own explicitly funded provider scope. A disconnected frontend or initial deployed browser smoke cannot satisfy this requirement; full nonproduction integration remains separately evidenced in [delivery state](../../DELIVERY-STATE.md).
+
 ## The profile switch is the activation
 
 1. On the current Jems site, open **Menu → Grown-ups → Private parent session**. The same entry appears in Parent Settings. It remains visible before character selection and when the workshop is disconnected or private testing is disabled. The optional **Adult (development)** profile choice is still shown only when server status enables it.

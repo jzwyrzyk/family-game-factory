@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "lane": "deployed-disconnected-frontend-smoke",
+  "sourceSha": "28fe3311036f8ef9f3bfc623c522432499c08113",
+  "startedAt": "2026-11-24T03:44:03.890Z",
+  "status": "passed",
+  "completeUatPassed": false,
+  "providerMode": "disconnected-no-provider-calls",
+  "remoteDataMutated": false,
+  "localData": "fresh disposable synthetic browser contexts only",
+  "serviceWorkers": "registration disabled before page scripts; offline-cache acceptance is separate",
+  "privateAccess": "local-only-not-proven",
+  "acceptanceRemaining": [
+    "complete game mechanics and cross-feature regressions",
+    "real AI conversation, generation, modification and spending controls",
+    "private backend identities, profile isolation and remote persistence",
+    "artwork upload, recovery, backup/restore and nonproduction reset",
+    "complete Math, Language, coding, rewards and adult workspace acceptance",
+    "actual-device microphone, audio and fullscreen behavior",
+    "owner visual review, play quality, child enjoyment and learning effectiveness"
+  ],
+  "devices": [
+    {
+      "device": "desktop",
+      "viewport": {
+        "width": 1400,
+        "height": 960
+      },
+      "status": "passed",
+      "checks": [
+        "fresh synthetic context and first-visit character selection",
+        "homepage and current Ready to Play catalogue",
+        "menu opens, fits viewport, closes by Escape and explicit button, restores focus",
+        "visible navigation: studioNavNotifications",
+        "visible navigation: studioNavJourney",
+        "visible navigation: studioNavRewards",
+        "visible navigation: studioNavPals",
+        "visible navigation: studioNavScenes",
+        "visible navigation: studioMenuArt",
+        "visible navigation: studioNavProblemSolving",
+        "visible navigation: studioMenuParent",
+        "My Creations renders",
+        "native Factory accepts mouse/touch input, shows wrong-sort consequence, retains candidate and exits",
+        "synthetic local character preference survives one reload"
+      ],
+      "blockedRequests": 0,
+      "failedResponses": 0,
+      "runtimeErrors": 0,
+      "screenshots": [
+        "desktop-home.png",
+        "desktop-menu.png",
+        "desktop-game-recovery.png"
+      ]
+    },
+    {
+      "device": "tablet",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "status": "passed",
+      "checks": [
+        "fresh synthetic context and first-visit character selection",
+        "homepage and current Ready to Play catalogue",
+        "menu opens, fits viewport, closes by Escape and explicit button, restores focus",
+        "visible navigation: studioNavNotifications",
+        "visible navigation: studioNavJourney",
+        "visible navigation: studioNavRewards",
+        "visible navigation: studioNavPals",
+        "visible navigation: studioNavScenes",
+        "visible navigation: studioMenuArt",
+        "visible navigation: studioNavProblemSolving",
+        "visible navigation: studioMenuParent",
+        "My Creations renders",
+        "native Factory accepts mouse/touch input, shows wrong-sort consequence, retains candidate and exits",
+        "synthetic local character preference survives one reload"
+      ],
+      "blockedRequests": 0,
+      "failedResponses": 0,
+      "runtimeErrors": 0,
+      "screenshots": [
+        "tablet-home.png",
+        "tablet-menu.png",
+        "tablet-game-recovery.png"
+      ]
+    },
+    {
+      "device": "phone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "status": "passed",
+      "checks": [
+        "fresh synthetic context and first-visit character selection",
+        "homepage and current Ready to Play catalogue",
+        "menu opens, fits viewport, closes by Escape and explicit button, restores focus",
+        "visible navigation: studioNavNotifications",
+        "visible navigation: studioNavJourney",
+        "visible navigation: studioNavRewards",
+        "visible navigation: studioNavPals",
+        "visible navigation: studioNavScenes",
+        "visible navigation: studioMenuArt",
+        "visible navigation: studioNavProblemSolving",
+        "visible navigation: studioMenuParent",
+        "My Creations renders",
+        "native Factory accepts mouse/touch input, shows wrong-sort consequence, retains candidate and exits",
+        "synthetic local character preference survives one reload"
+      ],
+      "blockedRequests": 0,
+      "failedResponses": 0,
+      "runtimeErrors": 0,
+      "screenshots": [
+        "phone-home.png",
+        "phone-menu.png",
+        "phone-game-recovery.png"
+      ]
+    }
+  ],
+  "environment": "dev",
+  "manifestSha256": "9fa6cf12de15b7d010af964cefbb85d188e6dc824676b428dc83362750810779",
+  "frontendSha256": "9b4171d1dbea4e06020f8688c6f9677c007f2e6ad4f947a85cc818716a95c1dc",
+  "expectedManifestPinned": false,
+  "identityStable": true,
+  "finishedAt": "2026-11-24T03:44:24.382Z"
+}
