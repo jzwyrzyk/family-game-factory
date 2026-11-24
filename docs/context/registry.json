@@ -1058,10 +1058,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T03:38:53.760Z",
-      "sourceDigest": "f02ab6701fe641145f684c852cfc60eceeed9c1b2358a28faccb110b32de856a",
+      "reviewedAt": "2026-11-24T03:40:23.658Z",
+      "sourceDigest": "5520f34e71b66e1b4d518a6726d799b074df25be2b8c11fadf23e35d35a074b5",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final read-only workflow graph including first-attempt full validation receipt creation on PR/manual runs for producer testing; the API verifier still accepts only main-push receipts. Stable checks, complete coverage and production controls remain unchanged; audit and delivery state document pending hosted benchmark and approval hold.",
+      "reviewReason": "Reviewed the immutable original Arcade workflow fixture and activation tests: all191 operations tests pass while the original executor explicitly rejects this redesigned workflow. Frozen activation hashes and executable remain unchanged; the guide preserves the separate approval boundary and pending hosted evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
