@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T04:03:35.404Z",
-      "sourceDigest": "26886ee7701b77fdb0b2971a9b0074f8521d4bbc90fc95c61e10a53952d50e2d",
+      "reviewedAt": "2026-11-24T04:03:56.550Z",
+      "sourceDigest": "17090777223d3d4ad4a3def32594438e16d021e2e9d342788a2f99c1a325e5fe",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded protected PR153 merge and21 passing checks, the actual diagnostic invalid_target failure before broker access, its uninspected failure artifact, independent serving metadata and previous Pages/source/build receipts, plus unresolved live acceptance and published network-policy blocker.",
+      "reviewReason": "Recorded protected PR153 merge and 21 passing checks, the actual invalid_target authentication failure before any broker query, its uninspected artifact, serving metadata, prior Pages receipts, approved-source build and unresolved live/network gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
