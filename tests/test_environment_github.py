@@ -181,6 +181,13 @@ class CandidateTests(unittest.TestCase):
         with self.assertRaisesRegex(github.GitHubError, "BUNDLE_PR_MISMATCH"):
             github.choose_candidate(api, 99, POLICY)
 
+    def test_successful_docs_only_bundle_run_without_artifact_is_a_clean_skip(self):
+        api = FakeGitHub()
+        api.artifact = None
+        self.assertEqual(github.choose_candidate(api, 99, POLICY),
+                         {"eligible": False, "reason": "NO_DEPLOYABLE_BUNDLE"})
+        self.assertEqual(api.downloads, [])
+
     def test_artifact_envelope_source_run_and_digest_are_required(self):
         for mutation in (lambda a: a.artifact.update(expired=True),
                          lambda a: a.artifact.update(digest=None),
@@ -273,8 +280,8 @@ class ReportingTests(unittest.TestCase):
 
     def test_inventory_uses_latest_status_and_never_labels_prod(self):
         api = FakeGitHub()
-        api.deployments = [{"id": 3, "environment": "dev-pr-12", "sha": SOURCE,
-                            "payload": {"jemsEnvironmentVersion": 1}},
+        api.deployments = [{"id": 3, "environment": "dev-pr-12", "sha": SOURCE, "production_environment": False,
+                            "payload": {"jemsEnvironmentVersion": 1, "service": "jems-dev-pr-12"}},
                            {"id": 2, "environment": "production", "sha": SOURCE}]
         api.statuses = [{"id": 10, "state": "success", "environment_url": self.receipt()["url"]},
                         {"id": 11, "state": "inactive"}]

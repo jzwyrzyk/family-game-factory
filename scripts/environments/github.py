@@ -217,6 +217,8 @@ def current_target(api: GitHub, candidate: dict) -> bool:
 def _artifact(api: GitHub, run: dict, source: str) -> dict:
     artifacts = api.pages(f"{PREFIX}/actions/runs/{run['id']}/artifacts", "artifacts")
     matching = [a for a in artifacts if a.get("name") == "jems-site-bundle"]
+    if not matching:
+        raise GitHubError("NO_DEPLOYABLE_BUNDLE")
     if len(matching) != 1:
         raise GitHubError("NO_UNIQUE_BUNDLE_ARTIFACT")
     artifact = matching[0]
@@ -289,7 +291,12 @@ def choose_candidate(api: GitHub, run_id: int, policy: list[dict], download_dir:
         raise GitHubError("TEST_BUNDLE_NOT_MAIN")
     if environment == "dev" and not any(p.get("number") == pr and p.get("head", {}).get("sha") == source for p in current.get("pull_requests", [])):
         raise GitHubError("BUNDLE_PR_MISMATCH")
-    artifact = _artifact(api, current, source)
+    try:
+        artifact = _artifact(api, current, source)
+    except GitHubError as error:
+        if str(error) == "NO_DEPLOYABLE_BUNDLE":
+            return {"eligible": False, "reason": "NO_DEPLOYABLE_BUNDLE"}
+        raise
     candidate = {"eligible": True, "environment": environment, "prNumber": pr,
                  "sourceSha": source, "runId": current["id"], "artifactId": artifact["id"],
                  "artifactDigest": artifact["digest"]}
@@ -380,7 +387,9 @@ def inventory(api: GitHub) -> dict:
         if not isinstance(name, str) or not re.fullmatch(r"dev-pr-[1-9][0-9]*|test", name) or name in seen:
             continue
         payload = deployment.get("payload", {})
-        if not isinstance(payload, dict) or payload.get("jemsEnvironmentVersion") != 1:
+        expected_service = "jems-test" if name == "test" else "jems-" + name
+        if (not isinstance(payload, dict) or payload.get("jemsEnvironmentVersion") != 1
+                or payload.get("service") != expected_service or deployment.get("production_environment") is not False):
             continue
         seen.add(name)
         statuses = api.pages(f"{PREFIX}/deployments/{deployment['id']}/statuses")

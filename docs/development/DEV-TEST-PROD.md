@@ -53,7 +53,9 @@ The privileged publisher must never execute a PR's scripts, Dockerfile, download
 
 The build records exact source and frontend content identity, replaces browser configuration with a disconnected nonproduction configuration, and displays environment/PR/source. An identity marker is evidence about the served bundle, not independent build provenance. The trusted controller must bind it to the verified source/run/artifact envelope.
 
-Use zero minimum instances, a bounded maximum per service, an approved maximum number of active previews and a default 72-hour retention window. Refresh expiry only for an eligible new deployment. Close events remove the matching preview; scheduled reconciliation catches missed events and expiry. Cleanup requires exact project, managed labels and PR/service identity, and cannot select TEST or production. Deletion does not erase files already cached by a tester's browser.
+Use zero minimum instances, a bounded maximum per service, an approved maximum number of active previews and a default 72-hour retention window. Refresh expiry only for an eligible new deployment. Scheduled reconciliation checks closed PRs and expiry twice an hour (GitHub scheduling may be delayed); a manual cleanup dispatch is also available. Cleanup requires exact project, managed labels and PR/service identity, and cannot select TEST or production. Deletion does not erase files already cached by a tester's browser.
+
+Evaluate preview applicability against the complete PR diff, and TEST against its last successful owned deployment. A documentation commit arriving during an application build must not cancel that build and strand the application change without a current eligible bundle. Documentation-only PRs skip packaging; documentation-only main advances skip it only when the prior deployed TEST application already covers the unchanged inputs. Missing deployment evidence fails safely toward producing a bundle, never toward assuming the application shipped.
 
 ## Permanent TEST and complete experience
 
@@ -84,6 +86,8 @@ Any relevant source, artifact, worker/runtime or configuration change invalidate
 After the active cutover, connect this prerequisite to the existing release-intent workflow. Keep the existing backend dependency sequence, canary, provenance, compatibility and data safeguards. Application merges must never write production release intent as a side effect. During this foundation work, `ops/release.json`, `ops/compatibility.json`, `ops/publish-images.txt` and production deployment workflows remain unchanged.
 
 ## Recovery and status
+
+The owner can bookmark [the environment directory](https://github.com/jzwyrzyk/family-game-factory/issues/156). Its current entries correctly show nonproduction setup pending; automation begins only after activation.
 
 A failed verification stops further promotion. Traffic rollback may use an already retained, verified compatible baseline through the existing controller. A previous frontend may not understand newer saved data; automatic recovery must check reader/schema/runtime compatibility, in-flight jobs and artifact retention. If compatibility is unknown, halt for the documented recovery decision or roll forward; never restore bytes blindly or delete user work. The current source foundation does not yet automate the complete functional-verification/recovery sequence.
 

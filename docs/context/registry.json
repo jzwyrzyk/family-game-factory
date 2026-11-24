@@ -870,10 +870,10 @@
         "scripts/tests/verify-pal-assets.test.mjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T03:47:39.155Z",
-      "sourceDigest": "c98aec0c78a258daa739866c6cb7051b31d2056e11c7d915743c648035459b66",
+      "reviewedAt": "2026-11-24T03:56:55.963Z",
+      "sourceDigest": "d08e4bd0791064980ebaa4ec36f0a45947fce7a707c349b63ef0d9760ac5af9a",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed bounded package and identity attack tests, origin-confined deployed smoke and exact-release evidence gates; recorded three viewport local captures, full acceptance gaps and unchanged complete regression partition.",
+      "reviewReason": "Added real Git regression cases for documentation commits racing application builds and owned deployment baseline validation; existing browser evidence and incomplete live acceptance statements remain accurate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1068,10 +1068,10 @@
         "infra/nonproduction/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T03:47:39.655Z",
-      "sourceDigest": "7fa1e6a1487e3d0dc84bcf3369f5eeef3ab52b2a6139d01052ce6d3a56c72d56",
+      "reviewedAt": "2026-11-24T03:56:56.562Z",
+      "sourceDigest": "25bc0f57c9d46882b71a7ccb6f3f0ea5c130918d46e46d19cea06250597d20df",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed disabled nonproduction workflows, trusted artifact isolation, separate project IAM and cleanup, retention and sealed approval interface; documented missing live setup and preserved active production intents and workflows.",
+      "reviewReason": "Reviewed cumulative PR and last deployed TEST build planning so documentation advances cannot strand code; recorded draft PR and directory, actual scheduled cleanup cadence and unchanged production cutover.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
