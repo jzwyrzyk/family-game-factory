@@ -1055,10 +1055,10 @@
         "DELIVERY-STATE.md"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T12:57:42.968Z",
-      "sourceDigest": "1f165fc1694bf6994b33725d4bff0197748b165894b0b741b77ef50dbd0a20b0",
+      "reviewedAt": "2026-11-24T13:38:56.079Z",
+      "sourceDigest": "bccedbc8ffd7bcfd2ff15ef1a553c77c619ded1a3707c100ec732bfb7ea3f8a4",
       "reviewOutcome": "updated",
-      "reviewReason": "Shorten fixed acceptance tag to fit current Gateway DNS labels; verify the same candidate/scope, atomic cleanup and existing release gates.",
+      "reviewReason": "Record actual PR160 tag activation and independent 95/5 observation, preserve unresolved request/data evidence, and document owner-approved risk-accepted cutover with all automated/protected release gates retained; refresh only the pinned Gateway promotion intent.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

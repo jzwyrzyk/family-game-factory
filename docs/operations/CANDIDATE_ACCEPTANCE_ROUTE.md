@@ -1,4 +1,6 @@
-# Gateway candidate acceptance route — approved, not yet activated
+# Gateway candidate acceptance route — activation and acceptance disposition
+
+**November24 update:** PR160 activated the fixed tag through the protected workflow; actual receipts are in [delivery state](../../DELIVERY-STATE.md). The owner subsequently stopped the manual browser procedure and approved the [bounded acceptance exception](PRODUCTION_ACTIVATION.md#owner-approved-acceptance-exception--november-24). The preparation and unexecuted test procedure below remain historical; candidate conversation acceptance was not established. Promotion still requires all automated gates and removes the tag atomically.
 
 The existing 5% Gateway canary has observed status/unlock successes but no attributed conversation POST in the owner-supplied evidence. The successful November 24 07:06 EST conversation reached the baseline. This proposal makes one authenticated candidate conversation deterministic. It does not accept the candidate, install diagnostics, promote traffic or publish Pages.
 
