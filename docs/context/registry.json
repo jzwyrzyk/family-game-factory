@@ -145,10 +145,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T17:33:42.672Z",
-      "sourceDigest": "847cc8a38d9c62ea5e19e959a9e924e3e4fca78177f8d13f2f5635fde0d6dee1",
+      "reviewedAt": "2026-11-25T18:24:21.985Z",
+      "sourceDigest": "f6c07d9cb139945baa6a14d113dfe66d5477ed0675a93a9ff383d716db34fb46",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the actual native/notebook, recovery and Adult source changes against doctrine: authored work, explicit Keep, local participation, separate guardian choices and held paid authority remain intact; no learning, earning or product intent changed.",
+      "reviewReason": "Inventory-aware legacy lookup and diagnostic error context preserve child-owned originals, explicit consent, rollback and audience boundaries; no product doctrine change.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -680,10 +680,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T17:48:13.970Z",
-      "sourceDigest": "7148381ccd08eb1041a75e62b5d42c447553c2fe2f12017ecbcf403efe53ac7f",
+      "reviewedAt": "2026-11-25T18:24:22.137Z",
+      "sourceDigest": "b8d5f8f52eb9183a29d58846b3f208bffb5b6f9ae00f2093b7491b7e54967b24",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented protected household original recovery with explicit operator mapping, fresh device and Adult authorization on every operation, strict same-origin POST transport and revocation-aware durable operation barriers; no live service authority added. Reviewed the WebKit operator checkbox/input constraints and wrapping fix against actual desktop/tablet captures; no authorization, typography threshold or clipping relaxation.",
+      "reviewReason": "Completion records database and migration-stage diagnostics without filtering, deleting or omitting stored originals; inventory absence avoids a needless legacy creation probe.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -890,10 +890,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:09:00.427Z",
-      "sourceDigest": "020c50eb1bdb57fe7dcf32824d84baaf8afd0f28a45f8587bfeee2d50bdc3de9",
+      "reviewedAt": "2026-11-25T18:24:22.462Z",
+      "sourceDigest": "b696d4cfe63ff03668bb2beca62d45a1f942556cd84499e0c4f8ccdddf47a1f2",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered multiowner and real HTTPS browser recovery in Chromium and WebKit gates, retained blocked-IDB and async navigation assertions, recorded frozen 677-unit/118-CI/emulator/full-storage evidence and failed initial hosted attempts; duplicate preview ZIP removed only while source/file manifests and all receipts remain. Integrated main185 standalone source coverage, offline adapters and file-based browser checks; all existing 118 CI contracts pass after package reconciliation. Preserved the WebKit tablet overflow assertion and added bounded checkbox diagnostics; offline review now awaits actual Parent entry and passes smoke/integration with 356 decoded assets in the documented local harness, while actual hosted file navigation remains required. Added controlled held-configuration regression that fails on the original build and passes on corrected Chromium, with original navigation/consent assertions plus failure DOM/error JSON and screenshots; exact new-head WebKit remains required.",
+      "reviewReason": "Retain 9a WebKit migration failure and verified prior corrections, negative-before/positive-after real-IDB legacy probe, scoped Chromium migration evidence and all 19 independent WebKit commands with prerequisite checks and aggregate failure.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1134,10 +1134,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T18:09:00.599Z",
-      "sourceDigest": "79e3922b7ec88e02e5840180d38e9818344074aae2e0c36815cbb74d35a96192",
+      "reviewedAt": "2026-11-25T18:24:22.675Z",
+      "sourceDigest": "c92be405fefc48a69cc81d34ec7f7d58800c15ecd827c285437af5a71a053140",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact frozen local head/tree, final benchmark pins and limits, initial four hosted failures, worker21 five-job success and current application186 qualification; deployment, device, provider, owner and protected merge remain distinct gates. Integrated main1be7e1a and preserved both command groups and isolated UI-review workflow; recorded the withheld conflict-state checks and requirement for new combined-head qualification. Recorded acb119f Security failure and verified screenshot ZIP; standalone workflow now binds artifact/source identity to exact checked-out candidate HEAD rather than merge-base, retaining mismatch rejection and distinguishing candidate from merged UI. Preserved main187 historical merged-tool delivery/acceptance receipts and refreshed the current base to af11650 without conflating that independent merge authorization with this held application continuation. Preserved c423550 hosted guided-entry failure and successful actual file review, identifying the demonstrated missing-host dependency rather than the disproven API-publication suspicion; successor exact-head checks remain the readiness gate.",
+      "reviewReason": "Record exact 9a source and security artifact, passing guidance/operator fixes, undiagnosed later household export abort and successor evidence requirement; no deployment or activation claim.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1615,10 +1615,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "d9d72b37c8acdda8b91cc3cefdfa976fc40b5bd3e503f47e23eab8e5d5312bad",
-      "reviewedAt": "2026-11-25T17:33:44.591Z",
+      "sourceDigest": "5ae76c00c8fa87f1d5cb93f46f5dc3a45dade591a28ca6af666fb513f6f84abf",
+      "reviewedAt": "2026-11-25T18:24:22.313Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented additive repair of verified missing referenced originals before safety capture, exact hashes and retained rigs, near-quota and interrupted restore; existing bytes and active movement selection are not overwritten by repair and physical deletion remains held for prepared references.",
+      "reviewReason": "Art Studio now states database version 3 and drawing catalog, inventory-aware absent legacy lookup, visible inventory failures and retained existing/no-inventory readers; 46 real-IDB contracts preserve original art and rig ancestry.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",

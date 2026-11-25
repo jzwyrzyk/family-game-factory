@@ -22,6 +22,8 @@ The subsequent `acb119f` hosted security run exposed an actual WebKit tablet ope
 
 The `c423550` candidate passed the real hosted offline file review but exposed another WebKit timing case: guided creation depended on a builder panel created after asynchronous configuration. Mounting it in the existing synchronous Parent settings panel removes that unnecessary network dependency while preserving all consent/session checks. The deliberately delayed-configuration regression and subsequent exact-head security checks govern acceptance; the initial API-publication timing suspicion was not the demonstrated cause.
 
+On `9a0152a`, WebKit verified the delayed-configuration and operator fixes, then reached a later household-export `AbortError`. The follow-up preserves precise database/stage diagnostics and avoids creating an absent legacy-art database merely to probe for it. Its real-IDB negative/positive checks retain original records and strict export inventory; the exact browser abort cause remains qualified. WebKit storage can now report independent results after entry fails, provided builds/browser setup succeeded, without turning a failed security job green.
+
 No protected-main merge, deployment, cloud provisioning, IAM/WIF change, real household transfer/deletion, invitation, paid request or capability activation was performed by this assignment. DEV/TEST deployment, independently reviewed provider/legal readiness, physical-device and owner acceptance remain separate gates.
 
 

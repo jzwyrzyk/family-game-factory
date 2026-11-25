@@ -48,19 +48,49 @@ jobs:
           curl -fsSL --retry 3 https://storage.googleapis.com/firebase-preview-drop/emulator/cloud-firestore-emulator-v1.19.8.jar -o "$RUNNER_TEMP/jems-firestore.jar"
           node scripts/beta/test-emulator.mjs "$RUNNER_TEMP/jems-firestore.jar"
       - name: Build private application and separately scoped feature files
+        id: privatebuild
         if: steps.beta.outputs.selected == 'true'
         run: npm run build && npm run build:family-beta && node scripts/beta/build.mjs --early-preview
       - name: Prepare browsers for synthetic family journeys
+        id: browsers
         if: steps.beta.outputs.selected == 'true'
         run: npx playwright install --with-deps chromium webkit
       - name: Chromium and WebKit private entry and responsive acceptance
         if: steps.beta.outputs.selected == 'true'
         run: node --import tsx tests/beta-browser.ts
       - name: WebKit transactional storage and complete recovery
-        if: steps.beta.outputs.selected == 'true'
+        # These checks are independent of private-entry layout/migration. Keep
+        # collecting their evidence after an entry failure, without masking it.
+        if: ${{ !cancelled() && steps.beta.outputs.selected == 'true' && steps.privatebuild.outcome == 'success' && steps.browsers.outcome == 'success' }}
         env:
           STORAGE_BROWSER: webkit
-        run: node tests/storage-domains-browser.cjs && node tests/storage-complete-backup-browser.cjs && node tests/storage-indexed-notebook-browser.cjs && node tests/storage-creation-browser.cjs && node tests/storage-authority-browser.cjs && node tests/storage-v1-browser.cjs && node tests/storage-sync-browser.cjs && node tests/studio-native-browser.cjs && node tests/storage-recovery-ui-browser.cjs && node scripts/storage/build-preview.mjs && node tests/storage-native-ui.cjs && node tests/storage-creation-ui.cjs && node tests/studio-native-ui.cjs && node tests/studio-notebook-ui.cjs && node tests/studio-guidance-browser.cjs && node tests/studio-prepare-browser.cjs && node tests/storage-adult-transfer-browser.cjs && node tests/storage-recovery-multiowner-browser.cjs && node --import tsx tests/household-recovery-browser.ts
+        run: |
+          storage_failures=0
+          run_storage() { if ! "$@"; then storage_failures=$((storage_failures + 1)); fi; }
+          run_storage node tests/storage-domains-browser.cjs
+          run_storage node tests/storage-complete-backup-browser.cjs
+          run_storage node tests/storage-indexed-notebook-browser.cjs
+          run_storage node tests/storage-creation-browser.cjs
+          run_storage node tests/storage-authority-browser.cjs
+          run_storage node tests/storage-v1-browser.cjs
+          run_storage node tests/storage-sync-browser.cjs
+          run_storage node tests/studio-native-browser.cjs
+          run_storage node tests/storage-recovery-ui-browser.cjs
+          if node scripts/storage/build-preview.mjs; then
+            run_storage node tests/storage-native-ui.cjs
+            run_storage node tests/storage-creation-ui.cjs
+            run_storage node tests/studio-native-ui.cjs
+            run_storage node tests/studio-notebook-ui.cjs
+            run_storage node tests/studio-guidance-browser.cjs
+            run_storage node tests/studio-prepare-browser.cjs
+            run_storage node tests/storage-adult-transfer-browser.cjs
+            run_storage node tests/storage-recovery-multiowner-browser.cjs
+            run_storage node --import tsx tests/household-recovery-browser.ts
+          else
+            storage_failures=$((storage_failures + 1))
+          fi
+          echo "$storage_failures WebKit storage commands failed"
+          test "$storage_failures" -eq 0
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() && steps.beta.outputs.selected == 'true' }}
         with:
