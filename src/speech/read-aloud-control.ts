@@ -9,7 +9,7 @@ export interface ReadAloudOptions {
   onStarted?(): void;
   onDelivered?():void;
   onUnavailable?():void;
-  deviceOnly?:boolean;
+  deviceOnly?:boolean|(()=>boolean);
 }
 /** A visible, tap-only speaker control. Dictation keeps its separate microphone. */
 export function createReadAloudControl(options: ReadAloudOptions) {
@@ -36,7 +36,7 @@ export function createReadAloudControl(options: ReadAloudOptions) {
       onMode: mode => {button.dataset.voiceMode=mode;},
       onFinished: showIdle, onDelivered: options.onDelivered,
       onUnavailable: () => { options.onUnavailable?.(); notice.textContent = 'Voice is not ready here. Ask a grown-up to read with you.'; },
-    },{deviceOnly:options.deviceOnly});
+    },{deviceOnly:typeof options.deviceOnly==='function'?options.deviceOnly():options.deviceOnly});
   };
   showIdle();
   return { element, button, notice,

@@ -129,7 +129,7 @@ export function installCreationStudio(host: Host) {
     if(scene){const actor=scene.actors.find(actor=>actor.id===selectedActor);return [message,'Choose a character, add an action, then press Play to see what happens.',actor?'You are editing '+actor.name+'.':'',$('creationSceneWords').textContent].filter(Boolean).join(' ');}
     return [message,$('creationSubtitle').textContent,$('creationChallengeShelf').hidden?'Choose a world or open one of your saved scenes.':'Choose a scene challenge. Watch it, then rebuild it your way.'].filter(Boolean).join('. ');
   }
-  const sceneReading=createReadAloudControl({text:readingText,canRead:()=>visible&&!FG.learning.active});
+  const sceneReading=createReadAloudControl({text:readingText,deviceOnly:()=>isEarlyGrade(profileGrade(FG.store.current())),canRead:()=>visible&&!FG.learning.active});
   sceneReading.button.id='creationRead';sceneReading.button.dataset.action='read-creation';
   readingTools.append(sceneReading.element);$('creationHeadingActions').prepend(readingTools);
   const actorReading=createReadAloudControl({text:()=>[$('creationActorDialogTitle').textContent,$('creationActorArtStatus').textContent,'Choose a character to add it to your scene.'].filter(Boolean).join('. '),canRead:()=>visible&&!FG.learning.active&&$<HTMLDialogElement>('creationActorDialog').open});

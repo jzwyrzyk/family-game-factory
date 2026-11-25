@@ -65,11 +65,14 @@ function choose(id){assertRewardSourceWritable();
  window.dispatchEvent(new CustomEvent('factory-profile-changing',{detail:{profileId:id}}));
  leaveAdultProfile();data.activeProfile=id;persist();return true;
 }
-async function changeLearningProfile(patch){
+async function changeLearningProfile(patch,stillOpen=()=>true){
  const owner=current();
+ if(Object.hasOwn(patch,'grade') && patch.grade!==owner.grade){
+ if(!isGrade(patch.grade))throw Error('Choose a listed learning grade.');
  if(!FG.verifyParentSettings)throw Error('Unlock Parent Controls on a trusted family device to change the learning level.');
  await FG.verifyParentSettings();
- if(owner!==current()||FG.learning?.active)throw Error('The player or activity changed. Open settings again.');
+ }
+ if(owner!==current()||!stillOpen()||FG.learning?.active)throw Error('The player or activity changed. Open settings again.');
  applyProfile(patch);
 }
 function changeProfile(patch){
