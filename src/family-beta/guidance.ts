@@ -2,6 +2,7 @@ import {isEarlyGrade,isGrade,type Grade} from '../learning/grades';
 const beta=()=>typeof document!=='undefined'&&document.documentElement.dataset.privateBeta==='true';
 type Setting={grade:Grade;version:number};
 type Guidance={token:string;profileId:string;expiresAt:number};
+let requestGeneration=0;
 let guidance:Guidance|undefined,timer:ReturnType<typeof setTimeout>|undefined;
 const settings:Record<string,Setting>={};
 export function betaProfileSettings(){
@@ -12,7 +13,7 @@ export function betaProfileSettings(){
 }
 const owner=()=>String((window as any).FG?.store?.current?.().id??'');
 function changed(){window.dispatchEvent(new Event('factory-parent-guidance'));}
-function clear(){guidance=undefined;clearTimeout(timer);changed();}
+function clear(){requestGeneration++;guidance=undefined;clearTimeout(timer);changed();}
 export function hasParentGuidance(id=owner()){if(guidance&&guidance.expiresAt<=Date.now())clear();return beta()&&guidance?.profileId===id;}
 export function learnerHeaders(headers:Headers,id:string){
  headers.delete('X-Jems-Learner');headers.delete('X-Jems-Parent-Guidance');
@@ -31,7 +32,7 @@ export async function saveBetaLearningGrade(profileId:string,grade:Grade){
  if(!beta())return;
  const before=betaProfileSettings()[profileId];
  const next=await command('profile-settings',{profileId,grade,expectedVersion:before?.version??0});
- settings[profileId]=next;if(guidance?.profileId===profileId)clear();
+ settings[profileId]=next;if(owner()===profileId||guidance?.profileId===profileId)clear();
 }
 export function installParentGuidance(){
  if(!beta()||document.getElementById('parentGuidance'))return;
@@ -42,7 +43,7 @@ export function installParentGuidance(){
  const together=document.createElement('p');together.id='guidedCreationTogether';together.className='notice';together.setAttribute('role','status');together.textContent='Making together. Stay with your grown-up while creating.';document.getElementById('page-studio')?.prepend(together);
  const status=panel.querySelector<HTMLElement>('#parentGuidanceStatus')!,start=panel.querySelector<HTMLButtonElement>('#parentGuidanceStart')!,end=panel.querySelector<HTMLButtonElement>('#parentGuidanceEnd')!;
  const render=()=>{const current=(window as any).FG.store.current(),active=hasParentGuidance(current.id);panel.hidden=!isEarlyGrade(current.grade);together.hidden=!active;start.hidden=active;end.hidden=!active;start.disabled=document.documentElement.dataset.parentGuidance!=='true';status.textContent=active?'Stay together while creating. This session ends within 15 minutes, on reload, or when switching explorers.':start.disabled?'Supervised remote creation remains closed in this preview.':'Unlock Parent Controls, then start a session for this explorer. Separately verified processing choices are still required.';};
- start.onclick=async()=>{const profileId=owner();start.disabled=true;try{const result=await command('parent-guidance',{profileId,supervise:true});if(owner()!==profileId)return;guidance=result;clearTimeout(timer);timer=setTimeout(clear,Math.max(0,result.expiresAt-Date.now()));changed();}catch(error){status.textContent=(error as Error).message;}finally{start.disabled=document.documentElement.dataset.parentGuidance!=='true';}};
+ start.onclick=async()=>{const profileId=owner(),request=++requestGeneration;start.disabled=true;try{const result=await command('parent-guidance',{profileId,supervise:true});if(request!==requestGeneration||owner()!==profileId)return;guidance=result;clearTimeout(timer);timer=setTimeout(clear,Math.max(0,result.expiresAt-Date.now()));changed();}catch(error){if(request===requestGeneration)status.textContent=(error as Error).message;}finally{if(request===requestGeneration)start.disabled=document.documentElement.dataset.parentGuidance!=='true';}};
  end.onclick=async()=>{const profileId=owner();clear();try{await command('parent-guidance',{profileId,supervise:false});}catch(error){status.textContent=(error as Error).message;}};
  window.addEventListener('factory-profile-changing',clear);window.addEventListener('pagehide',clear);
  for(const event of ['factory-parent-guidance','factory-profile','factory-learning-settings'])window.addEventListener(event,render);
