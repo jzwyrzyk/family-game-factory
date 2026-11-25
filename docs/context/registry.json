@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:26:14.095Z",
-      "sourceDigest": "02ef2e95ef3315a57f5bf3e189fb2a8f878cb56f7dce390bb915e62366b114a9",
+      "reviewedAt": "2026-11-25T01:37:11.072Z",
+      "sourceDigest": "54082a8d96d58efd645ce96328ff67ee4f76552011e21ec47c9833736b7f5e63",
       "reviewOutcome": "updated",
-      "reviewReason": "Parent handoff and reporting preserve the new curriculum and graphical scene changes from the preceding review stages.",
+      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -406,10 +406,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "b200b551e6ad0a352f759bb480aebb748e7863b5053479f2073b84f686bb1876",
-      "reviewedAt": "2026-11-25T01:35:59.005Z",
+      "sourceDigest": "27c4e7fa6f3025dff65335a284d02dd6a79259ead7c5fd0e2a999134a77971bb",
+      "reviewedAt": "2026-11-25T01:37:11.429Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The young learner journey and parent view retain the first-move observation on its own project and revision. Existing operational procedures and acceptance commands still apply to this change.",
+      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -675,10 +675,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T14:41:57.748Z",
-      "sourceDigest": "cb61afbc5c3fabd5edbfea8848b8dcc04ef11de5b4af798554270944eb3fb562",
+      "reviewedAt": "2026-11-25T01:37:11.473Z",
+      "sourceDigest": "1b3859e5f2fd331ed8b3cb442cbb85e38426813a814283e9774d64d526bd3c35",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the default-off Adult Private policy, existing status/job API diagnostics and private claim header against gateway admission and OpenAPI. Invalid premium settings preserve saved-revision/service routes. Architecture and premium contract separate configured, active and observed provider states; no credential, endpoint or live service change.",
+      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -728,10 +728,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:15:46.583Z",
-      "sourceDigest": "ba1aff63e84b717d5eb511c3927767db252983ddf706c58a7370fec0d1375bce",
+      "reviewedAt": "2026-11-25T01:37:11.539Z",
+      "sourceDigest": "64f11110ea1d181ceecac4ce1966086cc575a9d3aad0d828e2a6c49dae397b1b",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed family handoff, generation restrictions, local coding and games, privacy contracts and declared prompt delivery in parent reports.",
+      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -824,10 +824,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "9d13ae654b9f9d4f187374e14a4a74cad52397eeba1354091d984daad8b18b47",
-      "reviewedAt": "2026-11-25T01:15:46.736Z",
+      "sourceDigest": "03686c7668d00ce04c830f3d085ffb91c3b991baaa0edc5bfda4bd0cc9d226aa",
+      "reviewedAt": "2026-11-25T01:37:11.629Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed family handoff, generation restrictions, local coding and games, privacy contracts and declared prompt delivery in parent reports.",
+      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:35:59.065Z",
-      "sourceDigest": "055eab9eb2244e197baefeb57fca24b62acaab79ab3ebc4d3fa083e4cd4cc8ce",
+      "reviewedAt": "2026-11-25T01:37:11.719Z",
+      "sourceDigest": "3b2e505a38bb3d68bd7e0ad6d261d29c618ee74e69bbfa59ae63a6052490cef1",
       "reviewOutcome": "updated",
-      "reviewReason": "The young learner journey and parent view retain the first-move observation on its own project and revision.",
+      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
