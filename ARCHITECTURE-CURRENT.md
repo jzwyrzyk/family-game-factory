@@ -224,6 +224,14 @@ Native checkpoints mount into `learning-modal-card`, a layout-only host distinct
 
 The shared [friendly narrator](src/speech/friendly-narrator.ts) supplies Language reading, Studio Hear reply and Idea Workshop directions. It chooses a recognized female local English voice, favors higher-quality named variants, waits for asynchronous voice discovery, and cancels stale pending/active requests. A missing eligible voice receives a short visible notice instead of arbitrary default speech. Language records read-aloud support on playback start. This adds no provider, recording path, endpoint or persistence; browser/device voice quality remains unverified until heard on the actual device.
 
+## PR166 storage continuation — branch implementation
+
+The [storage inventory and architecture](docs/storage/README.md) records the current boundaries, measured synthetic baseline and remaining work. Local Studio creation/copy now journals exact staged workspace, notebook and optional profile images under the existing writer lock. Startup rolls pending writes back before use; committed markers finish cleanup. Adult recovery waits for a fresh authenticated grant. Family replacement refuses a pending project journal. Construction and learning-format copies join the same transaction; no actual family data migration occurs.
+
+Coach reply messages and design/provenance now share one notebook write. Remote copies retain an origin-bound request ID before POST and use read-only receipt lookup after uncertainty; the compatible gateway must precede the frontend. Notifications and the visible Check my copy action expose retained requests after reload without replaying the mutation. Native validation uses indexed ancestry; notebook validation is cached only for exact unchanged source bytes. Existing count/resource caps remain.
+
+An isolated IndexedDB record/outbox adapter, default-off Firestore per-record continuity service and optional private-game manifest encoder prepare the longer-term hybrid. They are not application migration, activated sync, complete automated backup or garbage collection. The split encoder defaults off; old inline/whole-artifact data still decode. [Rollout and remaining repository work](docs/storage/ROLLOUT.md) identify compatibility floors, reference completeness and approval boundaries. No new resources, paid calls, retention policy or production activation are included.
+
 ## Data ownership and persistence
 
 The separate [Jem Pals contract](docs/pals/README.md) adds local collectible companions to the rewards-enabled application. The catalog, growth projection and transactional store live in `src/pals/`; the trusted host connects them to Studio and Creation. No remote service or generation-worker capability is added by this feature.

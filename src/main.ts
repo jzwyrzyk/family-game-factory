@@ -1,3 +1,4 @@
+import {recoverLocalProjects} from './storage/project-recovery';
 import './brand/icons.css';
 import './learning/early/style.css';
 import './speech/read-aloud.css';
@@ -31,6 +32,7 @@ import {recoverRewardBackup,hasPendingRewardBackup,installRewardBackupControls} 
 setRewardSourceMaintenance(true);
 void installRewardWriteGuard().then(async writable=>{
   if(!writable)return;
+  if(recoverLocalProjects(localStorage)==='rolled-back'){location.reload();return;} // Legacy profiles were read during module initialization.
   await recoverRewardBackup();
   if(hasPendingRewardBackup())return; // Recovery is reloading the document.
   setRewardSourceMaintenance(false);

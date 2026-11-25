@@ -1,0 +1,54 @@
+{
+  "results": [
+    {
+      "device": "desktop",
+      "rendererBoundaries": 5,
+      "writerLock": true,
+      "indexed": [
+        "stale rejected",
+        "atomic rollback",
+        "profile revoked"
+      ]
+    },
+    {
+      "device": "tablet",
+      "rendererBoundaries": 5,
+      "writerLock": true,
+      "indexed": [
+        "stale rejected",
+        "atomic rollback",
+        "profile revoked"
+      ]
+    },
+    {
+      "device": "phone",
+      "rendererBoundaries": 5,
+      "writerLock": true,
+      "indexed": [
+        "stale rejected",
+        "atomic rollback",
+        "profile revoked"
+      ]
+    }
+  ],
+  "benchmark": [
+    {
+      "records": 1000,
+      "page100MedianMs": 4.899999999906868,
+      "page100P95Ms": 8.199999999953434,
+      "saveMs": 1.6000000000931323
+    },
+    {
+      "records": 10000,
+      "page100MedianMs": 12.5,
+      "page100P95Ms": 37,
+      "saveMs": 14.699999999953434
+    },
+    {
+      "records": 50000,
+      "page100MedianMs": 5.299999999930151,
+      "page100P95Ms": 16.599999999976717,
+      "saveMs": 2
+    }
+  ]
+}

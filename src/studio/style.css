@@ -461,3 +461,8 @@ body.studio-review #page-creations #savedRemixes{color:var(--jems-muted)}
 .early-journey .studio-workspace[data-mobile-panel=game]{grid-template-columns:minmax(0,1fr)}
 .early-journey .studio-menu-link,.early-journey #studioNew{min-height:72px}
 .early-journey .studio-home-intro>p,.early-journey #studioNew small{display:none}
+/* Recovery must remain readable on the actual composed phone surface. */
+.studio-copy-recovery{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:16px;margin:12px 0;background:#fff6d9;color:#493b1c;border:1px solid #c7ab69;border-radius:12px;font-size:var(--jems-child-body,20px)}
+.studio-copy-recovery[hidden]{display:none}
+.studio-copy-recovery p{margin:0;flex:1 1 220px;color:#493b1c;font-size:var(--jems-child-body,20px)}
+#studioCopyRecovery .studio-button{min-height:48px;font-size:var(--jems-child-label,18px);color:#493b1c;background:#fff;border:1px solid #947b40}

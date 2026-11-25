@@ -122,7 +122,8 @@
     "docs/game-intelligence/premium-benchmark/*.md",
     "docs/development/*.md",
     "infra/nonproduction/*.md",
-    "docs/development/evidence/*.md"
+    "docs/development/evidence/*.md",
+    "docs/storage/*.md"
   ],
   "areas": [
     {
@@ -1383,10 +1384,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T20:54:53.956Z",
-      "sourceDigest": "0bbbe4a7991101120d756bb7410ec66b372b46aa53313cf249bd7aeb584d7cb9",
+      "reviewedAt": "2026-11-24T22:27:04.816Z",
+      "sourceDigest": "d93b9d43785ae5e93b8633c819ffccc2f78188010f55e114c8ce4b96b95cd625",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled both registry source maps and documentation histories; routed new premium offline Python tools and completion handoff while preserving current maintenance requirements.",
+      "reviewReason": "Registered new storage source and document routes, including checking all storage Markdown links; preserved historical prototype/release references and distinguished incomplete migration and activation evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1670,6 +1671,27 @@
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
+    },
+    {
+      "id": "storage",
+      "documents": [
+        "docs/storage/*.md",
+        "docs/child-continuity/F06-STORAGE-RECOVERY-EXPERIMENT.md",
+        "docs/child-continuity/RELIABILITY-2026-11-23.md",
+        "ARCHITECTURE-CURRENT.md"
+      ],
+      "sources": [
+        "src/storage/**",
+        "server/storage/**",
+        "infra/storage/**",
+        "tools/storage-*",
+        "docs/storage/**"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "8b376cd6f135b4fbd1f410d3e6197414f1a19d3309ac220b8109fa2fc277916e",
+      "reviewedAt": "2026-11-24T22:45:14.633Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Recorded all six durable boundaries for the three-source journal and retained prior five-boundary benchmark evidence. Updated current IndexedDB samples without claiming app migration, stable latency SLA or live reliability."
     }
   ]
 }
