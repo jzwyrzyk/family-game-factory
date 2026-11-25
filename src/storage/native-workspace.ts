@@ -15,8 +15,13 @@ export class NativeWorkspace {
  static async open(storage:StoragePort,owner:()=>string){
   const captured=owner();let indexed:IndexedNativeStore|null=null;
   if(indexedStoragePreview()){
-   const candidate=await IndexedNativeStore.open(await nativeScope(captured),()=>{if(owner()!==captured)throw Error('The player changed. Reopen this game in its own profile.');assertRewardSourceWritable();});
-   if(await candidate.isActive())indexed=candidate;else candidate.close();
+   const scope=await nativeScope(captured),check=()=>{if(owner()!==captured)throw Error('The player changed. Reopen this game in its own profile.');assertRewardSourceLockHeld();};
+   const candidate=await IndexedNativeStore.open(scope,check);
+   try{if(await candidate.isActive()){
+    const {recoverStudioNative}=await import('./studio-native-transaction');
+    if(await recoverStudioNative(candidate.records,storage,check,captured)){location.reload();throw Error('Your saved copy is recovered. Reopening Jems…');}
+    indexed=await IndexedNativeStore.open(scope,()=>{check();assertRewardSourceWritable();});
+   }}finally{candidate.close();}
   }
   return new NativeWorkspace(indexed?null:new RevisionStore(storage),indexed,owner,captured);
  }

@@ -1,5 +1,5 @@
 import {IndexedRecords} from './indexed-records';
-import type {RecordScope,RecordChange,DurableRecord} from './record-contract';
+import type {RecordScope,RecordChange,DurableRecord,RecordReceipt} from './record-contract';
 import {validateWorkspace,type Project,type Revision,type PlayRecord,type Workspace} from '../factory/workspace';
 import {defaults,validateConfig,isGameId} from '../runtime/manifests';
 import type {GameId,Mechanics,PlayOutcome} from '../runtime/types';
@@ -125,6 +125,42 @@ export class IndexedNativeStore {
   this.assertAuthorized();if(!approved())throw Error('Private copies need current grown-up permission.');const rows=await this.projectRecords(projectId);
   for(let i=0;i<rows.length;i+=40){if(!approved())throw Error('Private copy permission changed.');const changes=rows.slice(i,i+40).map(row=>this.change(row.collection,row.id,row.value,row.version));await this.records.commit({id:crypto.randomUUID(),scope:this.scope,changes},{enqueue:true});}
   this.enablePrivateCopies(projectId,approved);return rows.length;
+ }
+ private async remoteChanges(rows:DurableRecord[]):Promise<RecordChange[]>{
+  await this.ready();if(!rows.length||rows.length>5000||new Set(rows.map(r=>r.collection+':'+r.id)).size!==rows.length)throw Error('Invalid private game copy.');
+  const current=await this.snapshot(),projects=new Map(current.projects.map(p=>[p.id,p])),revisions=new Map(current.revisions.map(r=>[r.id,r])),plays=new Map(current.plays.map(p=>[p.id,p]));
+  const incomingConfigs=new Map(rows.filter(r=>r.collection===CONFIGS).map(r=>[r.id,r]));const changes:RecordChange[]=[];
+  for(const row of rows){
+   if(row.deleted)throw Error('A private game was removed elsewhere. Review its saved copies before removing local work.');
+   if(![PROJECTS,REVISIONS,CONFIGS,PLAYS].includes(row.collection)&&!row.collection.startsWith('native-history:'))throw Error('Unknown private game record.');
+   if(await this.records.hasPending(row.collection,row.id))throw Error('STORAGE_CONFLICT');
+   const prior=await this.row(row.collection,row.id);
+   if(prior&&canonical(prior.value)!==canonical(row.value)&&[REVISIONS,CONFIGS].includes(row.collection)||prior&&canonical(prior.value)!==canonical(row.value)&&row.collection.startsWith('native-history:'))throw Error('The private copy conflicts with an immutable saved version.');
+   changes.push(this.change(row.collection,row.id,row.value,prior?.version??0));
+   if(row.collection===PROJECTS)projects.set(row.id,this.decodeProject(row));
+   if(row.collection===PLAYS){const play=row.value as PlayRecord;if(play.id!==row.id)throw Error('Invalid private play identity.');plays.set(row.id,copy(play));}
+   if(row.collection===CONFIGS&&await digest(JSON.stringify(row.value))!==row.id)throw Error('Private game settings failed their integrity check.');
+  }
+  for(const row of rows.filter(r=>r.collection===REVISIONS)){
+   const stored=row.value as StoredRevision,project=projects.get(stored.projectId);if(!project||stored.id!==row.id||project.owner!==this.scope.profile)throw Error('Private game owner is unavailable.');
+   const config=incomingConfigs.get(stored.configHash)??await this.row(CONFIGS,stored.configHash);if(!config||config.deleted||await digest(JSON.stringify(config.value))!==stored.configHash)throw Error('The private copy is missing verified game settings.');
+   const {configHash,...revision}=stored;revisions.set(row.id,{...copy(revision),config:validateConfig(project.game,config.value)});
+  }
+  for(const row of rows.filter(r=>r.collection.startsWith('native-history:'))){const revision=revisions.get((row.value as {revisionId:string}).revisionId);if(!revision||row.collection!==key(revision.projectId)||row.id!==historyId(revision)||canonical(row.value)!==canonical({revisionId:revision.id}))throw Error('Private revision history is incomplete.');}
+  for(const row of rows.filter(r=>r.collection===REVISIONS)){const revision=revisions.get(row.id)!;if(!rows.some(pointer=>pointer.collection===key(revision.projectId)&&pointer.id===historyId(revision))&&!await this.row(key(revision.projectId),historyId(revision)))throw Error('A private saved version is missing its history entry.');}
+  validateWorkspace({version:2,projects:[...projects.values()],revisions:[...revisions.values()],plays:[...plays.values()]});return changes;
+ }
+ async validateRemoteGraph(rows:DurableRecord[]):Promise<void>{await this.remoteChanges(rows);}
+ /** A feed is staged by the transport first. Complete graph validation precedes
+  * one atomic local publication; readers never see half a downloaded game. */
+ async applyRemoteGraph(rows:DurableRecord[],operation:string):Promise<RecordReceipt>{
+  const receiptKey='remote-'+await digest(operation),payloadHash=await digest(canonical(rows)),prior=await this.row(CONTROL,receiptKey),receipt=await this.records.receipt(operation);
+  if(receipt){if((prior?.value as {payloadHash?:string})?.payloadHash!==payloadHash)throw Error('STORAGE_OPERATION_REUSED');return receipt;}
+  const changes=await this.remoteChanges(rows);
+  // A no-op still receives a durable identity so interrupted mapping updates can
+  // reconcile the exact local publication without replaying user-created work.
+  changes.push(this.change(CONTROL,receiptKey,{operation,payloadHash},prior?.version??0));
+  return this.records.restoreLocal({id:operation,scope:this.scope,changes});
  }
  /** Restore a reviewed native snapshot in one local transaction. Retained
   * revisions and unrelated projects are never removed. Pointer changes are

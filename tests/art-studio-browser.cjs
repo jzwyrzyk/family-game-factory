@@ -38,7 +38,7 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   await noOverflow(page,'empty desktop studio');
   await upload(page,'Jellybean racer.png','car');const before=(await count(page))[0];assert.equal(before.name,'Jellybean racer');
   await page.getByLabel('Artwork collection',{exact:true}).selectOption('vehicle');
-  await page.evaluate(()=>{const original=IDBObjectStore.prototype.getAll;window.__restoreArtRead=()=>{IDBObjectStore.prototype.getAll=original;};IDBObjectStore.prototype.getAll=function(...args){if(this.name==='drawings'&&this.transaction.mode==='readonly'){window.__restoreArtRead();throw Error('Art shelf could not refresh. Try opening it again.');}return original.apply(this,args);};});
+  await page.evaluate(()=>{const original=IDBIndex.prototype.openCursor;window.__restoreArtRead=()=>{IDBIndex.prototype.openCursor=original;};IDBIndex.prototype.openCursor=function(...args){if(this.objectStore.name==='drawingMetadata'&&this.objectStore.transaction.mode==='readonly'){window.__restoreArtRead();throw Error('Art shelf could not refresh. Try opening it again.');}return original.apply(this,args);};});
   await page.getByRole('button',{name:'Save details',exact:true}).click();await page.waitForFunction(()=>document.getElementById('artStatus').textContent==='Art shelf could not refresh. Try opening it again.');
   assert.equal((await count(page))[0].category,'vehicle','metadata remains saved when shelf refresh fails');
   assert.equal(await page.locator('#artStatus').getAttribute('role'),'alert','refresh error stays visible instead of false success');

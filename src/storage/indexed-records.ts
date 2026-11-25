@@ -20,6 +20,7 @@ export class IndexedRecords {
    };
   };r.onerror=()=>reject(r.error);r.onblocked=()=>reject(Error('STORAGE_UPGRADE_BLOCKED'));r.onsuccess=()=>{try{assertAuthorized();r.result.onversionchange=()=>r.result.close();resolve(new IndexedRecords(r.result,{...scope},assertAuthorized));}catch(e){r.result.close();reject(e);}};});
  }
+ scopeIdentity():RecordScope{return {...this.scope};}
  close(){this.db.close();}
  async commit(operation:RecordOperation,options:{enqueue?:boolean}={}):Promise<RecordReceipt>{
   const op=structuredClone(operation),fingerprint=await operationFingerprint(op);return this.commitVerified(op,fingerprint,options.enqueue!==false);
