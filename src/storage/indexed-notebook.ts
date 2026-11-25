@@ -1,10 +1,10 @@
 import {IndexedRecords} from './indexed-records';
 import {recordId,type DurableRecord,type RecordChange,type RecordScope} from './record-contract';
-import {StudioNotebook,STUDIO_KEY,validateNotebook,type Notebook,type StudioSession,type ConversationChapter} from '../studio/notebook';
+import {StudioNotebook,STUDIO_KEY,NOTEBOOK_CAPACITY,validateNotebook,type Notebook,type StudioSession,type ConversationChapter} from '../studio/notebook';
 import {publishSourceEvidence,type SourceEvidenceSignal} from '../problem-solving/signals';
 import {builderJourney,gemStage,type BuilderJourney,type GemStage} from '../brand/gem-progress';
-import {hasMeaningfulCreation,recommendNext,readyGuidedExperiment,type NextRecommendation,type GuidePreferences} from '../studio/guidance';
-import {deriveStudioNotifications,type StudioNotification,type StudioNotificationContext,type StudioNotificationPreferences} from '../studio/notifications';
+import {hasMeaningfulCreation,recommendNext,readyGuidedExperiment,freshGuidance,type NextRecommendation,type GuidePreferences} from '../studio/guidance';
+import {deriveStudioNotifications,freshStudioNotificationPreferences,type StudioNotification,type StudioNotificationContext,type StudioNotificationPreferences} from '../studio/notifications';
 
 const CONTROL='notebook-control',CHUNKS='notebook-chunks',PAYLOADS='notebook-payloads';
 const CHUNK_UNITS=24_000,MAX_PAYLOAD_BYTES=8*1024*1024;
@@ -35,12 +35,20 @@ export interface PreparedNotebookTransaction<T>{
 interface Pointer {id:string;owner:string;payload:string;card?:NotebookCard}
 export const notebookCard=(s:StudioSession,expanded:StudioSession=s):NotebookCard=>({id:s.id,owner:s.owner,name:s.name,game:s.game,projectId:s.projectId,remoteId:s.remoteId,updated:s.updated,archived:!!s.archived,playOnly:!!s.playOnly,resumeDismissed:!!s.resumeDismissed,hasDraft:!!s.draft,messageCount:s.messages.length,pendingCopy:!!s.pendingCopy,pendingSubmission:!!s.pendingSubmission,jobStatus:s.job?.status??null,gemStage:gemStage(s),meaningfulCreation:hasMeaningfulCreation([expanded],s.owner),hasCandidate:!!s.candidate,experimentCount:s.experiments?.length??0,readyExperiment:!!readyGuidedExperiment(s),needsReadyRecovery:s.job?.status==='ready'&&!!s.job.revisionId&&(!!s.pendingExperiment||!s.experiments?.some(e=>e.candidate.remoteId===s.job!.revisionId)),jobApi:s.job?.api??null});
 
-/** Derivation runs at commit time, using the existing presentation logic. */
+/** Read-only view over an already validated source; pure projections do not
+ * need to serialize/reparse or clone every original word to inspect it. */
+export function notebookReadView(value:Notebook,session:StudioSession):StudioSession {
+ const earlier:ConversationChapter[]=[],seen=new Set<string>();let id:string|null|undefined=session.previousConversationId;
+ while(id){if(seen.has(id))throw Error('NOTEBOOK_CHAPTER_CHAIN_INVALID');seen.add(id);const chapter=value.conversationChapters?.find(c=>c.id===id&&c.owner===session.owner);if(!chapter)throw Error('NOTEBOOK_CHAPTER_CHAIN_INVALID');earlier.push(chapter);id=chapter.previousId;}
+ return earlier.length?{...session,messages:[...earlier.reverse().flatMap(c=>c.messages),...session.messages]}:session;
+}
+/** Derivation runs at commit time against a validated source, using the existing
+ * pure presentation rules. No mutation or defensive whole-history copy occurs. */
 export function deriveNotebookSummary(value:Notebook,owner:string):NotebookSummary {
- const raw=JSON.stringify(value),book=new StudioNotebook({getItem:key=>key===STUDIO_KEY?raw:null,setItem:()=>{throw Error('NOTEBOOK_SUMMARY_READONLY');}}),expanded=book.list(owner),preferences=book.notificationPreferences(owner);
+ const expanded=value.sessions.filter(s=>s.owner===owner).map(s=>notebookReadView(value,s)).sort((a,b)=>b.updated.localeCompare(a.updated)),preferences=value.notifications?.[owner]??freshStudioNotificationPreferences(),chapters=value.conversationChapters?.length??0;
  const continuationCandidates:NextRecommendation[]=[];let available=expanded;
  for(let next=recommendNext(available,owner,value.active[owner]);next;next=recommendNext(available,owner,value.active[owner])){continuationCandidates.push(next);available=available.filter(s=>s.id!==next!.sessionId);}
-  const summary:NotebookSummary={owner,active:value.active[owner]??null,journey:builderJourney(expanded,owner),meaningfulCreation:hasMeaningfulCreation(expanded,owner),recommendation:continuationCandidates[0]??null,continuationCandidates,capacity:book.capacity(),guidance:book.guidance(owner),avatar:book.avatar(owner),notificationPreferences:preferences,notificationVariants:expanded.map(session=>({id:session.id,items:Array.from({length:8},(_,mask)=>deriveStudioNotifications([session],owner,{unknownSessionIds:new Set(mask&1?[session.id]:[]),unconfirmedSessionIds:new Set(mask&2?[session.id]:[]),sendingSessionIds:new Set(mask&4?[session.id]:[])},preferences)[0]??null)}))};
+  const summary:NotebookSummary={owner,active:value.active[owner]??null,journey:builderJourney(expanded,owner),meaningfulCreation:hasMeaningfulCreation(expanded,owner),recommendation:continuationCandidates[0]??null,continuationCandidates,capacity:{limit:NOTEBOOK_CAPACITY,retained:value.sessions.length+chapters,active:value.sessions.filter(s=>!s.archived).length,archived:value.sessions.filter(s=>s.archived).length,chapters,available:NOTEBOOK_CAPACITY-value.sessions.length-chapters},guidance:value.guidance?.[owner]??freshGuidance(),avatar:value.avatars?.[owner]??null,notificationPreferences:preferences,notificationVariants:expanded.map(session=>({id:session.id,items:Array.from({length:8},(_,mask)=>deriveStudioNotifications([session],owner,{unknownSessionIds:new Set(mask&1?[session.id]:[]),unconfirmedSessionIds:new Set(mask&2?[session.id]:[]),sendingSessionIds:new Set(mask&4?[session.id]:[])},preferences)[0]??null)}))};
  return summary;
 }
 
@@ -145,9 +153,7 @@ export class IndexedNotebook {
   return {schema:1,generation,meta:await this.encode(meta),summary:await this.encode(deriveNotebookSummary(value,this.scope.profile)),sessions:sessions.map(s=>s.id),chapters:(conversationChapters??[]).map(c=>c.id),hasChapters:conversationChapters!==undefined,sourceHash};
  }
  private async preparePointer(value:StudioSession|ConversationChapter,notebook:Notebook):Promise<Pointer>{
-  let expanded=value as StudioSession;
-  if('game'in value&&value.previousConversationId){const earlier:ConversationChapter[]=[],seen=new Set<string>();let id:string|null|undefined=value.previousConversationId;while(id){if(seen.has(id))throw Error('NOTEBOOK_CHAPTER_CHAIN_INVALID');seen.add(id);const page=notebook.conversationChapters?.find(c=>c.id===id&&c.owner===value.owner);if(!page)throw Error('NOTEBOOK_CHAPTER_CHAIN_INVALID');earlier.push(page);id=page.previousId;}expanded={...value,messages:[...earlier.reverse().flatMap(c=>c.messages),...value.messages]};}
-  return {id:value.id,owner:value.owner,payload:await this.encode(value),...('game'in value?{card:notebookCard(value,expanded)}:{})};
+  return {id:value.id,owner:value.owner,payload:await this.encode(value),...('game'in value?{card:notebookCard(value,notebookReadView(notebook,value))}:{})};
  }
  private async stageGeneration(value:Notebook,generation:string,sourceHash:string){
   for(const [collection,rows]of [[sessionCollection(generation),value.sessions],[chapterCollection(generation),value.conversationChapters??[]]] as const)for(const row of rows)await this.immutable(collection,await hash(row.id),await this.preparePointer(row,value));

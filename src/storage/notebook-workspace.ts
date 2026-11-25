@@ -1,7 +1,7 @@
 import {StudioNotebook,STUDIO_KEY,NOTEBOOK_CAPACITY,CONVERSATION_PAGE_CAPACITY,NotebookCapacityError,ConversationCapacityError,type StudioSession,type Notebook} from '../studio/notebook';
 import {DESIGN_IDEA_CAPACITY,DesignCapacityError} from '../studio/design';
 import type {StoragePort} from '../factory/workspace';
-import {IndexedNotebook,deriveNotebookSummary,notebookCard,type NotebookCard,type NotebookSummary} from './indexed-notebook';
+import {IndexedNotebook,deriveNotebookSummary,notebookCard,notebookReadView,type NotebookCard,type NotebookSummary} from './indexed-notebook';
 import {indexedStoragePreview,nativeScope} from './native-workspace';
 import {assertRewardSourceWritable,assertRewardSourceLockHeld,setRewardSourceMaintenance} from '../rewards/write-guard';
 import type {StudioNotificationContext,StudioNotification} from '../studio/notifications';
@@ -77,7 +77,7 @@ export class NotebookWorkspace {
    const version=await this.indexed.version();cards=[];let cursor:string|null=null;
    do {const page=await this.indexed.page(cursor,24);cards.push(...page.items);cursor=page.next;if(cards.length>NOTEBOOK_CAPACITY)throw Error('NOTEBOOK_INDEX_INVALID');}while(cursor);
    view=await this.indexed.summary();facts=await this.indexed.pendingRewards(owner);if(version!==await this.indexed.version())throw Error('STORAGE_CONFLICT');
-  }else {const source=this.legacy!.read();cards=source.sessions.filter(s=>s.owner===owner).map(s=>notebookCard(s,this.legacy!.get(s.id,owner)));view=deriveNotebookSummary(source,owner);facts=this.legacy!.pendingRewards(owner);}
+  }else {const source=this.legacy!.read();cards=source.sessions.filter(s=>s.owner===owner).map(s=>notebookCard(s,notebookReadView(source,s)));view=deriveNotebookSummary(source,owner);facts=source.rewardOutbox?.filter(f=>f.owner===owner)??[];}
   this.check(owner);this.cards=cards.sort((a,b)=>b.updated.localeCompare(a.updated)||a.id.localeCompare(b.id));this.view=view;this.facts=facts;
   if(this.selected&&!cards.some(c=>c.id===this.selected))this.selected=null;if(!this.selected)this.selected=view.active;
   const selected=this.selected,epoch=this.selectionEpoch,required=new Set([...(selected?[selected]:[]),...(view.active?[view.active]:[]),...(this.transitionPrevious&&cards.some(c=>c.id===this.transitionPrevious)?[this.transitionPrevious]:[]),...cards.filter(c=>c.pendingCopy||c.pendingSubmission||c.needsReadyRecovery||['queued','building','testing'].includes(c.jobStatus??'')).slice(0,8).map(c=>c.id)]);
