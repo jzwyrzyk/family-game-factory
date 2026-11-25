@@ -5,7 +5,6 @@ interface StudioNavigationOptions {
   nav: HTMLElement;
   headerTools: HTMLElement;
   helpButton: HTMLButtonElement;
-  rewards: HTMLElement;
   subjects: HTMLElement;
   openArt(): void;
   openParent(): void;
@@ -16,7 +15,7 @@ interface StudioNavigationOptions {
  * The dialog stays inside nav so existing current-route renderers still see it.
  */
 export function installStudioNavigation(options: StudioNavigationOptions) {
-  const { nav, headerTools, helpButton, rewards, subjects } = options;
+  const { nav, headerTools, helpButton, subjects } = options;
   const home = nav.querySelector<HTMLButtonElement>('#studioNavHome');
   const create = nav.querySelector<HTMLButtonElement>('#studioNavCreate');
   if (!home || !create) throw Error('Studio navigation needs its existing home and creation routes.');

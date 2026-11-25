@@ -1,3 +1,4 @@
+import { createDashboardCard } from '../brand/dashboard-card';
 import { createJourneyGem, createJourneyRankThumbnail, type JourneyState } from '../brand/journey';
 import { GEM_MILESTONE_START, REWARD_AMOUNTS, type RewardGrant, type RewardsSummary } from './model';
 import { createGuideCard, type GuideHost } from '../studio/guide-card';
@@ -297,15 +298,12 @@ export type RewardsWidgetOptions = {
 
 /** One compact entry point. Reading it never grants or replays a reward. */
 export function createRewardsWidget(options: RewardsWidgetOptions) {
-  const element = button('jems-rewards-widget', '', options.onOpen);
+  const { element, artwork, detail } = createDashboardCard('My Gems', '', options.onOpen);
   element.id = 'jemsRewardsWidget';
-  const gem = createJourneyGem(1);
-  const count = node('strong');
-  const label = node('span', 'jems-rewards-widget-label', 'Gems');
-  element.append(gem, count, label);
+  artwork.append(createJourneyGem(1));
   const update = (summary: RewardsSummary, status: { loading?: boolean; error?: string } = {}) => {
-    count.textContent = status.loading ? '…' : status.error ? '—' : number(summary.lifetimeGems);
-    element.setAttribute('aria-label', status.loading ? 'My rewards, loading gems' : status.error ? 'My rewards, gems unavailable' : `My rewards, ${number(summary.lifetimeGems)} gems earned`);
+    detail.textContent = status.loading ? 'Counting gems…' : status.error ? 'Gems unavailable'
+      : `${number(summary.lifetimeGems)} ${summary.lifetimeGems === 1 ? 'gem' : 'gems'}`;
     element.setAttribute('aria-busy', String(!!status.loading));
     element.dataset.owner = summary.owner;
   };

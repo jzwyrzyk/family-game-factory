@@ -1,7 +1,7 @@
 import {familyFetch} from './session';
 import {identifyBuildRequest,validateBuildSubmission,type BuildSubmission} from './submission';
 import type {CreationProject} from '../creation/model';
-import {validateGeneratedCreationManifest} from '../creation/projects';
+import {validateSavedCreationManifest} from '../creation/projects';
 export type JobStatus='draft'|'queued'|'building'|'testing'|'ready'|'failed'|'cancelled';
 export interface BuilderConfig {version:1;mode:'unavailable'|'remote';apiBaseUrl?:string;previewOrigin?:string}
 export interface RequestChange {gameId:string;baseRevisionId:string|null;prompt:string;config?:Record<string,number|boolean>}
@@ -153,7 +153,7 @@ export class BuilderClient {
   const token=this.generation,data=await this.api('/v1/revisions/'+encodeURIComponent(revisionId)+'/creation');
   if(token!==this.generation)throw Error('PROFILE_CHANGED');
   if(!data||data.revisionId!==revisionId||typeof data.projectId!=='string'||!/^[\w-]{1,100}$/.test(data.projectId)||['__proto__','constructor','prototype'].includes(data.projectId)||!Object.hasOwn(data,'manifest'))throw Error('INVALID_CREATION_MANIFEST');
-  return {revisionId,projectId:data.projectId,manifest:data.manifest===null?null:validateGeneratedCreationManifest(data.manifest)};
+  return {revisionId,projectId:data.projectId,manifest:data.manifest===null?null:validateSavedCreationManifest(data.manifest)};
  }
  async preview(revisionId:string):Promise<Preview>{
   if(!/^[\w-]{1,100}$/.test(revisionId))throw Error('UNSAFE_PREVIEW');

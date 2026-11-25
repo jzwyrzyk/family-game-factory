@@ -1,3 +1,4 @@
+import { createDashboardCard } from '../brand/dashboard-card';
 import {hasParentGuidance,installParentGuidance} from '../family-beta/guidance';
 import {isEarlyGrade} from '../learning/grades';
 import {createEarlyHandoff,FAMILY_CREATION_LABEL} from './early-handoff';
@@ -436,7 +437,6 @@ export async function installStudio(){
  });
  document.querySelector('main')!.append(rewardsPage.element);
  const rewardsWidget=createRewardsWidget({...rewards.state,onOpen:()=>act(openRewards)});
- headerTools.prepend(rewardsWidget.element);
  const rewardToastHost=el('div','jems-rewards-toast-host');rewardToastHost.id='jemsRewardCelebrations';document.body.append(rewardToastHost);
  let rewardToastTimer:ReturnType<typeof setTimeout>|undefined,rewardBatchTimer:ReturnType<typeof setTimeout>|undefined,pendingGrants:RewardGrant[]=[],rewardViewReady:Promise<unknown>=Promise.resolve();
  function clearRewardCelebration(){clearTimeout(rewardToastTimer);clearTimeout(rewardBatchTimer);pendingGrants=[];rewardToastHost.replaceChildren();}
@@ -1935,7 +1935,7 @@ export async function installStudio(){
   const target=connection?$('builderConnection'):$('parentDashboard')?.querySelector<HTMLElement>('h1');
   if(target){target.tabIndex=-1;focusView(target);}
  }
- installStudioNavigation({nav,headerTools,helpButton,rewards:rewardsWidget.element,subjects:learningChoice,
+ installStudioNavigation({nav,headerTools,helpButton,subjects:learningChoice,
   openArt:()=>act(()=>artStudio.open()),openParent:()=>act(async ()=>(await openParent())),
  });
  const destinations=el('nav','jems-destinations');destinations.id='studioDestinations';destinations.setAttribute('aria-label','Your Jems world');
@@ -1946,9 +1946,11 @@ export async function installStudio(){
  );
  $('studioContinue').before(destinations);
  const journeySections=installJourneySections({overview:()=>act(()=>openJourney()),pals:()=>palsInterface.open(),rewards:()=>act(openRewards),powers:()=>$('studioNavPowers').click(),scenes:()=>creation.openChallenges(),experiments:()=>practice.open()});
- const palsEntry=$('studioPalsEntry');if(palsEntry)journeySections.overview.append(palsEntry);
- journeySections.overview.append(destinationTile('journeyPowers','My Powers','Math, English & thinking adventures','./jems-workbench.svg',()=>$('studioNavPowers').click()));
- const gemCard=el('section','jems-world-gems');gemCard.append(el('h2','','My gems'),rewardsWidget.element,el('p','','See your gems & achievements'));journeySections.overview.prepend(gemCard);
+ const powersCard=createDashboardCard('My Powers','Grow your skills',()=>$('studioNavPowers').click());
+ powersCard.element.id='journeyPowers';
+ const powersArt=document.createElement('img');powersArt.src='./jems-workbench.svg';powersArt.alt='';
+ powersCard.artwork.append(powersArt);
+ journeySections.overview.append(rewardsWidget.element,palsInterface.dashboardCard,powersCard.element);
  installParentGuidance();
  refreshEarlyJourney();
  window.addEventListener('factory-parent-guidance',()=>{guidanceEpoch++;refreshEarlyJourney();if(young()){++viewIntent;coaching?.reset();clients.forEach(client=>client.disconnect());if(route==='studio'){disposeGame();page.classList.add('hidden');act(home);}}});

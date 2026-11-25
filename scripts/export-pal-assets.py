@@ -254,6 +254,9 @@ def run_export(args):
     output = Path(args.output).resolve()
     require(output.name == "jems-pals", "Output directory must be named jems-pals")
     characters, records = source_records(args.kit)
+    retired = {"luma", "zippa"}
+    characters = [c for c in characters if c["slug"] not in retired]
+    records = [r for r in records if r["slug"] not in retired]
     assets, audit_by_key = {}, {}
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as executor:
         futures = [executor.submit(export_one, record, output) for record in records]
@@ -263,7 +266,7 @@ def run_export(args):
             if index % 24 == 0 or index == len(records):
                 print(f"Verified and exported {index}/{len(records)}", file=sys.stderr, flush=True)
     manifest = {"schemaVersion": 1, "assetVersion": VERSION,
-                "scope": {"id": "original-23", "characterCount": 23, "assetCount": 184}, "characters": []}
+                "scope": {"id": "active-core-21", "characterCount": 21, "assetCount": 168}, "characters": []}
     audits = []
     for character in characters:
         item = {**character, "forms": {}}
@@ -275,7 +278,7 @@ def run_export(args):
             audits.extend(audit_by_key[(character["slug"], form, state)] for state in STATES)
         manifest["characters"].append(item)
     expected_files = {output / Path(a["url"]).relative_to("jems-pals") for a in assets.values()}
-    actual_files = {p for slug in IDENTITIES for p in (output / slug).rglob("*.webp")}
+    actual_files = {p for slug in (set(IDENTITIES) - retired) for p in (output / slug).rglob("*.webp")}
     require(actual_files == expected_files, "Unregistered prior export exists; inspect it instead of silently deleting files")
     manifest_path = output / "manifest.json"
     write_json(manifest_path, manifest)
@@ -285,8 +288,8 @@ def run_export(args):
               "sourceKitPackageVersion": "2.9", "manifestSHA256": file_digest(manifest_path),
               "encoder": {"pillow": PIL.__version__, "libwebp": features.version("webp"),
                           "lossless": True, "quality": 100, "method": 6, "exact": True},
-              "counts": {"characters": 23, "forms": 46, "neutral": 46, "emotions": 138,
-                         "assets": 184, "assetsWithTransparency": sum(a["alpha"] for a in assets.values())},
+              "counts": {"characters": 21, "forms": 42, "neutral": 42, "emotions": 126,
+                         "assets": 168, "assetsWithTransparency": sum(a["alpha"] for a in assets.values())},
               "bytes": {"sourcePNG": source_bytes, "exportedWebP": exported_bytes,
                         "manifest": manifest_path.stat().st_size, "saved": source_bytes - exported_bytes,
                         "reductionPercent": (1 - exported_bytes / source_bytes) * 100},
@@ -305,14 +308,14 @@ def run_verify(args):
     manifest = json.loads(manifest_path.read_text())
     output = manifest_path.parent
     require(manifest["schemaVersion"] == 1 and manifest["assetVersion"] == VERSION, "Unsupported manifest")
-    require(manifest["scope"] == {"id": "original-23", "characterCount": 23, "assetCount": 184}, "Unexpected scope")
+    require(manifest["scope"] == {"id": "active-core-21", "characterCount": 21, "assetCount": 168}, "Unexpected scope")
     sources = {}
     if args.kit:
         _, records = source_records(args.kit)
         sources = {(r["slug"], r["form"], r["expression"]): r for r in records}
     audits = []
     seen_slots = set()
-    require(len(manifest["characters"]) == 23, "Expected 23 original characters")
+    require(len(manifest["characters"]) == 21, "Expected 21 active characters")
     for character in manifest["characters"]:
         require((character["characterKey"], character["speciesId"]) == IDENTITIES.get(character["slug"]), "Character identity mismatch")
         require(set(character["forms"]) == set(FORM_MAP.values()), "Expected two current forms")
@@ -347,7 +350,7 @@ def run_verify(args):
                     require(form_data["neutralSourceSHA256"] == record["neutralSourceSHA256"], "Wrong own-form neutral binding")
                     audit["freshSourcePixelComparison"] = True
                 audits.append(audit)
-    require(len(audits) == 184, "Expected 184 audited assets")
+    require(len(audits) == 168, "Expected 168 audited assets")
     report = {"status": "Pass", "assetVersion": VERSION, "manifestSHA256": file_digest(manifest_path),
               "decodedAssets": len(audits), "freshSourcePNGComparison": bool(sources),
               "allDecodedPixelsMatch": True, "allAlphaValuesMatch": True,

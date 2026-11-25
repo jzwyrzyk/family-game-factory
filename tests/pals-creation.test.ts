@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { addPalToProject, createPalPlayground, CREATION_PAL_IDS } from '../src/pals/creation';
 import { palArtworkPath, palDefinition, palSceneAssetId } from '../src/pals/catalog';
-import { CREATION_ASSETS, creationAsset, createStarterProject, validateEditableProject, validateGeneratedCreationManifest, privateArtId } from '../src/creation/projects';
+import { validateSavedCreationManifest, CREATION_ASSETS, creationAsset, createStarterProject, validateEditableProject, validateGeneratedCreationManifest, privateArtId } from '../src/creation/projects';
 import { SceneEngine } from '../src/creation/engine';
 import { CreationStore } from '../src/creation/storage';
 import { CreationStage, CREATION_ART_LOAD_TIMEOUT_MS } from '../src/creation/stage';
@@ -46,7 +46,7 @@ test('all new Pal scenes pin the approved character, form and artwork version', 
 
 test('legacy token scenes keep their exact historical assets through edit, Keep, import and reload', () => {
   const legacy = [
-    { id: 'pal-glim', label: 'Glim', kind: 'image', url: './jems-art/gem_blue.webp', palId: 'glim' },
+    { id: 'pal-glim', label: 'Glim', kind: 'image', url: './jems-art/gem_blue.webp' },
     { id: 'pal-kip', label: 'Kip', kind: 'image', url: './jems-art/gem_mint.webp', palId: 'kip' },
     { id: 'pal-riff', label: 'Riff', kind: 'image', url: './jems-art/gem_coral.webp', palId: 'riff' },
   ];
@@ -56,13 +56,13 @@ test('legacy token scenes keep their exact historical assets through edit, Keep,
     const original = createStarterProject('blank');
     original.actors[0] = { ...original.actors[0], name: token.label, assetId: token.id };
     const saved = store.create('one', original); store.keep(saved.id, 'one', saved.headId);
-    const combined = addPalToProject(original, 'glim', 'mature').scene;
+    const combined = addPalToProject(original, 'navi', 'mature').scene;
     assert.deepEqual(combined.actors[0], original.actors[0]);
-    assert.equal(combined.actors.at(-1)!.assetId, palSceneAssetId('glim', 'mature'));
+    assert.equal(combined.actors.at(-1)!.assetId, palSceneAssetId('navi', 'mature'));
     const updated = store.save(saved.id, 'one', combined, saved.headId); store.keep(saved.id, 'one', updated.id);
     const reopened = new CreationStore(storage).load(saved.id, 'one').scene;
     assert.deepEqual(reopened, combined);
-    assert.equal(validateGeneratedCreationManifest(reopened).actors[0].assetId, token.id);
+    assert.equal(validateSavedCreationManifest(reopened).actors[0].assetId, token.id);
   }
 });
 
@@ -90,14 +90,14 @@ test('approved scene artwork stays identifiable during loading, retries after re
   } as Record<string, unknown>, { get: (target, key) => target[key as string] ?? (() => {}), set: (target, key, value) => { target[key as string] = value; return true; } });
   const canvas = { width: 800, height: 450, getContext: () => context } as unknown as HTMLCanvasElement;
   const stage = new CreationStage(canvas, undefined, message => errors.push(message));
-  const scene = createPalPlayground('glim', 'mature'), snapshot = new SceneEngine(scene).snapshot();
+  const scene = createPalPlayground('navi', 'mature'), snapshot = new SceneEngine(scene).snapshot();
   stage.render(scene, snapshot);
   assert.equal(images.length, 1);
-  assert.equal(images[0].src, new URL(palArtworkPath('glim', 'mature'), 'https://example.test/jems/').href);
+  assert.equal(images[0].src, new URL(palArtworkPath('navi', 'mature'), 'https://example.test/jems/').href);
   assert.ok(labels.includes('Loading picture…'));
   images[0].complete = true; images[0].onerror!();
   assert.ok(labels.includes('Picture unavailable'));
-  assert.match(errors[0], /Luma.*Reopen this scene/);
+  assert.match(errors[0], /Navi.*Reopen this scene/);
   assert.equal(draws.length, 0, 'A failed portrait cannot substitute a different approved image');
   stage.clear(); stage.render(scene, snapshot);
   assert.equal(images.length, 2, 'Reopening performs a new load of the exact saved asset');
@@ -106,7 +106,7 @@ test('approved scene artwork stays identifiable during loading, retries after re
   assert.equal(draw[0], recovered);
   assert.ok(Math.abs((draw[3] as number) / (draw[4] as number) - 400 / 600) < 1e-12);
   assert.equal(draw[4], scene.actors[0].size);
-  assert.equal(scene.actors[0].assetId, palSceneAssetId('glim', 'mature'));
+  assert.equal(scene.actors[0].assetId, palSceneAssetId('navi', 'mature'));
 });
 
 test('each playground visibly jumps, dances and tells a joke on tap; it does not infer mastery', () => {
@@ -210,18 +210,18 @@ test('adding a Pal preserves the existing scene, source pins and programs with i
 test('Pal insertions remain bounded, validate before mutation, and fit smaller valid stages', () => {
   const scene = createStarterProject('blank');
   scene.width = 200; scene.height = 160; scene.actors[0].x = 100; scene.actors[0].y = 80;
-  const small = addPalToProject(scene, 'glim');
+  const small = addPalToProject(scene, 'navi');
   assert.equal(small.scene.actors[1].x, 144);
   assert.equal(small.scene.actors[1].y, 102);
   assert.ok(small.scene.actors[1].size! <= 72);
   const full = createStarterProject('blank');
   while (full.actors.length < 16) full.actors.push({ ...full.actors[0], id: 'actor-' + full.actors.length });
   const before = structuredClone(full);
-  assert.throws(() => addPalToProject(full, 'glim'), /cast is full/);
+  assert.throws(() => addPalToProject(full, 'navi'), /cast is full/);
   assert.deepEqual(full, before);
   assert.throws(() => createPalPlayground('invalid' as any), /available Pal/);
-  assert.throws(() => createPalPlayground('glim', 'future' as any), /available Pal form/);
-  assert.throws(() => addPalToProject(scene, 'glim', 'future' as any), /available Pal form/);
+  assert.throws(() => createPalPlayground('navi', 'future' as any), /available Pal form/);
+  assert.throws(() => addPalToProject(scene, 'navi', 'future' as any), /available Pal form/);
 });
 
 test('Pal scenes preserve explicit Keep, drafts, owner isolation and failed-write recovery', () => {
@@ -229,7 +229,7 @@ test('Pal scenes preserve explicit Keep, drafts, owner isolation and failed-writ
   const scene = createPalPlayground('riff'), project = store.create('one', scene);
   assert.equal(project.keptId, null);
   store.keep(project.id, 'one', project.headId);
-  const draft = addPalToProject(scene, 'glim').scene;
+  const draft = addPalToProject(scene, 'navi').scene;
   store.autosave(project.id, 'one', draft, project.headId);
   const reloaded = new CreationStore(storage).load(project.id, 'one');
   assert.equal(reloaded.scene.actors.length, 1);
@@ -260,7 +260,7 @@ test('adding a Pal keeps private original/cutout hashes, exact source pins and p
     original.provenance = { createdBy: 'child', sourceKind: 'curated', sourceProjectId: 'kept-game', sourceRevisionId: 'exact-revision' };
     const project = store.create('one', original);
     store.keep(project.id, 'one', project.headId);
-    const combined = addPalToProject(original, 'glim').scene;
+    const combined = addPalToProject(original, 'navi').scene;
     assert.deepEqual(combined.actors.slice(0, original.actors.length), original.actors);
     assert.deepEqual(combined.provenance, original.provenance);
     store.autosave(project.id, 'one', combined, project.headId);
@@ -312,7 +312,7 @@ function stageImageFixture(t: TestContext) {
 
 test('playback preparation shares rendered loads and waits for hidden actors and decoded artwork', async t => {
   const { stage, images, draws } = stageImageFixture(t);
-  const scene = addPalToProject(createPalPlayground('glim'), 'kip').scene;
+  const scene = addPalToProject(createPalPlayground('navi'), 'kip').scene;
   scene.actors[1].visible = false;
   scene.actors.push({ ...scene.actors[0], id: 'same-picture-again' });
   stage.render(scene, new SceneEngine(scene).snapshot());
@@ -336,7 +336,7 @@ test('playback preparation shares rendered loads and waits for hidden actors and
 });
 
 test('playback preparation rejects an obsolete scene both before and after image readiness', async t => {
-  const { stage, images } = stageImageFixture(t), scene = createPalPlayground('glim');
+  const { stage, images } = stageImageFixture(t), scene = createPalPlayground('navi');
   await assert.rejects(stage.prepare(scene, () => false), /scene or player changed/);
   assert.equal(images.length, 0, 'An already obsolete scene cannot start new artwork requests.');
   let current = true;
@@ -347,7 +347,7 @@ test('playback preparation rejects an obsolete scene both before and after image
 });
 
 test('clearing the stage cancels pending preparation and retires late load and decode callbacks', async t => {
-  const { stage, images, draws, errors } = stageImageFixture(t), scene = createPalPlayground('glim');
+  const { stage, images, draws, errors } = stageImageFixture(t), scene = createPalPlayground('navi');
   const snapshot = new SceneEngine(scene).snapshot();
   stage.render(scene, snapshot);
   const rejected = assert.rejects(stage.prepare(scene), /scene or player changed/);
@@ -369,9 +369,9 @@ test('clearing the stage cancels pending preparation and retires late load and d
 
 test('unresponsive scene art times out once, identifies its Pal and can retry after reopening', async t => {
   t.mock.timers.enable({ apis: ['setTimeout'] });
-  const { stage, images, errors } = stageImageFixture(t), scene = createPalPlayground('glim');
+  const { stage, images, errors } = stageImageFixture(t), scene = createPalPlayground('navi');
   stage.render(scene, new SceneEngine(scene).snapshot());
-  const rejected = assert.rejects(stage.prepare(scene), /Luma's picture could not load in time/);
+  const rejected = assert.rejects(stage.prepare(scene), /Navi's picture could not load in time/);
   t.mock.timers.tick(CREATION_ART_LOAD_TIMEOUT_MS - 1);
   assert.deepEqual(errors, []);
   t.mock.timers.tick(1);
@@ -379,7 +379,7 @@ test('unresponsive scene art times out once, identifies its Pal and can retry af
   assert.equal(errors.length, 1);
   assert.match(errors[0], /Reopen this scene/);
   assert.equal(images[0].onload, null); assert.equal(images[0].onerror, null);
-  await assert.rejects(stage.prepare(scene), /Luma's picture could not load in time/);
+  await assert.rejects(stage.prepare(scene), /Navi's picture could not load in time/);
   assert.equal(images.length, 1, 'A failed current cache entry cannot cause a retry loop.');
   stage.clear(); stage.render(scene, new SceneEngine(scene).snapshot());
   const reopened = stage.prepare(scene);
@@ -394,4 +394,20 @@ test('an invalid decoded bitmap fails playback instead of starting an empty expo
   images[0].load(); images[0].failDecode();
   await rejected;
   assert.equal(images[0].onload, null); assert.equal(images[0].onerror, null);
+});
+
+test('saved retired scene references resolve exact artwork while new generation excludes every retired ID', () => {
+  for (const id of ['pal-glim', ...['luma','zippa'].flatMap(slug =>
+    ['base','mature'].map(form => `pal-${slug}-${form}-core-2026-11-20`))]) {
+    const scene = createStarterProject('blank');
+    scene.actors[0].assetId = id;
+    assert.equal(validateEditableProject(scene).actors[0].assetId, id);
+    assert.equal(validateSavedCreationManifest(scene).actors[0].assetId, id);
+    assert.ok(existsSync(resolve('public', creationAsset(id)!.url!)));
+    assert.ok(!CREATION_ASSETS.some(asset => asset.id === id));
+    assert.throws(() => validateGeneratedCreationManifest(scene), /available artwork/);
+    const engine = new SceneEngine(scene);
+    engine.start();
+    assert.ok(engine.advance(16).actors.some(actor => actor.id === scene.actors[0].id));
+  }
 });

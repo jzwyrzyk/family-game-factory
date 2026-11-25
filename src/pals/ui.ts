@@ -1,3 +1,4 @@
+import { createDashboardCard } from '../brand/dashboard-card';
 import { PAL_CATALOG, palArtworkPath, palDefinition, palLine, type PalId, type PalLineKind } from './catalog';
 import type { PalsView, PalPreferences, OwnedPalView, PalStage } from './model';
 import type { PalArtworkExpression } from './artwork';
@@ -321,7 +322,7 @@ export function createPalsPage(options: PalsPageOptions) {
     retry.disabled = busy || state.loading;
     total.textContent = isReady ? `${state.profile!.owned.length} / ${PAL_CATALOG.length} Pals` : 'Your collection';
     heading.textContent = isReady && !state.profile!.starterId ? 'Choose your Pal' : 'My Pals';
-    intro.textContent = isReady && !state.profile!.starterId ? 'Your first Pal is free.' : '';
+    intro.textContent = isReady && !state.profile!.starterId ? 'Pick Nook or Navi for free.' : '';
     intro.hidden = !intro.textContent;
     usedPortraits.clear();
     content.replaceChildren();
@@ -570,35 +571,20 @@ export function createPalsPage(options: PalsPageOptions) {
   };
 }
 
-export function createPalsWidget(options: { state: PalsViewState; onOpen: () => void; onCreate?: (id: PalId, owner: string) => void }) {
-  let state = options.state;
-  const element = el('section', 'pals-home-widget');
-  element.setAttribute('aria-label', 'My Pals');
-  const open = button('', 'open-pals', 'pals-widget-open');
-  open.onclick = options.onOpen;
-  const make = button('Create together', 'widget-create', 'pals-button');
-  make.onclick = () => { const id = state.profile?.activeId; if (id && ready(state) && !state.saving) options.onCreate?.(id, state.owner); };
-  element.append(open, make);
-  function update(next: PalsViewState) {
-    state = next;
-    const pal = owned(state, state.profile?.activeId);
-    open.replaceChildren();
-    const copy = el('span', 'pals-widget-copy');
-    if (ready(state) && pal) {
-      const definition = palDefinition(pal.id);
-      open.append(createPalPortrait(pal.id, pal.stage));
-      copy.append(el('strong', '', definition.name), el('span', '', pal.stageName));
-    } else {
-      if(ready(state)&&!pal)open.append(createPalPortrait('glim',1));
-      copy.append(el('strong', '', 'My Pals'), el('span', '', state.loading ? 'Opening your crew…' : state.error ? 'Open your collection to retry' : 'Choose your free Pal'));
+export function createPalsWidget(options: { state: PalsViewState; onOpen: () => void }) {
+  const { element, artwork } = createDashboardCard('My Pals', 'Meet your companions', options.onOpen);
+  function update(state: PalsViewState) {
+    const active = ready(state) && state.profile?.preferences.showCompanion ? owned(state, state.profile.activeId) : null;
+    const id = active?.id ?? 'navi', stage = active?.stage ?? 1;
+    const current = artwork.firstElementChild as HTMLElement | null;
+    if (current?.dataset.pal !== id || current.dataset.stage !== String(stage)) {
+      if (current) retirePortrait(current);
+      artwork.replaceChildren(createPalPortrait(id, stage, '', 'neutral', true));
     }
-    open.append(copy, el('span', 'pals-widget-arrow', '→'));
-    make.hidden = !options.onCreate || !pal || !ready(state);
-    make.disabled = !!state.saving;
     element.dataset.owner = state.owner;
   }
-  update(state);
-  return { element, update, dispose() { element.remove(); } };
+  update(options.state);
+  return { element, update, dispose() { if (artwork.firstElementChild) retirePortrait(artwork.firstElementChild as HTMLElement); element.remove(); } };
 }
 
 /** Inline host cameo. The host explicitly hides it during learning and can supply an existing help action. */

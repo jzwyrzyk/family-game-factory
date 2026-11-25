@@ -56,10 +56,7 @@ const PAPER_OPENINGS: Readonly<Record<string, readonly PaperOpening[]>> = Object
   'jems-pals/whorl/mature/encouraging-retry-a7f9ea8bd65b.webp': [[0.54, 0.28], [0.52, 0.48]],
   'jems-pals/whorl/mature/neutral-bcca0e4f1289.webp': [[0.54, 0.28], [0.52, 0.48]],
   'jems-pals/whorl/mature/thinking-646927e41128.webp': [[0.54, 0.28], [0.52, 0.48]],
-  'jems-pals/zippa/mature/celebrate-91c568325e4c.webp': [[0.3, 0.5], [0.71, 0.5], [0.48, 0.79]],
-  'jems-pals/zippa/mature/encouraging-retry-f2a920aa3c48.webp': [[0.3, 0.5], [0.71, 0.5], [0.48, 0.79]],
   'jems-pals/zippa/mature/neutral-df295181dbce.webp': [[0.3, 0.5], [0.71, 0.5], [0.48, 0.79]],
-  'jems-pals/zippa/mature/thinking-3253323605fa.webp': [[0.3, 0.5], [0.71, 0.5], [0.48, 0.79]],
 });
 
 export interface PalPaperMask {

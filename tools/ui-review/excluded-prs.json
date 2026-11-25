@@ -1,50 +1,5 @@
 [
   {
-    "number": 186,
-    "title": "Concurrent family-beta, storage and owner-premium integration (excluded from this candidate)",
-    "url": "https://github.com/jzwyrzyk/family-game-factory/pull/186"
-  },
-  {
-    "number": 181,
-    "title": "Independent integration rehearsal for family beta, storage and owner premium",
-    "url": "https://github.com/jzwyrzyk/family-game-factory/pull/181"
-  },
-  {
-    "number": 180,
-    "title": "Close private family beta audit findings before integration",
-    "url": "https://github.com/jzwyrzyk/family-game-factory/pull/180"
-  },
-  {
-    "number": 174,
-    "title": "Private family beta E \u2022 authenticated hosting, migration and controlled activation",
-    "url": "https://github.com/jzwyrzyk/family-game-factory/pull/174"
-  },
-  {
-    "number": 173,
-    "title": "Private family beta D \u2022 verified privacy operations and protected previews",
-    "url": "https://github.com/jzwyrzyk/family-game-factory/pull/173"
-  },
-  {
-    "number": 172,
-    "title": "Private family beta C \u2014 branded entry, private play and owner dashboard",
-    "url": "https://github.com/jzwyrzyk/family-game-factory/pull/172"
-  },
-  {
-    "number": 171,
-    "title": "Private family beta B \u2014 guardian onboarding, operations and admission",
-    "url": "https://github.com/jzwyrzyk/family-game-factory/pull/171"
-  },
-  {
-    "number": 170,
-    "title": "Private family beta A \u2014 isolate workspaces and spending records",
-    "url": "https://github.com/jzwyrzyk/family-game-factory/pull/170"
-  },
-  {
-    "number": 166,
-    "title": "F06 storage: durable recovery, atomic copies/replies and disabled continuity preparation",
-    "url": "https://github.com/jzwyrzyk/family-game-factory/pull/166"
-  },
-  {
     "number": 83,
     "title": "Add optional PostHog creation and art reuse pilot",
     "url": "https://github.com/jzwyrzyk/family-game-factory/pull/83"

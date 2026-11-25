@@ -23,6 +23,7 @@ import {createReadAloudControl} from '../speech/read-aloud-control';
 import { firstStepsSummary, simpleMove, directionMove, FIRST_STEPS_ACTIONS } from './learner-controls';
 import './style.css';
 import './landing.css';
+import { applyPalArtworkMask } from '../pals/presentation-image';
 import {createStudioIntroduction} from './introduction';
 
 type Host = {
@@ -428,7 +429,14 @@ export function installCreationStudio(host: Host) {
       wrap.append(createPalPortrait(asset.palId, asset.palForm === 'mature' ? 2 : 1));
     }else if (asset?.url) {
       const img = node('img'); img.alt = ''; img.decoding = 'async';
-      if (asset.palForm) img.onerror = () => { wrap.textContent = 'Picture unavailable'; };
+      if (asset.palForm) {
+        img.style.visibility = 'hidden';
+        img.onerror = () => { wrap.textContent = 'Picture unavailable'; };
+        img.onload = () => {
+          try { applyPalArtworkMask(img, asset.url!); img.style.visibility = 'visible'; }
+          catch { wrap.textContent = 'Picture unavailable'; }
+        };
+      }
       img.src = asset.url; wrap.append(img);
     }
     else { wrap.classList.add('creation-art-' + (asset?.shape || 'gem')); wrap.style.setProperty('--actor-color', asset?.color || '#9473D3'); wrap.textContent = asset?.emoji || (asset?.shape === 'robot' ? '▰' : asset?.shape === 'bucket' ? '◡' : '◆'); }

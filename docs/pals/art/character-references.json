@@ -3861,21 +3861,9 @@
           "roster_alias": "A",
           "species_id": null,
           "application_mapping": {
-            "collection_id": "glim",
-            "display_name": "Luma",
-            "asset_version": "core-2026-11-20",
-            "forms": {
-              "base": {
-                "neutral_url": "jems-pals/luma/base/neutral-93fde3101e62.webp",
-                "scene_asset_id": "pal-luma-base-core-2026-11-20"
-              },
-              "mature": {
-                "neutral_url": "jems-pals/luma/mature/neutral-6b3ffa07f571.webp",
-                "scene_asset_id": "pal-luma-mature-core-2026-11-20"
-              }
-            },
-            "compatibility": "retains_existing_collection_id",
-            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+            "status": "retired",
+            "historical_collection_id": "glim",
+            "scope": "Existing saved scene neutrals and historical approval records only."
           },
           "forms": {
             "base": {
@@ -10828,21 +10816,9 @@
           "roster_alias": "W",
           "species_id": "GP-S023",
           "application_mapping": {
-            "collection_id": "zippa",
-            "display_name": "Zippa",
-            "asset_version": "core-2026-11-20",
-            "forms": {
-              "base": {
-                "neutral_url": "jems-pals/zippa/base/neutral-b0f8aca344a3.webp",
-                "scene_asset_id": "pal-zippa-base-core-2026-11-20"
-              },
-              "mature": {
-                "neutral_url": "jems-pals/zippa/mature/neutral-df295181dbce.webp",
-                "scene_asset_id": "pal-zippa-mature-core-2026-11-20"
-              }
-            },
-            "compatibility": "new_collection_id",
-            "scope": "Approved artwork binding; owned progress remains receipt-derived. Scene IDs pin character, form and asset version. Live acceptance is recorded separately."
+            "status": "retired",
+            "historical_collection_id": "zippa",
+            "scope": "Existing saved scene neutrals and historical approval records only."
           },
           "forms": {
             "base": {

@@ -123,7 +123,7 @@ test('a queued refresh preserves the mutation lock and rejects a second starter 
     controller.subscribe(state => { seen.push(structuredClone(state)); });
     const exportGate = deferExport(), refreshing = track(controller.refresh());
     await exportGate.entered;
-    const rewardGate = deferRewardsRefresh(), choosing = track(controller.chooseStarter('glim'));
+    const rewardGate = deferRewardsRefresh(), choosing = track(controller.chooseStarter('navi'));
     assert.equal(controller.state.saving, true);
     exportGate.release(); await refreshing; await rewardGate.entered;
     assert.equal(controller.state.saving, true, 'the older refresh must preserve the queued choice lock');
@@ -133,8 +133,8 @@ test('a queued refresh preserves the mutation lock and rejects a second starter 
     rewardGate.release(); await choosing; await controller.refresh();
     assert.equal(choose.mock.callCount(), 1);
     assert.equal(controller.state.saving, false);
-    assert.equal(controller.state.profile!.starterId, 'glim');
-    assert.deepEqual(controller.state.profile!.owned.map(pal => pal.id), ['glim']);
+    assert.equal(controller.state.profile!.starterId, 'navi');
+    assert.deepEqual(controller.state.profile!.owned.map(pal => pal.id), ['navi']);
   });
 });
 
@@ -142,7 +142,7 @@ test('a learning checkpoint opened during the rewards await prevents the Pal mut
   await withController(t, async ({ controller, learning, deferRewardsRefresh, track }) => {
     const choose = t.mock.method(PalsStore.prototype, 'chooseStarter');
     const before = await controller.store().export();
-    const rewardGate = deferRewardsRefresh(), choosing = track(controller.chooseStarter('glim'));
+    const rewardGate = deferRewardsRefresh(), choosing = track(controller.chooseStarter('navi'));
     await rewardGate.entered;
     learning.active = true;
     rewardGate.release();
@@ -153,8 +153,8 @@ test('a learning checkpoint opened during the rewards await prevents the Pal mut
     assert.equal(controller.state.profile!.starterId, null);
     assert.equal(controller.state.saving, false);
     learning.active = false;
-    await controller.chooseStarter('glim');
-    assert.equal(controller.state.profile!.starterId, 'glim', 'the rejected action must release its lock');
+    await controller.chooseStarter('navi');
+    assert.equal(controller.state.profile!.starterId, 'navi', 'the rejected action must release its lock');
   });
 });
 
@@ -180,7 +180,7 @@ for (const [label, nextOwner] of [['another child', OTHER], ['the adult workspac
 
 test('an early rejected preference change emits the saved settings and an error for the parent controls', { concurrency: false }, async t => {
   await withController(t, async ({ controller, learning }) => {
-    await controller.chooseStarter('glim'); await controller.refresh();
+    await controller.chooseStarter('navi'); await controller.refresh();
     const preferenceWrite = t.mock.method(PalsStore.prototype, 'setPreferences');
     const before = await controller.store().export(), saved = structuredClone(controller.state.profile);
     const seen: PalsState[] = [];

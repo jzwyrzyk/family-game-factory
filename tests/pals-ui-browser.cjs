@@ -10,14 +10,14 @@ const { chromium } = require('playwright');
 
 const root = path.resolve(__dirname, '..');
 const characterIndex=JSON.parse(fs.readFileSync(path.join(root,'docs/pals/art/character-references.json'),'utf8'));
-const expectedNeutral=Object.fromEntries(characterIndex.roster_entries.flatMap(entry=>entry.members).map(member=>[member.application_mapping.collection_id,Object.fromEntries(Object.entries(member.application_mapping.forms).map(([form,record])=>[form,'/arcade/'+record.neutral_url]))]));
+const expectedNeutral=Object.fromEntries(characterIndex.roster_entries.flatMap(entry=>entry.members).filter(member=>member.application_mapping.status!=="retired").map(member=>[member.application_mapping.collection_id,Object.fromEntries(Object.entries(member.application_mapping.forms).map(([form,record])=>[form,'/arcade/'+record.neutral_url]))]));
 const script = `
 import {createPalsPage,createPalsWidget,createPalCameo} from './src/pals/ui';
 import './src/brand/art-library.css';
 const preferences={showCompanion:true,encouragement:true};
 const empty={owner:'player1',profile:{owner:'player1',starterId:null,activeId:null,owned:[],availableIds:[],preferences},lifetimeGems:0,loading:false};
-const state={owner:'player1',profile:{owner:'player1',starterId:'glim',activeId:'glim',availableIds:[],preferences,owned:[
- {id:'glim',joinedAt:'2026-11-19T12:00:00.000Z',source:'starter',adventures:8,practiceActivities:17,creationAdventures:5,stage:2,form:'mature',stageName:'Grown',nextStageAt:null,adventuresToNext:0,practiceToNextAdventure:3},
+const state={owner:'player1',profile:{owner:'player1',starterId:'navi',activeId:'navi',availableIds:[],preferences,owned:[
+ {id:'navi',joinedAt:'2026-11-19T12:00:00.000Z',source:'starter',adventures:8,practiceActivities:17,creationAdventures:5,stage:2,form:'mature',stageName:'Grown',nextStageAt:null,adventuresToNext:0,practiceToNextAdventure:3},
  {id:'kip',joinedAt:'2026-11-19T13:00:00.000Z',source:'gems',adventures:1,practiceActivities:6,creationAdventures:0,stage:1,form:'base',stageName:'Base',nextStageAt:5,adventuresToNext:4,practiceToNextAdventure:4}
 ]},lifetimeGems:138,loading:false};
 window.palActions=[];
@@ -58,18 +58,18 @@ window.palsFixture={page,widget,cameo,state,empty,control,update(next){page.upda
     await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
     await page.waitForFunction(()=>!!window.palsFixture);
     await page.evaluate(async()=>{await document.fonts.ready;await document.querySelector('.pals-hero-portrait img').decode();});
-    assert.equal(await page.locator('#jemsPalsCount').innerText(),'2 / 24 Pals');
-    assert.equal(await page.locator('#jemsPalDetailTitle').innerText(),'Luma');
+    assert.equal(await page.locator('#jemsPalsCount').innerText(),'2 / 22 Pals');
+    assert.equal(await page.locator('#jemsPalDetailTitle').innerText(),'Navi');
     assert.match(await page.locator('.pals-detail .pals-growth').innerText(),/8 adventures together/);
     assert.deepEqual(await page.locator('.pals-growth-stages > li').allTextContents(),['✓Base','✓Grown']);
     assert.equal(await page.locator('.pals-hero-portrait').getAttribute('data-form'),'mature');
     assert.equal(await page.locator('.pals-hero-portrait').getAttribute('data-artwork'),'approved');
-    assert.match(await page.locator('[data-pals-focus="create-glim"]').innerText(),/Create with Luma/);
+    assert.match(await page.locator('[data-pals-focus="create-navi"]').innerText(),/Create with Navi/);
     assert.match(await page.locator('.pals-card[data-pal="riff"]').innerText(),/12 more gems/);
     assert.ok(await page.locator('.pals-portrait img').evaluateAll((images,expected)=>images.every(image=>{const portrait=image.closest('.pals-portrait');return new URL(image.src).pathname===expected[portrait.dataset.pal]?.[portrait.dataset.form];}),expectedNeutral),'Every portrait resolves the exact approved character/form binding, including Brio');
     assert.ok(await page.locator('.pals-card-art img').evaluateAll(images=>images.every(image=>image.loading==='lazy')),'The gallery leaves offscreen image loading to the browser');
-    assert.match(await page.locator('.pals-hero-portrait img').getAttribute('src'),/jems-pals\/luma\/mature\/neutral-/);
-    assert.equal(await page.locator('.pals-card').count(),24);
+    assert.match(await page.locator('.pals-hero-portrait img').getAttribute('src'),/jems-pals\/navi\/mature\/neutral-/);
+    assert.equal(await page.locator('.pals-card').count(),22);
     results.push('complete approved roster, exact Base/Grown artwork and unlock progress');
 
     await page.waitForFunction(()=>document.querySelector('.pals-hero-portrait')?.dataset.state==='ready');
@@ -93,9 +93,9 @@ window.palsFixture={page,widget,cameo,state,empty,control,update(next){page.upda
       if(ownDecode)Object.defineProperty(heroImage,'decode',ownDecode);else delete heroImage.decode;
       return {before:previous.length,after:current.length,reused:current.filter(portrait=>previous.includes(portrait)).length,
         sameImages:current.every(portrait=>images.includes(portrait.querySelector('img'))),srcChanges,extraNativeDecodes,
-        distinctSurfaces:root.querySelector('.pals-hero-portrait img')!==root.querySelector('.pals-card[data-pal="glim"] img')};
+        distinctSurfaces:root.querySelector('.pals-hero-portrait img')!==root.querySelector('.pals-card[data-pal="navi"] img')};
     });
-    assert.deepEqual(reuse,{before:25,after:25,reused:25,sameImages:true,srcChanges:0,extraNativeDecodes:0,distinctSurfaces:true},'Ordinary saving/progress renders reuse current portraits without reassigning sources or decoding the ready hero again');
+    assert.deepEqual(reuse,{before:23,after:23,reused:23,sameImages:true,srcChanges:0,extraNativeDecodes:0,distinctSurfaces:true},'Ordinary saving/progress renders reuse current portraits without reassigning sources or decoding the ready hero again');
     const retirement=await page.evaluate(async()=>{
       const fixture=window.palsFixture,root=fixture.page.element;
       const previous=[...root.querySelectorAll('.pals-portrait')],portrait=root.querySelector('.pals-hero-portrait'),image=portrait.querySelector('img');
@@ -104,7 +104,7 @@ window.palsFixture={page,widget,cameo,state,empty,control,update(next){page.upda
       image.decode=function(){decodeCalls++;return pending=nativeDecode.call(this);};
       portrait.addEventListener('pal-picture-state',()=>changed++);
       loaded.call(image,new Event('load')); // Start a real native decode, then retire before its callback settles.
-      fixture.page.update({...fixture.state,profile:{...fixture.state.profile,owned:fixture.state.profile.owned.map(pal=>pal.id==='glim'
+      fixture.page.update({...fixture.state,profile:{...fixture.state.profile,owned:fixture.state.profile.owned.map(pal=>pal.id==='navi'
         ?{...pal,stage:1,form:'base',stageName:'Base',adventures:2,nextStageAt:5,adventuresToNext:3}:pal)}});
       const current=[...root.querySelectorAll('.pals-portrait')];
       const retired=previous.filter(item=>!current.includes(item));
@@ -116,15 +116,15 @@ window.palsFixture={page,widget,cameo,state,empty,control,update(next){page.upda
       fixture.page.update(fixture.state);
       return result;
     });
-    assert.deepEqual(retirement,{count:25,reused:23,retired:2,callbacksCleared:true,oldDecodeCalls:1,oldStateChanges:0,form:'base'},'A form replacement retires only its hero/gallery; late load and native settlement cannot revive retired work');
+    assert.deepEqual(retirement,{count:23,reused:21,retired:2,callbacksCleared:true,oldDecodeCalls:1,oldStateChanges:0,form:'base'},'A form replacement retires only its hero/gallery; late load and native settlement cannot revive retired work');
     results.push('bounded current-page portrait reuse and form-scoped load/decode retirement');
 
-    await page.locator('[data-pals-focus="create-glim"]').focus();await page.keyboard.press('Enter');
+    await page.locator('[data-pals-focus="create-navi"]').focus();await page.keyboard.press('Enter');
     await page.waitForFunction(()=>window.palActions.some(action=>action[0]==='create'));
-    assert.deepEqual(await page.evaluate(()=>window.palActions[0]),['create','glim','player1']);
-    assert.equal(await page.evaluate(()=>document.activeElement.dataset.palsFocus),'create-glim');
+    assert.deepEqual(await page.evaluate(()=>window.palActions[0]),['create','navi','player1']);
+    assert.equal(await page.evaluate(()=>document.activeElement.dataset.palsFocus),'create-navi');
     await page.evaluate(()=>window.palsFixture.page.update(window.palsFixture.state));
-    assert.equal(await page.evaluate(()=>document.activeElement.dataset.palsFocus),'create-glim','refresh retains keyboard focus');
+    assert.equal(await page.evaluate(()=>document.activeElement.dataset.palsFocus),'create-navi','refresh retains keyboard focus');
     await page.locator('[data-pals-focus="details-kip"]').click();
     assert.equal(await page.locator('#jemsPalDetailTitle').innerText(),'Nook');
     const before=await page.evaluate(()=>JSON.stringify(window.palsFixture.state.profile));
@@ -152,16 +152,16 @@ window.palsFixture={page,widget,cameo,state,empty,control,update(next){page.upda
     results.push('desktop, tablet, 390px and 320px reflow, touch targets and 200% zoom');
 
     await page.evaluate(()=>window.palsFixture.update(window.palsFixture.empty));
-    assert.equal(await page.locator('[data-pals-focus="starter-glim"]').count(),1);
+    assert.equal(await page.locator('[data-pals-focus="starter-navi"]').count(),1);
     assert.equal(await page.locator('[data-pals-focus="starter-kip"]').count(),1);
     await page.evaluate(()=>window.palsFixture.control.fail=true);
     await page.locator('[data-pals-focus="starter-kip"]').click();
     await page.waitForFunction(()=>document.getElementById('jemsPalsStatus').textContent.includes('storage is full'));
-    assert.equal(await page.locator('#jemsPalsCount').innerText(),'0 / 24 Pals','failed selection never fabricates an owned Pal');
+    assert.equal(await page.locator('#jemsPalsCount').innerText(),'0 / 22 Pals','failed selection never fabricates an owned Pal');
     assert.equal(await page.locator('[data-pals-focus="starter-kip"]').isEnabled(),true);
     await page.screenshot({path:path.join(root,'test-results/pals-ui-save-error.png'),fullPage:true});
     await page.evaluate(()=>{window.palsFixture.control.fail=false;window.palsFixture.control.defer=true;});
-    await page.locator('[data-pals-focus="starter-glim"]').click();
+    await page.locator('[data-pals-focus="starter-navi"]').click();
     assert.equal(await page.locator('[data-pals-focus="starter-kip"]').isDisabled(),true);
     await page.evaluate(()=>{
       const fixture=window.palsFixture;
@@ -204,18 +204,18 @@ window.palsFixture={page,widget,cameo,state,empty,control,update(next){page.upda
     assert.equal(await hero.getAttribute('data-form'),'mature');
     await expressions.locator('[data-expression="thinking"]').click();
     await page.waitForFunction(()=>document.querySelector('.pals-hero-portrait')?.dataset.state==='ready');
-    assert.match(await hero.locator('img').getAttribute('src'),/jems-pals\/luma\/mature\/thinking-/);
+    assert.match(await hero.locator('img').getAttribute('src'),/jems-pals\/navi\/mature\/thinking-/);
     assert.equal(await page.evaluate(()=>JSON.stringify(window.palsFixture.state.profile)),savedBefore,'Trying an expression never changes ownership or progress');
-    await page.route('**/jems-pals/luma/mature/celebrate-*.webp',route=>route.fulfill({status:503,body:'Fixture image unavailable'}));
+    await page.route('**/jems-pals/navi/mature/celebrate-*.webp',route=>route.fulfill({status:503,body:'Fixture image unavailable'}));
     await expressions.locator('[data-expression="celebrate"]').click();
     await page.waitForFunction(()=>{const portrait=document.querySelector('.pals-hero-portrait');return portrait?.dataset.state==='ready'&&portrait.dataset.expression==='neutral';});
-    assert.match(await hero.locator('img').getAttribute('src'),/jems-pals\/luma\/mature\/neutral-/,'A failed reaction falls back only to the same character and earned form');
+    assert.match(await hero.locator('img').getAttribute('src'),/jems-pals\/navi\/mature\/neutral-/,'A failed reaction falls back only to the same character and earned form');
     assert.equal(await expressions.locator('[data-expression="neutral"]').getAttribute('aria-pressed'),'true','Ready reflects the neutral fallback that actually loaded');
     assert.equal(await expressions.locator('[data-expression="celebrate"]').getAttribute('aria-pressed'),'false');
-    await page.unroute('**/jems-pals/luma/mature/celebrate-*.webp');
+    await page.unroute('**/jems-pals/navi/mature/celebrate-*.webp');
     let releaseReaction;
     const reactionGate=new Promise(resolve=>{releaseReaction=resolve;});
-    await page.route('**/jems-pals/luma/mature/celebrate-*.webp',async route=>{await reactionGate;await route.continue();});
+    await page.route('**/jems-pals/navi/mature/celebrate-*.webp',async route=>{await reactionGate;await route.continue();});
     await page.locator('#jemsPalPlay').click();
     await page.waitForTimeout(1800);
     assert.equal(await hero.getAttribute('data-state'),'loading');
@@ -224,14 +224,14 @@ window.palsFixture={page,widget,cameo,state,empty,control,update(next){page.upda
     await page.waitForFunction(()=>{const portrait=document.querySelector('.pals-hero-portrait');return portrait?.dataset.state==='ready'&&portrait.dataset.expression==='celebrate';});
     await page.waitForTimeout(150);
     assert.equal(await hero.getAttribute('data-expression'),'celebrate','The visible hold begins after image decode');
-    await page.unroute('**/jems-pals/luma/mature/celebrate-*.webp');
+    await page.unroute('**/jems-pals/navi/mature/celebrate-*.webp');
     await expressions.locator('[data-expression="thinking"]').focus();await page.keyboard.press('Enter');
     assert.equal(await page.evaluate(()=>document.activeElement.dataset.palsFocus),'expression-thinking','Expression loading does not steal keyboard focus');
     await page.waitForTimeout(1700);
     assert.equal(await hero.getAttribute('data-expression'),'thinking','An explicit expression choice cancels the older tap reset');
     let releaseHiddenExpression;
     const hiddenExpressionGate=new Promise(resolve=>{releaseHiddenExpression=resolve;});
-    await page.route('**/jems-pals/luma/mature/encouraging-retry-*.webp',async route=>{await hiddenExpressionGate;await route.continue();});
+    await page.route('**/jems-pals/navi/mature/encouraging-retry-*.webp',async route=>{await hiddenExpressionGate;await route.continue();});
     await expressions.locator('[data-expression="encouraging_retry"]').click();
     await page.waitForFunction(()=>document.querySelector('.pals-hero-portrait')?.dataset.state==='loading');
     await page.evaluate(()=>window.palsFixture.page.hide());
@@ -239,14 +239,14 @@ window.palsFixture={page,widget,cameo,state,empty,control,update(next){page.upda
     releaseHiddenExpression();
     await page.waitForFunction(()=>{const portrait=document.querySelector('.pals-hero-portrait');return portrait?.dataset.state==='ready'&&portrait.dataset.expression==='encouraging_retry';});
     assert.equal(await page.evaluate(()=>document.activeElement.id),'outside','A hidden image completion cannot move focus');
-    await page.unroute('**/jems-pals/luma/mature/encouraging-retry-*.webp');
+    await page.unroute('**/jems-pals/navi/mature/encouraging-retry-*.webp');
     await page.evaluate(()=>window.palsFixture.page.show());
     assert.equal(await expressions.evaluate(element=>element.open),false,'Navigation resets optional expression play');
     assert.equal(await hero.getAttribute('data-expression'),'neutral','A completed hidden expression cannot revive when the page reopens');
     results.push('selected-character expression play, same-form neutral fallback and no progress mutations');
 
     const freshPage=await context.newPage();freshPage.on('pageerror',error=>errors.push(error.message));
-    await freshPage.route('**/jems-pals/luma/mature/neutral-*.webp',route=>route.fulfill({status:503,body:'Fixture neutral unavailable'}));
+    await freshPage.route('**/jems-pals/navi/mature/neutral-*.webp',route=>route.fulfill({status:503,body:'Fixture neutral unavailable'}));
     await freshPage.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
     await freshPage.waitForFunction(()=>document.querySelector('.pals-hero-portrait')?.dataset.state==='unavailable');
     assert.equal(await freshPage.locator('.pals-hero-portrait .pals-picture-unavailable').isVisible(),true);
@@ -258,19 +258,19 @@ window.palsFixture={page,widget,cameo,state,empty,control,update(next){page.upda
       fixture.page.hide();fixture.page.show();
       return fixture.page.element.querySelector('.pals-hero-portrait')===portrait&&portrait.dataset.state==='unavailable';
     }),true,'Refresh and hide/show preserve the failed current image until explicit recovery');
-    assert.equal(await freshPage.locator('[data-pals-focus="picture-retry-glim"]').isVisible(),true,'A reused unavailable portrait immediately exposes its retry control');
-    await freshPage.unroute('**/jems-pals/luma/mature/neutral-*.webp');
+    assert.equal(await freshPage.locator('[data-pals-focus="picture-retry-navi"]').isVisible(),true,'A reused unavailable portrait immediately exposes its retry control');
+    await freshPage.unroute('**/jems-pals/navi/mature/neutral-*.webp');
     let releaseRetry;
     const retryGate=new Promise(resolve=>{releaseRetry=resolve;});
-    await freshPage.route('**/jems-pals/luma/mature/neutral-*.webp',async route=>{await retryGate;await route.continue();});
-    await freshPage.locator('[data-pals-focus="picture-retry-glim"]').focus();await freshPage.keyboard.press('Enter');
+    await freshPage.route('**/jems-pals/navi/mature/neutral-*.webp',async route=>{await retryGate;await route.continue();});
+    await freshPage.locator('[data-pals-focus="picture-retry-navi"]').focus();await freshPage.keyboard.press('Enter');
     await freshPage.waitForFunction(()=>document.querySelector('.pals-hero-portrait')?.dataset.state==='loading');
     await freshPage.evaluate(()=>{const fixture=window.palsFixture;fixture.page.update({...fixture.state,saving:true});fixture.page.update(fixture.state);});
-    assert.equal(await freshPage.evaluate(()=>document.activeElement.dataset.palsFocus),'picture-retry-glim','An in-progress keyboard retry retains its current control through ordinary renders');
-    assert.equal(await freshPage.locator('[data-pals-focus="picture-retry-glim"]').getAttribute('aria-disabled'),'true');
+    assert.equal(await freshPage.evaluate(()=>document.activeElement.dataset.palsFocus),'picture-retry-navi','An in-progress keyboard retry retains its current control through ordinary renders');
+    assert.equal(await freshPage.locator('[data-pals-focus="picture-retry-navi"]').getAttribute('aria-disabled'),'true');
     releaseRetry();
     await freshPage.waitForFunction(()=>document.querySelector('.pals-hero-portrait')?.dataset.state==='ready');
-    await freshPage.unroute('**/jems-pals/luma/mature/neutral-*.webp');
+    await freshPage.unroute('**/jems-pals/navi/mature/neutral-*.webp');
     assert.equal(await freshPage.evaluate(()=>document.querySelector('.pals-hero-portrait img')===window.failedPalImage),true,'Explicit retry recovers the same retained image through native loading/decoding');
     assert.equal(await freshPage.evaluate(()=>document.activeElement.id),'jemsPalPlay','Successful keyboard retry returns focus to the same Pal');
     await freshPage.route('**/jems-pals-extra/brio/mature/neutral-*.png',route=>route.fulfill({status:503,body:'Fixture Brio neutral unavailable'}));
