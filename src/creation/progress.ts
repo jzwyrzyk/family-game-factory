@@ -1,3 +1,4 @@
+import {CreationWorkspace} from '../storage/creation-workspace';
 /** Read-only observations from actual scene checks; never a general thinking score. */
 import { profileStorage } from '../adult-pilot/storage';
 import { CreationStore, CREATION_KEY } from './storage';
@@ -32,9 +33,10 @@ export function installCreationProgress():void {
     const panel=node('section','','panel');panel.id=view==='lab'?'creationLabProgress':'creationParentProgress';
     panel.hidden=true;panel.style.marginBlockStart='24px';host.append(panel);panels.set(view,panel);
   }
-  function clear(){for(const panel of panels.values()){panel.hidden=true;panel.replaceChildren();}}
-  function render(view:'lab'|'parent'){
-    clear();const panel=panels.get(view);if(!panel)return;
+  let renderEpoch=0;
+  function clear(){renderEpoch++;for(const panel of panels.values()){panel.hidden=true;panel.replaceChildren();}}
+  async function render(view:'lab'|'parent'){
+    clear();const request=renderEpoch;const panel=panels.get(view);if(!panel)return;
     const capturedOwner=owner(),parent=view==='parent';
     panel.hidden=false;
     const heading=node('h2',parent?'Scene challenge observations':'My scene experiments');
@@ -43,8 +45,11 @@ export function installCreationProgress():void {
       'Recent scene checks for the selected profile. Each result describes whether that saved version matched a specific scene goal. It does not establish general coding or thinking mastery; starter or assisted blocks may be included.':
       'Your recent scene checks. Open a scene to try another idea.', 'muted'));
     let observations:CreationObservation[];
-    try{observations=recentCreationObservations(new CreationStore(profileStorage(localStorage),owner),capturedOwner);}
-    catch(error){panel.append(node('p',(error as Error).message,'notice'));return;}
+    let source:CreationWorkspace|undefined;
+    try{source=await CreationWorkspace.open(profileStorage(localStorage),owner);observations=await source.recentChecks(capturedOwner,5);}
+    catch(error){if(request===renderEpoch&&owner()===capturedOwner)panel.append(node('p',(error as Error).message,'notice'));return;}
+    finally{source?.close();}
+    if(request!==renderEpoch||owner()!==capturedOwner)return;
     if(!observations.length){panel.append(node('p',parent?'No scene challenge checks have been saved for this profile yet.':'Try a scene challenge, then check what your blocks make happen.','muted'));return;}
     const list=node('ul');list.style.listStyle='none';list.style.padding='0';list.style.margin='0';
     for(const observation of observations){

@@ -40,6 +40,7 @@ SHARDS = {
         "node tests/offline-shell.cjs",
         "node tests/construction-touch.cjs",
         "node tests/private-drawings.cjs",
+        "npm run test:storage-browser",
     ),
     "generated": npm("intent-playtest", "intent-repair-browser", "generated-art",
                      "quality-capture"),

@@ -1,7 +1,7 @@
 import {profileGrade} from '../learning/engine';
 import { report, type Attempt } from '../learning/engine';
 import { reportLanguage, type LanguageAttempt } from '../language/engine';
-import { CreationStore } from '../creation/storage';
+import { CreationStore, type CreationWorkspace } from '../creation/storage';
 import { profileStorage } from '../adult-pilot/storage';
 import { PROBLEM_SOLVING_LIMITS, validateProblemSolvingEpisode } from '../problem-solving/model';
 import { buildParentDashboard, type ParentDashboard, type ParentDashboardInput, type ParentRange } from './model';
@@ -16,7 +16,7 @@ export interface ParentSnapshot {
 }
 
 /** Reporting normalizes a COPY. Opening a report must never initialize or save learner state. */
-export function captureParentSnapshot(FG: any, range: ParentRange = 30, now = Date.now()): ParentSnapshot {
+export function captureParentSnapshot(FG: any, range: ParentRange = 30, now = Date.now(), creation?:{snapshot:CreationWorkspace}|{error:unknown}): ParentSnapshot {
   const current = FG.store.current();
   const ownerId = String(current.id);
   const profile = JSON.parse(JSON.stringify(current));
@@ -30,7 +30,7 @@ export function captureParentSnapshot(FG: any, range: ParentRange = 30, now = Da
     const summary = reportLanguage(profile, now);
     input.language = { ownerId, report: summary, attempts: (profile.language?.attempts ?? []) as LanguageAttempt[] };
   } catch { input.unavailable!.language = 'read-error'; warnings.push('Language Arts history could not be read. Existing records have not been changed.'); }
-  try { input.creation = new CreationStore(profileStorage(localStorage), () => String(FG.store.current().id)).export(); }
+  try { if(creation&&'error' in creation)throw creation.error;input.creation = creation&&'snapshot' in creation?creation.snapshot:new CreationStore(profileStorage(localStorage), () => String(FG.store.current().id)).export(); }
   catch { input.unavailable!.creation = 'read-error'; warnings.push('Creation history could not be read. Existing scenes have not been changed.'); }
   if (FG.problemSolvingEvidence?.list) {
     try {

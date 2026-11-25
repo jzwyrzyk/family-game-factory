@@ -1,5 +1,7 @@
 # Jems parent privacy and temporary adult development profile
 
+Private beta processing also requires the current family capability, platform spending policy and independently reviewed provider evidence for that scope. The gateway computes those permissions on every workspace read. See the [tenancy contract](../family-beta/ARCHITECTURE.md).
+
 This change adds a temporary authenticated adult development profile to the existing Jems website alongside ordinary child profiles. Once deployed and configured, switching to Adult (development) activates approved AI tools after the existing passphrase unlock. It needs neither another site nor a separate activation button. See [the adult release guide](../adult-pilot/VOICE_RELEASE_AND_UAT.md) for the session contract and deployment steps.
 
 ## Parent choices in Grown-ups
@@ -41,3 +43,5 @@ Before an adult production test, deploy compatible source/image pins and approve
 Reference material for operator review: [FTC 16 CFR Part 312](https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-312), [OpenAI Under-18 API guidance](https://developers.openai.com/api/docs/guides/safety-checks/under-18-api-guidance), [OpenAI API data controls](https://developers.openai.com/api/docs/guides/your-data), [Google Cloud Speech-to-Text data logging](https://cloud.google.com/speech-to-text/docs/data-logging).
 
 The early-profile handoff opens existing family Parent Controls. Its play and local coding exits stay available. Unlocking management verifies the existing device-bound parent session for settings. It grants no inference or speech permission. Independent creation entries and browser creation mutations are restricted for early profiles. Server-enforced, learner-bound parent-guided generation remains an external family activation dependency. Adult Private has its own workspace and cannot supply this authorization.
+
+In beta, replacing or withdrawing a choice stops active generation and settles its reservation. An exact approved family case lets the guardian download server records. A separately authorized executor removes the family's workspace and artifacts after case verification. See the [data flows and evidence checklist](../family-beta/PRIVACY.md).

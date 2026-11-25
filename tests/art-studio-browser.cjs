@@ -38,7 +38,7 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   await noOverflow(page,'empty desktop studio');
   await upload(page,'Jellybean racer.png','car');const before=(await count(page))[0];assert.equal(before.name,'Jellybean racer');
   await page.getByLabel('Artwork collection',{exact:true}).selectOption('vehicle');
-  await page.evaluate(()=>{const original=IDBObjectStore.prototype.getAll;window.__restoreArtRead=()=>{IDBObjectStore.prototype.getAll=original;};IDBObjectStore.prototype.getAll=function(...args){if(this.name==='drawings'&&this.transaction.mode==='readonly'){window.__restoreArtRead();throw Error('Art shelf could not refresh. Try opening it again.');}return original.apply(this,args);};});
+  await page.evaluate(()=>{const original=IDBIndex.prototype.openCursor;window.__restoreArtRead=()=>{IDBIndex.prototype.openCursor=original;};IDBIndex.prototype.openCursor=function(...args){if(this.objectStore.name==='drawingMetadata'&&this.objectStore.transaction.mode==='readonly'){window.__restoreArtRead();throw Error('Art shelf could not refresh. Try opening it again.');}return original.apply(this,args);};});
   await page.getByRole('button',{name:'Save details',exact:true}).click();await page.waitForFunction(()=>document.getElementById('artStatus').textContent==='Art shelf could not refresh. Try opening it again.');
   assert.equal((await count(page))[0].category,'vehicle','metadata remains saved when shelf refresh fails');
   assert.equal(await page.locator('#artStatus').getAttribute('role'),'alert','refresh error stays visible instead of false success');
@@ -106,7 +106,7 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   await upload(page,'Mochi monster.png','character');await page.getByLabel('Artwork collection',{exact:true}).selectOption('character');await page.getByRole('button',{name:'Save details',exact:true}).click();await page.waitForFunction(()=>document.getElementById('artStatus').textContent==='Artwork details saved.');
   await upload(page,'Moonflower.png','flower');await page.getByLabel('Artwork collection',{exact:true}).selectOption('prop');await page.getByRole('button',{name:'Save details',exact:true}).click();await page.waitForFunction(()=>document.getElementById('artStatus').textContent==='Artwork details saved.');
   await page.getByRole('button',{name:'Close artwork details'}).click();await noOverflow(page,'library desktop');await page.screenshot({path:path.join(output,'art-library-desktop.png'),fullPage:true});
-  await page.locator('[data-category="character"]').click();assert.equal(await page.locator('.art-card').count(),1);await page.locator('.art-card').click();
+  await page.locator('[data-category="character"]').click();await page.waitForFunction(()=>document.getElementById('artGrid').getAttribute('aria-busy')!=='true');assert.equal(await page.locator('.art-card').count(),1);await page.locator('.art-card').click();
   await page.locator('#artEditMovement').click();await page.locator('dialog.drawing-lab').waitFor({state:'visible'});assert.equal(await page.locator('[data-kind]').inputValue(),'character','the selected collection starts the appropriate editor');
   await page.locator('.drawing-lab [data-save]').click();await page.waitForFunction(()=>document.querySelector('.drawing-lab [data-history]')?.options.length>1&&!document.querySelector('.drawing-lab [data-history]')?.disabled);
   await page.locator('.drawing-lab [data-close]').click();await page.locator('dialog.drawing-lab').waitFor({state:'detached'});

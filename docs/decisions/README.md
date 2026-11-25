@@ -10,6 +10,7 @@ These records explain durable choices without turning chat history into another 
 
 | Record | Decision | Status | Source |
 | --- | --- | --- | --- |
+| [Private Family Beta](2026-11-25-private-family-beta.md) | Family origins, server-authorized workspaces, verified privacy controls, shared accounting and authenticated household delivery | Proposed for release review | Owner assignment, November 2026 |
 | [DEV → TEST → PROD](2026-11-23-dev-test-prod.md) | Independent private PR previews, permanent isolated TEST and exact-release approval through the existing production controller; zero routine Cloud Shell | Accepted operating direction; source foundation and deployed completion separate | Owner's November 23 automated environment assignment, superseding previous unimplemented DEV/staging proposals |
 | [Retained games in My Creations](2026-11-23-retained-games-in-my-creations.md) | Move Dragon/Buckets cards into My Creations, preserve every variant and retain four Home games; scope the owner's retention exception to this cutover | Accepted for implementation; source and live acceptance separate | Owner's November 23 retained-games and production-cutover direction |
 | [Premium game builder](2026-11-23-premium-builder.md) | Use Astra High for all Adult Private premium game construction and repair, with separately approved planning and review | Accepted for implementation. Activation follows the production cutover and separate approval. | Owner's November 23 premium builder assignment |

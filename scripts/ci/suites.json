@@ -23,7 +23,8 @@
       "node tests/offline-shell.cjs",
       "node tests/construction-touch.cjs",
       "node tests/private-drawings.cjs",
-      "npm run test:real-agent"
+      "npm run test:real-agent",
+      "npm run test:storage-browser"
     ],
     "learning": [
       "npm run test:learning-ui",
@@ -81,7 +82,8 @@
         "node tests/offline-shell.cjs",
         "node tests/construction-touch.cjs",
         "node tests/private-drawings.cjs",
-        "npm run test:real-agent"
+        "npm run test:real-agent",
+        "npm run test:storage-browser"
       ]
     },
     "learning-math": {

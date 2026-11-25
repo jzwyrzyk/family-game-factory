@@ -1,10 +1,11 @@
 export interface DispatchPort {dispatch(jobId:string,attempt:number):Promise<void>}
-export interface GitHubDispatchConfig {enabled:boolean;repository:string;workflow:string;approvedSha:string;privateWorker?:boolean}
+export interface GitHubDispatchConfig {enabled:boolean;repository:string;workflow:string;approvedSha:string;privateWorker?:boolean;callbackRoute?:'beta-dev'|'beta-test'|'beta-prod'}
 /** Independent immutable code tag. The selected GitHub workflow runs from protected main. */
 export function workerTag(c:GitHubDispatchConfig){return (c.privateWorker?'factory-execution-':'factory-worker-')+c.approvedSha;}
 /** Token must be an installation token scoped to ONLY the target private repository. */
 export class GitHubDispatcher implements DispatchPort {
  constructor(private config:GitHubDispatchConfig,private token:(signal?:AbortSignal)=>Promise<string>,private transport:typeof fetch=fetch){
+  if(config.callbackRoute!==undefined&&(!config.privateWorker||!['beta-dev','beta-test','beta-prod'].includes(config.callbackRoute)))throw Error('WORKER_ROUTE_REQUIRED');
   if(config.enabled&&(!/^[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+$/.test(config.repository)||!/^[A-Za-z0-9_.-]+[.]yml$/.test(config.workflow)||!/^[a-f0-9]{40}$/.test(config.approvedSha)))throw Error('ACTIONS_APPROVAL_REQUIRED');
  }
  async dispatch(jobId:string,attempt:number){
@@ -30,7 +31,7 @@ export class GitHubDispatcher implements DispatchPort {
   // Dispatch inputs are opaque. The workflow itself repeats SHA checks; a race fails closed.
   const ref=this.config.privateWorker?'main':tag;
   signal.throwIfAborted();
-  const r=await this.transport(`${prefix}/actions/workflows/${this.config.workflow}/dispatches`,{method:'POST',redirect:'error',signal,headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({ref,inputs:{job_id:jobId,attempt:String(attempt)}})});
+  const r=await this.transport(`${prefix}/actions/workflows/${this.config.workflow}/dispatches`,{method:'POST',redirect:'error',signal,headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({ref,inputs:{job_id:jobId,attempt:String(attempt),...(this.config.callbackRoute?{gateway_route:this.config.callbackRoute}:{})}})});
   signal.throwIfAborted();
   if(r.status!==204)throw Error('ACTIONS_DISPATCH_FAILED');
  }

@@ -1,0 +1,220 @@
+{
+  "schema": "jems.bounded-sources-benchmark.v1",
+  "source": "0f459f5b29fa3a72c5caf1fa69051475421861f9",
+  "tree": "1c17844c1db1b8f842cb94001ff7209fd6663c7f",
+  "harnessSha256": "24beec6e92092b8ef8fe0c3af382c4192edc29a8b85938952dec83741631d162",
+  "browser": "156.0.8078.79",
+  "samples": 5,
+  "notes": [
+    "Actual built FG.store save/validate and real localStorage ProblemSolvingStore APIs; synthetic source seed, desktop Chromium; no cloud.",
+    "Not maximum simultaneous capacity: large six profiles each use100 of1500 allowed fact summaries; APS1200 total remains under1million-character envelope.",
+    "Additional250fact-per-profile stress case records simultaneous localStorage quota refusal explicitly, without counting failed fixture setup as a successful save.",
+    "Five APS writes exercise existing retention semantics: large current owner remains200 episodes with discarded count; this benchmark changes no retention policy.",
+    "Independent supplemental run, not part of game/art library timings; warm API CPU/wall observations include shared host scheduling."
+  ],
+  "rows": [
+    {
+      "scenario": "small",
+      "profiles": 1,
+      "attemptsPerSubjectPerProfile": 10,
+      "factsPerProfile": 10,
+      "initialApsEpisodesPerProfile": 20,
+      "profileUtf8Bytes": 42340,
+      "apsUtf8Bytes": 11488,
+      "apsRetention": {
+        "retained": 25,
+        "discarded": 0,
+        "firstRetained": 12,
+        "earliestAt": "2026-11-25T00:00:00.100Z",
+        "latestAt": "2026-11-25T00:16:43.100Z"
+      },
+      "runs": [
+        {
+          "profileStringifyMs": 1,
+          "profileParseMs": 0.2999999998137355,
+          "profileSaveMs": 0.40000000037252903,
+          "profileValidateMs": 1,
+          "apsListMs": 22.5,
+          "apsExportMs": 0.40000000037252903,
+          "apsRecordMs": 1.2999999998137355
+        },
+        {
+          "profileStringifyMs": 2.400000000372529,
+          "profileParseMs": 2.3999999994412065,
+          "profileSaveMs": 0.40000000037252903,
+          "profileValidateMs": 0.900000000372529,
+          "apsListMs": 0.39999999944120646,
+          "apsExportMs": 0.40000000037252903,
+          "apsRecordMs": 4.599999999627471
+        },
+        {
+          "profileStringifyMs": 0.09999999962747097,
+          "profileParseMs": 0.20000000018626451,
+          "profileSaveMs": 0.39999999944120646,
+          "profileValidateMs": 0.6000000005587935,
+          "apsListMs": 2.2999999998137355,
+          "apsExportMs": 0.40000000037252903,
+          "apsRecordMs": 0.8999999994412065
+        },
+        {
+          "profileStringifyMs": 0.40000000037252903,
+          "profileParseMs": 0.2999999998137355,
+          "profileSaveMs": 1.400000000372529,
+          "profileValidateMs": 1.3999999994412065,
+          "apsListMs": 0.40000000037252903,
+          "apsExportMs": 0.5,
+          "apsRecordMs": 0.599999999627471
+        },
+        {
+          "profileStringifyMs": 0.20000000018626451,
+          "profileParseMs": 0.5,
+          "profileSaveMs": 0.20000000018626451,
+          "profileValidateMs": 0.900000000372529,
+          "apsListMs": 0.5,
+          "apsExportMs": 1.099999999627471,
+          "apsRecordMs": 3.599999999627471
+        }
+      ]
+    },
+    {
+      "scenario": "medium",
+      "profiles": 3,
+      "attemptsPerSubjectPerProfile": 60,
+      "factsPerProfile": 100,
+      "initialApsEpisodesPerProfile": 100,
+      "profileUtf8Bytes": 1087298,
+      "apsUtf8Bytes": 139128,
+      "apsRetention": {
+        "retained": 105,
+        "discarded": 0,
+        "firstRetained": 12,
+        "earliestAt": "2026-11-25T00:00:00.100Z",
+        "latestAt": "2026-11-25T00:16:43.100Z"
+      },
+      "runs": [
+        {
+          "profileStringifyMs": 25.600000000558794,
+          "profileParseMs": 16.699999999254942,
+          "profileSaveMs": 97,
+          "profileValidateMs": 51.299999999813735,
+          "apsListMs": 21.799999999813735,
+          "apsExportMs": 13.900000000372529,
+          "apsRecordMs": 28.90000000037253
+        },
+        {
+          "profileStringifyMs": 33.40000000037253,
+          "profileParseMs": 10,
+          "profileSaveMs": 112.5,
+          "profileValidateMs": 18.90000000037253,
+          "apsListMs": 12.700000000186265,
+          "apsExportMs": 8.799999999813735,
+          "apsRecordMs": 43.40000000037253
+        },
+        {
+          "profileStringifyMs": 11.799999999813735,
+          "profileParseMs": 9.599999999627471,
+          "profileSaveMs": 119.90000000037253,
+          "profileValidateMs": 42.89999999944121,
+          "apsListMs": 9.799999999813735,
+          "apsExportMs": 5.7999999998137355,
+          "apsRecordMs": 21.200000000186265
+        },
+        {
+          "profileStringifyMs": 7.400000000372529,
+          "profileParseMs": 15.199999999254942,
+          "profileSaveMs": 84,
+          "profileValidateMs": 12.100000000558794,
+          "apsListMs": 10.599999999627471,
+          "apsExportMs": 4.900000000372529,
+          "apsRecordMs": 32
+        },
+        {
+          "profileStringifyMs": 3.7999999998137355,
+          "profileParseMs": 11.900000000372529,
+          "profileSaveMs": 83.69999999925494,
+          "profileValidateMs": 22.700000000186265,
+          "apsListMs": 4.900000000372529,
+          "apsExportMs": 4.2999999998137355,
+          "apsRecordMs": 29.09999999962747
+        }
+      ]
+    },
+    {
+      "scenario": "large",
+      "profiles": 6,
+      "attemptsPerSubjectPerProfile": 120,
+      "factsPerProfile": 100,
+      "initialApsEpisodesPerProfile": 200,
+      "profileUtf8Bytes": 3102467,
+      "apsUtf8Bytes": 548408,
+      "apsRetention": {
+        "retained": 200,
+        "discarded": 5,
+        "firstRetained": 12,
+        "earliestAt": "2026-11-25T00:00:00.100Z",
+        "latestAt": "2026-11-25T00:16:43.100Z"
+      },
+      "runs": [
+        {
+          "profileStringifyMs": 15.399999999441206,
+          "profileParseMs": 44.39999999944121,
+          "profileSaveMs": 265.90000000037253,
+          "profileValidateMs": 100.70000000018626,
+          "apsListMs": 138.09999999962747,
+          "apsExportMs": 108.70000000018626,
+          "apsRecordMs": 325
+        },
+        {
+          "profileStringifyMs": 94.29999999981374,
+          "profileParseMs": 87.79999999981374,
+          "profileSaveMs": 475,
+          "profileValidateMs": 112.5,
+          "apsListMs": 86.90000000037253,
+          "apsExportMs": 170.40000000037253,
+          "apsRecordMs": 181.19999999925494
+        },
+        {
+          "profileStringifyMs": 149.20000000018626,
+          "profileParseMs": 59.40000000037253,
+          "profileSaveMs": 195.20000000018626,
+          "profileValidateMs": 73.09999999962747,
+          "apsListMs": 24.700000000186265,
+          "apsExportMs": 166.5,
+          "apsRecordMs": 149
+        },
+        {
+          "profileStringifyMs": 55.59999999962747,
+          "profileParseMs": 48.40000000037253,
+          "profileSaveMs": 233.29999999981374,
+          "profileValidateMs": 122.1000000005588,
+          "apsListMs": 117.3999999994412,
+          "apsExportMs": 72.1000000005588,
+          "apsRecordMs": 140.8999999994412
+        },
+        {
+          "profileStringifyMs": 56.299999999813735,
+          "profileParseMs": 23.5,
+          "profileSaveMs": 86,
+          "profileValidateMs": 29.299999999813735,
+          "apsListMs": 53.40000000037253,
+          "apsExportMs": 56,
+          "apsRecordMs": 117.5
+        }
+      ]
+    },
+    {
+      "scenario": "bounded-quota-stress",
+      "status": "refused-capacity",
+      "phase": "synthetic-APS-seed",
+      "profiles": 6,
+      "attemptsPerSubjectPerProfile": 120,
+      "factsPerProfile": 250,
+      "initialApsEpisodesPerProfile": 200,
+      "profileUtf8Bytes": 4949267,
+      "attemptedApsUtf8Bytes": 548373,
+      "errorName": "QuotaExceededError",
+      "profilePreserved": true,
+      "priorApsPreserved": true
+    }
+  ]
+}

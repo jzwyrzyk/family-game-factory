@@ -6,7 +6,7 @@ export type JobStatus='draft'|'queued'|'building'|'testing'|'ready'|'failed'|'ca
 export interface BuilderConfig {version:1;mode:'unavailable'|'remote';apiBaseUrl?:string;previewOrigin?:string}
 export interface RequestChange {gameId:string;baseRevisionId:string|null;prompt:string;config?:Record<string,number|boolean>}
 export interface JobView {jobId:string;status:JobStatus;revisionId?:string;errorCode?:string;adapter?:string;phase?:string;attempts?:number;retryJobId?:string}
-export interface Preview {revisionId:string;projectId?:string;url:string;artifactId:string;expiresAt:number;adapter?:string;kind?:string;title?:string}
+export interface Preview {grant?:string;revisionId:string;projectId?:string;url:string;artifactId:string;expiresAt:number;adapter?:string;kind?:string;title?:string}
 export interface CreationManifestResponse {revisionId:string;projectId:string;manifest:CreationProject|null}
 const loopback=(url:URL)=>['127.0.0.1','localhost','[::1]'].includes(url.hostname);
 export function validateBuilderConfig(input:unknown):BuilderConfig {
@@ -66,6 +66,16 @@ export class BuilderClient {
   if(job.retryJobId){const latest=await this.readLatestJob(job.jobId,token);if(!latest)return;job=latest;}
   if(token!==this.generation)return;
   if(!await this.publish(job,token,saved.clientRequestId))return;return job;
+ }
+ /** Explicit supervised workspace action after a lost response. Reuse the
+  * durable request exactly. Browser startup and reconnection never call this. */
+ async resendSavedSubmission(input:BuildSubmission){
+  const request=validateBuildSubmission(input),known=await this.lookupSubmission(request);
+  if(known!==null)return known;
+  const token=this.generation,{gameId,baseRevisionId,prompt,clientRequestId}=request;
+  const ack=validateJob(await this.api('/v1/jobs',{gameId,baseRevisionId,prompt,clientRequestId}));
+  if(!await this.publish(ack,token,clientRequestId))return;
+  return ack;
  }
  /** Restore the exact saved job, including a retry whose acknowledgement was
   * lost. Looking up or following that chain never submits another paid job. */

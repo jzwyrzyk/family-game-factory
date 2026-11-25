@@ -5,6 +5,20 @@ on:
     types: [completed]
   workflow_dispatch:
     inputs:
+      family_beta:
+        description: Optional authenticated family candidate operation in an existing nonproduction environment
+        type: choice
+        options: ['off', verify, stage]
+        default: 'off'
+      family_stage:
+        description: Existing private family environment
+        type: choice
+        options: [dev, test]
+        default: dev
+      family_source:
+        description: Full reviewed application commit for the private family operation
+        type: string
+        required: false
       run_id:
         description: Successful source workflow run to reconcile; empty means cleanup only
         required: false
@@ -20,7 +34,7 @@ concurrency:
 
 jobs:
   prepare:
-    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && (github.event_name != 'workflow_dispatch' || !inputs.family_beta || inputs.family_beta == 'off') && (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -190,3 +204,61 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 scripts/environments/automation.py cleanup
+
+  private-family-candidate:
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && (inputs.family_beta == 'verify' || inputs.family_beta == 'stage')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: jems-nonproduction
+    permissions:
+      contents: read
+      actions: read
+      checks: read
+      pull-requests: read
+      id-token: write
+    env:
+      FAMILY_ENVIRONMENT: ${{ inputs.family_stage }}
+      FAMILY_SOURCE: ${{ inputs.family_source }}
+      FAMILY_OPERATION: ${{ inputs.family_beta }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - id: config
+        name: Check the protected nonproduction controller configuration
+        run: python3 scripts/environments/automation.py config
+      - name: Verify the reviewed family candidate before cloud authentication
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVIEWED_RELEASE: ${{ inputs.family_stage == 'dev' && vars.JEMS_FAMILY_DEV_RELEASE || vars.JEMS_FAMILY_TEST_RELEASE }}
+        run: |
+          python3 - <<'PYTHON'
+          import json, os, re, sys
+          from pathlib import Path
+          sys.path.insert(0,'scripts/environments')
+          import ci_evidence, github
+          source=os.environ['FAMILY_SOURCE']; stage=os.environ['FAMILY_ENVIRONMENT']
+          assert re.fullmatch(r'[a-f0-9]{40}',source) and stage in ('dev','test')
+          record=json.loads(os.environ['REVIEWED_RELEASE'])
+          assert record['source']==source and record['descriptor']['environment']==stage
+          api=github.GitHub()
+          ci_evidence.verify_full_ci(api,source,stage,record.get('pr'))
+          runs=api.request('repos/jzwyrzyk/family-game-factory/actions/workflows/trusted-device-security.yml/runs?head_sha='+source)['workflow_runs']
+          eligible=[r for r in runs if r['head_sha']==source and r['event']==('pull_request' if stage=='dev' else 'push')]
+          assert eligible and max(eligible,key=lambda r:r['id'])['conclusion']=='success'
+          target=Path(os.environ['RUNNER_TEMP'])/'family-release.json';target.touch(mode=0o600,exist_ok=False);target.write_text(json.dumps(record))
+          PYTHON
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          workload_identity_provider: ${{ steps.config.outputs.provider }}
+          service_account: ${{ steps.config.outputs.deployer }}
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f
+      - name: Verify existing infrastructure or stage digest-pinned revisions at zero traffic
+        run: node scripts/beta/environment-release.mjs "$RUNNER_TEMP/family-release.json" "$FAMILY_OPERATION" "$FAMILY_ENVIRONMENT" "$FAMILY_SOURCE" "$RUNNER_TEMP/family-receipt.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: family-candidate-${{ inputs.family_stage }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/family-receipt.json
+          if-no-files-found: error
+          retention-days: 14

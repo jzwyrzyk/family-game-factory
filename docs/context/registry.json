@@ -123,7 +123,8 @@
     "docs/game-intelligence/premium-benchmark/*.md",
     "docs/development/*.md",
     "infra/nonproduction/*.md",
-    "docs/development/evidence/*.md"
+    "docs/development/evidence/*.md",
+    "docs/storage/*.md"
   ],
   "areas": [
     {
@@ -144,10 +145,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T21:27:35.450Z",
-      "sourceDigest": "8dd4f382037bef30cb73b088a6080c731934aa1f97a375052774b7290d67e964",
-      "reviewOutcome": "updated",
-      "reviewReason": "Architecture records shared presentation-only alpha preparation; original artwork, ownership and product doctrine are unchanged.",
+      "reviewedAt": "2026-11-25T18:24:21.985Z",
+      "sourceDigest": "f6c07d9cb139945baa6a14d113dfe66d5477ed0675a93a9ff383d716db34fb46",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Inventory-aware legacy lookup and diagnostic error context preserve child-owned originals, explicit consent, rollback and audience boundaries; no product doctrine change.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -304,13 +305,14 @@
         "docs/brand/achievement-art/README.md",
         "docs/brand/achievement-art/*.json",
         "docs/brand/art-library/**",
-        "src/speech/**"
+        "src/speech/**",
+        "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T21:27:36.000Z",
-      "sourceDigest": "578812989cb35f853a01486f9f9d3b172f343082ee9897f9faa8111837e6db39",
+      "reviewedAt": "2026-11-25T21:23:13.250Z",
+      "sourceDigest": "57ab04a98224db722fd91a4b94eb49cd9c4f03db93f3aca9b56da9ec4238917c",
       "reviewOutcome": "updated",
-      "reviewReason": "Journey fidelity evidence records compact card sizing, four viewport captures and shared portraits; child copy and approved navigation hierarchy remain unchanged.",
+      "reviewReason": "Documented active-only fitted-play observations and original navigation intent across local revision reads; newer Change or Help prevents late mounting while existing owner/session/epoch guards remain.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -407,10 +409,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "53ccc18b5a8d5c8f3238096846f4e98d71020854935d317db6fed55c4a529bde",
-      "reviewedAt": "2026-11-25T21:27:37.669Z",
+      "sourceDigest": "cc8e4b6b3a2e729b32f5fd154215f0f2bae944ce52a9f6568222059a4ffa8369",
+      "reviewedAt": "2026-11-25T17:33:43.447Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Shared Pal rendering contract now covers DOM picker and canvas scene, exact-source holes, preparation failure and unchanged saved scene references.",
+      "reviewReason": "Reviewed scoped prepared-domain capture and restore beyond the old cross-owner aggregate, actual 42-scene recovery and fresh target initialization; per-owner scene validators, authoring semantics, immutable provenance and explicit preparation remain documented.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -494,10 +496,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "016ac2a13ffdf7bd1d96bab3226fe97e8612100410308aea2cf8b33ce2aca610",
-      "reviewedAt": "2026-11-25T18:46:30.452Z",
+      "sourceDigest": "8abff69badaf5e4321ad79c8580fb4c56b04d57761e9be3f7519c642c7562106",
+      "reviewedAt": "2026-11-25T18:50:02.598Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Canonical Invent a game CTA and Journey return are documented; rewards balances, grant authority and evidence rules remain unchanged.",
+      "reviewReason": "Storage rollout records exact no-op restore writes and one native-quota-only lossless Latin-1 retry, including journal and rollback; 25 contracts retain original sources and permanent-quota/wide-text failure behavior, without earning or retention changes.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -562,10 +564,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T04:08:52.154Z",
-      "sourceDigest": "5724f5d35ec88cc328b8c315085c1bc1e96473f58ddafa7f1f766ab8c8c8b298",
+      "reviewedAt": "2026-11-25T20:35:53.062Z",
+      "sourceDigest": "ba9a6743d805944944e22daec9c76063a7814ac413be0c022eaef0c5330d1fd8",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated the Mining visual-evidence contract to the inspected PR134 unified-player captures, with prior receipt preserved. Gameplay rules, artwork, shared Help lifecycle and compatibility contracts are unchanged by the exact hosted PNG import.",
+      "reviewReason": "Reviewed test-only passive ResizeObserver diagnostics, forwarded canvas setters and untouched native lifecycle controls. Updated Play View evidence with per-document assertions and causal old-callback failure; runtime fitting and all gameplay assertions remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -663,7 +665,8 @@
         "docs/auth/*.md",
         "server/README.md",
         "docs/adult-pilot/*.md",
-        "docs/privacy/*.md"
+        "docs/privacy/*.md",
+        "docs/family-beta/*.md"
       ],
       "sources": [
         "server/*.ts",
@@ -673,13 +676,14 @@
         "server/contracts/**",
         "server/storage/**",
         "docs/auth/*.md",
-        "server/privacy/**"
+        "server/privacy/**",
+        "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:37:11.473Z",
-      "sourceDigest": "1b3859e5f2fd331ed8b3cb442cbb85e38426813a814283e9774d64d526bd3c35",
+      "reviewedAt": "2026-11-25T18:24:22.137Z",
+      "sourceDigest": "b8d5f8f52eb9183a29d58846b3f208bffb5b6f9ae00f2093b7491b7e54967b24",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage.",
+      "reviewReason": "Completion records database and migration-stage diagnostics without filtering, deleting or omitting stored originals; inventory absence avoids a needless legacy creation probe.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -729,10 +733,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:43:53.020Z",
-      "sourceDigest": "23ec623429cdbf0cd68583d0045ad422cd56c17281aacfad3cf10bb2b9a7571c",
+      "reviewedAt": "2026-11-25T17:33:43.817Z",
+      "sourceDigest": "4f19311d071f73686310b2f9aa095800702709ad0e6c9f6f1eb4773452e11c12",
       "reviewOutcome": "updated",
-      "reviewReason": "The generator leaves educational grade with the host. Preserve the original request budget and optional companion admission.",
+      "reviewReason": "Documented trusted original capture and repeated asset repair, immutable source provenance and playback-only mapped copies; admission rejects recovered edit/base/fork lineage before reservation, preserving ordinary and premium limits without importing jobs or accounting.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -761,10 +765,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:39:40.971Z",
-      "sourceDigest": "f42ba445f7f88327ddb8ed6c59b54c976169fa5db68b62ef75a07f348f86cc3b",
+      "reviewedAt": "2026-11-25T16:41:37.451Z",
+      "sourceDigest": "7ac1eb43e2368e8d64ec8e0a351e9b45b481520a245c7df6491c1624282699e9",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented empty-composer completion, exactly-once draft coaching and explicit renewed Build after updated recap.",
+      "reviewReason": "Reviewed awaited notebook writes, draft/coaching epoch fences, owner-scoped bounded metadata presentation and inactive-family reply expiration; authored transcript preservation and separate consent remain documented.",
       "reviewHistory": [
         {
           "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
@@ -825,10 +829,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "d320ffa0ba7ec6354e5d7da2e22adad9ab88cdf4cf4d6404b3f730795ce37128",
-      "reviewedAt": "2026-11-25T01:44:10.317Z",
+      "sourceDigest": "254e5bc24519e6d068053d488e6e6483060cfde1884a725987ff7ed7f6109c48",
+      "reviewedAt": "2026-11-25T17:33:43.991Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified early-grade host and speech behavior with synthetic family sessions, eight native games, a live isolated fixture and five browser viewports.",
+      "reviewReason": "Reconciled fresh source-to-target Adult mapping and grant, original-audience retained-source capture, durable reviewed attempts, stale workspace UI clearing and playback-only remote copies; no credentials, jobs, spending or private authority transfer.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -886,10 +890,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T21:27:38.222Z",
-      "sourceDigest": "290fc9f09ad5147b91e679f072c00797a514caae4cbcc6a617100320d1a32351",
+      "reviewedAt": "2026-11-25T21:23:13.837Z",
+      "sourceDigest": "87d114b2a9156651ec4eefb2459822281d69a7e47ccaac6cc2882c257785941f",
       "reviewOutcome": "updated",
-      "reviewReason": "New 186-variant pixel audit and app/offline profiles are added to existing Pal and review gates; creative leaf coverage grows to 65 with no narrowed CI.",
+      "reviewReason": "Preserved 77b failures and exact causal negatives/positives: native request cancellation versus simulated handler aborts, metadata-only empty-host observer ownership, and actual Change in both pending local read gaps; no browser errors or original assertions relaxed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1126,13 +1130,14 @@
         "DELIVERY-STATE.md",
         "scripts/environments/**",
         "infra/nonproduction/**",
-        "scripts/environments/ci_evidence.py"
+        "scripts/environments/ci_evidence.py",
+        "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T21:27:38.863Z",
-      "sourceDigest": "d4059e046951c66e6067ecaa10e4fc9ceac4fff321a75bd86b3d7838ec447621",
+      "reviewedAt": "2026-11-25T21:23:13.987Z",
+      "sourceDigest": "e59f705db2c5d19717d0d9e28976d7e26fb4af728f1263d6aaeaaf9f68eae1a4",
       "reviewOutcome": "updated",
-      "reviewReason": "Delivery records owner Android defect, baseline source, correction evidence and explicit owner acceptance and merge/deploy hold.",
+      "reviewReason": "Recorded 77b Security failure, independently verified passing workflows, scoped corrections and local evidence; successor exact-head hosted checks still govern review readiness, with release and real-data operations held.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1387,10 +1392,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T15:58:37.345Z",
-      "sourceDigest": "e11f4416274087c5bdb8f3324e0801f938d415a0f8f3ee71810fa119f7f11ed2",
+      "reviewedAt": "2026-11-25T17:36:49.815Z",
+      "sourceDigest": "ffcb75ea2b467438035bcf79bf5bcb35abee7594f4127027f5431f504244a43e",
       "reviewOutcome": "updated",
-      "reviewReason": "Linked the standalone review runbook in README and documentation index, registered its maintenance contract and preserved the existing product entry instructions.",
+      "reviewReason": "Reviewed the added storage helper route, existing family/storage document index and source coverage; preserved the semantic-review requirement, link scope and all existing areas instead of refreshing unrelated records. Reviewed main185 required review runbook/index and broad tools/workflow routing together with storage helper coverage; retained both architectures and all existing semantic checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1491,10 +1496,10 @@
         "tests/parent-dashboard*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "04d6ff8e0f2e9b0a0103f3ab4676bd8448435d0767877576b52e5581d8177004",
-      "reviewedAt": "2026-11-25T01:35:59.159Z",
+      "sourceDigest": "6eec1383215c1abfc6281933bfd4372a504d5690ffdefb790d290486b8ab4f3f",
+      "reviewedAt": "2026-11-25T16:41:38.340Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The young learner journey and parent view retain the first-move observation on its own project and revision.",
+      "reviewReason": "Documented lazy Parent snapshots from the active scene authority, late-result owner/request fences and unavailable prepared-source errors; reporting remains read-only with existing learning interpretation.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-19T17:17:56.552Z",
@@ -1518,10 +1523,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "9a8c36452deed944bfe0576d7b2334401a537b735d2f247a61f122da1e016789",
-      "reviewedAt": "2026-11-25T18:40:42.754Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Updated browser navigation to the consolidated experiment entrance and retained exact evidence equality, separately asserting only the explicit intro preference.",
+      "sourceDigest": "ec5644fcbf01f5b6ef58818d76ce999d96b5938d1769bc1775f0e69ded23233d",
+      "reviewedAt": "2026-11-25T17:33:44.490Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed async practice action catch and browser-negative fixture: a failed awaited Studio entry now reports only to the same owner; episode schemas, evaluators, evidence meaning, retention, reporting and reward rules are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1610,10 +1615,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "db50db7310a056f43edb8f40a3af4ac106e1486a28b9f99279c59d6f0b083eaa",
-      "reviewedAt": "2026-11-25T18:46:31.554Z",
+      "sourceDigest": "8b3ecf6682dac371e9270e8477be8e589ef1b5a810f91953afcd86b75dd87fff",
+      "reviewedAt": "2026-11-25T18:50:03.037Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Visual review repaired drawing-dialog text and canonical My Art kicker alongside original Art layout, private storage and contextual returns.",
+      "reviewReason": "Recovery now completes initial art preparation before maintenance and rechecks audience; held-inventory actual-app regression retains original art, cloud lost-ack retry and single immutable root checks. Art readiness also covers exact read-only request cancellation.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1654,10 +1659,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "29d58775759c9a88295eb501eca578eb381383831a62466b0e6425af13ab47eb",
-      "reviewedAt": "2026-11-25T21:27:40.219Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Pal and expression contracts use canonical shared alpha, exact-source negative-space seeds and existing error recovery without collection/growth/reward changes.",
+      "sourceDigest": "c6201521fdd75fcc4c8dec29451d86d849ab294dd3fd48d3cc731f3d22399b2a",
+      "reviewedAt": "2026-11-25T16:41:38.788Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The Pals host now awaits the existing Studio entry/save guard; collection policy, deterministic rewards, Base/Grown assets, scene provenance and ownership rules are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1674,6 +1679,28 @@
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
+    },
+    {
+      "id": "storage",
+      "documents": [
+        "docs/storage/*.md",
+        "docs/child-continuity/F06-STORAGE-RECOVERY-EXPERIMENT.md",
+        "docs/child-continuity/RELIABILITY-2026-11-23.md",
+        "ARCHITECTURE-CURRENT.md"
+      ],
+      "sources": [
+        "src/storage/**",
+        "server/storage/**",
+        "infra/storage/**",
+        "tools/storage-*",
+        "docs/storage/**",
+        "scripts/storage/**"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "18b933d6e8a56f3b05e01944d099956324a5654bc728c3a18d0cc160908e6e86",
+      "reviewedAt": "2026-11-25T18:50:03.148Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Rollout records capture readiness ordering, lossless exact-string and bounded quota retry for legacy recovery, preserved protected rollback and no additional capacity or deletion; benchmark pins and native WebKit evidence limits remain explicit."
     }
   ]
 }

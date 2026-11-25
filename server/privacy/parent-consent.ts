@@ -129,5 +129,5 @@ export async function recordExternalGuardianVerification(
 }
 export function verifiedParentScope(s:PipelineState,familyId:string,scope:keyof ParentPrivacyScopes,now=Date.now()){
  const c=newest(s,familyId);
- return !!c&&verifiedChoice(s,c,now)&&c.scopes[scope]===true;
+ return (!s.betaScopes||s.betaScopes[scope]===true)&&!!c&&verifiedChoice(s,c,now)&&c.scopes[scope]===true;
 }

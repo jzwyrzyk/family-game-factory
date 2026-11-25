@@ -1,0 +1,32 @@
+/** Browser-only scoped recovery vault. No network or deletion. */
+import {RECOVERY_DB,recoveryScopeKey,validateRecoveryArchive,type RecoveryScope,type RecoveryArchive,type RecoveryPoint,type RestoreReceipt} from './recovery-format';
+export * from './recovery-format';
+const request=<T>(r:IDBRequest<T>)=>new Promise<T>((resolve,reject)=>{r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
+const done=(tx:IDBTransaction)=>new Promise<void>((resolve,reject)=>{tx.oncomplete=()=>resolve();tx.onabort=()=>reject(tx.error||Error('Recovery storage could not be saved. Existing work is unchanged.'));tx.onerror=()=>reject(tx.error);});
+async function database(){const open=indexedDB.open(RECOVERY_DB,1);open.onupgradeneeded=()=>{const db=open.result;db.createObjectStore('chunks');const points=db.createObjectStore('points',{keyPath:'key'});points.createIndex('scope-created',['scopeKey','createdAt','id']);db.createObjectStore('preparing');db.createObjectStore('receipts',{keyPath:'id'});db.createObjectStore('settings');};const db=await request(open);db.onversionchange=()=>db.close();return db;}
+async function transaction<T>(names:string[],mode:IDBTransactionMode,work:(tx:IDBTransaction)=>Promise<T>|T):Promise<T>{const db=await database(),tx=db.transaction(names,mode),finished=done(tx);void finished.catch(()=>{});try{const value=await work(tx);await finished;return value;}catch(error){try{tx.abort();}catch{}await finished.catch(()=>{});throw error;}finally{db.close();}}
+export class RecoveryVault {
+ constructor(readonly scope:RecoveryScope,private assertScope:()=>void){recoveryScopeKey(scope);}
+ private key(){this.assertScope();return recoveryScopeKey(this.scope);}
+ async save(archive:RecoveryArchive):Promise<RecoveryPoint>{const key=this.key();await validateRecoveryArchive(archive,this.scope);this.key();const point=archive.manifest,pointer=`${key}:${point.id}`;
+  await transaction(['preparing','points'],'readwrite',async tx=>{const prior=await request(tx.objectStore('preparing').get(pointer))??await request(tx.objectStore('points').get(pointer));if(prior&&prior.checksum!==point.checksum)throw Error('A recovery identity already belongs to different saved work.');tx.objectStore('preparing').put({checksum:point.checksum},pointer);});
+  // Bounded, idempotent batches. A complete point is published only at the end.
+  const entries=Object.entries(archive.chunks);for(let offset=0;offset<entries.length;offset+=16){this.key();await transaction(['chunks'],'readwrite',async tx=>{for(const [hash,value] of entries.slice(offset,offset+16)){const id=`${key}:${hash}`,old=await request(tx.objectStore('chunks').get(id));if(old!==undefined&&old!==value)throw Error('Stored recovery bytes are damaged.');tx.objectStore('chunks').put(value,id);}});}
+  this.key();await transaction(['points','preparing'],'readwrite',tx=>{tx.objectStore('points').put({...point,key:pointer,scopeKey:key});tx.objectStore('preparing').delete(pointer);});return point;
+ }
+ async read(id:string):Promise<RecoveryArchive>{const key=this.key();const stored=await transaction(['points'],'readonly',tx=>request(tx.objectStore('points').get(`${key}:${id}`)));if(!stored)throw Error('This recovery point is unavailable.');const {key:_key,scopeKey:_scope,...manifest}=stored;const chunks:Record<string,string>={};for(const part of manifest.parts)for(const hash of part.chunks){this.key();chunks[hash]=await transaction(['chunks'],'readonly',tx=>request(tx.objectStore('chunks').get(`${key}:${hash}`)));}const archive={manifest,chunks};await validateRecoveryArchive(archive,this.scope);this.key();return archive;}
+ async list(before?:{createdAt:string;id:string},limit=20):Promise<RecoveryPoint[]>{const key=this.key();if(!Number.isInteger(limit)||limit<1||limit>100)throw Error('Choose a bounded recovery page.');return transaction(['points'],'readonly',tx=>new Promise((resolve,reject)=>{const result:RecoveryPoint[]=[];const range=IDBKeyRange.bound([key,'',''],[key,before?.createdAt??'\uffff',before?.id??'\uffff'],false,!!before);const cursor=tx.objectStore('points').index('scope-created').openCursor(range,'prev');cursor.onerror=()=>reject(cursor.error);cursor.onsuccess=()=>{const entry=cursor.result;if(!entry||result.length===limit){resolve(result);return;}const {key:_key,scopeKey:_scope,...point}=entry.value;result.push(point);entry.continue();};}));}
+ async receipt(pointId:string):Promise<RestoreReceipt|undefined>{const key=this.key();return transaction(['receipts'],'readonly',tx=>request(tx.objectStore('receipts').get(`${key}:${pointId}`)));}
+ async recordRestore(pointId:string,rollbackId:string,phase:RestoreReceipt['phase']):Promise<void>{const scope=this.key();await transaction(['receipts'],'readwrite',tx=>{tx.objectStore('receipts').put({id:`${scope}:${pointId}`,pointId,scope,phase,rollbackId,updatedAt:new Date().toISOString()});});}
+ async schedule():Promise<{enabled:boolean;intervalHours:number;lastCompleted?:string}>{const key=this.key();return await transaction(['settings'],'readonly',tx=>request(tx.objectStore('settings').get(key)))??{enabled:false,intervalHours:24};}
+ async setSchedule(value:{enabled:boolean;intervalHours:number;lastCompleted?:string}){const key=this.key();if(typeof value.enabled!=='boolean'||!Number.isInteger(value.intervalHours)||value.intervalHours<1||value.intervalHours>720||value.lastCompleted!==undefined&&!Number.isFinite(Date.parse(value.lastCompleted)))throw Error('Choose a valid recovery schedule.');await transaction(['settings'],'readwrite',tx=>{tx.objectStore('settings').put(value,key);});}
+}
+
+/** Full before-images belong in IndexedDB, not beside a near-full legacy source
+ * in localStorage. The small pointer is scoped and never grants Adult access. */
+export async function recoveryJournal(id:string,namespace:string,value?:string):Promise<string|undefined>{
+ if(!/^[a-f0-9-]{36}$/.test(id)||!namespace||namespace.length>250)throw Error('The recovery journal identity is invalid.');
+ const key=JSON.stringify(['reward-journal',location.origin,namespace,id]);
+ if(value!==undefined){if(value.length>40_000_000)throw Error('The recovery journal is too large.');await transaction(['settings'],'readwrite',tx=>{tx.objectStore('settings').put(value,key);});return value;}
+ return transaction(['settings'],'readonly',tx=>request(tx.objectStore('settings').get(key)));
+}

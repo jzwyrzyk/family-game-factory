@@ -8,7 +8,7 @@ const {exploreWelcome,navigate,openProfiles,openRetainedGame}=require('./studio-
 
 async function records(page,store,owner){
   return page.evaluate(async({store,owner})=>{
-    const db=await new Promise((resolve,reject)=>{const request=indexedDB.open('family-private-drawings-v1',2);request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
+    const db=await new Promise((resolve,reject)=>{const request=indexedDB.open('family-private-drawings-v1');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
     try{return await new Promise((resolve,reject)=>{const request=db.transaction(store).objectStore(store).getAll();request.onsuccess=()=>resolve(request.result.filter(record=>record.owner===owner).map(record=>({...record,bytes:undefined,preview:undefined})));request.onerror=()=>reject(request.error);});}
     finally{db.close();}
   },{store,owner});

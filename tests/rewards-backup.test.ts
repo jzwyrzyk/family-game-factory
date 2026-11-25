@@ -385,3 +385,42 @@ test('maintenance pauses a late workspace write before changing its cached draft
   try{assert.throws(()=>workspace.keep(project.id,OWNER),/restoring saved progress/);assert.deepEqual(workspace.snapshot(),prior);assert.equal(storage.getItem(WORKSPACE_KEY),raw);}
   finally{setRewardSourceMaintenance(false);}
 });
+
+test('complete indexed restore journals only changed legacy sources and retains large originals byte-for-byte',async()=>{
+ const {storage,rewards,pals}=stores(),value=await incoming(),plan=validateFamilyRewardBackup(JSON.stringify(value),validateBase,rewards,pals),kept=[WORKSPACE_KEY,STUDIO_KEY,CREATION_KEY];
+ for(const key of kept)storage.setItem(key,' original indexed migration source '+key+'x'.repeat(1_900_000));
+ const before=Object.fromEntries(kept.map(key=>[key,storage.getItem(key)]));
+ const originalSet=storage.setItem.bind(storage);storage.setItem=(key,raw)=>{if(raw.length>1_000_000)throw Error('quota');originalSet(key,raw);};
+ await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals,'family',()=>{},kept);
+ const journal=JSON.parse(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!);assert.deepEqual(journal.preservedIndexed,kept);for(const key of kept){assert.equal(Object.hasOwn(journal.sources,key),false);assert.equal(storage.getItem(key),before[key]);}
+ assert.equal(await recoverRewardBackupJournal(storage,rewards,pals),'cleaned');for(const key of kept)assert.equal(storage.getItem(key),before[key]);
+ // An interruption restores only the protected mutable keys. Retained indexed
+ // sources never become a journal-owned deletion or replacement target.
+ await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals,'family',()=>{},kept);const pending=JSON.parse(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!);pending.phase='pending';originalSet(REWARD_BACKUP_JOURNAL_KEY,JSON.stringify(pending));
+ assert.equal(await recoverRewardBackupJournal(storage,rewards,pals),'reload');for(const key of kept)assert.equal(storage.getItem(key),before[key]);
+ const malformed={...pending,preservedIndexed:[FAMILY_STATE_KEY]};originalSet(REWARD_BACKUP_JOURNAL_KEY,JSON.stringify(malformed));await assert.rejects(recoverRewardBackupJournal(storage,rewards,pals),/indexed recovery journal/);
+});
+
+test('recovery leaves identical source strings in place instead of widening or rewriting them',async()=>{
+ const {storage,rewards,pals}=stores(),plan=validateFamilyRewardBackup(JSON.stringify(await incoming()),validateBase,rewards,pals);
+ const expected={[FAMILY_STATE_KEY]:JSON.stringify(plan.base),[WORKSPACE_KEY]:JSON.stringify(plan.workspace),[STUDIO_KEY]:JSON.stringify(plan.notebook),[CREATION_KEY]:JSON.stringify(plan.creation),[PROBLEM_SOLVING_KEY]:JSON.stringify(plan.problemSolving)};
+ for(const [key,value]of Object.entries(expected))storage.setItem(key,value);
+ const write=storage.setItem.bind(storage);storage.setItem=(key,value)=>{if(REWARD_SOURCE_KEYS.includes(key as any))throw Error('An identical source was unnecessarily rewritten');write(key,value);};
+ await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals);assert.equal(JSON.parse(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!).phase,'committed');assert.deepEqual(sources(storage),expected);
+});
+
+test('a native quota retry preserves every Latin-1 code unit and keeps its original journal intact',async()=>{
+ const {storage,rewards,pals}=await existing(),value=await incoming();value.factoryStudio.sessions[0].messages=[{id:'latin-1',role:'child',text:'Caf\u00e9 \u0080 \u00ff '+ 'x'.repeat(2000),at:new Date(TIME).toISOString()}];
+ const plan=validateFamilyRewardBackup(JSON.stringify(value),validateBase,rewards,pals),expected=JSON.stringify(plan.notebook),old=storage.getItem(STUDIO_KEY),write=storage.setItem.bind(storage);let attempts=0;
+ storage.setItem=(key,raw)=>{if(key===STUDIO_KEY&&raw===expected){attempts++;const journal=JSON.parse(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!);assert.equal(journal.phase,'pending');assert.equal(journal.sources[STUDIO_KEY],old);assert.equal(storage.getItem(STUDIO_KEY),old);if(attempts===1)throw new DOMException('Synthetic backing-width quota','QuotaExceededError');}write(key,raw);};
+ await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals);assert.equal(attempts,2);assert.equal(storage.getItem(STUDIO_KEY),expected);assert.equal(JSON.parse(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!).phase,'committed');
+});
+
+test('permanent quota and genuinely wide source text fail safely without looping or changing original bytes',async()=>{
+ for(const wide of [false,true]){
+  const {storage,rewards,pals,beforeSources,beforeLedger,persistence}=await existing(),value=await incoming();if(wide)value.factoryStudio.sessions[0].messages=[{id:'wide',role:'child',text:'Original \ud83e\ude81 and \ud800 preserved',at:new Date(TIME).toISOString()}];
+  const plan=validateFamilyRewardBackup(JSON.stringify(value),validateBase,rewards,pals),expected=JSON.stringify(plan.notebook),write=storage.setItem.bind(storage);let attempts=0;
+  storage.setItem=(key,raw)=>{if(key===STUDIO_KEY&&raw===expected){attempts++;throw new DOMException('Synthetic full store','QuotaExceededError');}write(key,raw);};
+  await assert.rejects(applyFamilyRewardBackup(plan,storage,rewards,'restore',pals),/original progress was restored/);assert.equal(attempts,wide?1:2);assert.deepEqual(sources(storage),beforeSources);assert.deepEqual(await persistence.read(REWARDS_DB_NAME),beforeLedger);assert.equal(JSON.parse(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!).phase,'rolled-back');
+ }
+});

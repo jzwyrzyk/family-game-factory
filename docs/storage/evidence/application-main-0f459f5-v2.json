@@ -1,0 +1,5112 @@
+{
+  "schema": "jems.storage.application-benchmark.v2",
+  "authority": "default-legacy",
+  "observedAt": "2026-11-25T16:20:22.845Z",
+  "source": "0f459f5b29fa3a72c5caf1fa69051475421861f9",
+  "gitTree": "1c17844c1db1b8f842cb94001ff7209fd6663c7f",
+  "trackedNonApplicationChanges": [],
+  "build": {
+    "directory": "dist",
+    "fileCount": 370,
+    "bytes": 238498792,
+    "builtFilesSha256": "330ed6894aa57c32130ecb2373a8cd12b8e49c92bc9120e44cbf93b96d91ff1a",
+    "provenance": "Build TARGET from this committed source before running; this digest identifies measured delivered bytes, not a hosted build attestation."
+  },
+  "scope": "Synthetic data generated with actual application RevisionStore/StudioNotebook, built Jems UI, real Chromium localStorage/IndexedDB; desktop emulation on one shared Linux host. No network provider or cloud data. Native/notebook record operations use the actual selected authority. The legacyExport/legacyRestoreValidation key names retain comparison compatibility; indexed runs snapshot/restore the active indexed sources. They exclude originals, rewards, Pals and cloud; full backup is measured separately.",
+  "instrumentation": "Synchronous JSON and localStorage instrumentation adds overhead; byte counters are UTF-16 code units, separately exported UTF-8 bytes. Startup includes browser navigation and readiness wait. IDB counters include logical JSON and binary payloads; footprint includes immutable history and retained original migration sources separately from localStorage, but omits browser index/page overhead. Original baseline v1 lacked these IDB counters and UI draft timing; compare v2 only. Process metrics are CDP observations of startup and the complete measured page lifetime (including explicit footprint traversal), not isolated CPU or physical-device memory. Samples share warm HTTP cache and accumulate one retained revision per sample.",
+  "browser": "156.0.8078.79",
+  "samples": 5,
+  "rows": [
+    {
+      "scenario": "small",
+      "projects": 5,
+      "revisionsPerProject": 1,
+      "initialRevisions": 5,
+      "sessions": 5,
+      "messagesPerSession": 20,
+      "artwork": {
+        "originalCount": 2,
+        "pixels": 256,
+        "originalBytes": 336612,
+        "previewBytes": 336612
+      },
+      "migration": null,
+      "metrics": {
+        "readyMs": {
+          "median": 965.8577219999988,
+          "p95": 1140.7619059999997,
+          "samples": [
+            892.3265769999998,
+            797.1931839999997,
+            965.8577219999988,
+            1140.7619059999997,
+            1035.8406839999989
+          ]
+        },
+        "libraryMs": {
+          "median": 135.79464199999984,
+          "p95": 149.73391099999935,
+          "samples": [
+            135.79464199999984,
+            94.88811499999974,
+            132.35333399999945,
+            149.73391099999935,
+            145.4475079999993
+          ]
+        },
+        "openMs": {
+          "median": 329.0083730000006,
+          "p95": 373.6049550000007,
+          "samples": [
+            373.6049550000007,
+            323.53592299999946,
+            339.6867770000008,
+            325.5348189999986,
+            329.0083730000006
+          ]
+        }
+      },
+      "runs": [
+        {
+          "readyMs": 892.3265769999998,
+          "libraryMs": 135.79464199999984,
+          "openMs": 373.6049550000007,
+          "startup": {
+            "counters": {
+              "getCalls": 60,
+              "getCodeUnits": 786611,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 386,
+              "parseCodeUnits": 1537727,
+              "parseMs": 6.499999998603016,
+              "stringifyCalls": 393,
+              "stringifyCodeUnits": 785588,
+              "stringifyMs": 2.4999999990686774,
+              "idbGetCalls": 4,
+              "idbCursorSteps": 0,
+              "idbPutCalls": 0,
+              "idbReadPayloadBytes": 673830,
+              "idbWritePayloadBytes": 0
+            },
+            "heapBytes": 13592958,
+            "domNodes": 2308,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.024666
+              },
+              {
+                "name": "TaskDuration",
+                "value": 0.847773
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 9361044
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 13406208
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 3.6000000000931323,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 27513,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 14,
+                "parseCodeUnits": 55721,
+                "parseMs": 0.2999999998137355,
+                "stringifyCalls": 12,
+                "stringifyCodeUnits": 28208,
+                "stringifyMs": 0.10000000009313226,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 0.8999999999068677,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 27513,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 51499,
+                "parseMs": 0.20000000018626451,
+                "stringifyCalls": 12,
+                "stringifyCodeUnits": 26619,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.10000000009313226,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 2633,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 292,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 292,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 2.8000000002793968,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 24880,
+                "setCalls": 1,
+                "setCodeUnits": 24876,
+                "parseCalls": 36,
+                "parseCodeUnits": 111557,
+                "parseMs": 0.6000000000931323,
+                "stringifyCalls": 36,
+                "stringifyCodeUnits": 111553,
+                "stringifyMs": 0.20000000018626451,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveRevision": {
+              "ms": 1.3999999999068677,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 7899,
+                "setCalls": 1,
+                "setCodeUnits": 2994,
+                "parseCalls": 5,
+                "parseCodeUnits": 6487,
+                "parseMs": 0.2999999993480742,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 9481,
+                "stringifyMs": 0.8000000002793968,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "profileSave": {
+              "ms": 0.10000000009313226,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 0.6999999997206032,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 27870,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 53441,
+                "parseMs": 0.19999999972060323,
+                "stringifyCalls": 13,
+                "stringifyCodeUnits": 57601,
+                "stringifyMs": 0.10000000009313226,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 29042
+            },
+            "legacyRestoreValidation": {
+              "ms": 2.6999999997206032,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 27870,
+                "parseCalls": 15,
+                "parseCodeUnits": 63589,
+                "parseMs": 0.10000000009313226,
+                "stringifyCalls": 16,
+                "stringifyCodeUnits": 62423,
+                "stringifyMs": 2,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "artExport": {
+              "ms": 91.39999999990687,
+              "utf8Bytes": 449388
+            },
+            "artRestore": {
+              "ms": 56.299999999813735
+            },
+            "artwork": {
+              "count": 2,
+              "uniqueHashes": 2,
+              "originalBytes": 336612
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 24876,
+                "family-game-factory-workspace-v2": 2994
+              },
+              "utf8Bytes": 29004,
+              "codeUnits": 28998
+            },
+            "uiSaveDraft": {
+              "ms": 39.49126199999955,
+              "counters": {
+                "getCalls": 4,
+                "getCodeUnits": 99388,
+                "setCalls": 1,
+                "setCodeUnits": 24880,
+                "parseCalls": 72,
+                "parseCodeUnits": 262637,
+                "parseMs": 0.9999999990686774,
+                "stringifyCalls": 69,
+                "stringifyCodeUnits": 188129,
+                "stringifyMs": 0.5,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 2,
+                  "logicalPayloadBytes": 673764
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 674065,
+              "browserEstimate": {
+                "quota": 10761996799,
+                "usage": 24578559,
+                "usageDetails": {
+                  "caches": 23926912,
+                  "indexedDB": 630784,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.13896
+            },
+            {
+              "name": "TaskDuration",
+              "value": 1.699319
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 11585348
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 22200320
+            }
+          ]
+        },
+        {
+          "readyMs": 797.1931839999997,
+          "libraryMs": 94.88811499999974,
+          "openMs": 323.53592299999946,
+          "startup": {
+            "counters": {
+              "getCalls": 60,
+              "getCodeUnits": 793566,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 391,
+              "parseCodeUnits": 1543531,
+              "parseMs": 5.199999997857958,
+              "stringifyCalls": 405,
+              "stringifyCodeUnits": 791503,
+              "stringifyMs": 2.3000000002793968,
+              "idbGetCalls": 5,
+              "idbCursorSteps": 0,
+              "idbPutCalls": 1,
+              "idbReadPayloadBytes": 674068,
+              "idbWritePayloadBytes": 238
+            },
+            "heapBytes": 25581622,
+            "domNodes": 2308,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.03442
+              },
+              {
+                "name": "TaskDuration",
+                "value": 0.748648
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 13653560
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 21995520
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 1.2000000001862645,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 27874,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 14,
+                "parseCodeUnits": 56443,
+                "parseMs": 0.20000000018626451,
+                "stringifyCalls": 12,
+                "stringifyCodeUnits": 28569,
+                "stringifyMs": 0.10000000009313226,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 0.2999999998137355,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 27874,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 51499,
+                "parseMs": 0.09999999962747097,
+                "stringifyCalls": 12,
+                "stringifyCodeUnits": 26619,
+                "stringifyMs": 0.10000000009313226,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.20000000018626451,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 2994,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0.10000000009313226,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 1.599999999627471,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 24880,
+                "setCalls": 1,
+                "setCodeUnits": 24876,
+                "parseCalls": 36,
+                "parseCodeUnits": 111557,
+                "parseMs": 0.10000000009313226,
+                "stringifyCalls": 36,
+                "stringifyCodeUnits": 111553,
+                "stringifyMs": 0.3000000002793968,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveRevision": {
+              "ms": 0.3000000002793968,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 8982,
+                "setCalls": 1,
+                "setCodeUnits": 3355,
+                "parseCalls": 5,
+                "parseCodeUnits": 7277,
+                "parseMs": 0.10000000009313226,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 10632,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "profileSave": {
+              "ms": 0,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 0.2999999998137355,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 28231,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 53802,
+                "parseMs": 0,
+                "stringifyCalls": 13,
+                "stringifyCodeUnits": 58323,
+                "stringifyMs": 0.10000000009313226,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 29403
+            },
+            "legacyRestoreValidation": {
+              "ms": 0.39999999990686774,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 28231,
+                "parseCalls": 15,
+                "parseCodeUnits": 65033,
+                "parseMs": 0,
+                "stringifyCalls": 16,
+                "stringifyCodeUnits": 63867,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "artExport": {
+              "ms": 98.6999999997206,
+              "utf8Bytes": 449388
+            },
+            "artRestore": {
+              "ms": 61.799999999813735
+            },
+            "artwork": {
+              "count": 2,
+              "uniqueHashes": 2,
+              "originalBytes": 336612
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 24876,
+                "family-game-factory-workspace-v2": 3355
+              },
+              "utf8Bytes": 29365,
+              "codeUnits": 29359
+            },
+            "uiSaveDraft": {
+              "ms": 41.099662999999055,
+              "counters": {
+                "getCalls": 4,
+                "getCodeUnits": 99520,
+                "setCalls": 1,
+                "setCodeUnits": 24880,
+                "parseCalls": 72,
+                "parseCodeUnits": 262934,
+                "parseMs": 0.7000000001862645,
+                "stringifyCalls": 69,
+                "stringifyCodeUnits": 188294,
+                "stringifyMs": 0.3000000002793968,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 2,
+                  "logicalPayloadBytes": 673764
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 674065,
+              "browserEstimate": {
+                "quota": 10761996799,
+                "usage": 24578559,
+                "usageDetails": {
+                  "caches": 23926912,
+                  "indexedDB": 630784,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.133089
+            },
+            {
+              "name": "TaskDuration",
+              "value": 1.647113
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 8259640
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 28872704
+            }
+          ]
+        },
+        {
+          "readyMs": 965.8577219999988,
+          "libraryMs": 132.35333399999945,
+          "openMs": 339.6867770000008,
+          "startup": {
+            "counters": {
+              "getCalls": 57,
+              "getCodeUnits": 724341,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 348,
+              "parseCodeUnits": 1393984,
+              "parseMs": 10.399999999441206,
+              "stringifyCalls": 360,
+              "stringifyCodeUnits": 714254,
+              "stringifyMs": 5.900000000372529,
+              "idbGetCalls": 4,
+              "idbCursorSteps": 0,
+              "idbPutCalls": 0,
+              "idbReadPayloadBytes": 673830,
+              "idbWritePayloadBytes": 0
+            },
+            "heapBytes": 20128616,
+            "domNodes": 2308,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.043484
+              },
+              {
+                "name": "TaskDuration",
+                "value": 0.939589
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 16807540
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 29323264
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 2.5,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 28235,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 14,
+                "parseCodeUnits": 57165,
+                "parseMs": 0.3000000002793968,
+                "stringifyCalls": 12,
+                "stringifyCodeUnits": 28930,
+                "stringifyMs": 0.20000000018626451,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 0.8000000002793968,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 28235,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 51499,
+                "parseMs": 0.2999999998137355,
+                "stringifyCalls": 12,
+                "stringifyCodeUnits": 26619,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.599999999627471,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 3355,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 1.400000000372529,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 24880,
+                "setCalls": 1,
+                "setCodeUnits": 24876,
+                "parseCalls": 36,
+                "parseCodeUnits": 111557,
+                "parseMs": 0.40000000037252903,
+                "stringifyCalls": 36,
+                "stringifyCodeUnits": 111553,
+                "stringifyMs": 0.5,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveRevision": {
+              "ms": 0.2999999998137355,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 10065,
+                "setCalls": 1,
+                "setCodeUnits": 3716,
+                "parseCalls": 5,
+                "parseCodeUnits": 7999,
+                "parseMs": 0.19999999972060323,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 11715,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "profileSave": {
+              "ms": 0.20000000018626451,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 0.39999999990686774,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 28592,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 54163,
+                "parseMs": 0.09999999962747097,
+                "stringifyCalls": 13,
+                "stringifyCodeUnits": 59045,
+                "stringifyMs": 0.20000000018626451,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 29764
+            },
+            "legacyRestoreValidation": {
+              "ms": 0.7000000001862645,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 28592,
+                "parseCalls": 15,
+                "parseCodeUnits": 66477,
+                "parseMs": 0.10000000009313226,
+                "stringifyCalls": 16,
+                "stringifyCodeUnits": 65311,
+                "stringifyMs": 0.20000000018626451,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "artExport": {
+              "ms": 100.79999999981374,
+              "utf8Bytes": 449388
+            },
+            "artRestore": {
+              "ms": 81.6999999997206
+            },
+            "artwork": {
+              "count": 2,
+              "uniqueHashes": 2,
+              "originalBytes": 336612
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 24876,
+                "family-game-factory-workspace-v2": 3716
+              },
+              "utf8Bytes": 29726,
+              "codeUnits": 29720
+            },
+            "uiSaveDraft": {
+              "ms": 73.09867000000122,
+              "counters": {
+                "getCalls": 4,
+                "getCodeUnits": 99520,
+                "setCalls": 1,
+                "setCodeUnits": 24880,
+                "parseCalls": 72,
+                "parseCodeUnits": 262934,
+                "parseMs": 2.6000000000931323,
+                "stringifyCalls": 69,
+                "stringifyCodeUnits": 188294,
+                "stringifyMs": 0.2999999998137355,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 2,
+                  "logicalPayloadBytes": 673764
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 674065,
+              "browserEstimate": {
+                "quota": 10761996799,
+                "usage": 24578559,
+                "usageDetails": {
+                  "caches": 23926912,
+                  "indexedDB": 630784,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.175107
+            },
+            {
+              "name": "TaskDuration",
+              "value": 1.874962
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 16462148
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 30982144
+            }
+          ]
+        },
+        {
+          "readyMs": 1140.7619059999997,
+          "libraryMs": 149.73391099999935,
+          "openMs": 325.5348189999986,
+          "startup": {
+            "counters": {
+              "getCalls": 60,
+              "getCodeUnits": 804396,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 391,
+              "parseCodeUnits": 1548585,
+              "parseMs": 10.099999999627471,
+              "stringifyCalls": 430,
+              "stringifyCodeUnits": 795145,
+              "stringifyMs": 18.299999999348074,
+              "idbGetCalls": 5,
+              "idbCursorSteps": 0,
+              "idbPutCalls": 1,
+              "idbReadPayloadBytes": 674068,
+              "idbWritePayloadBytes": 238
+            },
+            "heapBytes": 29443934,
+            "domNodes": 2525,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.044433
+              },
+              {
+                "name": "TaskDuration",
+                "value": 1.010678
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 16692792
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 32022528
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 1.8000000002793968,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 28596,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 14,
+                "parseCodeUnits": 57887,
+                "parseMs": 0.10000000009313226,
+                "stringifyCalls": 12,
+                "stringifyCodeUnits": 29291,
+                "stringifyMs": 0.10000000009313226,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 0.6000000000931323,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 28596,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 51499,
+                "parseMs": 0.39999999990686774,
+                "stringifyCalls": 12,
+                "stringifyCodeUnits": 26619,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 3716,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 1.5,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 24880,
+                "setCalls": 1,
+                "setCodeUnits": 24876,
+                "parseCalls": 36,
+                "parseCodeUnits": 111557,
+                "parseMs": 0.2999999998137355,
+                "stringifyCalls": 36,
+                "stringifyCodeUnits": 111553,
+                "stringifyMs": 0.5,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveRevision": {
+              "ms": 0.3000000002793968,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 11148,
+                "setCalls": 1,
+                "setCodeUnits": 4077,
+                "parseCalls": 5,
+                "parseCodeUnits": 8721,
+                "parseMs": 0.10000000009313226,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 12798,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "profileSave": {
+              "ms": 0.09999999962747097,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 0.40000000037252903,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 28953,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 54524,
+                "parseMs": 0.10000000009313226,
+                "stringifyCalls": 13,
+                "stringifyCodeUnits": 59767,
+                "stringifyMs": 0.10000000009313226,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 30125
+            },
+            "legacyRestoreValidation": {
+              "ms": 0.7999999998137355,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 28953,
+                "parseCalls": 15,
+                "parseCodeUnits": 67921,
+                "parseMs": 0.2999999998137355,
+                "stringifyCalls": 16,
+                "stringifyCodeUnits": 66755,
+                "stringifyMs": 0.10000000009313226,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "artExport": {
+              "ms": 114,
+              "utf8Bytes": 449388
+            },
+            "artRestore": {
+              "ms": 88.5
+            },
+            "artwork": {
+              "count": 2,
+              "uniqueHashes": 2,
+              "originalBytes": 336612
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 24876,
+                "family-game-factory-workspace-v2": 4077
+              },
+              "utf8Bytes": 30087,
+              "codeUnits": 30081
+            },
+            "uiSaveDraft": {
+              "ms": 48.21369600000071,
+              "counters": {
+                "getCalls": 4,
+                "getCodeUnits": 99520,
+                "setCalls": 1,
+                "setCodeUnits": 24880,
+                "parseCalls": 72,
+                "parseCodeUnits": 262934,
+                "parseMs": 0.6000000000931323,
+                "stringifyCalls": 69,
+                "stringifyCodeUnits": 188294,
+                "stringifyMs": 0.2999999998137355,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 2,
+                  "logicalPayloadBytes": 673764
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 674065,
+              "browserEstimate": {
+                "quota": 10761996799,
+                "usage": 24578559,
+                "usageDetails": {
+                  "caches": 23926912,
+                  "indexedDB": 630784,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.230941
+            },
+            {
+              "name": "TaskDuration",
+              "value": 1.990717
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 20438528
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 35606528
+            }
+          ]
+        },
+        {
+          "readyMs": 1035.8406839999989,
+          "libraryMs": 145.4475079999993,
+          "openMs": 329.0083730000006,
+          "startup": {
+            "counters": {
+              "getCalls": 57,
+              "getCodeUnits": 735171,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 350,
+              "parseCodeUnits": 1399142,
+              "parseMs": 10.900000000372529,
+              "stringifyCalls": 363,
+              "stringifyCodeUnits": 717298,
+              "stringifyMs": 4.800000000745058,
+              "idbGetCalls": 4,
+              "idbCursorSteps": 0,
+              "idbPutCalls": 0,
+              "idbReadPayloadBytes": 673830,
+              "idbWritePayloadBytes": 0
+            },
+            "heapBytes": 41265218,
+            "domNodes": 2308,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.029091
+              },
+              {
+                "name": "TaskDuration",
+                "value": 0.960173
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 29304232
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 40513536
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 1.1000000000931323,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 28957,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 14,
+                "parseCodeUnits": 58609,
+                "parseMs": 0.3000000002793968,
+                "stringifyCalls": 12,
+                "stringifyCodeUnits": 29652,
+                "stringifyMs": 0.10000000009313226,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 0.8999999999068677,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 28957,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 51499,
+                "parseMs": 0.2999999998137355,
+                "stringifyCalls": 12,
+                "stringifyCodeUnits": 26619,
+                "stringifyMs": 0.10000000009313226,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 4077,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 1.5,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 24880,
+                "setCalls": 1,
+                "setCodeUnits": 24876,
+                "parseCalls": 36,
+                "parseCodeUnits": 111557,
+                "parseMs": 0.19999999972060323,
+                "stringifyCalls": 36,
+                "stringifyCodeUnits": 111553,
+                "stringifyMs": 0.3000000002793968,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveRevision": {
+              "ms": 0.7999999998137355,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 12231,
+                "setCalls": 1,
+                "setCodeUnits": 4438,
+                "parseCalls": 5,
+                "parseCodeUnits": 9443,
+                "parseMs": 0.10000000009313226,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 13881,
+                "stringifyMs": 0.09999999962747097,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "profileSave": {
+              "ms": 0.10000000009313226,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 0.6000000000931323,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 29314,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 54885,
+                "parseMs": 0.2999999998137355,
+                "stringifyCalls": 13,
+                "stringifyCodeUnits": 60489,
+                "stringifyMs": 0.20000000018626451,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 30486
+            },
+            "legacyRestoreValidation": {
+              "ms": 2,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 29314,
+                "parseCalls": 15,
+                "parseCodeUnits": 69365,
+                "parseMs": 0.5,
+                "stringifyCalls": 16,
+                "stringifyCodeUnits": 68199,
+                "stringifyMs": 0.6000000000931323,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "artExport": {
+              "ms": 162.20000000018626,
+              "utf8Bytes": 449388
+            },
+            "artRestore": {
+              "ms": 84
+            },
+            "artwork": {
+              "count": 2,
+              "uniqueHashes": 2,
+              "originalBytes": 336612
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 24876,
+                "family-game-factory-workspace-v2": 4438
+              },
+              "utf8Bytes": 30448,
+              "codeUnits": 30442
+            },
+            "uiSaveDraft": {
+              "ms": 44.8087689999993,
+              "counters": {
+                "getCalls": 4,
+                "getCodeUnits": 99520,
+                "setCalls": 1,
+                "setCodeUnits": 24880,
+                "parseCalls": 72,
+                "parseCodeUnits": 262934,
+                "parseMs": 1.2999999998137355,
+                "stringifyCalls": 69,
+                "stringifyCodeUnits": 188294,
+                "stringifyMs": 0.7999999998137355,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 2,
+                  "logicalPayloadBytes": 673764
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 674065,
+              "browserEstimate": {
+                "quota": 10761996799,
+                "usage": 24578559,
+                "usageDetails": {
+                  "caches": 23926912,
+                  "indexedDB": 630784,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.151264
+            },
+            {
+              "name": "TaskDuration",
+              "value": 1.861948
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 32427608
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 56836096
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": "medium",
+      "projects": 25,
+      "revisionsPerProject": 4,
+      "initialRevisions": 100,
+      "sessions": 25,
+      "messagesPerSession": 100,
+      "artwork": {
+        "originalCount": 5,
+        "pixels": 512,
+        "originalBytes": 3146610,
+        "previewBytes": 684427
+      },
+      "migration": null,
+      "metrics": {
+        "readyMs": {
+          "median": 1831.6344769999996,
+          "p95": 2018.36665,
+          "samples": [
+            2018.36665,
+            1831.6344769999996,
+            1643.4418130000013,
+            1922.1760399999985,
+            1276.1829660000003
+          ]
+        },
+        "libraryMs": {
+          "median": 265.2297380000018,
+          "p95": 468.27636899999925,
+          "samples": [
+            365.2627270000012,
+            169.5735280000008,
+            468.27636899999925,
+            265.2297380000018,
+            155.49606800000038
+          ]
+        },
+        "openMs": {
+          "median": 675.9855709999974,
+          "p95": 1250.055085,
+          "samples": [
+            1068.700280000001,
+            654.8230889999977,
+            1250.055085,
+            675.9855709999974,
+            492.647993999999
+          ]
+        }
+      },
+      "runs": [
+        {
+          "readyMs": 2018.36665,
+          "libraryMs": 365.2627270000012,
+          "openMs": 1068.700280000001,
+          "startup": {
+            "counters": {
+              "getCalls": 60,
+              "getCodeUnits": 17581166,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 1586,
+              "parseCodeUnits": 34336334,
+              "parseMs": 139.50000000046566,
+              "stringifyCalls": 1593,
+              "stringifyCodeUnits": 17252804,
+              "stringifyMs": 38.89999999757856,
+              "idbGetCalls": 4,
+              "idbCursorSteps": 0,
+              "idbPutCalls": 0,
+              "idbReadPayloadBytes": 3832456,
+              "idbWritePayloadBytes": 0
+            },
+            "heapBytes": 28142744,
+            "domNodes": 2631,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.066903
+              },
+              {
+                "name": "TaskDuration",
+                "value": 1.834053
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 23768832
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 34783232
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 26.600000000093132,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 606630,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 54,
+                "parseCodeUnits": 1216735,
+                "parseMs": 18.59999999962747,
+                "stringifyCalls": 52,
+                "stringifyCodeUnits": 610105,
+                "stringifyMs": 1.8000000002793968,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 5.7000000001862645,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 606630,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1139504,
+                "parseMs": 2.2000000001862645,
+                "stringifyCalls": 52,
+                "stringifyCodeUnits": 574104,
+                "stringifyMs": 1.5,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.09999999962747097,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 41230,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 357,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 357,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 21.5,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 565400,
+                "setCalls": 1,
+                "setCodeUnits": 565396,
+                "parseCalls": 156,
+                "parseCodeUnits": 2317177,
+                "parseMs": 5.7999999998137355,
+                "stringifyCalls": 156,
+                "stringifyCodeUnits": 2317173,
+                "stringifyMs": 7.6000000005587935,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveRevision": {
+              "ms": 3.7000000001862645,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 123690,
+                "setCalls": 1,
+                "setCodeUnits": 41591,
+                "parseCalls": 5,
+                "parseCodeUnits": 83746,
+                "parseMs": 0.5,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 125337,
+                "stringifyMs": 0.599999999627471,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "profileSave": {
+              "ms": 0,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 16.600000000093132,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 606987,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1175858,
+                "parseMs": 2.7999999998137355,
+                "stringifyCalls": 53,
+                "stringifyCodeUnits": 1218615,
+                "stringifyMs": 7.7000000001862645,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 608159
+            },
+            "legacyRestoreValidation": {
+              "ms": 20.59999999962747,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 606987,
+                "parseCalls": 55,
+                "parseCodeUnits": 1301797,
+                "parseMs": 3.2999999998137355,
+                "stringifyCalls": 56,
+                "stringifyCodeUnits": 1300631,
+                "stringifyMs": 4.000000000465661,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "artExport": {
+              "ms": 848.5,
+              "utf8Bytes": 4196777
+            },
+            "artRestore": {
+              "ms": 680.3000000002794
+            },
+            "artwork": {
+              "count": 5,
+              "uniqueHashes": 5,
+              "originalBytes": 3146610
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 565396,
+                "family-game-factory-workspace-v2": 41591
+              },
+              "utf8Bytes": 608121,
+              "codeUnits": 608115
+            },
+            "uiSaveDraft": {
+              "ms": 180.5095680000013,
+              "counters": {
+                "getCalls": 4,
+                "getCodeUnits": 2261468,
+                "setCalls": 1,
+                "setCodeUnits": 565400,
+                "parseCalls": 312,
+                "parseCodeUnits": 5719717,
+                "parseMs": 16.700000000186265,
+                "stringifyCalls": 309,
+                "stringifyCodeUnits": 4023649,
+                "stringifyMs": 18.49999999953434,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 5,
+                  "logicalPayloadBytes": 3832387
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 3832688,
+              "browserEstimate": {
+                "quota": 10765498879,
+                "usage": 28080639,
+                "usageDetails": {
+                  "caches": 23926912,
+                  "indexedDB": 4132864,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.802974
+            },
+            {
+              "name": "TaskDuration",
+              "value": 5.461002
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 7202520
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 73216000
+            }
+          ]
+        },
+        {
+          "readyMs": 1831.6344769999996,
+          "libraryMs": 169.5735280000008,
+          "openMs": 654.8230889999977,
+          "startup": {
+            "counters": {
+              "getCalls": 60,
+              "getCodeUnits": 17588121,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 1591,
+              "parseCodeUnits": 34342138,
+              "parseMs": 115.6999999997206,
+              "stringifyCalls": 1605,
+              "stringifyCodeUnits": 17258719,
+              "stringifyMs": 30.40000000083819,
+              "idbGetCalls": 5,
+              "idbCursorSteps": 0,
+              "idbPutCalls": 1,
+              "idbReadPayloadBytes": 3832694,
+              "idbWritePayloadBytes": 238
+            },
+            "heapBytes": 41940118,
+            "domNodes": 2631,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.11261
+              },
+              {
+                "name": "TaskDuration",
+                "value": 1.730532
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 33371496
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 80834560
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 12.699999999720603,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 606991,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 54,
+                "parseCodeUnits": 1217457,
+                "parseMs": 5.399999999906868,
+                "stringifyCalls": 52,
+                "stringifyCodeUnits": 610466,
+                "stringifyMs": 1.2999999998137355,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 6.400000000372529,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 606991,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1139504,
+                "parseMs": 3.200000000651926,
+                "stringifyCalls": 52,
+                "stringifyCodeUnits": 574104,
+                "stringifyMs": 0.6999999997206032,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.09999999962747097,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 41591,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 26.700000000186265,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 565400,
+                "setCalls": 1,
+                "setCodeUnits": 565396,
+                "parseCalls": 156,
+                "parseCodeUnits": 2317177,
+                "parseMs": 7.700000000651926,
+                "stringifyCalls": 156,
+                "stringifyCodeUnits": 2317173,
+                "stringifyMs": 6.400000000372529,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveRevision": {
+              "ms": 2.6000000000931323,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 124773,
+                "setCalls": 1,
+                "setCodeUnits": 41952,
+                "parseCalls": 5,
+                "parseCodeUnits": 84471,
+                "parseMs": 0.39999999944120646,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 126423,
+                "stringifyMs": 0.40000000037252903,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "profileSave": {
+              "ms": 0,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 7.399999999906868,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 607348,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1176219,
+                "parseMs": 2.1000000000931323,
+                "stringifyCalls": 53,
+                "stringifyCodeUnits": 1219337,
+                "stringifyMs": 3.5,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 608520
+            },
+            "legacyRestoreValidation": {
+              "ms": 14.399999999906868,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 607348,
+                "parseCalls": 55,
+                "parseCodeUnits": 1303241,
+                "parseMs": 3.799999999348074,
+                "stringifyCalls": 56,
+                "stringifyCodeUnits": 1302075,
+                "stringifyMs": 3.3999999999068677,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "artExport": {
+              "ms": 784.8000000002794,
+              "utf8Bytes": 4196777
+            },
+            "artRestore": {
+              "ms": 694.3999999999069
+            },
+            "artwork": {
+              "count": 5,
+              "uniqueHashes": 5,
+              "originalBytes": 3146610
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 565396,
+                "family-game-factory-workspace-v2": 41952
+              },
+              "utf8Bytes": 608482,
+              "codeUnits": 608476
+            },
+            "uiSaveDraft": {
+              "ms": 132.78102600000057,
+              "counters": {
+                "getCalls": 4,
+                "getCodeUnits": 2261600,
+                "setCalls": 1,
+                "setCodeUnits": 565400,
+                "parseCalls": 312,
+                "parseCodeUnits": 5720014,
+                "parseMs": 29.399999999906868,
+                "stringifyCalls": 309,
+                "stringifyCodeUnits": 4023814,
+                "stringifyMs": 11.200000000186265,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 5,
+                  "logicalPayloadBytes": 3832387
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 3832688,
+              "browserEstimate": {
+                "quota": 10765498879,
+                "usage": 28080639,
+                "usageDetails": {
+                  "caches": 23926912,
+                  "indexedDB": 4132864,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.751861
+            },
+            {
+              "name": "TaskDuration",
+              "value": 4.701924
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 12991036
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 82825216
+            }
+          ]
+        },
+        {
+          "readyMs": 1643.4418130000013,
+          "libraryMs": 468.27636899999925,
+          "openMs": 1250.055085,
+          "startup": {
+            "counters": {
+              "getCalls": 57,
+              "getCodeUnits": 15897336,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 1428,
+              "parseCodeUnits": 30941131,
+              "parseMs": 101.00000000046566,
+              "stringifyCalls": 1440,
+              "stringifyCodeUnits": 15551570,
+              "stringifyMs": 37.899999998509884,
+              "idbGetCalls": 4,
+              "idbCursorSteps": 0,
+              "idbPutCalls": 0,
+              "idbReadPayloadBytes": 3832456,
+              "idbWritePayloadBytes": 0
+            },
+            "heapBytes": 61375683,
+            "domNodes": 2631,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.113893
+              },
+              {
+                "name": "TaskDuration",
+                "value": 1.632208
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 30441300
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 87072768
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 20.5,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 607352,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 54,
+                "parseCodeUnits": 1218179,
+                "parseMs": 2.9999999995343387,
+                "stringifyCalls": 52,
+                "stringifyCodeUnits": 610827,
+                "stringifyMs": 9.400000000372529,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 7.600000000093132,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 607352,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1139504,
+                "parseMs": 4.100000000093132,
+                "stringifyCalls": 52,
+                "stringifyCodeUnits": 574104,
+                "stringifyMs": 0.599999999627471,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.19999999972060323,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 41952,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0.09999999962747097,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 48.90000000037253,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 565400,
+                "setCalls": 1,
+                "setCodeUnits": 565396,
+                "parseCalls": 156,
+                "parseCodeUnits": 2317177,
+                "parseMs": 27.200000000651926,
+                "stringifyCalls": 156,
+                "stringifyCodeUnits": 2317173,
+                "stringifyMs": 12.499999999534339,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveRevision": {
+              "ms": 8.100000000093132,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 125856,
+                "setCalls": 1,
+                "setCodeUnits": 42313,
+                "parseCalls": 5,
+                "parseCodeUnits": 85193,
+                "parseMs": 0.40000000037252903,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 127506,
+                "stringifyMs": 0.2999999998137355,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "profileSave": {
+              "ms": 0,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 14.399999999906868,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 607709,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1176580,
+                "parseMs": 2.299999999348074,
+                "stringifyCalls": 53,
+                "stringifyCodeUnits": 1220059,
+                "stringifyMs": 5.100000000093132,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 608881
+            },
+            "legacyRestoreValidation": {
+              "ms": 24.09999999962747,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 607709,
+                "parseCalls": 55,
+                "parseCodeUnits": 1304685,
+                "parseMs": 5.500000000465661,
+                "stringifyCalls": 56,
+                "stringifyCodeUnits": 1303519,
+                "stringifyMs": 2.099999999627471,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "artExport": {
+              "ms": 2278.3000000002794,
+              "utf8Bytes": 4196777
+            },
+            "artRestore": {
+              "ms": 1333.2999999998137
+            },
+            "artwork": {
+              "count": 5,
+              "uniqueHashes": 5,
+              "originalBytes": 3146610
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 565396,
+                "family-game-factory-workspace-v2": 42313
+              },
+              "utf8Bytes": 608843,
+              "codeUnits": 608837
+            },
+            "uiSaveDraft": {
+              "ms": 155.29605399999855,
+              "counters": {
+                "getCalls": 4,
+                "getCodeUnits": 2261600,
+                "setCalls": 1,
+                "setCodeUnits": 565400,
+                "parseCalls": 312,
+                "parseCodeUnits": 5720014,
+                "parseMs": 25.799999999813735,
+                "stringifyCalls": 309,
+                "stringifyCodeUnits": 4023814,
+                "stringifyMs": 18.699999999254942,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 5,
+                  "logicalPayloadBytes": 3832387
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 3832688,
+              "browserEstimate": {
+                "quota": 10765498879,
+                "usage": 28080639,
+                "usageDetails": {
+                  "caches": 23926912,
+                  "indexedDB": 4132864,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 1.079129
+            },
+            {
+              "name": "TaskDuration",
+              "value": 7.657547
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 40271516
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 89051136
+            }
+          ]
+        },
+        {
+          "readyMs": 1922.1760399999985,
+          "libraryMs": 265.2297380000018,
+          "openMs": 675.9855709999974,
+          "startup": {
+            "counters": {
+              "getCalls": 57,
+              "getCodeUnits": 15902751,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 1428,
+              "parseCodeUnits": 30943658,
+              "parseMs": 153.89999999897555,
+              "stringifyCalls": 1440,
+              "stringifyCodeUnits": 15553014,
+              "stringifyMs": 34.299999999813735,
+              "idbGetCalls": 4,
+              "idbCursorSteps": 0,
+              "idbPutCalls": 0,
+              "idbReadPayloadBytes": 3832456,
+              "idbWritePayloadBytes": 0
+            },
+            "heapBytes": 67932447,
+            "domNodes": 2631,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.184791
+              },
+              {
+                "name": "TaskDuration",
+                "value": 1.827731
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 34898756
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 88248320
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 6.400000000372529,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 607713,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 54,
+                "parseCodeUnits": 1218901,
+                "parseMs": 2,
+                "stringifyCalls": 52,
+                "stringifyCodeUnits": 611188,
+                "stringifyMs": 0.8999999999068677,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 4.2999999998137355,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 607713,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1139504,
+                "parseMs": 1.900000000372529,
+                "stringifyCalls": 52,
+                "stringifyCodeUnits": 574104,
+                "stringifyMs": 0.5,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 42313,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 14.799999999813735,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 565400,
+                "setCalls": 1,
+                "setCodeUnits": 565396,
+                "parseCalls": 156,
+                "parseCodeUnits": 2317177,
+                "parseMs": 4.899999999906868,
+                "stringifyCalls": 156,
+                "stringifyCodeUnits": 2317173,
+                "stringifyMs": 5.099999999627471,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveRevision": {
+              "ms": 2.900000000372529,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 126939,
+                "setCalls": 1,
+                "setCodeUnits": 42674,
+                "parseCalls": 5,
+                "parseCodeUnits": 85915,
+                "parseMs": 0.40000000037252903,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 128589,
+                "stringifyMs": 0.19999999972060323,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "profileSave": {
+              "ms": 0.19999999972060323,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 7.100000000093132,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 608070,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1176941,
+                "parseMs": 2.099999999627471,
+                "stringifyCalls": 53,
+                "stringifyCodeUnits": 1220781,
+                "stringifyMs": 3.6000000000931323,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 609242
+            },
+            "legacyRestoreValidation": {
+              "ms": 10.399999999906868,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 608070,
+                "parseCalls": 55,
+                "parseCodeUnits": 1306129,
+                "parseMs": 2.7999999998137355,
+                "stringifyCalls": 56,
+                "stringifyCodeUnits": 1304963,
+                "stringifyMs": 2,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "artExport": {
+              "ms": 591.4000000003725,
+              "utf8Bytes": 4196777
+            },
+            "artRestore": {
+              "ms": 378.5
+            },
+            "artwork": {
+              "count": 5,
+              "uniqueHashes": 5,
+              "originalBytes": 3146610
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 565396,
+                "family-game-factory-workspace-v2": 42674
+              },
+              "utf8Bytes": 609204,
+              "codeUnits": 609198
+            },
+            "uiSaveDraft": {
+              "ms": 101.18240900000092,
+              "counters": {
+                "getCalls": 4,
+                "getCodeUnits": 2261600,
+                "setCalls": 1,
+                "setCodeUnits": 565400,
+                "parseCalls": 312,
+                "parseCodeUnits": 5720014,
+                "parseMs": 29.699999999720603,
+                "stringifyCalls": 309,
+                "stringifyCodeUnits": 4023814,
+                "stringifyMs": 7.300000000279397,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 5,
+                  "logicalPayloadBytes": 3832387
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 3832688,
+              "browserEstimate": {
+                "quota": 10765498879,
+                "usage": 28080639,
+                "usageDetails": {
+                  "caches": 23926912,
+                  "indexedDB": 4132864,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.890574
+            },
+            {
+              "name": "TaskDuration",
+              "value": 4.438098
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 8747056
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 81514496
+            }
+          ]
+        },
+        {
+          "readyMs": 1276.1829660000003,
+          "libraryMs": 155.49606800000038,
+          "openMs": 492.647993999999,
+          "startup": {
+            "counters": {
+              "getCalls": 57,
+              "getCodeUnits": 15908166,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 1430,
+              "parseCodeUnits": 30946289,
+              "parseMs": 72.8000000002794,
+              "stringifyCalls": 1443,
+              "stringifyCodeUnits": 15554614,
+              "stringifyMs": 30.300000000279397,
+              "idbGetCalls": 4,
+              "idbCursorSteps": 0,
+              "idbPutCalls": 0,
+              "idbReadPayloadBytes": 3832456,
+              "idbWritePayloadBytes": 0
+            },
+            "heapBytes": 54098288,
+            "domNodes": 2631,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.060751
+              },
+              {
+                "name": "TaskDuration",
+                "value": 1.186275
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 31316808
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 86937600
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 8.799999999813735,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 608074,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 54,
+                "parseCodeUnits": 1219623,
+                "parseMs": 3.099999999627471,
+                "stringifyCalls": 52,
+                "stringifyCodeUnits": 611549,
+                "stringifyMs": 0.7000000001862645,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 3.3000000002793968,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 608074,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1139504,
+                "parseMs": 1.7999999998137355,
+                "stringifyCalls": 52,
+                "stringifyCodeUnits": 574104,
+                "stringifyMs": 0.5,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 42674,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 13,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 565400,
+                "setCalls": 1,
+                "setCodeUnits": 565396,
+                "parseCalls": 156,
+                "parseCodeUnits": 2317177,
+                "parseMs": 3.7999999998137355,
+                "stringifyCalls": 156,
+                "stringifyCodeUnits": 2317173,
+                "stringifyMs": 4.2999999998137355,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveRevision": {
+              "ms": 1.599999999627471,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 128022,
+                "setCalls": 1,
+                "setCodeUnits": 43035,
+                "parseCalls": 5,
+                "parseCodeUnits": 86637,
+                "parseMs": 0,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 129672,
+                "stringifyMs": 0.3000000002793968,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "profileSave": {
+              "ms": 0.10000000009313226,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 6.100000000093132,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 608431,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1177302,
+                "parseMs": 1,
+                "stringifyCalls": 53,
+                "stringifyCodeUnits": 1221503,
+                "stringifyMs": 1.8000000002793968,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 609603
+            },
+            "legacyRestoreValidation": {
+              "ms": 9,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 608431,
+                "parseCalls": 55,
+                "parseCodeUnits": 1307573,
+                "parseMs": 2.3999999994412065,
+                "stringifyCalls": 56,
+                "stringifyCodeUnits": 1306407,
+                "stringifyMs": 1.400000000372529,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "artExport": {
+              "ms": 906.8999999999069,
+              "utf8Bytes": 4196777
+            },
+            "artRestore": {
+              "ms": 385.39999999990687
+            },
+            "artwork": {
+              "count": 5,
+              "uniqueHashes": 5,
+              "originalBytes": 3146610
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 565396,
+                "family-game-factory-workspace-v2": 43035
+              },
+              "utf8Bytes": 609565,
+              "codeUnits": 609559
+            },
+            "uiSaveDraft": {
+              "ms": 137.77245599999878,
+              "counters": {
+                "getCalls": 4,
+                "getCodeUnits": 2261600,
+                "setCalls": 1,
+                "setCodeUnits": 565400,
+                "parseCalls": 312,
+                "parseCodeUnits": 5720014,
+                "parseMs": 14.100000000558794,
+                "stringifyCalls": 309,
+                "stringifyCodeUnits": 4023814,
+                "stringifyMs": 5.799999998882413,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 5,
+                  "logicalPayloadBytes": 3832387
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 3832688,
+              "browserEstimate": {
+                "quota": 10765498879,
+                "usage": 28080639,
+                "usageDetails": {
+                  "caches": 23926912,
+                  "indexedDB": 4132864,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.434425
+            },
+            {
+              "name": "TaskDuration",
+              "value": 3.403521
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 7245852
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 75313152
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": "large",
+      "projects": 50,
+      "revisionsPerProject": 9,
+      "initialRevisions": 450,
+      "sessions": 70,
+      "messagesPerSession": 200,
+      "artwork": {
+        "originalCount": 8,
+        "pixels": 640,
+        "originalBytes": 9260556,
+        "previewBytes": 1517028
+      },
+      "migration": null,
+      "metrics": {
+        "readyMs": {
+          "median": 2190.557476999995,
+          "p95": 3434.4205199999997,
+          "samples": [
+            1564.6974030000056,
+            2279.1129230000006,
+            1630.1280669999978,
+            2190.557476999995,
+            3434.4205199999997
+          ]
+        },
+        "libraryMs": {
+          "median": 393.55802300000505,
+          "p95": 712.4183609999964,
+          "samples": [
+            712.4183609999964,
+            321.0929959999994,
+            393.55802300000505,
+            352.41477199998917,
+            446.9045139999944
+          ]
+        },
+        "openMs": {
+          "median": 1571.1935660000017,
+          "p95": 4669.57875700001,
+          "samples": [
+            1571.1935660000017,
+            1250.953555,
+            1385.21592100001,
+            2681.6222849999904,
+            4669.57875700001
+          ]
+        }
+      },
+      "runs": [
+        {
+          "readyMs": 1564.6974030000056,
+          "libraryMs": 712.4183609999964,
+          "openMs": 1571.1935660000017,
+          "startup": {
+            "counters": {
+              "getCalls": 57,
+              "getCodeUnits": 87349289,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 3858,
+              "parseCodeUnits": 170933274,
+              "parseMs": 386.499999998603,
+              "stringifyCalls": 3927,
+              "stringifyCodeUnits": 85711640,
+              "stringifyMs": 294.0999999991618,
+              "idbGetCalls": 4,
+              "idbCursorSteps": 0,
+              "idbPutCalls": 0,
+              "idbReadPayloadBytes": 10779816,
+              "idbWritePayloadBytes": 0
+            },
+            "heapBytes": 61110636,
+            "domNodes": 3254,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.048017
+              },
+              {
+                "name": "TaskDuration",
+                "value": 1.548837
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 32983740
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 90288128
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 39.60000000009313,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3313658,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 144,
+                "parseCodeUnits": 6637046,
+                "parseMs": 16.399999999906868,
+                "stringifyCalls": 142,
+                "stringifyCodeUnits": 3323388,
+                "stringifyMs": 5.7999999998137355,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 27.600000000093132,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3313658,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6294130,
+                "parseMs": 12.700000000186265,
+                "stringifyCalls": 142,
+                "stringifyCodeUnits": 3157163,
+                "stringifyMs": 7.2000000001862645,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.09999999962747097,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 176691,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 357,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 357,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 91.8000000002794,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 3136967,
+                "setCalls": 1,
+                "setCodeUnits": 3136963,
+                "parseCalls": 426,
+                "parseCodeUnits": 12666410,
+                "parseMs": 26.100000000093132,
+                "stringifyCalls": 426,
+                "stringifyCodeUnits": 12666406,
+                "stringifyMs": 32.700000000651926,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveRevision": {
+              "ms": 13.600000000093132,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 530073,
+                "setCalls": 1,
+                "setCodeUnits": 177052,
+                "parseCalls": 5,
+                "parseCodeUnits": 354668,
+                "parseMs": 1.7000000001862645,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 531720,
+                "stringifyMs": 1.6000000000931323,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "profileSave": {
+              "ms": 0.20000000018626451,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 27.399999999906868,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3314015,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6460708,
+                "parseMs": 6.699999999720603,
+                "stringifyCalls": 143,
+                "stringifyCodeUnits": 6638926,
+                "stringifyMs": 16.600000000093132,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 3315187
+            },
+            "legacyRestoreValidation": {
+              "ms": 55.700000000186265,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 3314015,
+                "parseCalls": 145,
+                "parseCodeUnits": 6993030,
+                "parseMs": 10.700000000186265,
+                "stringifyCalls": 146,
+                "stringifyCodeUnits": 6991864,
+                "stringifyMs": 12.299999999813735,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "artExport": {
+              "ms": 1484.1000000000931,
+              "utf8Bytes": 12349426
+            },
+            "artRestore": {
+              "ms": 1144
+            },
+            "artwork": {
+              "count": 8,
+              "uniqueHashes": 8,
+              "originalBytes": 9260556
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 3136963,
+                "family-game-factory-workspace-v2": 177052
+              },
+              "utf8Bytes": 3315149,
+              "codeUnits": 3315143
+            },
+            "uiSaveDraft": {
+              "ms": 210.5599560000046,
+              "counters": {
+                "getCalls": 4,
+                "getCodeUnits": 12547736,
+                "setCalls": 1,
+                "setCodeUnits": 3136967,
+                "parseCalls": 852,
+                "parseCodeUnits": 31517117,
+                "parseMs": 55.40000000037253,
+                "stringifyCalls": 849,
+                "stringifyCodeUnits": 22106348,
+                "stringifyMs": 54.49999999906868,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 8,
+                  "logicalPayloadBytes": 10779744
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 10780045,
+              "browserEstimate": {
+                "quota": 10772453887,
+                "usage": 35035647,
+                "usageDetails": {
+                  "caches": 23926912,
+                  "indexedDB": 11087872,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 1.883669
+            },
+            {
+              "name": "TaskDuration",
+              "value": 7.344337
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 46684380
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 96014336
+            }
+          ]
+        },
+        {
+          "readyMs": 2279.1129230000006,
+          "libraryMs": 321.0929959999994,
+          "openMs": 1250.953555,
+          "startup": {
+            "counters": {
+              "getCalls": 60,
+              "getCodeUnits": 96767046,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 4286,
+              "parseCodeUnits": 189789371,
+              "parseMs": 574.7999999998137,
+              "stringifyCalls": 4378,
+              "stringifyCodeUnits": 95155527,
+              "stringifyMs": 335.19999999925494,
+              "idbGetCalls": 5,
+              "idbCursorSteps": 0,
+              "idbPutCalls": 0,
+              "idbReadPayloadBytes": 10779816,
+              "idbWritePayloadBytes": 0
+            },
+            "heapBytes": 51987561,
+            "domNodes": 3254,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.281083
+              },
+              {
+                "name": "TaskDuration",
+                "value": 2.322844
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 35992304
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 90234880
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 30.5,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3314019,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 144,
+                "parseCodeUnits": 6637768,
+                "parseMs": 7.7000000001862645,
+                "stringifyCalls": 142,
+                "stringifyCodeUnits": 3323749,
+                "stringifyMs": 5.800000000279397,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 17.600000000093132,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3314019,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6294130,
+                "parseMs": 9.600000000093132,
+                "stringifyCalls": 142,
+                "stringifyCodeUnits": 3157163,
+                "stringifyMs": 4.2000000001862645,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 177052,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 76.10000000009313,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 3136967,
+                "setCalls": 1,
+                "setCodeUnits": 3136963,
+                "parseCalls": 426,
+                "parseCodeUnits": 12666410,
+                "parseMs": 20.199999999720603,
+                "stringifyCalls": 426,
+                "stringifyCodeUnits": 12666406,
+                "stringifyMs": 30.799999999813735,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveRevision": {
+              "ms": 10.899999999906868,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 531156,
+                "setCalls": 1,
+                "setCodeUnits": 177413,
+                "parseCalls": 5,
+                "parseCodeUnits": 355393,
+                "parseMs": 0.5,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 532806,
+                "stringifyMs": 0.9999999995343387,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "profileSave": {
+              "ms": 0.2999999998137355,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0.2999999998137355,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 25.800000000279397,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3314376,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6461069,
+                "parseMs": 6.600000000093132,
+                "stringifyCalls": 143,
+                "stringifyCodeUnits": 6639648,
+                "stringifyMs": 14.499999999534339,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 3315548
+            },
+            "legacyRestoreValidation": {
+              "ms": 53.8000000002794,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 3314376,
+                "parseCalls": 145,
+                "parseCodeUnits": 6994474,
+                "parseMs": 11.900000001303852,
+                "stringifyCalls": 146,
+                "stringifyCodeUnits": 6993308,
+                "stringifyMs": 9.499999999068677,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "artExport": {
+              "ms": 1554.2999999998137,
+              "utf8Bytes": 12349426
+            },
+            "artRestore": {
+              "ms": 1357.6999999997206
+            },
+            "artwork": {
+              "count": 8,
+              "uniqueHashes": 8,
+              "originalBytes": 9260556
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 3136963,
+                "family-game-factory-workspace-v2": 177413
+              },
+              "utf8Bytes": 3315510,
+              "codeUnits": 3315504
+            },
+            "uiSaveDraft": {
+              "ms": 190.4468160000033,
+              "counters": {
+                "getCalls": 4,
+                "getCodeUnits": 12547868,
+                "setCalls": 1,
+                "setCodeUnits": 3136967,
+                "parseCalls": 852,
+                "parseCodeUnits": 31517414,
+                "parseMs": 50.49999999906868,
+                "stringifyCalls": 849,
+                "stringifyCodeUnits": 22106513,
+                "stringifyMs": 50.29999999888241,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 8,
+                  "logicalPayloadBytes": 10779744
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 10780045,
+              "browserEstimate": {
+                "quota": 10772453887,
+                "usage": 35035647,
+                "usageDetails": {
+                  "caches": 23926912,
+                  "indexedDB": 11087872,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 1.757306
+            },
+            {
+              "name": "TaskDuration",
+              "value": 7.439913
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 58484628
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 113872896
+            }
+          ]
+        },
+        {
+          "readyMs": 1630.1280669999978,
+          "libraryMs": 393.55802300000505,
+          "openMs": 1385.21592100001,
+          "startup": {
+            "counters": {
+              "getCalls": 57,
+              "getCodeUnits": 87361560,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 3860,
+              "parseCodeUnits": 170940906,
+              "parseMs": 330.69999999925494,
+              "stringifyCalls": 3933,
+              "stringifyCodeUnits": 85715288,
+              "stringifyMs": 136.60000000242144,
+              "idbGetCalls": 4,
+              "idbCursorSteps": 0,
+              "idbPutCalls": 0,
+              "idbReadPayloadBytes": 10779816,
+              "idbWritePayloadBytes": 0
+            },
+            "heapBytes": 186201674,
+            "domNodes": 3254,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.217008
+              },
+              {
+                "name": "TaskDuration",
+                "value": 1.607051
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 75932164
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 135122944
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 41.39999999990687,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3314380,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 144,
+                "parseCodeUnits": 6638490,
+                "parseMs": 15.199999999254942,
+                "stringifyCalls": 142,
+                "stringifyCodeUnits": 3324110,
+                "stringifyMs": 7.7000000001862645,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 17.899999999906868,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3314380,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6294130,
+                "parseMs": 9.200000000186265,
+                "stringifyCalls": 142,
+                "stringifyCodeUnits": 3157163,
+                "stringifyMs": 4.300000000279397,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.10000000009313226,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 177413,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0.10000000009313226,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 76.5,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 3136967,
+                "setCalls": 1,
+                "setCodeUnits": 3136963,
+                "parseCalls": 426,
+                "parseCodeUnits": 12666410,
+                "parseMs": 17.399999999441206,
+                "stringifyCalls": 426,
+                "stringifyCodeUnits": 12666406,
+                "stringifyMs": 27.700000000651926,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveRevision": {
+              "ms": 11.5,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 532239,
+                "setCalls": 1,
+                "setCodeUnits": 177774,
+                "parseCalls": 5,
+                "parseCodeUnits": 356115,
+                "parseMs": 0.8999999999068677,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 533889,
+                "stringifyMs": 0.6999999997206032,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "profileSave": {
+              "ms": 0,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 28.199999999720603,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3314737,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6461430,
+                "parseMs": 6.900000000372529,
+                "stringifyCalls": 143,
+                "stringifyCodeUnits": 6640370,
+                "stringifyMs": 16.199999999254942,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 3315909
+            },
+            "legacyRestoreValidation": {
+              "ms": 63,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 3314737,
+                "parseCalls": 145,
+                "parseCodeUnits": 6995918,
+                "parseMs": 9.59999999916181,
+                "stringifyCalls": 146,
+                "stringifyCodeUnits": 6994752,
+                "stringifyMs": 11.500000000465661,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "artExport": {
+              "ms": 1503.2999999998137,
+              "utf8Bytes": 12349426
+            },
+            "artRestore": {
+              "ms": 1074.6000000000931
+            },
+            "artwork": {
+              "count": 8,
+              "uniqueHashes": 8,
+              "originalBytes": 9260556
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 3136963,
+                "family-game-factory-workspace-v2": 177774
+              },
+              "utf8Bytes": 3315871,
+              "codeUnits": 3315865
+            },
+            "uiSaveDraft": {
+              "ms": 192.645995999992,
+              "counters": {
+                "getCalls": 4,
+                "getCodeUnits": 12547868,
+                "setCalls": 1,
+                "setCodeUnits": 3136967,
+                "parseCalls": 852,
+                "parseCodeUnits": 31517414,
+                "parseMs": 45.30000000214204,
+                "stringifyCalls": 849,
+                "stringifyCodeUnits": 22106513,
+                "stringifyMs": 50.10000000009313,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 8,
+                  "logicalPayloadBytes": 10779744
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 10780045,
+              "browserEstimate": {
+                "quota": 10772453887,
+                "usage": 35035647,
+                "usageDetails": {
+                  "caches": 23926912,
+                  "indexedDB": 11087872,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 2.017094
+            },
+            {
+              "name": "TaskDuration",
+              "value": 6.956972
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 27406572
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 90054656
+            }
+          ]
+        },
+        {
+          "readyMs": 2190.557476999995,
+          "libraryMs": 352.41477199998917,
+          "openMs": 2681.6222849999904,
+          "startup": {
+            "counters": {
+              "getCalls": 57,
+              "getCodeUnits": 87366975,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 3858,
+              "parseCodeUnits": 170943329,
+              "parseMs": 392.9999999990687,
+              "stringifyCalls": 3930,
+              "stringifyCodeUnits": 85716576,
+              "stringifyMs": 200.80000000167638,
+              "idbGetCalls": 4,
+              "idbCursorSteps": 0,
+              "idbPutCalls": 0,
+              "idbReadPayloadBytes": 10779816,
+              "idbWritePayloadBytes": 0
+            },
+            "heapBytes": 74306467,
+            "domNodes": 3254,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.368306
+              },
+              {
+                "name": "TaskDuration",
+                "value": 2.092695
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 58299612
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 98869248
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 53.10000000009313,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3314741,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 144,
+                "parseCodeUnits": 6639212,
+                "parseMs": 14.100000000093132,
+                "stringifyCalls": 142,
+                "stringifyCodeUnits": 3324471,
+                "stringifyMs": 7.899999999906868,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 16.899999999906868,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3314741,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6294130,
+                "parseMs": 8.799999999348074,
+                "stringifyCalls": 142,
+                "stringifyCodeUnits": 3157163,
+                "stringifyMs": 4.2000000001862645,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.10000000009313226,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 177774,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 128.39999999990687,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 3136967,
+                "setCalls": 1,
+                "setCodeUnits": 3136963,
+                "parseCalls": 426,
+                "parseCodeUnits": 12666410,
+                "parseMs": 32.89999999990687,
+                "stringifyCalls": 426,
+                "stringifyCodeUnits": 12666406,
+                "stringifyMs": 52.50000000046566,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveRevision": {
+              "ms": 13.600000000093132,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 533322,
+                "setCalls": 1,
+                "setCodeUnits": 178135,
+                "parseCalls": 5,
+                "parseCodeUnits": 356837,
+                "parseMs": 1.1000000005587935,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 534972,
+                "stringifyMs": 1.0999999991618097,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "profileSave": {
+              "ms": 0.10000000009313226,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 35.6999999997206,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3315098,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6461791,
+                "parseMs": 7.8999999994412065,
+                "stringifyCalls": 143,
+                "stringifyCodeUnits": 6641092,
+                "stringifyMs": 21.90000000037253,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 3316270
+            },
+            "legacyRestoreValidation": {
+              "ms": 76.89999999990687,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 3315098,
+                "parseCalls": 145,
+                "parseCodeUnits": 6997362,
+                "parseMs": 14.999999999534339,
+                "stringifyCalls": 146,
+                "stringifyCodeUnits": 6996196,
+                "stringifyMs": 11.900000000372529,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "artExport": {
+              "ms": 1720.3999999999069,
+              "utf8Bytes": 12349426
+            },
+            "artRestore": {
+              "ms": 1083.9000000003725
+            },
+            "artwork": {
+              "count": 8,
+              "uniqueHashes": 8,
+              "originalBytes": 9260556
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 3136963,
+                "family-game-factory-workspace-v2": 178135
+              },
+              "utf8Bytes": 3316232,
+              "codeUnits": 3316226
+            },
+            "uiSaveDraft": {
+              "ms": 345.007620999997,
+              "counters": {
+                "getCalls": 4,
+                "getCodeUnits": 12547868,
+                "setCalls": 1,
+                "setCodeUnits": 3136967,
+                "parseCalls": 852,
+                "parseCodeUnits": 31517414,
+                "parseMs": 103.69999999785796,
+                "stringifyCalls": 849,
+                "stringifyCodeUnits": 22106513,
+                "stringifyMs": 84.20000000065193,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 8,
+                  "logicalPayloadBytes": 10779744
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 10780045,
+              "browserEstimate": {
+                "quota": 10772453887,
+                "usage": 35035647,
+                "usageDetails": {
+                  "caches": 23926912,
+                  "indexedDB": 11087872,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 3.2308
+            },
+            {
+              "name": "TaskDuration",
+              "value": 9.436774
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 46873580
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 95756288
+            }
+          ]
+        },
+        {
+          "readyMs": 3434.4205199999997,
+          "libraryMs": 446.9045139999944,
+          "openMs": 4669.57875700001,
+          "startup": {
+            "counters": {
+              "getCalls": 57,
+              "getCodeUnits": 87372390,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 3858,
+              "parseCodeUnits": 170945856,
+              "parseMs": 610.7000000006519,
+              "stringifyCalls": 3930,
+              "stringifyCodeUnits": 85718020,
+              "stringifyMs": 319.60000000102445,
+              "idbGetCalls": 4,
+              "idbCursorSteps": 0,
+              "idbPutCalls": 0,
+              "idbReadPayloadBytes": 10779816,
+              "idbWritePayloadBytes": 0
+            },
+            "heapBytes": 76405011,
+            "domNodes": 3254,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.226217
+              },
+              {
+                "name": "TaskDuration",
+                "value": 3.419744
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 60217488
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 100179968
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 88.8000000002794,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3315102,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 144,
+                "parseCodeUnits": 6639934,
+                "parseMs": 19.100000000093132,
+                "stringifyCalls": 142,
+                "stringifyCodeUnits": 3324832,
+                "stringifyMs": 25.600000000093132,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 55.39999999990687,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3315102,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6294130,
+                "parseMs": 17.50000000046566,
+                "stringifyCalls": 142,
+                "stringifyCodeUnits": 3157163,
+                "stringifyMs": 17.200000000186265,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.10000000009313226,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 178135,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 263.59999999962747,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 3136967,
+                "setCalls": 1,
+                "setCodeUnits": 3136963,
+                "parseCalls": 426,
+                "parseCodeUnits": 12666410,
+                "parseMs": 61.10000000009313,
+                "stringifyCalls": 426,
+                "stringifyCodeUnits": 12666406,
+                "stringifyMs": 68.40000000037253,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveRevision": {
+              "ms": 18.300000000279397,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 534405,
+                "setCalls": 1,
+                "setCodeUnits": 178496,
+                "parseCalls": 5,
+                "parseCodeUnits": 357559,
+                "parseMs": 1.2000000001862645,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 536055,
+                "stringifyMs": 1.599999999627471,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "profileSave": {
+              "ms": 0,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 89.40000000037253,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3315459,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6462152,
+                "parseMs": 12,
+                "stringifyCalls": 143,
+                "stringifyCodeUnits": 6641814,
+                "stringifyMs": 69.70000000018626,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 3316631
+            },
+            "legacyRestoreValidation": {
+              "ms": 182.20000000018626,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 3315459,
+                "parseCalls": 145,
+                "parseCodeUnits": 6998806,
+                "parseMs": 70.5,
+                "stringifyCalls": 146,
+                "stringifyCodeUnits": 6997640,
+                "stringifyMs": 25.09999999962747,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "artExport": {
+              "ms": 3777.7999999998137,
+              "utf8Bytes": 12349426
+            },
+            "artRestore": {
+              "ms": 1746.1999999997206
+            },
+            "artwork": {
+              "count": 8,
+              "uniqueHashes": 8,
+              "originalBytes": 9260556
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 3136963,
+                "family-game-factory-workspace-v2": 178496
+              },
+              "utf8Bytes": 3316593,
+              "codeUnits": 3316587
+            },
+            "uiSaveDraft": {
+              "ms": 796.6575570000132,
+              "counters": {
+                "getCalls": 4,
+                "getCodeUnits": 12547868,
+                "setCalls": 1,
+                "setCodeUnits": 3136967,
+                "parseCalls": 852,
+                "parseCodeUnits": 31517414,
+                "parseMs": 124.40000000037253,
+                "stringifyCalls": 849,
+                "stringifyCodeUnits": 22106513,
+                "stringifyMs": 256.1999999997206,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 8,
+                  "logicalPayloadBytes": 10779744
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 10780045,
+              "browserEstimate": {
+                "quota": 10772453887,
+                "usage": 35035647,
+                "usageDetails": {
+                  "caches": 23926912,
+                  "indexedDB": 11087872,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 5.329145
+            },
+            {
+              "name": "TaskDuration",
+              "value": 16.749339
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 37290908
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 93298688
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -88,6 +88,11 @@ Object.defineProperty(HTMLIFrameElement.prototype,'src',{...frameSrc,set(value){
 }});
 window.__reviewNavigate=async action=>{
  const FG=window.FG,click=id=>document.getElementById(id)?.click();
+ const enterParent=()=>new Promise((resolve,reject)=>{
+  const opened=event=>{if(event.detail==='parent'){clearTimeout(timeout);window.removeEventListener('factory-page',opened);resolve();}};
+  const timeout=setTimeout(()=>{window.removeEventListener('factory-page',opened);reject(Error('Parent navigation did not finish. Check the saved-work notice.'));},10000);
+  window.addEventListener('factory-page',opened);click('studioMenuParent');
+ });
  FG.learning?.dispose();for(const d of document.querySelectorAll('dialog[open]'))d.close();
  if(action==='home')FG.studio.home();
  else if(action==='create')click('studioNavCreate');
@@ -99,14 +104,14 @@ window.__reviewNavigate=async action=>{
  else if(action==='coding-intro'){FG.creation.openIntroduction();}
  else if(action==='coding-editor'){FG.creation.open();await delay(80);click('creationIntroSkip');click('creationFreeMode');document.querySelector('[data-creation-starter="robot"]')?.click();}
  else if(action==='coding-challenge'){FG.creation.openChallenges();await delay(80);document.querySelector('[data-challenge]')?.click();}
- else if(action==='privacy'){click('studioMenuParent');FG.parentDashboard.openTab('settings');document.getElementById('builderParentUnlockPassphrase').value='review-demo-only';document.getElementById('builderParentUnlock')?.requestSubmit();}
+ else if(action==='privacy'){await enterParent();FG.parentDashboard.openTab('settings');document.getElementById('builderParentUnlockPassphrase').value='review-demo-only';document.getElementById('builderParentUnlock')?.requestSubmit();}
 
  else if(action==='powers'||action==='math'||action==='english'){if(action!=='powers'){FG.store.current().learningSubject=action==='math'?'math':'language';FG.store.current().allowSubjectSwitch=true;}FG.app.page('lab');}
  else if(action==='reasoning')click('studioNavProblemSolving');
  else if(action==='journey')click('studioNavJourney');
  else if(action==='rewards')click('studioNavRewards');
  else if(action==='pals')FG.pals.open();
- else if(action==='parent'||action.startsWith('parent:')||action==='connection'){click('studioMenuParent');FG.parentDashboard.openTab(action.split(':')[1]|| (action==='connection'?'settings':'overview'));}
+ else if(action==='parent'||action.startsWith('parent:')||action==='connection'){await enterParent();FG.parentDashboard.openTab(action.split(':')[1]|| (action==='connection'?'settings':'overview'));}
  else if(action==='adult-session')dispatchEvent(new Event('factory-open-parent-session'));
  else if(action==='menu'){FG.studio.home();click('studioNavMenu');}
  else if(action==='profiles'){FG.studio.home();document.getElementById('studioProfileMenu').open=true;}

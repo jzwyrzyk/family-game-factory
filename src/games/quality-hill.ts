@@ -30,7 +30,8 @@ export default class QualityHill implements GameInstance {
   private audio = createGameAudio();
   private clock: ReturnType<typeof createFixedClock>;
   private resizeObserver: ResizeObserver;
-  private onWindowResize = () => this.resize();
+  private resizeFrame = 0;
+  private onWindowResize = () => this.scheduleResize();
   private listeners = new AbortController();
   private simulation: ReturnType<typeof createVehicle>;
   private drawnCar: DrawnCar|null = null;
@@ -126,7 +127,7 @@ export default class QualityHill implements GameInstance {
       onResume: () => { this.clearInput(); this.audio.resume(); this.pauseButton.replaceChildren(createIcon('pause')); this.pauseButton.setAttribute('aria-label', 'Pause game'); this.context.emit?.({ type: 'resume', name: 'hill' }); } });
     window.addEventListener('keydown', this.keydown, { signal: this.listeners.signal });
     window.addEventListener('keyup', this.keyup, { signal: this.listeners.signal });
-    this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(stage);
+    this.resizeObserver = new ResizeObserver(() => this.scheduleResize()); this.resizeObserver.observe(stage);
     window.addEventListener('resize', this.onWindowResize, { signal: this.listeners.signal });
     this.resize(); this.resetCamera(); this.hud(); this.clock.start();
     this.drawingOwner=String((window as any).FG?.store?.current()?.id||'');
@@ -188,6 +189,13 @@ export default class QualityHill implements GameInstance {
     return ok;
   }
   private begin(focus=true) { if (this.hostPaused||this.drawingLoading||this.drawingUnavailable) return; if (this.mode === 'result') this.restart(); if (this.mode !== 'ready') return; this.mode = 'drive'; this.clock.resume('user'); void this.audio.unlock(); this.audio.setScene('run'); setIconLabel(this.driveButton,'play','Driving'); this.driveButton.disabled = true; this.hud(); if(focus)this.canvas.focus({ preventScroll: true }); }
+  private scheduleResize() {
+    if (this.disposed || this.resizeFrame) return;
+    // The ordinary stage derives its height from the canvas. Resize outside
+    // observer delivery so that fitting the canvas cannot resize that same
+    // observed stage again within one notification loop.
+    this.resizeFrame = requestAnimationFrame(() => { this.resizeFrame = 0; if (!this.disposed) this.resize(); });
+  }
   private resize() {
     const rect = this.canvas.parentElement!.getBoundingClientRect(), w = Math.max(1, rect.width);
     const normalHeight = w < 600 ? Math.max(290, w * .75) : w * .54;
@@ -293,5 +301,5 @@ export default class QualityHill implements GameInstance {
   snapshot() { return { engine: 'quality-hill-v1', mode: this.mode, paused: this.clock.paused, hostPaused: this.hostPaused, track: this.track, options: { ...this.options }, paint: this.paint,
     distance: this.scene.distance, status: this.scene.status, time: this.scene.time, bodies: this.scene.bodies, best: { ...this.best }, grounded: this.scene.grounded, speed: this.scene.speed,
     inputActive: this.keys.size + this.pedals.size,drawingRigId:this.drawnCar?.rigId??null,requestedDrawingRigId:this.drawingRigId,drawingLoading:this.drawingLoading,drawingUnavailable:this.drawingUnavailable, performance: this.clock.stats, resources: { bodies: 3, joints: 2, particles: this.particles.length }, storageBlocked: this.storageBlocked }; }
-  unmount() { if (this.disposed) return; this.disposed = true; this.save(); this.clock.dispose(); this.audio.dispose(); this.simulation.dispose(); this.resizeObserver.disconnect(); this.listeners.abort(); this.clearInput(); this.mount.replaceChildren(); }
+  unmount() { if (this.disposed) return; this.disposed = true; cancelAnimationFrame(this.resizeFrame); this.resizeFrame = 0; this.save(); this.clock.dispose(); this.audio.dispose(); this.simulation.dispose(); this.resizeObserver.disconnect(); this.listeners.abort(); this.clearInput(); this.mount.replaceChildren(); }
 }

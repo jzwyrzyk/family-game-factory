@@ -56,7 +56,7 @@ The [snapshot adapter](../../src/parent/snapshot.ts) normalizes a copy, so openi
 the report does not initialize or save learner state. The
 [parent model](../../src/parent/model.ts) assembles snapshots after owner
 filtering. Math/Language report snapshots and retained attempts must identify the
-same selected owner. Creation joins only that owner's projects and revisions.
+same selected owner. Creation joins only that owner's projects and revisions. Reports load only when Parent is shown, capture the selected source and discard late results after a profile or filter change. When scenes are explicitly prepared, the asynchronous scene adapter supplies the authoritative snapshot; a failed prepared read is unavailable rather than falling back to stale legacy history. The existing My Powers panel reads only five recent indexed scene checks.
 Repeated checks of the same scene/version/goal remain inspectable in history but
 are collapsed for overview counts; repeated clicks do not become new examples.
 

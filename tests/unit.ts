@@ -1,3 +1,14 @@
+import './household-generated-recovery.test';
+import './storage-generated-recovery.test';
+import './storage-cloud-recovery.test';
+import './storage-sync.test';
+import './storage-workspace.test';
+import './storage-recovery-scheduler.test';
+import './storage-backup.test';
+import './storage-remote-copy.test';
+import './storage-continuity.test';
+import './storage-assets.test';
+import './storage-recovery.test';
 import './intent-repair.test';
 import './intent-worker-binding.test';
 import './private-generation-preflight.test';
