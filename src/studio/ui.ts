@@ -94,6 +94,8 @@ export async function installStudio(){
  const rewards=installRewards();
  const pals=installPals(rewards);
  const young=()=>isEarlyGrade(FG.store.current().grade)&&!hasParentGuidance(String(FG.store.current().id));
+ let guidanceEpoch=0;
+ const creationAction=()=>{const captured=String(FG.store.current().id),generation=guidanceEpoch;return()=>String(FG.store.current().id)===captured&&generation===guidanceEpoch&&!young();};
  const handOff=createEarlyHandoff(async ()=>(await openParent(true)),async ()=>(await home()),()=>creation.open(),()=>pals.state,()=>String(FG.store.current().id));
  let notebook:NotebookWorkspace,notebookOwner=String(FG.store.current().id);
  try{notebook=await NotebookWorkspace.open(profileStorage(localStorage),()=>String(FG.store.current().id),notifyRewardSourceSaved);}catch(error){
@@ -771,11 +773,12 @@ export async function installStudio(){
   finally{draftWrites--;}
  }
  async function setTab(tab:'game'|'talk'|'versions'){
+  const authorized=creationAction();
   if(tab!=='game'&&guardMath())return false;
   if(tab==='talk'&&young()){handOff();return false;}
   if(tab!=='talk'){stopSpeech();handoff.close();}
   if(tab!=='game'){
-   ++viewIntent;(await flushDraft());
+   ++viewIntent;(await flushDraft());if(tab==='talk'&&!authorized())return false;
    if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;status('Your game is waiting. Your build is saved; action games start a new round when you return.');}
   }
   panel=tab;if(tab==='talk'){clearRewardCelebration();document.getElementById('jems-delight-host')?.replaceChildren();}document.body.classList.toggle('studio-designing',tab==='talk');
@@ -1046,13 +1049,19 @@ export async function installStudio(){
   // stops its player, recording and checkpoint clock; hiding DOM alone cannot.
   (await creation.flush());FG.app.page('home');return true;
  }
- async function newIdea(){if(!(await leaveCreationForStudio()))return;if(young()){handOff();return;}(await flushDraft());const s=(await notebook.create(owner(),'new','My new idea',null,{creationStandard:2}));return open(s.id);}
+ async function newIdea(){
+  const authorized=creationAction();if(!(await leaveCreationForStudio()))return;if(!authorized()){if(young())handOff();return;}await flushDraft();if(!authorized())return;
+  const s=await saveLocalStudioProject(profileStorage(localStorage),FG,owner(),(_games,book)=>{if(!authorized())throw Error('The guided creation session ended. Your saved work is still here.');return book.create(owner(),'new','My new idea',null,{creationStandard:2});},notifyRewardSourceSaved);
+  if(authorized())return open(s.id);
+ }
  async function open(id:string,autoPlay=true){
+  const authorized=creationAction();
   if(!(await leaveCreationForStudio()))return;
   await flushDraft();const requested=await notebook.load(id,owner());
-  if(young()&&requested?.game==='new'&&!requested.projectId&&!requested.remoteId&&!requested.candidate){handOff();return;}
-  stopSpeech();handoff.close();moreChoices.open=false;disposeGame();(await notebook.select(id,owner()));activeId=id;keptInThisView=null;reflecting=false;lastOutcome=null;showing='working';status('');
-  const s=current();if(s.candidate&&!s.experiments?.some(e=>e.id===s.candidate!.id))(await notebook.saveExperiment(s.id,s.owner,s.candidate,[],'tune','helper'));(await coaching?.openSession());$<HTMLTextAreaElement>('studioPrompt').value=s.draft;globalStatus.textContent='';$<HTMLDetailsElement>('studioMore').open=false;showStudio();render();(await setTab('game'));focusView($('studioTitle'));
+  const needsGuidance=requested.game==='new'&&!requested.projectId&&!requested.remoteId&&!requested.candidate;
+  if(needsGuidance&&!authorized()){if(young())handOff();return;}
+  stopSpeech();handoff.close();moreChoices.open=false;disposeGame();(await notebook.select(id,owner()));if(needsGuidance&&!authorized())return;activeId=id;keptInThisView=null;reflecting=false;lastOutcome=null;showing='working';status('');
+  const s=current();if(s.candidate&&!s.experiments?.some(e=>e.id===s.candidate!.id))(await notebook.saveExperiment(s.id,s.owner,s.candidate,[],'tune','helper'));(await coaching?.openSession());if(needsGuidance&&!authorized())return;$<HTMLTextAreaElement>('studioPrompt').value=s.draft;globalStatus.textContent='';$<HTMLDetailsElement>('studioMore').open=false;showStudio();render();(await setTab('game'));focusView($('studioTitle'));
   if(autoPlay){if(s.projectId||s.remoteId)await playWorking();else if(s.candidate)await playCandidate();else if(readyExperiment(s))await openReadySession(s.id,s.owner);else{$('studioEmpty').hidden=false;(await setTab('talk'));}}
   if(remote.mode==='remote'&&!clients.has(s.id)&&(s.pendingSubmission?.api===remote.apiBaseUrl||s.job?.api===remote.apiBaseUrl&&(busy(s)||needsReadyRecovery(s))))resume(s);
  }
@@ -1216,8 +1225,9 @@ export async function installStudio(){
   focusView($('studioHelpTitle'));
  }
  async function submit(request?:{prompt:string;displayText?:string;compiledPlan?:boolean}){
+  const authorized=creationAction();
   if(young()){handOff();return;}
-  if(guardMath())return;stopSpeech();(await flushDraft());const s=current(),typed=s.draft.trim(),started=epoch;
+  if(guardMath())return;stopSpeech();(await flushDraft());if(!authorized())return;const s=current(),typed=s.draft.trim(),started=epoch;
   let prompt=request?.prompt||typed||(s.game==='new'&&!s.remoteId?s.messages.find(m=>m.role==='child')?.text.trim()||'':'');if(!prompt)return;
   notebook.assertMessageCapacity(s.id,s.owner,reflecting?1:2);
   const consumedDraft=!request||request.compiledPlan||request.prompt.trim()===typed?s.draft:undefined;
@@ -1238,7 +1248,7 @@ export async function installStudio(){
   if(unknownJobs.has(s.id)||s.pendingSubmission||needsReadyRecovery(s)){status('The last request is not confirmed. Your new thought is saved; no second build was sent.');return;}
   const mathRequest=interpretLearningRequest(prompt,FG.learning.subject);
   if(mathRequest){(await message(s,'child',prompt));(await notebook.update(s.id,s.owner,x=>{x.reflection=false;}));if(mathRequest.kind==='required'){(await message(s,'helper',mathRequest.message));}else{FG.learning.setMode(s.id,mathRequest.mode);(await message(s,'helper',`Learning format set to ${learningFormatLabel(FG.learning.subject,mathRequest.mode)}. It applies at the next safe learning moment; your game rules and learning history stay together.`));(await clearConsumedDraft());}render();return;}
-  if(await coaching?.intercept(prompt,true))return;if(!sameView(s,started))return;
+  if(await coaching?.intercept(prompt,true))return;if(!sameView(s,started)||!authorized())return;
   const decision=coaching?.details()||{continueTest:false,parents:[],depth:'tune' as const,origin:'child' as const};
   const firstBuild=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
   if(firstBuild){
@@ -1249,16 +1259,16 @@ export async function installStudio(){
    // the child's words. A Build gesture is already acknowledged by its handoff.
    if(!request&&typed&&!current().messages.some(m=>m.role==='child'&&m.text===typed))(await message(s,'child',typed));
   }else (await message(s,'child',request?.displayText||prompt));
-  (await notebook.update(s.id,s.owner,x=>{x.reflection=false;x.playOnly=false;}));
+  if(!authorized())return;(await notebook.update(s.id,s.owner,x=>{if(!authorized())throw Error('The guided creation session ended.');x.reflection=false;x.playOnly=false;}));
   if(s.projectId&&!s.remoteId&&!s.candidate?.remoteId){
     const working=(await games.revision(s.projectId,s.owner)),config=decision.continueTest&&s.candidate?.config?s.candidate.config:working.config;
-    if(!sameView(s,started))return;
+    if(!sameView(s,started)||!authorized())return;
     const intent=interpret(s.game as GameId,config,prompt);
     if(intent.kind==='supported'){
       const before=progressSnapshot(notebook.get(s.id,s.owner));
       const c:Candidate={id:crypto.randomUUID(),baseId:decision.continueTest&&s.candidate?s.candidate.baseId:working.id,config:intent.config,prompt,summary:intent.summary};
       games.clonePlayState(s.owner,decision.continueTest&&s.candidate?s.candidate.id:working.id,c.id);
-      (await notebook.saveExperiment(s.id,s.owner,c,decision.parents,decision.depth,decision.origin));
+      (await notebook.saveExperiment(s.id,s.owner,c,decision.parents,decision.depth,decision.origin));if(!authorized())return;
       const achievement=gemAchievement(before,notebook.get(s.id,s.owner));if(achievement){updateProfile();celebrateProgress(achievement);}
       // Keep the concurrent AI build and its exact starting revision.
        (await clearConsumedDraft());
@@ -1272,30 +1282,34 @@ export async function installStudio(){
   }
   const chosenBase=decision.continueTest?s.candidate:null;
   const baseId=chosenBase?.remoteId||s.remoteId||(chosenBase?.config?chosenBase.id:s.projectId?(await games.revision(s.projectId,s.owner)).id:null);
-  if(!sameView(s,started))return;
+  if(!sameView(s,started)||!authorized())return;
   (await notebook.update(s.id,s.owner,x=>{x.pendingExperiment={parents:decision.parents,depth:decision.depth,origin:decision.origin,baseId,prompt};}));
   if(consumedDraft!==undefined)submittedDrafts.set(s.id,consumedDraft);else submittedDrafts.delete(s.id);
-  await build(s,prompt,decision.continueTest);
+  if(authorized())await build(s,prompt,decision.continueTest);
  }
  function clientFor(s:StudioSession){
   let c=clients.get(s.id);if(c)return c;
   c=new BuilderClient(remote,(job,submissionId)=>onJob(s,job,submissionId));clients.set(s.id,c);return c;
  }
  async function build(s:StudioSession,prompt:string,continueTest=false){
+  const authorized=creationAction();
   if(young()){handOff();return;}
   sending.add(s.id);moreChoices.open=false;const identity=beginBuildHandoff(s,{phase:'sending'});render();status('Sending your idea…');
   const r=s.projectId?(await games.revision(s.projectId,s.owner)):null;
+  if(!authorized()){sending.delete(s.id);return;}
   const chosen=continueTest?s.candidate:null;
   const input={gameId:s.remoteId||chosen?.remoteId?(isGeneratedRemoteKind(s.remoteKind)?'generated-module':'star-catcher'):s.game,baseRevisionId:chosen?.remoteId||s.remoteId||(chosen?.config?chosen.id:r?.id)||null,prompt,...(r&&!s.remoteId&&!chosen?.remoteId?{config:chosen?.config||r.config}:{})};
   // Request admission ends at the durable ACK, not when a game finishes building.
   // Continue status polling independently while a child plays or makes other edits.
   let submissionId:string|undefined;
   void clientFor(s).submit(input,async request=>{
-   if(owner()!==s.owner||buildAttempts.get(s.id)?.attemptId!==identity.attemptId)throw Error('PROFILE_CHANGED');
+   if(!authorized()||owner()!==s.owner||buildAttempts.get(s.id)?.attemptId!==identity.attemptId)throw Error('PROFILE_CHANGED');
    (await notebook.update(s.id,s.owner,x=>{
+    if(!authorized())throw Error('The guided creation session ended.');
     if(x.pendingSubmission)throw Error('UNCONFIRMED_BUILD_RESPONSE');
     x.pendingSubmission={owner:s.owner,workspace:s.id,api:remote.apiBaseUrl!,request};
    }));
+   if(!authorized())throw Error('The guided creation session ended.');
    submissionId=request.clientRequestId;
   }).catch(async error=>{
    if(owner()!==s.owner||buildAttempts.get(s.id)?.attemptId!==identity.attemptId)return;
@@ -1679,14 +1693,14 @@ export async function installStudio(){
  window.addEventListener('factory-session-restored',()=>{void refreshServiceReadiness();if(activeId&&panel==='talk')void privateSpeech?.refresh();});
  window.addEventListener('factory-profile-before-change',event=>{stopSpeech();if(event.cancelable&&draftPending()){event.preventDefault();act(flushDraft);return;}handoff.close();disposeGame();});
  let profileOpening=0;
- window.addEventListener('factory-profile',()=>{const requested=++profileOpening,capturedOwner=owner();notebookOwner='';welcomeArt=null;handoff.close();buildAttempts.clear();submittedDrafts.clear();sending.clear();waitProject=null;stopSpeech();hideJourney();
+ window.addEventListener('factory-profile',()=>{const requested=++profileOpening,capturedOwner=owner(),preserveParent=!$('page-parent').classList.contains('hidden');notebookOwner='';welcomeArt=null;handoff.close();buildAttempts.clear();submittedDrafts.clear();sending.clear();waitProject=null;stopSpeech();hideJourney();
   // A hidden Studio DOM must never retain the previous child's transcript.
   // Clearing a browser view does not delete the former child's saved notebook.
   conversationReaders.forEach(reader=>reader.dispose());conversationReaders=[];notificationView?.clear();
   const conversation=$('studioMessages');conversation.replaceChildren();delete conversation.dataset.session;delete conversation.dataset.signature;$('coachProposals').replaceChildren();
   $('coachModeStatus').textContent='';$<HTMLTextAreaElement>('studioPrompt').value='';
   $('studioVoiceStatus').textContent='';
-  coachConnection=remote.mode==='remote'?'checking':'unavailable';builderReadiness=remote.mode==='remote'?'checking':'not-configured';$<HTMLDialogElement>('studioCopyDialog').close();coaching?.reset();clearTimeout(draftTimer);clients.forEach(c=>c.disconnect());clients.clear();unknownJobs.clear();for(const timer of retryTimers.values())clearTimeout(timer);retryTimers.clear();activeId=null;reflecting=false;disposeGame();$('studioLibrary').replaceChildren();notebook.close();void (async()=>{const next=await NotebookWorkspace.open(profileStorage(localStorage),owner,notifyRewardSourceSaved);if(requested!==profileOpening||owner()!==capturedOwner){next.close();return;}notebook=next;notebookOwner=capturedOwner;lastPresentedLevel=notebook.summary().journey.level;updateProfile();await home();void refreshServiceReadiness();resumeOutstanding();})().catch(error=>{if(owner()===capturedOwner)status((error as Error).message,true);});});
+  coachConnection=remote.mode==='remote'?'checking':'unavailable';builderReadiness=remote.mode==='remote'?'checking':'not-configured';$<HTMLDialogElement>('studioCopyDialog').close();coaching?.reset();clearTimeout(draftTimer);clients.forEach(c=>c.disconnect());clients.clear();unknownJobs.clear();for(const timer of retryTimers.values())clearTimeout(timer);retryTimers.clear();activeId=null;reflecting=false;disposeGame();$('studioLibrary').replaceChildren();notebook.close();void (async()=>{const next=await NotebookWorkspace.open(profileStorage(localStorage),owner,notifyRewardSourceSaved);if(requested!==profileOpening||owner()!==capturedOwner){next.close();return;}notebook=next;notebookOwner=capturedOwner;lastPresentedLevel=notebook.summary().journey.level;updateProfile();if(!preserveParent)await home();else route='other';void refreshServiceReadiness();resumeOutstanding();})().catch(error=>{if(owner()===capturedOwner)status((error as Error).message,true);});});
  window.addEventListener('factory-art-updated',event=>{
   if((event as CustomEvent).detail?.owner!==owner())return;
   void readWelcomeArt(true);
@@ -1869,7 +1883,7 @@ export async function installStudio(){
  });
  installParentGuidance();
  refreshEarlyJourney();
- window.addEventListener('factory-parent-guidance',()=>{refreshEarlyJourney();if(young()&&route==='studio')home();});
+ window.addEventListener('factory-parent-guidance',()=>{guidanceEpoch++;refreshEarlyJourney();if(young()){++viewIntent;coaching?.reset();clients.forEach(client=>client.disconnect());if(route==='studio'){disposeGame();page.classList.add('hidden');act(home);}}});
  window.addEventListener('factory-learning-settings',refreshEarlyJourney);
  window.addEventListener('factory-profile',refreshEarlyJourney);
  window.addEventListener('factory-early-handoff',event=>{if(young()){event.preventDefault();handOff();}});
