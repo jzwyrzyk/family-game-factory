@@ -8,7 +8,7 @@ concurrency:
   group: jems-reviewed-sandbox-publish
   cancel-in-progress: false
 env:
-  REVIEWED_SANDBOX_SHA: d1a0996edd3f2e70b64c41a1e9edc1aeb676b8f4
+  REVIEWED_SANDBOX_SHA: 6a9532763da4ec986b03df1cbc6d0a4b614810fb
   SANDBOX_IMAGE: ghcr.io/jzwyrzyk/family-game-factory-sandbox
 jobs:
   publish-reviewed-sandbox:

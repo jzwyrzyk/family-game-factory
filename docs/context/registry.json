@@ -1126,10 +1126,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T23:20:09.639Z",
-      "sourceDigest": "bc31b345eed05b98eab72cf64d2a3c994973b6b8a223e136f3ef90203bb20f27",
+      "reviewedAt": "2026-11-25T01:03:37.661Z",
+      "sourceDigest": "af00a5e7c9bdd99aadd68e48aea9390096b61d52ae74eaabb94a77931e410be1",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed publisher digest verification, signed manifest provenance via the existing pinned action, separated job permissions, and the acceptance runbook.",
+      "reviewReason": "The sandbox publisher and its test now select merged budget source 6a95327. The November 25 delivery entry records the tested tree and the publication and runtime gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
