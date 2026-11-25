@@ -36,7 +36,7 @@ export function installLearningProfileSetup() {
   const cancel=node('button','Not now');cancel.type='button';cancel.id='learningProfileCancel';
   const save=node('button','Save learning level');save.type='submit';save.id='learningProfileSave';save.className='learning-profile-save';
   actions.append(cancel,save);form.append(gradeFieldLabel,grade,difficultyLabel,difficulty,explanation,error,actions);dialog.append(title,form);document.body.append(dialog);
-  let owner='',priorFocus:HTMLElement|null=null;
+  let revision=0,owner='',priorFocus:HTMLElement|null=null;
 
   function refresh() {
     // Profile buttons are rebuilt after selection/renaming; retain this one control.
@@ -54,6 +54,7 @@ export function installLearningProfileSetup() {
     if(note)note.textContent=description.textContent+(profile.learningSetupComplete?'':' · Choose a level and save to finish setup.');
   }
   function close(restoreFocus=true) {
+    revision++;
     if(dialog.open)dialog.close();
     owner='';
     if(restoreFocus&&priorFocus?.isConnected&&!priorFocus.closest('[hidden],.hidden'))priorFocus.focus({preventScroll:true});
@@ -79,8 +80,9 @@ export function installLearningProfileSetup() {
   form.onsubmit=async event=>{
     event.preventDefault();
     if(!owner||owner!==String(FG.store.current().id)||FG.store.adultProfileId){close(false);return;}
+    const at=revision;
     try{
-      await FG.store.changeLearningProfile({grade:parseGradeOption(grade.value),intensity:difficulty.value,learningSetupComplete:true});
+      await FG.store.changeLearningProfile({grade:parseGradeOption(grade.value),intensity:difficulty.value,learningSetupComplete:true},()=>at===revision);
       FG.parentDashboard?.refresh();refresh();close();
     }catch(cause){error.textContent=cause instanceof Error?cause.message:'Could not save this level. Try again.';error.hidden=false;}
   };

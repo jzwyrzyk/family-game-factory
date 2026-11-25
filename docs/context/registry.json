@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:00:57.951Z",
-      "sourceDigest": "14a371eaf7273948660ec651987d892a42aeafa073b62ef8ee640c8856ab3845",
+      "reviewedAt": "2026-11-25T01:20:39.133Z",
+      "sourceDigest": "5ee5485a3436a7c206ea0bbbdf642827094710a07f7fe3d149acf90cb484dc68",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
+      "reviewReason": "Parent verification applies to actual grade changes. Offline learning fixtures explicitly supply a synthetic authorized parent.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -641,10 +641,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:00:58.547Z",
-      "sourceDigest": "7abd378c65ca377cc34388d61f9fc15af5771e5d3d7cad2e96f3e3765d536a1f",
+      "reviewedAt": "2026-11-25T01:20:39.496Z",
+      "sourceDigest": "ca72d267d454dca146d216ce8d9ab9b7a6f59e3a0ff15b1a6d77cc6caf6973d3",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
+      "reviewReason": "Parent verification applies to actual grade changes. Offline learning fixtures explicitly supply a synthetic authorized parent.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:00:58.653Z",
-      "sourceDigest": "026fb965d6d627eed35dc507e82638754031ad25479fd0be4124a64490ff13bc",
+      "reviewedAt": "2026-11-25T01:20:39.546Z",
+      "sourceDigest": "39faf3e76233ec32683297ba53ae0268da9a586e7ad3820d3ae58cd47a3cee09",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
+      "reviewReason": "Parent verification applies to actual grade changes. Offline learning fixtures explicitly supply a synthetic authorized parent.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1514,10 +1514,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "15cad784d99b9b82376f99ca755f2ff7b8d8e0308ed815cf17fefa097d1b6865",
-      "reviewedAt": "2026-11-25T01:00:58.912Z",
+      "sourceDigest": "131112bdd156f599674b42b406109871c4a0cd428db58a4a618071f86967fb55",
+      "reviewedAt": "2026-11-25T01:20:39.636Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
+      "reviewReason": "Parent verification applies to actual grade changes. Offline learning fixtures explicitly supply a synthetic authorized parent.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",

@@ -1,3 +1,4 @@
+const {authorizeLearningParent}=require('./learning-parent-fixture.cjs');
 /* Production child journeys. Network responses and storage faults are explicit
  * fixtures; no paid model, credentials, or experimental UI harness is used. */
 const {chromium}=require('playwright');
@@ -312,8 +313,9 @@ async function remoteJourney(browser,url,device,viewport,variant='v1'){
    // A parent-authorized English setting applies to the same generated v2
    // preview, not a separate practice-only game. Required learning must pause
    // play and preserve the actual game state until the child continues.
-   await page.evaluate(()=>{
-    FG.store.changeProfile({learningSubject:'language',allowSubjectSwitch:true,grade:2,rate:1,hints:false});
+   await authorizeLearningParent(page);
+    await page.evaluate(async ()=>{
+    await FG.store.changeLearningProfile({learningSubject:'language',allowSubjectSwitch:true,grade:2,rate:1,hints:false});
     FG.store.current().mathWindow=[];FG.store.save();
    });
    assert.equal(await page.evaluate(()=>FG.learning.subject),'language');

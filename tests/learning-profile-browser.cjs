@@ -1,3 +1,4 @@
+const {authorizeLearningParent}=require('./learning-parent-fixture.cjs');
 /* Real profile controls and the same host selection used by all games.
  * Synthetic local profiles only; no remote coaching or generation. */
 const {chromium}=require('playwright');
@@ -47,7 +48,8 @@ async function choose(page,index){await openProfiles(page);await page.locator('#
         await choose(page,1);await editLevel(page);
         assert.match(await page.locator('#learningProfileTitle').textContent(),/Explorer 2/);
         assert.equal(await page.locator('#learningProfileGrade').inputValue(),'1','the second child does not inherit an older demo grade');
-        await page.selectOption('#learningProfileGrade','4');await page.selectOption('#learningProfileDifficulty','balanced');
+        await authorizeLearningParent(page);
+    await page.selectOption('#learningProfileGrade','4');await page.selectOption('#learningProfileDifficulty','balanced');
         await page.locator('#learningProfileSave').click();
         await choose(page,0);
         assert.equal(await page.evaluate(()=>FG.store.current().grade),1,'the first child keeps their own grade');
@@ -75,7 +77,8 @@ async function choose(page,index){await openProfiles(page);await page.locator('#
         assert.equal(await page.locator('#parentLearningProfile').textContent(),'Learning settings for Explorer 2');
         assert.equal(await page.locator('#parentGrade').inputValue(),'4');
         assert.equal(await page.locator('#parentIntensity').inputValue(),'balanced');
-        await page.selectOption('#parentGrade','2');await page.selectOption('#parentIntensity','gentle');
+        await authorizeLearningParent(page);
+    await page.selectOption('#parentGrade','2');await page.selectOption('#parentIntensity','gentle');
         await page.locator('#saveParent').click();
         await choose(page,0);
         assert.equal(await page.locator('#parentLearningProfile').textContent(),'Learning settings for Explorer 1');
