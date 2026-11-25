@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:00:57.951Z",
-      "sourceDigest": "14a371eaf7273948660ec651987d892a42aeafa073b62ef8ee640c8856ab3845",
+      "reviewedAt": "2026-11-25T01:08:27.254Z",
+      "sourceDigest": "0647aa7f3aae2971f49e1726466d14543ec9fcaeaf279893a585d19569549dd2",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
+      "reviewReason": "Reviewed the early question catalogs, visual activities, device-only narration, legacy content assertions and skill crosswalk against the affected source.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -641,10 +641,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:00:58.547Z",
-      "sourceDigest": "7abd378c65ca377cc34388d61f9fc15af5771e5d3d7cad2e96f3e3765d536a1f",
+      "reviewedAt": "2026-11-25T01:08:27.725Z",
+      "sourceDigest": "9fec009f3c58c9dbff07f3168ca7772fc5f0383e91aefb58269e130e1f95587c",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
+      "reviewReason": "Reviewed the early question catalogs, visual activities, device-only narration, legacy content assertions and skill crosswalk against the affected source.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:00:58.653Z",
-      "sourceDigest": "026fb965d6d627eed35dc507e82638754031ad25479fd0be4124a64490ff13bc",
+      "reviewedAt": "2026-11-25T01:08:27.846Z",
+      "sourceDigest": "68fa1fc603989d1bc9608921a67f95359e58e79fdc62212da6e4d27f9f652e8c",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
+      "reviewReason": "Reviewed the early question catalogs, visual activities, device-only narration, legacy content assertions and skill crosswalk against the affected source.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -1,3 +1,4 @@
+import {EARLY_LANGUAGE_BANK} from './early';
 import {withinGrade} from '../learning/grades';
 import {getLanguageSkill, LANGUAGE_SKILLS} from './curriculum';
 import {LANGUAGE_G1} from './data-g1';
@@ -7,7 +8,7 @@ import {LANGUAGE_G4} from './data-g4';
 import type {LanguageItem, LanguageKind, LanguageLevel, LanguageForm} from './types';
 
 export interface LanguageTemplate {
-  kind:LanguageKind; q:string; a:string; d?:string[]; ex:string; t:number; passage?:string;
+  kind:LanguageKind; q:string; a:string; d?:string[]; ex:string; t:number; passage?:string; stimulus?:string;
 }
 export interface LanguageTemplateBank {
   h:string[]; items:LanguageTemplate[];
@@ -27,8 +28,8 @@ export const LANGUAGE_BANK_V1:Readonly<Record<string,LanguageTemplateBank>> = de
   ...LANGUAGE_G1, ...LANGUAGE_G2, ...LANGUAGE_G3, ...LANGUAGE_G4,
 });
 export const LANGUAGE_PACKS:Readonly<Record<string,Readonly<Record<string,LanguageTemplateBank>>>> =
-  Object.freeze({v1:LANGUAGE_BANK_V1});
-export const LANGUAGE_BANK = LANGUAGE_BANK_V1;
+  Object.freeze({v1:LANGUAGE_BANK_V1,v2:deeplyFreeze(EARLY_LANGUAGE_BANK)});
+export const LANGUAGE_BANK = Object.freeze({...LANGUAGE_BANK_V1,...LANGUAGE_PACKS.v2});
 const unit=(random:()=>number):number=>{
   const n=random(); return Number.isFinite(n)?Math.max(0,Math.min(0.999999,n)):0;
 };
@@ -43,13 +44,14 @@ export interface LanguageItemOptions {
 /** Reviewed templates only. Generated game code never authors or grades these items. */
 export function generateLanguageItem(skillId:string,options:LanguageItemOptions={}):LanguageItem {
   const skill=getLanguageSkill(skillId);
-  const bank=LANGUAGE_PACKS[ACTIVE_LANGUAGE_PACK][skillId];
+  const pack=Object.hasOwn(LANGUAGE_PACKS.v2,skillId)?'v2':ACTIVE_LANGUAGE_PACK;
+  const bank=LANGUAGE_PACKS[pack][skillId];
   if(!bank?.items.length)throw Error('Language skill has no reviewed examples: '+skillId);
   const random=options.random||Math.random;
   const tier=Math.max(0,Math.min(2,Math.floor(options.tier??0))) as LanguageLevel;
   const nearest=Math.min(...bank.items.map(x=>Math.abs(x.t-tier)));
   const matches=bank.items.map((item,index)=>({item,index})).filter(x=>Math.abs(x.item.t-tier)===nearest);
-  const notRecent=matches.filter(x=>!options.excludeIds?.includes(skillId+':'+ACTIVE_LANGUAGE_PACK+':'+x.index));
+  const notRecent=matches.filter(x=>!options.excludeIds?.includes(skillId+':'+pack+':'+x.index));
   const eligible=notRecent.length?notRecent:matches;
   const chosen=eligible[Math.floor(unit(random)*eligible.length)];
   const draft=chosen.item;
@@ -60,7 +62,7 @@ export function generateLanguageItem(skillId:string,options:LanguageItemOptions=
   const tiles=(kind==='word-tiles'?shuffle(draft.a.split(''),random):
     kind==='sentence-tiles'?shuffle(draft.a.split(/\s+/),random):undefined);
   return {
-    id:skillId+':'+ACTIVE_LANGUAGE_PACK+':'+chosen.index,contentPack:ACTIVE_LANGUAGE_PACK,
+    id:skillId+':'+pack+':'+chosen.index,contentPack:pack,...(draft.stimulus?{stimulus:draft.stimulus}:{}),
     skillId,title:skill.title,grade:skill.grade,domain:skill.domain,
     kind,form,tier:draft.t as LanguageLevel,question:draft.q,
     ...(draft.passage?{passage:draft.passage}:{}),

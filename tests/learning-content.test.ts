@@ -53,7 +53,7 @@ function validateVisual(visual:MathVisual){
 }
 
 test('curriculum provides explicit supported coverage for every grade and an acyclic prerequisite graph',()=>{
- assert.equal(SKILLS.length,73);assert.equal(new Set(SKILLS.map(s=>s.id)).size,SKILLS.length);
+ assert.equal(SKILLS.filter(s=>s.grade>=1).length,73);assert.equal(new Set(SKILLS.map(s=>s.id)).size,SKILLS.length);
  for(const grade of [1,2,3,4]){const skills=SKILLS.filter(s=>s.grade===grade);assert.ok(skills.length>=16);for(const domain of ['operations','place-value','measurement','geometry','data'])assert.ok(skills.some(s=>s.domain===domain),`grade ${grade} ${domain}`);}
  function visit(id:string,path:string[]){assert.ok(!path.includes(id),`cycle ${[...path,id]}`);const s=getSkill(id);assert.ok(s);assert.ok(s.standards.length&&s.description);for(const parent of s.prerequisites){const before=getSkill(parent);assert.ok(before,`missing ${parent}`);assert.ok(before.grade<=s.grade);visit(parent,[...path,id]);}}
  for(const skill of SKILLS)visit(skill.id,[]);
@@ -61,7 +61,7 @@ test('curriculum provides explicit supported coverage for every grade and an acy
 
 test('all 73 skill generators have valid independent answers and graduated support over 6,570 samples',()=>{
  let checked=0;
- for(const skill of SKILLS)for(let seed=1;seed<=30;seed++)for(const representation of ['symbolic','story','visual'] as const){
+ for(const skill of SKILLS.filter(s=>s.grade>=1))for(let seed=1;seed<=30;seed++)for(const representation of ['symbolic','story','visual'] as const){
   const item=generateItem(skill.id,{random:seeded(seed*193+skill.grade),tier:seed%3,representation});
   const label=`${skill.id} seed ${seed} ${representation}`;
   assert.equal(item.skillId,skill.id,label);assert.equal(item.grade,skill.grade,label);

@@ -5,10 +5,10 @@ import {LANGUAGE_SKILLS} from '../src/language/curriculum';
 import {ACTIVE_LANGUAGE_PACK,LANGUAGE_PACKS,LANGUAGE_BANK,generateLanguageItem,evaluateLanguageAnswer,languageContentErrors} from '../src/language/content';
 
 test('language curriculum spans four grades with 48 authored, prerequisite-linked skill units',()=>{
-  assert.equal(LANGUAGE_SKILLS.length,48);
+  assert.equal(LANGUAGE_SKILLS.filter(s=>s.grade>=1).length,48);
   for(const grade of [1,2,3,4])assert.equal(LANGUAGE_SKILLS.filter(s=>s.grade===grade).length,12);
   assert.deepEqual(languageContentErrors(),[]);
-  assert.equal(Object.values(LANGUAGE_BANK).reduce((n,x)=>n+x.items.length,0),192);
+  assert.equal(Object.values(LANGUAGE_PACKS.v1).reduce((n,x)=>n+x.items.length,0),192);
   const required=['phonics','spelling','vocabulary','grammar','comprehension','writing'];
   for(const domain of required)assert.ok(LANGUAGE_SKILLS.some(x=>x.domain===domain));
   const seen=new Set<string>();
@@ -76,7 +76,7 @@ test('published v1 examples have a pinned snapshot; never mutate archived review
   assert.equal(Object.isFrozen(LANGUAGE_BANK['g1-short-i-o-u']),true);
   assert.equal(Object.isFrozen(LANGUAGE_BANK['g1-short-i-o-u'].items),true);
   assert.equal(Object.isFrozen(LANGUAGE_BANK['g1-short-i-o-u'].items[2].d),true);
-  const data=JSON.stringify(LANGUAGE_BANK);
+  const data=JSON.stringify(LANGUAGE_PACKS.v1);
   let h=0x811c9dc5;
   for(let i=0;i<data.length;i++)h=Math.imul(h^data.charCodeAt(i),0x01000193)>>>0;
   assert.equal(h.toString(16).padStart(8,'0'),'5448ee3f',

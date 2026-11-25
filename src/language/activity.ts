@@ -1,3 +1,7 @@
+import {earlyInstruction} from '../learning/early/audio';
+import {picture,hasPicture} from '../learning/early/pictures';
+import {isEarlyGrade} from '../learning/grades';
+import '../learning/early/style.css';
 import {setIconLabel,type IconName} from '../brand/icons';
 import {beginLanguageAttempt,finishLanguageAttempt,recordLanguageReadAloud,saveCreativeDraft,
   selectLanguageItem,submitLanguageAnswer,useLanguageHint,type LanguageAttempt} from './engine';
@@ -42,7 +46,15 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     story.append(passageLabel,make('p','language-story-text',item.passage));
     root.append(story);
   }
-  const questionReading=createReadAloudControl({
+  const early=isEarlyGrade(item.grade);root.classList.toggle('early-activity',early);
+  if(item.stimulus){
+    const stimulus=make('span','early-word');
+    if(item.stimulus.startsWith('picture:'))stimulus.append(picture(item.stimulus.slice(8)));else stimulus.textContent=item.stimulus;
+    root.append(stimulus);
+  }
+  const instruction=early?earlyInstruction(()=>item.question,String(options.profile.id),()=>!disposed&&!done&&!locked,
+    mode=>{if(attempt.promptDelivery!=='grown-up')attempt.promptDelivery=mode;save();}):null;
+  const questionReading=instruction??createReadAloudControl({
     text:()=> (item.passage?item.passage+'. ':'')+item.question+'. '+(item.choices||[]).map((choice,index)=>'Option '+(index+1)+': '+choice.label+'.').join(' '),
     canRead:()=>!disposed&&!done&&!locked,
     buttonClass:'language-secondary',
@@ -114,7 +126,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
   on(hintButton,'click',()=>hint());
   on(showButton,'click',showWorked);
   function submit(raw:string){
-    if(disposed||done||locked)return;stopReading();
+    if(disposed||done||locked||instruction&&!instruction.ready())return;stopReading();
     const result=submitLanguageAnswer(options.profile,attempt.id,raw);save();
     if(!result.valid){feedback.dataset.state='input';feedback.textContent=result.message||'Choose an answer first.';return;}
     if(result.correct){
@@ -133,6 +145,12 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     const grid=make('div','language-choice-grid');grid.setAttribute('role','group');grid.setAttribute('aria-label','Choose an answer');
     for(const choice of item.choices){
       const b=button(choice.label,'language-choice');
+      if(early&&hasPicture(choice.value))b.replaceChildren(picture(choice.value));
+      if(item.skillId==='k-ela-common-word'){
+        b.setAttribute('aria-label',choice.value);
+        if(choice.value==='up'||choice.value==='down')b.textContent=choice.value==='up'?'↑':'↓';
+        else {b.textContent='';const box=make('span','early-box');box.dataset.position=choice.value;box.append(picture('ball'));b.append(box);}
+      }
       b.dataset.value=choice.value;
       on(b,'click',()=>{
         for(const other of grid.querySelectorAll('button'))other.setAttribute('aria-pressed',String(other===b));

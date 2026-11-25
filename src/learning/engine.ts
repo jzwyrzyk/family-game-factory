@@ -1,3 +1,4 @@
+import {validEarlyMath} from './early/math';
 import {gradeRank, isGrade, previousGrade, withinGrade, isEarlyGrade} from './grades';
 import { SKILLS, getSkill } from './curriculum';
 import { generateItem, evaluateAnswer, legacyFactItem } from './content';
@@ -27,6 +28,7 @@ export interface Attempt {
   outcome: 'open' | 'completed' | 'skipped' | 'interrupted' | 'shown';
   correct: boolean; independent: boolean;
   firstResponseRecorded: boolean; struggleRecorded: boolean;
+  promptDelivery?: 'audio'|'grown-up';
   legacy?: { firstTryCorrect: boolean; helpUsed: boolean; reportedAttempts: number; rawAnswersAvailable: false };
 }
 export interface ErrorPattern {
@@ -107,6 +109,7 @@ function validItem(item: unknown): item is MathItem {
     || !Object.values(item.parameters).every(value => (typeof value === 'number' && Number.isFinite(value)) || boundedString(value, 1000))) return false;
   if (![0, 1, 2].includes(item.tier)) return false;
   if (item.choices !== undefined && (!Array.isArray(item.choices) || item.choices.length > 20 || !item.choices.every((c: any) => safeObject(c) && boundedString(c.value, 120) && boundedString(c.label, 500)))) return false;
+  if(isEarlyGrade(item.grade) && !validEarlyMath(item as MathItem,getSkill(item.skillId)!))return false;
   return JSON.stringify(item).length <= 20_000;
 }
 /** Validate imported persistent state before replacing the child's existing profile. */
@@ -127,6 +130,7 @@ export function validateLearning(value: unknown): boolean {
     const ids = new Set<string>();
     return value.attempts.every((a: any) => {
       if (!safeObject(a) || !boundedString(a.id, 100) || ids.has(a.id) || !validItem(a.item) || !safeObject(a.context)) return false;
+      if(a.promptDelivery!==undefined&&!['audio','grown-up'].includes(a.promptDelivery))return false;
       ids.add(a.id);
       if (!['sessionId', 'gameId', 'versionId', 'projectId'].every(k => a.context[k] === undefined || boundedString(a.context[k], 200))) return false;
       if (!['checkpoint', 'interaction', 'both'].includes(a.context.mode) || !validTime(a.startedAt) || (a.completedAt !== undefined && !validTime(a.completedAt))) return false;
@@ -273,7 +277,7 @@ export function submitAnswer(profile: LearnerProfile, attemptId: string, raw: st
   add(state.totals, 'submissions');
   for (const s of summaries(state, attempt.item, now)) {
     add(s, 'submissions'); s.lastAt = now;
-    if (first && attempt.hintLevel === 0) { add(s, 'firstAttemptCount'); if (checked.correct) add(s, 'firstAttemptCorrect'); }
+    if (first && attempt.hintLevel === 0 && attempt.promptDelivery!=='grown-up') { add(s, 'firstAttemptCount'); if (checked.correct) add(s, 'firstAttemptCorrect'); }
     if (!checked.correct) { add(s, 'incorrectResponses'); observeError(s, attempt.item, checked.normalized, now); }
   }
   attempt.firstResponseRecorded = true;
@@ -345,9 +349,10 @@ function syncLegacy(profile: LearnerProfile, attempt: Attempt, now: number) {
 export function finishAttempt(profile: LearnerProfile, attemptId: string, outcome: Exclude<Attempt['outcome'], 'open'>, now = Date.now()): Attempt {
   now = stamp(now); const state = ensureLearning(profile, now), attempt = currentAttempt(profile, attemptId);
   if (attempt.outcome !== 'open') return attempt;
+  if(!withinGrade(attempt.item.grade,profileGrade(profile)))outcome='interrupted';
   attempt.outcome = outcome; attempt.completedAt = now;
   attempt.correct = outcome === 'completed' && (attempt.legacy ? true : attempt.answers.at(-1)?.correct === true);
-  attempt.independent = attempt.correct && attempt.hintLevel === 0 && (attempt.legacy ? attempt.legacy.firstTryCorrect : attempt.answers.length === 1);
+  attempt.independent = attempt.correct && attempt.promptDelivery!=='grown-up' && attempt.hintLevel === 0 && (attempt.legacy ? attempt.legacy.firstTryCorrect : attempt.answers.length === 1);
   add(state.totals, outcome);
   if (attempt.independent) { add(state.totals, 'independent'); state.support[attempt.item.skillId] = { count: 0, lastAt: now }; }
   else if (attempt.correct) add(state.totals, 'assisted');
@@ -416,6 +421,7 @@ export function selectItem(profile: LearnerProfile, context: LearningContext = {
     const needsSupport = available.filter(s => evidenceState(state.skills[s.id]) === 'learning-with-support');
     if (needsSupport.length) focus = needsSupport;
   }
+  if (!focus.length) focus = available.filter(s=>s.grade===grade);
   if (!focus.length) focus = [available[0]];
   const cycles: Record<string, SelectionPurpose[]> = {
     gentle: ['focus', 'confidence', 'review', 'confidence'],
@@ -466,6 +472,10 @@ export function selectItem(profile: LearnerProfile, context: LearningContext = {
     target = pool[nextSequence(state, 'targetCursor') % pool.length];
   }
   if (!candidates.length) candidates = focus;
+  if(isEarlyGrade(grade)){
+    const ready=candidates.filter(s=>s.prerequisites.every(id=>(state.skills[id]?.independentCorrect??0)>=2));
+    candidates=ready.length?ready:available.filter(s=>!s.prerequisites.length);
+  }
   const skill = target ? getSkill(target.skillId)! : selectSkill(candidates, state, random, purpose === 'focus' || purpose === 'prerequisite');
   const s = state.skills[skill.id];
   const level = evidenceState(s);

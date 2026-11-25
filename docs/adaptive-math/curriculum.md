@@ -169,3 +169,5 @@ The catalog below mirrors the shipped IDs, standards tags, and prerequisites. Ti
 | `g4-angles` | **Angle measurement.** Classify and combine stated angle measures. | 4.MD.C.5, 4.MD.C.7 | `g2-add-100`, `g2-subtract-100` |
 | `g4-shapes` | **Parallel sides in polygons.** Count pairs of parallel sides in familiar polygons. | 4.G.A.1, 4.G.A.2 | `g3-shapes` |
 | `g4-symmetry` | **Lines of symmetry.** Recognize mirror folds in regular familiar shapes. | 4.G.A.3 | `g3-shapes` |
+
+The [early crosswalk](EARLY-CROSSWALK.md) covers the six-grade development stack. Seeded early items rebuild their options, prompts and answer on admission and import.

@@ -1,3 +1,5 @@
+import {earlyMathItem} from './early/math';
+import {isEarlyGrade} from './grades';
 import { getSkill } from './curriculum';
 import type { AnswerCheck, HintStep, MathItem, MathVisual, Representation } from './types';
 
@@ -19,6 +21,7 @@ export function generateItem(skillId:string,options:ItemOptions={}):MathItem {
  const int=(min:number,max:number)=>{const value=rng();return min+Math.floor(Math.max(0,Math.min(0.999999999999,Number.isFinite(value)?value:0))*(max-min+1));};
  const choose=<T>(xs:T[]):T=>xs[int(0,xs.length-1)];
  const tier=Number.isFinite(options.tier)?Math.max(0,Math.min(2,Math.round(options.tier!))):1;
+ if(isEarlyGrade(definition.grade)) return earlyMathItem(definition,tier,int(0,0xffffffff));
  const requested=options.representation||choose<Representation>(['symbolic','story','visual']);
  const number=(question:string,answer:number,parameters:Draft['parameters'],hints:HintStep[],workedExample:string,visual?:MathVisual,unit?:string):Draft=>({question,answer,answerKind:'number',parameters,hints,workedExample,...(visual?{visual}:{}),...(unit?{unit}:{})});
  const choice=(question:string,answer:string,choices:MathItem['choices'],parameters:Draft['parameters'],hints:HintStep[],workedExample:string,visual?:MathVisual):Draft=>({question,answer,answerKind:'choice',choices,parameters,hints,workedExample,...(visual?{visual}:{})});
@@ -295,6 +298,10 @@ export function evaluateAnswer(item:MathItem,raw:string):AnswerCheck {
  if(typeof raw!=='string'||raw.length>80)return {valid:false,correct:false,normalized:'',message:'Enter a short answer.'};
  const value=raw.trim().replace(/−/g,'-');
  if(!value)return {valid:false,correct:false,normalized:'',message:'Enter an answer, or choose a hint.'};
+ if(isEarlyGrade(item.grade) && ['touch','build'].includes(String(item.parameters.style))){
+  const valid=/^(?:0|[1-9]|1[0-9]|20)$/.test(value);
+  return {valid,correct:valid&&value===String(item.answer),normalized:value};
+ }
  if(item.answerKind==='choice'){
   const option=item.choices?.find(c=>c.value.toLowerCase()===value.toLowerCase()||c.label.toLowerCase()===value.toLowerCase());
   return option?{valid:true,correct:option.value===String(item.answer),normalized:option.value}:{valid:false,correct:false,normalized:value,message:'Choose one of the offered answers.'};

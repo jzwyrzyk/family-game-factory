@@ -83,3 +83,5 @@ import './drawing-engine.test';
 
 import './bubble-gum-rules.test';
 import './bubble-gum-journey.test';
+
+import './early-grades.test';
