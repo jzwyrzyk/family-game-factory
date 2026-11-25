@@ -1,6 +1,6 @@
 import {IndexedNativeStore} from './indexed-native';
 import {nativeScope} from './native-workspace';
-import {validateWorkspace,type Workspace} from '../factory/workspace';
+import {validateWorkspace,validateIndexedNativeWorkspace,type Workspace} from '../factory/workspace';
 export interface NativeRecoverySnapshot {owner:string;workspace:Workspace}
 export async function captureNativeRecovery(owners:string[],guard:()=>void):Promise<NativeRecoverySnapshot[]>{const snapshots=[];for(const owner of owners){guard();const store=await IndexedNativeStore.open(await nativeScope(owner),guard);try{if(await store.isActive())snapshots.push({owner,workspace:await store.snapshot()});}finally{store.close();}}return snapshots;}
 export function mergeNativeRecovery(legacy:Workspace,snapshots:NativeRecoverySnapshot[]):Workspace {
@@ -10,4 +10,4 @@ export function mergeNativeRecovery(legacy:Workspace,snapshots:NativeRecoverySna
  * compatible graph until a separately selected migration build is approved. */
 export async function restoreNativeRecovery(snapshots:NativeRecoverySnapshot[],operation:string,guard:()=>void,initialize:NativeRecoverySnapshot[]=[]):Promise<string[]>{const restored:string[]=[];for(const [index,snapshot]of snapshots.entries()){guard();const store=await IndexedNativeStore.open(await nativeScope(snapshot.owner),guard);try{const initial=initialize.find(x=>x.owner===snapshot.owner);if(!await store.isActive()&&initial)await store.migrateLegacy(JSON.stringify(initial.workspace));if(await store.isActive()){await store.restoreSnapshot(snapshot.workspace,operation+'-'+index);restored.push(snapshot.owner);}}finally{store.close();}}return restored;}
 
-export function nativeSnapshotsOf(workspace:Workspace,owners:string[]):NativeRecoverySnapshot[]{return owners.map(owner=>{const projects=workspace.projects.filter(p=>p.owner===owner),ids=new Set(projects.map(p=>p.id)),revisions=workspace.revisions.filter(r=>ids.has(r.projectId)),revisionIds=new Set(revisions.map(r=>r.id));return {owner,workspace:validateWorkspace({version:2,projects,revisions,plays:workspace.plays.filter(p=>revisionIds.has(p.revisionId))})};});}
+export function nativeSnapshotsOf(workspace:Workspace,owners:string[]):NativeRecoverySnapshot[]{return owners.map(owner=>{const projects=workspace.projects.filter(p=>p.owner===owner),ids=new Set(projects.map(p=>p.id)),revisions=workspace.revisions.filter(r=>ids.has(r.projectId)),revisionIds=new Set(revisions.map(r=>r.id));return {owner,workspace:validateIndexedNativeWorkspace({version:2,projects,revisions,plays:workspace.plays.filter(p=>revisionIds.has(p.revisionId))},owner)};});}
