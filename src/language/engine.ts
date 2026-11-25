@@ -75,7 +75,7 @@ function trustedItem(item:unknown):item is LanguageItem {
   const skill=LANGUAGE_SKILLS.find(s=>s.id===item.skillId);
   if(!skill||item.grade!==skill.grade||item.domain!==skill.domain||
      typeof item.title!=='string'||item.title.length>150)return false;
-  const form=template.kind==='word-tiles'?'encoding':template.kind==='sentence-tiles'||template.kind==='edit'?'syntax':
+  const form=skill.domain==='listening'&&template.kind==='sentence-tiles'?'comprehension':template.kind==='word-tiles'?'encoding':template.kind==='sentence-tiles'||template.kind==='edit'?'syntax':
     template.kind==='creative'?'expression':skill.domain==='comprehension'?'comprehension':'pattern';
   if(item.form!==form)return false;
   if(item.purpose!==undefined&&!['focus','review','confidence','prerequisite','explore'].includes(item.purpose))return false;

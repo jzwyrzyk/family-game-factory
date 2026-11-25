@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:22:00.442Z",
-      "sourceDigest": "5b3d2ea1a544092e9fca8710648e3eac013846793e44d36e31cf084d629b4ae9",
+      "reviewedAt": "2026-11-25T01:26:05.160Z",
+      "sourceDigest": "54ec301bb9b0f168f71d1719cade171ceab967513924bd148feee0517a1ecd98",
       "reviewOutcome": "updated",
-      "reviewReason": "Early scene instructions use device speech while the existing authoring interpreter and ordinary creator controls remain available.",
+      "reviewReason": "Graphical scene controls and early challenges integrate with the reviewed early listening and mathematics activities.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -641,10 +641,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:22:00.973Z",
-      "sourceDigest": "6f55a2e6a9299923ecc2174fd95f3ef6899da1c60185671dfb6c3b5fd3801eb1",
+      "reviewedAt": "2026-11-25T01:26:05.525Z",
+      "sourceDigest": "2eddc8222c4b50c193bbb17d9d4b3aa91bb2e5059364a74e4ad644f18a5a58ce",
       "reviewOutcome": "updated",
-      "reviewReason": "Early scene instructions use device speech while the existing authoring interpreter and ordinary creator controls remain available.",
+      "reviewReason": "Graphical scene controls and early challenges integrate with the reviewed early listening and mathematics activities.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:22:01.023Z",
-      "sourceDigest": "1e5dbadc8e3521315f1de56f549e083cac83d1ac0ee265eb17a6e32a162ddbae",
+      "reviewedAt": "2026-11-25T01:26:05.573Z",
+      "sourceDigest": "fceb8b2f20a335969a0c4d19a1469895601361abacd8ea3cb11e4b9ba6fe1916",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Early scene instructions use device speech while the existing authoring interpreter and ordinary creator controls remain available. Existing operational procedures and acceptance commands still apply to this change.",
+      "reviewReason": "Graphical scene controls and early challenges integrate with the reviewed early listening and mathematics activities. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

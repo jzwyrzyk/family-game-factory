@@ -17,3 +17,5 @@
 .early-box{display:block;position:relative;width:50px;height:27px;background:#b97f45;border:3px solid #684425;border-radius:4px;margin-top:22px}
 .early-box .early-picture{position:absolute;width:25px;height:25px;left:9px;bottom:100%}
 .early-box[data-position=in] .early-picture{bottom:4px;clip-path:inset(0 0 30% 0)}
+
+.early-activity .language-tile{min-height:76px;min-width:76px}.early-activity .language-built{display:flex;justify-content:center;gap:.6rem;min-height:3rem}
