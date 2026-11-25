@@ -32,3 +32,12 @@ export async function inspectHousehold(art:{owner:string;id:string}){
  const item=await drawing(art.owner,art.id);
  return {workspace:new RevisionStore(localStorage).snapshot(),notebook:new StudioNotebook(localStorage).read(),art:{owner:item.owner,id:item.id,sha256:item.sha256,bytes:Array.from(new Uint8Array(item.bytes))}};
 }
+
+import {RecoveryVault} from '../src/storage/recovery-vault';
+import {transferredRecoveryScope,decodeCompleteBackup} from '../src/storage/complete-backup';
+export async function inspectRecovery(id?:string,mapped=false){
+ const scope={origin:location.origin,audience:'family',owners:(window as any).FG.store.familyProfiles().map((p:any)=>p.id)};
+ const accepted=mapped?transferredRecoveryScope(scope):scope;if(!accepted)throw Error('Expected approved recovery transfer mapping');
+ const source=new RecoveryVault(accepted,()=>{}),points=await source.list();
+ const archive=await source.read(id??points[0]?.id);return {archive,decoded:await decodeCompleteBackup(archive,accepted),localPoints:await new RecoveryVault(scope,()=>{}).list()};
+}

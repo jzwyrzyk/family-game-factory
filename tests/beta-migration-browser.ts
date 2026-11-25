@@ -29,8 +29,11 @@ export async function migrationBrowser(ctx:BrowserContext){
   await source.evaluate(()=>localStorage.setItem('family-game-factory-reward-backup-journal-v1','pending synthetic restore'));
   await assert.rejects(source.evaluate(m=>(window as any).vault.exportHousehold(m),map),/pending backup recovery/);
   await source.evaluate(()=>localStorage.removeItem('family-game-factory-reward-backup-journal-v1'));
-  const pending=async(add:boolean)=>source.evaluate(async add=>{await new Promise<void>((ok,fail)=>{const r=indexedDB.open('jems-records-preparation-v1');r.onsuccess=()=>{const tx=r.result.transaction('pending','readwrite');if(add)tx.objectStore('pending').put({state:'applying'},'synthetic-pending');else tx.objectStore('pending').delete('synthetic-pending');tx.oncomplete=()=>{r.result.close();ok();};tx.onerror=()=>fail(tx.error);};r.onerror=()=>fail(r.error);});},add);
-  await pending(true);await assert.rejects(source.evaluate(m=>(window as any).vault.exportHousehold(m),map),/pending storage recovery/);await pending(false);
+  const pending=async(add:boolean)=>source.evaluate(async add=>{await new Promise<void>((ok,fail)=>{const r=indexedDB.open('jems-records-preparation-v1');r.onsuccess=()=>{const tx=r.result.transaction('pending','readwrite');if(add)tx.objectStore('pending').put('synthetic-operation','synthetic-pending');else tx.objectStore('pending').delete('synthetic-pending');tx.oncomplete=()=>{r.result.close();ok();};tx.onerror=()=>fail(tx.error);};r.onerror=()=>fail(r.error);});},add);
+  await pending(true); // Committed, unsent outbox markers are data, not unfinished local journals.
+  await source.evaluate(()=>localStorage.setItem('family-game-factory-local-journal-v1','pending synthetic local restore'));
+  await assert.rejects(source.evaluate(m=>(window as any).vault.exportHousehold(m),map),/pending storage recovery/);
+  await source.evaluate(()=>localStorage.removeItem('family-game-factory-local-journal-v1'));
   const archive=await source.evaluate(m=>(window as any).vault.exportHousehold(m),map);
   assert.equal(archive.body.data.databases.length,4);assert.ok(!JSON.stringify(archive).includes('not-exported'));
   const dest=await open(targetOrigin);
@@ -45,6 +48,7 @@ export async function migrationBrowser(ctx:BrowserContext){
   await dest.evaluate(a=>{localStorage.setItem('jems-household-transfer-in-progress-v1',a.sha256);localStorage.setItem(a.body.data.local[0][0],a.body.data.local[0][1]);},archive);
   assert.deepEqual(await restore(dest,map,archive,true),{rolledBack:true});
   for(let i=0;i<2;i++)assert.deepEqual(await restore(dest,map,archive),{complete:true});
+  assert.deepEqual(await dest.evaluate(async()=>new Promise((ok,fail)=>{const r=indexedDB.open('jems-records-preparation-v1');r.onsuccess=()=>{const tx=r.result.transaction('pending'),q=tx.objectStore('pending').get('synthetic-pending');q.onsuccess=()=>ok(q.result);q.onerror=()=>fail(q.error);tx.oncomplete=()=>r.result.close();};r.onerror=()=>fail(r.error);})),'synthetic-operation');
   assert.ok(await dest.evaluate(()=>localStorage.getItem('family-game-factory-state-v1')?.includes('Splash or Pass')));
   assert.equal(await dest.evaluate(()=>localStorage.getItem('unrelated-site-record')),null);
   assert.equal((await source.evaluate(m=>(window as any).vault.exportHousehold(m),map)).sha256,archive.sha256);
@@ -79,11 +83,27 @@ export async function applicationMigrationBrowser(ctx:BrowserContext,engine:stri
  try{
   await app(source,sourceOrigin);
   const before=await source.evaluate(async()=>{const modulePath='/fixture.js',fixture=await import(modulePath);return fixture.createHousehold();});
+  // Save through the actual parent recovery surface, including original art.
+  await source.evaluate(()=>{const FG=(window as any).FG;FG.app.page('parent');FG.parentDashboard.openTab('settings');});
+  await source.locator('#recovery-save').click();await source.waitForFunction(()=>document.getElementById('jemsRecoveryStatus')?.textContent?.includes('Complete recovery copy saved'));
+  const point=await source.evaluate(async()=>{const modulePath='/fixture.js',fixture=await import(modulePath);return fixture.inspectRecovery();});
+  assert.deepEqual(point.decoded.progress.factoryWorkspace,before.workspace);assert.equal(point.archive.manifest.scope.origin,sourceOrigin);
   await transfer(source,sourceOrigin);const archive=await source.evaluate(m=>(window as any).vault.exportHousehold(m),map);
   await transfer(dest,targetOrigin);await dest.evaluate(([m,a])=>(window as any).vault.restoreHousehold(m,a),[map,archive]);
   await app(dest,targetOrigin);
   const restored=await dest.evaluate(async art=>{const modulePath='/fixture.js',fixture=await import(modulePath);return fixture.inspectHousehold(art);},before.art);
   assert.deepEqual(restored.workspace,before.workspace);assert.deepEqual(restored.notebook,before.notebook);assert.deepEqual(restored.art,before.art);
+  const transferred=await dest.evaluate(async id=>{const modulePath='/fixture.js',fixture=await import(modulePath);return fixture.inspectRecovery(id,true);},point.archive.manifest.id);
+  assert.deepEqual(transferred.archive,point.archive,'Original recovery manifests/chunks and source-origin provenance must be unchanged.');
+  assert.equal(transferred.localPoints.length,0,'Source points are archived, never silently rebound to the target origin.');
+  assert.deepEqual(await dest.evaluate(()=>JSON.parse(localStorage.getItem('jems-recovery-origin-transfer-v1')!)),{schema:'jems.recovery-origin-transfer.v1',...map,archiveSha256:archive.sha256});
+  await dest.evaluate(()=>{const FG=(window as any).FG;FG.app.page('parent');FG.parentDashboard.openTab('settings');});
+  await dest.locator('#recovery-show').click();await dest.locator('#recovery-preview-'+point.archive.manifest.id).click();await dest.locator('#jemsRecoveryPreview').waitFor({state:'visible'});
+  assert.match(await dest.locator('#jemsRecoveryPreview').innerText(),/8 saved games and 1 original pictures/);
+  await dest.locator('#jemsRecoveryPreview').screenshot({path:'test-results/family-beta/'+engine+'-transferred-recovery-preview.png'});
+  await Promise.all([dest.waitForEvent('load'),dest.locator('#recovery-restore').click()]);await dest.waitForFunction(()=>Boolean((window as any).FG?.studio));
+  const recovered=await dest.evaluate(async art=>{const modulePath='/fixture.js',fixture=await import(modulePath);return fixture.inspectHousehold(art);},before.art);
+  assert.deepEqual(recovered.workspace,before.workspace);assert.deepEqual(recovered.notebook,before.notebook);assert.deepEqual(recovered.art,before.art);
   for(const entry of before.entries){
    await dest.evaluate(e=>{const FG=(window as any).FG;if(!FG.store.choose(e.owner))throw Error('Profile switch blocked');window.dispatchEvent(new Event('factory-profile'));FG.store.current().mathWindow=[Date.now()];FG.store.save();return FG.studio.open(e.sessionId);},entry);
    await dest.locator('#page-studio.studio-play-mode').waitFor();
@@ -106,6 +126,6 @@ export async function applicationMigrationBrowser(ctx:BrowserContext,engine:stri
    await dest.locator('#studioHome').click();
   }
   await transfer(source,sourceOrigin);assert.equal((await source.evaluate(m=>(window as any).vault.exportHousehold(m),map)).sha256,archive.sha256);
-  console.log(engine+' restored two profile owners, eight kept projects, saved mechanics, original art bytes and original Studio session IDs; both current and earlier native engines launched');
+  console.log(engine+' restored two profile owners, eight kept projects, saved mechanics, original art bytes and original Studio session IDs and exact source-origin recovery point; explicit mapped recovery restore and both current/earlier native engines launched');
  }finally{await ctx.close();}
 }

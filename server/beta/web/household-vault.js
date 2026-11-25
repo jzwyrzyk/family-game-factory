@@ -45,7 +45,7 @@ async function pack(v) {
  if(Array.isArray(v))return ['array',await Promise.all(v.map(pack))];
  if(v instanceof Map)return ['map',await Promise.all([...v].map(async ([k,val])=>[await pack(k),await pack(val)]))];
  if(v instanceof Set)return ['set',await Promise.all([...v].map(pack))];
- if(v && [Object.prototype,null].includes(Object.getPrototypeOf(v)))return ['object',await Promise.all(Object.keys(v).sort(sort).map(async k=>[k,await pack(v[k])]))];
+ if(v && [Object.prototype,null].includes(Object.getPrototypeOf(v)))return ['object',await Promise.all(Object.keys(v).map(async k=>[k,await pack(v[k])]))];
  throw Error('Unsupported record type. The source must be retained.');
 }
 function unpack([tag,a,b,c,d]){
@@ -84,13 +84,14 @@ async function readDatabase(name){
    if(os.autoIncrement)throw Error('Unreviewed automatic key generator. Keep the source.');
    const indexes=[...os.indexNames].sort(sort).map(n=>{const i=os.index(n);return {name:n,keyPath:i.keyPath,unique:i.unique,multiEntry:i.multiEntry};});
    const [keys,values]=await Promise.all([request(os.getAllKeys()),request(os.getAll())]);
-   if((baseName(name)==='jems-records-preparation-v1'&&storeName==='pending'||baseName(name)==='jems-recovery-vault-v1'&&storeName==='preparing')&&values.length)throw Error('Finish pending storage recovery on the original device before moving this household.');
+   if((baseName(name)==='jems-recovery-vault-v1'&&storeName==='preparing')&&values.length)throw Error('Finish pending storage recovery on the original device before moving this household.');
    return {name:storeName,keyPath:os.keyPath,indexes,rows:await Promise.all(keys.map(async(k,i)=>[await pack(k),await pack(values[i])]))};
   }));
   return {name,version:db.version,stores};
  }finally{db.close();}
 }
 async function inventory() {
+ if(Object.keys(localStorage).some(name=>baseName(name)==='family-game-factory-local-journal-v1'))throw Error('Finish pending storage recovery on the original device before moving this household.');
  const local=Object.keys(localStorage).filter(n=>reviewed(n)).sort(sort).map(n=>[n,localStorage.getItem(n)]);
  if(local.some(([name])=>baseName(name)==='family-game-factory-reward-backup-journal-v1'))throw Error('Finish pending backup recovery on the original device before moving this household.');
  const databases=await Promise.all((await originDatabases()).map(readDatabase));
