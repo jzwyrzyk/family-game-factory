@@ -1,3 +1,4 @@
+import {stopJobs} from './stop-jobs';
 import type {AtomicStore,Documents} from './documents';
 import {closedPolicy,remoteAllowed,remoteScopes,uuid,workspaceOf,type BetaConfig,type Family,type Policy} from './model';
 import type {PipelineState,Repository} from '../pipeline/types';
@@ -44,9 +45,12 @@ export class FamilyDirectory {
   s.betaScopes=Object.fromEntries(remoteScopes.map(scope=>[scope,remoteAllowed(f,p,this.config.providerEvidence,scope,now)])) as PipelineState['betaScopes'];
   const deviceStatus=()=>(s.devices??[]).map(({id,familyId,expiresAt,lastSeenAt,revokedAt})=>({id,familyId,expiresAt,lastSeenAt,revokedAt:revokedAt??null}));
   const devicesBefore=JSON.stringify(deviceStatus());
+  const consentChoices=()=>JSON.stringify((s.parentPrivacyChoices??[]).map(c=>[c.id,c.revokedAt??null]));
+  const priorConsent=consentChoices();
   const count=s.jobs.length,result=update(s);
   if(write){
    assertOwnership();
+   if(priorConsent!==consentChoices())stopJobs(s);
    const ledger=s.ledgers[f.id],used=ledger.used-before.used,reserved=ledger.reserved-before.reserved;
    if(ledger.month!==period||ledger.allowance!==f.allowance||!Number.isSafeInteger(ledger.reserved)||!Number.isSafeInteger(ledger.used)||
     ledger.reserved<0||used<0)throw Error('INVALID_LEDGER');

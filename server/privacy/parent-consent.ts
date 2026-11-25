@@ -2,7 +2,6 @@
  * Parent clicks create PENDING records only; an independent owner-controlled,
  * externally verified receipt is needed before any provider consent activates.
  */
-import {stopJobs} from '../beta/stop-jobs';
 import {createHash,randomUUID} from 'node:crypto';
 import type {PipelineState,Repository} from '../pipeline/types';
 import type {VerifiedSession} from '../contracts/api';
@@ -75,7 +74,6 @@ export async function submitParentPrivacyChoice(repo:Repository,session:Verified
   activeDevice(s,session,now);
   s.parentPrivacyChoices||=[];
   if(s.parentPrivacyChoices.length>=300)throw Error('PRIVACY_RECORD_LIMIT');
-  if(s.betaScopes)stopJobs(s);
   // Updating requested scopes revokes previous provider consent immediately.
   for(const c of s.parentPrivacyChoices)if(c.familyId===session.familyId&&c.revokedAt===undefined)c.revokedAt=now;
   s.coachConsent=(s.coachConsent||[]).filter(x=>x.familyId!==session.familyId);
@@ -91,7 +89,6 @@ export async function submitParentPrivacyChoice(repo:Repository,session:Verified
 export async function revokeParentPrivacyChoice(repo:Repository,session:VerifiedSession,now=Date.now()){
  return repo.transaction(s=>{
   activeDevice(s,session,now);
-  if(s.betaScopes)stopJobs(s);
   for(const c of s.parentPrivacyChoices||[])if(c.familyId===session.familyId&&c.revokedAt===undefined)c.revokedAt=now;
   s.coachConsent=(s.coachConsent||[]).filter(x=>x.familyId!==session.familyId);
   return {status:'revoked' as const};
