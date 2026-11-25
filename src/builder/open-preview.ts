@@ -3,7 +3,7 @@ import type {Preview} from './client';
 export function openPreviewFrame(frame:HTMLIFrameElement,preview:Preview,channel:string){
  const url=new URL(preview.url);
  if(preview.grant===undefined){url.searchParams.set('channel',channel);frame.src=url.href;return;}
- if(url.pathname!=='/family-preview'||url.search||url.hash||typeof preview.grant!=='string'||preview.grant.length>3000)throw Error('UNSAFE_PREVIEW');
+ if(!['/family-preview','/household-preview'].includes(url.pathname)||url.search||url.hash||typeof preview.grant!=='string'||preview.grant.length>3000)throw Error('UNSAFE_PREVIEW');
  // A sandboxed frame gets its browsing-context name at insertion. Naming an
  // already attached opaque context can direct the form into a new window.
  const parent=frame.parentElement,next=frame.nextSibling;

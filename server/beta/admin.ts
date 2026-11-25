@@ -3,6 +3,7 @@ import {createRemoteJWKSet,jwtVerify} from 'jose';
 import {checkParentPassphrase,type FamilyParentAuth} from '../trusted-devices';
 import {privacyStatus,recordExternalGuardianVerification} from '../privacy/parent-consent';
 import type {PipelineState,Repository} from '../pipeline/types';
+import {pendingReservations} from './portability';
 import {stopJobs} from './stop-jobs';
 import {createFamily,familyOrigin,scopes,type BetaConfig,type Capability,type Family,type Policy,uuid} from './model';
 import {digest,exact,issueInvitation,verifyParticipation} from './access';
@@ -50,8 +51,8 @@ export class BetaAdministration {
     const date=new Date(now),month=new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth()-i,1)).toISOString().slice(0,7);
     const u=await tx.get<Usage>(this.d.path(id)+'/usage/'+month);return {month,used:u?.used??0,reserved:u?.reserved??0};
    }));
-   if(f.request?.kind==='deletion'&&['deleting','completed'].includes(f.request.state))return {...publicFamily(f),origin:familyOrigin(this.d.config,id),privacy:{status:'withdrawn',noticeVersion:null,scopes:{}},devices:[],usage};
-   const detail=await this.d.inWorkspace(tx,f,policy,s=>({privacy:privacyStatus(s,id,now),devices:(s.devices??[]).map(d=>({id:d.id,name:d.name,expiresAt:d.expiresAt,revoked:!!d.revokedAt}))}),false);
+   if(f.request?.kind==='deletion'&&['deleting','completed'].includes(f.request.state))return {...publicFamily(f),origin:familyOrigin(this.d.config,id),privacy:{status:'withdrawn',noticeVersion:null,scopes:{}},devices:[],pending:[],usage};
+   const detail=await this.d.inWorkspace(tx,f,policy,s=>({pending:pendingReservations(s),privacy:privacyStatus(s,id,now),devices:(s.devices??[]).map(d=>({id:d.id,name:d.name,expiresAt:d.expiresAt,revoked:!!d.revokedAt}))}),false);
    return {...publicFamily(f),origin:familyOrigin(this.d.config,id),...detail,usage};
   });
  }

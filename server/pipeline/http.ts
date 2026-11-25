@@ -1,3 +1,4 @@
+import {ownerPreviewGrant} from '../beta/owner-preview';
 import {isGeneratedGame} from '../agent/generated';
 import {validateGeneratedCreationManifest} from '../../src/creation/projects';
 import {renderGenerated} from '../sandbox/preview.cjs';
@@ -8,7 +9,7 @@ import type {Repository} from './types';
 import { renderPreview } from './artifacts';
 import { JobService } from './service';
 import {readJsonBody} from '../http-json';
-interface HttpConfig {sessionKey:string;previewKey:string;appOrigin:string;previewOrigin:string;dispatch?:(id:string)=>Promise<void>;poll?:()=>Promise<void>}
+interface HttpConfig {protectedHousehold?:boolean;sessionKey:string;previewKey:string;appOrigin:string;previewOrigin:string;dispatch?:(id:string)=>Promise<void>;poll?:()=>Promise<void>}
 function json(response:ServerResponse,status:number,value:unknown){response.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});response.end(JSON.stringify(value));}
 const body=(request:IncomingMessage)=>readJsonBody(request,12000,{limitError:'REQUEST_TOO_LARGE',emptyObject:true});
 const signature=(key:string,fields:string)=>createHmac('sha256',key).update(fields).digest('base64url');
@@ -49,7 +50,9 @@ export function apiHandler(service:JobService,config:HttpConfig,repo?:Repository
    if(path==='/v1/creations'&&request.method==='GET')return json(response,200,(await service.list(session)).map(r=>({...r,game:isGeneratedGame(r.game)?{kind:r.game.kind,title:r.game.title,instructions:r.game.instructions,controls:r.game.controls}:r.game})));
    match=path.match(/^\/v1\/revisions\/([\w-]+)\/(preview|keep|undo|fork)$/);
    if(match){const id=match[1];if(match[2]==='preview'&&request.method==='GET'){
-     const revision=await service.revision(session,id),expiresAt=Math.min(Date.now()+120000,session.expiresAt);
+     const revision=await service.revision(session,id);
+     if(config.protectedHousehold)return json(response,200,await ownerPreviewGrant(config,session,revision));
+     const expiresAt=Math.min(Date.now()+120000,session.expiresAt);
      let fields=`${id}\n${session.familyId}\n${expiresAt}`;
      const url=new URL('/preview/'+id,config.previewOrigin);
      if(revision.adultPilotProfileId){

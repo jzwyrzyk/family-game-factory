@@ -30,7 +30,8 @@ export function protectedHousehold(config:Pick<GatewayConfig,'platformMode'|'hou
     req.headers.cookie=internalCookies(req.headers.cookie);await api(req,res);return;
    }
    if(req.method!=='GET')throw Error();
-   res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; worker-src 'self' blob:; connect-src 'self'; frame-src "+config.previewOrigin+"; frame-ancestors 'none'; form-action 'self'; object-src 'none'; base-uri 'none'");
+   res.setHeader('Referrer-Policy','strict-origin');
+   res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; worker-src 'self' blob:; connect-src 'self'; frame-src "+config.previewOrigin+"; frame-ancestors 'none'; form-action 'self' "+config.previewOrigin+"; object-src 'none'; base-uri 'none'");
    let file=path.slice(1);
    if(path==='/factory-config.json'){
     res.setHeader('Content-Type','application/json');res.end(JSON.stringify({version:1,mode:'remote',apiBaseUrl:config.gatewayOrigin,previewOrigin:config.previewOrigin}));return;

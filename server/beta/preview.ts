@@ -3,6 +3,7 @@ import {SignJWT,jwtVerify} from 'jose';
 import type {FamilyDirectory} from './store';
 import type {AtomicStore} from './documents';
 import {activeFamily,betaNotice,participationNotice,playIdle,uuid,workspaceOf,familyOrigin,type Family,type Policy} from './model';
+import {previewForm,sendPreview} from './preview-form';
 import {digest} from './access';
 import {cookieValue} from '../trusted-devices';
 import type {VerifiedSession} from '../contracts/api';
@@ -34,13 +35,9 @@ export function familyPreview(config:PreviewRouting,db:AtomicStore,artifacts:(wo
   try{
    if(req.headers.host!==new URL(config.previewOrigin).host)throw Error();
    if(req.url==='/health'&&req.method==='GET'){await db.run(tx=>tx.get('factoryBeta/'+config.environment),true);res.end('{"ready":true}');return;}
-   if(req.url!=='/family-preview'||req.method!=='POST'||req.headers['content-type']?.split(';')[0]!=='application/x-www-form-urlencoded')throw Error();
-   const chunks:Buffer[]=[];let bytes=0;
-   for await(const chunk of req){bytes+=chunk.length;if(bytes>4096)throw Error();chunks.push(Buffer.from(chunk));}
-   const form=new URLSearchParams(Buffer.concat(chunks).toString());
-   if([...form.keys()].sort().join(',')!=='channel,grant')throw Error();
-   const channel=form.get('channel');if(!uuid(channel))throw Error();
-   const {payload}=await jwtVerify(form.get('grant')!,new TextEncoder().encode(config.previewKey),{
+   if(req.url!=='/family-preview')throw Error();
+   const {channel,grant}=await previewForm(req);
+   const {payload}=await jwtVerify(grant,new TextEncoder().encode(config.previewKey),{
     algorithms:['HS256'],typ:'jems-play-preview',issuer:config.hubOrigin,audience:config.previewOrigin,maxTokenAge:'2m'});
    const {family,device,play,revision}=payload;
    if(!uuid(family)||!uuid(device)||typeof play!=='string'||!/^[a-f0-9]{64}$/.test(play)||typeof revision!=='string'||!/^[\w-]{1,100}$/.test(revision))throw Error();
@@ -56,9 +53,7 @@ export function familyPreview(config:PreviewRouting,db:AtomicStore,artifacts:(wo
     requireResourceAudience(state,{subject:'family-preview',familyId:family,deviceId:device,role:'designer',expiresAt:payload.exp!*1000},r);
     return isGeneratedGame(r.game)?renderGenerated(r.game,revision,channel):renderPreview(r.game,revision,channel);
    },true);
-   res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','X-Content-Type-Options':'nosniff','Permissions-Policy':'camera=(), microphone=(), geolocation=()',
-    'Content-Security-Policy':artifact.csp.replace(/frame-ancestors [^;]+/,'frame-ancestors '+authorizedOrigin)});
-   res.end(artifact.html);
+   sendPreview(res,authorizedOrigin,artifact);
   }catch{res.writeHead(403,{'Content-Type':'text/plain'});res.end('Private preview unavailable');}
  };
 }

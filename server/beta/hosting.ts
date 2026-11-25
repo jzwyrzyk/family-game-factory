@@ -27,6 +27,7 @@ export function betaHosting(directory:string,config:BetaConfig,previewOrigin:str
   res.setHeader('Content-Security-Policy',inPlay?
    `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; worker-src 'self' blob:; connect-src 'self'; frame-src ${previewOrigin}; frame-ancestors 'none'; form-action 'self' ${previewOrigin}; object-src 'none'; base-uri 'none'`:
    "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
+  if(c.guardianTool&&path==='/entry/export-device.js')return file(res,'entry/household-vault.js');
   if(c.administrator){
    if(path==='/manage')return html(res,page('Family administration','<h1>Family administration</h1><div id="console"></div>',{script:'/manage/client.js'}));
    if(path==='/manage/client.js')return file(res,'entry/manage.js');
@@ -52,8 +53,9 @@ export function betaHosting(directory:string,config:BetaConfig,previewOrigin:str
   if(path==='/play/factory-config.json'){res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({version:1,mode:'remote',apiBaseUrl:'https://'+req.headers.host,previewOrigin}));return true;}
   const name=path.slice('/play/'.length);
   if(name.startsWith('features/')){
-   const feature=/^features\/(shell|games|coding|learning|problemSolving|artwork)\.(js|css)$/.exec(name)?.[1];
-   if(!feature||(feature==='shell'?full:!caps[feature as Capability]))throw Error('FORBIDDEN');
+   const feature=/^features\/(shell|games|coding|learning|problemSolving|artwork|remote)\.(js|css)$/.exec(name)?.[1];
+   const available=feature==='shell'?!full:feature==='remote'?caps.conversation||caps.generation||caps.remoteSpeech:!!caps[feature as Capability];
+   if(!feature||!available)throw Error('FORBIDDEN');
    return file(res,name);
   }
   if(/^assets\/index-[\w-]+\.(js|css)$/.test(name)){if(!full)throw Error('FORBIDDEN');return file(res,name);}

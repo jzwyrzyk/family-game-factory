@@ -9,7 +9,7 @@ const databaseNames = new Set(['family-game-factory-rewards-v1','family-game-fac
 const baseName = name => name.replace(/^family-game-factory-adult:adult:[a-f\d-]{36}:/i,'');
 function reviewed(name, db=false) {
  const base=baseName(name);
- if(db ? databaseNames.has(base) : dataKeys.has(base)||/^family-game-factory-pending-submission-v1:[\w:-]+$/.test(base))return true;
+ if(db ? databaseNames.has(base) : dataKeys.has(base)||/^jems-beta-remote-v1:[a-f\d-]{36}$/.test(base)||/^family-game-factory-pending-submission-v1:[\w:-]+$/.test(base))return true;
  if(name!==journalKey && /^(family-|factory-|jems[.-]|splash-or-pass)/.test(name))throw Error('Unreviewed Jems storage. Keep the original device and contact the operator.');
  return false;
 }
@@ -147,4 +147,12 @@ export async function restoreHousehold(mapping,archive,rollback=false){
   if(await digest(await inventory())!==await digest(data))throw Error('Read-back verification failed. Retain the source and archive.');
   localStorage.removeItem(journalKey);return {complete:true};
  });
+}
+
+export async function exportFamilyDevice(){
+ if(!/^f-[a-f\d-]{36}\./i.test(location.hostname))throw Error('Open the approved family workshop on this device.');
+ const data=await inventory();
+ if(data.local.some(([k])=>k.startsWith('family-game-factory-adult:'))||data.databases.some(d=>d.name.startsWith('family-game-factory-adult:')))throw Error('Operator review required for this device.');
+ const body={format:'jems.private-family-device-export.v1',origin:location.origin,data};
+ return {body,sha256:await digest(body)};
 }

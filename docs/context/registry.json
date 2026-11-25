@@ -307,10 +307,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:18:28.295Z",
-      "sourceDigest": "c6dd26211884a4761bf60a6a6cd6ef210a1f40a7297eb95a4f4f6a74a01558a0",
+      "reviewedAt": "2026-11-25T00:29:41.787Z",
+      "sourceDigest": "de530a7171d8670de3c4d9d7ab4d2a734125f89e7259438e5de1c2895a8c1c3e",
       "reviewOutcome": "updated",
-      "reviewReason": "Describe the protected household, local storage transfer, private entry renewal, and the approved welcome retirement page.",
+      "reviewReason": "Record scoped remote activities, persistent-profile device transfer and owner-only preview behavior.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -678,10 +678,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:18:29.359Z",
-      "sourceDigest": "dbcd4be0700c9e652cdf33a2e4fcf9a15c14ae76878823f3b114e9eb8aa45f9b",
+      "reviewedAt": "2026-11-25T00:29:42.599Z",
+      "sourceDigest": "799951bcf2974a3cb1461f0d27df0d6edd34cf0679fe1ff7eb31c9f85504cb54",
       "reviewOutcome": "updated",
-      "reviewReason": "Document three private host definitions, authenticated household delivery, and the nonproduction routing manifest.",
+      "reviewReason": "Record paginated guardian exports, content-free pending reservations and household preview verification.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -731,10 +731,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:18:29.810Z",
-      "sourceDigest": "77fb8c274680afb980427e11723fcafdcf40177958ca4f1470f9deca1eeb1b4d",
+      "reviewedAt": "2026-11-25T00:29:42.946Z",
+      "sourceDigest": "0f1f37b8cc49596140865356db055d78ef013365641a8c2ffdda38afdc5b9d85",
       "reviewOutcome": "updated",
-      "reviewReason": "Record preview form isolation, the F06 codec compatibility and immutable worker and price release gates.",
+      "reviewReason": "Document the protected owner's POST grant, revision audience and independent preview key.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -887,10 +887,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:18:30.730Z",
-      "sourceDigest": "a2d49b7ca456353e6c95b4923b88e985cb225bc92608bcc160df171438be5681",
+      "reviewedAt": "2026-11-25T00:29:43.286Z",
+      "sourceDigest": "70319a5ef48f296025ee61b72f4d09eb4bda115202dcf945e16ec9ac26fac1bc",
       "reviewOutcome": "updated",
-      "reviewReason": "Separate Firestore emulator and browser acceptance from authenticated deployed infrastructure and real devices.",
+      "reviewReason": "Cover durable WebKit migration, scoped creative controls and household preview revocation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1130,10 +1130,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T00:18:31.195Z",
-      "sourceDigest": "84f8480bbe5ede3428c06aa27626d5a630441329ab77a0a656372ee988008269",
+      "reviewedAt": "2026-11-25T00:29:43.678Z",
+      "sourceDigest": "1d906dcea4ef9c51ab206288dccae085fba76b1437c596f5d9267ef564765518",
       "reviewOutcome": "updated",
-      "reviewReason": "Record the controlled private beta activation sequence, owner operating procedures, and public runtime retirement.",
+      "reviewReason": "Match protected nonproduction scaling to the existing environment controller.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -12,7 +12,7 @@ import {betaFixture,fixtureKey,parent} from './beta-fixture';
 import {betaRouter} from '../server/beta/router';
 import {betaHosting} from '../server/beta/hosting';
 import {trustedDeviceHandler} from '../server/trusted-devices';
-import {familyOrigin} from '../server/beta/model';
+import {familyOrigin,defaultCapabilities} from '../server/beta/model';
 
 async function main(){
  const {d,invite,mutate}=await betaFixture(),family=await invite('browser-adult'),origin=familyOrigin(d.config,family.id);
@@ -47,6 +47,7 @@ async function main(){
     await p.goto(local+(first?'/invitation':'/recovery'));await p.locator('[name=invitation]').fill(String(issued.invitation));
     await p.locator('[name=passphrase]').fill(parent);await p.getByRole('checkbox').check();await p.getByRole('button',{name:'Pair this device'}).click();await p.locator('#paired output').waitFor();
     const pair=await p.locator('#paired output').innerText();await mutate('verify',family.id,{pairingCode:pair,receipt:'synthetic-browser-'+engine});
+    await mutate('policy',family.id,{capabilities:defaultCapabilities(),monthlyCents:0,paused:true,generationPaused:true});
     await p.goto(local+'/grown-ups');await p.getByLabel('Parent passphrase').fill(parent);await p.getByRole('button',{name:'Unlock family controls'}).click();
     await p.getByRole('button',{name:'Add an explorer'}).click();await p.getByText(/explorer profiles\./).waitFor();
     await p.goto(local+'/acknowledge');await p.screenshot({path:out+'/'+engine+'-acknowledgment.png',fullPage:true});
@@ -57,7 +58,15 @@ async function main(){
     await p.getByRole('button',{name:'End play'}).click();await p.waitForURL(/\/(?:login|acknowledge)$/);
     const denied=await ctx.request.get(local+'/play/',{maxRedirects:0});assert.ok([303,401].includes(denied.status()));if(denied.status()===303)assert.equal(denied.headers().location,'/acknowledge');
     await p.goBack();assert.equal(await p.locator('#studioLibraryTitle').count(),0);assert.deepEqual(errors,[]);
-    await ctx.close();await migrationBrowser(browser);await previewBrowser(browser);console.log(engine+' passed three layouts, invitation, verification, family profile, play gate, logout, migration and separate-origin preview submission');
+    await mutate('policy',family.id,{capabilities:{...defaultCapabilities(),games:false,coding:false,learning:false,problemSolving:false,conversation:true},monthlyCents:0,paused:true,generationPaused:true});
+    await p.goto(local+'/acknowledge');await p.getByLabel('Parent passphrase').fill(parent);for(const box of await p.getByRole('checkbox').all())await box.check();
+    await p.getByRole('button',{name:'Enter Jems'}).click();await p.getByRole('button',{name:'My creative workshop'}).click();
+    await p.getByRole('button',{name:'Talk about this idea'}).waitFor();assert.equal(await p.getByRole('button',{name:'Build or revise my game'}).count(),0);
+    assert.equal((await ctx.request.get(local+'/play/features/games.js')).status(),403);assert.equal((await ctx.request.get(local+'/play/features/remote.js')).status(),200);
+    await ctx.close();
+    const durable=await (engine==='webkit'?webkit:chromium).launchPersistentContext(dir+'/migration-'+engine,
+     engine==='chromium'&&process.env.BETA_CHROMIUM_PATH?{executablePath:process.env.BETA_CHROMIUM_PATH}:{});
+    await migrationBrowser(durable);await previewBrowser(browser);console.log(engine+' passed three layouts, invitation, verification, family profile, play gate, logout, migration and separate-origin preview submission');
    }finally{await browser.close();}
   }
  }finally{server.closeAllConnections();await new Promise<void>(ok=>server.close(()=>ok()));rmSync(dir,{recursive:true});}

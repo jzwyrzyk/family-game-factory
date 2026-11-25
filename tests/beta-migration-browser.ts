@@ -1,16 +1,15 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import type {Browser,Page} from 'playwright';
+import type {BrowserContext,Page} from 'playwright';
 
-export async function migrationBrowser(browser:Browser){
- const ctx=await browser.newContext();
+export async function migrationBrowser(ctx:BrowserContext){
  const sourceOrigin='https://original-household.example',targetOrigin='https://new-household.example';
  const map={familyId:'existing-owner',workspace:'original-workspace',sourceOrigin,targetOrigin};
  const script=readFileSync('server/beta/web/household-vault.js','utf8');
  await ctx.route('**/*',route=>route.fulfill(route.request().url().endsWith('vault.js')?{contentType:'text/javascript',body:script}:
   {contentType:'text/html',body:'<title>Synthetic household device</title><script type="module">import * as vault from "/vault.js";window.vault=vault;</script>'}));
  const open=async(host:string)=>{const tab=await ctx.newPage();await tab.goto(host);await tab.waitForFunction(()=>Boolean((window as any).vault));return tab;};
- const source=await open(sourceOrigin),dest=await open(targetOrigin);
+ const source=await open(sourceOrigin);
  try{
   await source.evaluate(async()=>{
    localStorage.setItem('family-game-factory-state-v1',JSON.stringify({games:['Splash or Pass','Dragon'],math:{facts:4},english:{stories:2}}));
@@ -22,11 +21,12 @@ export async function migrationBrowser(browser:Browser){
    for(const name of ['family-game-factory-rewards-v1','family-game-factory-pals-v1','family-private-drawings-v1','jems-records-preparation-v1']){
     await new Promise<void>((ok,fail)=>{const r=indexedDB.open(name,2);r.onupgradeneeded=()=>{const s=r.result.createObjectStore('records',{keyPath:'id'});s.createIndex('owner','owner');
      s.add({id:'saved',owner:'original',image:new Blob([new Uint8Array([3,9,7])],{type:'image/png'}),date:new Date('2026-11-01'),bytes:new Uint8Array([27,4])});};
-     r.onerror=()=>fail(r.error);r.onsuccess=()=>{r.result.close();ok();};});
+     r.onerror=()=>fail(Error(name+' initialization failed: '+String(r.error)));r.onsuccess=()=>{r.result.close();ok();};});
    }
   });
   const archive=await source.evaluate(m=>(window as any).vault.exportHousehold(m),map);
   assert.equal(archive.body.data.databases.length,4);assert.ok(!JSON.stringify(archive).includes('not-exported'));
+  const dest=await open(targetOrigin);
   const restore=(p:Page,m:typeof map,a:typeof archive,undo=false)=>p.evaluate(([map,file,rollback])=>(window as any).vault.restoreHousehold(map,file,rollback),[m,a,undo]);
   const bad=structuredClone(archive);bad.body.data.local[0][1]='unexpected';await assert.rejects(restore(dest,map,bad));
   await assert.rejects(restore(dest,{...map,familyId:'invited-family'},archive));

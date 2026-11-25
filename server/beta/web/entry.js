@@ -36,6 +36,13 @@ addEventListener('pagehide',()=>{for(const f of document.forms)f.reset();for(con
 addEventListener('pageshow',e=>{if(e.persisted)location.reload();});
 
 if($('familyExport'))$('familyExport').onclick=act(async()=>{
- const data=await request('/entry/export',{}),url=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));
+ const data=await request('/entry/export',{});
+ for(const kind of ['acknowledgments','usage']){
+  let after='';const values=[];do{const page=await request('/entry/export-receipts',{kind,after});values.push(...page.rows);after=page.next;}while(after);
+  data[kind==='usage'?'monthlyUsage':kind]=values;
+ }
+ try{const {exportFamilyDevice}=await import('/entry/export-device.js');data.device=await exportFamilyDevice();}
+ catch{data.deviceExportIncomplete=true;status('Server records are ready. Device storage needs separate recovery. Keep this device and contact the operator.');}
+ const url=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));
  const a=document.createElement('a');a.href=url;a.download='jems-private-family-export.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 });

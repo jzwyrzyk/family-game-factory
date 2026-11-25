@@ -5,12 +5,13 @@ import {verifySession} from '../pipeline/auth';
 import {cookieValue,assertActiveTrustedDevice} from '../trusted-devices';
 import {acknowledge,exact,internalCookies,liveSession,logout,redeem,requirePlay} from './access';
 import {activeFamily,betaNotice,familyOrigin,participationNotice,uuid,type Capabilities} from './model';
+import {exportApproved,exportReceiptPage,exportWorkspace} from './portability';
 import {previewAdmission,type PreviewRouting} from './preview';
 import {BetaAdministration,verifyAdministrator} from './admin';
 import type {FamilyDirectory} from './store';
 
 type Handler=(req:IncomingMessage,res:ServerResponse)=>Promise<void>;
-export type Surface=(req:IncomingMessage,res:ServerResponse,context:{path:string;family?:string;capabilities?:Capabilities;administrator?:boolean;expires?:number;idleUntil?:number;profiles?:string[]})=>Promise<boolean>;
+export type Surface=(req:IncomingMessage,res:ServerResponse,context:{path:string;family?:string;capabilities?:Capabilities;administrator?:boolean;guardianTool?:boolean;expires?:number;idleUntil?:number;profiles?:string[]})=>Promise<boolean>;
 export function json(res:ServerResponse,status:number,data:unknown,cookies?:string[]){
  res.writeHead(status,{'Content-Type':'application/json; charset=utf-8',...(cookies?{'Set-Cookie':cookies}:{})});res.end(JSON.stringify(data));
 }
@@ -78,22 +79,22 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    if(req.method==='POST'&&(path==='/entry/logout'||path==='/entry/end')){
     exact(await read(req),[]);json(res,200,{ended:true},await logout(d,id,raw,key,path==='/entry/logout'));return;
    }
-   if(path==='/entry/profiles'||path==='/entry/review-art'||path==='/entry/export'){
+   if(path==='/entry/profiles'||path==='/entry/review-art'||['/entry/export','/entry/export-receipts','/entry/export-device.js'].includes(path)){
     const body=req.method==='POST'?await read(req):{};
-    exact(body,path==='/entry/review-art'?['digest']:[]);
+    exact(body,path==='/entry/review-art'?['digest']:path==='/entry/export-receipts'?['kind','after']:[]);
     const result=await d.withFamily(id,async(tx,f,p)=>{
      activeFamily(f,p);
      const cookies=internalCookies(raw),now=Date.now();
      const session=await d.inWorkspace(tx,f,p,s=>liveSession(f,s,cookies,key,now),false);
      const parent=verifySession(cookieValue(cookies,'factory_parent'),key,now);
      if(parent.role!=='parent'||parent.familyId!==id||parent.deviceId!==session.deviceId)throw Error('FORBIDDEN');
-     if(path==='/entry/export'){
-      if(req.method!=='POST'||f.request?.kind!=='export'||!['ready','completed'].includes(f.request.state)||!f.request.approvedAt||f.request.approvedAt+86400000<=now)throw Error('EXPORT_APPROVAL_REQUIRED');
-      const data=await d.inWorkspace(tx,f,p,s=>({schema:'jems.family-export.v1',familyId:id,profileIds:f.profiles??[],
-       revisions:s.revisions.filter(r=>r.familyId===id&&!r.adultPilotProfileId),jobs:s.jobs.map(j=>({id:j.id,prompt:j.prompt,status:j.status,revisionId:j.revisionId??null,usedMicroUsd:j.usedUnits})),
-       consents:(s.parentPrivacyChoices??[]).map(c=>({notice:c.noticeVersion,scopes:c.scopes,requestedAt:c.requestedAt,verifiedAt:c.verifiedAt??null,withdrawnAt:c.revokedAt??null})),
-       usage:s.ledgers[id],exportedAt:now}),false);
-      f.request.state='completed';tx.set(d.path(id),f);return data;
+     if(path.startsWith('/entry/export')){
+      exportApproved(f,now);
+      if(path==='/entry/export-device.js'){if(req.method!=='GET')throw Error('FORBIDDEN');return {guardianTool:true};}
+      if(req.method!=='POST')throw Error('FORBIDDEN');
+      if(path==='/entry/export-receipts')return exportReceiptPage(tx,d.path(id),f,body.kind,body.after);
+      const data=await d.inWorkspace(tx,f,p,s=>exportWorkspace(f,s,now),false);
+      f.request!.state='completed';tx.set(d.path(id),f);return data;
      }
      if(path==='/entry/review-art'){
       if(req.method!=='POST'||typeof body.digest!=='string'||!f.capabilities.artwork||!f.approvedArt?.includes(body.digest))throw Error('ART_REVIEW_REQUIRED');
@@ -101,7 +102,9 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
      }
      if(req.method==='POST'){f.profiles??=[];if(f.profiles.length>=6)throw Error('PROFILE_LIMIT');f.profiles.push(randomUUID());tx.set(d.path(id),f);}
      return {ids:f.profiles??[]};
-    });json(res,200,result);return;
+    });
+    if(path==='/entry/export-device.js'){if(await options.surface?.(req,res,{path,family:id,guardianTool:true}))return;throw Error('NOT_FOUND');}
+    json(res,200,result);return;
    }
    if(path.startsWith('/play/')&&req.method==='GET'){
     let access;
