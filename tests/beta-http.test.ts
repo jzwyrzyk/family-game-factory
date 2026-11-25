@@ -49,3 +49,19 @@ test('first-party API protects real revision and job identifiers on read, change
   assert.equal((await d.repository(a.id).snapshot()).jobs[0].status,'ready');
  }finally{server.closeAllConnections();await new Promise<void>(ok=>server.close(()=>ok()));}
 });
+
+test('entry documents protect native form handling even before their module runs',async()=>{
+ const {publicPage}=await import('../server/beta/pages');
+ const {betaHosting}=await import('../server/beta/hosting');
+ const {fixtureConfig}=await import('./beta-fixture');
+ for(const path of ['/invitation','/recovery','/login','/grown-ups','/acknowledge']){
+  const html=publicPage(path,fixtureConfig,true)!;
+  const forms=Array.from(html.matchAll(/<form\b[^>]*>/g),m=>m[0]);
+  assert.ok(forms.length,path);
+  for(const form of forms)assert.match(form,/method="post"/);
+ }
+ const headers=new Map<string,string>();
+ const res={setHeader:(key:string,value:string)=>headers.set(key,value),writeHead(){},end(){}};
+ await betaHosting('.',fixtureConfig,'https://viewer.example')({method:'GET'} as any,res as any,{path:'/invitation',family:'synthetic'});
+ assert.match(headers.get('Content-Security-Policy')!,/form-action 'none'/);
+});
