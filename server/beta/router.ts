@@ -17,7 +17,7 @@ export function json(res:ServerResponse,status:number,data:unknown,cookies?:stri
 }
 const read=(req:IncomingMessage)=>readJsonBody(req,4096,{invalidJsonError:'INVALID_REQUEST',emptyObject:true});
 export function betaRouter(d:FamilyDirectory,key:string,options:{
- runtime:(id:string)=>Promise<Handler>;preview?:PreviewRouting;worker?:Handler;scheduler?:Handler;surface?:Surface;adminIdentity?:typeof verifyAdministrator;
+ runtime:(id:string)=>Promise<Handler>;operatorReadiness?:{jobCeilingMicroUsd:number;generationDispatch:boolean;coachBridge:boolean;speechBridge:boolean};preview?:PreviewRouting;worker?:Handler;scheduler?:Handler;surface?:Surface;adminIdentity?:typeof verifyAdministrator;
 }):Handler {
  const hub=new URL(d.config.hubOrigin),admin=new BetaAdministration(d);
  return async(req,res)=>{
@@ -42,7 +42,8 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
     const sub=await (options.adminIdentity??verifyAdministrator)(typeof assertion==='string'?assertion:undefined,d.config);
     if(req.method==='POST'&&path==='/manage/action'){json(res,200,await admin.change(sub,await read(req)));return;}
     if(req.method==='GET'&&(path==='/manage/state'||path.startsWith('/manage/family/'))){
-     json(res,200,await admin.view(sub,path==='/manage/state'?undefined:path.slice('/manage/family/'.length)));return;
+     const result=await admin.view(sub,path==='/manage/state'?undefined:path.slice('/manage/family/'.length));
+     json(res,200,path==='/manage/state'?{...result,runtime:options.operatorReadiness??null}:result);return;
     }
     if(await options.surface?.(req,res,{path,administrator:true}))return;
     throw Error('NOT_FOUND');

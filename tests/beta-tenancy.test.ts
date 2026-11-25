@@ -25,3 +25,7 @@ test('mode and provider evidence fail closed',()=>{
  assert.throws(()=>validateBeta(fixtureConfig,'beta-household'));
  assert.equal(closedPolicy().stop,true);
 });
+
+test('a named worker environment cannot dispatch into another environment',()=>{
+ const cfg={...fixtureConfig,environment:'dev',workerRoute:'beta-prod' as const};assert.throws(()=>validateBeta(cfg,'existing-owner'));
+});

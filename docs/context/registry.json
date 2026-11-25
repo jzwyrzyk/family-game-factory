@@ -678,10 +678,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:36:05.217Z",
-      "sourceDigest": "68a9dce57220bf1bb3b9f6c8293fd741466ac2c78e2f428d6dd3d634acb8604d",
+      "reviewedAt": "2026-11-25T00:39:27.889Z",
+      "sourceDigest": "e9f3135b77df398de8a5e2421d80c94c1d1f4ab34862790ddacf0c6f7b1a9f76",
       "reviewOutcome": "updated",
-      "reviewReason": "Document the opt-in zero-traffic staging contract and household ownership check across receipt stores.",
+      "reviewReason": "Record one guardian per pilot family, approved environment routing and operator-visible runtime readiness and ceiling.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -887,10 +887,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:36:05.577Z",
-      "sourceDigest": "6dc47a81b78236f2f13fc89a2bd42ef88b73582f6c3e9ee4582532e8f6044ade",
+      "reviewedAt": "2026-11-25T00:39:28.323Z",
+      "sourceDigest": "924132af0430649993d912e1515e7735dc75db4ea7bd2f8192fa9ec7bf637974",
       "reviewOutcome": "updated",
-      "reviewReason": "Cover live-service and candidate identity verification using the synthetic cloud adapter and existing environment contracts.",
+      "reviewReason": "Document source selection, Pages allowlist and independent release, emulator and real-device acceptance gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1130,10 +1130,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T00:36:05.947Z",
-      "sourceDigest": "9cdfad207005d5821b2b5d98025215a8e4befff3ffc94be37ad4d77a3e2f13fa",
+      "reviewedAt": "2026-11-25T00:39:28.873Z",
+      "sourceDigest": "1e5df9e71d522801a6c25ad1ee5d8712475dc6c2fd23750550dc58b56904f29e",
       "reviewOutcome": "updated",
-      "reviewReason": "Describe the protected GitHub verify and stage controls, provenance, read-back, setup blockers and independent traffic approval.",
+      "reviewReason": "Describe protected controller policy for future public-only Pages retirement and the source-preserving rollback path.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

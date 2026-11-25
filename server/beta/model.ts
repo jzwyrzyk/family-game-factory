@@ -36,7 +36,7 @@ export interface BetaConfig {
 }
 export function validateBeta(config:BetaConfig|undefined,householdWorkspace:string){
  if(!config||config.ownerActivation!=='private-family-beta-v1'||!/^[-a-z0-9]{1,30}$/.test(config.environment)||
-  (config.workerRoute!==undefined&&!['beta-dev','beta-test','beta-prod'].includes(config.workerRoute))||
+  (config.workerRoute!==undefined&&(!['beta-dev','beta-test','beta-prod'].includes(config.workerRoute)||config.workerRoute!=='beta-'+config.environment.split('-')[0]))||
   !/^https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)+$/.test(config.hubOrigin)||
   !/^[^\s@<>]+@[^\s@<>]+\.[A-Za-z]{2,}$/.test(config.operatorContact)||
   householdWorkspace.startsWith('beta-')||!/^\/projects\/\d+\/global\/backendServices\/\d+$/.test(config.administrator?.audience)||

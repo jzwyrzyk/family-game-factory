@@ -130,6 +130,8 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
 }
 export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
  const beta=validateBeta(config.beta,config.workspace);
+ if(!Number.isSafeInteger(config.maxJobMicroUsd)||config.maxJobMicroUsd<1||config.maxJobMicroUsd>1000000||
+   !/^https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)+$/.test(config.previewOrigin)||config.previewOrigin===beta.hubOrigin)throw Error('BETA_CONFIGURATION_REQUIRED');
  if(platformMode(config.platformMode)!=='PRIVATE_FAMILY_BETA'||config.householdPrivateHost||config.appOrigin!==beta.hubOrigin||
     config.gatewayOrigin!==beta.hubOrigin||config.localFile||!config.projectId||!config.artifactBucket||
     new URL(config.previewOrigin).hostname.endsWith('.'+new URL(beta.hubOrigin).hostname)||
@@ -151,7 +153,9 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
   workflow:config.workerWorkflow??'',approvedSha:config.workerApprovedSha??'',privateWorker:true});
  const token=installationTokenProvider({appId:config.githubAppId,installationId:config.githubInstallationId,repositoryId:Number(config.workerRepositoryId)},()=>config.githubPrivateKey);
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
- return betaRouter(d,config.sessionKey,{preview:{environment:beta.environment,hubOrigin:beta.hubOrigin,previewOrigin:config.previewOrigin,previewKey:config.previewKey},surface:surface??betaHosting('dist-family-beta',beta,config.previewOrigin),runtime:async id=>(await runtime(id)).handler,
+ return betaRouter(d,config.sessionKey,{operatorReadiness:{jobCeilingMicroUsd:config.maxJobMicroUsd,
+  generationDispatch:paidExecutionAllowed(config.active,process.env.FACTORY_ACTIONS_APPROVED)&&config.approval?.enabled===true&&!!beta.workerRoute&&!!config.workerApprovedSha,
+  coachBridge:!!coachConfig(process.env).enabled&&!!config.coachPrivateOrigin,speechBridge:!!speechConfig(process.env).approved&&!!config.coachPrivateOrigin},preview:{environment:beta.environment,hubOrigin:beta.hubOrigin,previewOrigin:config.previewOrigin,previewKey:config.previewKey},surface:surface??betaHosting('dist-family-beta',beta,config.previewOrigin),runtime:async id=>(await runtime(id)).handler,
   worker:async(req,res)=>{
    const id=req.url?.match(/^\/v1\/worker\/jobs\/([a-f0-9-]+)\/(?:claim|report|status)$/)?.[1];
    const bearer=req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];
