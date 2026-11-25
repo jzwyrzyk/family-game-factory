@@ -215,8 +215,8 @@ async function sentCorrections(browser,url){
   await page.waitForFunction(()=>document.getElementById('studioSend').disabled===false);
   assert.equal(f.requests.length,0);
   const originalReview=(await session(page)).design.creationReview.fingerprint;
-  await page.fill('#studioPrompt',correction);await page.waitForFunction(()=>document.getElementById('studioSend').disabled);
-  await page.click('#studioTalk');
+  await page.fill('#studioPrompt',correction);
+  await page.click('#studioSend');
   await page.waitForFunction(()=>document.getElementById('coachModeStatus').classList.contains('is-thinking'));
   assert.equal(await page.locator('#studioSend').isDisabled(),true,'an earlier verdict cannot authorize an unreviewed correction');
   assert.equal(f.requests.length,0,'sending a correction never builds');

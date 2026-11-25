@@ -95,7 +95,9 @@ window.__reviewNavigate=async action=>{
  else if(action==='coding')FG.creation.open();
  else if(action==='art')await FG.artStudio.open();
  else if(action==='art-draw'){await FG.artStudio.open();click('artDrawButton');}
- else if(action==='coding-editor'){FG.creation.open();await delay(80);document.querySelector('[data-creation-starter="robot"]')?.click();}
+ else if(action==='coding-make'){FG.creation.open();await delay(80);click('creationIntroSkip');click('creationFreeMode');}
+ else if(action==='coding-intro'){FG.creation.open();}
+ else if(action==='coding-editor'){FG.creation.open();await delay(80);click('creationIntroSkip');click('creationFreeMode');document.querySelector('[data-creation-starter="robot"]')?.click();}
  else if(action==='coding-challenge'){FG.creation.openChallenges();await delay(80);document.querySelector('[data-challenge]')?.click();}
  else if(action==='privacy'){click('studioMenuParent');FG.parentDashboard.openTab('settings');document.getElementById('builderParentUnlockPassphrase').value='review-demo-only';document.getElementById('builderParentUnlock')?.requestSubmit();}
 

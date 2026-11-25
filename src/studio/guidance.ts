@@ -2,11 +2,12 @@ import type { Experiment } from './design';
 import type { StudioSession } from './notebook';
 
 /** Small, optional explanations. These IDs are presentation preferences, never achievements. */
-export const GUIDE_TIP_IDS = ['idea', 'waiting', 'ready', 'play', 'improve', 'keep', 'saved', 'scenes', 'practice', 'progress'] as const;
+export const GUIDE_TIP_IDS = ['idea', 'waiting', 'ready', 'play', 'improve', 'keep', 'saved', 'scenes', 'practice', 'progress', 'studio-intro'] as const;
 export type GuideTipId = typeof GUIDE_TIP_IDS[number];
 export type GuidePreferences = { welcomeDismissed: boolean; dismissedTips: GuideTipId[] };
 export type GuideCopy = { title: string; description: string };
 export const GUIDE_TIPS: Readonly<Record<GuideTipId, GuideCopy>> = {
+  'studio-intro': {title:'Your first steps',description:'Choose arrows and play to see your instructions move a character.'},
   idea: { title: 'Start with your idea', description: 'Start with something you imagine. Jems will help you choose how it looks and plays before you build.' },
   waiting: { title: 'Play while it is being made', description: 'Your idea stays here while you play. We will tell you when your game is ready to try.' },
   ready: { title: 'Your game is ready to try', description: 'Open your game whenever you are ready. You can finish what you are playing first.' },

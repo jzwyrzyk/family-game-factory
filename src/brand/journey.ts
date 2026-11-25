@@ -106,7 +106,7 @@ export function installGemJourney(options: GemJourneyOptions) {
   const back = button('jems-journey-back', '', 'jemsJourneyBack');
   setIconLabel(back, 'arrow', 'My jems', 'jems-icon--back');
   back.addEventListener('click', () => options.onBack());
-  const heading = node('h1', '', 'My journey');
+  const heading = node('h1', '', 'My Journey');
   heading.id = 'jemsJourneyTitle';
   heading.tabIndex = -1;
   const headingWrap = node('div', 'jems-journey-heading');

@@ -21,7 +21,7 @@ export function installProblemSolvingPractice(host: Host) {
   const owner = () => String(FG.store.current().id);
   const store = () => new ProblemSolvingStore(profileStorage(localStorage), owner);
   const page = node('section', 'page hidden'); page.id = 'page-problem-solving';
-  page.innerHTML = `<header class="ps-heading"><div><span class="ps-eyebrow">THE jems IDEA WORKSHOP</span><h1 id="psHeading" tabindex="-1">Try an idea.</h1><p id="psSubtitle">Wonder a little. Try something. See what changes.</p></div><button type="button" class="ps-button ps-home" id="psHome">${iconMarkup('arrow', 'jems-icon--back')} My Games</button></header><div id="psStatus" class="ps-status" role="status" aria-live="polite"></div><div id="psBody"></div>`;
+  page.innerHTML = `<header class="ps-heading"><div><span class="ps-eyebrow">Creative Studio</span><h1 id="psHeading" tabindex="-1">Try an experiment.</h1><p id="psSubtitle">Wonder a little. Try something. See what changes.</p></div><button type="button" class="ps-button ps-home" id="psHome">${iconMarkup('arrow', 'jems-icon--back')} Creative Studio</button></header><div id="psStatus" class="ps-status" role="status" aria-live="polite"></div><div id="psBody"></div>`;
   document.querySelector('main')!.append(page);
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => page.querySelector<T>('#' + id)!;
   let active: ProblemSolvingDraft | null = null, visible = false, activeOwner = '', revisionRetry = false;
@@ -103,7 +103,7 @@ export function installProblemSolvingPractice(host: Host) {
   }
   function renderShelf() {
     stopSpeech(); active = null; revisionRetry = false; page.dataset.phase = 'shelf'; status('');
-    $('psHeading').textContent = 'Try an idea.'; $('psSubtitle').textContent = 'Wonder a little. Try something. See what changes.';
+    $('psHeading').textContent = 'Try an experiment.'; $('psSubtitle').textContent = 'Wonder a little. Try something. See what changes.';
     const body = $('psBody'); body.replaceChildren();
     const intro = node('div', 'ps-shelf-intro');
     intro.append(image('./jems-art/character_spark_wave.webp', 'ps-companion'), node('p', '', 'A small adventure for your next big idea. Pick one to begin.'));

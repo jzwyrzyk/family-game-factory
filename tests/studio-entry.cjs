@@ -29,24 +29,29 @@ exports.completeWelcome=async function completeWelcome(page,character='spark'){
 };
 exports.navigate=async function navigate(page,id){
  const selector=id.startsWith('#')?id:'#'+id;
- const target=page.locator(selector);
- // Active play has its own visible exit. Global destinations return after the
- // child leaves through that guarded, save-aware route.
  if(await page.locator('#page-studio.studio-play-mode').isVisible())await page.locator('#studioHome').click();
  if(await page.locator('#page-creation.has-scene').isVisible())await page.locator('#creationHome').click();
+ const sections={'#studioNavPals':'pals','#studioNavRewards':'rewards','#studioNavPowers':'powers','#jemsRewardsWidget':'rewards'};
+ if(sections[selector]){
+  await exports.navigate(page,'#studioNavJourney');
+  await page.locator('#page-jems-journey [data-journey-section="'+sections[selector]+'"]').click();return;
+ }
+ if(selector==='#studioNavProblemSolving'){
+  await exports.navigate(page,'#studioNavScenes');
+  await page.locator('#creationTryIdea').click();return;
+ }
+ const target=page.locator(selector);
  if(!await target.isVisible())await page.locator('#studioNavMenu').click();
  await target.click();
+ if(selector==='#studioNavScenes'&&await page.locator('#creationIntroduction').isVisible())await page.locator('#creationIntroSkip').click();
 };
-/** Retained native games live in My Creations, reached through visible controls. */
+/** Retained games are on My Games; no record is created by opening the shelf. */
 exports.openRetainedGame=async function openRetainedGame(page,game,activate=target=>target.click()){
  if(!['buckets','dragon'].includes(game))throw Error('Choose a retained native game');
- if(!await page.locator('#page-creations').isVisible()){
-  if(await page.locator('#page-studio.studio-play-mode').isVisible())await activate(page.locator('#studioHome'));
-  if(await page.locator('#page-creation').isVisible())await activate(page.locator('#creationHome'));
-  if(!await page.locator('#studioSavedIdeas').isVisible())await activate(page.locator('#studioNavHome'));
-  await activate(page.locator('#studioSavedIdeas'));
- }
- await activate(page.locator(`#page-creations [data-starter="${game}"]`));
+ if(await page.locator('#page-studio.studio-play-mode').isVisible())await activate(page.locator('#studioHome'));
+ if(await page.locator('#page-creation').isVisible())await activate(page.locator('#creationHome'));
+ if(!await page.locator('#studioOriginals').isVisible())await activate(page.locator('#studioNavHome'));
+ await activate(page.locator(`#studioOriginals [data-starter="${game}"]`));
 };
 exports.openProfiles=async function openProfiles(page,activate=target=>target.click()){
  if(await page.locator('#page-studio.studio-play-mode').isVisible()){
