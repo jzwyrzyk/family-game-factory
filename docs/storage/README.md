@@ -14,7 +14,26 @@ The source-backed acceptance includes real IndexedDB notebook tests (ten scenari
 
 The [v2 main baseline](evidence/application-main-0f459f5-v2.json) adds actual visible draft editing and durable flush, IDB request/payload counters, per-key source occupancy, current/history/vault logical footprint, startup CPU observations and a delivered-build digest. It uses protected main `0f459f5`, Chromium `156.0.8078.79`, five samples and the same 5/25/50-project and 100/2,500/14,000-message libraries as the earlier receipt. Original-art bytes are unchanged. Baseline medians are 966/1,832/2,191 ms to application readiness, 329/676/1,571 ms to open the saved game, and 45/138/211 ms for the real draft/flush interaction. These supersede no historical observation: the older v1 run used fewer counters and shared-host conditions differed.
 
-Use `STORAGE_BENCHMARK_AUTHORITY=indexed` only against a `storage-preview` build. The harness invokes the actual application preparation API, reloads, verifies both active authorities, and exercises their real domain methods and visible UI. Run the default build separately. The comparable candidate v2 receipt is pending final-source measurement; no improvement percentage or overall readiness score is claimed from the baseline alone. The fixture's profile source is 1,134 UTF-8 bytes and has no populated learning/APS history: its 0–0.1 ms profile-save median is not a worst-case profile/learning result. Bounded source limits remain in the inventory.
+Use `STORAGE_BENCHMARK_AUTHORITY=indexed` only against a `storage-preview` build. The harness invokes the actual Parent preparation button, reloads once, verifies all three active native/notebook/Creation authorities, and exercises their real domain methods and visible UI. Run the default build separately. The comparable candidate v2 receipt is pending final-source measurement; no improvement percentage or overall readiness score is claimed from the baseline alone. The game-library fixture's profile source is 1,134 UTF-8 bytes and has no populated learning/APS history: its 0–0.1 ms baseline profile-save median is not a worst-case profile/learning result. The separate bounded-source results below measure populated histories.
+
+### Bounded profiles, learning and APS
+
+The [main bounded-source receipt](evidence/bounded-main-0f459f5.json) and [candidate bounded-source receipt](evidence/bounded-candidate-595a926.json) run the actual built `FG.store` save/backup validator and real-browser `ProblemSolvingStore` list/export/record APIs, with five samples in Chromium 156. The tool is `tools/storage-bounded-sources-benchmark.cjs TARGET OUTPUT.json`. These independent fixtures populate 1/3/6 profiles, 10/60/120 attempts **per subject per profile**, 10/100/100 fact summaries per profile and 20/100/200 APS episodes per profile. Synthetic repeated fact summaries model storage volume; they are not learner evidence or estimates of typical growth.
+
+| Metric, small / medium / large | Main `0f459f5` | Candidate `595a926` |
+| --- | ---: | ---: |
+| Profile source UTF-8 bytes | 42,340 / 1,087,298 / 3,102,467 | Same |
+| APS source bytes after five writes | 11,488 / 139,128 / 548,408 | Same |
+| Profile save median ms | 0.4 / 97.0 / 233.3 | 0.3 / 131.2 / 281.6 |
+| Profile stringify / parse median ms, large | 56.3 / 48.4 | 35.8 / 36.4 |
+| Profile backup validation median ms | 0.9 / 22.7 / 100.7 | 1.2 / 26.5 / 55.6 |
+| Selected-owner APS list median ms | 0.5 / 10.6 / 86.9 | 0.5 / 27.9 / 53.2 |
+| APS complete export median ms | 0.4 / 5.8 / 108.7 | 0.5 / 8.3 / 54.2 |
+| APS record median ms | 1.3 / 29.1 / 149.0 | 1.6 / 44.5 / 76.7 |
+
+These formats remain whole-key stores and their byte amplification is unchanged. Shared-host scheduling and concurrent tests make timings noisy; the slower medium/large profile saves remain in the report. No speed claim follows from faster parse or APS samples alone. The existing APS retention policy keeps 200 episodes for the active owner and records five discarded middle observations in the large fixture after five new writes; this assignment does not change that inherited policy. The receipt retains the discarded count and preserved first-episode range explicitly.
+
+An additional **simultaneous capacity stress case fails on both source versions**: six profiles with 120 attempts in each subject and 250 fact summaries each form a valid 4,949,267-byte profile source. Adding a valid 548,373-byte APS source exceeds this Chromium origin's localStorage quota. Both previously stored source strings remain unchanged after the rejected write. This is an observed existing capacity limit, not a successful save or a new candidate regression. Per-domain schema bounds (including the 1,500-fact cap) do not promise that every maximum fits together with other localStorage sources. A future migration of these bounded domains needs separate engineering and compatibility acceptance; the prepared native/notebook/Creation path does not remove this limit.
 
 ## Actual application measurements on current main
 
@@ -44,6 +63,24 @@ The browser is desktop emulation on a shared Linux host, with warm HTTP cache an
 The retained [cost model](evidence/cost-model.json) projects a five-person family's end-of-year-five monthly storage/metadata/object/network run rate of approximately **$0.023 / $0.295 / $2.581** for its low/typical/high assumptions. It includes one sizing allowance for a recovery copy. It excludes Cloud Run, load balancing, NAT/IP/worker compute, provider calls, support, logs, CI, taxes, discounts and free tiers. Rates are historical planning inputs, not newly verified pricing or observed bills; the target region and architecture must be read back before activation. The [environment cost model](../development/COSTS.md) supplies separate infrastructure/worker assumptions and warns about standing NAT/IP charges.
 
 The storage projection cannot be called the total beta cost or a spending ceiling. Content sharing can reduce retained object bytes while increasing hashing, conditional puts, dependency reads and backup verification work. Full-workspace reads, serial reconciliation and a globally contended ledger can dominate latency before raw storage charges are significant. Keep metadata-only reads and bounded concurrent scans separate from the global atomic admission transaction: strict family/global spending enforcement must not be weakened for throughput. No cloud billing savings or production capacity result was observed in this assignment.
+
+### Authorized continuity payload observations
+
+The [source-pinned wire receipt](evidence/synchronization-wire-478c988.json) records the native adapter and real Chromium Parent control transport at source `478c988`, using real IndexedDB and a deterministic in-page continuity server. It is an earlier component receipt, distinct from the final application build and later reversible-removal tests. Values count JSON bodies only; HTTP headers, retries outside these cases, authentication reads and billed Firestore operations are excluded. The fixture is a small native game graph, not bulk artwork or conversation synchronization.
+
+| Scenario | JSON request / response bytes | Observed logical calls |
+| --- | ---: | --- |
+| Native first selected copy, modeled transport | 1,437 / 1,948 | status 1, lookup 1, commit 1, changes 2 |
+| Native unchanged check, modeled transport | 82 / 189 | status 1, changes 1 |
+| One mechanic revision, modeled transport | 1,477 / 1,988 | status 1, lookup 1, commit 1, changes 2 |
+| Parent selected-copy journey, actual browser fetch | 2,710 / 6,202 | status 3, changes 8, lookup 1, commit 1 |
+| Parent unchanged check, actual browser fetch | 83 / 237 | status 1, changes 1 |
+| Parent concurrent-edit conflict, actual browser fetch | 1,870 / 478 | status 1, lookup 1, commit 1, read 4 |
+| Parent Keep both with interrupted preservation and retry | 2,369 / 4,046 | read 6, status 1, lookup 1, commit 1, changes 3 |
+
+Unchanged checks avoid sending retained game payloads. Preserving both branches and resolving uncertainty costs extra reads and metadata; those requests are part of recovery, not hidden inefficiency. The feed/current indexes retain references rather than duplicating every large value. Exact database billing cannot be inferred from HTTP call counts. Current-principal/device checks and atomic global admission remain required even when their operations dominate a small payload.
+
+The historical five-year cost scenarios exceed today's configured per-device domain caps; they represent future demand, not demonstrated application capacity or permission to raise limits. Browser originals, immutable history and complete recovery copies remain retained. The small fixture deliberately has previews equal in byte size to its original 256-pixel PNGs; larger fixtures retain separate smaller derivatives. No quality reduction or deletion is counted as a saving. At the historical `$0.15/GiB-month` metadata rate, one 16 MB logical recovery copy is about `$0.0022/month` before current/history duplication, keys/indexes, operation charges and service overhead. This is arithmetic on an explicit planning rate, not a current quote or observed bill. Approved hosting/load-balancer, worker networking, Cloud Run, provider and operational costs still need the separate environment plan.
 
 ## Preserved November 24 implementation record
 
