@@ -38,6 +38,34 @@ async function observeEmptyPlayHost(page){
   window.__stopEmptyPlayHostObservation=()=>observer.disconnect();
  });
 }
+async function checkPendingNativeChange(page){
+ const before=await page.evaluate(async()=>{const book=await FG.studio.captureNotebook(),owner=FG.store.current().id,id=book.active[owner];return {owner,id,draft:book.sessions.find(s=>s.id===id).draft};});
+ assert.equal(before.draft,'Private saved thought');
+ for(const stage of ['revealed','mounted']){
+  await page.click('#studioHome');await page.waitForFunction(()=>document.getElementById('page-studio').classList.contains('hidden'));
+  await page.evaluate(stage=>{
+   const shell=document.getElementById('page-studio'),host=document.getElementById('studioGameHost');window.__pendingNativeChange=[];
+   const observer=new MutationObserver(()=>{
+    if(shell.classList.contains('hidden')||shell.classList.contains('studio-play-mode')||host.querySelector('.quality-hill'))return;
+    const native=host.querySelector('#page-game');if(stage==='mounted'&&(!native||native.classList.contains('hidden')))return;
+    observer.disconnect();const button=document.getElementById('studioChange');
+    window.__pendingNativeChange.push({stage,disabled:button.disabled,fitted:false,hill:false});button.click();
+   });observer.observe(host,{childList:true,subtree:true});observer.observe(shell,{attributes:true,attributeFilter:['class']});
+  },stage);
+  await page.locator('#studioLibrary .studio-saved-open').filter({hasText:'Indexed road trip'}).click();
+  const after=await page.evaluate(async()=>{
+   // Capture drains actual UI actions; a Change discovered while open waits is
+   // included by the second drain. There is no mocked storage or fixed sleep.
+   await FG.studio.captureNotebook();const book=await FG.studio.captureNotebook(),owner=FG.store.current().id,id=book.active[owner],shell=document.getElementById('page-studio');
+   return {events:window.__pendingNativeChange,owner,id,draft:book.sessions.find(s=>s.id===id).draft,input:document.getElementById('studioPrompt').value,panel:shell.querySelector('.studio-workspace').dataset.mobilePanel,fitted:shell.classList.contains('studio-play-mode'),hill:!!document.querySelector('.quality-hill')};
+  });
+  assert.deepEqual(after.events,[{stage,disabled:false,fitted:false,hill:false}],'Change uses the real enabled button in the pending local read');
+  assert.equal(after.panel,'talk','the newer Change action wins over delayed local playback');assert.equal(after.fitted,false);assert.equal(after.hill,false);assert.equal(await page.locator('#studioPrompt').isVisible(),true);
+  assert.deepEqual({owner:after.owner,id:after.id,draft:after.draft},before);assert.equal(after.input,before.draft);
+  await page.click('#studioPlay');await page.waitForFunction(()=>document.getElementById('page-studio').classList.contains('studio-play-mode'));assert.equal(await page.evaluate(()=>FG.runtime.snapshot().config.wheelSize),.57,'a later explicit Play still opens the exact kept revision');
+  await page.click('#studioChange');await page.waitForFunction(()=>!document.querySelector('.quality-hill'));
+ }
+}
 async function checkUnwrappedNativeLifecycle(context,url,viewport){
  const page=await context.newPage(),errors=[];let phase='unwrapped startup';
  page.on('pageerror',error=>errors.push({phase,message:error.message}));
@@ -97,7 +125,8 @@ async function checkUnwrappedNativeLifecycle(context,url,viewport){
    phase='reload kept copy';await page.reload();await page.waitForFunction(()=>FG.studio);await observeEmptyPlayHost(page);await page.locator('#studioLibrary .studio-saved-open').filter({hasText:'Indexed road trip'}).click();await page.waitForSelector('.quality-hill');await page.waitForFunction(()=>document.getElementById('page-studio').classList.contains('studio-play-mode'));await checkPlaySubscriptions(page,true);const emptyHost=await page.evaluate(()=>{window.__stopEmptyPlayHostObservation();return window.__emptyPlayHostSubscriptions;});assert.ok(emptyHost.length,'saved opening exposes its real empty host while the indexed revision loads');assert.ok(emptyHost.every(targets=>targets.length===0),'the revealed empty host has no inactive play subscriptions');assert.equal(await page.evaluate(()=>FG.runtime.snapshot().config.wheelSize),.57);
    phase='edit draft and switch away';await page.click('#studioChange');await page.fill('#studioPrompt','Private saved thought');await openProfiles(page);await page.locator('.profile-choice').nth(1).click();await page.waitForFunction(()=>document.getElementById('studioPrompt').value==='');assert.equal(await page.locator('#studioLibrary [data-session]').count(),0);
    phase='switch back and reopen saved Rally';await openProfiles(page);await page.locator('.profile-choice').first().click();await page.locator('#studioLibrary .studio-saved-open').filter({hasText:'Indexed road trip'}).click();await page.waitForSelector('.quality-hill');await page.waitForFunction(()=>document.getElementById('page-studio').classList.contains('studio-play-mode'));await page.click('#studioChange');assert.equal(await page.inputValue('#studioPrompt'),'Private saved thought');await page.waitForFunction(()=>!document.querySelector('.quality-hill'));await checkPlaySubscriptions(page,false);assert.deepEqual(await page.evaluate(()=>window.__hillResizeEffects),[],'saved Rally transitions do not write canvas dimensions during observer delivery');assert.deepEqual(errors,[]);
-   console.log(JSON.stringify({browser:process.env.STORAGE_BROWSER??'chromium',viewport,indexedNotebook:process.env.STUDIO_NOTEBOOK==='1',checks:['active-only fitted play observations','unobserved real empty-host revision-loading gap','observer-safe Rally layout transition','same-tab migration selects authority','native Keep','compound copy','reload exact revision','profile switch and draft isolation']}));await page.close();
+   phase='Change during pending local revision';await checkPendingNativeChange(page);await checkPlaySubscriptions(page,false);assert.deepEqual(errors,[]);
+   console.log(JSON.stringify({browser:process.env.STORAGE_BROWSER??'chromium',viewport,indexedNotebook:process.env.STUDIO_NOTEBOOK==='1',checks:['active-only fitted play observations','unobserved real empty-host revision-loading gap','observer-safe Rally layout transition','same-tab migration selects authority','native Keep','compound copy','reload exact revision','profile switch and draft isolation','Change wins in both pending local read gaps','later explicit Play preserves owner/draft/kept revision']}));await page.close();
    await checkUnwrappedNativeLifecycle(context,`http://127.0.0.1:${server.address().port}/arcade/?studio=1`,viewport);await context.close();
   }
  }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

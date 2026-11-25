@@ -1077,8 +1077,9 @@ export async function installStudio(){
   const needsGuidance=requested.game==='new'&&!requested.projectId&&!requested.remoteId&&!requested.candidate;
   if(needsGuidance&&!authorized()){if(young())handOff();return;}
   stopSpeech();handoff.close();moreChoices.open=false;disposeGame();(await notebook.select(id,owner()));if(needsGuidance&&!authorized())return;activeId=id;keptInThisView=null;reflecting=false;lastOutcome=null;showing='working';status('');
-  const s=current();if(s.candidate&&!s.experiments?.some(e=>e.id===s.candidate!.id))(await notebook.saveExperiment(s.id,s.owner,s.candidate,[],'tune','helper'));(await coaching?.openSession());if(needsGuidance&&!authorized())return;$<HTMLTextAreaElement>('studioPrompt').value=s.draft;globalStatus.textContent='';$<HTMLDetailsElement>('studioMore').open=false;showStudio();render();(await setTab('game'));focusView($('studioTitle'));
-  if(autoPlay){if(s.projectId||s.remoteId)await playWorking();else if(s.candidate)await playCandidate();else if(readyExperiment(s))await openReadySession(s.id,s.owner);else{$('studioEmpty').hidden=false;(await setTab('talk'));}}
+  const s=current();if(s.candidate&&!s.experiments?.some(e=>e.id===s.candidate!.id))(await notebook.saveExperiment(s.id,s.owner,s.candidate,[],'tune','helper'));(await coaching?.openSession());if(needsGuidance&&!authorized())return;$<HTMLTextAreaElement>('studioPrompt').value=s.draft;globalStatus.textContent='';$<HTMLDetailsElement>('studioMore').open=false;
+  const playIntent=viewIntent;showStudio();render();(await setTab('game'));if(playIntent!==viewIntent)return;focusView($('studioTitle'));
+  if(autoPlay){if(s.projectId||s.remoteId)await playWorking(playIntent);else if(s.candidate)await playCandidate(playIntent);else if(readyExperiment(s))await openReadySession(s.id,s.owner);else{$('studioEmpty').hidden=false;(await setTab('talk'));}}
   if(remote.mode==='remote'&&!clients.has(s.id)&&(s.pendingSubmission?.api===remote.apiBaseUrl||s.job?.api===remote.apiBaseUrl&&(busy(s)||needsReadyRecovery(s))))resume(s);
  }
  function renderConversation(){
@@ -1193,33 +1194,35 @@ export async function installStudio(){
    lastOutcome=description;
   }catch(error){status((error as Error).message,true);}
  }
- async function playLocal(s:StudioSession,config:Mechanics,key:string,view:typeof showing,revisionId?:string){
-  if(!canChangePlay(s))return false;
+ async function playLocal(s:StudioSession,config:Mechanics,key:string,view:typeof showing,revisionId?:string,intent=viewIntent){
+  // Change/Help can be chosen while either indexed revision read is pending,
+  // before a mounted game exists for disposal to advance the runtime epoch.
+  if(intent!==viewIntent||!canChangePlay(s))return false;
   const playedTest=view==='candidate'?s.candidate?.id||s.selectedTest||null:null;
   // Returning from shared Help/Change keeps the originating build reachable.
   // Opening another session or leaving the player already clears this binding.
   const waiting=s.game==='mining'&&waitProject?.owner===s.owner?waitProject:null;
   disposeGame();waitProject=waiting;lastOutcome=null;viewedRevisionId=revisionId||null;remoteViewedId=null;const generation=epoch;showing=view;mountNative();
   const boundRevision=s.projectId?(await games.revision(s.projectId,s.owner,revisionId??(view==='candidate'?s.candidate?.baseId??undefined:undefined))):null;
-  if(generation!==epoch||owner()!==s.owner||activeId!==s.id)return false;
+  if(intent!==viewIntent||generation!==epoch||owner()!==s.owner||activeId!==s.id)return false;
   FG.app.openGame(s.game,{config,stateKey:key,drawingRigId:boundRevision?.drawingRigId??null,projectId:s.id,onOutcome:async(outcome:PlayOutcome)=>{
     if(generation!==epoch||s.owner!==owner()||activeId!==s.id)return;
     if(revisionId&&s.projectId)try{(await games.record(s.owner,s.projectId,revisionId,outcome));}catch(error){status((error as Error).message,true);}
     if(generation!==epoch||s.owner!==owner()||activeId!==s.id)return;
     (await announceOutcome(s,outcome.description||`You ${outcome.won?'finished':'tried'} this round.`,false,playedTest));
   }});
-  mounted=true;showStudio();render();(await setTab('game'));enterPlayView();status(view==='candidate'?'Try your test. Your main game has not changed.':view==='history'?'Playing an earlier version for comparison.':'Your main game. Choose Change my game whenever you have an idea.');return true;
+  mounted=true;showStudio();render();(await setTab('game'));if(intent!==viewIntent||!sameView(s,generation))return false;enterPlayView();status(view==='candidate'?'Try your test. Your main game has not changed.':view==='history'?'Playing an earlier version for comparison.':'Your main game. Choose Change my game whenever you have an idea.');return true;
  }
- async function playWorking(){const s=current();if(!canChangePlay(s))return;if(s.remoteId){await showRemote(s,s.remoteId,'working');return;}if(!s.projectId){disposeGame();showing='working';$('studioEmpty').hidden=false;showStudio();render();return;}const r=(await games.revision(s.projectId,s.owner));await playLocal(s,validateConfig(s.game as GameId,r.config),r.id,'working',r.id);}
- async function playCandidate(){const s=current(),c=s.candidate;if(!canChangePlay(s))return;if(!c)return playWorking();if(c.remoteId){await showRemote(s,c.remoteId,'candidate');}else await playLocal(s,validateConfig(s.game as GameId,c.config),c.id,'candidate');}
+ async function playWorking(intent=viewIntent){const s=current();if(intent!==viewIntent||!canChangePlay(s))return;if(s.remoteId){await showRemote(s,s.remoteId,'working');return;}if(!s.projectId){disposeGame();showing='working';$('studioEmpty').hidden=false;showStudio();render();return;}const r=(await games.revision(s.projectId,s.owner));await playLocal(s,validateConfig(s.game as GameId,r.config),r.id,'working',r.id,intent);}
+ async function playCandidate(intent=viewIntent){const s=current(),c=s.candidate;if(intent!==viewIntent||!canChangePlay(s))return;if(!c)return playWorking(intent);if(c.remoteId){await showRemote(s,c.remoteId,'candidate');}else await playLocal(s,validateConfig(s.game as GameId,c.config),c.id,'candidate',undefined,intent);}
  async function playViewed(){
-  const s=current();if(!canChangePlay(s))return;
+  const s=current(),intent=viewIntent;if(!canChangePlay(s))return;
   stopSpeech();
   if(showing==='history'){
    if(remoteViewedId){await showRemote(s,remoteViewedId);return;}
-   if(s.projectId&&viewedRevisionId){const r=(await games.revision(s.projectId,s.owner,viewedRevisionId));await playLocal(s,validateConfig(s.game as GameId,r.config),r.id,'history',r.id);return;}
+   if(s.projectId&&viewedRevisionId){const r=(await games.revision(s.projectId,s.owner,viewedRevisionId));await playLocal(s,validateConfig(s.game as GameId,r.config),r.id,'history',r.id,intent);return;}
   }
-  if(showing==='candidate'&&s.candidate)await playCandidate();else await playWorking();
+  if(showing==='candidate'&&s.candidate)await playCandidate(intent);else await playWorking(intent);
  }
  async function showHelp(){
   const s=current();if(guardMath())return;const helpIntent=++viewIntent;
