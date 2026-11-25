@@ -143,10 +143,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:44:10.185Z",
-      "sourceDigest": "f83f9913ed630db9b84be9ba27a9c625f8c0580d0299c6cfb640ac7ae0c90ab1",
+      "reviewedAt": "2026-11-25T02:09:44.110Z",
+      "sourceDigest": "17c4fa9cace49f73718df0e43de278fc4a9ac40d938ac605caa0d22c72963cac",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified early-grade host and speech behavior with synthetic family sessions, eight native games, a live isolated fixture and five browser viewports.",
+      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:57:26.982Z",
-      "sourceDigest": "28cb322dd37584f756e4f2473c441b935b31ce428fc1dbf140a3e9890ee5604c",
+      "reviewedAt": "2026-11-25T02:09:44.215Z",
+      "sourceDigest": "f7e68329f9fa5f777aa383ac4bed0b1adc2c58b15943e91189c5552ea9537ae3",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed imported grade holds, two-subject game playback, responsive coding controls, natural checkpoint and authorized restore paths in integrated verification.",
+      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -406,10 +406,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "97666e5fc0ee8739084b067d633b59636bea4f83e6823ae39e5639f3aaf1d39d",
-      "reviewedAt": "2026-11-25T01:57:27.832Z",
+      "sourceDigest": "2d596e7af62766c696ddb6480a4d2169a9526b522d7c5bd8a0c6a126cc72a15a",
+      "reviewedAt": "2026-11-25T02:09:44.619Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed imported grade holds, two-subject game playback, responsive coding controls, natural checkpoint and authorized restore paths in integrated verification.",
+      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -641,10 +641,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:57:27.920Z",
-      "sourceDigest": "96335bad7b1b5b1196faab3c8ba65fe0ba46c7037e3946875fd504767916e98c",
+      "reviewedAt": "2026-11-25T02:09:44.693Z",
+      "sourceDigest": "8dfd020d7abadd0b6d39efa2a39e264d8fd8091d4d3a074b62136c2b2b392fec",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed imported grade holds, two-subject game playback, responsive coding controls, natural checkpoint and authorized restore paths in integrated verification.",
+      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:58:26.544Z",
-      "sourceDigest": "38dba3e8d3d4785f12d75739ee07a62f54ea17646638eabb0dbf9726b4fdda46",
+      "reviewedAt": "2026-11-25T02:09:44.753Z",
+      "sourceDigest": "a90e14b4f5647a1eae7cc76c63b5cb8f572bf7c2d450a02e396620e7712345f4",
       "reviewOutcome": "updated",
-      "reviewReason": "The integrated browser matrix covers the current assembly workshop and tests the original splash round through its actual animated result.",
+      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

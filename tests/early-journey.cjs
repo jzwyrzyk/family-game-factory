@@ -173,7 +173,7 @@ async function checkEarlyScene(page){
 }
 async function localAudioAndCreationGate(page){
  const {build}=require('esbuild');
- for(const [entry,globalName] of [['src/language/content.ts','EarlyContent'],['src/builder/session.ts','EarlyFamilyClient']]){
+ for(const [entry,globalName] of [['src/learning/content.ts','EarlyMath'],['src/language/content.ts','EarlyContent'],['src/builder/session.ts','EarlyFamilyClient']]){
   const bundle=await build({entryPoints:[entry],platform:'browser',format:'iife',globalName,bundle:true,write:false});
   await page.addScriptTag({content:bundle.outputFiles[0].text});
  }
@@ -206,7 +206,29 @@ async function localAudioAndCreationGate(page){
  await activity.locator('[data-value='+JSON.stringify(answer)+']').click();await page.waitForFunction(()=>!FG.learning.active);
  const record=await page.evaluate(()=>FG.store.current().language.attempts[0]);
  assert.equal(record.item.domain,'early-reading');assert.equal(record.independent,true);
- await page.evaluate(()=>document.querySelector('#early-listening-check').remove());
+ await page.evaluate(()=>{
+  FG.store.changeProfile({learningSubject:'math'});
+  let item;
+  for(let seed=0;seed<=200;seed++){
+   item=EarlyMath.generateItem('k-numeral-group',{tier:0,random:()=>seed/201});if(item.answer==='0')break;
+  }
+  if(item.answer!=='0')throw Error('Missing a zero-quantity test item');
+  FG.learning.mount(document.querySelector('#early-listening-check'),{item,context:{gameId:'synthetic-quantity'},onComplete(){}});
+ });
+ const empty=page.locator('#early-listening-check .early-empty-group');
+ assert.equal(await empty.textContent(),'');assert.equal(await empty.getAttribute('aria-label'),'Empty group');
+ await page.waitForFunction(()=>FG.store.current().learning.attempts.find(a=>a.id===FG.learning.activeAttemptId)?.promptDelivery==='audio');
+ await page.locator('#early-listening-check [data-value="0"]').click();await page.waitForFunction(()=>!FG.learning.active);
+ await page.evaluate(()=>{
+  document.querySelector('#early-listening-check').remove();
+  FG.app.openGame('gum',{config:{originalRules:true,qualityVersion:0,gumBudget:10,jointStrength:1,highlightMatches:false,extraDecoys:0}});
+ });
+ const directions=page.locator('[data-early-game-directions="gum"]');
+ await directions.waitFor();
+ await page.waitForFunction(()=>window.spoken.at(-1)==='Tap a piece to add it to your build.');
+ await directions.getByRole('button',{name:'Mute',exact:true}).click();
+ await page.evaluate(()=>FG.app.page('home'));assert.equal(await directions.count(),0);
+
  console.log('PASS local speech event fixture, replay, silent decoding target, independent response and restricted creation requests.');
 }
 

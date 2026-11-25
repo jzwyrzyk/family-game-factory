@@ -17,6 +17,14 @@ Use Node 22, the repository lockfile and its Chromium installation. Run `npm ci`
 
 Splash or Pass reaches a natural round-end checkpoint. The other native matrix cases send the existing checkpoint event after entering play or performing a game action. The legacy regression suites also exercise elapsed-play and round-end triggers. Generated game checks use a local reviewed fixture. The gateway responses, speech lifecycle and learner profiles are synthetic. No person supplied a voice recording. The device matrix establishes browser rendering and pointer behavior. Educational efficacy, physical-device ergonomics and acoustic quality require their own evidence.
 
+## Verification receipts
+
+The curriculum contains 17 Pre-K math skills and 23 kindergarten math skills. The deterministic engine suite samples 60 seeds for each of those 40 skills and checks every possible subset for the new four-, six- and eight-picture sorting boards. The reviewed language catalog has 11 Pre-K skills with 206 tier entries and 16 kindergarten skills with 294 tier entries. Entries reused across difficulty tiers count once per tier. The 48 legacy Language Arts skill units retain their version-1 content.
+
+The small-phone acceptance suite also runs at 320 × 667 with a challenge open. It tests a real pointer hit on every first-step action and checks 150% Chromium zoom. The isolated version-1 input regression uses a loopback-routed HTML host and independently sandboxed game response. This gives Playwright's clock a real navigation boundary and preserves the existing score, frame and held-input assertions.
+
+A local merge-tree rehearsal against family beta and storage rehearsal #181 at `8e6be75` produced conflicts in the local profile store, Studio UI and styles, package scripts, the architecture and delivery records, the documentation registry and the parent-consent document. Integration must preserve both sets of profile, recovery and consent changes. #181 is a rehearsal branch. Its beta audit dependency #180 and the separately verified family host precede any external early-learner beta.
+
 ## Captured journeys
 
 | Screenshot | Viewport |

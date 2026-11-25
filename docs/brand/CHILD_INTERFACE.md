@@ -74,3 +74,7 @@ Early learning uses generous illustrated answer targets, spoken prompts, replay 
 ## Early learner journeys
 
 Early activities offer pictured answers, audio replay, mute, a declared grown-up reading option and large tap targets. Children can select and undo story tiles without dragging. A printed decoding target stays visible and silent. A tap before instruction delivery leaves the attempt open. Use the shared Spark and owned-Pal art in the creation handoff. In the scene editor, a child can add direction blocks by tapping. On narrow phones Code and Play share the workspace through adjacent controls. Expand or use fullscreen to work with either view.
+
+A young profile starting one of the retained native games hears a short first action after browser activation. Replay and mute appear with game tools. Opening a checkpoint stops the previous instruction. Leaving play or switching profiles disposes its reader. The handoff and scene introduction also respect that profile’s early-learning mute choice.
+
+In the graphical editor, Jump and Dance display existing Spark poses with their direction or music symbols. Focus motion respects the device’s reduced-motion preference. Empty sets use a framed empty group. Objects in nonempty sets have individual picture descriptions so a screen reader can enumerate them.

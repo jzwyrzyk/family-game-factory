@@ -1,3 +1,4 @@
+import {earlySoundMuted} from '../learning/early/audio';
 import {profileGrade} from '../learning/engine';
 import {isEarlyGrade,withinGrade} from '../learning/grades';
 import { SceneEngine, type SceneSnapshot } from './engine';
@@ -39,6 +40,17 @@ const node = <K extends keyof HTMLElementTagNameMap>(tag: K, className = '', tex
 const iconNode = <K extends keyof HTMLElementTagNameMap>(tag: K, className: string, icon: IconName, text: string, iconClass = '') => {
   const element = node(tag, className); setIconLabel(element, icon, text, iconClass); return element;
 };
+function commandSymbol(type:string,mark:string){
+  const symbol=node('span','creation-command-symbol',mark);
+  symbol.setAttribute('aria-hidden','true');
+  if(type==='jump'||type==='dance'){
+    symbol.classList.add('creation-action-pose','creation-pose-'+type);
+    const art=document.createElement('img');art.alt='';art.draggable=false;
+    art.src=new URL('jems-art/character_spark_'+(type==='jump'?'celebrate':'wave')+'.webp',document.baseURI).href;
+    symbol.append(art);
+  }
+  return symbol;
+}
 const clone = <T>(value: T): T => structuredClone(value);
 const uid = () => crypto.randomUUID();
 const palette = [
@@ -291,7 +303,7 @@ export function installCreationStudio(host: Host) {
     $<HTMLButtonElement>('creationRun').disabled=false;$<HTMLButtonElement>('creationVideo').disabled=false;$<HTMLButtonElement>('creationDownload').disabled=false;
     if (loaded.project.challengeId && !challengeId) status('This scene’s original challenge is no longer available. You can still edit and keep your scene.');
     $<HTMLInputElement>('creationTitle').value = scene.title; freshEngine(); renderEditor(); renderBrief(); renderSource(); renderGuide(challengeId ? 'practice' : 'scene'); updateUndo();
-    if(isEarlyGrade(profileGrade(FG.store.current()))&&navigator.userActivation?.hasBeenActive)sceneReading.button.click();
+    if(isEarlyGrade(profileGrade(FG.store.current()))&&!earlySoundMuted(owner())&&navigator.userActivation?.hasBeenActive)sceneReading.button.click();
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
   function enter() { if (!host.enter()) return false; visible = true; page.classList.remove('hidden'); startCheckpointTimer(); return true; }
@@ -647,7 +659,7 @@ export function installCreationStudio(host: Host) {
       const edit = node('button', 'creation-block-summary'); edit.type = 'button'; edit.dataset.editBlock = block.id;
       edit.setAttribute('aria-expanded', String(expanded)); edit.setAttribute('aria-label', `Change ${metadata.label} action`);
       const direction=block.type==='move'?simpleMove(block)?.direction:undefined;
-      edit.append(node('span','creation-step-number',String(index+1)),node('span','creation-command-symbol',direction?directions[direction]:metadata.icon),node('span','creation-block-name',metadata.label), node('span', 'creation-block-description', firstStepsSummary(block)));
+      edit.append(node('span','creation-step-number',String(index+1)),commandSymbol(block.type,direction?directions[direction]:metadata.icon),node('span','creation-block-name',metadata.label), node('span', 'creation-block-description', firstStepsSummary(block)));
       edit.onclick = () => { expandedBlockId = expandedBlockId === block.id ? '' : block.id; renderPrograms(); page.querySelector<HTMLElement>(`[data-edit-block="${CSS.escape(block.id)}"]`)?.focus({ preventScroll: true }); };
       head.append(edit);
       const controls = node('span', 'creation-block-tools');
@@ -728,7 +740,7 @@ export function installCreationStudio(host: Host) {
     const b = node('button', 'creation-palette-block block-' + item.group); b.type = 'button'; if(!direction||direction==='right')b.dataset.addBlock=item.type;
     if(direction)b.dataset.moveDirection=direction;
     const label=direction?'Move '+direction:item.label;
-    b.setAttribute('aria-label',label);b.title=label;b.append(node('span','creation-command-symbol',direction?directions[direction]:item.icon),node('b','',direction?direction[0].toUpperCase()+direction.slice(1):label));
+    b.setAttribute('aria-label',label);b.title=label;b.append(commandSymbol(item.type,direction?directions[direction]:item.icon),node('b','',direction?direction[0].toUpperCase()+direction.slice(1):label));
     b.onclick = () => act(() => {
       mutation(project => {
         if (!selectedProgram) { const program = { id: uid(), actorId: selectedActor, trigger: { type: 'start' as const }, actions: [] as CreationBlock[] }; project.programs.push(program); selectedProgram = program.id; insert = { programId: program.id }; }
