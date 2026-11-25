@@ -26,7 +26,7 @@ export function betaHosting(directory:string,config:BetaConfig,previewOrigin:str
   if(inPlay)res.setHeader('Referrer-Policy','strict-origin');
   res.setHeader('Content-Security-Policy',inPlay?
    `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: data:; worker-src 'self' blob:; connect-src 'self'; frame-src ${previewOrigin}; frame-ancestors 'none'; form-action 'self' ${previewOrigin}; object-src 'none'; base-uri 'none'`:
-   "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
+   "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
   if(c.guardianTool&&path==='/entry/export-device.js')return file(res,'entry/household-vault.js');
   if(c.administrator){
    if(path==='/manage')return html(res,page('Family administration','<h1>Family administration</h1><div id="console"></div>',{script:'/manage/client.js'}));
