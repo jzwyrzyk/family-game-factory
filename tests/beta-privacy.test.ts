@@ -71,3 +71,16 @@ test('scheduled reconciliation clears expired server coaching replies for an idl
  const receipts=(await repo.snapshot()).coachReceipts!;
  assert.equal(receipts.length,2);assert.equal(receipts[0].reply,undefined);assert.equal(receipts[1].reply?.text,'fixture');
 });
+
+test('local-only family work cannot become a server-side creative record',async()=>{
+ const {JobService}=await import('../server/pipeline/service'),{MockAgent}=await import('../server/testing/mock-agent');
+ const {defaults}=await import('../src/runtime/manifests');
+ const {d,enroll}=await betaFixture(),family=await enroll('local-creations'),repo=d.repository(family.id);
+ const session=(await requirePlay(d,family.id,family.cookies,fixtureKey,'check')).session;
+ const service=new JobService(repo,new MockAgent(),{test:async()=>{}});
+ const original=randomUUID();
+ await repo.transaction(s=>s.revisions.push({id:original,familyId:family.id,projectId:original,parentId:null,game:{kind:'star-catcher-v1',target:3,seconds:15}}));
+ await assert.rejects(service.registerBase(session,{gameId:'moon',localRevisionId:'local-seed',config:defaults('moon')}),/GUARDIAN_CONSENT_REQUIRED/);
+ await assert.rejects(service.fork(session,original,'Workshop copy'),/GUARDIAN_CONSENT_REQUIRED/);
+ assert.equal((await repo.snapshot()).revisions.length,1);
+});
