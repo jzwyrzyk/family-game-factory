@@ -101,6 +101,7 @@ export class JobService {
   return this.repo.transaction(s=>{
    assertActiveTrustedDevice(s,session);
    if(this.options.adultPilotMode?!adultPilotAllowed(s,session):!!(session.adultSessionId||session.adultProfileId))throw Error('ADULT_PILOT_ACCESS_REQUIRED');
+   if(s.betaScopes&&!verifiedParentScope(s,session.familyId,'generation'))throw Error('GUARDIAN_CONSENT_REQUIRED');
    const scope=session.adultProfileId?`${session.familyId}:${session.adultProfileId}`:session.familyId;
    const id='seed-'+createHash('sha256').update(scope+':'+r.localRevisionId).digest('hex'),existing=s.revisions.find(x=>x.id===id);
    if(existing){requireResourceAudience(s,session,existing);if(JSON.stringify(existing.config)!==JSON.stringify(config))throw Error('IDEMPOTENCY_CONFLICT');}
@@ -287,6 +288,7 @@ export class JobService {
    const source=s.revisions.find(r=>r.id===id&&r.game);if(!source)throw Error('NOT_FOUND');requireResourceAudience(s,session,source);
    if(requestId){const prior=s.revisions.find(r=>r.copyRequestId===requestId&&r.familyId===source.familyId&&r.adultPilotProfileId===source.adultPilotProfileId);
     if(prior){requireResourceAudience(s,session,prior);if(prior.sourceRevisionId!==id||prior.name!==name.trim())throw Error('IDEMPOTENCY_CONFLICT');return {revisionId:prior.id};}}
+   if(s.betaScopes&&!verifiedParentScope(s,session.familyId,'generation'))throw Error('GUARDIAN_CONSENT_REQUIRED');
    const revision={...source,id:uuid(),projectId:uuid(),parentId:null,sourceRevisionId:source.id,name:name.trim(),copyRequestId:requestId};s.revisions.push(revision);s.active[revision.projectId]=revision.id;return {revisionId:revision.id};
   });
  }

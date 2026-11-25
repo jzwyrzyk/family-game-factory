@@ -12,7 +12,7 @@ export function verifyBuild(build,record,source,image,trigger){
  const resolved=git?.revision??provenance?.resolvedRepoSource?.commitSha;
  const repository='https://github.com/jzwyrzyk/family-game-factory';
  const bound=git ? [repository,repository+'.git'].includes(git.url) :
-  trigger?.id===record.trigger&&trigger?.github?.owner==='jzwyrzyk'&&trigger?.github?.name==='family-game-factory';
+  provenance?.resolvedRepoSource?.repoName==='github_jzwyrzyk_family-game-factory'&&trigger?.id===record.trigger&&trigger?.github?.owner==='jzwyrzyk'&&trigger?.github?.name==='family-game-factory';
  requireState(bound,'Verified build repository provenance required.');
  requireState(resolved===source&&build.substitutions?.REPO_FULL_NAME==='jzwyrzyk/family-game-factory','Build source does not match the reviewed repository and commit.');
  requireState(build.results?.images?.some(i=>i.name.replace(/:[^/:]+$/,'')+'@'+i.digest===image),'Build output digest differs from the reviewed image.');
