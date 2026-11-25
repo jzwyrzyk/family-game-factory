@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T18:16:02.770Z",
-      "sourceDigest": "db4335d97b37dd6fe65cacd06c129b38bd120955bf3187df7c268f5d56f985c3",
-      "reviewOutcome": "updated",
-      "reviewReason": "Documented My Creations entry/cards, readable moved controls and shared native-host restoration; desktop and phone saved-variant journeys passed.",
+      "reviewedAt": "2026-11-25T00:47:28.656Z",
+      "sourceDigest": "073e73457b64f67b9150838658fc01771bdf34d0b72d420953c03a9abe4ef978",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The new private game-balance error uses the existing saved-game recovery surface. Navigation, child copy and availability for other audiences retain their existing contracts.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -675,10 +675,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T14:41:57.748Z",
-      "sourceDigest": "cb61afbc5c3fabd5edbfea8848b8dcc04ef11de5b4af798554270944eb3fb562",
+      "reviewedAt": "2026-11-25T00:47:29.307Z",
+      "sourceDigest": "1b3859e5f2fd331ed8b3cb442cbb85e38426813a814283e9774d64d526bd3c35",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the default-off Adult Private policy, existing status/job API diagnostics and private claim header against gateway admission and OpenAPI. Invalid premium settings preserve saved-revision/service routes. Architecture and premium contract separate configured, active and observed provider states; no credential, endpoint or live service change.",
+      "reviewReason": "Architecture now describes transactional shared game reservations and the independent monthly family limit.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -728,10 +728,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T21:03:59.475Z",
-      "sourceDigest": "a7748aa2cc821639c57f194a3393e9938b763f708217921d7acfd51afc79fb2f",
+      "reviewedAt": "2026-11-25T00:47:29.606Z",
+      "sourceDigest": "81ca1b66af75252f75c837aa1fa517b9eb39380f25026678ae5c3a699834939c",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed atomic normal-motion evidence sampling after the offline paused-frame race; preserved source/frame/state identities and originals, and explicitly retained production eight-image policy and paid serial/full-job behavior.",
+      "reviewReason": "Premium contract and decision document fresh Build, later edit and repair reservations, historical lineage and actual settlement.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -824,10 +824,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "ee30422a65cfbeff27ec88eb03a1bc4b9d25de6034ed1012e09cbbff664b847b",
-      "reviewedAt": "2026-11-24T20:54:52.440Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reconciled merged DEV TEST rollout guidance with premium Adult Private approval and saved-reader preservation; no child scope, grants, provider retention or authorization policy changes.",
+      "sourceDigest": "a97496e41e30005f51186703ac211da62c7d93fb34bafd4e0102bd481ef8e69a",
+      "reviewedAt": "2026-11-24T23:12:38.569Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Inspected gateway and service gates: trusted device, adult grant and privacy checks precede the new ceiling; no new profile or data access.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T21:04:00.001Z",
-      "sourceDigest": "98447857529890e9cbb50fe3661a63b4f4c487a4c3257304148cee1263d19186",
-      "reviewOutcome": "updated",
-      "reviewReason": "Verified final offline adversarial matrix detects 15 broken sessions with three working controls, keeps 108 original PNG identities and compares full/lossy sheets; recorded clean hosted image actual-byte and legacy/premium proof without claiming gVisor/provider acceptance.",
+      "reviewedAt": "2026-11-25T00:47:29.942Z",
+      "sourceDigest": "9bf8fbce6f1bca385b1684d2895dcac69d78f6212e1d20e24244f3e4b4de14ea",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Existing premium and unit commands cover concurrent fork edits, actual settlement across revisions, pass-sized art and repair holds, and conservative unknown usage. CI selection and release evidence rules stay in place.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
