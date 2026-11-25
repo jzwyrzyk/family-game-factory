@@ -140,7 +140,7 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    const reason=e instanceof Error?e.message:'';
    const status=reason==='NOT_FOUND'||reason==='FAMILY_UNAVAILABLE'?404:
     ['PLAY_REQUIRED','UNAUTHENTICATED'].includes(reason)?401:['RATE_LIMIT','PARENT_LOCKED'].includes(reason)?429:
-    /^(FORBIDDEN|ADMIN_REQUIRED|INVALID_(PARENT_ACCESS|INVITATION)|.*_REQUIRED|FAMILY_ACCESS_PAUSED|INVITATIONS_PAUSED|INVALID_LIFECYCLE)$/.test(reason)?403:
+    /^(FORBIDDEN|ADMIN_REQUIRED|INVALID_(PARENT_ACCESS|INVITATION)|.*_REQUIRED|FAMILY_ACCESS_PAUSED|INVITATIONS_PAUSED|INVALID_LIFECYCLE|DELETION_PENDING)$/.test(reason)?403:
     /^(INVALID_|BETA_CAPACITY|RECEIPT_REUSED|REQUEST_PENDING)/.test(reason)?400:503;
    json(res,status,{errorCode:status===503?'SERVICE_UNAVAILABLE':reason});
   }

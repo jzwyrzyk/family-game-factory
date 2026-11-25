@@ -43,3 +43,17 @@ test('protected household preview binds the original workspace, active owner dev
   assert.equal(await deliver(cfg.appOrigin),403);
  }finally{server.closeAllConnections();await new Promise<void>(ok=>server.close(()=>ok()));}
 });
+
+test('a pending erasure holds access and preserves permanent revocation',async()=>{
+ const {d,enroll,mutate}=await betaFixture();
+ for(const revoked of [false,true]){
+  const family=await enroll('erasure-'+revoked);
+  if(revoked)await mutate('revoke',family.id);
+  await mutate('request-deletion',family.id);
+  const state=()=>d.withFamily(family.id,async(_tx,f)=>f);
+  assert.equal((await state()).status,revoked?'revoked':'suspended');
+  for(const action of ['resume','recover'])await assert.rejects(mutate(action,family.id),/DELETION_PENDING/);
+  await mutate('confirm-deletion',family.id,{requestId:(await state()).request!.id,receipt:'confirmed-deletion-'+revoked});
+  assert.equal((await state()).status,'revoked');
+ }
+});
