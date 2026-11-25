@@ -1,3 +1,4 @@
+import {earlySoundMuted} from '../learning/early/audio';
 import {setIconLabel} from '../brand/icons';
 import {createReadAloudControl} from '../speech/read-aloud-control';
 import {createPalPortrait,type PalsViewState} from '../pals/ui';
@@ -24,6 +25,6 @@ export function createEarlyHandoff(parent:()=>void,play:()=>void,code:()=>void,p
   if(active)art.replaceChildren(createPalPortrait(active.id,active.stage,'','neutral',true));
   else {const image=document.createElement('img');image.src=new URL('jems-art/character_spark_wave.webp',document.baseURI).href;image.alt='';art.replaceChildren(image);}
   if(!dialog.open)dialog.showModal();
-  if(navigator.userActivation?.hasBeenActive)reader.button.click();
+  if(!earlySoundMuted(owner())&&navigator.userActivation?.hasBeenActive)reader.button.click();
  };
 }

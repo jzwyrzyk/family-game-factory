@@ -7,9 +7,9 @@ function frame(className:string) {
  const node=document.createElement('span');node.className=className;return node;
 }
 function group(n:number,object:string) {
- const node=frame('early-group');node.setAttribute('role','img');node.setAttribute('aria-label',`${n} ${object} pictures`);
- for(let i=0;i<n;i++){const image=picture(object);image.alt='';node.append(image);}
- if(n===0)node.textContent='0';
+ const node=frame('early-group');
+ for(let i=0;i<n;i++)node.append(picture(object));
+ if(n===0){node.classList.add('early-empty-group');node.setAttribute('role','img');node.setAttribute('aria-label','Empty group');}
  return node;
 }
 function visual(value:string,object:string){

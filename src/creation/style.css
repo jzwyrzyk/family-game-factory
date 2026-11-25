@@ -324,3 +324,13 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
  #page-creation .creation-palette-block .creation-command-symbol{font-size:23px;line-height:1}
  #page-creation .creation-palette-block>b{font-size:18px;line-height:1.05;white-space:nowrap}
 }
+
+.creation-action-pose img{display:none}
+[data-graphical=true] .creation-action-pose{position:relative;display:inline-block;width:1.1em;height:1em;text-align:right}
+[data-graphical=true] .creation-action-pose img{display:block;position:absolute;left:-.15em;bottom:0;width:1em;height:1em;object-fit:contain;pointer-events:none}
+@media(prefers-reduced-motion:no-preference){
+ [data-graphical=true] button:focus-visible .creation-pose-jump img{animation:creation-small-hop .55s ease-out}
+ [data-graphical=true] button:focus-visible .creation-pose-dance img{animation:creation-small-dance .6s ease-in-out}
+ @keyframes creation-small-hop{50%{transform:translateY(-20%)}}
+ @keyframes creation-small-dance{35%{transform:rotate(-12deg)}70%{transform:rotate(12deg)}}
+}

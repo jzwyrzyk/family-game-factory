@@ -143,10 +143,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:11:52.744Z",
-      "sourceDigest": "a406cc00d0d419c26e60d03d106cf6db4676876a97cb2b2458e12a8549b5c5b4",
+      "reviewedAt": "2026-11-25T02:09:44.110Z",
+      "sourceDigest": "17c4fa9cace49f73718df0e43de278fc4a9ac40d938ac605caa0d22c72963cac",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed grade-based coding presentation, saved scene compatibility and four additional bounded path challenges against the Creation Studio contract and child interface.",
+      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T04:08:54.672Z",
-      "sourceDigest": "28cb322dd37584f756e4f2473c441b935b31ce428fc1dbf140a3e9890ee5604c",
+      "reviewedAt": "2026-11-25T02:09:44.215Z",
+      "sourceDigest": "f7e68329f9fa5f777aa383ac4bed0b1adc2c58b15943e91189c5552ea9537ae3",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the foundational grade eligibility and backup controls against the preceding integration stage.",
+      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -406,10 +406,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "97666e5fc0ee8739084b067d633b59636bea4f83e6823ae39e5639f3aaf1d39d",
-      "reviewedAt": "2026-11-25T01:55:08.991Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Integrate the compact First steps controls into the young learner journey without altering its parent approval or evidence contracts. Existing operational procedures and acceptance commands still apply to this change.",
+      "sourceDigest": "2d596e7af62766c696ddb6480a4d2169a9526b522d7c5bd8a0c6a126cc72a15a",
+      "reviewedAt": "2026-11-25T02:09:44.619Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -494,9 +494,9 @@
       ],
       "reviewAfterDays": 30,
       "sourceDigest": "f15af69b31bfd284f39b6445eb53eff516a602bef7cac1202eb0aa27655f93e2",
-      "reviewedAt": "2026-11-25T04:08:55.066Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the foundational grade eligibility and backup controls against the preceding integration stage. Existing operational procedures and acceptance commands still apply to this change.",
+      "reviewedAt": "2026-11-25T01:57:27.874Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed imported grade holds, two-subject game playback, responsive coding controls, natural checkpoint and authorized restore paths in integrated verification.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -641,10 +641,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:48:55.165Z",
-      "sourceDigest": "0d4d853b038b9b8b627bc1ec5c0a6a792b0a0593de5e850a01f069cc5ce37c8b",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The illustrated family handoff and parent evidence remain compatible with the new math sorting and picture responses. Existing operational procedures and acceptance commands still apply to this change.",
+      "reviewedAt": "2026-11-25T02:09:44.693Z",
+      "sourceDigest": "8dfd020d7abadd0b6d39efa2a39e264d8fd8091d4d3a074b62136c2b2b392fec",
+      "reviewOutcome": "updated",
+      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -824,10 +824,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "03686c7668d00ce04c830f3d085ffb91c3b991baaa0edc5bfda4bd0cc9d226aa",
-      "reviewedAt": "2026-11-25T01:37:11.629Z",
+      "sourceDigest": "d320ffa0ba7ec6354e5d7da2e22adad9ab88cdf4cf4d6404b3f730795ce37128",
+      "reviewedAt": "2026-11-25T01:44:10.317Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage.",
+      "reviewReason": "Verified early-grade host and speech behavior with synthetic family sessions, eight native games, a live isolated fixture and five browser viewports.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:48:55.223Z",
-      "sourceDigest": "7dcb0781d9ed94a6c35c97a8fa643ba5908a34785cb24882ff85a21922975950",
+      "reviewedAt": "2026-11-25T02:09:44.753Z",
+      "sourceDigest": "a90e14b4f5647a1eae7cc76c63b5cb8f572bf7c2d450a02e396620e7712345f4",
       "reviewOutcome": "updated",
-      "reviewReason": "The illustrated family handoff and parent evidence remain compatible with the new math sorting and picture responses.",
+      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1126,10 +1126,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T21:04:00.637Z",
-      "sourceDigest": "8b90caceaf316bd524c2af26e758dec86f03eb531bf59bf80f662f90d445477e",
+      "reviewedAt": "2026-11-25T01:57:28.126Z",
+      "sourceDigest": "f40e66eea0ae9d57af85629f89644fd1a6b5b22d74fb91d4db189f4452632925",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded source-specific local trials, standalone artifact hashes and downloaded clean hosted image evidence; preserved superseded run scope, current main production records and all external activation gates.",
+      "reviewReason": "Reviewed imported grade holds, two-subject game playback, responsive coding controls, natural checkpoint and authorized restore paths in integrated verification.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

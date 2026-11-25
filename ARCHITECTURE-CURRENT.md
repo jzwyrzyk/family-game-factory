@@ -423,3 +423,7 @@ This foundation does **not** establish a complete isolated TEST backend/private 
 ## Early learner development stack
 
 The ordered grade table in `src/learning/grades.ts` encodes Pre-K as -1, Kindergarten as 0, and Grades 1–4 with their original numbers. Missing historical grade uses the existing Grade 1 default. The two new grade choices are exposed in the named synthetic early-preview build. Parent saves recheck the trusted gateway's existing same-family, same-device parent authorization before changing local state. Detailed decisions and release dependencies are tracked in the [early learning decision](docs/decisions/2026-11-25-early-learning.md).
+
+### Early-preview verification
+
+The host accepts an illustrated picture-order response against the reviewed event sequence. The response records listening comprehension. For early movement challenges an optional direction choice and the bounded run’s first observed direction are stored on the saved revision’s check. Both fields are absent on historical checks. See the [synthetic acceptance guide](docs/evidence/early-learning/README.md).

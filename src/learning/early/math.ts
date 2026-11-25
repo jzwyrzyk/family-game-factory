@@ -134,7 +134,7 @@ export function earlyMathItem(skill:SkillDefinition,tier:number,seed:number):Mat
  return {id:`${skill.id}:early1:${(signature>>>0).toString(36)}`,skill:skill.title,skillId:skill.id,grade:skill.grade,tier,question,answer,answerKind:'choice',
   choices:choices.map(value=>({value,label:value})),representation:topic==='numeral'||topic==='compare-numeral'?'symbolic':'visual',
   parameters:{seed,style,prompt,n,object,layout,b},hints:[{text:'Look at one picture at a time.'},{text:'Compare each choice with the question.'},{text:'Try making the group or shape with your hands.'}],
-  workedExample:`The matching answer is ${answer}. Try it together.`};
+  workedExample:style==='sort'?'Choose each picture that matches the example. Leave the other pictures in place.':`The matching answer is ${answer}. Try it together.`};
 }
 export function validEarlyMath(item:MathItem,skill:SkillDefinition):boolean {
  const seed=item.parameters?.seed;
