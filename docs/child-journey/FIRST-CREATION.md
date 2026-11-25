@@ -117,3 +117,5 @@ After readiness and explicit Build, retain pending/accepted/unknown-state checks
 The [initial-request unit tests](../../tests/build-submission-recovery.test.ts) and [browser fixtures](../../tests/build-submission-recovery-browser.cjs) additionally exercise save-before-POST, lost acknowledgement and empty lookup after reload, failed acknowledgement/Ready candidate saves, exact identity and profile isolation, newer-draft preservation and recovery without a second initial POST. An authorized HTTP lookup must leave dispatch, provider and allowance state unchanged.
 
 Record the tested source and actual results in delivery evidence. Browser fixtures and responsive screenshots do not establish real-provider operation, physical-device reliability, child comprehension, enjoyment, or learning gains.
+
+The first Build gesture reserves the current idea before awaiting its draft write or readiness check. Repeated taps during that work share the existing attempt. After admission, the durable pending-submission record and acknowledgement checks govern recovery. Leaving the idea during a draft save cancels the unsent correction.

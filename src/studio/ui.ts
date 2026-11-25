@@ -1690,16 +1690,23 @@ export async function installStudio(){
  $('studioCopy').onclick=()=>{if(guardMath())return;stopSpeech();++viewIntent;if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;} $<HTMLInputElement>('studioCopyName').value=current().name+' copy';$<HTMLDialogElement>('studioCopyDialog').showModal();$('studioCopyName').focus();};$('studioCopyCancel').onclick=()=>$<HTMLDialogElement>('studioCopyDialog').close();$<HTMLDialogElement>('studioCopyDialog').addEventListener('close',()=>{if(route==='studio'&&!FG.learning.active)focusView($('studioCopy'));});
  $('studioCopyForm').onsubmit=e=>{e.preventDefault();act(()=>copyGame($<HTMLInputElement>('studioCopyName').value.trim()));};
  $('studioPromptForm').onsubmit=e=>{e.preventDefault();$('studioTalk').click();};
+ const firstBuildActions=new Set<string>();
  $('studioSend').onclick=()=>act(async()=>{
   if(young()){await handOff();return;}
   if(guardMath()||coaching?.busy()||saving)return;
   const s=current(),creating=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
-  // Existing games retain submit()'s local-edit path while a remote test runs.
-  if(creating&&(sending.has(s.id)||busy(s)||s.pendingSubmission||unknownJobs.has(s.id)||needsReadyRecovery(s)))return;
-  if(creating&&$<HTMLTextAreaElement>('studioPrompt').value.trim()){
-   stopSpeech();await flushDraft();await coaching?.discuss('discuss');return;
-  }
-  await submit();
+  // Reserve this first-build gesture before any async storage or coach work.
+  // Once admitted, the builder owns its usual pending-submission guard.
+  if(!creating){await submit();return;}
+  if(firstBuildActions.has(s.id)||sending.has(s.id)||busy(s)||s.pendingSubmission||unknownJobs.has(s.id)||needsReadyRecovery(s))return;
+  firstBuildActions.add(s.id);
+  try{
+   if($<HTMLTextAreaElement>('studioPrompt').value.trim()){
+    const started=epoch;
+    stopSpeech();await flushDraft();
+    if(sameView(s,started))await coaching?.discuss('discuss');
+   }else await submit();
+  }finally{firstBuildActions.delete(s.id);}
  });
  continueChat.onclick=()=>act(async()=>{
   if(guardMath())return;

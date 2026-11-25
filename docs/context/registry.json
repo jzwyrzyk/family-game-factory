@@ -146,10 +146,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:29:02.401Z",
-      "sourceDigest": "79e9842fb80352579fc9b967a0d1f48db36a41d3414b2df6e6c34f7921646967",
+      "reviewedAt": "2026-11-25T23:38:12.735Z",
+      "sourceDigest": "6925af7797920346bfc5542e781245e8f039124dca019a6962d867f334a2a400",
       "reviewOutcome": "updated",
-      "reviewReason": "The child doctrine now specifies small-phone starter reach and accessible contrast on secondary pages.",
+      "reviewReason": "The first-creation contract now records single admission for repeated taps without changing saved-idea ownership or readiness rules.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -310,10 +310,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:28:28.349Z",
-      "sourceDigest": "f4344e9174fbac6de912f2d6a7ed0fefc46893dbb0acc5ebd3b5ed1312d63395",
+      "reviewedAt": "2026-11-25T23:37:55.191Z",
+      "sourceDigest": "9fc46a601c3012b0fd13afe7231ff32b111837e443a734f47bfa672e1a5056ce",
       "reviewOutcome": "updated",
-      "reviewReason": "The shared header and phone starter rows are documented in the child interface doctrine. Reviewed Notifications contrast and Powers mobile navigation placement.",
+      "reviewReason": "The first-creation contract records the per-idea Build gesture guard across async storage and review. Shared headings and navigation still use the guarded host routes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -891,10 +891,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:28:29.508Z",
-      "sourceDigest": "460a8ffcc6b9a4d964bf947a6747c0a3ddce5b44359f365ccf4fa6e864bb50ce",
+      "reviewedAt": "2026-11-25T23:37:56.486Z",
+      "sourceDigest": "a57592eb6fa2f44a34805323cd171aec8de5a81040406a49a9299de4de6e8b80",
       "reviewOutcome": "updated",
-      "reviewReason": "The matched-viewport browser suite now verifies both starter actions fit on phones, and archive tests explicitly enumerate the reviewed files.",
+      "reviewReason": "The indexed storage fixture waits for its own shelf. Intentional attempts to leave active learning continue to verify denial; the guided fixture sends rapid Build gestures.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
