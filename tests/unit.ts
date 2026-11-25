@@ -1,3 +1,4 @@
+import './household-generated-recovery.test';
 import './storage-generated-recovery.test';
 import './storage-cloud-recovery.test';
 import './storage-sync.test';

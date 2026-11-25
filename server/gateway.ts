@@ -21,6 +21,8 @@ import {PrivateNarrationBridge} from './coach/private-narration-bridge';
 import {coachConfig,coachHandler} from './coach/http';
 import {GcsPrivateArtifacts} from './storage/artifacts';
 import {artifactEncoding} from './storage/encoding-policy';
+import {createHouseholdRecovery,type HouseholdRecoveryConfig} from './storage/household-recovery';
+import {FirestoreBackupScheduleLedger} from './storage/recovery-scheduler';
 import {createServer} from 'node:http';
 import {loadGatewayConfig} from './private-config';
 import {startBootstrap} from './bootstrap';
@@ -52,6 +54,7 @@ export interface GatewayConfig {
  /** Optional private identity-authenticated coach executor URL, never the OpenAI API URL. */
  coachPrivateOrigin?:string;
  storageEncoding?:'private-game-v2';
+ householdRecovery?:HouseholdRecoveryConfig['householdRecovery'];
 }
 export function paidExecutionAllowed(configActive:boolean,approvalFlag:string|undefined){return configActive&&approvalFlag==='true';}
 /** An explicitly requested but unavailable pilot must never select legacy code generation. */
@@ -65,6 +68,7 @@ export function approvedPremiumPilot(config:GatewayConfig,requested:boolean,adul
 }
 export async function createGateway(config:GatewayConfig,tenantRepo?:Repository){
  const encoding=artifactEncoding(config);
+ if(config.householdRecovery&&(typeof config.householdRecovery.enabled!=='boolean'||config.householdRecovery.enabled&&(tenantRepo||platformMode(config.platformMode)!=='HOUSEHOLD'||!config.householdPrivateHost||!config.projectId||!config.artifactBucket||config.localFile||config.appOrigin!==config.gatewayOrigin)))throw Error('HOUSEHOLD_RECOVERY_CONFIG_REQUIRED');
  if((platformMode(config.platformMode)==='PRIVATE_FAMILY_BETA')!==!!tenantRepo)throw Error('BETA_GATEWAY_REQUIRED');
  for(const origin of [config.appOrigin,config.gatewayOrigin,config.previewOrigin]){const url=new URL(origin);if(url.origin!==origin||url.protocol!=='https:')throw Error('HTTPS_ORIGINS_REQUIRED');}
  if(new URL(config.previewOrigin).hostname===new URL(config.appOrigin).hostname||new URL(config.previewOrigin).hostname===new URL(config.gatewayOrigin).hostname)throw Error('SEPARATE_PREVIEW_HOST_REQUIRED');
@@ -118,10 +122,19 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
    coachTarget?new PrivateNarrationBridge(coachTarget):offlineNarration),{appOrigin:config.appOrigin,sessionKey:config.sessionKey},repo);
  const api=apiHandler(service,http,repo),sessions=sessionHandler(repo,{hostCookies:!!config.householdPrivateHost,appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey}),trusted=trustedDeviceHandler(repo,{appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey,adultPilot:adult,firstParty:!!tenantRepo,hostCookies:!!config.householdPrivateHost,eraseCoachReceipts:session=>coachService.eraseFamilyReceipts(session)});
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
+ const householdRecovery=(()=>{
+  if(!config.householdRecovery?.enabled)return undefined;
+  const db=new Firestore({projectId:config.projectId}),store=firestoreStore(db),artifacts=new GcsPrivateArtifacts(config.artifactBucket!,config.workspace);
+  return createHouseholdRecovery(config,store,artifacts,(audience,authorize)=>new FirestoreBackupScheduleLedger(db,config.workspace,audience,{
+   put:async(bytes,options)=>{await store.run(authorize,true);return artifacts.put(bytes,options);},
+   get:async ref=>{await store.run(authorize,true);return artifacts.get(ref);}
+  },async tx=>authorize({get:async<T>(path:string)=>{const row=await tx.get(db.doc(path));return row.exists?row.data() as T:undefined;}})));
+ })();
  return {service,repo,coordinator,handler:async(req:Parameters<typeof api>[0],res:Parameters<typeof api>[1])=>{
   const url=new URL(req.url!,config.gatewayOrigin);
   if(url.pathname==='/health'){res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','no-store');try{await repo.snapshot();res.end(JSON.stringify({ready:true,paidExecution:paidEnabled}));}catch{res.statusCode=503;res.end(JSON.stringify({ready:false,paidExecution:false}));}return;}
   if(url.pathname.startsWith('/preview/')){res.writeHead(403);res.end('Separate preview origin required');return;}
+  if(url.pathname==='/v1/recovery/adult/mappings'||url.pathname.startsWith('/v1/recovery/generated/')){if(householdRecovery)await householdRecovery.handler(req,res);else{res.writeHead(503,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:'GENERATED_RECOVERY_DISABLED'}));}return;}
   if(url.pathname.startsWith('/v1/worker/')){await worker(req,res);queueMicrotask(()=>{void coordinator.tick().catch(()=>{});});return;}
   if(url.pathname==='/v1/internal/dispatch'){
    try{if(req.method!=='POST'||!config.schedulerEmail)throw Error();const token=req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];if(!token)throw Error();const {payload}=await jwtVerify(token,schedulerKeys,{issuer:['https://accounts.google.com','accounts.google.com'],audience:config.gatewayOrigin,algorithms:['RS256']});if(payload.email!==config.schedulerEmail||payload.email_verified!==true)throw Error();await reconcilePaidReceipts(repo);await coordinator.tick();res.writeHead(204);res.end();}catch{res.writeHead(403);res.end();}return;
