@@ -143,10 +143,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T18:16:02.638Z",
-      "sourceDigest": "a2b674e124a188be2d394f5c77895271de95374fc3b21b6cd2d67d403951ceff",
+      "reviewedAt": "2026-11-25T00:50:44.560Z",
+      "sourceDigest": "232805c17ba41fd57b28d6b5489dfda6ee9f771fdc3d34fd62f1980866440f45",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner-specific retained-game placement and cutover retention exception in a decision; general preserve-work doctrine is unchanged.",
+      "reviewReason": "The November 25 child-interface standard and decision replace the stage-first dock with responsive stage and code proportions. The child still owns each authored action and explicit Keep.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -406,10 +406,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "046b2da4d3be2a0b8803de7689f7ac8daff903cc1c25a9e8ce18f26418dee6c3",
-      "reviewedAt": "2026-11-23T18:16:03.267Z",
+      "sourceDigest": "eb6193e0977d8af435af318e449eeaabe8be15f99708b7efc679a5aad7c6d7ae",
+      "reviewedAt": "2026-11-25T00:50:44.900Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated shared architecture for retained saved-variant routing; scene/art ownership, revision data and creation authority remain unchanged.",
+      "reviewReason": "The Creation Studio contract and acceptance table specify the six reachable actions, pane sizing, compact view and tool controls, whole-pane scrolling and revised fitted-stage floors.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T21:04:00.001Z",
-      "sourceDigest": "98447857529890e9cbb50fe3661a63b4f4c487a4c3257304148cee1263d19186",
+      "reviewedAt": "2026-11-25T00:50:45.093Z",
+      "sourceDigest": "2443e06d67577b9ff8593cc949344fa32e5a448fa223452d32210f1a274de91b",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified final offline adversarial matrix detects 15 broken sessions with three working controls, keeps 108 original PNG identities and compares full/lossy sheets; recorded clean hosted image actual-byte and legacy/premium proof without claiming gVisor/provider acceptance.",
+      "reviewReason": "The acceptance record maps eight production-build viewport captures to ancestor-clipped hit testing, coordinate input, physical gestures in Chromium emulation, zoom, rotation and fullscreen recovery.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
