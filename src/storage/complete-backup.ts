@@ -7,6 +7,7 @@ import {CREATION_KEY} from '../creation/storage';
 import {captureCreationRecovery,mergeCreationRecovery,restoreCreationRecovery,creationSnapshotsOf,type CreationRecoverySnapshot} from './creation-recovery';
 import {captureNotebookRecovery,mergeNotebookRecovery,restoreNotebookRecovery,notebookSnapshotsOf,type NotebookRecoverySnapshot} from './notebook-recovery';
 import {activeRig} from '../drawing/store';
+import {artDatabase} from '../drawing/library';
 import {captureNativeRecovery,mergeNativeRecovery,restoreNativeRecovery,nativeSnapshotsOf,type NativeRecoverySnapshot} from './native-recovery';
 import {continuityTransport} from './synchronizer';
 import {requireCloudRecovery,uploadCloudRecovery,readCloudRecovery,listCloudRecovery,type CloudRecoveryTransport} from './cloud-recovery';
@@ -68,6 +69,10 @@ const recoveryTransport=()=>continuityTransport(String((window as any).FG.store.
 function currentVault(){const scope=currentScope();return new RecoveryVault(scope,()=>{assertRewardSourceLockHeld();if(currentScope().audience!==scope.audience||scope.audience!=='family'&&currentAdultSession()?.profileId!==scope.audience||location.origin!==scope.origin)throw Error('The selected workspace changed. Reopen recovery for this family.');});}
 export async function captureCompleteRecovery(rewards:RewardsController,label='Saved recovery point'):Promise<RecoveryArchive>{
  const FG=(window as any).FG;await FG.studio?.flushDraft?.();await FG.creation?.flush?.();const vault=currentVault();
+ // An initial legacy-art migration may still be finishing after Home's bounded
+ // presence check. Finish that preparation before maintenance forbids writes;
+ // otherwise capture would invalidate the very source it is waiting to read.
+ const artwork=await artDatabase();artwork.close();if(currentScope().audience!==vault.scope.audience)throw Error('Recovery workspace changed.');
  return withPalsMaintenance(pals=>rewards.maintenance(async ledger=>{const progress=await captureFamilyRewardPayload(FG,ledger,pals) as Record<string,any>;if(!Array.isArray(progress.profiles))throw Error('Saved progress needs repair before a complete recovery point can be made. Export the preserved records first.');const guard=()=>{assertRewardSourceLockHeld();if(currentScope().audience!==vault.scope.audience)throw Error('Recovery workspace changed.');};const native=await captureNativeRecovery(vault.scope.owners,guard);const notebooks=await captureNotebookRecovery(vault.scope.owners,guard);const creations=await captureCreationRecovery(vault.scope.owners,guard);const art=[];for(const owner of vault.scope.owners)art.push({owner,bundle:await exportArtBundle(owner),activeRigId:(await activeRig(owner))?.id??null});const archive=await encodeCompleteBackup(vault.scope,{progress,art,native,notebooks,creations,preparedDomains:true},label);await vault.save(archive);return archive;}));
 }
 export async function restoreCompleteRecovery(rewards:RewardsController,archive:RecoveryArchive,attemptId?:string):Promise<'restored'|'already-restored'>{
