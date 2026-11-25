@@ -1,4 +1,4 @@
-import {isGrade} from '../learning/grades';
+import {isGrade,isEarlyGrade} from '../learning/grades';
 import {getSkill} from '../learning/curriculum';
 /* Family Game Factory — local-only, versioned state. No network calls. */
 import { profileGrade, validateLearning } from '../learning/engine';
@@ -12,6 +12,10 @@ import {assertRewardSourceWritable} from '../rewards/write-guard';
 'use strict';
 const FG = window.FG = window.FG || {};
 const KEY = 'family-game-factory-state-v1';
+const earlyPreview=import.meta.env?.MODE==='early-preview';
+const heldGrade=grade=>isEarlyGrade(grade)&&!earlyPreview;
+const previewMessage='This learning level needs the early learning preview. A grown-up can switch players or restore a supported backup.';
+
 const profiles = [
   {id:'player1',name:'Explorer 1',icon:'🌟',age:7,grade:1,focus:'add',intensity:'gentle',rate:3,hints:true,punish:false,skills:{},stats:{},mathWindow:[],learningSetupComplete:false},
   {id:'player2',name:'Explorer 2',icon:'🚀',age:9,grade:1,focus:'adaptive',intensity:'gentle',rate:3,hints:true,punish:false,skills:{},stats:{},mathWindow:[],learningSetupComplete:false},
@@ -67,6 +71,7 @@ function choose(id){assertRewardSourceWritable();
 }
 async function changeLearningProfile(patch,stillOpen=()=>true){
  const owner=current();
+ if(Object.hasOwn(patch,'grade')&&heldGrade(patch.grade))throw Error(previewMessage);
  if(Object.hasOwn(patch,'grade') && patch.grade!==owner.grade){
  if(!isGrade(patch.grade))throw Error('Choose a listed learning grade.');
  if(!FG.verifyParentSettings)throw Error('Unlock Parent Controls on a trusted family device to change the learning level.');
@@ -98,8 +103,9 @@ function addFeedback({game,type,idea}){const t=String(idea||'').trim();if(t.leng
 function recordGame(game,won,level){const p=current();const s=p.stats[game] ||= {played:0,wins:0,bestLevel:0};s.played++;if(won)s.wins++;if(won)s.bestLevel=Math.max(s.bestLevel,Number(level)||1);persist()}
 function validateBackup(raw){const value=JSON.parse(raw);if(!validate(value,false))throw Error('Not a valid Family Game Factory v1 backup');if(new Set(value.profiles.map(p=>p.id)).size!==value.profiles.length)throw Error('This backup repeats a player.');for(const p of value.profiles)if(!validateLearning(p.learning)||!validateLanguage(p.language))throw Error('Learning history in this backup is invalid or unsupported. Existing progress is unchanged.');return normalize(value);}
 function backupChangesGrades(value){
+ if(value.profiles.some(p=>heldGrade(p.grade)))throw Error(previewMessage);
  return value.profiles.some(p=>{const existing=familyProfiles().find(candidate=>candidate.id===p.id);return !existing||profileGrade(existing)!==profileGrade(p);});
 }
 function restore(raw){assertRewardSourceWritable();if(adultProfileId)throw Error('Switch to a family profile before restoring a family backup.');const value=validateBackup(raw);if(backupChangesGrades(value))throw Error('Use grown-up backup import to restore learning grades.');delete value.factoryWorkspace;delete value.factoryStudio;delete value.factoryCreation;delete value.factoryCreationRecoveryRaw;delete value.factoryProblemSolving;delete value.factoryProblemSolvingRecoveryRaw;delete value.factoryRewards;delete value.factoryRewardsRecovery;delete value.factoryPals;delete value.factoryPalsRecovery;value.feedback=value.feedback.slice(0,200);try{localStorage.setItem(KEY,JSON.stringify(value))}catch(_){throw Error('Could not restore progress on this device. Existing progress is unchanged.')}data=value;loadError=null;recoveryRaw=null}
-FG.store={get data(){return data},get adultProfileId(){return adultProfileId},get loadError(){return loadError},get recoveryRaw(){return recoveryRaw},current,choose,familyProfiles,enterAdultProfile,leaveAdultProfile,changeProfile,changeLearningProfile,choosePracticeSubject,addFeedback,recordGame,pendingRewards,acknowledgeRewards,validateBackup,backupChangesGrades,emptyBackup:()=>normalize(empty()),save:persist,restore,reset:()=>{assertRewardSourceWritable();if(adultProfileId)throw Error('Switch to a family profile before resetting family data.');if(loadError)throw Error('Export the preserved progress or restore a compatible backup before resetting.');const prior=data;data=empty();if(!persist()){data=prior;throw Error('Progress could not be reset. Your saved data is still here.');}}};
+FG.store={get data(){return data},get adultProfileId(){return adultProfileId},get loadError(){return loadError||(heldGrade(current()?.grade)?previewMessage:null)},get recoveryRaw(){return recoveryRaw},current,choose,familyProfiles,enterAdultProfile,leaveAdultProfile,changeProfile,changeLearningProfile,choosePracticeSubject,addFeedback,recordGame,pendingRewards,acknowledgeRewards,validateBackup,backupChangesGrades,emptyBackup:()=>normalize(empty()),save:persist,restore,reset:()=>{assertRewardSourceWritable();if(adultProfileId)throw Error('Switch to a family profile before resetting family data.');if(loadError)throw Error('Export the preserved progress or restore a compatible backup before resetting.');const prior=data;data=empty();if(!persist()){data=prior;throw Error('Progress could not be reset. Your saved data is still here.');}}};
 })();
