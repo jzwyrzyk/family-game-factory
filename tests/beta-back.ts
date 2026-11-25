@@ -1,5 +1,12 @@
 import assert from 'node:assert/strict';
-import type {BrowserContext,Page} from 'playwright';
+import type {BrowserContext,Frame,Page} from 'playwright';
+
+export async function waitForEndedPlayLanding(page:Page,origin:string):Promise<void>{
+ // This enrolled fixture has profiles and current notices. /login first checks
+ // the device and replaces itself; it is not the final navigation boundary.
+ await page.waitForURL(origin+'/acknowledge',{waitUntil:'load'});
+ await page.getByRole('heading',{name:'Parents, a quick check before we play!',exact:true}).waitFor({state:'visible'});
+}
 
 /** WebKit can report a superseded history navigation as a policy cancellation.
  * This predicate permits checking the resulting document; it proves no access
@@ -27,6 +34,13 @@ export async function assertEndedPlayEntry(page:Page,context:BrowserContext,expe
 }
 
 export async function backToEndedPlayEntry(page:Page,context:BrowserContext,engine:string,expectedURL:string):Promise<void>{
- try{await page.goBack();}catch(error){if(!isWebKitHistoryCancellation(engine,error))throw error;}
- await assertEndedPlayEntry(page,context,expectedURL);
+ const transitions=[page.url()];let policyCancellation=false;
+ const navigated=(frame:Frame)=>{if(frame===page.mainFrame()){transitions.push(frame.url());if(transitions.length>20)transitions.shift();}};
+ page.on('framenavigated',navigated);
+ try{
+  try{await page.goBack();}catch(error){if(!isWebKitHistoryCancellation(engine,error))throw error;policyCancellation=true;}
+  await assertEndedPlayEntry(page,context,expectedURL);
+  console.log(JSON.stringify({engine,endedPlayHistory:{policyCancellation,expectedURL,transitions}}));
+ }catch(error){console.error(JSON.stringify({engine,endedPlayHistoryFailure:{policyCancellation,expectedURL,actualURL:page.url(),transitions}}));throw error;}
+ finally{page.off('framenavigated',navigated);}
 }

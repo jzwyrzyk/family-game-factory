@@ -16,15 +16,18 @@ import {betaRouter} from '../server/beta/router';
 import {betaHosting} from '../server/beta/hosting';
 import {trustedDeviceHandler} from '../server/trusted-devices';
 import {familyOrigin,defaultCapabilities} from '../server/beta/model';
-import {backToEndedPlayEntry,assertEndedPlayEntry} from './beta-back';
+import {backToEndedPlayEntry,assertEndedPlayEntry,waitForEndedPlayLanding} from './beta-back';
 
 async function entryBrowser(browser:Browser,engine:string,tls:ServerOptions,out:string){
  const {d,invite,mutate}=await betaFixture(),family=await invite('browser-adult'),origin=familyOrigin(d.config,family.id);
  const handler=betaRouter(d,fixtureKey,{runtime:async id=>trustedDeviceHandler(d.repository(id),{familyId:id,sessionKey:fixtureKey,appOrigin:origin,firstParty:true}),
   surface:betaHosting('dist-family-beta',d.config,'https://preview.example')});
+ let loginStatusGate:Promise<void>|undefined;
  const server=createServer(tls,(req,res)=>{
   // The test-only TLS listener maps localhost to this one synthetic host.
-  if(req.headers.origin===local)req.headers.origin=origin;req.headers.host=new URL(origin).host;void handler(req,res);
+  if(req.headers.origin===local)req.headers.origin=origin;req.headers.host=new URL(origin).host;
+  const gate=req.url==='/entry/status'?loginStatusGate:undefined;
+  if(gate)void gate.then(()=>{if(!res.destroyed)void handler(req,res);});else void handler(req,res);
  });
  let local='';await new Promise<void>(ok=>server.listen(0,'127.0.0.1',ok));local='https://127.0.0.1:'+(server.address() as AddressInfo).port;
  const contexts:BrowserContext[]=[];
@@ -63,7 +66,19 @@ async function entryBrowser(browser:Browser,engine:string,tls:ServerOptions,out:
     await p.getByRole('button',{name:'Enter Jems'}).click();await p.waitForURL('**/play/');
     await p.waitForFunction(()=>Boolean((window as any).FG?.store?.current()?.id));await p.locator('#studioLibraryTitle, #studioWelcomeTitle').first().waitFor({state:'attached'});
     assert.equal(await p.evaluate(async()=>(await navigator.serviceWorker.getRegistrations()).length),0);
-    await p.getByRole('button',{name:'End play'}).click();await p.waitForURL(/\/(?:login|acknowledge)$/);
+    // Hold the real login status response. End play is not ready for a Back
+    // action while that intermediate document can still redirect elsewhere.
+    let releaseLogin!:()=>void;loginStatusGate=new Promise<void>(resolve=>{releaseLogin=resolve;});
+    const loginRequest=p.waitForRequest(request=>request.url()===local+'/entry/status');
+    let landingReady=false,landing:Promise<void>|undefined;
+    try{
+     await p.getByRole('button',{name:'End play'}).click();
+     landing=waitForEndedPlayLanding(p,local).then(()=>{landingReady=true;});
+     await loginRequest;await p.waitForURL(local+'/login',{waitUntil:'load'});
+     await p.locator('#checking').waitFor({state:'visible'});
+     assert.equal(landingReady,false,'the intermediate login page is not the settled End play destination');
+     releaseLogin();await landing;
+    }finally{releaseLogin();loginStatusGate=undefined;await landing?.catch(()=>{});}
     const denied=await ctx.request.get(local+'/play/',{maxRedirects:0});assert.ok([303,401].includes(denied.status()));if(denied.status()===303)assert.equal(denied.headers().location,'/acknowledge');
     await backToEndedPlayEntry(p,ctx,engine,publicBeforePlay);assert.equal(await p.locator('#studioLibraryTitle').count(),0);assert.deepEqual(errors,[]);
     // Simulate only the BFCache pageshow notification, exercising the actual
