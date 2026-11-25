@@ -29,7 +29,13 @@ export async function earlyBetaBrowser(tls:ServerOptions,engine:'chromium'|'webk
   const browser=await (engine==='webkit'?webkit:chromium).launch({proxy:tunnel.proxy,...(engine==='chromium'&&process.env.BETA_CHROMIUM_PATH?{executablePath:process.env.BETA_CHROMIUM_PATH}:{})});
   try{
    const ctx=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:768,height:1024}}),page=await ctx.newPage();
-   const browserErrors:string[]=[];page.on('pageerror',error=>browserErrors.push(error.message));
+   const browserErrors:string[]=[],networkEvents:unknown[]=[];
+   page.on('pageerror',error=>{browserErrors.push(error.message);networkEvents.push({event:'pageerror',url:page.url(),message:error.message});});
+   page.on('framenavigated',frame=>{if(frame===page.mainFrame())networkEvents.push({event:'navigation',url:frame.url()});});
+   const readinessRequest=(url:string)=>/\/v1\/(?:coach|builder)\/status$/.test(url);
+   page.on('request',request=>{if(readinessRequest(request.url()))networkEvents.push({event:'request',url:request.url(),page:page.url()});});
+   page.on('requestfailed',request=>{if(readinessRequest(request.url()))networkEvents.push({event:'requestfailed',url:request.url(),page:page.url(),failure:request.failure()});});
+   page.on('response',response=>{if(readinessRequest(response.url()))networkEvents.push({event:'response',url:response.url(),status:response.status()});});
    let releaseConfig=()=>{};
    try{
    const fixture=(await build({stdin:{contents:"export {familyFetch} from './src/builder/session'; export {selectItem} from './src/learning/engine'; export {selectLanguageItem} from './src/language/engine';",resolveDir:process.cwd()},bundle:true,format:'esm',platform:'browser',write:false})).outputFiles[0].text;
@@ -107,7 +113,7 @@ export async function earlyBetaBrowser(tls:ServerOptions,engine:'chromium'|'webk
    console.log(engine+' private early-preview preserved all six profile grades across reload and blocked unapproved early creation, started supervision with configuration held pending, opened the separately supervised composer and renewed notices without retaining prior scopes');
    }catch(error){
     const state=await page.evaluate(()=>{const w=window as any,profile=w.FG?.store?.current?.();return {url:location.href,readyState:document.readyState,privateBeta:document.documentElement.dataset.privateBeta,parentGuidance:document.documentElement.dataset.parentGuidance,studioReady:Boolean(w.FG?.studio),profile:profile?{id:profile.id,grade:profile.grade}:null,parentNavigation:w.parentNavigation,visiblePages:[...document.querySelectorAll('main > .page:not(.hidden)')].map(node=>node.id),parentSettings:Boolean(document.getElementById('parentPanel-settings')),builderConnection:Boolean(document.getElementById('builderConnection')),guidance:document.getElementById('parentGuidance')?.outerHTML,startupRecovery:document.getElementById('jemsStartupRecovery')?.textContent,globalStatus:document.getElementById('studioGlobalStatus')?.textContent};}).catch(()=>({url:page.url()}));
-    const diagnostics={engine,error:String(error),browserErrors,state};
+    const diagnostics={engine,error:String(error),browserErrors,networkEvents,state};
     console.error('Private early-preview failure '+JSON.stringify(diagnostics));
     await writeFile('test-results/family-beta/'+engine+'-beta-early-failure.json',JSON.stringify(diagnostics,null,2));
     await page.screenshot({path:'test-results/family-beta/'+engine+'-beta-early-failure.png',fullPage:true}).catch(()=>{});

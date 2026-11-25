@@ -118,6 +118,13 @@ export async function installStudio(){
  let previewLearning:ReturnType<typeof attachPreviewLearning>|null=null;
  let configReady=false, route:'library'|'studio'|'journey'|'rewards'|'pals'|'notifications'|'other'='library', draftTimer:ReturnType<typeof setTimeout>|undefined;
  let coachConnection:CoachConnection='checking',builderReadiness:BuilderReadiness='checking';
+ // Background availability reads belong to this visible document. Stopping
+ // them never cancels/replays a paid mutation; a restored document rechecks.
+ let readinessRequest:AbortController|undefined,readinessPageActive=true;
+ const cancelReadiness=()=>{readinessRequest?.abort();readinessRequest=undefined;};
+ window.addEventListener('factory-profile-changing',cancelReadiness);
+ window.addEventListener('pagehide',()=>{readinessPageActive=false;cancelReadiness();});
+ window.addEventListener('pageshow',event=>{readinessPageActive=!document.documentElement.hidden;if(event.persisted&&readinessPageActive)void refreshServiceReadiness();});
  let saving=false, reflecting=false, lastOutcome:string|null=null,viewedRevisionId:string|null=null,remoteViewedId:string|null=null;
  let coaching:ReturnType<typeof installCoaching>|undefined;
  let voice:ReturnType<typeof installStudioVoice>|undefined;
@@ -879,17 +886,19 @@ export async function installStudio(){
   (await openPractice(activity));
  }
  async function refreshServiceReadiness(){
-  if(remote.mode!=='remote')return;
+  if(remote.mode!=='remote'||!readinessPageActive)return;
+  cancelReadiness();const request=new AbortController();readinessRequest=request;
   const actor=owner(),at=epoch;
   // Public configuration merely selects URLs; only an authenticated server
   // check can distinguish an available service, session failure and allowance.
   const check=async(path:string)=>{
-   const response=await familyFetch(remote.apiBaseUrl!,path,{credentials:'include',cache:'no-store'});
+   const response=await familyFetch(remote.apiBaseUrl!,path,{credentials:'include',cache:'no-store',signal:request.signal});
    if(!response.ok)throw Error(response.status===401?'UNAUTHENTICATED':response.status===403?'FORBIDDEN':'SERVICE_UNAVAILABLE');
    return response.json();
   };
   const [coach,builder]=await Promise.allSettled([check('/v1/coach/status'),check('/v1/builder/status')]);
-  if(actor!==owner()||at!==epoch)return;
+  if(request.signal.aborted||!readinessPageActive||readinessRequest!==request||actor!==owner()||at!==epoch)return;
+  readinessRequest=undefined;
   if(coach.status==='fulfilled'){
    // A healthy route cannot erase a failed model turn or certify a live reply.
    if(!coach.value?.available)coachConnection='unavailable';

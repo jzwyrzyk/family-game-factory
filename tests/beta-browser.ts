@@ -4,41 +4,32 @@ import {browserIsolation} from './beta-browser-isolation';
 import {previewBrowser} from './beta-preview-browser';
 import {migrationBrowser,applicationMigrationBrowser} from './beta-migration-browser';
 import assert from 'node:assert/strict';
-import {createServer} from 'node:https';
+import {createServer,type ServerOptions} from 'node:https';
 import type {AddressInfo} from 'node:net';
-import {mkdtempSync,readFileSync,mkdirSync,rmSync} from 'node:fs';
+import {mkdtempSync,readFileSync,writeFileSync,mkdirSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {execFileSync} from 'node:child_process';
-import {chromium,webkit} from 'playwright';
+import {chromium,webkit,type Browser,type BrowserContext} from 'playwright';
 import {betaFixture,fixtureKey,parent} from './beta-fixture';
 import {betaRouter} from '../server/beta/router';
 import {betaHosting} from '../server/beta/hosting';
 import {trustedDeviceHandler} from '../server/trusted-devices';
 import {familyOrigin,defaultCapabilities} from '../server/beta/model';
 
-async function main(){
+async function entryBrowser(browser:Browser,engine:string,tls:ServerOptions,out:string){
  const {d,invite,mutate}=await betaFixture(),family=await invite('browser-adult'),origin=familyOrigin(d.config,family.id);
  const handler=betaRouter(d,fixtureKey,{runtime:async id=>trustedDeviceHandler(d.repository(id),{familyId:id,sessionKey:fixtureKey,appOrigin:origin,firstParty:true}),
   surface:betaHosting('dist-family-beta',d.config,'https://preview.example')});
- const dir=mkdtempSync(join(tmpdir(),'jems-beta-browser-'));
- execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-keyout',dir+'/key','-out',dir+'/cert','-days','1','-subj','/CN=localhost'],{stdio:'ignore'});
- const server=createServer({key:readFileSync(dir+'/key'),cert:readFileSync(dir+'/cert')},(req,res)=>{
+ const server=createServer(tls,(req,res)=>{
   // The test-only TLS listener maps localhost to this one synthetic host.
   if(req.headers.origin===local)req.headers.origin=origin;req.headers.host=new URL(origin).host;void handler(req,res);
  });
  let local='';await new Promise<void>(ok=>server.listen(0,'127.0.0.1',ok));local='https://127.0.0.1:'+(server.address() as AddressInfo).port;
- const out='test-results/family-beta';mkdirSync(out,{recursive:true});
+ const contexts:BrowserContext[]=[];
  try{
-  const engines=(process.env.BETA_BROWSERS??'chromium,webkit').split(',');
-  if(process.env.CI&&(!engines.includes('chromium')||!engines.includes('webkit')))throw Error('Hosted beta acceptance requires Chromium and WebKit.');
-  let completed=0;
-  for(const engine of engines){
-   if(!['chromium','webkit'].includes(engine))throw Error('Unknown browser');
-   const browser=await (engine==='webkit'?webkit:chromium).launch(engine==='chromium'&&process.env.BETA_CHROMIUM_PATH?{executablePath:process.env.BETA_CHROMIUM_PATH}:{});
-   try{
     const noScript=await browser.newContext({ignoreHTTPSErrors:true,javaScriptEnabled:false}),native=await noScript.newPage();
-    const nativeRequests:string[]=[];native.on('request',request=>nativeRequests.push(request.url()));
+    contexts.push(noScript);const nativeRequests:string[]=[];native.on('request',request=>nativeRequests.push(request.url()));
     await native.goto(local+'/invitation');
     const marker='synthetic-native-form-credential-marker-value';
     await native.locator('[name=invitation]').fill(marker);await native.locator('[name=passphrase]').fill('synthetic native parent passphrase');await native.getByRole('checkbox').check();
@@ -47,7 +38,7 @@ async function main(){
     assert.equal(native.url(),local+'/invitation');assert.ok(nativeRequests.every(url=>!url.includes(marker)&&!url.includes('passphrase')));
     await noScript.close();
     const ctx=await browser.newContext({ignoreHTTPSErrors:true}),p=await ctx.newPage();
-    const assets=new Set<string>();p.on('request',r=>assets.add(r.url()));const errors:string[]=[];p.on('pageerror',e=>errors.push(e.message));
+    contexts.push(ctx);const assets=new Set<string>();p.on('request',r=>assets.add(r.url()));const errors:string[]=[];p.on('pageerror',e=>errors.push(e.message));
     for(const [w,h] of [[1440,900],[768,1024],[390,844]]){
      await p.setViewportSize({width:w,height:h});await p.goto(local);await p.getByRole('heading',{name:'Little creators. Limitless imagination.'}).waitFor();
      await p.evaluate(()=>document.fonts.ready);assert.ok(await p.locator('.mine img').evaluateAll(imgs=>imgs.every(i=>(i as HTMLImageElement).naturalWidth>0)));
@@ -55,12 +46,13 @@ async function main(){
     }
     assert.ok([...assets].every(url=>url.startsWith(local+'/')));assert.ok(![...assets].some(url=>url.includes('/play/')));
     for(const route of ['/play/','/play/assets/index-private.js','/sw.js','/?arcade=1','/index.html','/manage','/v1/creations'])assert.ok((await ctx.request.get(local+route)).status()>=400);
-    const first=completed++===0;
-    // Each engine redeems into this fixed host. Revoke old devices before the second run.
-    const issued=first?{invitation:family.invitation}:await mutate('recover',family.id);
-    await p.goto(local+(first?'/invitation':'/recovery'));await p.locator('[name=invitation]').fill(String(issued.invitation));
-    await p.locator('[name=passphrase]').fill(parent);await p.getByRole('checkbox').check();await p.getByRole('button',{name:'Pair this device'}).click();await p.locator('#paired output').waitFor();
-    const pair=await p.locator('#paired output').innerText();await mutate('verify',family.id,{pairingCode:pair,receipt:'synthetic-browser-'+engine});
+    // Each engine proves both enrollment and recovery using its own family.
+    for(const phase of ['invitation','recovery']){
+     const issued=phase==='invitation'?family:await mutate('recover',family.id);
+     await p.goto(local+'/'+phase);await p.locator('[name=invitation]').fill(String(issued.invitation));
+     await p.locator('[name=passphrase]').fill(parent);await p.getByRole('checkbox').check();await p.getByRole('button',{name:'Pair this device'}).click();await p.locator('#paired output').waitFor();
+     const pair=await p.locator('#paired output').innerText();await mutate('verify',family.id,{pairingCode:pair,receipt:'synthetic-browser-'+engine+'-'+phase});
+    }
     await mutate('policy',family.id,{capabilities:defaultCapabilities(),monthlyCents:0,paused:true,generationPaused:true});
     await p.goto(local+'/grown-ups');await p.getByLabel('Parent passphrase').fill(parent);await p.getByRole('button',{name:'Unlock family controls'}).click();
     await p.getByRole('button',{name:'Add an explorer'}).click();await p.getByText(/explorer profiles\./).waitFor();
@@ -78,14 +70,39 @@ async function main(){
     await p.getByRole('button',{name:'Talk about this idea'}).waitFor();assert.equal(await p.getByRole('button',{name:'Build or revise my game'}).count(),0);
     assert.equal((await ctx.request.get(local+'/play/features/games.js')).status(),403);assert.equal((await ctx.request.get(local+'/play/features/remote.js')).status(),200);
     await ctx.close();
-    await browserIsolation({key:readFileSync(dir+'/key'),cert:readFileSync(dir+'/cert')},engine as 'chromium'|'webkit');
-    await earlyBetaBrowser({key:readFileSync(dir+'/key'),cert:readFileSync(dir+'/cert')},engine as 'chromium'|'webkit');
-    await operatorBrowser({key:readFileSync(dir+'/key'),cert:readFileSync(dir+'/cert')},engine as 'chromium'|'webkit');
-    const durable=await (engine==='webkit'?webkit:chromium).launchPersistentContext(dir+'/migration-'+engine,
-     engine==='chromium'&&process.env.BETA_CHROMIUM_PATH?{executablePath:process.env.BETA_CHROMIUM_PATH}:{});
-    await migrationBrowser(durable);await applicationMigrationBrowser(await browser.newContext(),engine);await previewBrowser(browser);console.log(engine+' passed three layouts, invitation, verification, family profile, play gate, logout, migration and separate-origin preview submission');
+ }finally{await Promise.allSettled(contexts.map(context=>context.close()));server.closeAllConnections();await new Promise<void>(ok=>server.close(()=>ok()));}
+}
+
+async function main(){
+ const dir=mkdtempSync(join(tmpdir(),'jems-beta-browser-')),out='test-results/family-beta';mkdirSync(out,{recursive:true});
+ execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-keyout',dir+'/key','-out',dir+'/cert','-days','1','-subj','/CN=localhost'],{stdio:'ignore'});
+ const tls={key:readFileSync(dir+'/key'),cert:readFileSync(dir+'/cert')};
+ const results:{engine:string;stage:string;status:'passed'|'failed';error?:string}[]=[],failures:unknown[]=[];
+ const run=async(engine:string,stage:string,work:()=>Promise<void>)=>{try{await work();results.push({engine,stage,status:'passed'});console.log('PASS beta '+engine+' '+stage);}catch(error){failures.push(error);results.push({engine,stage,status:'failed',error:String(error)});console.error('FAIL beta '+engine+' '+stage,error);}};
+ try{
+  const engines=(process.env.BETA_BROWSERS??'chromium,webkit').split(',');
+  if(process.env.CI&&(!engines.includes('chromium')||!engines.includes('webkit')))throw Error('Hosted beta acceptance requires Chromium and WebKit.');
+  for(const engine of engines){
+   if(engine!=='chromium'&&engine!=='webkit')throw Error('Unknown browser');
+   let browser:Browser|undefined;
+   await run(engine,'browser-startup',async()=>{browser=await (engine==='webkit'?webkit:chromium).launch(engine==='chromium'&&process.env.BETA_CHROMIUM_PATH?{executablePath:process.env.BETA_CHROMIUM_PATH}:{});});
+   if(!browser)continue; // No browser-dependent assertion can run without its engine.
+   try{
+    // Each fixture owns isolated family/session/browser state. A failed journey
+    // remains failed while unrelated acceptance continues collecting evidence.
+    await run(engine,'entry',()=>entryBrowser(browser!,engine,tls,out));
+    await run(engine,'origin-isolation',()=>browserIsolation(tls,engine));
+    await run(engine,'early-guidance',()=>earlyBetaBrowser(tls,engine));
+    await run(engine,'operator',()=>operatorBrowser(tls,engine));
+    await run(engine,'generic-migration',async()=>{
+     const context=await (engine==='webkit'?webkit:chromium).launchPersistentContext(dir+'/migration-'+engine,engine==='chromium'&&process.env.BETA_CHROMIUM_PATH?{executablePath:process.env.BETA_CHROMIUM_PATH}:{});
+     try{await migrationBrowser(context);}finally{await context.close();}
+    });
+    await run(engine,'application-migration',async()=>{const context=await browser!.newContext();try{await applicationMigrationBrowser(context,engine);}finally{await context.close();}});
+    await run(engine,'preview',()=>previewBrowser(browser!));
    }finally{await browser.close();}
   }
- }finally{server.closeAllConnections();await new Promise<void>(ok=>server.close(()=>ok()));rmSync(dir,{recursive:true});}
+  if(failures.length)throw new AggregateError(failures,failures.length+' independent beta browser stages failed.');
+ }finally{writeFileSync(out+'/browser-results.json',JSON.stringify({schema:'jems.beta-browser-acceptance.v1',source:process.env.GITHUB_SHA??null,results},null,2));rmSync(dir,{recursive:true});}
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});
