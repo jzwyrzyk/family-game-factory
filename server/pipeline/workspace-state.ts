@@ -15,8 +15,8 @@ export async function readWorkspace(tx:Documents,workspace:string,artifacts?:Pri
  if(state.version!==1)throw Error('PERSISTENCE_SCHEMA_REJECTED');
  return {root,chunks,state};
 }
-export async function writeWorkspace(tx:Documents,workspace:Awaited<ReturnType<typeof readWorkspace>>,artifacts?:PrivateArtifacts){
- const serialized=await encodeArtifacts(workspace.state,artifacts);
+export async function writeWorkspace(tx:Documents,workspace:Awaited<ReturnType<typeof readWorkspace>>,artifacts?:PrivateArtifacts,encoding:{splitGamePayloads?:boolean}={}){
+ const serialized=await encodeArtifacts(workspace.state,artifacts,encoding);
  if(Buffer.byteLength(serialized)>3*1024*1024)throw Error('WORKSPACE_CAPACITY_REACHED');
  const points=Array.from(serialized);
  const chunks=Math.ceil(points.length/250000);

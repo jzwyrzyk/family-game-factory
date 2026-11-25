@@ -1,5 +1,7 @@
 # Private Family Beta — Owner Operating Guide
 
+Before inviting a real family, complete the [activation and rollback checklist](ACTIVATION.md) for the selected environment.
+
 Use the approved management address ending in **/manage**. Sign in with the designated operator account. Keep the operator passphrase separate from any family passphrase. Every change shows the target family and asks for confirmation. Use a private reference such as workshop-04 for your own contact book. Keep real contact details and verification evidence in the separately approved, access-controlled operator system.
 
 ## Invite a grown-up

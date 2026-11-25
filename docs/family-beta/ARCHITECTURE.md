@@ -1,5 +1,7 @@
 # Private family beta trust boundaries
 
+The [hosting decision](../decisions/2026-11-25-private-family-beta.md) records the origin boundary, and the [activation checklist](ACTIVATION.md) covers the separately approved infrastructure, household handoff, public retirement and offline limitations.
+
 The legacy deployment selects one configured family, one Firestore workspace and one GCS prefix at startup. It may issue a legacy designer session without a live device. Device secrets rotate in the workspace. The parent passphrase unlocks management for 15 minutes. A named Adult Private permit and a separate tab proof protect adult work. Generation workers authenticate with pinned GitHub OIDC and bind a run and stage to a job. Preview links on the household service carry a short-lived bearer signature.
 
 The legacy browser stores family profiles, progress, games, drafts, revisions, coding projects, private art, notebooks, rewards and Pals in origin-scoped localStorage and IndexedDB. Its service worker caches application files. A new family ID in an API payload would isolate none of these stores. Server backups, artifacts, audit and usage also require explicit ownership.
@@ -31,3 +33,5 @@ The neutral address offers Family login and I have an invitation. A nonsecret wo
 The private session checks foreground activity and periodically checks access. Brief network loss allows the current document to continue until its last server-confirmed deadline. A page hidden for navigation blanks its contents. Restoring a history entry returns to login. Logout broadcasts locally and ends its server grant. Local records stay in the family's own origin. No beta service worker or cache-first navigation is installed.
 
 The existing trusted-device workflow runs the new synthetic HTTP, Chromium and WebKit checks. Screenshots belong to synthetic accounts and expire after seven days. A hardware Safari test, deployed ingress, IAP, owner visual acceptance and private preview validation have separate release receipts.
+
+The hosting change takes the split-game artifact codec and its four tests verbatim from storage PR #166 at `3149e4e`. All three workspace paths read both formats. The original Firestore repository forwards the option unchanged. New family writes keep the existing format until a separate storage rollout. The migration reads the dormant F06 device database alongside reviewed household, adult, drawing and reward stores.

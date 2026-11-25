@@ -1,3 +1,5 @@
+import {previewBrowser} from './beta-preview-browser';
+import {migrationBrowser} from './beta-migration-browser';
 import assert from 'node:assert/strict';
 import {createServer} from 'node:https';
 import type {AddressInfo} from 'node:net';
@@ -53,9 +55,9 @@ async function main(){
     await p.waitForFunction(()=>Boolean((window as any).FG?.store?.current()?.id));await p.locator('#studioLibraryTitle, #studioWelcomeTitle').first().waitFor({state:'attached'});
     assert.equal(await p.evaluate(async()=>(await navigator.serviceWorker.getRegistrations()).length),0);
     await p.getByRole('button',{name:'End play'}).click();await p.waitForURL(/\/(?:login|acknowledge)$/);
-    assert.equal((await ctx.request.get(local+'/play/')).status(),401);
+    const denied=await ctx.request.get(local+'/play/',{maxRedirects:0});assert.ok([303,401].includes(denied.status()));if(denied.status()===303)assert.equal(denied.headers().location,'/acknowledge');
     await p.goBack();assert.equal(await p.locator('#studioLibraryTitle').count(),0);assert.deepEqual(errors,[]);
-    await ctx.close();console.log(engine+' passed three layouts, invitation, verification, family profile, play gate and logout');
+    await ctx.close();await migrationBrowser(browser);await previewBrowser(browser);console.log(engine+' passed three layouts, invitation, verification, family profile, play gate, logout, migration and separate-origin preview submission');
    }finally{await browser.close();}
   }
  }finally{server.closeAllConnections();await new Promise<void>(ok=>server.close(()=>ok()));rmSync(dir,{recursive:true});}

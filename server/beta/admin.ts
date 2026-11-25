@@ -10,7 +10,7 @@ import type {FamilyDirectory,Usage} from './store';
 import type {Documents} from './documents';
 
 const iapKeys=createRemoteJWKSet(new URL('https://www.gstatic.com/iap/verify/public_key-jwk'));
-export async function verifyAdministrator(assertion:string|undefined,config:BetaConfig){
+export async function verifyAdministrator(assertion:string|undefined,config:{administrator:Pick<BetaConfig['administrator'],'audience'|'subject'>}){
  if(!assertion||assertion.length>16384)throw Error('ADMIN_REQUIRED');
  const {payload}=await jwtVerify(assertion,iapKeys,{issuer:'https://cloud.google.com/iap',audience:config.administrator.audience,algorithms:['ES256'],maxTokenAge:'11m'});
  if(payload.sub!==config.administrator.subject)throw Error('ADMIN_REQUIRED');

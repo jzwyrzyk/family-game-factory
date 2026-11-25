@@ -1,5 +1,7 @@
 # Jems current architecture
 
+The optional private release candidate serves the household behind a signed IAP subject on its own origin, with trusted family and Adult Private credentials inside that boundary. It delivers the public-only retirement directory separately. The family workspace codec reads existing artifact representations and the opt-in F06 split-game format. Legacy writes stay the default. The hosting image contains the real private frontend and keyless gateway. The independent viewer accepts scoped preview grants. [Hosting, migration and rollback](docs/family-beta/ACTIVATION.md)
+
 The [family beta tenancy contract](docs/family-beta/ARCHITECTURE.md) describes the per-family workspace, browser origin, operating modes and cross-workspace accounting.
 
 This is a map of the **implemented source architecture**, not an assertion that every component is deployed or enabled. Read [Delivery state](DELIVERY-STATE.md) for dated release evidence and [Product doctrine](PRODUCT-DOCTRINE.md) for intent. Update this map in the same PR that changes a boundary, contract, storage owner, runtime or execution path.

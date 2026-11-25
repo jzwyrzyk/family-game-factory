@@ -104,7 +104,13 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
     });json(res,200,result);return;
    }
    if(path.startsWith('/play/')&&req.method==='GET'){
-    const access=await requirePlay(d,id,raw,key,path==='/play/'?'entry':'check');
+    let access;
+    try{access=await requirePlay(d,id,raw,key,path==='/play/'?'entry':'check');}
+    catch(error){
+     if(path!=='/play/'||!(error instanceof Error)||error.message!=='PLAY_REQUIRED')throw error;
+     await d.withFamily(id,async(tx,f,p)=>{activeFamily(f,p);await d.inWorkspace(tx,f,p,s=>liveSession(f,s,internalCookies(raw),key,Date.now()),false);});
+     res.writeHead(303,{Location:'/acknowledge'});res.end();return;
+    }
     if(await options.surface?.(req,res,{path,family:id,capabilities:access.capabilities,profiles:access.profiles,expires:access.expires,idleUntil:access.idleUntil}))return;
     throw Error('NOT_FOUND');
    }

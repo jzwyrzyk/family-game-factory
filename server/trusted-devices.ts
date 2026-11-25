@@ -96,11 +96,11 @@ export function firstPartyCookie(cookie:string){
  return cookie.replace(/^factory_/, '__Host-factory_').replace(/; Path=[^;]+/,'; Path=/').replace('; SameSite=None; Partitioned','; SameSite=Strict');
 }
 export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;familyId:string;sessionKey:string;
- firstParty?:boolean;adultPilot?:AdultPilotFlags;eraseCoachReceipts?:(session:VerifiedSession)=>Promise<unknown>}){
+ firstParty?:boolean;hostCookies?:boolean;adultPilot?:AdultPilotFlags;eraseCoachReceipts?:(session:VerifiedSession)=>Promise<unknown>}){
  return async(request:IncomingMessage,response:ServerResponse)=>{
   const cors={'Access-Control-Allow-Origin':config.appOrigin,'Access-Control-Allow-Credentials':'true','Vary':'Origin','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'};
   const reply=(status:number,value:unknown,cookies?:string[])=>{
-   response.writeHead(status,{...cors,'Content-Type':'application/json',...(cookies?{'Set-Cookie':config.firstParty?cookies.map(firstPartyCookie):cookies}:{})});
+   response.writeHead(status,{...cors,'Content-Type':'application/json',...(cookies?{'Set-Cookie':(config.firstParty||config.hostCookies)?cookies.map(firstPartyCookie):cookies}:{})});
    response.end(JSON.stringify(value));
   };
   const readBody=async()=>{

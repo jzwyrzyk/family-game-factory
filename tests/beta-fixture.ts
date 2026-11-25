@@ -1,6 +1,6 @@
 import {BetaAdministration} from '../server/beta/admin';
 import {FamilyDirectory} from '../server/beta/store';
-import {FixtureDocuments} from '../server/beta/documents';
+import {FixtureDocuments,type AtomicStore} from '../server/beta/documents';
 import {newParentAuth} from '../server/trusted-devices';
 import {betaNotice,participationNotice,type BetaConfig} from '../server/beta/model';
 import {acknowledge,internalCookies,redeem,requirePlay} from '../server/beta/access';
@@ -13,9 +13,9 @@ export const parent='synthetic parent passphrase',operator='synthetic operator p
 export const redemption=(invitation:string,purpose='new-family')=>({invitation,purpose,passphrase:parent,notice:betaNotice,terms:participationNotice,guardianAffirmed:true});
 export const acknowledgments={adult:true,supervise:true,avoidIdentifying:true,notice:betaNotice,terms:participationNotice,passphrase:parent};
 export const cookieHeader=(values:string[])=>values.map(c=>c.split(';')[0]).join('; ');
-export async function betaFixture(){
- const config=structuredClone(fixtureConfig);config.administrator.verifier=newParentAuth(operator);
- const d=new FamilyDirectory(new FixtureDocuments(),config),admin=new BetaAdministration(d);
+export async function betaFixture(store:AtomicStore=new FixtureDocuments(),environment='synthetic'){
+ const config={...structuredClone(fixtureConfig),environment};config.administrator.verifier=newParentAuth(operator);
+ const d=new FamilyDirectory(store,config),admin=new BetaAdministration(d);
  const mutate=(action:string,target:string,params:unknown={})=>admin.change('test-owner',{action,target,params,confirm:action+' '+target,passphrase:operator});
  await d.db.run(async tx=>tx.create(d.root+'/metadata/household',{familyId:'synthetic-owner',workspace:'original-household',environment:config.environment}));
  await mutate('platform','platform',{invitations:true,participation:true,stop:false,monthlyCents:100});

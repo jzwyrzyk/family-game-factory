@@ -307,10 +307,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:59:21.800Z",
-      "sourceDigest": "0f6d4cc1ea943c4f4b4efa35a80a9b5140dae16eb76e374328326b0bae9739cb",
+      "reviewedAt": "2026-11-25T00:18:28.295Z",
+      "sourceDigest": "c6dd26211884a4761bf60a6a6cd6ef210a1f40a7297eb95a4f4f6a74a01558a0",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated private preview form submission and reviewed-art guardian authorization in the architecture and owner operating instructions.",
+      "reviewReason": "Describe the protected household, local storage transfer, private entry renewal, and the approved welcome retirement page.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -678,10 +678,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:19:20.069Z",
-      "sourceDigest": "29546fd758deda3a8887a8f61f5b7da02fcda6b27505b29bf68d6714dc2fdf3a",
+      "reviewedAt": "2026-11-25T00:18:29.359Z",
+      "sourceDigest": "dbcd4be0700c9e652cdf33a2e4fcf9a15c14ae76878823f3b114e9eb8aa45f9b",
       "reviewOutcome": "updated",
-      "reviewReason": "Document consent withdrawal settlement inside the per-family transaction and preserve the private inference packaging boundary.",
+      "reviewReason": "Document three private host definitions, authenticated household delivery, and the nonproduction routing manifest.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -731,10 +731,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:59:22.966Z",
-      "sourceDigest": "b538dbd4f0afa532c670fc06850d8416b08456644424fe1d688132fb8bf80e1a",
+      "reviewedAt": "2026-11-25T00:18:29.810Z",
+      "sourceDigest": "77fb8c274680afb980427e11723fcafdcf40177958ca4f1470f9deca1eeb1b4d",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed atomic household opening balance, reservation and settlement accounting, scoped provider approval, pinned workflow origin and job-attempt binding.",
+      "reviewReason": "Record preview form isolation, the F06 codec compatibility and immutable worker and price release gates.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -827,10 +827,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "5d7f2eb9952e436f6dbd8f4415e06ce9df079e7f32d5b4ef80d42b38d08cf4e6",
-      "reviewedAt": "2026-11-25T00:19:20.180Z",
+      "sourceDigest": "c3ef915d638a6a49e4135b7b178a3a620596c0096c5df39fcdac021dfe41b6ba",
+      "reviewedAt": "2026-11-25T00:18:30.250Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Keep consent updates, cancellation and restricted export procedures covered by the owner guide and privacy data-flow review.",
+      "reviewReason": "Document guardian-authorized household export, transfer integrity, assisted migration and verified rollback constraints.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -887,10 +887,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:59:23.746Z",
-      "sourceDigest": "deb7580c45b118d42525460d93e935d1f435a7aff89214c8f829c76d0c7dc9fd",
+      "reviewedAt": "2026-11-25T00:18:30.730Z",
+      "sourceDigest": "a2d49b7ca456353e6c95b4923b88e985cb225bc92608bcc160df171438be5681",
       "reviewOutcome": "updated",
-      "reviewReason": "Added synthetic preview replay and cross-family checks, consent withdrawal during a reservation, and reversible household opening-balance evidence.",
+      "reviewReason": "Separate Firestore emulator and browser acceptance from authenticated deployed infrastructure and real devices.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1130,10 +1130,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T23:48:30.269Z",
-      "sourceDigest": "d19e6d067d5a0636159f6998a9d1c2cd8491e73abeb0da7650ee210c7e083249",
+      "reviewedAt": "2026-11-25T00:18:31.195Z",
+      "sourceDigest": "84f8480bbe5ede3428c06aa27626d5a630441329ab77a0a656372ee988008269",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented separate private build output, responsive fixture browser checks and timed screenshot retention in the existing auth workflow.",
+      "reviewReason": "Record the controlled private beta activation sequence, owner operating procedures, and public runtime retirement.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -3,6 +3,7 @@ import {mappedHouseholdRepository,type HouseholdBinding} from './beta/household'
 import {FamilyDirectory} from './beta/store';
 import {firestoreStore} from './beta/documents';
 import {betaRouter,type Surface} from './beta/router';
+import {protectedHousehold,type HouseholdHost} from './beta/owner-host';
 import {betaHosting} from './beta/hosting';
 import {assertRunJob} from './beta/worker';
 import type {Repository} from './pipeline/types';
@@ -37,7 +38,7 @@ import {sessionHandler} from './sessions';
 import {trustedDeviceHandler} from './trusted-devices';
 import {adultPilotConfigured,adultPilotFlags} from './adult-pilot';
 export interface GatewayConfig {
- platformMode?:'HOUSEHOLD'|'PRIVATE_FAMILY_BETA'|'PUBLIC'; beta?:BetaConfig;householdBudgetBinding?:HouseholdBinding;
+ platformMode?:'HOUSEHOLD'|'PRIVATE_FAMILY_BETA'|'PUBLIC'; beta?:BetaConfig;householdPrivateHost?:HouseholdHost;householdBudgetBinding?:HouseholdBinding;
  active:boolean;appOrigin:string;gatewayOrigin:string;previewOrigin:string;sessionKey:string;previewKey:string;familyId:string;
  repository:string;repositoryId:string;workflow:string;approvedSha:string;
  workerRepository?:string;workerRepositoryId?:string;workerWorkflow?:string;workerApprovedSha?:string;
@@ -109,7 +110,7 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
  const offlineNarration:NarrationProvider={readiness:async()=>false,read:async()=>{throw Error('NARRATION_UNAVAILABLE');}};
  const narration=narrationHttpHandler(new NarrationService(repo,{...narrationConfig(environment),requireVerifiedParentPrivacy:!adult.enabled},
    coachTarget?new PrivateNarrationBridge(coachTarget):offlineNarration),{appOrigin:config.appOrigin,sessionKey:config.sessionKey},repo);
- const api=apiHandler(service,http,repo),sessions=sessionHandler(repo,{appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey}),trusted=trustedDeviceHandler(repo,{appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey,adultPilot:adult,firstParty:!!tenantRepo,eraseCoachReceipts:session=>coachService.eraseFamilyReceipts(session)});
+ const api=apiHandler(service,http,repo),sessions=sessionHandler(repo,{hostCookies:!!config.householdPrivateHost,appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey}),trusted=trustedDeviceHandler(repo,{appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey,adultPilot:adult,firstParty:!!tenantRepo,hostCookies:!!config.householdPrivateHost,eraseCoachReceipts:session=>coachService.eraseFamilyReceipts(session)});
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
  return {service,repo,coordinator,handler:async(req:Parameters<typeof api>[0],res:Parameters<typeof api>[1])=>{
   const url=new URL(req.url!,config.gatewayOrigin);
@@ -129,7 +130,7 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
 }
 export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
  const beta=validateBeta(config.beta,config.workspace);
- if(platformMode(config.platformMode)!=='PRIVATE_FAMILY_BETA'||config.appOrigin!==beta.hubOrigin||
+ if(platformMode(config.platformMode)!=='PRIVATE_FAMILY_BETA'||config.householdPrivateHost||config.appOrigin!==beta.hubOrigin||
     config.gatewayOrigin!==beta.hubOrigin||config.localFile||!config.projectId||!config.artifactBucket||
     new URL(config.previewOrigin).hostname.endsWith('.'+new URL(beta.hubOrigin).hostname)||
     (config.active&&!beta.workerRoute)||config.sessionKey.length<32||config.previewKey.length<32||config.sessionKey===config.previewKey)throw Error('BETA_CONFIGURATION_REQUIRED');
@@ -182,5 +183,9 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
   }});
 }
 // Configuration file is mounted privately from Secret Manager; never VITE_ or public/factory-config.json.
-async function main(){if(process.env.FACTORY_BOOTSTRAP==='true'){startBootstrap();return;}if(!process.env.FACTORY_PRIVATE_CONFIG)throw Error('PRIVATE_CONFIG_REQUIRED');const config=await loadGatewayConfig(process.env.FACTORY_PRIVATE_CONFIG);const handler=platformMode(config.platformMode)==='PRIVATE_FAMILY_BETA'?await privateBetaGateway(config):(await createGateway(config)).handler;createServer((req,res)=>{void handler(req,res).catch(()=>{if(!res.headersSent)res.writeHead(503);res.end('Private service unavailable');});}).listen(Number(process.env.PORT)||8080);}
+async function main(){if(process.env.FACTORY_BOOTSTRAP==='true'){startBootstrap();return;}if(!process.env.FACTORY_PRIVATE_CONFIG)throw Error('PRIVATE_CONFIG_REQUIRED');const config=await loadGatewayConfig(process.env.FACTORY_PRIVATE_CONFIG);const mode=platformMode(config.platformMode);
+ let handler;
+ if(mode==='PRIVATE_FAMILY_BETA')handler=await privateBetaGateway(config);
+ else{const household=await createGateway(config);handler=config.householdPrivateHost?protectedHousehold(config,'dist-family-beta',household.handler):household.handler;}
+ createServer((req,res)=>{void handler(req,res).catch(()=>{if(!res.headersSent)res.writeHead(503);res.end('Private service unavailable');});}).listen(Number(process.env.PORT)||8080);}
 if(process.argv.some(x=>/[/\\]gateway\.ts$/.test(x)))void main().catch(()=>{console.error('Gateway configuration/startup failed. No credentials are logged.');process.exitCode=1;});
