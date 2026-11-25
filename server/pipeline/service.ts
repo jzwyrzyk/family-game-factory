@@ -1,5 +1,6 @@
-import {PREMIUM_POLICY_VERSION} from '../agent/model-policy';
-import {pinPremiumPolicy,premiumReservation,settleStoppedJob,type PremiumPilot} from './premium-policy';
+import {permitsNewArt} from '../quality/presentation-plan';
+import {PREMIUM_POLICY_VERSION,premiumAttemptReserve} from '../agent/model-policy';
+import {committedGameUnits,premiumGameCeiling,pinPremiumPolicy,premiumReservation,settleStoppedJob,type PremiumPilot} from './premium-policy';
 import {isGeneratedGame,validateCompiled,type GeneratedGame} from '../agent/generated';
 import {privateGenerationPreflight} from '../quality/private-generation-preflight';
 import {draftChildIntentContract} from '../quality/child-intent';
@@ -154,14 +155,21 @@ export class JobService {
    // A saved premium game (including a fork) binds its paid edits to the
    // reviewed construction policy even after an operator rolls back admission.
    if(!pilot&&isGeneratedGame(base?.game)&&base.game.productionPlan?.version==='game-production-plan-v2')throw Error('MODEL_POLICY_UNAVAILABLE');
-   let premiumPolicy;
+   let premiumPolicy,premiumEditCeilingMicroUsd;
+   let maxUnits=this.agent.kind==='mock'?0:this.options.maxUnits;
    if(pilot){
     try{premiumPolicy=pinPremiumPolicy(pilot);}catch{throw Error('MODEL_POLICY_UNAVAILABLE');}
+    if(base||r.retryOf){
+     premiumEditCeilingMicroUsd=premiumGameCeiling(this.options.premiumMaxJobMicroUsd);
+     const art=permitsNewArt({childIntent:r.prompt,baseRevision:{id:base?.id||'new',game:base?.game||undefined}});
+     maxUnits=premiumAttemptReserve(pilot.approval,'construction',true,art);
+     const committed=committedGameUnits(s,session.familyId,session.adultProfileId,r.baseRevisionId,r.retryOf);
+     if(committed+maxUnits>premiumEditCeilingMicroUsd)throw Error('GAME_BUDGET_REACHED');
+    }else maxUnits=premiumReservation(pilot,this.options.premiumMaxJobMicroUsd);
    }
-   const maxUnits=pilot?premiumReservation(pilot,this.options.premiumMaxJobMicroUsd):this.agent.kind==='mock'?0:this.options.maxUnits;
    if(maxUnits&&(!ledger.paidEnabled||ledger.used+ledger.reserved+maxUnits>ledger.allowance))throw Error('SPENDING_CUTOFF');
    const qualityRequired=this.agent.kind==='metered-api'&&!this.agent.testFixture&&needsCurrentQuality(base?.game)?'game-quality-v1' as const:undefined;
-   ledger.reserved+=maxUnits;const job:Job={...r,...(premiumPolicy?{premiumPolicy}:{}),...(qualityRequired?{qualityRequired}:{}),...(this.options.adultPilotMode?{adultPilotDeviceId:session.deviceId,adultPilotSessionId:session.adultSessionId,adultPilotProfileId:session.adultProfileId}:{}),id:uuid(),familyId:session.familyId,status:'draft',adapter:this.agent.testFixture?'mock':this.agent.kind,maxUnits,usedUnits:0,retryCount};s.jobs.push(job);audit(s,job,'queued');return {jobId:job.id,status:'queued' as JobStatus,adapter:job.adapter};
+   ledger.reserved+=maxUnits;const job:Job={...r,...(premiumPolicy?{premiumPolicy}:{}),...(premiumEditCeilingMicroUsd?{premiumEditCeilingMicroUsd}:{}),...(qualityRequired?{qualityRequired}:{}),...(this.options.adultPilotMode?{adultPilotDeviceId:session.deviceId,adultPilotSessionId:session.adultSessionId,adultPilotProfileId:session.adultProfileId}:{}),id:uuid(),familyId:session.familyId,status:'draft',adapter:this.agent.testFixture?'mock':this.agent.kind,maxUnits,usedUnits:0,retryCount};s.jobs.push(job);audit(s,job,'queued');return {jobId:job.id,status:'queued' as JobStatus,adapter:job.adapter};
   });
  }
  private jobView(state:PipelineState,session:VerifiedSession,j:Job){

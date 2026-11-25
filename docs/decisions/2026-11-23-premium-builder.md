@@ -27,3 +27,7 @@ The owner authorized repository completion, offline staged accounting/evidence/l
 ## November 24 testing ceiling decision
 
 Issue #167 authorizes the existing whole-job policy with a separate Adult Private ceiling of $5. Reserve the reviewed stages and bounded repairs transactionally before dispatch. Keep the staged-admission prototype offline. Revisit the envelope after project price verification and one specifically funded trial. [Economics, acceptance and rollback](../game-intelligence/premium-benchmark/NOVEMBER-26.md)
+
+## November 25 clarification on saved revisions
+
+The owner approved one $5 testing maximum across the initial Build and later paid changes to the same game, with room for multiple revisions when actual costs permit. Keep the complete initial Build reservation. On a saved edit or explicit retry, hold a complete reviewed first pass and fund any necessary repair before dispatch. Preserve Astra High, the independent review and artwork appropriate to the request. Count active holds and conservative unknown charges across branches, retries and billing months. The monthly family allowance and authorization for a paid trial remain separate. [Implementation and validation](https://github.com/jzwyrzyk/family-game-factory/pull/168)

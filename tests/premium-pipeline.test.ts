@@ -42,7 +42,7 @@ async function setup(){
  await grantAdultPilot(repo,{familyId,deviceId:child.deviceId,receipt:'synthetic-receipt',operatorConfirmedAdult:true,expiresAt:Date.now()+86400000});
  const grant=await repo.transaction(s=>beginAdultPilotSession(s,child));
  const adult=authenticateAdultPilotSession(await repo.snapshot(),child,grant.cookieValue,grant.sessionToken);
- const coordinator=new ActionCoordinator(repo,{dispatch:async()=>{}},legacy,900000,false,true,pilot);
+ const coordinator=new ActionCoordinator(repo,{dispatch:async()=>{}},legacy,900000,false,true,pilot,options.premiumMaxJobMicroUsd);
  return {repo,service,adult,coordinator};
 }
 async function admitted(){
@@ -246,6 +246,113 @@ for(const pass of [true,false])test('hosted premium candidate is '+(pass?'accept
  }
 });
 
+// This historical Build predates pass-sized reservations. Its job and revision
+// already carry every link needed to charge later edits against the same game.
+async function savedGame(spent:number){
+ const h=await admitted();
+ await h.repo.transaction(s=>{
+  const job=s.jobs[0];
+  Object.assign(job,{status:'ready',usedUnits:spent,revisionId:'saved'});
+  s.revisions.push({id:'saved',familyId,parentId:null,projectId:'original-project',
+   adultPilotProfileId:h.adult.adultProfileId,game:illustratedGame()});
+  Object.assign(s.ledgers[familyId],{used:0,reserved:0,allowance:10_000_000}); // new family billing month
+  return true;
+ });
+ return h;
+}
+const edit=(baseRevisionId:string,clientRequestId:string,prompt='Make the player jump higher.')=>
+ ({...request,gameId:'generated-module',baseRevisionId,clientRequestId,prompt});
+
+test('separate successful paid revisions share the original game balance and release unused funds',async()=>{
+ const h=await savedGame(1_500_000);
+ let base='saved',editCost=0;
+ for(const clientId of ['first-edit','second-edit']){
+  const r=edit(base,clientId),ack=await h.service.submit(h.adult,r);
+  await h.coordinator.enqueue(ack.jobId);
+  const gen=identity('generate'),sandbox=identity('test'),reviewer=identity('review');
+  const claim=await h.coordinator.claim(ack.jobId,0,'generate',gen,PREMIUM_POLICY_VERSION);
+  // No redraw on the first pass of a mechanics edit to illustrated artwork.
+  assert.equal(claim.input!.budget.maxUnits,1_692_000);
+  const plan=bindGameProductionPlan({...fixturePremiumPlanProposal({}),presentationStyle:'illustrated'},{...claim.input!,signal:new AbortController().signal},true);
+  const source=productionFixture(stickerLaunchFixture,r.prompt);
+  const game={...source,assets:illustratedGame().assets,productionPlan:plan,playthrough:source.playthrough!.slice(0,1)};
+  const generated=usage('planning','construction');
+  await h.coordinator.report(ack.jobId,0,'generate',gen,{candidate:{format:'generated-source-v1',game},...generated});
+  await h.coordinator.claim(ack.jobId,0,'test',sandbox,PREMIUM_POLICY_VERSION);
+  const compiled=compiledPipelineFixture(game),evidence=syntheticQualityEvidence(compiled);
+  await h.coordinator.report(ack.jobId,0,'test',sandbox,{ok:true,game:compiled,qualityEvidence:evidence});
+  await h.coordinator.claim(ack.jobId,0,'review',reviewer,PREMIUM_POLICY_VERSION);
+  const review=bindQualityReview(compiled,evidence,syntheticPremiumReviewAnswer()),reviewed=usage('review');
+  await h.coordinator.report(ack.jobId,0,'review',reviewer,{review,...reviewed});
+  const result=await h.service.get(h.adult,ack.jobId);
+  assert.equal(result.status,'ready');
+  base=result.revisionId!;
+  await h.service.keep(h.adult,base);
+  editCost+=generated.usageUnits+reviewed.usageUnits;
+  const ledger=(await h.repo.snapshot()).ledgers[familyId];
+  assert.equal(ledger.reserved,0);
+  assert.equal(ledger.used,editCost);
+ }
+ const fork=await h.service.fork(h.adult,base,'Copy');
+ const sibling=(await h.service.undo(h.adult,base)).revisionId;
+ // Both copies have the same historical spend even when the current ledger is empty.
+ const lowered=new JobService(h.repo,agent,gate,{...options,premiumPilot:pilot,premiumMaxJobMicroUsd:1_500_000+editCost+1_692_000-1});
+ for(const id of [base,sibling,fork.revisionId])await assert.rejects(lowered.submit(h.adult,edit(id,'no-room')),/GAME_BUDGET_REACHED/);
+ assert.equal((await h.repo.snapshot()).ledgers[familyId].reserved,0);
+});
+test('requested artwork on a saved game reserves its approved first-pass image capacity',async()=>{
+ const h=await savedGame(3_108_000);
+ const ack=await h.service.submit(h.adult,edit('saved','art-edit','Redraw the background.'));
+ assert.equal((await h.repo.snapshot()).ledgers[familyId].reserved,1_892_000);
+ await h.service.cancel(h.adult,ack.jobId);
+ assert.equal((await h.repo.snapshot()).ledgers[familyId].reserved,0);
+});
+test('concurrent edits on fork and original compete for the same game funds',async()=>{
+ const h=await savedGame(1_700_000),fork=await h.service.fork(h.adult,'saved','Copy');
+ const results=await Promise.allSettled(['saved',fork.revisionId].map((id,i)=>h.service.submit(h.adult,edit(id,'race-'+i))));
+ assert.equal(results.filter(x=>x.status==='fulfilled').length,1);
+ assert.match(String(results.find(x=>x.status==='rejected')?.reason),/GAME_BUDGET_REACHED/);
+ assert.equal((await h.repo.snapshot()).ledgers[familyId].reserved,1_692_000);
+ const independent=await h.service.submit(h.adult,{...request,clientRequestId:'independent'});
+ assert.equal(independent.status,'queued');
+});
+test('unknown initial Build cost stays charged through a fresh retry ID and a new family month',async()=>{
+ const h=await admitted(),gen=identity('generate');
+ await h.coordinator.claim(h.id,0,'generate',gen,PREMIUM_POLICY_VERSION);
+ await h.coordinator.report(h.id,0,'generate',gen,{errorCode:'PROVIDER_TIMEOUT',usageComplete:false,...usage()});
+ await h.repo.transaction(s=>{s.ledgers[familyId].used=0;return true;});
+ await assert.rejects(h.service.retry(h.adult,h.id,'explicit-retry'),/GAME_BUDGET_REACHED/);
+ assert.equal((await h.repo.snapshot()).jobs.length,1);
+});
+for(const limit of ['game','family','funded'] as const)test('visual repair reserves before dispatch: '+limit,async()=>{
+ const h=await savedGame(limit==='game'?3_308_000:1_500_000);
+ if(limit==='family')await h.service.setAllowance({...h.adult,role:'parent'},1_692_000,true);
+ const ack=await h.service.submit(h.adult,edit('saved','needs-repair'));
+ await h.coordinator.enqueue(ack.jobId);
+ const gen=identity('generate'),sandbox=identity('test');
+ const claim=await h.coordinator.claim(ack.jobId,0,'generate',gen,PREMIUM_POLICY_VERSION);
+ const plan=bindGameProductionPlan({...fixturePremiumPlanProposal({}),presentationStyle:'illustrated'},{...claim.input!,signal:new AbortController().signal},true);
+ const source=productionFixture(stickerLaunchFixture,claim.input!.childIntent);
+ const game={...source,assets:illustratedGame().assets,productionPlan:plan,playthrough:source.playthrough!.slice(0,1)};
+ const generated=usage('planning','construction');
+ await h.coordinator.report(ack.jobId,0,'generate',gen,{candidate:{format:'generated-source-v1',game},...generated});
+ await h.coordinator.claim(ack.jobId,0,'test',sandbox,PREMIUM_POLICY_VERSION);
+ const failure={ok:false,diagnostics:'VISUAL_INCOHERENT_ART'};
+ await h.coordinator.report(ack.jobId,0,'test',sandbox,failure);
+ await h.coordinator.report(ack.jobId,0,'test',sandbox,failure);
+ const state=await h.repo.snapshot(),job=state.jobs.at(-1)!;
+ if(limit==='funded'){
+  assert.equal(state.ledgers[familyId].reserved,generated.usageUnits+2_020_000);
+  const repair=await h.coordinator.claim(job.id,1,'generate',identity('generate',1),PREMIUM_POLICY_VERSION);
+  assert.equal(repair.input!.budget.maxUnits,2_020_000);
+ }else{
+  assert.equal(job.status,'failed');
+  assert.equal(job.errorCode,limit==='game'?'GAME_BUDGET_REACHED':'SPENDING_CUTOFF');
+  assert.equal(job.execution!.attempt,0);
+  assert.equal(state.ledgers[familyId].used,generated.usageUnits);
+  assert.equal(state.ledgers[familyId].reserved,0);
+ }
+});
 test('approved art on a saved revision stays within its immutable family and adult profile',async()=>{
  const {repo,service,adult}=await setup();
  const original=illustratedGame();

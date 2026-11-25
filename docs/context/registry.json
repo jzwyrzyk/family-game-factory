@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T18:16:02.770Z",
-      "sourceDigest": "db4335d97b37dd6fe65cacd06c129b38bd120955bf3187df7c268f5d56f985c3",
-      "reviewOutcome": "updated",
-      "reviewReason": "Documented My Creations entry/cards, readable moved controls and shared native-host restoration; desktop and phone saved-variant journeys passed.",
+      "reviewedAt": "2026-11-25T00:47:28.656Z",
+      "sourceDigest": "073e73457b64f67b9150838658fc01771bdf34d0b72d420953c03a9abe4ef978",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The new private game-balance error uses the existing saved-game recovery surface. Navigation, child copy and availability for other audiences retain their existing contracts.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -675,10 +675,10 @@
         "server/privacy/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:12:37.864Z",
-      "sourceDigest": "4717df49f05d43ccf498dadc8d27ac7b5789b59616e58e83cee3e5a516e32cdb",
+      "reviewedAt": "2026-11-25T00:47:29.307Z",
+      "sourceDigest": "1b3859e5f2fd331ed8b3cb442cbb85e38426813a814283e9774d64d526bd3c35",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed gateway wiring, the isolated private cap and existing job reservations against the November 26 activation contract.",
+      "reviewReason": "Architecture now describes transactional shared game reservations and the independent monthly family limit.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -728,10 +728,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:14:20.397Z",
-      "sourceDigest": "5166eba9969f0617fd7fe3f9b00e512e8677a39f77f651d0b6a5ae4b1d94fb66",
+      "reviewedAt": "2026-11-25T00:47:29.606Z",
+      "sourceDigest": "81ca1b66af75252f75c837aa1fa517b9eb39380f25026678ae5c3a699834939c",
       "reviewOutcome": "updated",
-      "reviewReason": "Compared actual scene and sheet request dimensions with published output pricing, modeled prompt headroom, and reconciled the $3.912 synthetic reservation and image receipts.",
+      "reviewReason": "Premium contract and decision document fresh Build, later edit and repair reservations, historical lineage and actual settlement.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:14:03.529Z",
-      "sourceDigest": "fef2f9d5825eddeeef93c92d37eaaca29ea3037ed791855b4aa8411850e375c6",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed exact-cap, contention with sufficient ledger for an oversized request, measured text and image receipts, and old-job tests.",
+      "reviewedAt": "2026-11-25T00:47:29.942Z",
+      "sourceDigest": "9bf8fbce6f1bca385b1684d2895dcac69d78f6212e1d20e24244f3e4b4de14ea",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Existing premium and unit commands cover concurrent fork edits, actual settlement across revisions, pass-sized art and repair holds, and conservative unknown usage. CI selection and release evidence rules stay in place.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
