@@ -1,0 +1,275 @@
+{
+  "version": 1,
+  "pages": [
+    {
+      "id": "studio-library",
+      "label": "Home / My Games",
+      "action": "home"
+    },
+    {
+      "id": "studio",
+      "label": "Make a Game / conversation",
+      "action": "create"
+    },
+    {
+      "id": "creations",
+      "label": "My Creations",
+      "action": "creations"
+    },
+    {
+      "id": "creation",
+      "label": "Creative Studio / Coding",
+      "action": "coding"
+    },
+    {
+      "id": "art-studio",
+      "label": "Art Studio / drawings",
+      "action": "art"
+    },
+    {
+      "id": "lab",
+      "label": "My Powers / learning",
+      "action": "powers"
+    },
+    {
+      "id": "problem-solving",
+      "label": "Problem-solving practice",
+      "action": "reasoning"
+    },
+    {
+      "id": "jems-journey",
+      "label": "My Journey / maker levels",
+      "action": "journey"
+    },
+    {
+      "id": "jems-rewards",
+      "label": "Rewards / gems / achievements",
+      "action": "rewards"
+    },
+    {
+      "id": "jems-pals",
+      "label": "Gem Pals / collection & growth",
+      "action": "pals"
+    },
+    {
+      "id": "parent",
+      "label": "Parent dashboard",
+      "action": "parent"
+    },
+    {
+      "id": "home",
+      "label": "Legacy arcade home (retained)",
+      "action": "legacy-home"
+    },
+    {
+      "id": "game",
+      "label": "Legacy gameplay (retained)",
+      "action": "legacy-game"
+    },
+    {
+      "id": "create",
+      "label": "Legacy idea wizard / builder (retained)",
+      "action": "legacy-create"
+    },
+    {
+      "id": "feedback",
+      "label": "Legacy remix (retained)",
+      "action": "legacy-feedback"
+    },
+    {
+      "id": "studioNotifications",
+      "label": "Notifications",
+      "action": "notifications"
+    }
+  ],
+  "states": [
+    {
+      "id": "welcome",
+      "label": "First-time character welcome",
+      "action": "welcome"
+    },
+    {
+      "id": "profile",
+      "label": "Profile selection",
+      "action": "profiles"
+    },
+    {
+      "id": "menu",
+      "label": "Navigation menu",
+      "action": "menu"
+    },
+    {
+      "id": "coach-confirm",
+      "label": "Coach: idea ready to build",
+      "action": "coach-confirm"
+    },
+    {
+      "id": "build-wait",
+      "label": "Build: construction / waiting",
+      "action": "build-wait"
+    },
+    {
+      "id": "build-ready",
+      "label": "Build: ready to play",
+      "action": "build-ready"
+    },
+    {
+      "id": "build-error",
+      "label": "Build: failed / retry",
+      "action": "build-error"
+    },
+    {
+      "id": "build-unavailable",
+      "label": "Build: service unavailable",
+      "action": "build-unavailable"
+    },
+    {
+      "id": "factory",
+      "label": "Play Gem Factory",
+      "action": "game:factory"
+    },
+    {
+      "id": "mining",
+      "label": "Play Mind Your Jems",
+      "action": "game:mining"
+    },
+    {
+      "id": "gum",
+      "label": "Play Bubble Gum Builders",
+      "action": "game:gum"
+    },
+    {
+      "id": "hill",
+      "label": "Play Junkyard Rally",
+      "action": "game:hill"
+    },
+    {
+      "id": "buckets",
+      "label": "Retained Splash or Pass",
+      "action": "game:buckets"
+    },
+    {
+      "id": "dragon",
+      "label": "Retained Dragon Island Rescue",
+      "action": "game:dragon"
+    },
+    {
+      "id": "moon",
+      "label": "Retained Moon Donut Dash",
+      "action": "game:moon"
+    },
+    {
+      "id": "robot",
+      "label": "Retained Robot Route Lab",
+      "action": "game:robot"
+    },
+    {
+      "id": "math",
+      "label": "Math question / answers / hints",
+      "action": "math"
+    },
+    {
+      "id": "english",
+      "label": "English question / answers / hints",
+      "action": "english"
+    },
+    {
+      "id": "skills",
+      "label": "Parent: skills & progress",
+      "action": "parent:skills"
+    },
+    {
+      "id": "evidence",
+      "label": "Parent: evidence journal",
+      "action": "parent:evidence"
+    },
+    {
+      "id": "school",
+      "label": "Parent: school connections",
+      "action": "parent:school"
+    },
+    {
+      "id": "settings",
+      "label": "Parent: learning & privacy settings",
+      "action": "parent:settings"
+    },
+    {
+      "id": "connection",
+      "label": "Family: trusted devices & invitations",
+      "action": "connection"
+    },
+    {
+      "id": "adult-session",
+      "label": "Family: private parent session",
+      "action": "adult-session"
+    },
+    {
+      "id": "help",
+      "label": "Journey help / tips",
+      "action": "help"
+    },
+    {
+      "id": "learning-setup",
+      "label": "Profile: learning level setup",
+      "action": "learning-setup"
+    },
+    {
+      "id": "coding-editor",
+      "label": "Coding: First steps editor",
+      "action": "coding-editor"
+    },
+    {
+      "id": "coding-challenge",
+      "label": "Coding: rebuild challenge",
+      "action": "coding-challenge"
+    },
+    {
+      "id": "art-draw",
+      "label": "Art Studio: drawing canvas",
+      "action": "art-draw"
+    },
+    {
+      "id": "privacy",
+      "label": "Parent: guardian consent",
+      "action": "privacy"
+    }
+  ],
+  "journeys": [
+    "Welcome \u2192 character \u2192 creation conversation \u2192 build \u2192 wait \u2192 play \u2192 keep",
+    "Ready-to-play native game \u2192 local edit \u2192 compare \u2192 keep / undo",
+    "Creative Studio \u2192 scene \u2192 blocks \u2192 run \u2192 save \u2192 reopen",
+    "Coding challenge \u2192 inspect target \u2192 rebuild \u2192 check / retry",
+    "Art Studio \u2192 draw / upload \u2192 prepare \u2192 save \u2192 reuse",
+    "My Powers \u2192 Math / English \u2192 answer \u2192 hint / retry \u2192 next",
+    "Parent \u2192 learner \u2192 progress \u2192 evidence \u2192 school \u2192 settings / export",
+    "Gem Pals \u2192 choose / inspect \u2192 growth \u2192 create with Pal",
+    "Rewards \u2192 gems \u2192 achievements \u2192 maker journey",
+    "Notifications \u2192 build status \u2192 open saved creation",
+    "Trusted devices \u2192 invitation \u2192 guardian choices \u2192 private adult session"
+  ],
+  "scenarios": [
+    "normal",
+    "first-time",
+    "empty",
+    "populated",
+    "loading",
+    "error",
+    "locked",
+    "unlocked",
+    "long-content"
+  ],
+  "gaps": [
+    "Gem Pal artwork is packaged as maximum-768px WebP display derivatives (quality 90) of the original images. Full-resolution pixel inspection is outside this compact artifact; UI_REVIEW_EXACT_ASSETS=1 retains original bytes. Other artwork, fonts and UI source are unchanged.",
+    "AI replies and remote build lifecycle are deterministic synthetic responses. No model, spending, authentication or server behavior is exercised.",
+    "Generated-game preview uses a clearly labelled embedded transport fixture; generated-game artwork and arbitrary generated gameplay are not represented. Native games use their actual merged engines.",
+    "Pre-K and Kindergarten use the merged early-preview compile mode; they are not enabled in the ordinary production build.",
+    "No separate scene-preview approval screen was found in merged game creation. Existing coding scene preview and coach readiness are retained.",
+    "New-family welcome, account recovery and administrator screens in family-beta PRs 170\u2013174 are not merged and are excluded.",
+    "Browser speech, microphone capture, service worker, external links and real authentication are disabled. Passphrases entered here have no authority; use only demo text.",
+    "Scenario controls affect fixture initialization and service responses; they do not claim every possible page/scenario cross-product is implemented.",
+    "Review navigation can dismiss active learning or dialogs to reach a requested state; normal in-app navigation retains its existing guards.",
+    "Local synthetic IndexedDB storage is isolated by a review-run prefix. Review findings persist separately where browser storage permits, with explicit JSON and Markdown exports.",
+    "Mobile/tablet viewport emulation does not establish real hardware, Safari, touch keyboard, sound or educational acceptance."
+  ],
+  "excludedPRs": []
+}

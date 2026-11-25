@@ -10,6 +10,8 @@ Start with the canonical references below. Feature documents remain the detailed
 
 The current four-experience release is consolidated in [PR134](https://github.com/jzwyrzyk/family-game-factory/pull/134). Its scope combines the Bubble Gum, Mining, Factory and first-learner Coding contracts below with shared navigation, profile settings, reading and Notifications. Source-PR histories are preserved; read delivery state for the current integration gates and release evidence.
 
+The [standalone UI review](ui-review/README.md) packages the real UI for offline acceptance, with synthetic data, a coverage checklist and local findings exports.
+
 ## Canonical references
 
 | Reference | Question it answers | Update when |

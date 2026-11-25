@@ -20,3 +20,8 @@ validation-evidence.json
 /diagnostics-output/
 
 /dist-family-beta/
+# Standalone review builds and development scratch
+/dist-review/
+/work/
+
+/node_modules

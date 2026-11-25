@@ -82,7 +82,8 @@
     "docs/development/DEV-TEST-PROD.md",
     "docs/development/SETUP.md",
     "docs/development/COSTS.md",
-    "docs/decisions/2026-11-23-dev-test-prod.md"
+    "docs/decisions/2026-11-23-dev-test-prod.md",
+    "docs/ui-review/README.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -877,7 +878,8 @@
         "docs/bubble-gum-builders/*.md",
         "docs/game-intelligence/premium-benchmark/*.md",
         "docs/development/*.md",
-        "infra/nonproduction/*.md"
+        "infra/nonproduction/*.md",
+        "docs/ui-review/*.md"
       ],
       "sources": [
         "tests/**",
@@ -888,10 +890,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T17:33:44.145Z",
-      "sourceDigest": "39d154c95803438ec4cd356eb60ebf21bdd17655ce8319142d043c4db657d454",
+      "reviewedAt": "2026-11-25T17:36:49.452Z",
+      "sourceDigest": "1eace0b14e9dbcfeeb57064814ac26f75bd41e4cf291cc9e00d0bef266687e0a",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered multiowner and real HTTPS browser recovery in Chromium and WebKit gates, retained blocked-IDB and async navigation assertions, recorded frozen 677-unit/118-CI/emulator/full-storage evidence and failed initial hosted attempts; duplicate preview ZIP removed only while source/file manifests and all receipts remain.",
+      "reviewReason": "Registered multiowner and real HTTPS browser recovery in Chromium and WebKit gates, retained blocked-IDB and async navigation assertions, recorded frozen 677-unit/118-CI/emulator/full-storage evidence and failed initial hosted attempts; duplicate preview ZIP removed only while source/file manifests and all receipts remain. Integrated main185 standalone source coverage, offline adapters and file-based browser checks; all existing 118 CI contracts pass after package reconciliation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1110,7 +1112,8 @@
         "docs/bubble-gum-builders/*.md",
         "docs/development/*.md",
         "infra/nonproduction/*.md",
-        "docs/evidence/README.md"
+        "docs/evidence/README.md",
+        "docs/ui-review/*.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -1131,10 +1134,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T17:33:44.298Z",
-      "sourceDigest": "1e5b7221e9befcda299288b2fcc65af49bd64c7dbae3a347026144a6b6f5d0fc",
+      "reviewedAt": "2026-11-25T17:36:49.621Z",
+      "sourceDigest": "2539e5300aa8abd4bc8a63ae3891d6ec71a4923cabb73587338a5ffc4940e564",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact frozen local head/tree, final benchmark pins and limits, initial four hosted failures, worker21 five-job success and current application186 qualification; deployment, device, provider, owner and protected merge remain distinct gates.",
+      "reviewReason": "Recorded exact frozen local head/tree, final benchmark pins and limits, initial four hosted failures, worker21 five-job success and current application186 qualification; deployment, device, provider, owner and protected merge remain distinct gates. Integrated main1be7e1a and preserved both command groups and isolated UI-review workflow; recorded the withheld conflict-state checks and requirement for new combined-head qualification.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1376,7 +1379,8 @@
         "AGENTS.md",
         "docs/README.md",
         "docs/context/*.md",
-        ".github/PULL_REQUEST_TEMPLATE.md"
+        ".github/PULL_REQUEST_TEMPLATE.md",
+        "docs/ui-review/*.md"
       ],
       "sources": [
         "scripts/check-docs.mjs",
@@ -1388,10 +1392,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T16:41:38.170Z",
-      "sourceDigest": "8362f0a492033a7dc7372832fc00a70f9e24ddd870b2eca8785e7f8bb5a9acd5",
+      "reviewedAt": "2026-11-25T17:36:49.815Z",
+      "sourceDigest": "ffcb75ea2b467438035bcf79bf5bcb35abee7594f4127027f5431f504244a43e",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the added storage helper route, existing family/storage document index and source coverage; preserved the semantic-review requirement, link scope and all existing areas instead of refreshing unrelated records.",
+      "reviewReason": "Reviewed the added storage helper route, existing family/storage document index and source coverage; preserved the semantic-review requirement, link scope and all existing areas instead of refreshing unrelated records. Reviewed main185 required review runbook/index and broad tools/workflow routing together with storage helper coverage; retained both architectures and all existing semantic checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

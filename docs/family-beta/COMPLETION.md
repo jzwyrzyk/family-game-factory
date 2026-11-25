@@ -6,7 +6,7 @@ This is the combined requirement and evidence register for the November 25, 2026
 
 ## Source baseline and review order
 
-The refreshed protected application main is `0f459f5b29fa3a72c5caf1fa69051475421861f9` (the #184 integration record). It includes premium #139/#168, responsive Coding #175 and all early-learning #176–179/#183 changes. Source assembly began by integrating storage #166, then the family beta chain and #180 audit corrections. The historical #181 branch remains untouched evidence; it is neither the new base nor a deployment candidate.
+The initial protected application baseline was `0f459f5b29fa3a72c5caf1fa69051475421861f9` (the #184 integration record). The continuation also incorporates refreshed main `1be7e1adc027a061981098f9b3fb7b8949ff1419`, which merges #185’s standalone offline UI review tool; its build commands, isolated adapters, source coverage and workflow are preserved. It includes premium #139/#168, responsive Coding #175 and all early-learning #176–179/#183 changes. Source assembly began by integrating storage #166, then the family beta chain and #180 audit corrections. The historical #181 branch remains untouched evidence; it is neither the new base nor a deployment candidate.
 
 | Input | Exact observed head | Dependency / disposition |
 | --- | --- | --- |

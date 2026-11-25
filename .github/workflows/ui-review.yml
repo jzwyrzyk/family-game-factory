@@ -1,0 +1,57 @@
+name: Standalone UI review
+on:
+  push:
+    branches: [main]
+    paths: ['src/**', 'public/**', 'index.html', 'tools/ui-review/**', 'tests/parent-dashboard-fixture.ts', 'package*.json', '.github/workflows/ui-review.yml']
+  pull_request:
+    paths: ['tools/ui-review/**', 'docs/ui-review/**', '.github/workflows/ui-review.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ui-review-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  offline-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: python -m pip install Pillow==11.3.0
+      - name: Identify represented merged application
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "UI_REVIEW_BASE_SHA=$(git merge-base HEAD origin/main)" >> "$GITHUB_ENV"
+          else
+            echo "UI_REVIEW_BASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          fi
+      - run: npm run review:build
+      - name: Upload the standalone download
+        uses: actions/upload-artifact@v4
+        with:
+          name: jems-ui-review-${{ github.sha }}
+          path: dist-review/
+          retention-days: 14
+          if-no-files-found: error
+          compression-level: 6
+      - run: npx playwright install --with-deps chromium
+      - run: npm run review:test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jems-ui-review-evidence-${{ github.sha }}
+          path: test-results/ui-review/
+          retention-days: 14
+          compression-level: 6
