@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:08:27.254Z",
-      "sourceDigest": "0647aa7f3aae2971f49e1726466d14543ec9fcaeaf279893a585d19569549dd2",
+      "reviewedAt": "2026-11-25T01:15:45.995Z",
+      "sourceDigest": "a5fb65232394a147f0c5b2d3ade81b595faf6107d55241a23646bd8f0de9023c",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the early question catalogs, visual activities, device-only narration, legacy content assertions and skill crosswalk against the affected source.",
+      "reviewReason": "Reviewed family handoff, generation restrictions, local coding and games, privacy contracts and declared prompt delivery in parent reports.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -728,10 +728,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T21:03:59.475Z",
-      "sourceDigest": "a7748aa2cc821639c57f194a3393e9938b763f708217921d7acfd51afc79fb2f",
+      "reviewedAt": "2026-11-25T01:15:46.583Z",
+      "sourceDigest": "ba1aff63e84b717d5eb511c3927767db252983ddf706c58a7370fec0d1375bce",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed atomic normal-motion evidence sampling after the offline paused-frame race; preserved source/frame/state identities and originals, and explicitly retained production eight-image policy and paid serial/full-job behavior.",
+      "reviewReason": "Reviewed family handoff, generation restrictions, local coding and games, privacy contracts and declared prompt delivery in parent reports.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -824,10 +824,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "ee30422a65cfbeff27ec88eb03a1bc4b9d25de6034ed1012e09cbbff664b847b",
-      "reviewedAt": "2026-11-24T20:54:52.440Z",
+      "sourceDigest": "9d13ae654b9f9d4f187374e14a4a74cad52397eeba1354091d984daad8b18b47",
+      "reviewedAt": "2026-11-25T01:15:46.736Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled merged DEV TEST rollout guidance with premium Adult Private approval and saved-reader preservation; no child scope, grants, provider retention or authorization policy changes.",
+      "reviewReason": "Reviewed family handoff, generation restrictions, local coding and games, privacy contracts and declared prompt delivery in parent reports.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1487,10 +1487,10 @@
         "tests/parent-dashboard*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "a8f550a9ef223282e87d3002facf0e6608bb5f6bcfa27d9058ffd7556cc54990",
-      "reviewedAt": "2026-11-25T01:00:58.822Z",
+      "sourceDigest": "3b67bcb6a2bb4ad3cb5f6a8a61b9bc0e0b43169a7e63a6cbf47a3ba5f4588152",
+      "reviewedAt": "2026-11-25T01:15:46.890Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
+      "reviewReason": "Reviewed family handoff, generation restrictions, local coding and games, privacy contracts and declared prompt delivery in parent reports.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-19T17:17:56.552Z",
