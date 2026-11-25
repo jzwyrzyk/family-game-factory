@@ -19,6 +19,17 @@ Splash or Pass reaches a natural round-end checkpoint. The other native matrix c
 
 ## Verification receipts
 
+The seven PNGs below come from a clean build of `757a2c197fcceb4aa746970ddb7615c65edadf5a`. The preview manifest reported that SHA and `dirty: false`. The synthetic journey completed all 25 browser checks with Google Chrome for Testing 141.0.7390.37 on Linux. These include the displayed group for zero, the first spoken action in the assembly game and an actual input after each checkpoint.
+
+| Additional local checks | Result |
+| --- | --- |
+| Existing application unit suite | 597 passed |
+| CI orchestration contract suite | 118 passed |
+| Selected creation, challenge, budget, reward, backup, parent-report, authorization and grade tests | 132 passed, with overlap with the application suite |
+| Deployment and operations fixture suites | 83 and 239 passed |
+| First-learner coding layout | Eight viewports passed, including the 320 CSS pixel phone, plus a 150% Chromium zoom check |
+
+
 The curriculum contains 17 Pre-K math skills and 23 kindergarten math skills. The deterministic engine suite samples 60 seeds for each of those 40 skills and checks every possible subset for the new four-, six- and eight-picture sorting boards. The reviewed language catalog has 11 Pre-K skills with 206 tier entries and 16 kindergarten skills with 294 tier entries. Entries reused across difficulty tiers count once per tier. The 48 legacy Language Arts skill units retain their version-1 content.
 
 The small-phone acceptance suite also runs at 320 × 667 with a challenge open. It tests a real pointer hit on every first-step action and checks 150% Chromium zoom. The isolated version-1 input regression uses a loopback-routed HTML host and independently sandboxed game response. This gives Playwright's clock a real navigation boundary and preserves the existing score, frame and held-input assertions.
