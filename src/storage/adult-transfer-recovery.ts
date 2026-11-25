@@ -5,7 +5,7 @@ import {REWARDS_DB_NAME} from '../rewards/store';
 import {PALS_DB_NAME} from '../pals/store';
 import {assemblyHash} from '../creation/private-art';
 import {recoveryHash as sha256,type RecoveryArchive,type RecoveryScope} from './recovery-format';
-import {decodeCompleteBackup,encodeCompleteBackup,transferredRecoveryScope,type CompleteBackup} from './complete-backup';
+import {decodeCompleteBackup,encodeCompleteBackup,completeSources,transferredRecoveryScope,type CompleteBackup} from './complete-backup';
 import {nativeSnapshotsOf} from './native-recovery';
 import {notebookSnapshotsOf} from './notebook-recovery';
 import {creationSnapshotsOf} from './creation-recovery';
@@ -22,18 +22,18 @@ export async function transferredAdultMappings():Promise<AdultRecoveryMapping[]>
  const target=currentAdultSession()?.profileId;if(!target)throw Error('Open Private parent access first.');await verifyAdultRecovery(target);
  const response=await requestAdultRecovery('/v1/recovery/adult/mappings'),scope:RecoveryScope={origin:location.origin,audience:target,owners:[target]},source=transferredRecoveryScope(scope),receipt=JSON.parse(localStorage.getItem('jems-recovery-origin-transfer-v1')??'null');
  if(!source||!receipt)throw Error('Complete the approved household transfer before recovering an earlier private workspace.');
- if(!Array.isArray(response.mappings))throw Error('The private recovery mapping is invalid.');return response.mappings.filter((mapping:AdultRecoveryMapping)=>mapping&&mapping.familyId===receipt.familyId&&mapping.workspace===receipt.workspace&&mapping.sourceOrigin===source.origin&&mapping.targetOrigin===location.origin&&adult(mapping.sourceAudience)&&mapping.sourceAudience!==target&&mapping.targetAudience===target&&Number.isSafeInteger(mapping.expiresAt)&&mapping.expiresAt>Date.now());
+ if(!Array.isArray(response.mappings))throw Error('The private recovery mapping is invalid.');return response.mappings.filter((mapping:AdultRecoveryMapping)=>mapping&&mapping.familyId===receipt.familyId&&mapping.workspace===receipt.workspace&&mapping.sourceOrigin===source.origin&&mapping.targetOrigin===location.origin&&adult(mapping.sourceAudience)&&mapping.targetAudience===target&&Number.isSafeInteger(mapping.expiresAt)&&mapping.expiresAt>Date.now());
 }
 export function remoteRecoveryReferences(snapshot:CompleteBackup):string[]{
- const result=new Set<string>();for(const session of snapshot.progress.factoryStudio?.sessions??[]){if(session.remoteId)result.add(session.remoteId);for(const candidate of [session.candidate,session.undone,...(session.experiments??[]).map((x:any)=>x.candidate)])if(candidate?.remoteId){result.add(candidate.remoteId);if(candidate.baseId)result.add(candidate.baseId);}for(const kept of session.keptExperiments??[])if(kept.kind==='remote'){result.add(kept.revisionId);result.add(kept.baseId);}}
+ const result=new Set<string>();for(const session of completeSources(snapshot).notebooks.flatMap(row=>row.notebook.sessions)){if(session.remoteId)result.add(session.remoteId);for(const candidate of [session.candidate,session.undone,...(session.experiments??[]).map((x:any)=>x.candidate)])if(candidate?.remoteId){result.add(candidate.remoteId);if(candidate.baseId)result.add(candidate.baseId);}for(const kept of session.keptExperiments??[])if(kept.kind==='remote'){result.add(kept.revisionId);result.add(kept.baseId);}}
  return [...result];
 }
 /** Maps only schema-owned identity fields. Authored words, original picture
  * bytes and the source archive remain untouched. Server mappings are needed
  * for every remote original; pending paid operations stay in the source copy. */
 export async function mapTransferredAdultBackup(archive:RecoveryArchive,mapping:AdultRecoveryMapping,remote:GeneratedRecoveryMap={revisionMap:{},projectMap:{}}):Promise<RecoveryArchive>{
- const scope=archive.manifest.scope;if(!adult(mapping.sourceAudience)||!adult(mapping.targetAudience)||mapping.sourceAudience===mapping.targetAudience||scope.audience!==mapping.sourceAudience||scope.origin!==mapping.sourceOrigin||scope.owners.length!==1||scope.owners[0]!==mapping.sourceAudience)throw Error('The private source does not match its reviewed mapping.');
- const snapshot=await decodeCompleteBackup(archive,scope),p=snapshot.progress,source=mapping.sourceAudience,target=mapping.targetAudience;
+ const scope=archive.manifest.scope;if(!adult(mapping.sourceAudience)||!adult(mapping.targetAudience)||mapping.sourceAudience===mapping.targetAudience&&mapping.sourceOrigin===mapping.targetOrigin||scope.audience!==mapping.sourceAudience||scope.origin!==mapping.sourceOrigin||scope.owners.length!==1||scope.owners[0]!==mapping.sourceAudience)throw Error('The private source does not match its reviewed mapping.');
+ const snapshot=await decodeCompleteBackup(archive,scope),resolved=completeSources(snapshot),p=snapshot.progress; p.factoryWorkspace=resolved.native[0].workspace;p.factoryStudio=resolved.notebooks[0].notebook;p.factoryCreation=resolved.creations[0].workspace;const source=mapping.sourceAudience,target=mapping.targetAudience;
  const changeOwner=(row:any)=>{if(row.owner!==source)throw Error('The private copy includes another owner.');row.owner=target;};
  const outbox=(rows:any[]|undefined)=>{for(const row of rows??[])changeOwner(row);};
  for(const profile of p.profiles){if(profile.id!==source)throw Error('The private profile is invalid.');profile.id=target;outbox(profile.rewardOutbox);}p.activeProfile=target;for(const feedback of p.feedback??[]){if(feedback.profile!==source)throw Error('Private feedback belongs to another player.');feedback.profile=target;}

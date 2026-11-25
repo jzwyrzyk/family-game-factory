@@ -238,6 +238,7 @@ export function installRewardBackupControls(rewards:RewardsController):void {
   exportButton.addEventListener('click',event=>{
     event.preventDefault();event.stopImmediatePropagation();
     void (async()=>{
+      if(import.meta.env.MODE==='storage-preview')throw Error('Use Save a recovery copy, then Preview and Download complete copy. Complete copies include every prepared player library and its original pictures.');
       flush();await withPalsMaintenance(palStore=>rewards.maintenance(async store=>{
         download(await captureFamilyRewardPayload(FG,store,palStore));
       }));
