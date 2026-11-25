@@ -5,7 +5,7 @@ import type {PipelineState} from '../pipeline/types';
 export const MAX_ARTIFACT_BYTES=8*1024*1024;
 const digest=(bytes:Buffer)=>createHash('sha256').update(bytes).digest('hex');
 export interface ArtifactRef {storage:'private-artifact-v1';sha256:string;bytes:number}
-export interface PrivateArtifacts {put(bytes:Buffer):Promise<ArtifactRef>;get(ref:ArtifactRef):Promise<Buffer>}
+export interface PrivateArtifacts {put(bytes:Buffer,options?:{verifyStored?:boolean}):Promise<ArtifactRef>;get(ref:ArtifactRef):Promise<Buffer>}
 export function validateRef(ref:ArtifactRef){if(!ref||ref.storage!=='private-artifact-v1'||!/^[a-f0-9]{64}$/.test(ref.sha256)||!Number.isInteger(ref.bytes)||ref.bytes<1||ref.bytes>MAX_ARTIFACT_BYTES)throw Error('PRIVATE_ARTIFACT_REFERENCE_REJECTED');}
 /** ADC on the gateway/preview identities only; no URLs, ACL changes or signing keys are exposed. */
 export class GcsPrivateArtifacts implements PrivateArtifacts {
@@ -17,8 +17,8 @@ export class GcsPrivateArtifacts implements PrivateArtifacts {
   this.bucket=client.bucket(bucket);
  }
  private file(ref:ArtifactRef){validateRef(ref);return this.bucket.file(`factory/${this.workspace}/sha256/${ref.sha256}`)}
- async put(bytes:Buffer){const ref:ArtifactRef={storage:'private-artifact-v1',sha256:digest(bytes),bytes:bytes.length};validateRef(ref);if(this.cache.has(ref.sha256))return ref;
-  try{await this.file(ref).save(bytes,{resumable:false,preconditionOpts:{ifGenerationMatch:0},metadata:{contentType:'application/json',cacheControl:'private,no-store'}})}catch(error){if((error as {code?:number}).code!==412)throw Error('PRIVATE_ARTIFACT_WRITE_FAILED');await this.get(ref);}
+ async put(bytes:Buffer,options:{verifyStored?:boolean}={}){const ref:ArtifactRef={storage:'private-artifact-v1',sha256:digest(bytes),bytes:bytes.length};validateRef(ref);if(this.cache.has(ref.sha256)&&!options.verifyStored)return ref;
+  try{await this.file(ref).save(bytes,{resumable:false,preconditionOpts:{ifGenerationMatch:0},metadata:{contentType:'application/json',cacheControl:'private,no-store'}})}catch(error){if((error as {code?:number}).code!==412)throw Error('PRIVATE_ARTIFACT_WRITE_FAILED');if(options.verifyStored)this.cache.delete(ref.sha256);await this.get(ref);}
   this.remember(ref,bytes);return ref;
  }
  async get(ref:ArtifactRef){validateRef(ref);const cached=this.cache.get(ref.sha256);if(cached){if(cached.length!==ref.bytes)throw Error('PRIVATE_ARTIFACT_INTEGRITY_FAILED');this.remember(ref,cached);return Buffer.from(cached)}const [bytes]=await this.file(ref).download({start:0,end:MAX_ARTIFACT_BYTES});if(bytes.length!==ref.bytes||digest(bytes)!==ref.sha256)throw Error('PRIVATE_ARTIFACT_INTEGRITY_FAILED');this.remember(ref,bytes);return bytes;}

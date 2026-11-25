@@ -4,8 +4,8 @@ import {betaFixture} from './beta-fixture';
 import type {AtomicStore} from '../server/beta/documents';
 import {guardedBackupOperation,reconcileGeneratedRestoreOperation} from '../server/beta/backup-operations';
 export async function backupOperationEmulatorAcceptance(store:AtomicStore){
- const {d,enroll,mutate}=await betaFixture(store,'restore-'+randomUUID().slice(0,8)),family=await enroll('restore-proof'),pointId='scheduled-'+createHash('sha256').update(randomUUID()).digest('hex').slice(0,48),checksum='c'.repeat(64),identity=createHash('sha256').update(pointId+':'+checksum).digest('hex'),receiptPath=d.path(family.id)+'/generated-restores/'+identity,operations='factoryBackupSchedules/beta-'+family.id+'/activeOperations';
- const receipt={pointId,checksum,added:1,opened:1,retained:0},completion={pointId,checksum,result:(saved:Record<string,unknown>)=>saved};let begin!:()=>void,release!:()=>void,writes=0;
+ const {d,enroll,mutate}=await betaFixture(store,'restore-'+randomUUID().slice(0,8)),family=await enroll('restore-proof'),pointId='scheduled-'+createHash('sha256').update(randomUUID()).digest('hex').slice(0,48),checksum='c'.repeat(64),attemptId=randomUUID(),identity=createHash('sha256').update(JSON.stringify([pointId,checksum,attemptId])).digest('hex'),receiptPath=d.path(family.id)+'/generated-restores/'+identity,operations='factoryBackupSchedules/beta-'+family.id+'/activeOperations';
+ const receipt={pointId,checksum,attemptId,added:1,opened:1,retained:0},completion={pointId,checksum,attemptId,result:(saved:Record<string,unknown>)=>saved};let begin!:()=>void,release!:()=>void,writes=0;
  const started=new Promise<void>(done=>begin=done),pending=new Promise<void>(done=>release=done);
  const first=guardedBackupOperation(d,family.id,'profile-one','generated-restore',async()=>{},async()=>{begin();await pending;await store.run(async tx=>{tx.create(receiptPath,receipt);});writes++;throw Error('SYNTHETIC_LOST_ACK');},undefined,completion);
  const failed=assert.rejects(first,/SYNTHETIC_LOST_ACK/);await started;

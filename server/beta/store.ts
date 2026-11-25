@@ -15,6 +15,9 @@ export class FamilyDirectory {
   this.root='factoryBeta/'+config.environment;
  }
  path(id:string){if(!uuid(id))throw Error('INVALID_FAMILY');return this.root+'/families/'+id;}
+ /** Server recovery only. Its caller must hold the operation barrier and recheck
+  * current grants before each immutable object write. */
+ recoveryArtifacts(id:string){this.path(id);return this.artifacts('beta-'+id);}
  async family(tx:Documents,id:string){
   const f=await tx.get<Family>(this.path(id));
   if(!f||f.id!==id)throw Error('FAMILY_UNAVAILABLE');
