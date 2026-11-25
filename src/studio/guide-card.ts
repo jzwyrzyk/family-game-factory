@@ -5,7 +5,7 @@ import './guidance.css';
 /** The host owns profile selection, durable preferences and save errors. */
 export type GuideHost = {
   isDismissed(id: GuideTipId): boolean;
-  dismiss(id: GuideTipId): void;
+  dismiss(id: GuideTipId): void|Promise<void>;
 };
 
 export type GuideCard = HTMLElement & { refresh(): void };
@@ -66,11 +66,12 @@ export function createGuideCard(options: GuideCardOptions): GuideCard {
   dismiss.className = 'jems-guide-dismiss';
   dismiss.textContent = 'Got it';
   dismiss.setAttribute('aria-label', `Dismiss hint: ${options.title}`);
-  dismiss.onclick = () => {
+  dismiss.onclick = async () => {
     if (options.canAct?.() === false) return;
     try {
       // A failed preference write must leave the hint and its control visible.
-      options.host?.dismiss(options.tip);
+      const saved=options.host?.dismiss(options.tip);if(saved)await saved;
+      if(options.canAct?.()===false)return;
       dismissedInView = true;
       card.hidden = true;
       options.onDismiss?.();

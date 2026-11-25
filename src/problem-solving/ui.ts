@@ -6,7 +6,7 @@ import { assertPracticeContinuation, evaluatePracticeChoice, getPracticeTask, pr
 import './style.css';
 import {createFriendlyNarrator} from '../speech/friendly-narrator';
 
-type Host = { enter(): boolean; home(): void };
+type Host = { enter(): boolean|Promise<boolean>; home(): void };
 const node = <K extends keyof HTMLElementTagNameMap>(tag: K, className = '', text = '') => {
   const el = document.createElement(tag); el.className = className; el.textContent = text; return el;
 };
@@ -249,8 +249,8 @@ export function installProblemSolvingPractice(host: Host) {
   }
   function close() { stopSpeech(); visible = false; revisionRetry = false; page.classList.add('hidden'); }
   function open(id?: string) {
-    act(() => {
-      if (!host.enter()) return;
+    act(async () => {
+      if (!await host.enter()) return;
       visible = true; activeOwner = owner(); page.classList.remove('hidden');
       if (id) {
         const task = getPracticeTask(id), allowed = practiceTasksForGrade(FG.store.current().grade).some(item => item.id === task.id);

@@ -1,6 +1,6 @@
 import type {IndexedRecords} from './indexed-records';
 import type {RecordChange} from './record-contract';
-import type {StoragePort} from '../factory/workspace';
+import {WORKSPACE_KEY,type StoragePort} from '../factory/workspace';
 import {STUDIO_KEY} from '../studio/notebook';
 import {FAMILY_STATE_KEY} from './family-state';
 import {projectJournal} from './project-recovery';
@@ -17,7 +17,7 @@ const fail=()=>Error('A saved copy needs recovery. Your original records and pen
 /** The native delta and these exact source images are committed in one local
  * IndexedDB transaction. No upload or paid operation is represented here. */
 export async function prepareStudioNativeIntent(records:IndexedRecords,owner:string,changes:Change[],id=crypto.randomUUID()):Promise<RecordChange[]>{
- if(!changes.length||changes.length>2||new Set(changes.map(c=>c.key)).size!==changes.length||changes.some(c=>![STUDIO_KEY,FAMILY_STATE_KEY].includes(c.key)||typeof c.after!=='string'||c.after.length>16000000||c.before!==null&&typeof c.before!=='string'||(c.before?.length??0)>16000000))throw fail();
+ if(!changes.length||changes.length>3||new Set(changes.map(c=>c.key)).size!==changes.length||changes.some(c=>![STUDIO_KEY,FAMILY_STATE_KEY,WORKSPACE_KEY].includes(c.key)||typeof c.after!=='string'||c.after.length>16000000||c.before!==null&&typeof c.before!=='string'||(c.before?.length??0)>16000000))throw fail();
  const prior=await records.get(COLLECTION,'active');if(prior&&!prior.deleted&&(prior.value as Intent)?.phase!=='complete')throw fail();
  const chunks=new Map<string,string>();
  const pack=async(text:string)=>{const ids:string[]=[];for(let offset=0;offset<text.length;offset+=CHUNK){const value=text.slice(offset,offset+CHUNK),id=await hash(value);chunks.set(id,value);ids.push(id);}return ids;};
@@ -40,7 +40,7 @@ export function recoverStudioNative(records:IndexedRecords,storage:StoragePort,a
 async function recover(records:IndexedRecords,storage:StoragePort,assertAuthorized:()=>void,owner:string,manageMaintenance:boolean):Promise<boolean>{
  assertAuthorized();const row=await records.get(COLLECTION,'active');assertAuthorized();if(!row||row.deleted)return false;
  const intent=row.value as Intent;
- if(!intent||typeof intent.id!=='string'||!/^[-a-zA-Z0-9_:]{1,100}$/.test(intent.id)||intent.version!==1||intent.owner!==owner||intent.scope!==namespace(owner)||!['prepared','complete'].includes(intent.phase)||!Array.isArray(intent.images)||intent.images.length<1||intent.images.length>2||new Set(intent.images.map(v=>v.key)).size!==intent.images.length)throw fail();
+ if(!intent||typeof intent.id!=='string'||!/^[-a-zA-Z0-9_:]{1,100}$/.test(intent.id)||intent.version!==1||intent.owner!==owner||intent.scope!==namespace(owner)||!['prepared','complete'].includes(intent.phase)||!Array.isArray(intent.images)||intent.images.length<1||intent.images.length>3||new Set(intent.images.map(v=>v.key)).size!==intent.images.length)throw fail();
  if(intent.phase==='complete')return false;
  if(manageMaintenance)setRewardSourceMaintenance(true);
  try{
@@ -50,7 +50,7 @@ async function recover(records:IndexedRecords,storage:StoragePort,assertAuthoriz
   if(result.length>16000000||await hash(result)!==digest)throw fail();return result;
  };
  const changes:Change[]=[];
- for(const image of intent.images){if(![STUDIO_KEY,FAMILY_STATE_KEY].includes(image.key)||image.before===null&&image.beforeHash!==null)throw fail();changes.push({key:image.key,before:image.before===null?null:await load(image.before,image.beforeHash!),after:await load(image.after,image.afterHash)});}
+ for(const image of intent.images){if(![STUDIO_KEY,FAMILY_STATE_KEY,WORKSPACE_KEY].includes(image.key)||image.before===null&&image.beforeHash!==null)throw fail();changes.push({key:image.key,before:image.before===null?null:await load(image.before,image.beforeHash!),after:await load(image.after,image.afterHash)});}
  const source=storage as JournalStorage;if(typeof source.removeItem!=='function')throw fail();
  const journal=projectJournal(source,intent.scope,assertAuthorized);journal.recover();assertAuthorized();
  if(changes.some(c=>source.getItem(c.key)!==c.before&&source.getItem(c.key)!==c.after))throw fail();

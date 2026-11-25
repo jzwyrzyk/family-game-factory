@@ -7,6 +7,8 @@ import { adultWorkspaceId } from '../adult-pilot/storage';
 import { StudioGames } from './adapter';
 import { STUDIO_KEY, StudioNotebook, type StudioSession } from './notebook';
 import {IndexedNativeStore} from '../storage/indexed-native';
+import {IndexedNotebook} from '../storage/indexed-notebook';
+import {publishSourceEvidence,type SourceEvidenceSignal} from '../problem-solving/signals';
 import {indexedStoragePreview,nativeScope} from '../storage/native-workspace';
 import {prepareStudioNativeIntent,recoverStudioNative} from '../storage/studio-native-transaction';
 import {validateWorkspace} from '../factory/workspace';
@@ -80,35 +82,44 @@ export async function saveStudioProject(
 ):Promise<StudioSession>{
  assertRewardSourceWritable();if(!indexedStoragePreview())return saveLocalStudioProject(storage,host,owner,create,onRewardSourceSaved,updateProfile,sourceProjectId===null);
  const audience=adultWorkspaceId(),guard=()=>{assertRewardSourceLockHeld();if(host.store.current().id!==owner||adultWorkspaceId()!==audience)throw Error('Player changed. Reopen your game.');};
- guard();const indexed=await IndexedNativeStore.open(await nativeScope(owner),guard);
+ guard();const scope=await nativeScope(owner),indexed=await IndexedNativeStore.open(scope,guard),notices=new Set<string>(),signals:SourceEvidenceSignal[]=[];
+ const indexedBook=await IndexedNotebook.open(scope,guard,value=>notices.add(value));
  try{
-  if(!await indexed.isActive())return saveLocalStudioProject(storage,host,owner,create,onRewardSourceSaved,updateProfile,sourceProjectId===null);
+  const nativeActive=await indexed.isActive(),notebookActive=await indexedBook.isActive();
+  if(!nativeActive&&!notebookActive)return saveLocalStudioProject(storage,host,owner,create,onRewardSourceSaved,updateProfile,sourceProjectId===null);
   guard();assertRewardSourceWritable();setRewardSourceMaintenance(true);
-  const notices=new Set<string>();let result:StudioSession;
+  let result:StudioSession,publish=()=>{};
   try{
    if(await recoverStudioNative(indexed.records,storage,guard,owner))throw Error('A previous copy finished recovery. Reload before making another copy.');
-   const before=new Map([STUDIO_KEY,FAMILY_STATE_KEY].map(key=>[key,storage.getItem(key)]));
-   const workspace=await indexed.snapshotProject(sourceProjectId);guard();
-   const values=new Map<string,string|null>([[WORKSPACE_KEY,JSON.stringify(workspace)],...before]);
+   const sourceKeys=[FAMILY_STATE_KEY,...(nativeActive?[]:[WORKSPACE_KEY]),...(notebookActive?[]:[STUDIO_KEY])];
+   const before=new Map(sourceKeys.map(key=>[key,storage.getItem(key)]));
+   const workspace=nativeActive?await indexed.snapshotProject(sourceProjectId):null;guard();
+   const values=new Map<string,string|null>([[WORKSPACE_KEY,workspace?JSON.stringify(workspace):storage.getItem(WORKSPACE_KEY)],...before]);
    const staged:ProjectStorage={getItem:key=>values.get(key)??null,setItem:(key,value)=>{values.set(key,value);},removeItem:key=>{values.delete(key);}};
    const data=structuredClone(host.store.data),profile=structuredClone(host.store.current());
    if(!data)throw Error('The selected player needs recovery before making a copy.');
    data.profiles=data.profiles.map(p=>p.id===owner?profile:p);
-   const stagedHost:ProfileHost={store:{current:()=>profile,data,save:()=>{staged.setItem(FAMILY_STATE_KEY,JSON.stringify(data));return true;}}};
-   // The existing staging callback is synchronous. No task can interleave in
-   // this short section; every asynchronous step retains the maintenance gate.
-   setRewardSourceMaintenance(false);
-   try{result=saveLocalStudioProject(staged,stagedHost,owner,create,value=>notices.add(value),updateProfile,sourceProjectId===null);}
-   finally{setRewardSourceMaintenance(true);}
+   const stagedHost:ProfileHost={store:{current:()=>profile,data,save:()=>{if(!validateFamilyState(data))throw Error('Saved profile needs recovery.');staged.setItem(FAMILY_STATE_KEY,JSON.stringify(data));return true;}}};
+   const run=(book:StudioNotebook)=>{
+    // The mutation is synchronous; all async preparation keeps the source gate.
+    setRewardSourceMaintenance(false);
+    try{if(sourceProjectId===null)book.assertCanCreate();const value=create(new StudioGames(staged,stagedHost),book);if(updateProfile){updateProfile(profile,value);stagedHost.store.save();}return value;}
+    finally{setRewardSourceMaintenance(true);}
+   };
+   const prepared=notebookActive?await indexedBook.prepareTransaction(run):null;
+   result=prepared?prepared.value:run(new StudioNotebook(staged,value=>notices.add(value),signal=>signals.push(signal)));
    guard();if([...before].some(([key,value])=>storage.getItem(key)!==value))throw Error('Saved work changed. Reopen it before making this copy.');
    const changes=[...before].filter(([key,value])=>staged.getItem(key)!==value).map(([key,value])=>({key,before:value,after:staged.getItem(key)!}));
-   if(!changes.length)throw Error('This copy has no saved notebook reference.');
-   const id=crypto.randomUUID(),extra=await prepareStudioNativeIntent(indexed.records,owner,changes,id);
-   guard();await indexed.restoreSnapshot(validateWorkspace(JSON.parse(staged.getItem(WORKSPACE_KEY)!)),id,extra);
-   await recoverStudioNative(indexed.records,storage,guard,owner);guard();
+   const id=crypto.randomUUID(),extra=[...(prepared?.changes??[]),...(changes.length?await prepareStudioNativeIntent(indexed.records,owner,changes,id):[])];
+   guard();
+   if(nativeActive)await indexed.restoreSnapshot(validateWorkspace(JSON.parse(staged.getItem(WORKSPACE_KEY)!)),id,extra);
+   else if(extra.length)await indexed.records.restoreLocal({id,scope,changes:extra});
+   if(changes.length)await recoverStudioNative(indexed.records,storage,guard,owner);guard();
    if(changes.some(change=>change.key===FAMILY_STATE_KEY))Object.assign(host.store.current(),profile);
+   publish=prepared?.publish??(()=>{});
   }finally{setRewardSourceMaintenance(false);}
+  publish();for(const signal of signals)publishSourceEvidence(signal);
   for(const changed of notices){try{onRewardSourceSaved?.(changed);}catch{}}
   return result!;
- }finally{indexed.close();}
+ }finally{indexed.close();indexedBook.close();}
 }
