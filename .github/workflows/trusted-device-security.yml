@@ -67,6 +67,7 @@ jobs:
           name: private-family-synthetic-layouts-${{ github.sha }}
           path: |
             test-results/family-beta/*.png
+            test-results/family-beta/*.json
             test-results/complete-recovery/**
             test-results/complete-recovery-ui/**
             test-results/adult-transfer/**

@@ -36,7 +36,10 @@ export async function saveBetaLearningGrade(profileId:string,grade:Grade){
 }
 export function installParentGuidance(){
  if(!beta()||document.getElementById('parentGuidance'))return;
- const host=document.getElementById('builderConnection');if(!host)return;
+ // Parent settings is installed with the local app. The builder connection is
+ // created only after remote configuration arrives, so it cannot host a local
+ // guardian control that must also work while that request is pending.
+ const host=document.getElementById('parentPanel-settings');if(!host)return;
  const panel=document.createElement('section');panel.id='parentGuidance';panel.className='panel';
  panel.innerHTML='<h3>Make together</h3><p>A grown-up can stay with an early learner for a short creation session. This does not grant any optional processing permission.</p><p role="status" id="parentGuidanceStatus"></p><button type="button" class="btn secondary" id="parentGuidanceStart">Start parent-guided creation</button><button type="button" class="btn secondary" id="parentGuidanceEnd">End guided creation</button>';
  host.append(panel);

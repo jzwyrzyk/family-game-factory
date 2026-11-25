@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {writeFile} from 'node:fs/promises';
 import {createServer,type ServerOptions} from 'node:https';
 import type {AddressInfo} from 'node:net';
 import {randomUUID} from 'node:crypto';
@@ -28,6 +29,9 @@ export async function earlyBetaBrowser(tls:ServerOptions,engine:'chromium'|'webk
   const browser=await (engine==='webkit'?webkit:chromium).launch({proxy:tunnel.proxy,...(engine==='chromium'&&process.env.BETA_CHROMIUM_PATH?{executablePath:process.env.BETA_CHROMIUM_PATH}:{})});
   try{
    const ctx=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:768,height:1024}}),page=await ctx.newPage();
+   const browserErrors:string[]=[];page.on('pageerror',error=>browserErrors.push(error.message));
+   let releaseConfig=()=>{};
+   try{
    const fixture=(await build({stdin:{contents:"export {familyFetch} from './src/builder/session'; export {selectItem} from './src/learning/engine'; export {selectLanguageItem} from './src/language/engine';",resolveDir:process.cwd()},bundle:true,format:'esm',platform:'browser',write:false})).outputFiles[0].text;
    await ctx.route(origin+'/play/synthetic-fixture.js',route=>route.fulfill({contentType:'text/javascript',body:fixture}));
    for(const pair of family.cookies.split('; ')){const at=pair.indexOf('=');await ctx.addCookies([{name:pair.slice(0,at),value:pair.slice(at+1),url:origin,secure:true,httpOnly:true,sameSite:'Strict'}]);}
@@ -67,12 +71,25 @@ export async function earlyBetaBrowser(tls:ServerOptions,engine:'chromium'|'webk
    await mutate('policy',family.id,{capabilities:{...defaultCapabilities(),generation:true},paused:false,generationPaused:false,monthlyCents:100});
    const choice=await submitParentPrivacyChoice(d.repository(family.id),{...session,role:'parent'},{noticeVersion:betaNotice,guardianAffirmed:true,providerAcknowledged:true,scopes:{generation:true,conversation:false,remoteSpeech:false}});
    await recordExternalGuardianVerification(d.repository(family.id),{familyId:family.id,choiceId:choice.choiceId,receipt:'synthetic-browser-guidance',verifiedByOwner:true});
+   // Configuration is deliberately unresolved while the local Parent controls
+   // mount and supervise this learner. Neither guidance nor its navigation may
+   // depend on the asynchronous builder connection panel being installed.
+   const pendingConfig=new Promise<void>(resolve=>{releaseConfig=resolve;});let heldConfigRequests=0;
+   const configRoute=async(route:import('playwright').Route)=>{heldConfigRequests++;await pendingConfig;await route.continue();};
+   await ctx.route('**/factory-config.json',configRoute);
    await page.reload();await page.waitForURL('**/acknowledge');await page.getByLabel('Parent passphrase').fill(parent);for(const checkbox of await page.getByRole('checkbox').all())await checkbox.check();await page.getByRole('button',{name:'Enter Jems'}).click();await page.waitForFunction(()=>Boolean((window as any).FG?.studio));
+   assert.ok(heldConfigRequests>0,'The builder configuration request is deliberately pending.');
+   assert.equal(await page.locator('#builderConnection').count(),0,'Remote connection controls must still be waiting for configuration.');
+   assert.equal(await page.locator('#parentPanel-settings #parentGuidanceStart').count(),1,'Guidance must mount with local Parent settings.');
    // Open Parent in the same task as profile switching: the notebook's async
    // rebind must not later override the adult's explicit navigation with Home.
    await page.evaluate(profileId=>{const w=window as any,FG=w.FG;w.parentNavigation=[];window.addEventListener('factory-page',event=>w.parentNavigation.push((event as CustomEvent).detail));FG.store.choose(profileId);window.dispatchEvent(new Event('factory-profile'));window.dispatchEvent(new Event('factory-open-parent-connection'));},profiles[0]);
    await page.locator('#parentGuidanceStart').click();await page.waitForFunction(()=>document.getElementById('parentGuidanceStatus')?.textContent?.includes('Stay together'));
    const navigation=await page.evaluate(()=>(window as any).parentNavigation as string[]);assert.ok(navigation.includes('parent'));assert.ok(!navigation.slice(navigation.indexOf('parent')+1).includes('home'));assert.equal(await page.locator('#page-parent').isVisible(),true);
+   await page.screenshot({path:'test-results/family-beta/'+engine+'-beta-parent-guidance-pending-config.png',fullPage:true});
+   releaseConfig();await ctx.unroute('**/factory-config.json',configRoute);
+   await page.locator('#builderConnection').waitFor();
+   assert.equal(await page.locator('#parentGuidanceStart').count(),1,'Completing remote setup must not duplicate or replace guidance.');
    await page.locator('#homeBtn').click();await page.locator('#studioNew').click();await page.locator('#studioPrompt').waitFor({state:'visible'});
    assert.equal(await page.locator('#earlyCreationHandoff[open]').count(),0);assert.equal(await page.locator('#guidedCreationTogether').isVisible(),true);
    await page.screenshot({path:'test-results/family-beta/'+engine+'-beta-parent-guided-creation.png',fullPage:true});
@@ -86,7 +103,16 @@ export async function earlyBetaBrowser(tls:ServerOptions,engine:'chromium'|'webk
    await page.getByLabel('Parent passphrase').fill(parent);await page.getByRole('checkbox').check();await page.getByRole('button',{name:'Accept updated notices'}).click();await page.waitForURL('**/grown-ups');
    const renewed=await d.repository(family.id).snapshot();assert.equal(renewed.parentPrivacyChoices?.filter(choice=>choice.revokedAt===undefined).length??0,0);
    assert.equal((await d.withFamily(family.id,async(_tx,f)=>f)).plays.length,0);
-   console.log(engine+' private early-preview preserved all six profile grades across reload and blocked unapproved early creation, opened the separately supervised composer and renewed notices without retaining prior scopes');
+   assert.deepEqual(browserErrors,[]);
+   console.log(engine+' private early-preview preserved all six profile grades across reload and blocked unapproved early creation, started supervision with configuration held pending, opened the separately supervised composer and renewed notices without retaining prior scopes');
+   }catch(error){
+    const state=await page.evaluate(()=>{const w=window as any,profile=w.FG?.store?.current?.();return {url:location.href,readyState:document.readyState,privateBeta:document.documentElement.dataset.privateBeta,parentGuidance:document.documentElement.dataset.parentGuidance,studioReady:Boolean(w.FG?.studio),profile:profile?{id:profile.id,grade:profile.grade}:null,parentNavigation:w.parentNavigation,visiblePages:[...document.querySelectorAll('main > .page:not(.hidden)')].map(node=>node.id),parentSettings:Boolean(document.getElementById('parentPanel-settings')),builderConnection:Boolean(document.getElementById('builderConnection')),guidance:document.getElementById('parentGuidance')?.outerHTML,startupRecovery:document.getElementById('jemsStartupRecovery')?.textContent,globalStatus:document.getElementById('studioGlobalStatus')?.textContent};}).catch(()=>({url:page.url()}));
+    const diagnostics={engine,error:String(error),browserErrors,state};
+    console.error('Private early-preview failure '+JSON.stringify(diagnostics));
+    await writeFile('test-results/family-beta/'+engine+'-beta-early-failure.json',JSON.stringify(diagnostics,null,2));
+    await page.screenshot({path:'test-results/family-beta/'+engine+'-beta-early-failure.png',fullPage:true}).catch(()=>{});
+    throw error;
+   }finally{releaseConfig();}
   }finally{await browser.close();}
  }finally{await tunnel.close();server.closeAllConnections();await new Promise<void>(ok=>server.close(()=>ok()));}
 }
