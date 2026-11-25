@@ -641,8 +641,8 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:26:14.463Z",
-      "sourceDigest": "2eddc8222c4b50c193bbb17d9d4b3aa91bb2e5059364a74e4ad644f18a5a58ce",
+      "reviewedAt": "2026-11-25T01:28:45.037Z",
+      "sourceDigest": "ba7dc4c367bbca5eb5553c243ce5e8c549b4cbefb0446959037ff3a216c63aec",
       "reviewOutcome": "unchanged",
       "reviewReason": "Parent handoff and reporting preserve the new curriculum and graphical scene changes from the preceding review stages. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
@@ -884,8 +884,8 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:26:14.507Z",
-      "sourceDigest": "fceb8b2f20a335969a0c4d19a1469895601361abacd8ea3cb11e4b9ba6fe1916",
+      "reviewedAt": "2026-11-25T01:28:45.083Z",
+      "sourceDigest": "f7748c15606b170461603eaf6bbaa14baa3dd904897416330825101e12ab3404",
       "reviewOutcome": "updated",
       "reviewReason": "Parent handoff and reporting preserve the new curriculum and graphical scene changes from the preceding review stages.",
       "reviewHistory": [

@@ -1,4 +1,5 @@
 import {EARLY_LANGUAGE_BANK} from './early';
+import {hasPicture} from '../learning/early/pictures';
 import {withinGrade} from '../learning/grades';
 import {getLanguageSkill, LANGUAGE_SKILLS} from './curriculum';
 import {LANGUAGE_G1} from './data-g1';
@@ -56,11 +57,11 @@ export function generateLanguageItem(skillId:string,options:LanguageItemOptions=
   const chosen=eligible[Math.floor(unit(random)*eligible.length)];
   const draft=chosen.item;
   const kind=draft.kind;
-  const form:LanguageForm=skill.domain==='listening'&&kind==='sentence-tiles'?'comprehension':kind==='word-tiles'?'encoding':kind==='sentence-tiles'||kind==='edit'?'syntax':
+  const form:LanguageForm=kind==='picture-order'?'comprehension':kind==='word-tiles'?'encoding':kind==='sentence-tiles'||kind==='edit'?'syntax':
     kind==='creative'?'expression':skill.domain==='comprehension'?'comprehension':'pattern';
   const choices=kind==='choice' ? shuffle([draft.a,...(draft.d||[])].map(value=>({value,label:value})),random) : undefined;
   const tiles=(kind==='word-tiles'?shuffle(draft.a.split(''),random):
-    kind==='sentence-tiles'?shuffle(draft.a.split(/\s+/),random):undefined);
+    (kind==='picture-order'||kind==='sentence-tiles')?shuffle(draft.a.split(/\s+/),random):undefined);
   return {
     id:skillId+':'+pack+':'+chosen.index,contentPack:pack,...(draft.stimulus?{stimulus:draft.stimulus}:{}),
     skillId,title:skill.title,grade:skill.grade,domain:skill.domain,
@@ -108,6 +109,10 @@ export function languageContentErrors():string[] {
         if(!item.a||!item.d||item.d.length!==3||new Set([item.a,...item.d]).size!==4)errors.push(key+': ambiguous/missing choices');
       } else if(item.kind==='word-tiles'){
         if(!/^[a-z]{3,20}$/i.test(item.a))errors.push(key+': unsupported spelling construction');
+      } else if(item.kind==='picture-order'){
+        const tokens=item.a.split(' ');
+        if(skill.domain!=='listening'||tokens.length<2||tokens.length>3||tokens.some(t=>!hasPicture(t))||new Set(tokens).size!==tokens.length)
+          errors.push(key+': invalid illustrated listening sequence');
       } else if(item.kind==='sentence-tiles'){
         if(item.a.split(/\s+/).length<4)errors.push(key+': incomplete sentence construction');
       } else if(item.kind==='edit'){
