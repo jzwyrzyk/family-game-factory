@@ -143,10 +143,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T18:16:02.638Z",
-      "sourceDigest": "a2b674e124a188be2d394f5c77895271de95374fc3b21b6cd2d67d403951ceff",
+      "reviewedAt": "2026-11-25T00:50:44.560Z",
+      "sourceDigest": "232805c17ba41fd57b28d6b5489dfda6ee9f771fdc3d34fd62f1980866440f45",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner-specific retained-game placement and cutover retention exception in a decision; general preserve-work doctrine is unchanged.",
+      "reviewReason": "The November 25 child-interface standard and decision replace the stage-first dock with responsive stage and code proportions. The child still owns each authored action and explicit Keep.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -406,10 +406,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "046b2da4d3be2a0b8803de7689f7ac8daff903cc1c25a9e8ce18f26418dee6c3",
-      "reviewedAt": "2026-11-23T18:16:03.267Z",
+      "sourceDigest": "3588727c1c12a79916b8a7d1bc015172fd8be36a5507c752c3a873318057bc41",
+      "reviewedAt": "2026-11-25T00:58:13.627Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated shared architecture for retained saved-variant routing; scene/art ownership, revision data and creation authority remain unchanged.",
+      "reviewReason": "The learner test now waits for the first visible playback frame. The workspace criteria and viewport evidence continue to require an enabled, unclipped Pause control before input.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:47:29.942Z",
-      "sourceDigest": "9bf8fbce6f1bca385b1684d2895dcac69d78f6212e1d20e24244f3e4b4de14ea",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Existing premium and unit commands cover concurrent fork edits, actual settlement across revisions, pass-sized art and repair holds, and conservative unknown usage. CI selection and release evidence rules stay in place.",
+      "reviewedAt": "2026-11-25T01:05:30.649Z",
+      "sourceDigest": "645f0ae9add381b7f474b404ac928ef3ce845db3e32b6f34dde1f06ea35e6f41",
+      "reviewOutcome": "updated",
+      "reviewReason": "Combined PR168’s premium unit and settlement coverage with the editor’s viewport, rendered-control and gesture acceptance. Both keep their existing CI command and release selection contracts.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1091,6 +1091,13 @@
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed the measured 550-second Mining dependency installation and preserved every visual assertion, viewport, capture and timeout while applying the hosted-verified Chromium-only setup pattern. The 99 CI contracts and workflow lint pass; new-source visual acceptance remains pending.",
           "sourceCommit": "daec8cf53ed0d0cd267943ed03722675e8bafd87"
+        },
+        {
+          "sourceCommit": "6a9532763da4ec986b03df1cbc6d0a4b614810fb",
+          "reviewedAt": "2026-11-25T00:47:29.942Z",
+          "sourceDigest": "9bf8fbce6f1bca385b1684d2895dcac69d78f6212e1d20e24244f3e4b4de14ea",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Existing premium and unit commands cover concurrent fork edits, actual settlement across revisions, pass-sized art and repair holds, and conservative unknown usage. CI selection and release evidence rules stay in place."
         }
       ]
     },

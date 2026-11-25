@@ -20,9 +20,9 @@ Keep decorative reward popups out of an active creation conversation and fitted 
 
 An explicit Build receives immediate, focused acknowledgement. Pending submission and an accepted build use different truthful states. Once accepted, offer **Play while I wait** and **Stay here** in the focused handoff. Use approved artwork, short copy and large controls; no fictitious time estimate is needed. Ordinary background readiness remains a visible, explicit action and never reopens a dismissed dialog or interrupts play. The [first-creation contract](../child-journey/FIRST-CREATION.md#build-handoff-and-recovery) defines the state and focus boundaries.
 
-### First coding puts the scene first
+### First coding puts the actions within reach
 
-The owner's [November 22 coding refinement](../decisions/2026-11-22-first-learner-coding.md) makes **First steps** the ordinary scene editor. Give the stage the largest visual role, with a compact action dock, a readable ordered program and a clear Play action. Keep exits, Undo and Keep easy to find. A first learner should not need to understand coordinates, variables, signal names or several scripts to make a character move.
+The owner's [November 22 coding refinement](../decisions/2026-11-22-first-learner-coding.md) makes **First steps** the ordinary scene editor. Give the stage and code comparable space in landscape. In portrait, reserve about two thirds of the available workspace for code. On constrained screens, offer Code and Play views. All six beginner actions must be immediately visible and tappable on entering Code. Keep exits, Undo and Keep easy to find. A first learner should not need to understand coordinates, variables, signal names or several scripts to make a character move.
 
 Reveal one block's useful controls when selected. Put additional authoring tools and scene settings behind explicit choices. Simplification must preserve exact custom values, nested blocks, existing programs and saved references. It must not substitute a supplied solution for the child's sequence or make an existing exercise impossible to solve. Start and tap choices select their own programs, so exploring a different event never erases the first program.
 
