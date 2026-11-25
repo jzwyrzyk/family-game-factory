@@ -2,8 +2,8 @@ import {IndexedRecords} from './indexed-records';
 import {recordId,type DurableRecord,type RecordChange,type RecordScope} from './record-contract';
 import {StudioNotebook,STUDIO_KEY,validateNotebook,type Notebook,type StudioSession,type ConversationChapter} from '../studio/notebook';
 import {publishSourceEvidence,type SourceEvidenceSignal} from '../problem-solving/signals';
-import {builderJourney,type BuilderJourney} from '../brand/gem-progress';
-import {hasMeaningfulCreation,recommendNext,type NextRecommendation,type GuidePreferences} from '../studio/guidance';
+import {builderJourney,gemStage,type BuilderJourney,type GemStage} from '../brand/gem-progress';
+import {hasMeaningfulCreation,recommendNext,readyGuidedExperiment,type NextRecommendation,type GuidePreferences} from '../studio/guidance';
 import {deriveStudioNotifications,type StudioNotification,type StudioNotificationContext,type StudioNotificationPreferences} from '../studio/notifications';
 
 const CONTROL='notebook-control',CHUNKS='notebook-chunks',PAYLOADS='notebook-payloads';
@@ -18,22 +18,29 @@ type Meta=Omit<Notebook,'sessions'|'conversationChapters'>;
 interface Head {schema:1;generation:string;meta:string;summary:string;sessions:string[];chapters:string[];hasChapters:boolean;sourceHash:string}
 interface Migration {schema:1;sourceHash:string;generation:string;completed:number;total:number;complete:boolean}
 interface Payload {schema:1;sha256:string;bytes:number;units:number;chunks:string[]}
-export interface NotebookCard {id:string;owner:string;name:string;game:StudioSession['game'];projectId:string|null;remoteId:string|null;updated:string;archived:boolean;playOnly:boolean;resumeDismissed:boolean;hasDraft:boolean;messageCount:number;pendingCopy:boolean;pendingSubmission:boolean;jobStatus:string|null}
+export interface NotebookCard {id:string;owner:string;name:string;game:StudioSession['game'];projectId:string|null;remoteId:string|null;updated:string;archived:boolean;playOnly:boolean;resumeDismissed:boolean;hasDraft:boolean;messageCount:number;pendingCopy:boolean;pendingSubmission:boolean;jobStatus:string|null;gemStage:GemStage;meaningfulCreation:boolean;hasCandidate:boolean;experimentCount:number;readyExperiment:boolean;needsReadyRecovery:boolean;jobApi:string|null}
 export interface NotebookSummary {
- owner:string;active:string|null;journey:BuilderJourney;meaningfulCreation:boolean;recommendation:NextRecommendation|null;
+ owner:string;active:string|null;journey:BuilderJourney;meaningfulCreation:boolean;recommendation:NextRecommendation|null;continuationCandidates:NextRecommendation[];
  capacity:ReturnType<StudioNotebook['capacity']>;guidance:GuidePreferences;avatar:ReturnType<StudioNotebook['avatar']>;notificationPreferences:StudioNotificationPreferences;
  /** Eight small presentation variants per session cover transient connection
   * observations without storing duplicate conversation, design or job payloads.
   * Bits: unknown=1, unconfirmed=2, sending=4. These never authorize an action. */
  notificationVariants:{id:string;items:(StudioNotification|null)[]}[];
 }
+export interface PreparedNotebookTransaction<T>{
+ changes:RecordChange[];value:T;
+ /** Call once, only after the caller's shared-scope transaction commits. */
+ publish:()=>void;
+}
 interface Pointer {id:string;owner:string;payload:string;card?:NotebookCard}
-export const notebookCard=(s:StudioSession):NotebookCard=>({id:s.id,owner:s.owner,name:s.name,game:s.game,projectId:s.projectId,remoteId:s.remoteId,updated:s.updated,archived:!!s.archived,playOnly:!!s.playOnly,resumeDismissed:!!s.resumeDismissed,hasDraft:!!s.draft,messageCount:s.messages.length,pendingCopy:!!s.pendingCopy,pendingSubmission:!!s.pendingSubmission,jobStatus:s.job?.status??null});
+export const notebookCard=(s:StudioSession,expanded:StudioSession=s):NotebookCard=>({id:s.id,owner:s.owner,name:s.name,game:s.game,projectId:s.projectId,remoteId:s.remoteId,updated:s.updated,archived:!!s.archived,playOnly:!!s.playOnly,resumeDismissed:!!s.resumeDismissed,hasDraft:!!s.draft,messageCount:s.messages.length,pendingCopy:!!s.pendingCopy,pendingSubmission:!!s.pendingSubmission,jobStatus:s.job?.status??null,gemStage:gemStage(s),meaningfulCreation:hasMeaningfulCreation([expanded],s.owner),hasCandidate:!!s.candidate,experimentCount:s.experiments?.length??0,readyExperiment:!!readyGuidedExperiment(s),needsReadyRecovery:s.job?.status==='ready'&&!!s.job.revisionId&&(!!s.pendingExperiment||!s.experiments?.some(e=>e.candidate.remoteId===s.job!.revisionId)),jobApi:s.job?.api??null});
 
 /** Derivation runs at commit time, using the existing presentation logic. */
 export function deriveNotebookSummary(value:Notebook,owner:string):NotebookSummary {
  const raw=JSON.stringify(value),book=new StudioNotebook({getItem:key=>key===STUDIO_KEY?raw:null,setItem:()=>{throw Error('NOTEBOOK_SUMMARY_READONLY');}}),expanded=book.list(owner),preferences=book.notificationPreferences(owner);
-  const summary:NotebookSummary={owner,active:value.active[owner]??null,journey:builderJourney(expanded,owner),meaningfulCreation:hasMeaningfulCreation(expanded,owner),recommendation:recommendNext(expanded,owner,value.active[owner]),capacity:book.capacity(),guidance:book.guidance(owner),avatar:book.avatar(owner),notificationPreferences:preferences,notificationVariants:expanded.map(session=>({id:session.id,items:Array.from({length:8},(_,mask)=>deriveStudioNotifications([session],owner,{unknownSessionIds:new Set(mask&1?[session.id]:[]),unconfirmedSessionIds:new Set(mask&2?[session.id]:[]),sendingSessionIds:new Set(mask&4?[session.id]:[])},preferences)[0]??null)}))};
+ const continuationCandidates:NextRecommendation[]=[];let available=expanded;
+ for(let next=recommendNext(available,owner,value.active[owner]);next;next=recommendNext(available,owner,value.active[owner])){continuationCandidates.push(next);available=available.filter(s=>s.id!==next!.sessionId);}
+  const summary:NotebookSummary={owner,active:value.active[owner]??null,journey:builderJourney(expanded,owner),meaningfulCreation:hasMeaningfulCreation(expanded,owner),recommendation:continuationCandidates[0]??null,continuationCandidates,capacity:book.capacity(),guidance:book.guidance(owner),avatar:book.avatar(owner),notificationPreferences:preferences,notificationVariants:expanded.map(session=>({id:session.id,items:Array.from({length:8},(_,mask)=>deriveStudioNotifications([session],owner,{unknownSessionIds:new Set(mask&1?[session.id]:[]),unconfirmedSessionIds:new Set(mask&2?[session.id]:[]),sendingSessionIds:new Set(mask&4?[session.id]:[])},preferences)[0]??null)}))};
  return summary;
 }
 
@@ -137,38 +144,44 @@ export class IndexedNotebook {
   const {sessions,conversationChapters,...meta}=value;
   return {schema:1,generation,meta:await this.encode(meta),summary:await this.encode(deriveNotebookSummary(value,this.scope.profile)),sessions:sessions.map(s=>s.id),chapters:(conversationChapters??[]).map(c=>c.id),hasChapters:conversationChapters!==undefined,sourceHash};
  }
- private async preparePointer(value:StudioSession|ConversationChapter):Promise<Pointer>{return {id:value.id,owner:value.owner,payload:await this.encode(value),...('game'in value?{card:notebookCard(value)}:{})};}
+ private async preparePointer(value:StudioSession|ConversationChapter,notebook:Notebook):Promise<Pointer>{
+  let expanded=value as StudioSession;
+  if('game'in value&&value.previousConversationId){const earlier:ConversationChapter[]=[],seen=new Set<string>();let id:string|null|undefined=value.previousConversationId;while(id){if(seen.has(id))throw Error('NOTEBOOK_CHAPTER_CHAIN_INVALID');seen.add(id);const page=notebook.conversationChapters?.find(c=>c.id===id&&c.owner===value.owner);if(!page)throw Error('NOTEBOOK_CHAPTER_CHAIN_INVALID');earlier.push(page);id=page.previousId;}expanded={...value,messages:[...earlier.reverse().flatMap(c=>c.messages),...value.messages]};}
+  return {id:value.id,owner:value.owner,payload:await this.encode(value),...('game'in value?{card:notebookCard(value,expanded)}:{})};
+ }
  private async stageGeneration(value:Notebook,generation:string,sourceHash:string){
-  for(const [collection,rows]of [[sessionCollection(generation),value.sessions],[chapterCollection(generation),value.conversationChapters??[]]] as const)for(const row of rows)await this.immutable(collection,await hash(row.id),await this.preparePointer(row));
+  for(const [collection,rows]of [[sessionCollection(generation),value.sessions],[chapterCollection(generation),value.conversationChapters??[]]] as const)for(const row of rows)await this.immutable(collection,await hash(row.id),await this.preparePointer(row,value));
   const head=await this.prepareHead(value,generation,sourceHash);if(!equal(await this.snapshotAt(head),value))throw Error('NOTEBOOK_RESTORE_READBACK_FAILED');return head;
  }
  /** Reuses the existing source business logic. The callback is synchronous;
   * rewards and evidence publish only after the durable IDB commit succeeds.
   * Write CPU still validates the bounded owner notebook; only changed records
   * are written. No fire-and-forget mirror or early saved acknowledgment exists. */
- async transaction<T>(mutate:(book:StudioNotebook)=>T):Promise<T>{
+ async prepareTransaction<T>(mutate:(book:StudioNotebook)=>T):Promise<PreparedNotebookTransaction<T>>{
   this.checkOwner();const h=await this.head(),before=await this.snapshotAt(h.value);await this.unchanged(h.row.version);
   let raw=JSON.stringify(before);const rewards=new Set<string>(),signals:SourceEvidenceSignal[]=[];
   const book=new StudioNotebook({getItem:key=>key===STUDIO_KEY?raw:null,setItem:(key,value)=>{if(key!==STUDIO_KEY)throw Error('NOTEBOOK_KEY_DENIED');raw=value;}},owner=>rewards.add(owner),signal=>signals.push(structuredClone(signal)));
   const result=mutate(book);if(result&&typeof(result as any).then==='function')throw Error('Notebook mutations must finish before saving.');const next=this.own(book.read());
-  if(equal(before,next))return structuredClone(result);
+  if(equal(before,next))return {changes:[],value:structuredClone(result),publish:()=>{}};
   const changes:RecordChange[]=[];
   for(const [kind,oldRows,newRows]of [['sessions',before.sessions,next.sessions],['chapters',before.conversationChapters??[],next.conversationChapters??[]]] as const){
    const collection=kind==='sessions'?sessionCollection(h.value.generation):chapterCollection(h.value.generation),old=new Map(oldRows.map(x=>[x.id,x])),current=new Map(newRows.map(x=>[x.id,x]));
-   for(const [id,value]of current){if(equal(value,old.get(id)))continue;const key=await hash(id),row=await this.row(collection,key);changes.push(this.change(collection,key,await this.preparePointer(value),row?.version??0));}
+   for(const [id,value]of current){if(equal(value,old.get(id)))continue;const key=await hash(id),row=await this.row(collection,key);changes.push(this.change(collection,key,await this.preparePointer(value,next),row?.version??0));}
    for(const [id]of old)if(!current.has(id)){const key=await hash(id),row=await this.row(collection,key);if(!row)throw Error('NOTEBOOK_RECORD_MISSING');changes.push(this.change(collection,key,row.value,row.version,true));}
   }
   let nextHead:Head;
   if(changes.length>49){nextHead=await this.stageGeneration(next,'replace-'+crypto.randomUUID(),h.value.sourceHash);changes.length=0;}
   else nextHead=await this.prepareHead(next,h.value.generation,h.value.sourceHash);
   changes.push(this.change(CONTROL,'head',nextHead,h.row.version));
-  await this.save(changes);for(const owner of rewards){try{this.rewardSaved?.(owner);}catch{}}for(const signal of signals)publishSourceEvidence(signal);return structuredClone(result);
+  let published=false;
+  return {changes,value:structuredClone(result),publish:()=>{if(published)return;published=true;for(const owner of rewards){try{this.rewardSaved?.(owner);}catch{}}for(const signal of signals)publishSourceEvidence(signal);}};
  }
+ async transaction<T>(mutate:(book:StudioNotebook)=>T):Promise<T>{const prepared=await this.prepareTransaction(mutate);if(prepared.changes.length)await this.save(prepared.changes);prepared.publish();return prepared.value;}
  async update(id:string,mutate:(session:StudioSession)=>void){return this.transaction(book=>book.update(id,this.scope.profile,mutate));}
  async create(game:StudioSession['game'],name:string,projectId:string|null=null){return this.transaction(book=>book.create(this.scope.profile,game,name,projectId));}
  async message(id:string,role:StudioSession['messages'][number]['role'],text:string){return this.transaction(book=>book.message(id,this.scope.profile,role,text));}
 
- async migrateLegacy(raw:string,options:{batchSize?:number;onBatch?:(completed:number,total:number)=>void}={}):Promise<Migration>{
+ async migrateLegacy(raw:string,options:{batchSize?:number;onBatch?:(completed:number,total:number)=>void;beforeActivate?:()=>void}={}):Promise<Migration>{
   this.checkOwner();const value=this.own(JSON.parse(raw),true),sourceHash=await hash(raw),priorRow=await this.row(CONTROL,'migration'),prior=priorRow?.value as Migration|undefined;
   if(prior&&(prior.schema!==1||!Number.isInteger(prior.completed)||prior.completed<0||prior.completed>prior.total||typeof prior.complete!=='boolean'||prior.generation!==sourceHash))throw Error('NOTEBOOK_MIGRATION_INVALID');
   if(prior&&prior.sourceHash!==sourceHash)throw Error('The source notebook changed. Keep the original and review migration again.');if(prior?.complete)return prior;
@@ -176,9 +189,9 @@ export class IndexedNotebook {
   const batchSize=options.batchSize??20;if(!Number.isInteger(batchSize)||batchSize<1||batchSize>40)throw Error('STORAGE_PAGE_INVALID');
   let manifest:Migration=prior??{schema:1,sourceHash,generation:sourceHash,completed:0,total:value.sessions.length+(value.conversationChapters?.length??0),complete:false},version=priorRow?.version??0;
   const entries=[...value.sessions.map(s=>({collection:sessionCollection(manifest.generation),value:s})),...(value.conversationChapters??[]).map(c=>({collection:chapterCollection(manifest.generation),value:c}))];
-  for(let i=manifest.completed;i<entries.length;i+=batchSize){const batch=entries.slice(i,i+batchSize),changes:RecordChange[]=[];for(const entry of batch)changes.push(this.change(entry.collection,await hash(entry.value.id),await this.preparePointer(entry.value)));manifest={...manifest,completed:i+batch.length};changes.push(this.change(CONTROL,'migration',manifest,version++));await this.save(changes,'notebook-migrate:'+sourceHash+':'+i);options.onBatch?.(manifest.completed,manifest.total);}
+  for(let i=manifest.completed;i<entries.length;i+=batchSize){const batch=entries.slice(i,i+batchSize),changes:RecordChange[]=[];for(const entry of batch)changes.push(this.change(entry.collection,await hash(entry.value.id),await this.preparePointer(entry.value,value)));manifest={...manifest,completed:i+batch.length};changes.push(this.change(CONTROL,'migration',manifest,version++));await this.save(changes,'notebook-migrate:'+sourceHash+':'+i);options.onBatch?.(manifest.completed,manifest.total);}
   const head=await this.prepareHead(value,manifest.generation,sourceHash),readback=await this.snapshotAt(head);if(!equal(readback,value))throw Error('NOTEBOOK_MIGRATION_READBACK_FAILED');manifest={...manifest,complete:true};
-  await this.save([this.change(CONTROL,'head',head),this.change(CONTROL,'migration',manifest,version)],'notebook-migrate:'+sourceHash+':complete');return manifest;
+  options.beforeActivate?.();this.checkOwner();await this.save([this.change(CONTROL,'head',head),this.change(CONTROL,'migration',manifest,version)],'notebook-migrate:'+sourceHash+':complete');return manifest;
  }
  /** Explicit whole-owner replacement stages a fresh generation; only the head
   * switches atomically. Prior generations/original source remain recoverable. */
