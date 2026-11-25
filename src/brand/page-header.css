@@ -28,7 +28,7 @@ body .page.jems-secondary-page[id] {
   border-radius: 6px;
   background: transparent;
   box-shadow: none;
-  color: #6434a7;
+  color: #54288d;
   font: 800 18px/1.3 var(--jems-round, Nunito, system-ui);
   cursor: pointer;
 }
@@ -44,7 +44,7 @@ body .page.jems-secondary-page[id] {
 }
 .page.jems-secondary-page .jems-page-header .jems-page-description {
   grid-area: 3 / 1 / 4 / -1;
-  color: #485870;
+  color: #35445d;
   font: 500 clamp(18px, 2vw, 20px)/1.45 var(--jems-body, Inter, system-ui);
   margin: 0;
   max-width: 66ch;
