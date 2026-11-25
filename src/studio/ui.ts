@@ -1,3 +1,5 @@
+import {isEarlyGrade} from '../learning/grades';
+import {createEarlyHandoff,FAMILY_CREATION_LABEL} from './early-handoff';
 import { attachPreviewLearning } from '../learning/remote';
 import { interpretLearningRequest, learningFormatLabel, setMode } from '../learning/policy';
 import {installCoaching} from './coaching';
@@ -86,6 +88,8 @@ export async function installStudio(){
  if(!FG?.app||!FG?.store)return;
  const rewards=installRewards();
  const pals=installPals(rewards);
+ const young=()=>isEarlyGrade(FG.store.current().grade);
+ const handOff=createEarlyHandoff(()=>openParent(true),()=>home(),()=>creation.open(),()=>pals.state,()=>String(FG.store.current().id));
  let notebook:StudioNotebook;
  try{notebook=new StudioNotebook(profileStorage(localStorage),notifyRewardSourceSaved);}catch(error){
   const warning=el('p','notice',String((error as Error).message));$('page-home').prepend(warning);return;
@@ -745,6 +749,7 @@ export async function installStudio(){
  }
  function setTab(tab:'game'|'talk'|'versions'){
   if(tab!=='game'&&guardMath())return false;
+  if(tab==='talk'&&young()){handOff();return false;}
   if(tab!=='talk'){stopSpeech();handoff.close();}
   if(tab!=='game'){
    ++viewIntent;flushDraft();
@@ -873,7 +878,17 @@ export async function installStudio(){
   const version=savedGumVersion(s);
   return version===2?'Sticker workshop':version===1?'Machine workshop':version===0?'Earlier workshop':null;
  }
+ function refreshEarlyJourney(){
+  const early=young();document.body.classList.toggle('early-journey',early);
+  const title=document.querySelector('#studioNew strong'),copy=document.querySelector('#studioNew small');
+  if(title)title.textContent=early?FAMILY_CREATION_LABEL:'Invent a game';
+  if(copy)copy.textContent=early?'Invite your grown-up':'Start with your own idea';
+  for(const [id,label] of [['studioNavCreate','Create'],['studioMenuCreate','Create a game']]){
+    const control=document.getElementById(id);if(control)setIconLabel(control,early?'parent':'add',early?FAMILY_CREATION_LABEL:label);
+  }
+ }
  function renderLibrary(){
+  refreshEarlyJourney();
   refreshLearningChoice();
   const entries=notebook.list(owner()),box=$('studioLibrary');box.replaceChildren();
   // Import references to existing local remixes without copying or migrating their data.
@@ -1001,9 +1016,11 @@ export async function installStudio(){
   // stops its player, recording and checkpoint clock; hiding DOM alone cannot.
   creation.flush();FG.app.page('home');return true;
  }
- function newIdea(){if(!leaveCreationForStudio())return;flushDraft();const s=notebook.create(owner(),'new','My new idea',null,{creationStandard:2});return open(s.id);}
+ function newIdea(){if(!leaveCreationForStudio())return;if(young()){handOff();return;}flushDraft();const s=notebook.create(owner(),'new','My new idea',null,{creationStandard:2});return open(s.id);}
  async function open(id:string,autoPlay=true){
   if(!leaveCreationForStudio())return;
+  const requested=notebook.list(owner()).find(s=>s.id===id);
+  if(young()&&requested?.game==='new'&&!requested.projectId&&!requested.remoteId&&!requested.candidate){handOff();return;}
   stopSpeech();flushDraft();handoff.close();moreChoices.open=false;disposeGame();notebook.select(id,owner());activeId=id;keptInThisView=null;reflecting=false;lastOutcome=null;showing='working';status('');
   const s=current();if(s.candidate&&!s.experiments?.some(e=>e.id===s.candidate!.id))notebook.saveExperiment(s.id,s.owner,s.candidate,[],'tune','helper');coaching?.openSession();$<HTMLTextAreaElement>('studioPrompt').value=s.draft;globalStatus.textContent='';$<HTMLDetailsElement>('studioMore').open=false;showStudio();render();setTab('game');focusView($('studioTitle'));
   if(autoPlay){if(s.projectId||s.remoteId)await playWorking();else if(s.candidate)await playCandidate();else if(readyExperiment(s))await openReadySession(s.id,s.owner);else{$('studioEmpty').hidden=false;setTab('talk');}}
@@ -1162,6 +1179,7 @@ export async function installStudio(){
   focusView($('studioHelpTitle'));
  }
  async function submit(request?:{prompt:string;displayText?:string;compiledPlan?:boolean}){
+  if(young()){handOff();return;}
   if(guardMath())return;stopSpeech();flushDraft();const s=current(),typed=s.draft.trim(),started=epoch;
   let prompt=request?.prompt||typed||(s.game==='new'&&!s.remoteId?s.messages.find(m=>m.role==='child')?.text.trim()||'':'');if(!prompt)return;
   notebook.assertMessageCapacity(s.id,s.owner,reflecting?1:2);
@@ -1225,6 +1243,7 @@ export async function installStudio(){
   c=new BuilderClient(remote,(job,submissionId)=>onJob(s,job,submissionId));clients.set(s.id,c);return c;
  }
  async function build(s:StudioSession,prompt:string,continueTest=false){
+  if(young()){handOff();return;}
   sending.add(s.id);moreChoices.open=false;const identity=beginBuildHandoff(s,{phase:'sending'});render();status('Sending your idea…');
   const r=s.projectId?games.revision(s.projectId,s.owner):null;
   const chosen=continueTest?s.candidate:null;
@@ -1575,6 +1594,7 @@ export async function installStudio(){
   status('Chat and design notes cleared on this device. Saved game versions remain.');
  });
  $('studioTalk').onclick=()=>act(()=>{
+  if(young()){handOff();return;}
   stopSpeech();
   if(!$<HTMLTextAreaElement>('studioPrompt').value.trim()){status('Type a message or choose Speak first.');return;}
   return coaching?.discuss('discuss');
@@ -1775,6 +1795,10 @@ export async function installStudio(){
  installStudioNavigation({nav,headerTools,helpButton,rewards:rewardsWidget.element,subjects:learningChoice,
   openArt:()=>act(()=>artStudio.open()),openParent:()=>act(()=>openParent()),
  });
+ refreshEarlyJourney();
+ window.addEventListener('factory-learning-settings',refreshEarlyJourney);
+ window.addEventListener('factory-profile',refreshEarlyJourney);
+ window.addEventListener('factory-early-handoff',event=>{if(young()){event.preventDefault();handOff();}});
  refreshNotifications();
  window.addEventListener('factory-open-parent-connection',event=>{
   event.preventDefault();act(()=>openParent(true));

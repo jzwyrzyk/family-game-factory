@@ -452,3 +452,12 @@ body.studio-review #page-creations>.page-head>p{font-size:var(--jems-child-label
 /* Light collection panels need readable copy; the dark idea cards retain their own ink. */
 body.studio-review #page-creations > .panel > p,
 body.studio-review #page-creations #savedRemixes{color:var(--jems-muted)}
+.early-handoff{width:min(420px,92vw);max-height:92dvh;overflow:auto;padding:1.5rem;border:0;border-radius:24px;background:#fff7ed;color:#152640;text-align:center}
+.early-handoff::backdrop{background:#172240bb}
+.early-handoff img,.early-handoff .pals-portrait{width:120px;height:110px;object-fit:contain;margin:auto}
+.early-handoff button{min-height:60px;font-size:1.15rem;margin:.3rem;border:2px solid #554470;border-radius:14px}
+.early-handoff button svg{vertical-align:middle;margin-inline-end:.4rem}
+.early-journey #studioConversation{display:none}
+.early-journey .studio-workspace[data-mobile-panel=game]{grid-template-columns:minmax(0,1fr)}
+.early-journey .studio-menu-link,.early-journey #studioNew{min-height:72px}
+.early-journey .studio-home-intro>p,.early-journey #studioNew small{display:none}
