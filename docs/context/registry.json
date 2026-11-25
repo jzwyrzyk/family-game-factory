@@ -309,10 +309,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:50:01.961Z",
-      "sourceDigest": "9df3ac99749104a8317e88981c08cfb2f1c96a401700698ee4d8d2c2cf724252",
+      "reviewedAt": "2026-11-25T21:23:13.250Z",
+      "sourceDigest": "57ab04a98224db722fd91a4b94eb49cd9c4f03db93f3aca9b56da9ec4238917c",
       "reviewOutcome": "updated",
-      "reviewReason": "Family architecture describes pagehide/profile/superseded cancellation of read-only readiness probes, fresh checks after safe history reload and unchanged paid-request semantics; deterministic delayed-status regression preserves zero browser errors.",
+      "reviewReason": "Documented active-only fitted-play observations and original navigation intent across local revision reads; newer Change or Help prevents late mounting while existing owner/session/epoch guards remain.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -890,10 +890,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T20:55:55.050Z",
-      "sourceDigest": "5ed53147c0a5a911420dfd30fb5de26f956dcbb6e144a7d394a953e18a88f4d1",
+      "reviewedAt": "2026-11-25T21:23:13.837Z",
+      "sourceDigest": "87d114b2a9156651ec4eefb2459822281d69a7e47ccaac6cc2882c257785941f",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved exact e83 WebKit early-guidance failure and its independent storage/native-control passes. Documented native HTTPS fixture transport, protected synthetic-module admission, explicit held-request pagehide cancellation negative/positive and all eight Chromium beta stages; no error filtering, retries, tolerance changes or unproven runtime diagnosis.",
+      "reviewReason": "Preserved 77b failures and exact causal negatives/positives: native request cancellation versus simulated handler aborts, metadata-only empty-host observer ownership, and actual Change in both pending local read gaps; no browser errors or original assertions relaxed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1134,10 +1134,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T20:55:55.557Z",
-      "sourceDigest": "eba28fd1b57c9a0ff8fc338db20a84286dda69450af2d29ca79c6a49108db9e0",
+      "reviewedAt": "2026-11-25T21:23:13.987Z",
+      "sourceDigest": "e59f705db2c5d19717d0d9e28976d7e26fb4af728f1263d6aaeaaf9f68eae1a4",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded failed e83 qualification, independently verified artifacts and test-only native HTTPS continuation. Every final-head hosted gate still governs review readiness; protected merges, cloud activation, actual household/provider/device/legal acceptance and release remain separately held.",
+      "reviewReason": "Recorded 77b Security failure, independently verified passing workflows, scoped corrections and local evidence; successor exact-head hosted checks still govern review readiness, with release and real-data operations held.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
