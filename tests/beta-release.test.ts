@@ -61,7 +61,7 @@ test('protected nonproduction controller verifies build evidence and stages each
   if(group==='builds triggers describe')return {id:trigger,github:{owner:'jzwyrzyk',name:'family-game-factory'}};
   if(args[0]==='builds'){
    const img=args[2]===id?cfg.gatewayImage:cfg.previewImage;
-   return {id:args[2],buildTriggerId:trigger,status:'SUCCESS',sourceProvenance:missingProvenance?{}:{resolvedRepoSource:{commitSha:source}},substitutions:{COMMIT_SHA:source,REPO_FULL_NAME:'jzwyrzyk/family-game-factory'},
+   return {id:args[2],buildTriggerId:trigger,status:'SUCCESS',sourceProvenance:missingProvenance?{}:{resolvedRepoSource:{commitSha:source,repoName:'github_jzwyrzyk_family-game-factory'}},substitutions:{COMMIT_SHA:source,REPO_FULL_NAME:'jzwyrzyk/family-game-factory'},
     results:{images:[{name:img.split('@')[0]+':approved',digest:wrongImage?'sha256:'+'f'.repeat(64):img.split('@')[1]}]}};
   }
   if(group==='compute url-maps describe')return plan.urlMap;
@@ -78,7 +78,7 @@ test('protected nonproduction controller verifies build evidence and stages each
   throw Error('Unexpected command');
  }
  const opts={environment:'test',source,mode:'verify'};await environmentRelease(record,controller,opts,io);assert.equal(staged.length,0);
- missingProvenance=true;await assert.rejects(environmentRelease(record,controller,{...opts,mode:'stage'},io),/source/);assert.equal(staged.length,0);missingProvenance=false;
+ missingProvenance=true;await assert.rejects(environmentRelease(record,controller,{...opts,mode:'stage'},io),/source|provenance/);assert.equal(staged.length,0);missingProvenance=false;
  wrongImage=true;await assert.rejects(environmentRelease(record,controller,{...opts,mode:'stage'},io),/digest/);assert.equal(staged.length,0);wrongImage=false;
  await assert.rejects(environmentRelease(record,{...controller,enabled:false},{...opts,mode:'stage'},io));
  for(let i=0;i<2;i++){const receipt=await environmentRelease(record,controller,{...opts,mode:'stage'},io);assert.ok(receipt.services.every((r:any)=>r.revision&&r.currentTrafficPreserved));}
