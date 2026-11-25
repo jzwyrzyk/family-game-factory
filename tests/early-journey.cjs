@@ -111,7 +111,7 @@ async function nativeMatrix(page){
     after=async()=>{await mount.locator('[data-direction="up"]').click();assert.equal((await state()).planLength,2);};
    }
    if(game==='buckets'){
-    await mount.locator('#go').click();await page.waitForFunction(()=>FG.runtime.snapshot().state.mode==='result');
+    await mount.locator('#go').click();await page.waitForFunction(()=>FG.runtime.snapshot().state.mode==='result',null,{timeout:45000});
     await mount.locator('#go').click();
    }else await page.evaluate(game=>window.dispatchEvent(new CustomEvent('factory-game-event',{detail:{type:'checkpoint',game}})),game);
    const scope=page.locator('#stage-overlay .early-activity');await scope.waitFor();

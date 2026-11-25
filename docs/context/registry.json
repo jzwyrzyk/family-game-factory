@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:57:27.964Z",
-      "sourceDigest": "12961fb8c0b7692680a27740b38db2f5fbf1547f8ed87ec0cfe924f64f3dda38",
+      "reviewedAt": "2026-11-25T01:58:26.544Z",
+      "sourceDigest": "38dba3e8d3d4785f12d75739ee07a62f54ea17646638eabb0dbf9726b4fdda46",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed imported grade holds, two-subject game playback, responsive coding controls, natural checkpoint and authorized restore paths in integrated verification.",
+      "reviewReason": "The integrated browser matrix covers the current assembly workshop and tests the original splash round through its actual animated result.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
