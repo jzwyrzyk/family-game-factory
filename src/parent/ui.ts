@@ -1,3 +1,5 @@
+import {CreationWorkspace} from '../storage/creation-workspace';
+import {profileStorage} from '../adult-pilot/storage';
 import {gradeLabel} from '../learning/grades';
 import './style.css';
 import { captureParentSnapshot, type ParentSnapshot } from './snapshot';
@@ -123,9 +125,16 @@ export function installParentDashboard() {
   };
   rangeSelect.onchange = () => { range = rangeSelect.value === 'all' ? 'all' : Number(rangeSelect.value) as ParentRange; evidenceLimit = 30; refresh(); };
   function resetFilters(data: ParentSnapshot) { subject = 'all'; skillFilter = defaultSkillFilter(data); query = ''; evidenceSkill = ''; evidenceId = ''; evidenceIds = []; evidenceSource = 'all'; evidenceLimit = 30; }
-  function refresh() {
+  let reportEpoch=0;
+  async function refresh() {
+    const request=++reportEpoch,capturedOwner=String(FG.store.current().id),capturedRange=range,now=Date.now();
     try {
-      const next = captureParentSnapshot(FG, range);
+      let creation:Parameters<typeof captureParentSnapshot>[3];
+      let source:CreationWorkspace|undefined;
+      try{source=await CreationWorkspace.open(profileStorage(localStorage),()=>String(FG.store.current().id));creation={snapshot:await source.read()};}
+      catch(error){creation={error};}finally{source?.close();}
+      if(request!==reportEpoch||String(FG.store.current().id)!==capturedOwner)return;
+      const next = captureParentSnapshot(FG, capturedRange,now,creation);
       if (next.ownerId !== owner) { owner = next.ownerId; resetFilters(next); for (const [id, panel] of panels) if (id !== 'settings') panel.replaceChildren(); }
       snapshot = next; download.disabled = false;
       renderProblemControls();
@@ -136,7 +145,7 @@ export function installParentDashboard() {
       childSelect.value = next.ownerId;
       message(next.warnings.join(' '));
       render();
-    } catch (error) { snapshot = null; download.disabled = true; renderProblemControls(); for (const [id, panel] of panels) if (id !== 'settings') panel.replaceChildren(empty('Report unavailable', 'Your saved work has not been changed. Open Settings to review recovery and backup options.')); message((error as Error).message); }
+    } catch (error) { if(request!==reportEpoch||String(FG.store.current().id)!==capturedOwner)return;snapshot = null; download.disabled = true; renderProblemControls(); for (const [id, panel] of panels) if (id !== 'settings') panel.replaceChildren(empty('Report unavailable', 'Your saved work has not been changed. Open Settings to review recovery and backup options.')); message((error as Error).message); }
   }
   function render() {
     for (const [id, panel] of panels) { panel.hidden = selectedTab !== id; const b = tabButtons.get(id)!; b.setAttribute('aria-selected', String(id === selectedTab)); b.tabIndex = id === selectedTab ? 0 : -1; }
@@ -388,12 +397,13 @@ export function installParentDashboard() {
     const a = node('a'); a.href = url; a.download = `jems-learning-summary-${new Date(captured.dashboard.through).toISOString().slice(0, 10)}.txt`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1200);
     message('Download requested for this learner’s selected records. No report was sent or uploaded.');
   }
-  window.addEventListener('factory-profile-changing', () => { snapshot = null; owner = ''; download.disabled = true; renderProblemControls(); for (const [id, panel] of panels) if (id !== 'settings') panel.replaceChildren(); message(''); });
-  window.addEventListener('factory-profile', refresh);
+  window.addEventListener('factory-profile-changing', () => { reportEpoch++;snapshot = null; owner = ''; download.disabled = true; renderProblemControls(); for (const [id, panel] of panels) if (id !== 'settings') panel.replaceChildren(); message(''); });
+  const refreshVisible=()=>{if(!document.getElementById('page-parent')?.classList.contains('hidden'))void refresh();};
+  window.addEventListener('factory-profile', refreshVisible);
   window.addEventListener('factory-page', event => { if ((event as CustomEvent).detail === 'parent') refresh(); });
-  window.addEventListener('factory-problem-solving-updated', refresh);
-  window.addEventListener('storage', event => { if (event.key === null || event.key.endsWith(PROBLEM_SOLVING_KEY)) refresh(); });
+  window.addEventListener('factory-problem-solving-updated', refreshVisible);
+  window.addEventListener('storage', event => { if (event.key === null || event.key.endsWith(PROBLEM_SOLVING_KEY)) refreshVisible(); });
   FG.parentDashboard = { refresh, openTab };
-  refresh();
+  refreshVisible();
   return FG.parentDashboard;
 }

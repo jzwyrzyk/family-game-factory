@@ -1,3 +1,4 @@
+import {installIndexedRewardAuthorities} from './storage/reward-authorities';
 import {recoverCompleteRestore} from './storage/complete-backup';
 import {recoverLocalProjects} from './storage/project-recovery';
 import './brand/icons.css';
@@ -38,10 +39,11 @@ void installRewardWriteGuard().then(async writable=>{
   await recoverRewardBackup();
   if(hasPendingRewardBackup())return; // Recovery is reloading the document.
   setRewardSourceMaintenance(false);
+  await initLiveRemix(); // Complete scoped indexed/local recovery before source rewards start.
   installProblemSolvingEvidence();
+  installIndexedRewardAuthorities(()=>String((window as any).FG.store.current().id));
   const rewards=installRewards();
   installRewardBackupControls(rewards);
-  await initLiveRemix();
   void initBuilder().then(installAdultProfile);
   installJemsDelight();installOffline();installDrawings();installQualityCards();installParentDashboard();installProblemSolvingProgress();
   await installStudio();installStudioHostNavigation();
