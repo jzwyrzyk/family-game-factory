@@ -9,7 +9,7 @@ import type {RewardFact} from '../rewards/model';
 
 /** A bounded synchronous presentation view over an async durable authority.
  * Call load before using a selected session. Card records are never passed off
- * as complete sessions. One foreground session plus at most eight unresolved
+ * as complete sessions. The selected and last active session plus at most eight unresolved
  * jobs are cached; the ordinary indexed open does not read the legacy blob. */
 export class NotebookWorkspace {
  private cards:NotebookCard[]=[];
@@ -17,6 +17,8 @@ export class NotebookWorkspace {
  private facts:RewardFact[]=[];
  private loaded=new Map<string,StudioSession>();
  private selected:string|null=null;
+ private transitionPrevious:string|null=null;
+ private selectionEpoch=0;
  private queue:Promise<unknown>=Promise.resolve();
  private staged:StudioNotebook|null=null;
  private invalidated=false;
@@ -45,6 +47,10 @@ export class NotebookWorkspace {
  guidance(owner:string){this.check(owner);return structuredClone(this.view.guidance);}
  notificationPreferences(owner:string){this.check(owner);return structuredClone(this.view.notificationPreferences);}
  pendingRewards(owner:string){this.check(owner);return structuredClone(this.facts);}
+ async refreshRewards(){
+  await this.queue.catch(()=>{});this.check();
+  for(let attempt=0;;attempt++){try{const facts=this.indexed?await this.indexed.pendingRewards(this.captured):this.legacy!.pendingRewards(this.captured);this.check();this.facts=facts;return;}catch(error){if(attempt>=2||!(error instanceof Error)||error.message!=='STORAGE_CONFLICT')throw error;}}
+ }
  notifications(context:StudioNotificationContext={}):StudioNotification[]{
   this.check();const items:StudioNotification[]=[];
   for(const row of this.view.notificationVariants){const mask=(context.unknownSessionIds?.has(row.id)?1:0)|(context.unconfirmedSessionIds?.has(row.id)?2:0)|(context.sendingSessionIds?.has(row.id)?4:0),item=row.items[mask];if(item)items.push(structuredClone(item));}
@@ -57,9 +63,9 @@ export class NotebookWorkspace {
  current(){this.check();if(!this.selected)throw Error('Choose a project first.');return this.get(this.selected,this.captured);}
  last(owner:string):StudioSession|null {this.check(owner);const id=this.view.active;if(!id)return null;const session=this.get(id,owner);return session.archived||session.resumeDismissed?null:session;}
  async load(id:string,owner:string):Promise<StudioSession>{
-  this.check(owner);const session=this.indexed?await this.indexed.get(id,owner):this.legacy!.get(id,owner);this.check(owner);this.selected=id;this.loaded.set(id,session);this.trim();return structuredClone(session);
+  this.check(owner);const epoch=++this.selectionEpoch,session=this.indexed?await this.indexed.get(id,owner):this.legacy!.get(id,owner);this.check(owner);if(epoch!==this.selectionEpoch)throw Error('The selected idea changed. Open it again.');if(this.selected!==id)this.transitionPrevious=this.selected;this.selected=id;this.loaded.set(id,session);this.trim();return structuredClone(session);
  }
- private trim(){const pending=new Set(this.cards.filter(c=>c.pendingCopy||c.pendingSubmission||c.needsReadyRecovery||['queued','building','testing'].includes(c.jobStatus??'')).slice(0,8).map(c=>c.id));for(const id of this.loaded.keys())if(id!==this.selected&&!pending.has(id))this.loaded.delete(id);}
+ private trim(){const pending=new Set(this.cards.filter(c=>c.pendingCopy||c.pendingSubmission||c.needsReadyRecovery||['queued','building','testing'].includes(c.jobStatus??'')).slice(0,8).map(c=>c.id));for(const id of this.loaded.keys())if(id!==this.selected&&id!==this.view.active&&id!==this.transitionPrevious&&!pending.has(id))this.loaded.delete(id);}
  async refresh(owner=this.captured):Promise<NotebookSummary>{
   // A reward acknowledgement may advance the same head after a source save.
   // Retry only the read projection, never a mutation or paid request.
@@ -74,8 +80,8 @@ export class NotebookWorkspace {
   }else {const source=this.legacy!.read();cards=source.sessions.filter(s=>s.owner===owner).map(s=>notebookCard(s,this.legacy!.get(s.id,owner)));view=deriveNotebookSummary(source,owner);facts=this.legacy!.pendingRewards(owner);}
   this.check(owner);this.cards=cards.sort((a,b)=>b.updated.localeCompare(a.updated)||a.id.localeCompare(b.id));this.view=view;this.facts=facts;
   if(this.selected&&!cards.some(c=>c.id===this.selected))this.selected=null;if(!this.selected)this.selected=view.active;
-  const required=new Set([...(this.selected?[this.selected]:[]),...cards.filter(c=>c.pendingCopy||c.pendingSubmission||c.needsReadyRecovery||['queued','building','testing'].includes(c.jobStatus??'')).slice(0,8).map(c=>c.id)]);
-  const loaded=new Map<string,StudioSession>();for(const id of required){const session=this.indexed?await this.indexed.get(id,owner):this.legacy!.get(id,owner);this.check(owner);loaded.set(id,session);}this.loaded=loaded;
+  const selected=this.selected,epoch=this.selectionEpoch,required=new Set([...(selected?[selected]:[]),...(view.active?[view.active]:[]),...(this.transitionPrevious&&cards.some(c=>c.id===this.transitionPrevious)?[this.transitionPrevious]:[]),...cards.filter(c=>c.pendingCopy||c.pendingSubmission||c.needsReadyRecovery||['queued','building','testing'].includes(c.jobStatus??'')).slice(0,8).map(c=>c.id)]);
+  const loaded=new Map<string,StudioSession>();for(const id of required){const session=this.indexed?await this.indexed.get(id,owner):this.legacy!.get(id,owner);this.check(owner);loaded.set(id,session);}if(epoch===this.selectionEpoch&&selected===this.selected)this.loaded=loaded;
   return this.summary();
  }
  /** For callback provenance checks the staged source is authoritative. Outside
@@ -114,7 +120,7 @@ export class NotebookWorkspace {
  async create(...args:Parameters<StudioNotebook['create']>):Promise<ReturnType<StudioNotebook['create']>>{return this.mutate(book=>book.create(...args));}
  async update(...args:Parameters<StudioNotebook['update']>):Promise<ReturnType<StudioNotebook['update']>>{return this.mutate(book=>book.update(...args));}
  async reply(...args:Parameters<StudioNotebook['reply']>):Promise<ReturnType<StudioNotebook['reply']>>{return this.mutate(book=>book.reply(...args));}
- async select(...args:Parameters<StudioNotebook['select']>):Promise<ReturnType<StudioNotebook['select']>>{return this.mutate(book=>book.select(...args));}
+ async select(...args:Parameters<StudioNotebook['select']>):Promise<ReturnType<StudioNotebook['select']>>{const result=await this.mutate(book=>book.select(...args));this.transitionPrevious=null;this.trim();return result;}
  async message(...args:Parameters<StudioNotebook['message']>):Promise<ReturnType<StudioNotebook['message']>>{return this.mutate(book=>book.message(...args));}
  async continueConversation(...args:Parameters<StudioNotebook['continueConversation']>):Promise<ReturnType<StudioNotebook['continueConversation']>>{return this.mutate(book=>book.continueConversation(...args));}
  async clearConversation(...args:Parameters<StudioNotebook['clearConversation']>):Promise<ReturnType<StudioNotebook['clearConversation']>>{return this.mutate(book=>book.clearConversation(...args));}
