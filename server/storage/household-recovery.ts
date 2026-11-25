@@ -92,7 +92,7 @@ export function createHouseholdRecovery(config:HouseholdRecoveryConfig,store:Ato
   if(!input||typeof input!=='object'||Array.isArray(input))throw Error('INVALID_REQUEST');const body=input as Record<string,unknown>;
   const initial=await store.run(tx=>authenticate(tx,cookies,proof),true),target=initial.session.adultProfileId!;
   if(path==='mappings'){
-   exact(body,[]);return {mappings:(config.householdRecovery!.adultMappings??[]).filter(m=>m.targetAudience===target).map(m=>{
+   exact(body,['profile']);if(body.profile!==target)throw Error('GENERATED_RECOVERY_SCOPE_INVALID');return {mappings:(config.householdRecovery!.adultMappings??[]).filter(m=>m.targetAudience===target).map(m=>{
     const restored=initial.loaded.state.revisions.filter(r=>r.familyId===config.familyId&&r.adultPilotProfileId===target&&r.recoveryProvenance?.playbackOnly===true&&r.recoveryProvenance.sourceAudience===m.sourceAudience&&r.recoveryProvenance.sourceOrigin===m.sourceOrigin);
     return {...m,familyId:config.familyId,workspace:config.workspace,targetOrigin:config.appOrigin,expiresAt:initial.session.expiresAt,revisionMap:Object.fromEntries(restored.map(r=>[r.recoveryProvenance!.sourceRevisionId,r.id])),projectMap:Object.fromEntries(restored.map(r=>[r.recoveryProvenance!.sourceProjectId,r.projectId]))};
    })};
@@ -166,9 +166,8 @@ export function createHouseholdRecovery(config:HouseholdRecoveryConfig,store:Ato
   try{
    const path=new URL(req.url??'/',config.appOrigin).pathname;
    if(req.headers.origin!==config.appOrigin)throw Error('FORBIDDEN');
-   let action:string,input:unknown;
-   if(path==='/v1/recovery/adult/mappings'&&req.method==='GET'){action='mappings';input={};}
-   else{if(!/^\/v1\/recovery\/generated\/(?:list|capture|preview|restore)$/.test(path)||req.method!=='POST'||req.headers['x-factory-request']!=='1'||!req.headers['content-type']?.startsWith('application/json'))throw Error('FORBIDDEN');action=path.split('/').at(-1)!;input=await readJsonBody(req,8192,{invalidJsonError:'INVALID_REQUEST'});}
+   if(!(path==='/v1/recovery/adult/mappings'||/^\/v1\/recovery\/generated\/(?:list|capture|preview|restore)$/.test(path))||req.method!=='POST'||req.headers['x-factory-request']!=='1'||!req.headers['content-type']?.startsWith('application/json'))throw Error('FORBIDDEN');
+   const action=path.split('/').at(-1)!,input=await readJsonBody(req,8192,{invalidJsonError:'INVALID_REQUEST'});
    const value=await request(req.headers.cookie,req.headers['x-factory-adult-session'],action,input);res.writeHead(200);res.end(JSON.stringify(value));
   }catch(error){const message=(error as Error).message,code=/^[A-Z][A-Z0-9_]{1,80}$/.test(message)?message:'RECOVERY_UNAVAILABLE';res.writeHead(code==='NOT_FOUND'?404:code==='GENERATED_RECOVERY_DISABLED'?503:403);res.end(JSON.stringify({error:code}));}
  };
