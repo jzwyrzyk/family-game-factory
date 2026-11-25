@@ -49,3 +49,43 @@ PR188 after hosted verification. Before/after screenshots and the variant audit
 sheets accompany this record. Corrected physical Android/other-device acceptance
 and owner approval remain pending. No merge, deployment, paid generation or
 collection-data migration is part of this correction.
+
+## Committed visual evidence
+
+Baseline screenshots use `40063a13352b90344318a61e4fe86d74e4020433` (including a
+fresh offline build). Corrected screenshots use application source
+`475ddbac5c87af47d47608ab6f67b6532565ffa7`; subsequent evidence-only commits do
+not alter the renderer. Screenshots are actual Chromium compositions. The local
+offline run uses the documented in-memory transport because managed Chromium
+blocks `file://`; final hosted verification separately exercises real file URLs.
+
+| 390 × 844 phone | Before / after | Complete corrected Journey |
+| --- | --- | --- |
+| Production bundle | [274px → 126px](app-phone-before-after.webp) | [Starter](app-phone-starter-overview.webp), [equipped](app-phone-equipped-overview.webp) |
+| Standalone HTML | [274px → 126px](offline-phone-before-after.webp) | [Starter](offline-phone-starter-overview.webp), [equipped](offline-phone-equipped-overview.webp) |
+
+The eight inspected contact sheets cover all 186 approved variants:
+[1](approved-variants-1.webp), [2](approved-variants-2.webp),
+[3](approved-variants-3.webp), [4](approved-variants-4.webp),
+[5](approved-variants-5.webp), [6](approved-variants-6.webp),
+[7](approved-variants-7.webp), [8](approved-variants-8.webp).
+Exact-file negative-space seeds now include expression loops and leg gaps even
+when the exterior already has alpha. Independent browser landmarks check paper
+holes and preserved pale anatomy in Brim, Poff, Pleeko and Tessit; unit coverage
+also retains identically colored enclosed highlights and every source RGB value.
+No source artwork, manifest or approval status changed.
+
+Local build, Pal unit/asset verification, 8 component groups, 8 integrated groups,
+8 expression groups, all-variant fidelity, four-size app/offline starter and
+equipped journeys, creation/reward units, CI contract and documentation checks
+passed. Creative picker coverage checks prepared masks, contained dimensions and
+hidden error labels; existing scene/playback tests retain saved Base/Grown IDs,
+Keep/reload, ownership and learning/reward assertions. Full original PNG captures
+and machine results are retained by the final hosted evidence artifact. The
+required hosted CI and exact latest-candidate HTML identities are in PR188.
+
+[Creative picker](pals-creative-picker-mobile.webp),
+[phone scene](pals-app-playground-mobile.webp),
+[desktop scene](pals-app-playground-desktop.webp),
+[application pixel/variant results](app-results.json),
+[offline results](offline-results.json), [baseline measurements](before-metrics.json).
