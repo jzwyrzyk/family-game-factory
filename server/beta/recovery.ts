@@ -1,3 +1,4 @@
+import {guardedBackupOperation} from './backup-operations';
 import {createHash} from 'node:crypto';
 import {ContinuityService,DocumentContinuityRepository} from '../storage/continuity';
 import {RecoveryPoints} from '../storage/recovery-points';
@@ -61,7 +62,7 @@ export async function runFamilyCloudRecovery(d:FamilyDirectory,id:string,ledgerF
 export function familyBackupLedger(db:Firestore,d:FamilyDirectory,bucket:string,id:string,profile:string):BackupScheduleLedger {
  const authorize=()=>d.db.run(tx=>authorizeScheduledRecovery(d,tx,id,profile),true).then(()=>{}),artifacts=new GcsPrivateArtifacts(bucket,'beta-'+id);
  return new FirestoreBackupScheduleLedger(db,'beta-'+id,JSON.stringify([id,profile,'backups']),{
-  put:async bytes=>{await authorize();return artifacts.put(bytes);},get:async ref=>{await authorize();return artifacts.get(ref);}
+  put:async bytes=>guardedBackupOperation(d,id,profile,'artifact-write',tx=>authorizeScheduledRecovery(d,tx,id,profile),()=>artifacts.put(bytes),createHash('sha256').update(bytes).digest('hex')),get:async ref=>{await authorize();return artifacts.get(ref);}
  },async native=>{
   const readonly:Documents={get:async<T>(path:string)=>{const row=await native.get(db.doc(path));return row.exists?row.data() as T:undefined;},page:async()=>{throw Error('BACKUP_AUTH_QUERY_UNSUPPORTED');},set:()=>{throw Error('BACKUP_AUTH_READ_ONLY');},create:()=>{throw Error('BACKUP_AUTH_READ_ONLY');},delete:()=>{throw Error('BACKUP_AUTH_READ_ONLY');}};
   await authorizeScheduledRecovery(d,readonly,id,profile);
