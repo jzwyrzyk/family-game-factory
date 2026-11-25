@@ -427,3 +427,7 @@ The ordered grade table in `src/learning/grades.ts` encodes Pre-K as -1, Kinderg
 ### Early-preview verification
 
 The host accepts an illustrated picture-order response against the reviewed event sequence. The response records listening comprehension. For early movement challenges an optional direction choice and the bounded run’s first observed direction are stored on the saved revision’s check. Both fields are absent on historical checks. See the [synthetic acceptance guide](docs/evidence/early-learning/README.md).
+
+## Standalone UI review adapter
+
+The optional [UI review build](docs/ui-review/README.md) imports the application entry without editing product UI. Its isolated tool directory owns synthetic storage/service adapters, an embedded-asset packager, a separate iframe toolbar, coverage inventory and file-based smoke tests. Production builds do not import it. A deny-network CSP and transport stubs keep review offline; generated previews and authentication are explicitly simulated. The compact build downsamples only Gem Pal images; the exact-asset option preserves their bytes. Early grades use the merged preview compile mode without changing ordinary production availability.

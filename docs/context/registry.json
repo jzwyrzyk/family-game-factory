@@ -82,7 +82,8 @@
     "docs/development/DEV-TEST-PROD.md",
     "docs/development/SETUP.md",
     "docs/development/COSTS.md",
-    "docs/decisions/2026-11-23-dev-test-prod.md"
+    "docs/decisions/2026-11-23-dev-test-prod.md",
+    "docs/ui-review/README.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -873,7 +874,8 @@
         "docs/bubble-gum-builders/*.md",
         "docs/game-intelligence/premium-benchmark/*.md",
         "docs/development/*.md",
-        "infra/nonproduction/*.md"
+        "infra/nonproduction/*.md",
+        "docs/ui-review/*.md"
       ],
       "sources": [
         "tests/**",
@@ -884,10 +886,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T02:09:44.753Z",
-      "sourceDigest": "a90e14b4f5647a1eae7cc76c63b5cb8f572bf7c2d450a02e396620e7712345f4",
+      "reviewedAt": "2026-11-25T16:09:15.573Z",
+      "sourceDigest": "b8ed2e9ef6aed6949405a013cf1260152d33833e48987af33be7684ff5115283",
       "reviewOutcome": "updated",
-      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
+      "reviewReason": "Recorded successful actual file:// smoke and integration checks in run 45650993855; sanitized screenshot filenames after the evidence upload rejected a colon.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1106,7 +1108,8 @@
         "docs/bubble-gum-builders/*.md",
         "docs/development/*.md",
         "infra/nonproduction/*.md",
-        "docs/evidence/README.md"
+        "docs/evidence/README.md",
+        "docs/ui-review/*.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -1126,10 +1129,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T05:19:31.718Z",
-      "sourceDigest": "452b58c9eb24f99716c78b08d97de70788cc2f20ac6e66a63488c2a7676c6f53",
+      "reviewedAt": "2026-11-25T16:09:16.085Z",
+      "sourceDigest": "3a94ad20cdb0bbb8e7f53413c941efc646ebd390faf5ae55daac35dca38ddf58",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the delivered early-learning PRs and their protected merge receipts against the integration guide.",
+      "reviewReason": "Separated immediate HTML upload from later evidence upload so screenshot packaging cannot withhold the primary deliverable; recorded the successful tests and failed upload distinctly.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1371,7 +1374,8 @@
         "AGENTS.md",
         "docs/README.md",
         "docs/context/*.md",
-        ".github/PULL_REQUEST_TEMPLATE.md"
+        ".github/PULL_REQUEST_TEMPLATE.md",
+        "docs/ui-review/*.md"
       ],
       "sources": [
         "scripts/check-docs.mjs",
@@ -1383,10 +1387,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T20:54:53.956Z",
-      "sourceDigest": "0bbbe4a7991101120d756bb7410ec66b372b46aa53313cf249bd7aeb584d7cb9",
+      "reviewedAt": "2026-11-25T15:58:37.345Z",
+      "sourceDigest": "e11f4416274087c5bdb8f3324e0801f938d415a0f8f3ee71810fa119f7f11ed2",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled both registry source maps and documentation histories; routed new premium offline Python tools and completion handoff while preserving current maintenance requirements.",
+      "reviewReason": "Linked the standalone review runbook in README and documentation index, registered its maintenance contract and preserved the existing product entry instructions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
