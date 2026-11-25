@@ -890,10 +890,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:50:02.705Z",
-      "sourceDigest": "9143fa63eb073e025dd0e5fe3fc37815c979f9ff4c02d85975a1daf99a2e275c",
+      "reviewedAt": "2026-11-25T19:08:50.077Z",
+      "sourceDigest": "11b3abe5222b4b6a66814569457a43d61e8081baeff0efbb327a0e819f190d4e",
       "reviewOutcome": "updated",
-      "reviewReason": "Retain 7cc fifteen-of-sixteen outcome, independent 120-command receipt and WebKit failures; new held-status and held-art reproductions fail before/pass after, independent beta stages retain aggregate failure, and unchanged 20,000-code-unit quota margin covers changed and unchanged restores.",
+      "reviewReason": "Record exact7299 fifteen-of-sixteen result, verified120-command receipt and all16 beta/two-engine stage passes, native nearquota proof and remainingcloud error; followup preserves assertions through realHTTP with activeSW, partialresponse lostack and sameoperation/singleroot verification.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1134,10 +1134,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T18:50:02.867Z",
-      "sourceDigest": "d3d513e17abde7770a7608ebd2c6fc48a23925cc67a5bf08ae2158751bfd49c8",
+      "reviewedAt": "2026-11-25T19:08:50.276Z",
+      "sourceDigest": "b582abd42219f3fbc30bb90cae93f15db977ac17abeeee878ace6198b0895e31",
       "reviewOutcome": "updated",
-      "reviewReason": "Record exact 7cc source/tree and observed Arcade/security/offline outcomes plus independently verified artifact hashes; corrected-source hosted browser acceptance remains required and no release authorization is implied.",
+      "reviewReason": "Record7299 exactsource/tree/securityartifact and actualWebKit migration/quota outcomes without claiming completeSecurity; followup cloud fixture usesrealHTTP, with nativeWebKit successor acceptance stillrequired and interception hypothesis explicitlyunproven.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
