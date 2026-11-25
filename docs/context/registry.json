@@ -1133,10 +1133,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T21:04:00.637Z",
-      "sourceDigest": "8b90caceaf316bd524c2af26e758dec86f03eb531bf59bf80f662f90d445477e",
+      "reviewedAt": "2026-11-25T01:37:22.154Z",
+      "sourceDigest": "c508caa1067cbdd041f3a8f81de92d014f08e88692cf3877bb8b1b857c195d3f",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded source-specific local trials, standalone artifact hashes and downloaded clean hosted image evidence; preserved superseded run scope, current main production records and all external activation gates.",
+      "reviewReason": "Recorded the verified PR175 merge after PR168, matched the protected-main tree to full PR validation, and separated browser evidence from pending owner acceptance and production release.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
