@@ -1,9 +1,16 @@
 # Early learning curriculum crosswalk
 
-Each row identifies an observable practice task. A correct response is one formative observation. The current catalogs contain 33 math skills and 27 language skills. Existing grade 1–4 packs retain their identifiers and answer keys.
+Each row identifies an observable practice task. A correct response is one formative observation. The current catalogs contain 40 math skills and 27 language skills. Existing grade 1–4 packs retain their identifiers and answer keys.
 
 | Grade | Domain | Skill | Standard or objective | Activity | Tier | Scope | Evidence |
 |---|---|---|---|---|---|---|---|
+| Pre-K | Geometry | Classify objects by shape | P-MATH 9 | Select all matching shapes | 4, 6 or 8 objects | Practiced | Exact selected subset |
+| Pre-K | Measurement | Classify objects by size | P-MATH 8 | Select all matching sizes | 4, 6 or 8 objects | Practiced | Exact selected subset |
+| Pre-K | Number sense | Match a printed numeral to a set | P-MATH 5 | Choose a group for a silent numeral | 1–3, 1–5, 1–10 | Practiced | Numeral-to-quantity response |
+| Kindergarten | Data | Classify shapes by type | K.MD.B.3 | Select all matching shapes | 4, 6 or 8 objects | Practiced | Exact selected subset |
+| Kindergarten | Data | Classify objects by size | K.MD.B.3 | Select all matching sizes | 4, 6 or 8 objects | Practiced | Exact selected subset |
+| Kindergarten | Number sense | Match written numerals and sets | K.CC.B.4b | Choose a group for a silent numeral | 0–5, 0–10, 0–20 | Practiced | Cardinality response |
+| Kindergarten | Geometry | Identify shape attributes | K.G.B.4 | Select a shape by sides and corners | 0–2 | Partially supported | Identified named properties |
 | Pre-K | operations | Touch each object once | P-MATH 3 | Tap each picture once. Then tap the check mark. | 0–2 | Practiced | visual math response |
 | Pre-K | operations | Recognize a small group | P-MATH 2 | Find the group of 2. | 0–2 | Practiced | visual math response |
 | Pre-K | operations | Count a collection | P-MATH 3 | How many do you see? | 0–2 | Practiced | visual math response |

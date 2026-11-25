@@ -641,10 +641,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:28:36.451Z",
-      "sourceDigest": "ba7dc4c367bbca5eb5553c243ce5e8c549b4cbefb0446959037ff3a216c63aec",
+      "reviewedAt": "2026-11-25T01:48:45.081Z",
+      "sourceDigest": "0d4d853b038b9b8b627bc1ec5c0a6a792b0a0593de5e850a01f069cc5ce37c8b",
       "reviewOutcome": "updated",
-      "reviewReason": "Graphical scene controls and early challenges integrate with the reviewed early listening and mathematics activities.",
+      "reviewReason": "Combine bounded first-move observations and the graphical editor with the expanded illustrated curriculum and selection checks.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:37:01.656Z",
-      "sourceDigest": "3b2e505a38bb3d68bd7e0ad6d261d29c618ee74e69bbfa59ae63a6052490cef1",
+      "reviewedAt": "2026-11-25T01:48:45.139Z",
+      "sourceDigest": "7dcb0781d9ed94a6c35c97a8fa643ba5908a34785cb24882ff85a21922975950",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage. Existing operational procedures and acceptance commands still apply to this change.",
+      "reviewReason": "Combine bounded first-move observations and the graphical editor with the expanded illustrated curriculum and selection checks. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

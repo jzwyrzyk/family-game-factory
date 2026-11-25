@@ -298,6 +298,10 @@ export function evaluateAnswer(item:MathItem,raw:string):AnswerCheck {
  if(typeof raw!=='string'||raw.length>80)return {valid:false,correct:false,normalized:'',message:'Enter a short answer.'};
  const value=raw.trim().replace(/−/g,'-');
  if(!value)return {valid:false,correct:false,normalized:'',message:'Enter an answer, or choose a hint.'};
+ if(isEarlyGrade(item.grade)&&item.parameters.style==='sort'){
+  const valid=/^[01]{4,8}$/.test(value)&&value.length===String(item.answer).length;
+  return {valid,correct:valid&&value===item.answer,normalized:value};
+ }
  if(isEarlyGrade(item.grade) && ['touch','build'].includes(String(item.parameters.style))){
   const valid=/^(?:0|[1-9]|1[0-9]|20)$/.test(value);
   return {valid,correct:valid&&value===String(item.answer),normalized:value};
