@@ -76,7 +76,7 @@
     "test:early-preview": "vite build --mode early-preview --outDir test-results/early-build && node --import tsx --test tests/early-grades.test.ts && node --import tsx tests/early-journey.cjs",
     "test:ci": "node --test scripts/ci/*.test.mjs tests/ci-*.test.mjs tests/browser-scenarios.test.cjs",
     "review:build": "node tools/ui-review/check-coverage.mjs && node tools/ui-review/build.mjs",
-    "review:test": "node tools/ui-review/smoke.cjs",
+    "review:test": "node tools/ui-review/smoke.cjs && node tools/ui-review/integration.cjs",
     "review:coverage": "node tools/ui-review/check-coverage.mjs"
   },
   "devDependencies": {

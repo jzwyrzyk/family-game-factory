@@ -886,10 +886,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T16:00:44.162Z",
-      "sourceDigest": "d7da23c63a0aa3637ecb4984a07e64d413c9ba1ffc20ed51f18953447216af97",
+      "reviewedAt": "2026-11-25T16:05:38.007Z",
+      "sourceDigest": "29d9b7bc621d51505366bde4f0130330d743dcaea919abf65e5f8d90643d468c",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final adapter, fixture and smoke-test changes, including synthetic rewards, coding/drawing intermediate states, metadata capture, and disabled speech. Runbook records scope and limitations.",
+      "reviewReason": "Added permanent real-component coding/upload/privacy and all-embedded-image decode checks; recorded the measured 11–12px original Art Studio text as a product concern without changing it.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1129,10 +1129,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T16:04:22.155Z",
-      "sourceDigest": "ad2f71cacde96f53fe9cc07165d1fe6dc80e14299b255832cf6ae95fa594a722",
+      "reviewedAt": "2026-11-25T16:05:38.805Z",
+      "sourceDigest": "29650b37f9e362764a6d10dd9235872e717b2f24e81cbb39d74ce0789b0f4818",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified the workflow diff pins Ubuntu 24.04/Node 24 and builds before browser setup; documented failed attempts caused by Playwright 1.56.1 on Ubuntu 26.04.",
+      "reviewReason": "Extended the artifact test command with offline integration checks and linked acceptance observations; workflow remains artifact-only with no deployment or production access.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

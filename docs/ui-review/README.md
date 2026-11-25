@@ -46,3 +46,5 @@ A managed local browser can prohibit `file://` by administrator policy. `UI_REVI
 The workflow is additive, read-only, and independent of production releases. It runs on relevant main changes and sandbox-tool PRs. Review findings never upload automatically. Real-device, Edge-specific, speech/audio, accessibility and owner acceptance remain separate evidence. The HTML's coverage dialog is the authoritative per-artifact list of known deviations.
 
 The artifact workflow pins Ubuntu 24.04 because the repository’s Playwright 1.56.1 cannot install on Ubuntu 26.04. Initial workflow attempts encountered this runner incompatibility before building. The corrected job builds the HTML before browser setup, so a browser-install failure still leaves a downloadable artifact with explicitly incomplete validation.
+
+Additional integration checks add a Jump block and run the real scene engine, upload a synthetic local PNG into the art library, issue a simulated device invitation, and decode every embedded image. [Initial acceptance observations](ACCEPTANCE.md) record existing product UI concerns separately.
