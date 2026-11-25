@@ -105,19 +105,27 @@ export class IndexedNativeStore {
   * approved session. The pump independently rechecks remote grants per request. */
  enablePrivateCopies(projectId:string,approved:()=>boolean){this.assertAuthorized();if(!approved())throw Error('Private copies need current grown-up permission.');this.privateCopies.set(projectId,approved);}
  disablePrivateCopies(){this.privateCopies.clear();}
- async projectRecords(projectId:string):Promise<DurableRecord[]>{
+ async projectRecords(projectId:string,options:{includeArtworkReferences?:boolean}={}):Promise<DurableRecord[]>{
   await this.ready();const found=new Map<string,DurableRecord>(),seenProjects=new Set<string>();
   const add=(row:DurableRecord)=>found.set(row.collection+':'+row.id,row);
   const collect=async(id:string):Promise<void>=>{
    if(seenProjects.has(id))return;seenProjects.add(id);const projectRow=await this.row(PROJECTS,id);if(!projectRow)throw Error('An original game is unavailable.');this.decodeProject(projectRow);add(projectRow);
    let after:string|null=null;do{const page=await this.records.page(key(id),after,100);for(const pointer of page){add(pointer);const revision=await this.row(REVISIONS,(pointer.value as {revisionId:string}).revisionId);if(!revision)throw Error('A saved version is unavailable.');add(revision);const stored=revision.value as StoredRevision;
     // Original image/rig transfer has a separate authorization and integrity path.
-    if(stored.drawingRigId)throw Error('Include this game’s original artwork in a complete private copy first.');
+    if(stored.drawingRigId&&!options.includeArtworkReferences)throw Error('Include this game’s original artwork in a complete private copy first.');
     const config=await this.row(CONFIGS,stored.configHash);if(!config||await digest(JSON.stringify(config.value))!==stored.configHash)throw Error('Saved settings need recovery.');add(config);
     if(stored.sourceRevisionId){const source=await this.row(REVISIONS,stored.sourceRevisionId);if(!source)throw Error('The copied game’s original version is unavailable.');await collect((source.value as StoredRevision).projectId);}
    }after=page.length===100?page.at(-1)!.id:null;}while(after);
   };
   await collect(projectId);return [...found.values()];
+ }
+ /** Small compound Studio changes stage one project and its required source
+  * ancestry, never the other family games or historical play evidence. */
+ async snapshotProject(projectId:string|null):Promise<Workspace>{
+  await this.ready();if(projectId===null)return {version:2,projects:[],revisions:[],plays:[]};
+  const rows=await this.projectRecords(projectId,{includeArtworkReferences:true}),projects=rows.filter(row=>row.collection===PROJECTS).map(row=>this.decodeProject(row)),configs=new Map(rows.filter(row=>row.collection===CONFIGS).map(row=>[row.id,row.value]));
+  const revisions=rows.filter(row=>row.collection===REVISIONS).map(row=>{const {configHash,...revision}=row.value as StoredRevision,project=projects.find(p=>p.id===revision.projectId);if(!project||!configs.has(configHash))throw Error('The saved project is incomplete.');return {...revision,config:validateConfig(project.game,configs.get(configHash))};});
+  return validateWorkspace({version:2,projects,revisions,plays:[]});
  }
  /** Queue only the game the grown-up selected, together with its immutable
   * revision ancestry. Local values remain unchanged; receipts make retries safe. */
