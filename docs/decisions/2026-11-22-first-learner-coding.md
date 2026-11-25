@@ -22,6 +22,12 @@ Practice leads with one brief, Watch and Check. Longer requirements and the reco
 
 For scene Pals, prepare a bounded, cached render surface when the approved image loads. Make border-connected cream paper transparent while retaining original RGB values and immutable approved source references. This is scene-renderer compositing: it adds no generated artwork, replacement source files or global collection redesign. The character's white details, highlights and pale gem anatomy must remain intact. Inspect every supported Base/Grown image against contrasting scene backgrounds before claiming roster-wide quality.
 
+## November 25 responsive workspace correction
+
+The owner reported that children could reach computational blocks only by manipulating a tiny scrollbar. On main `13260750`, the 1366 × 768 dock measured 255px high. Its independently scrolling palette had 77px and none of its six controls was fully reachable on entry. This P0 correction supersedes the stage-first sizing and compact dock above.
+
+Split the available width equally on desktop and landscape tablets. In portrait, split the available height approximately 35/65 between stage and editor. On small or short screens, provide explicit Code and Play views over the same project. Preserve a fitted stage and a separate full-stage option. The child can scroll the entire code pane with a finger, select a block and edit its values at the established text and target sizes. Revisit the breakpoints after owner review and observed use on physical devices.
+
 ## Consequences and limits
 
 The beginner view reduces simultaneous decisions while retaining actual sequencing, repetition, event response and debugging. The fuller editor remains an explicit choice. The owner requested a usability overhaul, not removal of existing creations or a new compulsory progression ladder.

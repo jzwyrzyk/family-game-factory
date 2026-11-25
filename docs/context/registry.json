@@ -1095,6 +1095,13 @@
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed the measured 550-second Mining dependency installation and preserved every visual assertion, viewport, capture and timeout while applying the hosted-verified Chromium-only setup pattern. The 99 CI contracts and workflow lint pass; new-source visual acceptance remains pending.",
           "sourceCommit": "daec8cf53ed0d0cd267943ed03722675e8bafd87"
+        },
+        {
+          "sourceCommit": "6a9532763da4ec986b03df1cbc6d0a4b614810fb",
+          "reviewedAt": "2026-11-25T00:47:29.942Z",
+          "sourceDigest": "9bf8fbce6f1bca385b1684d2895dcac69d78f6212e1d20e24244f3e4b4de14ea",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "Existing premium and unit commands cover concurrent fork edits, actual settlement across revisions, pass-sized art and repair holds, and conservative unknown usage. CI selection and release evidence rules stay in place."
         }
       ]
     },
