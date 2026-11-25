@@ -9,7 +9,7 @@ const empty=()=>JSON.stringify({schema:'jems.creation.workspace.v1',projects:[],
  * in a storage-preview build selects IndexedDB as the scene authority. */
 export class CreationWorkspace {
  private constructor(private legacy:CreationStore|null,readonly indexed:IndexedCreationStore|null,private owner:()=>string,private captured:string){}
- static async open(storage:CreationStoragePort,owner:()=>string){const captured=owner();let indexed:IndexedCreationStore|null=null;if(indexedStoragePreview()){const candidate=await IndexedCreationStore.open(await nativeScope(captured),()=>{if(owner()!==captured)throw Error('The player changed. Reopen this scene.');assertRewardSourceWritable();});if(await candidate.isActive())indexed=candidate;else candidate.close();}return new CreationWorkspace(indexed?null:new CreationStore(storage,owner),indexed,owner,captured);}
+ static async open(storage:CreationStoragePort,owner:()=>string){const captured=owner();let indexed:IndexedCreationStore|null=null;if(indexedStoragePreview()){const candidate=await IndexedCreationStore.open(await nativeScope(captured),()=>{if(owner()!==captured)throw Error('The player changed. Reopen this scene.');assertRewardSourceWritable();});try{if(await candidate.isActive())indexed=candidate;else candidate.close();}catch(error){candidate.close();throw error;}}return new CreationWorkspace(indexed?null:new CreationStore(storage,owner),indexed,owner,captured);}
  private check(owner=this.captured){if(owner!==this.captured||this.owner()!==this.captured)throw Error('The player changed. Reopen this scene.');}
  close(){this.indexed?.close();}
  async read(){this.check();return this.indexed?this.indexed.snapshot():this.legacy!.read();}

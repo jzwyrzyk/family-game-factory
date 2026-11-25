@@ -26,7 +26,7 @@ export class IndexedNativeStore {
  private async save(changes:RecordChange[],operation:string=crypto.randomUUID()){
   this.assertAuthorized();const projects=changes.filter(c=>c.collection===PROJECTS);const enqueue=projects.length>0&&projects.every(c=>this.privateCopies.get(c.id)?.()===true);return this.records.commit({id:operation,scope:this.scope,changes},{enqueue});
  }
- async migration():Promise<Migration|null>{return (await this.row(CONTROL,'migration'))?.value as Migration|null??null;}
+ async migration():Promise<Migration|null>{const row=await this.row(CONTROL,'migration');if(!row)return null;const value=row.value as Migration;if(row.deleted||!value||typeof value!=='object'||Array.isArray(value)||value.schema!==1||typeof value.sourceHash!=='string'||!/^[a-f0-9]{64}$/.test(value.sourceHash)||typeof value.complete!=='boolean'||['progress','total','projects','revisions','plays'].some(key=>!Number.isSafeInteger((value as any)[key])||(value as any)[key]<0)||value.progress>value.total||value.complete&&value.progress!==value.total||Object.keys(value).some(key=>!['schema','sourceHash','progress','total','complete','projects','revisions','plays'].includes(key)))throw Error('Saved game storage preparation needs recovery. Its original source has not been replaced.');return copy(value);}
  async isActive(){return (await this.migration())?.complete===true;}
  private async ready(){this.assertAuthorized();if(!await this.isActive())throw Error('Finish preparing saved games before opening this library.');}
  async page(after:string|null=null,limit=24):Promise<{items:Project[];next:string|null}>{
@@ -222,7 +222,7 @@ export class IndexedNativeStore {
  async migrateLegacy(raw:string,options:{batchSize?:number;onBatch?:(completed:number,total:number)=>void;beforeActivate?:()=>void}={}):Promise<Migration>{
   this.assertAuthorized();const input=validateWorkspace(JSON.parse(raw)),sourceHash=await digest(raw),batchSize=options.batchSize??40;
   if(!Number.isInteger(batchSize)||batchSize<1||batchSize>40)throw Error('Invalid migration batch size.');
-  const current=await this.row(CONTROL,'migration'),prior=current?.value as Migration|undefined;
+  const current=await this.row(CONTROL,'migration'),prior=await this.migration();
   if(prior&&prior.sourceHash!==sourceHash)throw Error('Saved work changed during preparation. Keep its original and start a separately reviewed migration.');
   if(prior?.complete)return prior;
   const projects=input.projects.filter(p=>p.owner===this.scope.profile),ids=new Set(projects.map(p=>p.id)),revisions=input.revisions.filter(r=>ids.has(r.projectId)),revisionIds=new Set(revisions.map(r=>r.id)),plays=input.plays.filter(p=>revisionIds.has(p.revisionId));

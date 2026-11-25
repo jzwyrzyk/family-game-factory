@@ -6,7 +6,7 @@ export class IndexedRecords {
  constructor(private db:IDBDatabase,private scope:RecordScope,private assertAuthorized:()=>void){}
  static open(scope:RecordScope,assertAuthorized:()=>void):Promise<IndexedRecords>{
   assertAuthorized();if(!recordId(scope.family)||!recordId(scope.profile))return Promise.reject(Error('STORAGE_SCOPE_INVALID'));
-  return new Promise((resolve,reject)=>{const r=indexedDB.open(DB,2);r.onupgradeneeded=()=>{for(const name of ['records','history','receipts','outbox','pending','meta'])if(!r.result.objectStoreNames.contains(name))r.result.createObjectStore(name);const outbox=r.transaction!.objectStore('outbox');if(!outbox.indexNames.contains('scopeSequence'))outbox.createIndex('scopeSequence',['queueScope','queueSequence']);
+  return new Promise((resolve,reject)=>{let blocked=false;const r=indexedDB.open(DB,2);r.onupgradeneeded=()=>{for(const name of ['records','history','receipts','outbox','pending','meta'])if(!r.result.objectStoreNames.contains(name))r.result.createObjectStore(name);const outbox=r.transaction!.objectStore('outbox');if(!outbox.indexNames.contains('scopeSequence'))outbox.createIndex('scopeSequence',['queueScope','queueSequence']);
    const rows:{key:IDBValidKey;operation:RecordOperation}[]=[],cursor=outbox.openCursor();
    cursor.onsuccess=()=>{if(cursor.result){rows.push({key:cursor.result.key,operation:cursor.result.value});cursor.result.continue();return;}
     // The previous preparation format had no queue order. Recover its actual
@@ -18,7 +18,7 @@ export class IndexedRecords {
     while(done.size<rows.length){let progress=false;for(let i=0;i<rows.length;i++)if(!done.has(i)&&[...depends[i]].every(j=>done.has(j))){const row=rows[i];outbox.put({...row.operation,queueScope:scopeKey(row.operation.scope),queueSequence:++sequence},row.key);done.add(i);progress=true;}if(!progress){r.transaction!.abort();return;}}
     r.transaction!.objectStore('meta').put(sequence,'sequence');
    };
-  };r.onerror=()=>reject(r.error);r.onblocked=()=>reject(Error('STORAGE_UPGRADE_BLOCKED'));r.onsuccess=()=>{try{assertAuthorized();r.result.onversionchange=()=>r.result.close();resolve(new IndexedRecords(r.result,{...scope},assertAuthorized));}catch(e){r.result.close();reject(e);}};});
+  };r.onerror=()=>reject(r.error);r.onblocked=()=>{blocked=true;reject(Error('STORAGE_UPGRADE_BLOCKED'));};r.onsuccess=()=>{if(blocked){r.result.close();return;}try{assertAuthorized();r.result.onversionchange=()=>r.result.close();resolve(new IndexedRecords(r.result,{...scope},assertAuthorized));}catch(e){r.result.close();reject(e);}};});
  }
  scopeIdentity():RecordScope{return {...this.scope};}
  close(){this.db.close();}
