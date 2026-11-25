@@ -442,3 +442,5 @@ After merging Gem Pal expression assets and the learning-surface fixes, the exac
 The early learner stack uses synthetic profiles, both subject engines and bounded scene traces. Browser prompt delivery and declared adult reading have separate provenance. Keep native gameplay, isolated preview fixtures, rendered viewport inspection, real-device acceptance and educational efficacy as separate receipts.
 
 The [early learner verification guide](early-learning/README.md) covers the five synthetic viewport journeys, the two-subject native matrix and the isolated reviewed game fixture.
+
+The November 25 child-experience candidate adds `test:child-modernization` through the existing navigation suite. Recursive creative-group coverage increases from 63 to 64 commands; original command identities, failure behavior and full-selection policy remain unchanged. The strict count fixture was updated to reflect the additional required browser check. [Candidate evidence](child-modernization/README.md).

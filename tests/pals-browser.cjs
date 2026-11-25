@@ -312,6 +312,7 @@ async function installReceiptFixture(page) {
 
     phase = 'choosing a starter and reloading';
     assert.equal(await page.locator('#studioNavPals').count(), 1);
+    await navigate(page,'#studioNavJourney');
     assert.equal(await page.locator('#studioPalsEntry').isVisible(), true);
     await readablePalText(page, '.pals-widget-copy strong');
     assert.equal(await gems(page), 0);
@@ -582,6 +583,7 @@ async function installReceiptFixture(page) {
     await navigate(page,'#studioNavScenes');
     await selectedNav(page, 'studioNavScenes');
     assert.equal(await page.locator('[data-creation-pal]').count(), 3);
+    if(!await page.locator('[data-creation-pal="glim"]').isVisible())await page.click('#creationFreeMode');
     await page.click('[data-creation-pal="glim"]');
     assert.equal((await scene(page)).actors[0].assetId, 'pal-luma-mature-core-2026-11-20', 'A new playground uses the currently earned Grown artwork');
     await page.click('#creationBack');

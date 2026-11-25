@@ -131,7 +131,7 @@ export function installGemJourney(options: GemJourneyOptions) {
   const nextText = node('p');
   nextText.id = 'jemsJourneyNextAction';
   next.append(nextLabel, nextText);
-  const create = button('jems-journey-primary', 'Make a jem', 'jemsJourneyCreate');
+  const create = button('jems-journey-primary', 'Invent a game', 'jemsJourneyCreate');
   const createArrow = createIcon('arrow', 'jems-journey-arrow');
   create.append(createArrow);
   create.addEventListener('click', () => {
@@ -273,7 +273,7 @@ export function installGemJourney(options: GemJourneyOptions) {
     subtitle.textContent = previewing ? entry.action : state.level === 0 ? 'Every great jem starts with you.' : entry.reward;
     next.hidden = previewing || state.level === 4;
     nextText.textContent = state.nextAction || (state.level === 3 ? `${Math.min(3, state.polishedCount)} of 3 projects polished.` : LEVELS[Math.min(3, state.level)].action);
-    create.firstChild!.textContent = (options.onPrimaryAction && state.primaryActionLabel?.trim()) || (state.level === 4 ? 'Make something new' : 'Make a jem');
+    create.firstChild!.textContent = (options.onPrimaryAction && state.primaryActionLabel?.trim()) || (state.level === 4 ? 'Make something new' : 'Invent a game');
     returnCurrent.hidden = !previewing;
     setIconLabel(change, 'edit', state.character ? 'Change character' : 'Choose character');
 

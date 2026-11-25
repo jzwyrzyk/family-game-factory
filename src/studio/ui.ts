@@ -675,7 +675,7 @@ export async function installStudio(){
  }
  function renderJourney(){
   const progress=levelForOwner();
-  journey.render({ownerId:owner(),level:progress.level,character:notebook.avatar(owner()),polishedCount:progress.polishedCount,nextAction:progress.nextAction,primaryActionLabel:journeyContinuation()?'Continue my jem':'Make a jem'});
+  journey.render({ownerId:owner(),level:progress.level,character:notebook.avatar(owner()),polishedCount:progress.polishedCount,nextAction:progress.nextAction,primaryActionLabel:journeyContinuation()?'Continue my jem':'Invent a game'});
  }
  function journeyContinuation(){
   const sessions=notebook.list(owner()).filter(s=>!s.archived&&!busy(s));

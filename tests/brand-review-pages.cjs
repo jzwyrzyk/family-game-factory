@@ -28,7 +28,7 @@ async function pages(device,viewport){
  try{
   await p.goto(base);await p.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);await exploreWelcome(p);
   assert.deepEqual(await p.locator('#studioStarters [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['factory','mining','gum','hill'],'four curated Ready to Play games keep their intended order');
-  assert.equal(await p.locator('#page-studio-library #studioOriginals').count(),0,'Home keeps only the four Ready to Play games');
+  assert.equal(await p.locator('#page-studio-library #studioOriginals').count(),1,'Home keeps originals below the four curated games');
   assert.deepEqual(await p.locator('#page-studio-library #studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'retained games belong to My jems');
   assert.equal(await p.locator('#page-studio-library #studioOriginalsTitle').textContent(),'Your original games');
   await shot(p,device,'01-studio-home');

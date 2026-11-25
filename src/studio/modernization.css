@@ -31,3 +31,8 @@
 .jems-journey .jems-journey-start,.jems-journey .jems-journey-card-name{font-size:20px}
 
 #page-art-studio :is(.art-next p,.art-card-meta,.art-draft-note,.art-detail-tools button,.art-metadata label,.art-version-label,.art-metadata input,.art-metadata select,.art-version-label select){font-size:18px}#page-art-studio .art-small{font-size:18px!important}#page-art-studio .art-card-copy strong{font-size:22px}.art-picture-tools :is(h3,output,p){font-size:18px}
+
+.studio-menu-group[aria-labelledby="studioMenuLearnTitle"]:has(#studioLearningChoice[hidden]){display:none}
+.drawing-paint :is(.dl-header p,.dl-canvas-help,.dp-tools label,.dp-tools input,.dp-tools p,.dl-kicker){font-size:18px;color:#52617a}.drawing-paint .dp-tools button,.drawing-paint .dl-header button{font-size:18px;min-height:48px}.drawing-paint .dp-tools h3{font-size:22px}.drawing-paint .dl-header p{font-size:20px}
+
+@media(max-width:720px){#page-problem-solving .ps-heading{flex-wrap:wrap}#page-problem-solving .ps-heading>div{flex:1 1 100%;min-width:0}#page-problem-solving .ps-home{font-size:18px;min-height:48px}}

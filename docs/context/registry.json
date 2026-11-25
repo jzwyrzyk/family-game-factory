@@ -307,10 +307,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:39:37.940Z",
-      "sourceDigest": "e01ba2dec679fd304373d9d004a53e23f9c86bff0e115658a69c022db0743dfa",
+      "reviewedAt": "2026-11-25T18:46:29.325Z",
+      "sourceDigest": "029822f191136db58bea9ad746dbd7ed71a943c4a3fd01764090130993277725",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated Home hierarchy, menu, Journey, guidance and readability contracts; moved retained games to My jems with version-library access.",
+      "reviewReason": "Final visual pass fixed intro/disclosure/Build contrast, drawing labels, narrow experiment header and canonical Help/creation labels; feature contracts retain shared Art reference.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -494,10 +494,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "455e71ef0ae1435a0c8ec38bf0fd9f9eb0cf0b5a06064b626703e808566ec21a",
-      "reviewedAt": "2026-11-25T18:39:40.173Z",
+      "sourceDigest": "016ac2a13ffdf7bd1d96bab3226fe97e8612100410308aea2cf8b33ce2aca610",
+      "reviewedAt": "2026-11-25T18:46:30.452Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented Journey location for gems and achievements while preserving balances, reasons and all award authority.",
+      "reviewReason": "Canonical Invent a game CTA and Journey return are documented; rewards balances, grant authority and evidence rules remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -886,10 +886,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:40:04.269Z",
-      "sourceDigest": "efcf48c9748b0fb23f111d328707ebd65ebac692a2fbf3ef3ed558301831710e",
+      "reviewedAt": "2026-11-25T18:46:30.939Z",
+      "sourceDigest": "20d18130e408d6b98f8a91597ed48f0c7d4b7b28541d6356efe6d29c4669cfed",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved evidence assertions while updating real entry journeys for the explicit intro preference and consolidated routes; documented candidate test limits.",
+      "reviewReason": "Recorded 63-to-64 creative command expansion without narrowing; maintained exact-once Build, visible route, early-preview and browser zoom checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1610,10 +1610,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "d402857b8e4bc2d1f372a27cf0c0f6926847aa176beaf7d3d315f5215f9fe5ce",
-      "reviewedAt": "2026-11-25T18:39:44.076Z",
+      "sourceDigest": "db50db7310a056f43edb8f40a3af4ac106e1486a28b9f99279c59d6f0b083eaa",
+      "reviewedAt": "2026-11-25T18:46:31.554Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded original composition preservation, readability repair and owner-bound contextual return to game, scene or character choice.",
+      "reviewReason": "Visual review repaired drawing-dialog text and canonical My Art kicker alongside original Art layout, private storage and contextual returns.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1654,10 +1654,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "78b5622271804f18563ee41f8c6b9dd03130d27714906f58e40d9b6efd4c1526",
-      "reviewedAt": "2026-11-25T18:39:44.458Z",
+      "sourceDigest": "3f7067c124698131bf0c26a9d481f87f7db54c79e5c2d93f89093298580ee231",
+      "reviewedAt": "2026-11-25T18:46:32.168Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented Journey collection entry; original portrait rendering, entitlements, growth and owner-scoped state remain authoritative.",
+      "reviewReason": "Integrated Pal tests now open the real Journey entry and Make scene character shelf; collection/ownership/growth assertions remain intact.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",

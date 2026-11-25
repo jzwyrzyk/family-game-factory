@@ -25,7 +25,7 @@ const {start}=require('./browser-server.cjs');
   const more=async()=>{if(!await page.locator('#studioMore').evaluate(e=>e.open))await page.click('#studioMore > summary');};
   const profiles=()=>openProfiles(page);
   assert.deepEqual(await page.locator('#studioStarters [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['factory','mining','gum','hill'],'four curated Ready to Play games keep their intended order');
-  assert.equal(await page.locator('#page-studio-library #studioOriginals').count(),0,'Home keeps only the four Ready to Play games');
+  assert.equal(await page.locator('#page-studio-library #studioOriginals').count(),1,'Home keeps originals below the four curated games');
   assert.deepEqual(await page.locator('#page-studio-library #studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'retained games belong to My jems');
   assert.equal(await page.locator('#page-studio-library #studioOriginalsTitle').textContent(),'Your original games');
   await page.screenshot({path:`test-results/studio-library-${device}.png`,fullPage:true});

@@ -109,6 +109,7 @@ async function browserZoom(port){
     const page=await context.newPage(), {tap,reach}=await inputs(page,false);
     await page.route('**/factory-config.json',r=>r.fulfill({json:{version:1,mode:'unavailable'}}));
     await page.goto(`http://127.0.0.1:${port}/arcade/?creation=1`);
+    await page.locator('#creationIntroduction').waitFor({state:'visible'});
     if(await page.locator('#creationIntroduction').isVisible())await tap(page.locator('#creationIntroSkip'));
         await tap(page.locator('#creationFreeMode'));await tap(page.locator('[data-creation-starter="blank"]'));
     await tap(page.locator('[data-add-block="move"]'));

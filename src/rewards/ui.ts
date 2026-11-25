@@ -105,7 +105,7 @@ export function createRewardsPage(options: RewardsPageOptions) {
   const play = button('jems-rewards-primary', 'Play & practice', options.onPlay);
   play.id = 'jemsRewardsPlay';
   play.append(node('span', 'jems-rewards-arrow', '→'));
-  const create = button('jems-rewards-secondary', 'Make a game', options.onCreate);
+  const create = button('jems-rewards-secondary', 'Invent a game', options.onCreate);
   create.id = 'jemsRewardsCreate';
   actions.append(play, create);
   copy.append(eyebrow, totalRow, encouragement, next, actions);
