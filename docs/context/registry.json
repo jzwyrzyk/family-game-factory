@@ -890,10 +890,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T20:35:53.550Z",
-      "sourceDigest": "5eaed87ce10c072c3f6c94598a7b12d4426be38e17a76bfbf20c3720ec346c47",
+      "reviewedAt": "2026-11-25T20:55:55.050Z",
+      "sourceDigest": "5ed53147c0a5a911420dfd30fb5de26f956dcbb6e144a7d394a953e18a88f4d1",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded all sixteen passing b237 diagnostic workflows, independent source/artifact verification and exact local passive-trace/native-control evidence. Preserved every historical failure and the unattributed later WebKit warning; final current-head qualification remains on PR186, with no retries, filtered errors or relaxed tolerances.",
+      "reviewReason": "Preserved exact e83 WebKit early-guidance failure and its independent storage/native-control passes. Documented native HTTPS fixture transport, protected synthetic-module admission, explicit held-request pagehide cancellation negative/positive and all eight Chromium beta stages; no error filtering, retries, tolerance changes or unproven runtime diagnosis.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1134,10 +1134,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T20:35:54.005Z",
-      "sourceDigest": "dbd83a87449ba497f9716787f808810371da498e7d2460bae4838d65a77e3287",
+      "reviewedAt": "2026-11-25T20:55:55.557Z",
+      "sourceDigest": "eba28fd1b57c9a0ff8fc338db20a84286dda69450af2d29ca79c6a49108db9e0",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the b237 diagnostic checkpoint and subsequent test-only timing refinement with exact identities. Current PR head must pass every hosted gate; review readiness is distinct from all held merge, provisioning, real-data, provider, device and release approvals.",
+      "reviewReason": "Recorded failed e83 qualification, independently verified artifacts and test-only native HTTPS continuation. Every final-head hosted gate still governs review readiness; protected merges, cloud activation, actual household/provider/device/legal acceptance and release remain separately held.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
