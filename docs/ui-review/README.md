@@ -6,7 +6,7 @@ The toolbar selects an experience, supported learning grade, effective iframe vi
 
 ## Regenerate
 
-From a clean checkout with Node 22+, Python 3 and Pillow:
+From a clean checkout with Node 24+, Python 3 and Pillow:
 
 ```sh
 npm ci
@@ -44,3 +44,5 @@ Scenario scope is explicit: first-time/empty clear records, populated adds sampl
 A managed local browser can prohibit `file://` by administrator policy. `UI_REVIEW_INLINE_HARNESS=1 npm run review:test` is an explicit development fallback that fulfills one loopback navigation from memory (no server). That result is only DOM/interaction evidence, not proof that file navigation succeeded. GitHub Actions runs the actual `file://` check on stock Chromium and uploads the HTML, manifest and test evidence without deployment credentials.
 
 The workflow is additive, read-only, and independent of production releases. It runs on relevant main changes and sandbox-tool PRs. Review findings never upload automatically. Real-device, Edge-specific, speech/audio, accessibility and owner acceptance remain separate evidence. The HTML's coverage dialog is the authoritative per-artifact list of known deviations.
+
+The artifact workflow pins Ubuntu 24.04 because the repository’s Playwright 1.56.1 cannot install on Ubuntu 26.04. Initial workflow attempts encountered this runner incompatibility before building. The corrected job builds the HTML before browser setup, so a browser-install failure still leaves a downloadable artifact with explicitly incomplete validation.

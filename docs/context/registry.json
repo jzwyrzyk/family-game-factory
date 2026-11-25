@@ -1129,10 +1129,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T16:03:31.345Z",
-      "sourceDigest": "1b50feb39de5ac9c23d403d0643a5dcbb302c477919af25bb814e04a4dc17206",
+      "reviewedAt": "2026-11-25T16:04:22.155Z",
+      "sourceDigest": "ad2f71cacde96f53fe9cc07165d1fe6dc80e14299b255832cf6ae95fa594a722",
       "reviewOutcome": "updated",
-      "reviewReason": "Pinned the artifact job to Ubuntu 24.04 and Node 24 after Playwright 1.56.1 rejected ubuntu-latest/26.04; moved packaging before browser installation so download delivery survives setup failure. Documented the failed initial attempt.",
+      "reviewReason": "Verified the workflow diff pins Ubuntu 24.04/Node 24 and builds before browser setup; documented failed attempts caused by Playwright 1.56.1 on Ubuntu 26.04.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
