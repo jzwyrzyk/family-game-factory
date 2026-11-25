@@ -406,10 +406,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "facbfa499f5063b5554efc14d3231dd7f67a8c54f4fadfc0a837cc7efa709f8f",
-      "reviewedAt": "2026-11-25T01:22:00.930Z",
+      "sourceDigest": "b200b551e6ad0a352f759bb480aebb748e7863b5053479f2073b84f686bb1876",
+      "reviewedAt": "2026-11-25T01:35:48.555Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Early scene instructions use device speech while the existing authoring interpreter and ordinary creator controls remain available.",
+      "reviewReason": "Early movement challenges store explicit prediction choices against a bounded run and keep short tablet stages visible alongside the tools.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:28:36.503Z",
-      "sourceDigest": "f7748c15606b170461603eaf6bbaa14baa3dd904897416330825101e12ab3404",
+      "reviewedAt": "2026-11-25T01:35:48.601Z",
+      "sourceDigest": "055eab9eb2244e197baefeb57fca24b62acaab79ab3ebc4d3fa083e4cd4cc8ce",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Graphical scene controls and early challenges integrate with the reviewed early listening and mathematics activities. Existing operational procedures and acceptance commands still apply to this change.",
+      "reviewReason": "Early movement challenges store explicit prediction choices against a bounded run and keep short tablet stages visible alongside the tools. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1487,10 +1487,10 @@
         "tests/parent-dashboard*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "a8f550a9ef223282e87d3002facf0e6608bb5f6bcfa27d9058ffd7556cc54990",
-      "reviewedAt": "2026-11-25T01:00:58.822Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
+      "sourceDigest": "35f37902c2623942fe502f822c838e8c07de7b638f87d23a1e21f68c0d8d08a9",
+      "reviewedAt": "2026-11-25T01:35:48.694Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Early movement challenges store explicit prediction choices against a bounded run and keep short tablet stages visible alongside the tools. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-19T17:17:56.552Z",
