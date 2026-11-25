@@ -1,8 +1,10 @@
+import {profileGrade} from '../learning/engine';
+import {isEarlyGrade,withinGrade} from '../learning/grades';
 import { SceneEngine, type SceneSnapshot } from './engine';
 import { validateCreationProject, type CreationProject, type CreationBlock } from './model';
 import { CREATION_ASSETS, createStarterProject, createProjectFromStudio, creationAsset, validateEditableProject, parsePrivateArtId } from './projects';
 import { CreationStore, CREATION_KEY, validateCreationWorkspace } from './storage';
-import { CREATION_CHALLENGES, getCreationChallenge, createChallengeStarter, createChallengeTarget, evaluateChallenge } from './challenges';
+import { challengesForGrade, getCreationChallenge, createChallengeStarter, createChallengeTarget, evaluateChallenge } from './challenges';
 import { profileStorage } from '../adult-pilot/storage';
 import { CreationStage } from './stage';
 import type { StudioSession } from '../studio/notebook';
@@ -87,7 +89,7 @@ export function installCreationStudio(host: Host) {
             <div class="creation-code-heading"><h2 id="creationCodeTitle">My character’s blocks</h2><div class="creation-tools-switch" role="group" aria-label="Coding tools"><button id="creationSimpleMode" aria-pressed="true">First steps</button><button id="creationFullMode" aria-pressed="false">More tools</button></div></div>
             <section class="creation-cast-card"><div id="creationActors" class="creation-actors" role="group" aria-label="Choose a character"></div><button id="creationAddActor" class="creation-button creation-quiet" aria-label="Add a character">${iconMarkup('add')} Character</button><details id="creationSceneOptions" class="creation-scene-options"><summary>Scene settings</summary><div><div class="creation-setting-row"><label>World <select id="creationBackground"><option value="meadow">Sunny meadow</option><option value="sky">Cloud country</option><option value="night">Starry night</option><option value="workshop">Dream workshop</option></select></label><span id="creationPositionHelp">Drag a character to set its starting spot.</span></div><div id="creationActorSettings" class="creation-actor-settings"></div><div id="creationVariables" class="creation-variables"></div></div></details></section>
           </div>
-          <div id="creationSimpleEvents" class="creation-simple-events" role="group" aria-label="When the code starts"><button id="creationOnPlay" aria-pressed="true">${iconMarkup('play')} On Play</button><button id="creationOnTap" aria-pressed="false">${iconMarkup('star')} On tap</button><span id="creationEventNotice" hidden></span><span id="creationPlanHint">Add an action. Try it. Change it.</span></div><div class="creation-script-row"><label>Script <select id="creationScript" aria-label="Choose a script"></select></label><button id="creationAddScript" class="creation-button creation-quiet">${iconMarkup('add')} Script</button></div><div id="creationTrigger" class="creation-trigger"></div>
+          <div id="creationSimpleEvents" class="creation-simple-events" role="group" aria-label="When the code starts"><button id="creationOnPlay" aria-pressed="true"><span aria-hidden="true">⚑</span> On Play</button><button id="creationOnTap" aria-pressed="false"><span aria-hidden="true">☝</span> On tap</button><span id="creationEventNotice" hidden></span><span id="creationPlanHint">Add an action. Try it. Change it.</span></div><div class="creation-script-row"><label>Script <select id="creationScript" aria-label="Choose a script"></select></label><button id="creationAddScript" class="creation-button creation-quiet">${iconMarkup('add')} Script</button></div><div id="creationTrigger" class="creation-trigger"></div>
           <div class="creation-sequence"><div id="creationBlocks" class="creation-blocks"></div></div>
         </section>
       </div>
@@ -286,6 +288,7 @@ export function installCreationStudio(host: Host) {
     $<HTMLButtonElement>('creationRun').disabled=false;$<HTMLButtonElement>('creationVideo').disabled=false;$<HTMLButtonElement>('creationDownload').disabled=false;
     if (loaded.project.challengeId && !challengeId) status('This scene’s original challenge is no longer available. You can still edit and keep your scene.');
     $<HTMLInputElement>('creationTitle').value = scene.title; freshEngine(); renderEditor(); renderBrief(); renderSource(); renderGuide(challengeId ? 'practice' : 'scene'); updateUndo();
+    if(isEarlyGrade(profileGrade(FG.store.current()))&&navigator.userActivation?.hasBeenActive)sceneReading.button.click();
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
   function enter() { if (!host.enter()) return false; visible = true; page.classList.remove('hidden'); startCheckpointTimer(); return true; }
@@ -430,7 +433,7 @@ export function installCreationStudio(host: Host) {
     }
     $('creationSavedSection').hidden = !saved.childElementCount;
     const challenges = $('creationChallenges'); challenges.replaceChildren();
-    CREATION_CHALLENGES.forEach((item, index) => {
+    challengesForGrade(profileGrade(FG.store.current())).forEach((item, index) => {
       const choice = node('div', 'creation-challenge-choice');
       const latest = projects.find(project => project.challengeId === item.id);
       const button = node('button', 'creation-challenge-card'); button.type = 'button'; button.dataset.challenge = item.id;
@@ -534,6 +537,7 @@ export function installCreationStudio(host: Host) {
     if (!scene) return;
     if (!scene.actors.some(actor => actor.id === selectedActor)) { selectedActor = scene.actors[0].id; selectedProgram = ''; insert = null; }
     page.dataset.tools = fullTools ? 'full' : 'first';
+    page.dataset.graphical=String(!fullTools&&withinGrade(profileGrade(FG.store.current()),1));
     $('creationSimpleMode').setAttribute('aria-pressed', String(!fullTools));
     $('creationFullMode').setAttribute('aria-pressed', String(fullTools));
     $('creationStep').hidden = !fullTools;
@@ -619,7 +623,8 @@ export function installCreationStudio(host: Host) {
       const head = node('div', 'creation-block-head');
       const edit = node('button', 'creation-block-summary'); edit.type = 'button'; edit.dataset.editBlock = block.id;
       edit.setAttribute('aria-expanded', String(expanded)); edit.setAttribute('aria-label', `Change ${metadata.label} action`);
-      edit.append(node('span', 'creation-step-number', String(index + 1)), node('span', 'creation-block-name', metadata.icon + ' ' + metadata.label), node('span', 'creation-block-description', firstStepsSummary(block)));
+      const direction=block.type==='move'?simpleMove(block)?.direction:undefined;
+      edit.append(node('span','creation-step-number',String(index+1)),node('span','creation-command-symbol',direction?directions[direction]:metadata.icon),node('span','creation-block-name',metadata.label), node('span', 'creation-block-description', firstStepsSummary(block)));
       edit.onclick = () => { expandedBlockId = expandedBlockId === block.id ? '' : block.id; renderPrograms(); page.querySelector<HTMLElement>(`[data-edit-block="${CSS.escape(block.id)}"]`)?.focus({ preventScroll: true }); };
       head.append(edit);
       const controls = node('span', 'creation-block-tools');
@@ -695,13 +700,18 @@ export function installCreationStudio(host: Host) {
     }; list.append(destination); return list;
   }
   const paletteBox = $('creationPalette');
-  for (const item of palette) {
-    const b = node('button', 'creation-palette-block block-' + item.group); b.type = 'button'; b.dataset.addBlock = item.type; b.title = item.detail; b.append(node('span', '', item.icon), node('b', '', item.label));
+  const directions = {right:'→',left:'←',up:'↑',down:'↓'} as const;
+  for (const item of palette) for(const direction of (item.type==='move'?['right','left','up','down']:[null]) as (keyof typeof directions|null)[]) {
+    const b = node('button', 'creation-palette-block block-' + item.group); b.type = 'button'; if(!direction||direction==='right')b.dataset.addBlock=item.type;
+    if(direction)b.dataset.moveDirection=direction;
+    const label=direction?'Move '+direction:item.label;
+    b.setAttribute('aria-label',label);b.title=label;b.append(node('span','creation-command-symbol',direction?directions[direction]:item.icon),node('b','',label));
     b.onclick = () => act(() => {
       mutation(project => {
         if (!selectedProgram) { const program = { id: uid(), actorId: selectedActor, trigger: { type: 'start' as const }, actions: [] as CreationBlock[] }; project.programs.push(program); selectedProgram = program.id; insert = { programId: program.id }; }
         const block = newBlock(item.type);
-        expandedBlockId = block.id;
+        if(direction&&block.type==='move')Object.assign(block,directionMove(direction,80));
+        expandedBlockId = isEarlyGrade(profileGrade(FG.store.current()))?'':block.id;
         const variable = block.type === 'if' && block.condition.type === 'variable' ? block.condition.variable : block.type === 'set' || block.type === 'change' ? block.variable : null;
         if (variable && !Object.hasOwn(project.variables, variable)) project.variables[variable] = 0;
         blocksAt(project, insert || { programId: selectedProgram }).push(block);

@@ -1,11 +1,14 @@
+import {withinGrade, type Grade} from '../learning/grades';
 import {validateCreationProject,type CreationBlock,type CreationProject} from './model';
 import {SceneEngine} from './engine';
 
 /** Open practice scenes, not protected assessment items or a measure of general ability. */
-export type CreationChallengeId = 'robot-route' | 'dragon-bounces' | 'robot-taps' | 'early-cheer' | 'bucket-rule';
+export type CreationChallengeId = 'robot-route' | 'dragon-bounces' | 'robot-taps' | 'early-cheer' | 'bucket-rule' | 'first-step' | 'fix-direction' | 'turn-the-corner' | 'meadow-corner';
 export interface ChallengeInput {timeMs:number; type:'tap'; actorId:string}
 export interface CreationChallenge {
   id:CreationChallengeId;
+  grade?:Grade;
+  prerequisites?:readonly CreationChallengeId[];
   title:string;
   brief:string;
   requirements:readonly string[];
@@ -33,7 +36,24 @@ export interface CreationChallengeResult {
   };
 }
 
+const earlyRoutes = {
+ 'first-step': [[80,0]],
+ 'fix-direction': [[-80,0]],
+ 'turn-the-corner': [[80,0],[0,-80]],
+ 'meadow-corner': [[80,0],[0,-80]]
+} as const;
+type EarlyRoute = keyof typeof earlyRoutes;
+const isEarlyRoute = (id:string):id is EarlyRoute => Object.hasOwn(earlyRoutes,id);
+function earlyChallenge(id:EarlyRoute,title:string,grade:Grade,brief:string,concepts:string[],prerequisites:CreationChallengeId[]):CreationChallenge{
+ return {id,title,grade,brief,concepts,prerequisites,requirements:[brief,'Keep the other objects still.'],
+  hint:'Watch the character. Follow the first arrow with your finger.',extension:'Try a different path in a copy.',
+  durationMs:4500,previewInputs:[],testDescription:'We watch the path and where the character stops.'};
+}
 export const CREATION_CHALLENGES:readonly CreationChallenge[] = [
+  earlyChallenge('first-step','One step right',-1,'Move the dragon one step to the right.',['movement','cause and effect'],[]),
+  earlyChallenge('fix-direction','Turn it around',-1,'The dragon goes the wrong way. Make it go one step left.',['debugging','direction'],['first-step']),
+  earlyChallenge('turn-the-corner','Around the corner',0,'Move the robot right, then up.',['sequence','direction'],['first-step']),
+  earlyChallenge('meadow-corner','Try it in the meadow',0,'Make the dragon follow the same path. Right, then up.',['sequence','transfer'],['turn-the-corner']),
   {
     id:'robot-route', title:'Robot’s gem route',
     brief:'Watch the robot go up to the gem, across above the bucket, and down to the bucket. Make that route.',
@@ -45,7 +65,7 @@ export const CREATION_CHALLENGES:readonly CreationChallenge[] = [
     testDescription:'We watch the whole route, including its turns. The final position alone does not match it.'
   },
   {
-    id:'dragon-bounces', title:'Three dragon bounces',
+    id:'dragon-bounces', grade:0, title:'Three dragon bounces',
     brief:'Make the dragon bounce three times in the same spot, with a little rest between bounces.',
     requirements:['Keep the original scene and starting place.', 'Make three clear upward bounces, returning to the ground between them.', 'Stay in the same spot and finish resting on the ground within 5 seconds.'],
     concepts:['repetition','patterns'],
@@ -55,7 +75,7 @@ export const CREATION_CHALLENGES:readonly CreationChallenge[] = [
     testDescription:'A repeat block and three separately written bounces both work. We count the visible bounces.'
   },
   {
-    id:'robot-taps', title:'One tap, one step',
+    id:'robot-taps', grade:0, title:'One tap, one step',
     brief:'The robot waits for you. Each time you tap it, it moves 120 steps to the right.',
     requirements:['Start in the original place and wait until the robot is tapped.', 'Move 120 steps right for each tap, then wait again.', 'The rule must work when the taps come at different times.'],
     concepts:['events','cause and effect'],
@@ -87,6 +107,9 @@ export const CREATION_CHALLENGES:readonly CreationChallenge[] = [
   }
 ];
 
+export function challengesForGrade(grade:Grade){
+ return CREATION_CHALLENGES.filter(challenge=>withinGrade(challenge.grade??1,grade));
+}
 export function getCreationChallenge(id:string):CreationChallenge|undefined {
   return CREATION_CHALLENGES.find(challenge=>challenge.id===id);
 }
@@ -97,7 +120,7 @@ const program = (id:string, actorId:string, trigger:'start'|'tap', actions:Creat
 function baseProject(id:CreationChallengeId, target:boolean):CreationProject {
   const challenge=getCreationChallenge(id);
   if(!challenge) throw new RangeError('Choose an available creation challenge.');
-  const robot=id==='robot-route'||id==='robot-taps';
+  const robot=id==='turn-the-corner'||id==='robot-route'||id==='robot-taps';
   return {
     schema:'jems.creation.v1', id:`challenge-${id}-${target?'target':'work'}`,
     title:challenge.title,width:800,height:450,background:robot?'workshop':'meadow',
@@ -115,6 +138,10 @@ export function createChallengeTarget(id:string):CreationProject {
   const challenge=getCreationChallenge(id);
   if(!challenge) throw new RangeError('Choose an available creation challenge.');
   const project=baseProject(challenge.id,true);
+  if(isEarlyRoute(challenge.id)){
+    const actions=earlyRoutes[challenge.id].map(([dx,dy],i)=>block('step-'+i,{type:'move',dx,dy,durationMs:800}));
+    project.programs=[program('follow-path',project.actors[0].id,'start',actions)];return project;
+  }
   switch(challenge.id) {
     case 'robot-route':
       project.programs=[program('route','robot','start',[
@@ -152,8 +179,9 @@ export function createChallengeStarter(id:string):CreationProject {
   const challenge=getCreationChallenge(id);
   if(!challenge) throw new RangeError('Choose an available creation challenge.');
   const project=baseProject(challenge.id,false);
-  const actorId=challenge.id==='bucket-rule'?'bucket':challenge.id==='robot-route'||challenge.id==='robot-taps'?'robot':'dragon';
+  const actorId=challenge.id==='bucket-rule'?'bucket':challenge.id==='turn-the-corner'||challenge.id==='robot-route'||challenge.id==='robot-taps'?'robot':'dragon';
   project.programs=[program('my-program',actorId,'start',[])];
+  if(challenge.id==='fix-direction')project.programs[0].actions=[block('wrong-way',{type:'move',dx:80,dy:0,durationMs:800})];
   if(challenge.id==='early-cheer') {
     project.programs[0].actions=[
       block('cheer-too-early',{type:'say',text:'Hooray!',durationMs:1100}),
@@ -216,7 +244,7 @@ function sceneMatches(id:CreationChallengeId,project:CreationProject):boolean {
 }
 
 function landmarksStayPut(id:CreationChallengeId,run:ObservedRun):boolean {
-  const moving=id==='bucket-rule'?'bucket':id==='robot-route'||id==='robot-taps'?'robot':'dragon';
+  const moving=id==='bucket-rule'?'bucket':id==='turn-the-corner'||id==='robot-route'||id==='robot-taps'?'robot':'dragon';
   const landmarks=baseProject(id,false).actors.filter(actor=>actor.id!==moving);
   return run.frames.every(frame=>landmarks.every(landmark=>at(actorAt(frame,landmark.id),landmark.x,landmark.y)));
 }
@@ -231,6 +259,20 @@ function distanceToSegment(point:Point,start:Point,end:Point):number {
   return Math.hypot(point.x-(start.x+fraction*dx),point.y-(start.y+fraction*dy));
 }
 
+function earlyPathChecks(id:EarlyRoute,run:ObservedRun):ChallengeCheck[] {
+  const actorId=id==='turn-the-corner'?'robot':'dragon',route=earlyRoutes[id];
+  let x=150,y=320,index=0,visibleTravel=false,matched=true;
+  for(const frame of run.frames){
+    const actor=actorAt(frame,actorId);
+    if(!actor?.visible){matched=false;continue;}
+    if(index===route.length){matched &&= at(actor,x,y);continue;}
+    const [dx,dy]=route[index],end={x:x+dx,y:y+dy};
+    matched &&= distanceToSegment(actor,{x,y},end)<=POSITION_TOLERANCE;
+    if(Math.hypot(actor.x-x,actor.y-y)>18 && Math.hypot(actor.x-end.x,actor.y-end.y)>18)visibleTravel=true;
+    if(at(actor,end.x,end.y)){matched &&= visibleTravel;index++;x=end.x;y=end.y;visibleTravel=false;}
+  }
+  return [check('follow-path','Follow the pictured path',matched&&index===route.length,'The character followed each leg of the path.','Watch again. Where does the path change direction?')];
+}
 function routeChecks(run:ObservedRun):ChallengeCheck[] {
   const route=[{x:150,y:320},{x:150,y:120},{x:600,y:120},{x:600,y:320}];
   let segment=0,stayedOnRoute=true;
@@ -382,7 +424,7 @@ export function evaluateChallenge(id:string,project:CreationProject):CreationCha
       const tested=bucketChecks(project);checks=tested.checks;limited=tested.limited;
     } else {
       const run=observe(project,challenge.durationMs,challenge.previewInputs);limited=run.limitReached;
-      checks=challenge.id==='robot-route'?routeChecks(run):challenge.id==='dragon-bounces'?bounceChecks(run):cheerChecks(run);
+      checks=isEarlyRoute(challenge.id)?earlyPathChecks(challenge.id,run):challenge.id==='robot-route'?routeChecks(run):challenge.id==='dragon-bounces'?bounceChecks(run):cheerChecks(run);
       checks.unshift(landmarkCheck(landmarksStayPut(challenge.id,run)));
       checks.push(check('finished-in-time','Finish the short scene',run.frames.at(-1)!.snapshot.status==='completed',
         'The whole program finished within the scene’s time.',`Finish this scene within ${challenge.durationMs/1000} seconds. A long wait or more actions are still running.`));

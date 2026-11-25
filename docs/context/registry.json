@@ -143,10 +143,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:50:44.560Z",
-      "sourceDigest": "232805c17ba41fd57b28d6b5489dfda6ee9f771fdc3d34fd62f1980866440f45",
+      "reviewedAt": "2026-11-25T01:11:52.744Z",
+      "sourceDigest": "a406cc00d0d419c26e60d03d106cf6db4676876a97cb2b2458e12a8549b5c5b4",
       "reviewOutcome": "updated",
-      "reviewReason": "The November 25 child-interface standard and decision replace the stage-first dock with responsive stage and code proportions. The child still owns each authored action and explicit Keep.",
+      "reviewReason": "Reviewed grade-based coding presentation, saved scene compatibility and four additional bounded path challenges against the Creation Studio contract and child interface.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -406,10 +406,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "eb6193e0977d8af435af318e449eeaabe8be15f99708b7efc679a5aad7c6d7ae",
-      "reviewedAt": "2026-11-25T00:50:44.900Z",
+      "sourceDigest": "53fd96a8015440c8d11a5edcbc9f5f6dc9ce16636d9504ad168eb6bffcc63588",
+      "reviewedAt": "2026-11-25T01:11:52.892Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The Creation Studio contract and acceptance table specify the six reachable actions, pane sizing, compact view and tool controls, whole-pane scrolling and revised fitted-stage floors.",
+      "reviewReason": "Reviewed grade-based coding presentation, saved scene compatibility and four additional bounded path challenges against the Creation Studio contract and child interface.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:08:27.846Z",
-      "sourceDigest": "68fa1fc603989d1bc9608921a67f95359e58e79fdc62212da6e4d27f9f652e8c",
+      "reviewedAt": "2026-11-25T01:11:52.992Z",
+      "sourceDigest": "3b0d4b1a060053dedb3410aa3d1dd768fbd147cecfda744c2ec6259a9ae6343c",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the early question catalogs, visual activities, device-only narration, legacy content assertions and skill crosswalk against the affected source.",
+      "reviewReason": "Reviewed grade-based coding presentation, saved scene compatibility and four additional bounded path challenges against the Creation Studio contract and child interface.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

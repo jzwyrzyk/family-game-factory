@@ -296,3 +296,12 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
   #creationPalette { grid-template-columns:repeat(6,minmax(0,1fr)); }
   .creation-palette-block { flex-direction:row; }
 }
+
+.creation-command-symbol{font-size:1.7rem;font-weight:800;line-height:1}
+[data-graphical=true] .creation-command-symbol{font-size:2.25rem}
+[data-graphical=true] .creation-palette-block{min-height:64px}
+[data-graphical=true] .creation-palette-block>b{font-size:18px}
+[data-graphical=true] .creation-block-summary{min-height:52px}
+[data-graphical=true] .block-motion .creation-command-symbol{color:#244b7e}
+[data-graphical=true] .block-story .creation-command-symbol{color:#753d74}
+[data-graphical=true] .block-control .creation-command-symbol{color:#70501a}

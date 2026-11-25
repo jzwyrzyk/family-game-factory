@@ -206,3 +206,18 @@ The compact shell keeps Create primary, with Create & code under Menu → Make a
 Creation Studio keeps a speaker control available above the shelf and scene workspace. An explicit tap reads the current directions, the selected rebuild challenge and revealed hint, or visible scene-check feedback. The character picker has its own accessible speaker control while its dialog is open. The next tap stops reading; changing scene, editing, opening a learning checkpoint, leaving or switching players stops pending and active narration. No speech starts automatically, and reading directions does not add a hint or award learning evidence. See the [shared read-aloud contract](../speech/READ_ALOUD.md) for natural/device voice selection and actual-playback evidence boundaries.
 
 The [Pal scene rendering contract](PAL_SCENE_RENDERING.md) records the exact image scope, reviewed negative-space openings, immutable source boundary, and compositing evidence.
+
+## Early graphical coding
+
+First steps gives each direction a tap-to-add arrow. Every arrow inserts an ordinary relative move with the original interpreter's duration, distance and revision semantics. Sequence blocks show their direction. Grade 2 and above keep labels alongside the command symbols. More tools exposes exact values on every profile. The responsive stage and workspace come from #175.
+
+| Grade | Concept / activity | Developmental reference | Support level | Evidence |
+|---|---|---|---|---|
+| Pre-K | One step right, correct the direction | CSTA 2026 EK-PRO-TR-07 | Introduced | A bounded run follows the target direction and stops |
+| Kindergarten | Follow a two-leg path and repeat it in a second scene | Michigan 1A-AP-10, CSTA 2026 EK-PRO-PD-04 | Practiced | Ordered visible movement and stationary landmarks |
+| Kindergarten | Repetition and taps | Michigan 1A-AP-10, CAL ScratchJr event and motion activities | Partially supported | Bounce and tap schedules checked on the saved version |
+| Grade 1 | Longer routes and repair | CSTA 2026 E1-PRO-PD-04 and E1-PRO-TR-07 | Practiced | Saved-version behavior and recorded hint use |
+
+The introductory sequence starts with one step, follows with correcting a direction, and introduces turning before transfer to the meadow. These are suggested prerequisites. Children can also experiment freely. A passing trace cannot establish a prediction the child never supplied. The parent report describes what the version did.
+
+Sources reviewed November 25, 2026 include the [2026 CSTA PK–12 edition](https://csteachers.org/2026-csta-pk-12-computer-science-standards/), [Michigan's adopted K–12 CS standards](https://www.michigan.gov/mde/services/academic-standards/michigan-k-12-computer-science-standards) and [Boston College's Coding as Another Language Kindergarten ScratchJr curriculum](https://sites.bc.edu/codingasanotherlanguage/curricula/scratchjr-curricula/kindergarten-scratchjr/). The CSTA 2026 edition has grade-specific identifiers. Michigan's state framework retains its adopted K–2 identifiers.
