@@ -35,7 +35,7 @@ export interface ProviderEvidence {notice:string;expiresAt:number;provider:'open
 export interface BetaConfig {
  environment:string;hubOrigin:string;earlyLearningPreview?:boolean;parentGuidedCreation?:boolean;workerRoute?:'beta-dev'|'beta-test'|'beta-prod';administrator:{audience:string;subject:string;verifier:Pick<FamilyParentAuth,'salt'|'digest'>};
  ownerActivation:string;operatorContact:string;providerEvidence:ProviderEvidence[];
- continuity?:{enabled:boolean;notice:string;domains:StorageDomain[];backupSchedule?:{enabled:boolean;intervalMs:number;maxPointsPerRun:number}};
+ continuity?:{enabled:boolean;notice:string;domains:StorageDomain[];generatedRecovery?:boolean;backupSchedule?:{enabled:boolean;intervalMs:number;maxPointsPerRun:number}};
 }
 export function validateBeta(config:BetaConfig|undefined,householdWorkspace:string){
  if(!config||config.earlyLearningPreview!==undefined&&typeof config.earlyLearningPreview!=='boolean'||config.parentGuidedCreation!==undefined&&typeof config.parentGuidedCreation!=='boolean'||config.ownerActivation!=='private-family-beta-v1'||!/^[-a-z0-9]{1,30}$/.test(config.environment)||
