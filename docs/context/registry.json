@@ -886,10 +886,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T16:05:38.007Z",
-      "sourceDigest": "29d9b7bc621d51505366bde4f0130330d743dcaea919abf65e5f8d90643d468c",
+      "reviewedAt": "2026-11-25T16:09:15.573Z",
+      "sourceDigest": "b8ed2e9ef6aed6949405a013cf1260152d33833e48987af33be7684ff5115283",
       "reviewOutcome": "updated",
-      "reviewReason": "Added permanent real-component coding/upload/privacy and all-embedded-image decode checks; recorded the measured 11–12px original Art Studio text as a product concern without changing it.",
+      "reviewReason": "Recorded successful actual file:// smoke and integration checks in run 45650993855; sanitized screenshot filenames after the evidence upload rejected a colon.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1129,10 +1129,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T16:05:38.805Z",
-      "sourceDigest": "29650b37f9e362764a6d10dd9235872e717b2f24e81cbb39d74ce0789b0f4818",
+      "reviewedAt": "2026-11-25T16:09:16.085Z",
+      "sourceDigest": "3a94ad20cdb0bbb8e7f53413c941efc646ebd390faf5ae55daac35dca38ddf58",
       "reviewOutcome": "updated",
-      "reviewReason": "Extended the artifact test command with offline integration checks and linked acceptance observations; workflow remains artifact-only with no deployment or production access.",
+      "reviewReason": "Separated immediate HTML upload from later evidence upload so screenshot packaging cannot withhold the primary deliverable; recorded the successful tests and failed upload distinctly.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

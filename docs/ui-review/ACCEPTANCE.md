@@ -15,3 +15,7 @@ At a 390px application viewport, the original **Art Studio → Draw here** dialo
 ## Limits
 
 Generated gameplay is a labelled transport fixture, and simulated coaching is not evidence of AI quality. Pal images are display derivatives; exact original bytes remain an optional larger build. Family-beta welcome/recovery/admin flows are not on this baseline. Pre-K/Kindergarten are merged preview capabilities. Real hardware, Edge-specific behavior, audio, educational efficacy and owner visual acceptance remain unverified.
+
+## Actual file-navigation result
+
+The [November 25 file-browser job](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45650993855/job/139335118048) passed the complete smoke and integration commands on stock Chromium, opening the HTML with `file://` and no server. This verified all 16 pages, the four viewports, representative journeys, exports, original image decoding and zero external requests. The subsequent artifact upload failed because one screenshot filename contained a colon. Screenshot names are now portable, and the HTML download uploads in a separate step immediately after building so evidence packaging cannot withhold it.

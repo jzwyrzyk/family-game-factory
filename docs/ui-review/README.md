@@ -48,3 +48,5 @@ The workflow is additive, read-only, and independent of production releases. It 
 The artifact workflow pins Ubuntu 24.04 because the repository’s Playwright 1.56.1 cannot install on Ubuntu 26.04. Initial workflow attempts encountered this runner incompatibility before building. The corrected job builds the HTML before browser setup, so a browser-install failure still leaves a downloadable artifact with explicitly incomplete validation.
 
 Additional integration checks add a Jump block and run the real scene engine, upload a synthetic local PNG into the art library, issue a simulated device invitation, and decode every embedded image. [Initial acceptance observations](ACCEPTANCE.md) record existing product UI concerns separately.
+
+The primary download uploads immediately after the build, separately from browser evidence. Download availability does not by itself imply passing tests: check the run’s test step or the acceptance notes. Screenshot names use portable characters for Windows extraction.
