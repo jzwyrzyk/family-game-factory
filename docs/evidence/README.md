@@ -442,3 +442,7 @@ After merging Gem Pal expression assets and the learning-surface fixes, the exac
 The early learner stack uses synthetic profiles, both subject engines and bounded scene traces. Browser prompt delivery and declared adult reading have separate provenance. Keep native gameplay, isolated preview fixtures, rendered viewport inspection, real-device acceptance and educational efficacy as separate receipts.
 
 The [early learner verification guide](early-learning/README.md) covers the five synthetic viewport journeys, the two-subject native matrix and the isolated reviewed game fixture.
+
+## Current-main family and storage continuation
+
+The required storage shard now expands the actual native/notebook/scene, original-recovery, scoped sync/conflict/removal, guided-interruption and all-domain preparation journeys. The private-family security workflow additionally runs their supported WebKit variants and distinct synthetic HTTPS family origins, with native Firestore emulator checks. The original Arcade groups and independent security, parent, visual, image, environment and documentation gates remain required. [The combined requirement register](../family-beta/COMPLETION.md) records current-head acceptance and failures separately from historical PR evidence. Browser emulation is not physical-device or owner acceptance.

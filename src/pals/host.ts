@@ -6,7 +6,7 @@ import './pals.css';
 
 interface PalsHost {
   controller: PalsController;
-  enter(): boolean;
+  enter(): boolean|Promise<boolean>;
   home(): void;
   create(id: PalId): void;
   refreshCreation(): void;
@@ -23,8 +23,8 @@ export function installPalsInterface(host: PalsHost) {
   let toastTimer: ReturnType<typeof setTimeout> | undefined, pending: PalsNotice | null = null;
   let pendingOwner = '', quip = 0, lastEncouragementAt = 0;
   const action = (work: () => void | Promise<void>) => { try { void Promise.resolve(work()).catch(() => {}); } catch { /* Controller renders its scoped failure. */ } };
-  function open() {
-    try { if (!host.enter()) return; }
+  async function open() {
+    try { if (!await host.enter()) return; }
     catch (error) {
       const status = document.getElementById('studioGlobalStatus');
       if (status) { status.hidden = false; status.textContent = error instanceof Error ? error.message : 'Your current work could not be saved. Try again before opening My Pals.'; status.classList.add('is-error'); }

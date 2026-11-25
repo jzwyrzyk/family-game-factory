@@ -1,3 +1,4 @@
+import {hasParentGuidance,learnerHeaders} from '../family-beta/guidance';
 import {isEarlyGrade} from '../learning/grades';
 /** Session continuity shared by Studio, remote builder and optional coach.
  * Only a 401 triggers rotation. A rejected POST is NEVER replayed automatically.
@@ -40,7 +41,7 @@ export async function familyFetch(base:string,path:string,init:RequestInit={}):P
  const owner=currentProfile();
  const creationMutation=(init.method||'GET').toUpperCase()!=='GET'&&
    (/^\/v1\/(jobs|job-requests|actions|revisions)(?:\/|$)/.test(path)||/^\/v1\/coach(?:$|\/audio$)/.test(path));
- const restricted=()=>creationMutation&&isEarlyGrade(currentProfile()?.grade);
+ const restricted=()=>creationMutation&&isEarlyGrade(currentProfile()?.grade)&&!hasParentGuidance(String(currentProfile()?.id));
  const handoff=()=>new Response(JSON.stringify({errorCode:'PARENT_GUIDED_CREATION_UNAVAILABLE'}),{status:403});
  if(restricted())return handoff();
  const generation=adultSessionVersion(),adult=adultRequestSession(base);
@@ -76,6 +77,7 @@ export async function familyFetch(base:string,path:string,init:RequestInit={}):P
  if(restricted())return handoff();
  // Avoid forwarding child prompts or mutations through unexpected redirects.
  const headers=new Headers(init.headers);
+ learnerHeaders(headers,String(owner?.id??''));
  headers.delete('X-Factory-Adult-Session'); // Only this tab's current memory proof may authorize a request.
  if(adult)headers.set('X-Factory-Adult-Session',adult.sessionToken);
  signal?.throwIfAborted();

@@ -1,0 +1,39 @@
+{
+  "schema": "jems.storage.notebook-write-diagnostic.v1",
+  "method": "A single warmed source mutation in each variant. Both bundles use the after tree; before substitutes only src/storage/indexed-notebook.ts from the identified parent commit. Separate browser contexts; real IndexedDB; no UI, p95, physical-device or cloud claim.",
+  "beforeNotebookCommit": "bb9cce191616bfad666bf8c3a415297558450ba8",
+  "afterTreeCommit": "604c6e6da0068b7a063665ddb655de0d7551f67f",
+  "beforeNotebookSha256": "7f1a9c3f70bc3a03acc077215d334da6e1c51abf5f773d77d236580dbdd034f6",
+  "afterNotebookSha256": "b2e925553cd7cc0aecd09ce774b4501f85b0e41d2820d8a8c3cd1d1567648ea7",
+  "harnessSha256": "abdf88d7c12a28f2250d81e8ad412574ed7058d5d44dd1e7eb28e36868b50586",
+  "harnessSource": "const fs=require('node:fs'),http=require('node:http');\nconst root='/workspace/work/notebook-write-performance';\nconst {build}=require(root+'/node_modules/esbuild'),{chromium}=require(root+'/node_modules/playwright');\n(async()=>{\n const bundles={};for(const variant of ['before','after'])bundles[variant]=(await build({stdin:{contents:\"export * from './src/storage/indexed-notebook';export * from './src/studio/notebook';\",resolveDir:root},bundle:true,write:false,format:'iife',globalName:'Fixture',platform:'browser',plugins:variant==='before'?[{name:'prior-notebook',setup(b){b.onLoad({filter:/src\\/storage\\/indexed-notebook\\.ts$/},()=>({contents:fs.readFileSync('/workspace/work/notebook-write-before.ts','utf8'),loader:'ts',resolveDir:root+'/src/storage'}));}}]:[]})).outputFiles[0].text;\n const server=http.createServer((req,res)=>{const variant=req.url.includes('before')?'before':'after';res.setHeader('Content-Type',req.url.endsWith('.js')?'text/javascript':'text/html');res.end(req.url.endsWith('.js')?bundles[variant]:`<!doctype html><script src=\"/${variant}.js\"></script>`);}).listen(0,'127.0.0.1');await new Promise(resolve=>server.listening?resolve():server.once('listening',resolve));\n const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox'],headless:true});const results=[];\n try{for(const variant of ['before','after']){const context=await browser.newContext(),page=await context.newPage();await page.goto(`http://127.0.0.1:${server.address().port}/${variant}`);const result=await page.evaluate(async()=>{\n  const values=new Map(),port={getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,v)},source=new Fixture.StudioNotebook(port),seed=source.create('player1','new','Diagnostic original'),data=source.read();\n  data.sessions=Array.from({length:70},(_,i)=>({...structuredClone(seed),id:'diagnostic-session-'+i,name:'Diagnostic original '+i,messages:Array.from({length:200},(_,j)=>({id:`message-${i}-${j}`,role:j%2?'helper':'child',text:(`Original words from session ${i} page ${j}. `+'A small fox jumps over the moon. '.repeat(9)).slice(0,220),at:'2026-11-25T00:00:00Z'}))}));data.active.player1=data.sessions[0].id;const raw=JSON.stringify(data),scope={family:'source-write-diagnostic',profile:'player1'};\n  let store=await Fixture.IndexedNotebook.open(scope,()=>{});await store.migrateLegacy(raw);store.close();store=await Fixture.IndexedNotebook.open(scope,()=>{});\n  await store.transaction(()=>undefined);\n  let reads=0,writes=0,readBytes=0,writeBytes=0,stringifyCalls=0;const get=store.records.get.bind(store.records),commit=store.records.commit.bind(store.records),stringify=JSON.stringify;\n  store.records.get=async(...args)=>{const row=await get(...args);reads++;readBytes+=new TextEncoder().encode(stringify(row??null)).length;return row;};\n  store.records.commit=async(operation,...args)=>{writes+=operation.changes.length;writeBytes+=new TextEncoder().encode(stringify(operation)).length;return commit(operation,...args);};\n  JSON.stringify=function(...args){stringifyCalls++;return stringify.apply(this,args);};const started=performance.now();\n  try{await store.update(data.sessions[0].id,s=>{s.draft='Measured durable source update';});}finally{JSON.stringify=stringify;}\n  const elapsedMs=performance.now()-started,result={sessions:70,messages:14000,sourceBytes:new TextEncoder().encode(raw).length,elapsedMs,reads,writes,readBytes,writeBytes,stringifyCalls};if((await store.get(data.sessions[0].id)).draft!=='Measured durable source update')throw Error('Save was not durable');store.close();return result;\n });results.push({variant,...result});await context.close();}\n console.log(JSON.stringify({scope:'single instrumented warm source write, real Chromium IndexedDB; no UI/device acceptance',results},null,2));\n }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}\n})().catch(error=>{console.error(error);process.exitCode=1;});\n",
+  "observation": {
+    "scope": "single instrumented warm source write, real Chromium IndexedDB; no UI/device acceptance",
+    "results": [
+      {
+        "variant": "before",
+        "sessions": 70,
+        "messages": 14000,
+        "sourceBytes": 4192730,
+        "elapsedMs": 708.2999999998137,
+        "reads": 380,
+        "writes": 22,
+        "readBytes": 4548199,
+        "writeBytes": 443189,
+        "stringifyCalls": 462740
+      },
+      {
+        "variant": "after",
+        "sessions": 70,
+        "messages": 14000,
+        "sourceBytes": 4192730,
+        "elapsedMs": 260.29999999981374,
+        "reads": 28,
+        "writes": 22,
+        "readBytes": 6010,
+        "writeBytes": 443189,
+        "stringifyCalls": 1904
+      }
+    ]
+  }
+}

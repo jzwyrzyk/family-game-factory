@@ -62,7 +62,7 @@ async function prepare(browser,viewport,device){
 async function blockedArtEntry(browser,url){
  const {context,page,errors,posts}=await prepare(browser,devices[0][1],'desktop');
  try{
-  // A real older tab can block the v1-to-v2 art database upgrade. Keep that
+  // A real older tab can block the art database upgrade. Keep that
   // connection open rather than replacing the application's storage result.
   const blocker=await context.newPage();
   await blocker.route('**/art-upgrade-blocker',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><title>Older art tab fixture</title>'}));
@@ -76,13 +76,15 @@ async function blockedArtEntry(browser,url){
    window.firstJourneyArtBlocker.onversionchange=()=>{window.firstJourneyArtUpgradeRequested=true;};
   });
   await page.addInitScript(()=>{
-   // Observe completion of the original readonly request without changing its
-   // result or timing. Migration's separate readwrite transaction is excluded.
-   const getAll=IDBObjectStore.prototype.getAll;
-   IDBObjectStore.prototype.getAll=function(...args){
-    const request=getAll.apply(this,args);
-    if(this.name==='drawings'&&this.transaction.db.name==='family-private-drawings-v1'&&this.transaction.mode==='readonly'){
-     this.transaction.addEventListener('complete',()=>{window.firstJourneyArtReadComplete=true;});
+   // Observe the real blocked request completing without replacing its result.
+   // The current database API rejects blocked callers and closes their eventual
+   // connection; it does not resume a hidden read after the child has moved on.
+   const open=IDBFactory.prototype.open;
+   IDBFactory.prototype.open=function(...args){
+    const request=open.apply(this,args);let blocked=false;
+    if(args[0]==='family-private-drawings-v1'){
+     request.addEventListener('blocked',()=>{blocked=true;});
+     request.addEventListener('success',()=>{if(blocked)window.firstJourneyArtUpgradeComplete=true;});
     }
     return request;
    };
@@ -95,17 +97,17 @@ async function blockedArtEntry(browser,url){
   assert.equal(await page.locator('#studioWelcome').isVisible(),false,'unknown saved art conservatively opens ordinary home');
   assert.equal(await page.locator('#studioFavoritesSection').isVisible(),true);
   const before=await notebook(page);assert.equal(before.sessions.length,0);
-  assert.equal(await page.evaluate(()=>!!window.firstJourneyArtReadComplete),false,'the real art read is still blocked when home becomes usable');
+  assert.equal(await page.evaluate(()=>!!window.firstJourneyArtUpgradeComplete),false,'the real art upgrade is still blocked when home becomes usable');
   await page.locator('#studioNew').focus();
   await blocker.evaluate(()=>window.firstJourneyArtBlocker.close());
-  await page.waitForFunction(()=>window.firstJourneyArtReadComplete===true);
-  assert.equal(await page.locator('#studioNew').evaluate(node=>document.activeElement===node),true,'a late art read preserves the focused home action');
-  assert.equal(await page.locator('#studioWelcome').isVisible(),false,'a losing late read cannot replace the home fallback');
+  await page.waitForFunction(()=>window.firstJourneyArtUpgradeComplete===true);
+  assert.equal(await page.locator('#studioNew').evaluate(node=>document.activeElement===node),true,'a late art upgrade preserves the focused home action');
+  assert.equal(await page.locator('#studioWelcome').isVisible(),false,'a late art upgrade cannot replace the home fallback');
   assert.deepEqual(await notebook(page),before,'fallback and late recovery create no projects, guidance preferences or making evidence');
   await page.keyboard.press('Enter');await page.locator('#page-studio').waitFor({state:'visible'});
   assert.equal((await notebook(page)).sessions.length,1,'the normal home action remains usable after the blocked read settles');
   assert.deepEqual(posts,[]);assert.deepEqual(errors,[]);
-  console.log('PASS first creation blocked art: bounded normal-home fallback, real late-read completion, stable focus and no invented progress');
+  console.log('PASS first creation blocked art: bounded normal-home fallback, real late upgrade completion, stable focus and no invented progress');
  }catch(error){await page.screenshot({path:'test-results/first-creation-blocked-art-failure.png',fullPage:true}).catch(()=>{});throw error;}
  finally{await context.close();}
 }

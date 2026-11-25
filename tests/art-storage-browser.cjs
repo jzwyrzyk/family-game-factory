@@ -21,7 +21,9 @@ const { chromium } = require('playwright');
    const ctx = canvas.getContext('2d'); ctx.fillStyle = '#8b5cf6'; ctx.fillRect(10, 10, 90, 40); ctx.fillStyle = '#123'; ctx.fillRect(15, 45, 20, 20); ctx.fillRect(75, 45, 20, 20);
    const file = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
    const originalBytes = await file.arrayBuffer();
+   const open=indexedDB.open.bind(indexedDB);let legacyProbes=0;indexedDB.open=(...args)=>{if(args[0]==='family-drawing-rigs-v1')legacyProbes++;return open(...args);};
    const original = await art.saveDrawing(owner, 'Synthetic moon car', file);
+   check(legacyProbes===0&&!(await indexedDB.databases()).some(row=>row.name==='family-drawing-rigs-v1'),'absent legacy database discovery never attempts creation');indexedDB.open=open;
    check(original.sha256 === await art.drawingHash(originalBytes) && original.bytes.byteLength === originalBytes.byteLength, 'original bytes and fingerprint preserved');
    const assembly = { schemaVersion: 1, sourceId: original.id, sourceSha256: original.sha256, kind: 'car', revision: 1, notes: '', pieces: [
     { id: 'body', name: 'Body', role: 'body', region: { x: .1, y: .1, w: .8, h: .5, shape: 'rect' }, parentId: null, physical: true },
@@ -94,7 +96,7 @@ const { chromium } = require('playwright');
    await art.deleteArtwork(owner, recovered.drawings[0].id);
    owner = 'player1';
    const counts = await art.withArtTransaction(['drawings'], 'readwrite', async tx => {
-    for (let i = 0; i < art.ART_LIMITS.drawingsPerOwner - 2; i++) tx.objectStore('drawings').add({ ...original, id: 'quota-fixture-' + i, name: 'Synthetic quota fixture' });
+    for (let i = 0; i < art.ART_LIMITS.drawingsPerOwner - 2; i++) {const fixture={ ...original, id: 'quota-fixture-' + i, name: 'Synthetic quota fixture' };tx.objectStore('drawings').add(fixture);art.saveDrawingMetadata(tx,fixture);}
    });
    const concurrent = await Promise.allSettled([art.saveDrawing(owner, 'Last slot', file), art.saveDrawing(owner, 'Racing slot', file)]);
    check(concurrent.filter(result => result.status === 'fulfilled').length === 1 && (await art.drawings(owner)).length === art.ART_LIMITS.drawingsPerOwner, 'concurrent image saves cannot exceed transactional quota');
@@ -142,6 +144,14 @@ const { chromium } = require('playwright');
    return 'legacy image database upgrades with parent-first valid rigs, exact pixels and selected car; invalid originals retained for recovery';
   });
   console.log('PASS '+migrationResult); await migrationPage.close();
-  console.log(`PASS ${results.length + 1} private art storage contracts; zero network POSTs`);
+  const probePage=await browser.newPage();await probePage.goto(`http://127.0.0.1:${server.address().port}/`);
+  await probePage.evaluate(async()=>{
+   const open=indexedDB.open.bind(indexedDB),inventory=indexedDB.databases.bind(indexedDB);let probes=0;indexedDB.open=(...args)=>{if(args[0]==='family-drawing-rigs-v1')probes++;return open(...args);};
+   Object.defineProperty(indexedDB,'databases',{configurable:true,value:async()=>{throw Error('Synthetic inventory failure');}});
+   let failure;try{await art.artDatabase();}catch(error){failure=error;}if(failure?.message!=='Synthetic inventory failure'||probes)throw Error('Inventory failure was treated as absence');
+   Object.defineProperty(indexedDB,'databases',{configurable:true,value:undefined});const db=await art.artDatabase();db.close();if(probes!==1)throw Error('Unsupported inventory lost safe legacy probe fallback');
+   Object.defineProperty(indexedDB,'databases',{configurable:true,value:inventory});
+  });await probePage.close();console.log('PASS inventory errors remain visible and unsupported inventory retains legacy fallback');
+  console.log(`PASS ${results.length + 2} private art storage contracts; zero network POSTs`);
  } finally { await browser?.close(); server.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

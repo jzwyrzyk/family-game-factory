@@ -69,3 +69,12 @@ test('GCS adapter uses private workspace-scoped immutable writes, bounded reads 
  await assert.rejects(new GcsPrivateArtifacts('private-artifacts','workspace-a',client).get(ref),/INTEGRITY/);
  assert.throws(()=>new GcsPrivateArtifacts('private-artifacts','../other',client));
 });
+test('reviewed artifact repair verifies storage despite a cached reference and refuses corrupt existing bytes',async()=>{
+ const objects=new Map<string,Buffer>();let writes=0,reads=0;
+ const client:any={bucket:()=>({file:(path:string)=>({save:async(bytes:Buffer,options:any)=>{writes++;assert.equal(options.preconditionOpts.ifGenerationMatch,0);if(objects.has(path))throw Object.assign(Error('already exists'),{code:412});objects.set(path,Buffer.from(bytes));},download:async()=>{reads++;const bytes=objects.get(path);if(!bytes)throw Error('MISSING');return [bytes];}})})};
+ const store=new GcsPrivateArtifacts('private-artifacts','workspace-a',client),bytes=Buffer.from('exact retained original'),ref=await store.put(bytes),path='factory/workspace-a/sha256/'+ref.sha256;
+ objects.clear();await store.put(bytes);assert.equal(objects.size,0,'ordinary immutable cache remains an optimization');
+ await store.put(bytes,{verifyStored:true});assert.deepEqual(objects.get(path),bytes);assert.equal(writes,2);
+ await store.put(bytes,{verifyStored:true});assert.equal(reads,1,'an existing object is verified through a fresh read');
+ objects.set(path,Buffer.from('corrupt retained object'));await assert.rejects(store.put(bytes,{verifyStored:true}),/INTEGRITY/);assert.equal(objects.get(path)!.toString(),'corrupt retained object','recovery must not overwrite an existing object');
+});

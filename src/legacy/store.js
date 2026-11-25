@@ -1,6 +1,8 @@
+import {betaProfileSettings,saveBetaLearningGrade} from '../family-beta/guidance';
 import {isGrade,isEarlyGrade} from '../learning/grades';
 import {getSkill} from '../learning/curriculum';
-/* Family Game Factory — local-only, versioned state. No network calls. */
+import {validateFamilyState as validate} from '../storage/family-state';
+/* Versioned device state. Beta grade changes also save minimal parent-authorized metadata. */
 import { profileGrade, validateLearning } from '../learning/engine';
 import {validateLanguage} from '../language/engine';
 import {LANGUAGE_SKILLS} from '../language/curriculum';
@@ -21,13 +23,14 @@ const profiles = [
   {id:'player2',name:'Explorer 2',icon:'🚀',age:9,grade:1,focus:'adaptive',intensity:'gentle',rate:3,hints:true,punish:false,skills:{},stats:{},mathWindow:[],learningSetupComplete:false},
   {id:'player3',name:'Explorer 3',icon:'🦄',age:5,grade:1,focus:'add',intensity:'gentle',rate:2,hints:true,punish:false,skills:{},stats:{},mathWindow:[],learningSetupComplete:false}
 ];
-const learningIntensities = ['gentle','balanced','stretch'];
-const empty = () => ({version:1,activeProfile:'player1',profiles:JSON.parse(JSON.stringify(profiles)),feedback:[],createdAt:Date.now()});
-function validate(value,checkLearning=true){
- if (!value || value.version!==1 || !Array.isArray(value.profiles) || !Array.isArray(value.feedback)) return false;
- if(value.profiles.length<1 || value.profiles.length>6 || value.feedback.length>1000) return false;
- return value.profiles.every(p=> p&&typeof p.id==='string' && typeof p.name==='string' && typeof p.skills==='object' && p.skills!==null && !Array.isArray(p.skills) && typeof p.stats==='object' && p.stats!==null && (p.grade===undefined||isGrade(p.grade)) && (p.learningSetupComplete===undefined||typeof p.learningSetupComplete==='boolean') && (p.learningSubject===undefined||['math','language'].includes(p.learningSubject)) && (p.allowSubjectSwitch===undefined||typeof p.allowSubjectSwitch==='boolean') && validateLearningRewardOutbox(p) && (!checkLearning||(validateLearning(p.learning)&&validateLanguage(p.language))));
+const pilotIds=typeof document!=='undefined'&&document.documentElement?.getAttribute('data-family-profiles');
+if(pilotIds){
+ const ids=JSON.parse(pilotIds);
+ if(!Array.isArray(ids)||ids.length<1||ids.length>6||ids.some(id=>typeof id!=='string'||!/^[a-f0-9-]{36}$/.test(id)))throw Error('Invalid workshop profiles');
+ const template=profiles[0];profiles.splice(0,profiles.length,...ids.map((id,i)=>({...structuredClone(template),id,name:'Explorer '+(i+1),age:undefined})));
 }
+const learningIntensities = ['gentle','balanced','stretch'];
+const empty = () => ({version:1,activeProfile:profiles[0].id,profiles:JSON.parse(JSON.stringify(profiles)),feedback:[],createdAt:Date.now()});
 function normalize(value){for(const p of value.profiles){p.grade=profileGrade(p);p.intensity=learningIntensities.includes(p.intensity)?p.intensity:'gentle';p.learningSetupComplete=p.learningSetupComplete===true;p.learningSubject=p.learningSubject==='language'?'language':'math';p.allowSubjectSwitch=p.allowSubjectSwitch===true;p.languageFocus=Array.isArray(p.languageFocus)?p.languageFocus.filter(id=>typeof id==='string'&&LANGUAGE_SKILLS.some(s=>s.id===id)).slice(0,12):[];p.rate=Math.max(1,Math.min(8,Number(p.rate)||3));p.mathModes=Object.fromEntries(Object.entries(p.mathModes||{}).filter(([k,v])=>/^[\w:-]{1,160}$/.test(k)&&!['__proto__','constructor','prototype'].includes(k)&&['checkpoint','interaction','both'].includes(v)));p.skillFocus=Array.isArray(p.skillFocus)?p.skillFocus.filter(v=>typeof v==='string'&&getSkill(v)).slice(0,12):[];}return value;}
 let loadError=null,recoveryRaw=null;
 function load(){
@@ -38,6 +41,10 @@ function load(){
    loadError='Saved progress uses an unsupported format or contains damaged learning history. It has not been reset or overwritten. Export the saved data before restoring a compatible backup.';
    return validate(stored,false)?stored:empty();
   }
+  if(pilotIds){
+   if(stored.profiles.some(p=>!profiles.some(profile=>profile.id===p.id)))throw Error('Family profile mapping required');
+   for(const p of profiles)if(!stored.profiles.some(profile=>profile.id===p.id))stored.profiles.push(structuredClone(p));
+  }
   recoveryRaw=null;return normalize(stored);
  }catch(e){
   loadError='Progress could not be loaded. Existing saved data has not been overwritten. Export the saved data or restore a compatible backup before continuing.';
@@ -45,6 +52,8 @@ function load(){
  }
 }
 let data = load(),familyData=null,adultProfileId=null;
+const serverSettings=betaProfileSettings();
+for(const profile of data.profiles){if(serverSettings[profile.id])profile.grade=serverSettings[profile.id].grade;}
 function persist(){if(loadError)return false;try{assertRewardSourceWritable();localStorage.setItem(adultStorageKey(KEY),JSON.stringify(data));return true}catch(e){console.warn('Local saving unavailable',e);return false}}
 function pendingRewards(owner){if(loadError)throw Error(loadError);const raw=localStorage.getItem(adultStorageKey(KEY));if(!raw)return [];const saved=JSON.parse(raw);if(!validate(saved))throw Error('Saved learning rewards need recovery.');const p=saved.profiles.find(profile=>profile.id===owner);return p?validateRewardOutbox(p.rewardOutbox):[];}
 function acknowledgeRewards(owner,ids){assertRewardSourceWritable();const p=data.profiles.find(profile=>profile.id===owner);if(!p)throw Error('Choose the player who earned these rewards.');const prior=p.rewardOutbox;const removed=new Set(ids),next=validateRewardOutbox(prior).filter(fact=>!removed.has(rewardFactId(fact)));if(next.length===validateRewardOutbox(prior).length)return;p.rewardOutbox=next;if(!persist()){p.rewardOutbox=prior;throw Error('The reward was saved, but its activity receipt still needs a retry.');}}
@@ -77,6 +86,8 @@ async function changeLearningProfile(patch,stillOpen=()=>true){
  if(!FG.verifyParentSettings)throw Error('Unlock Parent Controls on a trusted family device to change the learning level.');
  await FG.verifyParentSettings();
  }
+ if(owner!==current()||!stillOpen()||FG.learning?.active)throw Error('The player or activity changed. Open settings again.');
+ if(Object.hasOwn(patch,'grade'))await saveBetaLearningGrade(owner.id,patch.grade);
  if(owner!==current()||!stillOpen()||FG.learning?.active)throw Error('The player or activity changed. Open settings again.');
  applyProfile(patch);
 }

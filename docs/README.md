@@ -1,5 +1,9 @@
 # jems documentation map
 
+Private family operating procedures are in the [owner guide](family-beta/OWNER.md) and the [consolidated activation and rollback checklist](family-beta/ACTIVATION.md).
+
+[Private family beta architecture and trust boundaries](family-beta/ARCHITECTURE.md) covers the household baseline, independent family accounts, protected browser delivery, approved entry artwork and the synthetic browser acceptance contract.
+
 CI and validation: [architecture, complete workflow audit, coverage, benchmarks and evidence reuse](evidence/README.md#ci-architecture-and-performance).
 
 Start with the canonical references below. Feature documents remain the detailed contracts; this index keeps them discoverable without copying all of their content into an engineering handbook.
@@ -71,3 +75,9 @@ The expression package joins code and asset evidence. Review `public/jems-pals/*
 The [original charter](factory-v2-implementation-charter.md), [Assignment 001 traceability](requirements-traceability.md), [early gap analysis](gap-analysis.md), [Assignment 002](assignment-002/README.md), [owner pilot handoff](assignment-005/OWNER-PILOT.md) and [repair completion report](repair-program/COMPLETION.md) are valuable history. Their old branch statuses, pins and "current live" statements must not be used as today's inventory. Use [delivery state](../DELIVERY-STATE.md) and verify its observation date.
 
 Prefer a link to the detailed contract over a copied version. Add new feature families to this index and to the [review registry](context/registry.json). Keep ephemeral execution logs in scoped evidence directories; preserve decisions and outcomes instead of dumping entire chats into the repository.
+
+## Storage reliability and scalable persistence
+
+[PR166 storage report](storage/README.md) · [complete source inventory](storage/INVENTORY.md) · [migration, retention and activation boundaries](storage/ROLLOUT.md). Integrated local recovery is distinct from the disabled indexed/cloud preparation and remaining application migration.
+
+For private family operations, use the [owner guide](family-beta/OWNER.md) and [privacy review](family-beta/PRIVACY.md).

@@ -1,0 +1,110 @@
+{
+  "scope": "Projected end-of-year-five monthly run rate. Not live measurements. Original+derivative totals per game; current generated runtime remains capped at 2 MiB. Gross rates, no free-tier credit, tax, compute, model, support, logs or CI charges. Egress $0.12/GiB is a sensitivity assumption, not verified route pricing. Recovery copy is a sizing allowance, not an implemented schedule.",
+  "prices": {
+    "region": "us-central1 reference, actual deployment region unverified",
+    "date": "2026-11-24",
+    "gcsGiBMonth": 0.01999981,
+    "firestoreGiBMonth": 0.14999967,
+    "backupGiBMonth": 0.030000080000000002,
+    "reads100k": 0.03,
+    "writes100k": 0.09,
+    "classA1000": 0.005,
+    "classB1000": 0.0004,
+    "egressGiB": 0.12
+  },
+  "rows": [
+    {
+      "scenario": "low",
+      "family": 5,
+      "years": 5,
+      "games": 300,
+      "revisionsPerGame": 5,
+      "revisionCount": 1500,
+      "mastersMiBPerGame": 1,
+      "messagesPerPersonDay": 10,
+      "devices": 2,
+      "assetGiB": 0.29296875,
+      "metadataGiB": 0.05168840289115906,
+      "writesMonth": 231.25000000000003,
+      "readsMonth": 925.0000000000001,
+      "egressGiBMonth": 0.009765625,
+      "duplicatedAssetGiBBefore": 1.46484375,
+      "costUSD": {
+        "assets": 0.0058593193359375,
+        "metadata": 0.007753243376500905,
+        "oneRecoveryCopy": 0.007409975557744503,
+        "reads": 0.0002775,
+        "writes": 0.00020812500000000003,
+        "objectOperations": 0.00033,
+        "network": 0.001171875
+      },
+      "totalUSDMonth": 0.023010038270182907
+    },
+    {
+      "scenario": "typical",
+      "family": 5,
+      "years": 5,
+      "games": 1200,
+      "revisionsPerGame": 20,
+      "revisionCount": 24000,
+      "mastersMiBPerGame": 4,
+      "messagesPerPersonDay": 40,
+      "devices": 3,
+      "assetGiB": 4.6875,
+      "metadataGiB": 0.4079192876815796,
+      "writesMonth": 1825,
+      "readsMonth": 10950,
+      "egressGiBMonth": 0.234375,
+      "duplicatedAssetGiBBefore": 93.75,
+      "costUSD": {
+        "assets": 0.093749109375,
+        "metadata": 0.061187758538872004,
+        "oneRecoveryCopy": 0.10598672063899041,
+        "reads": 0.0032849999999999997,
+        "writes": 0.0016424999999999999,
+        "objectOperations": 0.00148,
+        "network": 0.028124999999999997
+      },
+      "totalUSDMonth": 0.2954560885528624
+    },
+    {
+      "scenario": "high",
+      "family": 5,
+      "years": 5,
+      "games": 3600,
+      "revisionsPerGame": 50,
+      "revisionCount": 180000,
+      "mastersMiBPerGame": 12,
+      "messagesPerPersonDay": 100,
+      "devices": 5,
+      "assetGiB": 42.1875,
+      "metadataGiB": 2.360902726650238,
+      "writesMonth": 10562.5,
+      "readsMonth": 105625,
+      "egressGiBMonth": 3.515625,
+      "duplicatedAssetGiBBefore": 2109.375,
+      "costUSD": {
+        "assets": 0.843741984375,
+        "metadata": 0.3541346298996359,
+        "oneRecoveryCopy": 0.9145692550467253,
+        "reads": 0.03168749999999999,
+        "writes": 0.009506249999999999,
+        "objectOperations": 0.0054,
+        "network": 0.421875
+      },
+      "totalUSDMonth": 2.580914619321361
+    }
+  ],
+  "futureFamilies": [
+    {
+      "families": 100,
+      "typicalProjectedUSDMonth": 29.545608855286236,
+      "publicLaunchAuthorized": false
+    },
+    {
+      "families": 1000,
+      "typicalProjectedUSDMonth": 295.45608855286235,
+      "publicLaunchAuthorized": false
+    }
+  ]
+}

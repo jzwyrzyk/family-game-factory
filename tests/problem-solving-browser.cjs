@@ -80,6 +80,11 @@ async function narrationJourney(browser,url){
   assert.equal((await draft()).episode.observations.some(item=>item.responseId==='narration:interpret'),false,'waiting audio cannot credit the former profile');
   assert.equal(await page.evaluate(()=>window.__psAudio.every(audio=>audio.paused&&audio.src==='')),true);
   assert.equal(await page.evaluate(()=>window.__psRevoked.length),4,'completion, Stop, phase change and profile change release their audio');
+  // Host entry now awaits durable scene/notebook writes. A rejected async
+  // flush stays a visible save failure rather than an unhandled page exception.
+  await page.evaluate(async()=>{await FG.studio.flushDraft();window.__restorePracticeFlush=FG.creation.flush;FG.creation.flush=async()=>{throw Error('Synthetic scene flush did not save');};FG.problemSolving.open();});
+  await page.waitForFunction(()=>document.getElementById('psStatus').textContent==='Synthetic scene flush did not save');
+  await page.evaluate(()=>{FG.creation.flush=window.__restorePracticeFlush;delete window.__restorePracticeFlush;});
   assert.equal(requests.length,4);assert.equal(statuses,4);assert.deepEqual(unexpected,[]);assert.deepEqual(errors,[]);
   console.log('PASS APS mocked narration: explicit Read/Play/Stop, one synthesis per read, actual-start evidence, visible hint and phase/profile cleanup');
   return {device:'touch-narration-fixture',status:'passed',syntheticNarrationRequests:requests.length,liveProviderCalls:0};

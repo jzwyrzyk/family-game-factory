@@ -29,19 +29,15 @@ jobs:
           python-version: '3.12'
       - run: npm ci
       - run: python -m pip install Pillow==11.3.0
-      - name: Identify represented merged application
+      - name: Identify exact represented application source
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "UI_REVIEW_BASE_SHA=$(git merge-base HEAD origin/main)" >> "$GITHUB_ENV"
-          else
-            echo "UI_REVIEW_BASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
-          fi
+          echo "UI_REVIEW_BASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - run: npm run review:build
       - name: Upload the standalone download
         uses: actions/upload-artifact@v4
         with:
-          name: jems-ui-review-${{ github.sha }}
+          name: jems-ui-review-${{ env.UI_REVIEW_BASE_SHA }}
           path: dist-review/
           retention-days: 14
           if-no-files-found: error
@@ -51,7 +47,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: jems-ui-review-evidence-${{ github.sha }}
+          name: jems-ui-review-evidence-${{ env.UI_REVIEW_BASE_SHA }}
           path: test-results/ui-review/
           retention-days: 14
           compression-level: 6

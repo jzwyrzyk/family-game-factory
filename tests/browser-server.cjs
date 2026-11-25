@@ -1,5 +1,6 @@
 const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
-exports.start=(directory='dist')=>http.createServer((req,res)=>{
+exports.start=(directory='dist',intercept)=>http.createServer((req,res)=>{
+ if(intercept?.(req,res))return;
  const root=path.resolve(directory),relative=decodeURIComponent(new URL(req.url,'http://localhost').pathname).replace(/^\/arcade\//,'/');
  const file=path.resolve(root,'.'+(relative==='/'?'/index.html':relative));
  if(!file.startsWith(root+path.sep)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.writeHead(404);return res.end('Not found')}

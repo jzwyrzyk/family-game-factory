@@ -220,10 +220,46 @@ async function savedPreviewAfterConfig(browser,base){
  finally{releaseConfig();await context.close();}
 }
 
+async function readinessPageLifecycle(browser,base){
+ const {context,page,errors,posts}=await prepare(browser),api='https://page-readiness-api.test';
+ const cors={'Access-Control-Allow-Origin':new URL(base).origin,'Access-Control-Allow-Credentials':'true'};
+ let release;const held=new Promise(resolve=>{release=resolve;});const handlers=[];
+ try{
+  await page.addInitScript(()=>{
+   const fetch=window.fetch;window.readinessProbes=[];window.readinessDocumentId=crypto.randomUUID();
+   window.fetch=function(input,init){
+    const path=new URL(typeof input==='string'?input:input.url,location.href).pathname;
+    if(!/^\/v1\/(coach|builder)\/status$/.test(path))return fetch.call(this,input,init);
+    const probe={path,signal:init.signal,settled:false};window.readinessProbes.push(probe);
+    return fetch.call(this,input,init).finally(()=>{probe.settled=true;});
+   };
+  });
+  await page.route('**/factory-config.json',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'remote',apiBaseUrl:api,previewOrigin:'https://page-readiness-preview.test'})}));
+  await page.route(api+'/**',route=>{
+   const endpoint=new URL(route.request().url()).pathname;
+   const run=(async()=>{if(/^\/v1\/(coach|builder)\/status$/.test(endpoint))await held;await route.fulfill({headers:cors,contentType:'application/json',body:JSON.stringify(endpoint==='/v1/creations'?[]:{available:true})});})();handlers.push(run);return run;
+  });
+  await page.goto(base);await ready(page);await page.waitForFunction(()=>window.readinessProbes?.length===2);
+  const firstDocument=await page.evaluate(()=>window.readinessDocumentId);
+  await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true})));
+  assert.equal(await page.evaluate(()=>window.readinessProbes.every(probe=>probe.signal.aborted)),true,'Page hide cancels both native read-only status requests.');
+  await page.evaluate(()=>window.dispatchEvent(new Event('factory-session-restored')));
+  assert.equal(await page.evaluate(()=>window.readinessProbes.length),2,'A hidden page cannot restart readiness requests.');
+  release();await Promise.all(handlers);
+  await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true})));
+  // The existing save-authority guard reloads a restored history document.
+  // Verify fresh ready checks in that replacement, not a permanently stopped UI.
+  await page.waitForFunction(id=>window.readinessDocumentId!==id&&window.readinessProbes?.length===2&&window.readinessProbes.every(probe=>probe.settled),firstDocument);
+  assert.equal(await page.evaluate(()=>window.readinessProbes.every(probe=>!probe.signal.aborted)),true,'A restored page starts fresh readiness requests after the safe reload.');
+  assert.deepEqual(posts,[],'Readiness cancellation and restoration never send paid requests.');assert.deepEqual(errors,[]);
+  console.log('PASS native readiness cancellation on pagehide, no hidden restart, fresh pageshow checks and no paid request');
+ }catch(error){console.error('Readiness lifecycle failure',await page.evaluate(()=>({probes:window.readinessProbes?.map(probe=>({path:probe.path,aborted:probe.signal.aborted,settled:probe.settled})),hidden:document.documentElement.hidden})),errors);throw error;}finally{release();await context.close();}
+}
+
 (async()=>{
  const server=start();await new Promise(resolve=>server.listening?resolve():server.once('listening',resolve));
  const base=`http://127.0.0.1:${server.address().port}/arcade/`;
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH,args:['--no-sandbox']});
- try{await delayedConfig(browser,base);await rejectedConfig(browser,base);await savedPreviewAfterConfig(browser,base);}
+ try{await delayedConfig(browser,base);await rejectedConfig(browser,base);await savedPreviewAfterConfig(browser,base);await readinessPageLifecycle(browser,base);}
  finally{await browser.close();server.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

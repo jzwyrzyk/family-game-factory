@@ -6,7 +6,7 @@ import { assertPracticeContinuation, evaluatePracticeChoice, getPracticeTask, pr
 import './style.css';
 import {createFriendlyNarrator} from '../speech/friendly-narrator';
 
-type Host = { enter(): boolean; home(): void };
+type Host = { enter(): boolean|Promise<boolean>; home(): void };
 const node = <K extends keyof HTMLElementTagNameMap>(tag: K, className = '', text = '') => {
   const el = document.createElement(tag); el.className = className; el.textContent = text; return el;
 };
@@ -30,7 +30,10 @@ export function installProblemSolvingPractice(host: Host) {
     && active?.episode.id === readingEpisode && phaseNow() === readingPhase);
   const status = (text: string, error = false) => { $('psStatus').textContent = text; $('psStatus').classList.toggle('is-error', error); };
   const isCurrent = () => visible && activeOwner === owner();
-  const act = (fn: () => void) => { try { fn(); } catch (error) { status((error as Error).message, true); } };
+  const act = (fn: () => void|Promise<void>) => {
+    const capturedOwner=owner(),failed=(error:unknown)=>{if(owner()===capturedOwner)status((error as Error).message,true);};
+    try { const result=fn();if(result)void result.catch(failed); } catch(error) { failed(error); }
+  };
   const stopSpeech = () => narrator.cancel();
   function assertCurrent() {
     if (!isCurrent()) throw Error('Open this idea in your own profile.');
@@ -249,8 +252,8 @@ export function installProblemSolvingPractice(host: Host) {
   }
   function close() { stopSpeech(); visible = false; revisionRetry = false; page.classList.add('hidden'); }
   function open(id?: string) {
-    act(() => {
-      if (!host.enter()) return;
+    act(async () => {
+      if (!await host.enter()) return;
       visible = true; activeOwner = owner(); page.classList.remove('hidden');
       if (id) {
         const task = getPracticeTask(id), allowed = practiceTasksForGrade(FG.store.current().grade).some(item => item.id === task.id);

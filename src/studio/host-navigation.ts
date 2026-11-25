@@ -26,10 +26,10 @@ export function installStudioHostNavigation() {
     if (!button?.closest('#page-studio')) return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    try { fg.studio.home(); }
-    catch (error) {
+    const report=(error:unknown)=>{
       const status = document.getElementById('studioStatus');
       if (status) { status.textContent = (error as Error).message; status.classList.add('is-error'); }
-    }
+    };
+    try { void Promise.resolve(fg.studio.home()).catch(report); } catch(error){report(error);}
   }, true);
 }

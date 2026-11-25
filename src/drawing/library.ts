@@ -6,12 +6,12 @@ import type { SavedRig } from './store';
 import { adultStorageKey } from '../adult-pilot/storage';
 
 export const ART_DB_NAME = 'family-private-drawings-v1';
-export const ART_DB_VERSION = 2;
+export const ART_DB_VERSION = 3;
 export const ART_LIMITS = Object.freeze({ imageBytes: 5 * 1024 * 1024, imagePixels: 4096, storageBytes: 20 * 1024 * 1024, drawingsPerOwner: 100, rigsPerOwner: 200, designBytes: 8 * 1024 * 1024, bundleBytes: 64 * 1024 * 1024 });
 export type ArtGuard = () => boolean;
-export type ArtStoreName = 'drawings' | 'rigs' | 'active' | 'drafts' | 'usage' | 'meta';
+export type ArtStoreName = 'drawings' | 'rigs' | 'active' | 'drafts' | 'usage' | 'meta' | 'drawingMetadata';
 export type ArtUsage = { id: string; owner: string; targetId: string; targetKind: 'scene' | 'game'; drawingId: string; rigId?: string };
-const names: ArtStoreName[] = ['drawings', 'rigs', 'active', 'drafts', 'usage', 'meta'];
+const names: ArtStoreName[] = ['drawings', 'rigs', 'active', 'drafts', 'usage', 'meta', 'drawingMetadata'];
 
 export function artOwner(value: unknown): asserts value is string {
   if (typeof value !== 'string' || !value || value.length > 120 || /[\u0000-\u001f]/.test(value)) throw Error('Choose a player before opening artwork.');
@@ -38,13 +38,18 @@ async function migrateLegacy(database: IDBDatabase) {
   if (!rewardSourceWritable()) return;
   const marker = await artRequest(database.transaction('meta').objectStore('meta').get('legacy-rigs-v1'));
   if (marker) return;
-  const legacy = await new Promise<IDBDatabase | null>((resolve, reject) => {
-    const request = indexedDB.open('family-drawing-rigs-v1');
+  // Opening an absent database is a creation attempt even if its upgrade is
+  // aborted. Use a read-only inventory where supported so ordinary art startup
+  // cannot leave an uncommitted legacy catalog entry behind in the browser.
+  const legacyName='family-drawing-rigs-v1';
+  const exists=!indexedDB.databases||(await indexedDB.databases()).some(row=>row.name===legacyName);
+  const legacy = exists?await new Promise<IDBDatabase | null>((resolve, reject) => {
+    const request = indexedDB.open(legacyName);
     let missing = false;
     request.onupgradeneeded = () => { missing = true; request.transaction!.abort(); };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => missing ? resolve(null) : reject(request.error);
-  });
+  }):null;
   let rigs: SavedRig[] = [], active: { owner: string; id: string }[] = [];
   if (legacy) {
     try {
@@ -92,9 +97,19 @@ async function migrateLegacy(database: IDBDatabase) {
 export async function artDatabase(): Promise<IDBDatabase> {
   const request = indexedDB.open(ART_DB_NAME, ART_DB_VERSION);
   request.onupgradeneeded = () => {
-    for (const name of names) if (!request.result.objectStoreNames.contains(name)) request.result.createObjectStore(name, { keyPath: name === 'active' ? 'owner' : 'id' });
+    for (const name of names) {
+      const store=request.result.objectStoreNames.contains(name)?request.transaction!.objectStore(name):request.result.createObjectStore(name,{keyPath:name==='active'?'owner':'id'});
+      if(!['active','meta'].includes(name)&&!store.indexNames.contains('owner'))store.createIndex('owner','owner');
+      if(name==='drawingMetadata'&&!store.indexNames.contains('ownerCreated'))store.createIndex('ownerCreated',['owner','createdAt','id']);
+    }
+    // Add only a regenerable bounded catalog. Never rewrite original images.
+    const cursor=request.transaction!.objectStore('drawings').openCursor();
+    cursor.onsuccess=()=>{if(cursor.result){saveDrawingMetadata(request.transaction!,cursor.result.value);cursor.result.continue();}};
   };
-  const database = await artRequest(request);
+  const database = await new Promise<IDBDatabase>((resolve,reject)=>{
+    let blocked=false;request.onblocked=()=>{blocked=true;reject(Error('Close another open Jems tab, then reopen your artwork. Your original pictures are safe.'));};
+    request.onerror=()=>reject(request.error);request.onsuccess=()=>{if(blocked)request.result.close();else resolve(request.result);};
+  });
   database.onversionchange = () => database.close();
   try {
     if (!migration) migration = migrateLegacy(database).catch(error => { migration = undefined; throw error; });
@@ -104,7 +119,7 @@ export async function artDatabase(): Promise<IDBDatabase> {
 
 export async function withArtTransaction<T>(stores: ArtStoreName[], mode: IDBTransactionMode, action: (transaction: IDBTransaction) => Promise<T> | T): Promise<T> {
   const database = await artDatabase();
-  const transaction = database.transaction(stores, mode), done = transactionDone(transaction); void done.catch(() => {});
+  const transaction = database.transaction(mode==='readwrite'&&stores.includes('drawings')?[...new Set([...stores,'drawingMetadata'])]:stores, mode), done = transactionDone(transaction); void done.catch(() => {});
   try { const result = await action(transaction); await done; return result; }
   catch (error) { try { transaction.abort(); } catch {} await done.catch(() => {}); throw error; }
   finally { database.close(); }
@@ -135,13 +150,13 @@ export async function registerArtUsage(owner: string, input: Omit<ArtUsage, 'id'
 export async function releaseArtUsage(owner: string, targetId: string, guard?: ArtGuard) {
   assertArtWrite(owner, guard);
   return withArtTransaction(['usage'], 'readwrite', async transaction => {
-    const store = transaction.objectStore('usage'), all = await artRequest(store.getAll()) as ArtUsage[];
+    const store = transaction.objectStore('usage'), all = await ownerArtRecords<ArtUsage>(transaction,'usage',owner);
     assertArtWrite(owner, guard); for (const item of all) if (item.owner === owner && item.targetId === targetId) store.delete(item.id);
   });
 }
 /** Read the source histories as authority. A valid workspace can disprove an
  * obsolete index receipt; unavailable/corrupt source evidence cannot do so. */
-export function deriveArtUsages(owner: string, originals: Drawing[], rigs: SavedRig[], indexed: ArtUsage[]): ArtUsage[] {
+export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'owner'|'sha256'>[], rigs: SavedRig[], indexed: ArtUsage[]): ArtUsage[] {
   const result = new Map<string, ArtUsage>(), known = new Set<ArtUsage['targetKind']>();
   const images = new Map(originals.filter(item => item.owner === owner).map(item => [item.id, item]));
   const versions = new Map(rigs.filter(item => item.owner === owner).map(item => [item.id, item]));
@@ -182,10 +197,20 @@ export function deriveArtUsages(owner: string, originals: Drawing[], rigs: Saved
 }
 export async function artUsages(owner: string, drawingId?: string): Promise<ArtUsage[]> {
   artOwner(owner);
-  return withArtTransaction(['usage', 'drawings', 'rigs'], 'readonly', async transaction => {
-    const indexed = await artRequest(transaction.objectStore('usage').getAll()) as ArtUsage[];
-    const originals = await artRequest(transaction.objectStore('drawings').getAll()) as Drawing[];
-    const rigs = await artRequest(transaction.objectStore('rigs').getAll()) as SavedRig[];
+  return withArtTransaction(['usage', 'drawingMetadata', 'rigs'], 'readonly', async transaction => {
+    const indexed = await ownerArtRecords<ArtUsage>(transaction,'usage',owner);
+    const originals = await ownerArtRecords<DrawingMetadata>(transaction,'drawingMetadata',owner);
+    const rigs = await ownerArtRecords<SavedRig>(transaction,'rigs',owner);
     return deriveArtUsages(owner, originals, rigs, indexed).filter(item => !drawingId || item.drawingId === drawingId);
   });
+}
+
+/** Lightweight cards never hydrate full original image collections. */
+export type DrawingMetadata = Omit<Drawing,'bytes'> & {originalBytes:number};
+export function saveDrawingMetadata(transaction:IDBTransaction,item:Drawing):void {
+ const {bytes,...metadata}=item;
+ transaction.objectStore('drawingMetadata').put({...metadata,originalBytes:bytes.byteLength});
+}
+export function ownerArtRecords<T>(transaction:IDBTransaction,store:ArtStoreName,owner:string):Promise<T[]>{
+ artOwner(owner);return artRequest(transaction.objectStore(store).index('owner').getAll(IDBKeyRange.only(owner)));
 }

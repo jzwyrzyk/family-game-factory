@@ -1,6 +1,6 @@
 # Standalone UI review
 
-The review build packages the merged Jems UI into one downloadable `jems-ui-review.html`. Open it in current Chrome or Edge, including with the computer disconnected. No server, extension, account, real family data or AI service is needed.
+The review build packages the selected Jems source into one downloadable `jems-ui-review.html`. Open it in current Chrome or Edge, including with the computer disconnected. No server, extension, account, real family data or AI service is needed.
 
 The toolbar selects an experience, supported learning grade, effective iframe viewport, page/journey state and synthetic scenario. Fit display scales the live frame; the frame's CSS viewport still matches the selected dimensions and uses the product's responsive rules. Choose 100% to inspect physical text size, or hide the toolbar. Flag concerns after clicking an affected control, edit/delete findings, mark pages reviewed, and export Markdown or JSON. Findings use a separate browser-local key with an in-memory fallback. Export before closing if persistence is unavailable.
 
@@ -15,7 +15,7 @@ npm run review:build
 npm run review:test
 ```
 
-The file is written to `dist-review/jems-ui-review.html`. `UI_REVIEW_OUT` changes the output directory. `UI_REVIEW_BASE_SHA` records a specific represented source; the build rejects a source mismatch in application files. Normally the checkout's HEAD is recorded. The artifact includes the full SHA, build timestamp, route manifest, limits and excluded-PR inventory. On main the SHA is the merged source. PR review builds must not be described as merged application changes.
+The file is written to `dist-review/jems-ui-review.html`. `UI_REVIEW_OUT` changes the output directory. `UI_REVIEW_BASE_SHA` records a specific represented source; the build rejects a source mismatch in application files. The workflow pins the checked-out HEAD: the exact PR candidate for a PR run, or the merged commit for a main run. It never substitutes the merge base for candidate source. Download and evidence names use that same SHA. The artifact includes the full SHA, build timestamp, route manifest, limits and dated PR inventory. PR review builds must not be described as merged application changes.
 
 `UI_REVIEW_EXACT_ASSETS=1 npm run review:build` retains original asset bytes (approximately 303 MiB at the initial baseline). The default uses maximum-768px, quality-90 WebP derivatives of the original Gem Pal images, preserving aspect ratio and transparency. Other artwork and fonts are exact. This makes the initial artifact approximately 55 MiB. No generated/replacement art is used and `public/` is never edited. Full-resolution art approval is outside the compact artifact.
 
@@ -23,17 +23,17 @@ The file is written to `dist-review/jems-ui-review.html`. `UI_REVIEW_OUT` change
 
 `tools/ui-review/entry.ts` installs synthetic profiles, reporting records and optional saved creations, rewards and companions before dynamically importing the real `src/main.ts`. The ordinary application, including its CSS, native game engines, educational presentations, coding, drawing and parent reporting, is bundled with esbuild. The production build never imports these review files.
 
-`bootstrap.js` replaces service transports before application initialization. It uses reserved `.invalid` fixture origins, deterministic scripted coaching and queued/building/testing/ready/error job transitions. Generated gameplay is a labelled embedded transport fixture with the real host learning protocol. Native games retain their merged engines. Authentication, passphrases, invitations and consent states are illustrative responses only. Never enter real credentials.
+`bootstrap.js` replaces service transports before application initialization. It uses reserved `.invalid` fixture origins, deterministic scripted coaching and queued/building/testing/ready/error job transitions. Generated gameplay is a labelled embedded transport fixture with the real host learning protocol. Native games retain the represented source engines. Authentication, passphrases, invitations and consent states are illustrative responses only. Never enter real credentials.
 
 The build-only service-worker substitution, inline SVG symbol references, URL-to-embedded-blob mapping, isolated synthetic localStorage/IndexedDB names and review navigation adapter are explicit deviations. Source UI files are not edited. A restrictive CSP independently denies external connections, images, scripts, frames and native form submissions. WebSocket, EventSource, XHR, beacons, microphone and external navigation are unavailable. Browser-local synthetic saves are allowed. No cloud configuration, production deployment or paid generation is part of this tool.
 
-All six grade values are available through the merged `early-preview` compile mode. The ordinary application build still excludes Pre-K/Kindergarten selection. The sandbox does not promote that preview capability into production.
+All six grade values are available through the `early-preview` compile mode. The ordinary application build still excludes Pre-K/Kindergarten selection. The sandbox does not promote that preview capability into production.
 
 ## Inventory and maintenance
 
 `coverage.json` contains 16 discovered page containers, 30 selectable intermediate states, 11 journey families and 9 scenario choices at the initial baseline. Counts describe available review entrances; they are not proof of every possible combination or human acceptance. Retained legacy screens are explicitly labelled. `review:coverage` scans source page IDs and fails for new unlisted pages. New journeys and conditional dialogs still need human source review. Update the manifest, fixtures and tests together when main changes.
 
-`excluded-prs.json` is a dated inventory of significant open work checked on November 25, 2026. It is not a live PR-status service. In particular, the unmerged family-beta chain contains new-family entry, recovery, administration and privacy operations that must not appear in the merged review. The existing merged trusted-device and adult-session controls remain available.
+`excluded-prs.json` preserves significant open work checked on November 25, 2026 against the initial `0f459f5` baseline. It is not a live PR-status service or a list of source excluded from a later candidate. Family-beta server welcome, account recovery and administrator routes are outside this standalone frontend harness even when their source is present; their separate beta acceptance remains required. Existing trusted-device and adult-session controls remain available.
 
 Scenario scope is explicit: first-time/empty clear records, populated adds sample saved creations and receipts, long-content adds a longer library, unlocked seeds synthetic Pal/reward activity, locked denies simulated service availability, loading holds service work, and error fails coach/build responses. The toolbar can release pending work or restore normal responses before the product retry action. This does not manufacture a generic error overlay on every page.
 
@@ -48,5 +48,7 @@ The workflow is additive, read-only, and independent of production releases. It 
 The artifact workflow pins Ubuntu 24.04 because the repository’s Playwright 1.56.1 cannot install on Ubuntu 26.04. Initial workflow attempts encountered this runner incompatibility before building. The corrected job builds the HTML before browser setup, so a browser-install failure still leaves a downloadable artifact with explicitly incomplete validation.
 
 Additional integration checks add a Jump block and run the real scene engine, upload a synthetic local PNG into the art library, issue a simulated device invitation, and decode every embedded image. [Initial acceptance observations](ACCEPTANCE.md) record existing product UI concerns separately.
+
+Review navigation waits for the real Parent page event before selecting a tab or submitting the synthetic unlock form. The application still saves pending work asynchronously and rejects a form submission from the previous view; the harness does not bypass that guard.
 
 The primary download uploads immediately after the build, separately from browser evidence. Download availability does not by itself imply passing tests: check the run’s test step or the acceptance notes. Screenshot names use portable characters for Windows extraction.
