@@ -406,10 +406,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "27c4e7fa6f3025dff65335a284d02dd6a79259ead7c5fd0e2a999134a77971bb",
-      "reviewedAt": "2026-11-25T01:37:11.429Z",
+      "sourceDigest": "97666e5fc0ee8739084b067d633b59636bea4f83e6823ae39e5639f3aaf1d39d",
+      "reviewedAt": "2026-11-25T01:55:08.991Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage. Existing operational procedures and acceptance commands still apply to this change.",
+      "reviewReason": "Integrate the compact First steps controls into the young learner journey without altering its parent approval or evidence contracts. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
