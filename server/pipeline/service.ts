@@ -102,6 +102,7 @@ export class JobService {
    assertActiveTrustedDevice(s,session);
    if(this.options.adultPilotMode?!adultPilotAllowed(s,session):!!(session.adultSessionId||session.adultProfileId))throw Error('ADULT_PILOT_ACCESS_REQUIRED');
    if(s.betaScopes&&!verifiedParentScope(s,session.familyId,'generation'))throw Error('GUARDIAN_CONSENT_REQUIRED');
+   if(s.revisions.some(revision=>revision.familyId===session.familyId&&revision.adultPilotProfileId===session.adultProfileId&&revision.recoveryProvenance?.playbackOnly&&(revision.id===r.localRevisionId||revision.projectId===r.localRevisionId)))throw Error('RECOVERY_PLAYBACK_ONLY');
    const scope=session.adultProfileId?`${session.familyId}:${session.adultProfileId}`:session.familyId;
    const id='seed-'+createHash('sha256').update(scope+':'+r.localRevisionId).digest('hex'),existing=s.revisions.find(x=>x.id===id);
    if(existing){requireResourceAudience(s,session,existing);if(JSON.stringify(existing.config)!==JSON.stringify(config))throw Error('IDEMPOTENCY_CONFLICT');}
@@ -134,6 +135,9 @@ export class JobService {
    }
    const base=r.baseRevisionId?s.revisions.find(x=>x.id===r.baseRevisionId):undefined;
    if(r.baseRevisionId){if(!base)throw Error('NOT_FOUND');requireResourceAudience(s,session,base);}else if(r.gameId!=='new')throw Error('INVALID_REQUEST');
+   // A mapped recovery receives new IDs but no new premium allowance. It is
+   // playable evidence, never a fresh paid lineage. Reject before any reserve.
+   if(base?.recoveryProvenance?.playbackOnly)throw Error('RECOVERY_PLAYBACK_ONLY');
    // O4: reject unsupported or contradictory forms BEFORE reserving an
    // allowance or acknowledging an asynchronous paid build. This uses only
    // server-owned, family-authorized revision data; the private worker
@@ -286,6 +290,7 @@ export class JobService {
   if(typeof name!=='string'||name.trim().length<1||name.length>60||requestId!==undefined&&!safeId(requestId))throw Error('INVALID_REQUEST');
   return this.repo.transaction(s=>{
    const source=s.revisions.find(r=>r.id===id&&r.game);if(!source)throw Error('NOT_FOUND');requireResourceAudience(s,session,source);
+   if(source.recoveryProvenance?.playbackOnly)throw Error('RECOVERY_PLAYBACK_ONLY');
    if(requestId){const prior=s.revisions.find(r=>r.copyRequestId===requestId&&r.familyId===source.familyId&&r.adultPilotProfileId===source.adultPilotProfileId);
     if(prior){requireResourceAudience(s,session,prior);if(prior.sourceRevisionId!==id||prior.name!==name.trim())throw Error('IDEMPOTENCY_CONFLICT');return {revisionId:prior.id};}}
    if(s.betaScopes&&!verifiedParentScope(s,session.familyId,'generation'))throw Error('GUARDIAN_CONSENT_REQUIRED');
