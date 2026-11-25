@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {readFileSync,existsSync} from 'node:fs';
+import {readFileSync,writeFileSync,existsSync} from 'node:fs';
 import {resolve,extname} from 'node:path';
 import {build} from 'esbuild';
 import type {BrowserContext,Page} from 'playwright';
@@ -77,7 +77,21 @@ export async function applicationMigrationBrowser(ctx:BrowserContext,engine:stri
   const mime:Record<string,string>={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.woff':'font/woff','.woff2':'font/woff2'};
   await route.fulfill({contentType:mime[extname(file)]??'application/octet-stream',body:readFileSync(file)});
  });
+ // Observe native database lifecycle without replacing requests or outcomes.
+ // Failure receipts distinguish a stale inventory entry from a failed read.
+ await ctx.addInitScript(()=>{
+  const w=window as any,open=indexedDB.open;w.migrationDatabaseEvents=[];
+  const record=(event:unknown)=>{w.migrationDatabaseEvents.push(event);if(w.migrationDatabaseEvents.length>100)w.migrationDatabaseEvents.shift();};
+  indexedDB.open=function(...args:Parameters<IDBFactory['open']>){
+   const request=open.apply(this,args),name=args[0];
+   request.addEventListener('upgradeneeded',event=>record({name,event:'upgrade',oldVersion:event.oldVersion,newVersion:event.newVersion,stores:[...request.result.objectStoreNames]}));
+   request.addEventListener('success',()=>record({name,event:'opened',version:request.result.version,stores:[...request.result.objectStoreNames]}));
+   request.addEventListener('error',()=>record({name,event:'error',error:request.error?.name}));return request;
+  };
+ });
  const source=await ctx.newPage(),dest=await ctx.newPage();
+ const browserErrors:string[]=[];for(const page of [source,dest])page.on('pageerror',error=>browserErrors.push(error.message));
+ let stage='source application';
  const app=async(p:Page,origin:string)=>{await p.goto(origin+'/');await p.waitForFunction(()=>Boolean((window as any).FG?.studio));};
  const transfer=async(p:Page,origin:string)=>{await p.goto(origin+'/transfer');await p.waitForFunction(()=>Boolean((window as any).vault));};
  try{
@@ -88,9 +102,9 @@ export async function applicationMigrationBrowser(ctx:BrowserContext,engine:stri
   await source.locator('#recovery-save').click();await source.waitForFunction(()=>document.getElementById('jemsRecoveryStatus')?.textContent?.includes('Complete recovery copy saved'));
   const point=await source.evaluate(async()=>{const modulePath='/fixture.js',fixture=await import(modulePath);return fixture.inspectRecovery();});
   assert.deepEqual(point.decoded.progress.factoryWorkspace,before.workspace);assert.equal(point.archive.manifest.scope.origin,sourceOrigin);
-  await transfer(source,sourceOrigin);const archive=await source.evaluate(m=>(window as any).vault.exportHousehold(m),map);
-  await transfer(dest,targetOrigin);await dest.evaluate(([m,a])=>(window as any).vault.restoreHousehold(m,a),[map,archive]);
-  await app(dest,targetOrigin);
+  stage='source export';await transfer(source,sourceOrigin);console.log(engine+' household source database inventory '+JSON.stringify(await source.evaluate(()=>indexedDB.databases())));const archive=await source.evaluate(m=>(window as any).vault.exportHousehold(m),map);
+  stage='target restore';await transfer(dest,targetOrigin);await dest.evaluate(([m,a])=>(window as any).vault.restoreHousehold(m,a),[map,archive]);
+  stage='restored application';await app(dest,targetOrigin);
   const restored=await dest.evaluate(async art=>{const modulePath='/fixture.js',fixture=await import(modulePath);return fixture.inspectHousehold(art);},before.art);
   assert.deepEqual(restored.workspace,before.workspace);assert.deepEqual(restored.notebook,before.notebook);assert.deepEqual(restored.art,before.art);
   const transferred=await dest.evaluate(async id=>{const modulePath='/fixture.js',fixture=await import(modulePath);return fixture.inspectRecovery(id,true);},point.archive.manifest.id);
@@ -98,13 +112,13 @@ export async function applicationMigrationBrowser(ctx:BrowserContext,engine:stri
   assert.equal(transferred.localPoints.length,0,'Source points are archived, never silently rebound to the target origin.');
   assert.deepEqual(await dest.evaluate(()=>JSON.parse(localStorage.getItem('jems-recovery-origin-transfer-v1')!)),{schema:'jems.recovery-origin-transfer.v1',...map,archiveSha256:archive.sha256});
   await dest.evaluate(()=>{const FG=(window as any).FG;FG.app.page('parent');FG.parentDashboard.openTab('settings');});
-  await dest.locator('#recovery-show').click();await dest.locator('#recovery-preview-'+point.archive.manifest.id).click();await dest.locator('#jemsRecoveryPreview').waitFor({state:'visible'});
+  stage='mapped recovery';await dest.locator('#recovery-show').click();await dest.locator('#recovery-preview-'+point.archive.manifest.id).click();await dest.locator('#jemsRecoveryPreview').waitFor({state:'visible'});
   assert.match(await dest.locator('#jemsRecoveryPreview').innerText(),/8 saved games and 1 original pictures/);
   await dest.locator('#jemsRecoveryPreview').screenshot({path:'test-results/family-beta/'+engine+'-transferred-recovery-preview.png'});
   await Promise.all([dest.waitForEvent('load'),dest.locator('#recovery-restore').click()]);await dest.waitForFunction(()=>Boolean((window as any).FG?.studio));
   const recovered=await dest.evaluate(async art=>{const modulePath='/fixture.js',fixture=await import(modulePath);return fixture.inspectHousehold(art);},before.art);
   assert.deepEqual(recovered.workspace,before.workspace);assert.deepEqual(recovered.notebook,before.notebook);assert.deepEqual(recovered.art,before.art);
-  for(const entry of before.entries){
+  stage='restored playback';for(const entry of before.entries){
    await dest.evaluate(e=>{const FG=(window as any).FG;if(!FG.store.choose(e.owner))throw Error('Profile switch blocked');window.dispatchEvent(new Event('factory-profile'));FG.store.current().mathWindow=[Date.now()];FG.store.save();return FG.studio.open(e.sessionId);},entry);
    await dest.locator('#page-studio.studio-play-mode').waitFor();
    if(entry.game==='buckets'){
@@ -125,7 +139,14 @@ export async function applicationMigrationBrowser(ctx:BrowserContext,engine:stri
    assert.equal(entry.game==='buckets'?older.splashMs:older.breathSpeed,entry.game==='buckets'?entry.config.splashMs:entry.config.breathSpeed);
    await dest.locator('#studioHome').click();
   }
-  await transfer(source,sourceOrigin);assert.equal((await source.evaluate(m=>(window as any).vault.exportHousehold(m),map)).sha256,archive.sha256);
+  stage='unchanged source';await transfer(source,sourceOrigin);assert.equal((await source.evaluate(m=>(window as any).vault.exportHousehold(m),map)).sha256,archive.sha256);
   console.log(engine+' restored two profile owners, eight kept projects, saved mechanics, original art bytes and original Studio session IDs and exact source-origin recovery point; explicit mapped recovery restore and both current/earlier native engines launched');
+ }catch(error){
+  const describe=(page:Page)=>page.evaluate(async()=>({url:location.href,databases:await indexedDB.databases(),databaseEvents:(window as any).migrationDatabaseEvents,studioReady:Boolean((window as any).FG?.studio),vaultReady:Boolean((window as any).vault),startupRecovery:document.getElementById('jemsStartupRecovery')?.textContent,localKeys:Object.keys(localStorage)})).catch(()=>({url:page.url()}));
+  const diagnostics={engine,stage,error:String(error),browserErrors,source:await describe(source),target:await describe(dest)};
+  console.error('Household migration failure '+JSON.stringify(diagnostics));
+  writeFileSync('test-results/family-beta/'+engine+'-migration-failure.json',JSON.stringify(diagnostics,null,2));
+  for(const [label,page] of [['source',source],['target',dest]] as const)await page.screenshot({path:'test-results/family-beta/'+engine+'-migration-'+label+'-failure.png',fullPage:true}).catch(()=>{});
+  throw error;
  }finally{await ctx.close();}
 }

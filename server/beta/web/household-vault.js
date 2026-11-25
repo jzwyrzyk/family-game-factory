@@ -74,8 +74,9 @@ async function originDatabases(){
  return (await indexedDB.databases()).map(row=>row.name).filter(n=>typeof n==='string'&&reviewed(n,true)).sort(sort);
 }
 async function readDatabase(name){
- const open=indexedDB.open(name);open.onupgradeneeded=()=>open.transaction.abort();
- const db=await request(open);
+ let missing=false;
+ const open=indexedDB.open(name);open.onupgradeneeded=()=>{missing=true;open.transaction.abort();};
+ const db=await request(open).catch(error=>{throw Error('Could not open household database '+name+': '+(missing?'the inventoried database no longer exists; ':'')+(error?.name??'unknown error')+': '+(error?.message??'')+'. Keep the original device.',{cause:error});});
  try{
   const names=[...db.objectStoreNames].sort(sort);
   const tx=names.length?db.transaction(names):null;
@@ -83,7 +84,7 @@ async function readDatabase(name){
    const os=tx.objectStore(storeName);
    if(os.autoIncrement)throw Error('Unreviewed automatic key generator. Keep the source.');
    const indexes=[...os.indexNames].sort(sort).map(n=>{const i=os.index(n);return {name:n,keyPath:i.keyPath,unique:i.unique,multiEntry:i.multiEntry};});
-   const [keys,values]=await Promise.all([request(os.getAllKeys()),request(os.getAll())]);
+   const [keys,values]=await Promise.all([request(os.getAllKeys()),request(os.getAll())]).catch(error=>{throw Error('Could not read household database '+name+', store '+storeName+': '+(error?.name??'unknown error')+'. Keep the original device.',{cause:error});});
    if((baseName(name)==='jems-recovery-vault-v1'&&storeName==='preparing')&&values.length)throw Error('Finish pending storage recovery on the original device before moving this household.');
    return {name:storeName,keyPath:os.keyPath,indexes,rows:await Promise.all(keys.map(async(k,i)=>[await pack(k),await pack(values[i])]))};
   }));
