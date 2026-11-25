@@ -184,7 +184,8 @@ export class StudioNotebook {
   /** Expand a mutable callback's current page for provenance/readiness checks only. */
   withConversation(session:StudioSession):StudioSession {
     const n=this.load();if(!n.sessions.some(s=>s.id===session.id&&s.owner===session.owner))throw Error('Choose a game in your own profile.');
-    return copy(conversationContext(n,session));
+    // Keep the caller-owned mutable design current while copying cached transcript bytes.
+    return {...session,messages:copy(conversationContext(n,session).messages)};
   }
   assertMessageCapacity(id:string,owner:string,count=1):void {
     if(!Number.isInteger(count)||count<1||count>CONVERSATION_PAGE_CAPACITY)throw Error('Invalid conversation capacity request.');
