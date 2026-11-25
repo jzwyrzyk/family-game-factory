@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+import {selectableGrades, gradeLabel, parseGradeOption} from './grades';
 import {profileGrade} from './engine';
 import type {LearnerProfile} from './types';
 import './profile-setup.css';
@@ -21,9 +23,9 @@ export function installLearningProfileSetup() {
   dialog.setAttribute('aria-labelledby','learningProfileTitle');
   const title=node('h2');title.id='learningProfileTitle';
   const form=node('form');form.noValidate=false;
-  const gradeLabel=node('label','Learning grade');gradeLabel.htmlFor='learningProfileGrade';
+  const gradeFieldLabel=node('label','Learning grade');gradeFieldLabel.htmlFor='learningProfileGrade';
   const grade=node('select');grade.id='learningProfileGrade';grade.required=true;
-  for(const value of [1,2,3,4]){const option=node('option',`Grade ${value}`);option.value=String(value);grade.append(option);}
+  for(const value of selectableGrades(import.meta.env.MODE === "early-preview")){const option=node('option',gradeLabel(value));option.value=String(value);grade.append(option);}
   const difficultyLabel=node('label','Learning difficulty');difficultyLabel.htmlFor='learningProfileDifficulty';
   const difficulty=node('select');difficulty.id='learningProfileDifficulty';difficulty.required=true;
   for(const [value,label] of Object.entries(difficulties)){const option=node('option',label);option.value=value;difficulty.append(option);}
@@ -33,7 +35,7 @@ export function installLearningProfileSetup() {
   const actions=node('div');actions.className='learning-profile-actions';
   const cancel=node('button','Not now');cancel.type='button';cancel.id='learningProfileCancel';
   const save=node('button','Save learning level');save.type='submit';save.id='learningProfileSave';save.className='learning-profile-save';
-  actions.append(cancel,save);form.append(gradeLabel,grade,difficultyLabel,difficulty,explanation,error,actions);dialog.append(title,form);document.body.append(dialog);
+  actions.append(cancel,save);form.append(gradeFieldLabel,grade,difficultyLabel,difficulty,explanation,error,actions);dialog.append(title,form);document.body.append(dialog);
   let owner='',priorFocus:HTMLElement|null=null;
 
   function refresh() {
@@ -42,7 +44,7 @@ export function installLearningProfileSetup() {
     const profile:LearnerProfile=FG.store.current();
     const adult=!!FG.store.adultProfileId;
     summary.hidden=adult;
-    description.textContent=`Grade ${profileGrade(profile)} · ${difficulties[profile.intensity as keyof typeof difficulties]||'Gentle'}`;
+    description.textContent=`${gradeLabel(profileGrade(profile))} · ${difficulties[profile.intensity as keyof typeof difficulties]||'Gentle'}`;
     edit.textContent=profile.learningSetupComplete?'Change learning level':'Set learning level';
     edit.setAttribute('aria-label',`${edit.textContent} for ${profile.name||'this player'}. ${description.textContent}`);
     edit.disabled=!!FG.store.loadError||!!FG.learning?.active;
@@ -74,11 +76,11 @@ export function installLearningProfileSetup() {
   window.addEventListener('factory-profile-choices',refresh);
   window.addEventListener('factory-learning-settings',refresh);
   window.addEventListener('factory-learning-active',refresh);
-  form.onsubmit=event=>{
+  form.onsubmit=async event=>{
     event.preventDefault();
     if(!owner||owner!==String(FG.store.current().id)||FG.store.adultProfileId){close(false);return;}
     try{
-      FG.store.changeProfile({grade:Number(grade.value),intensity:difficulty.value,learningSetupComplete:true});
+      await FG.store.changeLearningProfile({grade:parseGradeOption(grade.value),intensity:difficulty.value,learningSetupComplete:true});
       FG.parentDashboard?.refresh();refresh();close();
     }catch(cause){error.textContent=cause instanceof Error?cause.message:'Could not save this level. Try again.';error.hidden=false;}
   };

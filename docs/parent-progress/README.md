@@ -158,3 +158,5 @@ baseline/follow-up forms, meaningful transfer probes, actual parent comprehensio
 testing, and research on educational benefit. Account sync, authenticated remote
 parent access, automatic digests, school imports, and normed score linking are
 separate capabilities, not implied by this dashboard.
+
+Early grade labels follow the shared grade table. Historical math and language skills with recorded evidence remain reportable after the parent lowers a ceiling.

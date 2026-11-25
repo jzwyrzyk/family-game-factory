@@ -33,6 +33,10 @@ export async function initBuilder(){
  let currentPage=document.querySelector('main > .page:not(.hidden)')?.id.replace(/^page-/,'')||'home';
  function makeClient(){const owner=FG.store.current().id,at=profileSequence;return new BuilderClient(config,(job,submissionId)=>{if(at!==profileSequence||owner!==FG.store.current().id)return;return update(job,submissionId);});}
  let client=makeClient();
+ FG.verifyParentSettings=async()=>{
+  try { const result=await client.api('/v1/devices'); if(!Array.isArray(result.devices))throw Error(); }
+  catch { throw Error('Unlock Parent Controls on a trusted family device to save learning settings.'); }
+ };
  const mathKey=()=>currentProject?'remote:'+currentProject:null;
  const operation=()=>({owner:FG.store.current().id,page:previousPage,sequence:previewSequence,revision:currentRevision,client});
  const stillCurrent=(at:ReturnType<typeof operation>)=>at.owner===FG.store.current().id&&at.page===currentPage&&at.page===previousPage&&at.sequence===previewSequence&&at.revision===currentRevision&&!panel.hidden;

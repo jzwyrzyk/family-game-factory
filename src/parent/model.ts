@@ -1,3 +1,4 @@
+import type {Grade} from '../learning/grades';
 /** Read-only parent reporting over existing host evidence. No new scoring or storage. */
 import type { Attempt } from '../learning/engine';
 import type { LanguageAttempt } from '../language/engine';
@@ -60,7 +61,7 @@ export interface ParentEvidence {
   subject: ParentSubjectId;
   skillId: string;
   skillTitle: string;
-  grade?: number;
+  grade?: Grade;
   standards: string[];
   at: number;
   prompt: string;
@@ -93,7 +94,7 @@ export interface ParentSkillRow {
   id: string;
   subject: ParentSubjectId;
   title: string;
-  grade?: number;
+  grade?: Grade;
   standards: string[];
   state: string;
   stateLabel: string;

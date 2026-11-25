@@ -3,7 +3,7 @@ import {summarizeParentPractice} from '../src/learning/insights';
 const day=86_400_000;
 const now=new Date('2026-11-17T12:00:00').getTime();
 const report={totals:{presentations:21,independent:10,assisted:4},skills:[
- {id:'g1-add',title:'Add within 10',grade:1,state:'learning-with-support',presentations:14,independent:10,assisted:4,distinctDays:2,dueAt:null,reviewDue:false}
+ {id:'g1-add',title:'Add within 10',grade:1 as const,state:'learning-with-support',presentations:14,independent:10,assisted:4,distinctDays:2,dueAt:null,reviewDue:false}
 ]};
 const make=(days:number,independent:boolean,outcome='completed')=>({startedAt:now-days*day,completedAt:now-days*day,outcome,independent});
 const attempts=[

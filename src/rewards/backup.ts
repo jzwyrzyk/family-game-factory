@@ -219,6 +219,7 @@ export function installRewardBackupControls(rewards:RewardsController):void {
       if(FG.store.adultProfileId)throw Error('Switch to a family profile before restoring a family backup.');
       if(file.size>20_000_000)throw Error('That backup is too large.');
       const raw=await file.text(),plan=validateFamilyRewardBackup(raw,FG.store.validateBackup,rewards.store());
+      if(FG.store.backupChangesGrades(plan.base))await FG.verifyParentSettings();
       if(!confirm('Restore this backup? Current family progress will be replaced.'))return;
       flush();await withPalsMaintenance(palStore=>rewards.maintenance(store=>applyFamilyRewardBackup(plan,localStorage,store,'restore',palStore)));
       alert('Progress restored successfully.');location.reload();

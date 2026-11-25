@@ -1,3 +1,4 @@
+import {withinGrade} from '../learning/grades';
 import {getLanguageSkill, LANGUAGE_SKILLS} from './curriculum';
 import {LANGUAGE_G1} from './data-g1';
 import {LANGUAGE_G2} from './data-g2';
@@ -96,7 +97,7 @@ export function languageContentErrors():string[] {
     if(bank.h.length!==3||bank.h.some(s=>!s||s.length<15))errors.push(skill.id+': missing instruction');
     for(const prerequisite of skill.prerequisites){
       const prior=LANGUAGE_SKILLS.find(x=>x.id===prerequisite);
-      if(!prior||prior.grade>skill.grade||prior.id===skill.id)errors.push(skill.id+': invalid prerequisite '+prerequisite);
+      if(!prior||!withinGrade(prior.grade,skill.grade)||prior.id===skill.id)errors.push(skill.id+': invalid prerequisite '+prerequisite);
     }
     bank.items.forEach((item,index)=>{
       const key=skill.id+':'+index;

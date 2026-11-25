@@ -1,3 +1,4 @@
+import {selectableGrades, gradeLabel, parseGradeOption, withinGrade, isEarlyGrade} from '../learning/grades';
 /* UI orchestration: game/learning engines remain independent. */
 import {createIcon,iconMarkup,setIconLabel} from '../brand/icons';
 (function(){
@@ -94,20 +95,20 @@ function renderFeedback(){const box=$('feedbackList');box.replaceChildren();cons
   node.append(title,desc,stamp,actions);box.append(node)})}
 
 function populateSkills(){
- const selected=$('parentSkill').value,grade=Number($('parentGrade').value);$('parentSkill').replaceChildren();
+ const selected=$('parentSkill').value,grade=parseGradeOption($('parentGrade').value);$('parentSkill').replaceChildren();
  const all=document.createElement('option');all.value='';all.textContent='Let the learning model choose';$('parentSkill').append(all);
- for(const skill of FG.learning.mathSkills.filter(x=>x.grade<=grade)){const o=document.createElement('option');o.value=skill.id;o.textContent=`Grade ${skill.grade} · ${skill.title}`;$('parentSkill').append(o);}
+ for(const skill of FG.learning.mathSkills.filter(x=>withinGrade(x.grade,grade))){const o=document.createElement('option');o.value=skill.id;o.textContent=`${gradeLabel(skill.grade)} · ${skill.title}`;$('parentSkill').append(o);}
  if([...$('parentSkill').options].some(x=>x.value===selected))$('parentSkill').value=selected;
  const lang=$('parentLanguageSkill'),prior=lang.value;lang.replaceChildren();const auto=document.createElement('option');auto.value='';auto.textContent='Let the language model choose';lang.append(auto);
- for(const skill of FG.learning.languageSkills.filter(x=>x.grade<=grade)){const option=document.createElement('option');option.value=skill.id;option.textContent='Grade '+skill.grade+' · '+skill.title;lang.append(option);}
+ for(const skill of FG.learning.languageSkills.filter(x=>withinGrade(x.grade,grade))){const option=document.createElement('option');option.value=skill.id;option.textContent=gradeLabel(skill.grade)+' · '+skill.title;lang.append(option);}
  if([...lang.options].some(x=>x.value===prior))lang.value=prior;
  const choice=$('parentSubject').value;$('parentMathSettings').hidden=choice==='language';$('parentLanguageSettings').hidden=choice==='math';
  $('parentPunish').closest('label').hidden=choice==='language';
- const multiplication=grade>=3;for(const o of $('parentFocus').options)if(['times8','mul','div'].includes(o.value))o.disabled=!multiplication;
+ const multiplication=withinGrade(3,grade);for(const o of $('parentFocus').options)if(['times8','mul','div'].includes(o.value))o.disabled=!multiplication;
  $('parentFacts').disabled=!multiplication;if(!multiplication&&['times8','mul','div'].includes($('parentFocus').value))$('parentFocus').value='adaptive';
 }
 function loadParent(){
- const p=FG.store.current();$('parentLearningProfile').textContent='Learning settings for '+p.name;$('parentLearningSummary').textContent='Grade '+p.grade+' · '+({gentle:'Gentle',balanced:'Balanced',stretch:'Stretch'}[p.intensity]||'Gentle')+(p.learningSetupComplete?'':' · Choose a level and save to finish setup.');$('parentSubject').value=p.allowSubjectSwitch?'both':p.learningSubject||'math';$('parentFacts').value=(p.factTargets||[]).map(x=>x.replace('mul:','')).join(', ');$('parentNickname').value=p.name;$('parentGrade').value=String(p.grade||1);$('parentFocus').value=p.focus;$('parentIntensity').value=p.intensity;$('parentRate').value=String(Math.max(1,p.rate||3));$('parentRateValue').textContent=$('parentRate').value;$('parentHint').checked=!!p.hints;$('parentPunish').checked=!!p.punish;
+ const p=FG.store.current();$('parentLearningProfile').textContent='Learning settings for '+p.name;$('parentLearningSummary').textContent=gradeLabel(p.grade)+' · '+({gentle:'Gentle',balanced:'Balanced',stretch:'Stretch'}[p.intensity]||'Gentle')+(p.learningSetupComplete?'':' · Choose a level and save to finish setup.');$('parentSubject').value=p.allowSubjectSwitch?'both':p.learningSubject||'math';$('parentFacts').value=(p.factTargets||[]).map(x=>x.replace('mul:','')).join(', ');$('parentNickname').value=p.name;$('parentGrade').value=String(p.grade);$('parentFocus').value=p.focus;$('parentIntensity').value=p.intensity;$('parentRate').value=String(Math.max(1,p.rate||3));$('parentRateValue').textContent=$('parentRate').value;$('parentHint').checked=!!p.hints;$('parentPunish').checked=!!p.punish;
  populateSkills();$('parentSkill').value=p.skillFocus?.[0]||'';$('parentLanguageSkill').value=p.languageFocus?.[0]||'';renderParentReports(JSON.parse(JSON.stringify(p)));$('parentStats').after($('copyFeedback'));setIconLabel($('copyFeedback'),'book','Copy saved game ideas for a developer');
  FG.parentDashboard?.refresh();
 }
@@ -126,10 +127,10 @@ function renderParentReports(p){
  target.append(tabs,...sections.values());
  buttons.get(p.learningSubject==='language'?'language':'math').click();
 }
-function saveParent(){
- const grade=Number($('parentGrade').value),choice=$('parentSubject').value,subject=choice==='both'?FG.learning.subject:choice,facts=choice!=='language'&&grade>=3?$('parentFacts').value.split(',').map(x=>x.trim().replace('×','x')).filter(Boolean):(FG.store.current().factTargets||[]).map(x=>x.replace('mul:',''));
+async function saveParent(){
+ const grade=parseGradeOption($('parentGrade').value),choice=$('parentSubject').value,subject=choice==='both'?FG.learning.subject:choice,facts=choice!=='language'&&withinGrade(3,grade)?$('parentFacts').value.split(',').map(x=>x.trim().replace('×','x')).filter(Boolean):(FG.store.current().factTargets||[]).map(x=>x.replace('mul:',''));
  if(facts.length>20||facts.some(x=>!/^(?:[1-9]|1[0-2])x(?:[1-9]|1[0-2])$/.test(x))){alert('Use up to 20 facts like 8x7, with numbers from 1 to 12. Settings have not changed.');return;}
- try{FG.store.changeProfile({name:$('parentNickname').value,grade,learningSetupComplete:true,focus:$('parentFocus').value,skillFocus:$('parentSkill').value?[$('parentSkill').value]:[],intensity:$('parentIntensity').value,rate:Number($('parentRate').value),hints:$('parentHint').checked,punish:$('parentPunish').checked,factTargets:facts.map(x=>'mul:'+x),learningSubject:subject,allowSubjectSwitch:choice==='both',languageFocus:$('parentLanguageSkill').value?[$('parentLanguageSkill').value]:[]});profiles();loadParent();alert('Learning settings saved on this browser. Every game requires checkpoints.');}catch(error){alert(error.message);}
+ try{await FG.store.changeLearningProfile({name:$('parentNickname').value,grade,learningSetupComplete:true,focus:$('parentFocus').value,skillFocus:$('parentSkill').value?[$('parentSkill').value]:[],intensity:$('parentIntensity').value,rate:Number($('parentRate').value),hints:$('parentHint').checked,punish:$('parentPunish').checked,factTargets:facts.map(x=>'mul:'+x),learningSubject:subject,allowSubjectSwitch:choice==='both',languageFocus:$('parentLanguageSkill').value?[$('parentLanguageSkill').value]:[]});profiles();loadParent();alert('Learning settings saved on this browser. Every game requires checkpoints.');}catch(error){alert(error.message);}
 }
 function download(text,name){const blob=new Blob([text],{type:'application/json'}),url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1200)}
 let wizardStep=0;
@@ -147,6 +148,7 @@ function bind(){
  document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>page(b.dataset.page)));document.querySelectorAll('[data-game]').forEach(b=>b.addEventListener('click',()=>gameOpen(b.dataset.game)));$('homeBtn').onclick=()=>page('home');$('playFeatured').onclick=()=>gameOpen('gum');$('exitGame').onclick=()=>page('home');$('improveThis').onclick=()=>{if(activeGameId)window.dispatchEvent(new CustomEvent('factory-remix-request',{cancelable:true,detail:{game:activeGameId}}))};$('gameHelp').onclick=()=>alert(FG.games[activeGameId]?.controls||'Use the controls shown in the game');
  if(FG.store.loadError){const notice=document.createElement('section');notice.id='storageRecovery';notice.className='panel learning-save-warning';notice.setAttribute('role','alert');const message=document.createElement('p');message.textContent=FG.store.loadError;const exportButton=document.createElement('button');exportButton.className='btn secondary';setIconLabel(exportButton,'download','Save original progress for recovery');exportButton.onclick=()=>download(FG.store.recoveryRaw,'family-game-factory-recovery.json');notice.append(message,exportButton);document.querySelector('main').prepend(notice);}
  $('labSubjectMath').onclick=()=>selectLabSubject('math');$('labSubjectLanguage').onclick=()=>selectLabSubject('language');
+ $('parentGrade').replaceChildren(...selectableGrades(import.meta.env.MODE === "early-preview").map(g=>new Option(gradeLabel(g),String(g))));
  $('parentGrade').onchange=populateSkills;$('parentSubject').onchange=populateSkills;$('parentRate').oninput=e=>$('parentRateValue').textContent=e.target.value;$('saveParent').onclick=saveParent;
  $('feedbackForm').onsubmit=e=>{e.preventDefault();const worked=FG.store.addFeedback({game:$('feedbackGame').value,type:$('feedbackType').value,idea:$('feedbackText').value});if(!worked)$('feedbackStatus').textContent='Could not save. Keep your idea here and try again.';if(worked){$('feedbackText').value='';setIconLabel($('feedbackStatus'),'check','Saved! Find it in My Creations.')}};
  $('inventForm').onsubmit=e=>{e.preventDefault();if(wizardStep!==2)return;const worked=FG.store.addFeedback({game:'new',type:'new game design',idea:designCard()});if(worked){$('inventForm').reset();wizardStep=0;showWizard();page('creations')}else $('createStatus').textContent='Your idea could not be saved. Keep it here and try again.'};

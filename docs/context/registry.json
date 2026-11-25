@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T18:16:02.770Z",
-      "sourceDigest": "db4335d97b37dd6fe65cacd06c129b38bd120955bf3187df7c268f5d56f985c3",
+      "reviewedAt": "2026-11-25T01:00:57.951Z",
+      "sourceDigest": "14a371eaf7273948660ec651987d892a42aeafa073b62ef8ee640c8856ab3845",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented My Creations entry/cards, readable moved controls and shared native-host restoration; desktop and phone saved-variant journeys passed.",
+      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -493,10 +493,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "4fdd985c5da76076a57ebca31acd176b4afa822b46bd5b97b17fc2a0d428dce0",
-      "reviewedAt": "2026-11-23T05:43:13.311Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Inspected combined notebook chapter expansion and family backup with Notifications, selected helper evidence and pending request identity. New tests preserve exact native game bytes and reward provenance through restore/fork; earning policy, immutable receipts and explicit Keep authority are unchanged.",
+      "sourceDigest": "a22bd6c510126d53da38e4abfc5de8bcdc8bc2e2e9fed999f29e1f9aae84086e",
+      "reviewedAt": "2026-11-25T01:00:58.444Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -641,10 +641,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T20:28:20.947Z",
-      "sourceDigest": "7a29e1ae8b763657ea3002efad103c42cfc42f3d44e1d3c554920a4aa0597fdb",
+      "reviewedAt": "2026-11-25T01:00:58.547Z",
+      "sourceDigest": "7abd378c65ca377cc34388d61f9fc15af5771e5d3d7cad2e96f3e3765d536a1f",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated Math and Language integration and acceptance for explicit saved grade and learning difficulty, conservative missing values, visible profile setup and assistance-aware read-aloud.",
+      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:50:45.093Z",
-      "sourceDigest": "2443e06d67577b9ff8593cc949344fa32e5a448fa223452d32210f1a274de91b",
+      "reviewedAt": "2026-11-25T01:00:58.653Z",
+      "sourceDigest": "026fb965d6d627eed35dc507e82638754031ad25479fd0be4124a64490ff13bc",
       "reviewOutcome": "updated",
-      "reviewReason": "The acceptance record maps eight production-build viewport captures to ancestor-clipped hit testing, coordinate input, physical gestures in Chromium emulation, zoom, rotation and fullscreen recovery.",
+      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1487,10 +1487,10 @@
         "tests/parent-dashboard*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "21cbc0fa874ca9cd7f833db2b5f756cbe41d49c349937372c3d04f5f7015c2e8",
-      "reviewedAt": "2026-11-23T03:35:24.321Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Only the synthetic parent-dashboard fixture date moved from 29 to 28 days before now so the oldest sample remains within the documented inclusive 30-local-calendar-day window at UTC midnight. Parent report source, filter semantics, evidence labels and limitations are unchanged.",
+      "sourceDigest": "a8f550a9ef223282e87d3002facf0e6608bb5f6bcfa27d9058ffd7556cc54990",
+      "reviewedAt": "2026-11-25T01:00:58.822Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-19T17:17:56.552Z",
@@ -1514,10 +1514,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "935acd09f28ffa7ac9ba0d8c7b1c30154fd0834b6ca6266cdfd9b137d9ced184",
-      "reviewedAt": "2026-11-22T18:41:05.064Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the browser Parent helper using the visible My Games exit from a fitted coding scene. Trusted source observations, assistance attribution and parent evidence assertions remain unchanged.",
+      "sourceDigest": "15cad784d99b9b82376f99ca755f2ff7b8d8e0308ed815cf17fefa097d1b6865",
+      "reviewedAt": "2026-11-25T01:00:58.912Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",

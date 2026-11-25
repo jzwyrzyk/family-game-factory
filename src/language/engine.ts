@@ -1,3 +1,4 @@
+import {withinGrade, isEarlyGrade} from '../learning/grades';
 import {LANGUAGE_SKILLS, getLanguageSkill} from './curriculum';
 import {LANGUAGE_BANK, LANGUAGE_PACKS, generateLanguageItem, evaluateLanguageAnswer} from './content';
 import {profileGrade} from '../learning/engine';
@@ -169,7 +170,7 @@ function completeSchedule(summary:LanguageEvidence,attempt:LanguageAttempt,now:n
 }
 export function beginLanguageAttempt(profile:LanguageProfile,item:LanguageItem,context:LanguageContext={}):LanguageAttempt {
   if(!trustedItem(item))throw Error('Unreviewed language question.');
-  if(item.grade>profileGrade(profile))throw Error('Language item exceeds parent grade scope.');
+  if(!withinGrade(item.grade,profileGrade(profile)))throw Error('Language item exceeds parent grade scope.');
   const state=ensureLanguage(profile),now=bounded(context.now??Date.now());
   for(const open of state.attempts.filter(a=>a.outcome==='open'))finishLanguageAttempt(profile,open.id,'interrupted',now);
   const attempt:LanguageAttempt={
@@ -186,6 +187,7 @@ export function beginLanguageAttempt(profile:LanguageProfile,item:LanguageItem,c
 export function submitLanguageAnswer(profile:LanguageProfile,id:string,raw:string,now=Date.now()){
   const state=ensureLanguage(profile),attempt=findOpen(state,id);
   if(attempt.outcome!=='open')return {valid:false,correct:attempt.correct,attempt,message:'This activity has finished.'};
+  if(!withinGrade(attempt.item.grade,profileGrade(profile)))return {valid:false,correct:false,attempt,message:'This activity exceeds the current grade.'};
   if(attempt.correct)return {valid:false,correct:true,attempt,message:'This answer was already counted.'};
   if(attempt.answers.length>=12)return {valid:false,correct:false,attempt,message:'Let us try a worked example now.'};
   const check=evaluateLanguageAnswer(attempt.item,raw);
@@ -263,7 +265,7 @@ const select=(items:LanguageSkill[],random:()=>number):LanguageSkill=>items[Math
 export function selectLanguageItem(profile:LanguageProfile,context:LanguageContext={}):LanguageItem {
   const state=ensureLanguage(profile),grade=profileGrade(profile),random=context.random||Math.random;
   // Keep extended creative writing for natural breaks or voluntary practice, never a timed mid-game pause.
-  const allowed=LANGUAGE_SKILLS.filter(s=>s.grade<=grade&&LANGUAGE_BANK[s.id]?.items.length&&
+  const allowed=LANGUAGE_SKILLS.filter(s=>withinGrade(s.grade,grade)&&(isEarlyGrade(grade)||!isEarlyGrade(s.grade)||profile.languageFocus?.includes(s.id))&&LANGUAGE_BANK[s.id]?.items.length&&
     (context.opportunity!=='mid-play'||!LANGUAGE_BANK[s.id].items.some(item=>item.kind==='creative')));
   if(!allowed.length)throw Error('No language curriculum available.');
   const preferred=(profile.languageFocus||[]).filter(x=>allowed.some(s=>s.id===x));
@@ -307,7 +309,7 @@ export function reportLanguage(profile:LanguageProfile,now=Date.now()){
     grade:profileGrade(profile),totals:{...state.totals},
     due:LANGUAGE_SKILLS.filter(s=>state.skills[s.id]?.dueAt!==null&&
       state.skills[s.id]?.dueAt!==undefined&&(state.skills[s.id]?.dueAt||Infinity)<=now).map(x=>x.id),
-    skills:LANGUAGE_SKILLS.filter(s=>s.grade<=profileGrade(profile)||state.skills[s.id]).map(s=>{
+    skills:LANGUAGE_SKILLS.filter(s=>withinGrade(s.grade,profileGrade(profile))||state.skills[s.id]).map(s=>{
       const ev=state.skills[s.id],status=languageEvidenceState(ev);
       return {id:s.id,title:s.title,grade:s.grade,domain:s.domain,state:status,
         presentations:ev?.presentations||0,independent:ev?.independent||0,assisted:ev?.assisted||0,
