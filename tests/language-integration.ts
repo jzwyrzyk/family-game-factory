@@ -1,3 +1,4 @@
+import {authorizeLearningParent} from './learning-parent-fixture.cjs';
 /** Production Family Game Factory ELA journeys; only audited local games and fixtures. */
 import assert from 'node:assert/strict';
 import {existsSync,mkdirSync,readFileSync,writeFileSync} from 'node:fs';
@@ -48,6 +49,7 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     // Compare after initial parent view, before any subject edit, to test actual preservation.
     const oldMath=await page.evaluate(()=>JSON.stringify(window.FG.store.current().learning||null));
     assert.deepEqual(await page.locator('#parentSubject option').evaluateAll(els=>els.map(el=>(el as HTMLOptionElement).value)),['math','language','both']);
+    await authorizeLearningParent(page);
     await page.selectOption('#parentGrade','2');
     await page.selectOption('#parentSubject','language');
     assert.equal(await page.locator('#parentLanguageSettings').isVisible(),true);
@@ -196,9 +198,10 @@ async function generatedPreview(browser:Browser,base:string){
   try{
     await page.goto(base);await page.waitForFunction(()=>window.FG?.learning);
     await page.addScriptTag({content:script});
-    await page.evaluate(({html,channel,artifactId})=>{
+    await authorizeLearningParent(page);
+    await page.evaluate(async ({html,channel,artifactId})=>{
       const w=window as any;
-      window.FG.store.changeProfile({learningSubject:'language',grade:2,rate:1,hints:false});
+      await window.FG.store.changeLearningProfile({learningSubject:'language',grade:2,rate:1,hints:false});
       window.FG.store.current().mathWindow=[];window.FG.store.save();
       w.elaPreviewRounds=[];
       const host=document.createElement('section');host.id='ela-preview-host';host.style.cssText='position:relative;height:720px;width:100%;max-width:760px;margin:auto;';

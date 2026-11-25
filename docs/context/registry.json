@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:08:27.254Z",
-      "sourceDigest": "0647aa7f3aae2971f49e1726466d14543ec9fcaeaf279893a585d19569549dd2",
+      "reviewedAt": "2026-11-25T01:21:50.865Z",
+      "sourceDigest": "61685bfaf269fc2cfda71c515fd81d039880c5ee1e98777618a2ea51eb6f7cb5",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the early question catalogs, visual activities, device-only narration, legacy content assertions and skill crosswalk against the affected source.",
+      "reviewReason": "The illustrated early skill catalog and its reviewed language version extend the existing host and retain older grade selection.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -641,10 +641,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:08:27.725Z",
-      "sourceDigest": "9fec009f3c58c9dbff07f3168ca7772fc5f0383e91aefb58269e130e1f95587c",
+      "reviewedAt": "2026-11-25T01:21:51.254Z",
+      "sourceDigest": "6f55a2e6a9299923ecc2174fd95f3ef6899da1c60185671dfb6c3b5fd3801eb1",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the early question catalogs, visual activities, device-only narration, legacy content assertions and skill crosswalk against the affected source.",
+      "reviewReason": "The illustrated early skill catalog and its reviewed language version extend the existing host and retain older grade selection.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:08:27.846Z",
-      "sourceDigest": "68fa1fc603989d1bc9608921a67f95359e58e79fdc62212da6e4d27f9f652e8c",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the early question catalogs, visual activities, device-only narration, legacy content assertions and skill crosswalk against the affected source.",
+      "reviewedAt": "2026-11-25T01:21:51.345Z",
+      "sourceDigest": "0600dcd9e2e1d8fb46eea526f22bf6e1b7804e1511aa3dd83640b36554795eff",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The illustrated early skill catalog and its reviewed language version extend the existing host and retain older grade selection. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1514,10 +1514,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "15cad784d99b9b82376f99ca755f2ff7b8d8e0308ed815cf17fefa097d1b6865",
-      "reviewedAt": "2026-11-25T01:00:58.912Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
+      "sourceDigest": "131112bdd156f599674b42b406109871c4a0cd428db58a4a618071f86967fb55",
+      "reviewedAt": "2026-11-25T01:21:51.475Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The illustrated early skill catalog and its reviewed language version extend the existing host and retain older grade selection. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
