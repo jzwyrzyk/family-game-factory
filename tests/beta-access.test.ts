@@ -65,3 +65,10 @@ test('callback identity is bound to the private workflow run for this job',async
  await assertRunJob(identity,job,'family-game-factory-lab/family-game-factory-worker',async()=>'fixture','beta-test',fetcher);
  await assert.rejects(assertRunJob(identity,other,'family-game-factory-lab/family-game-factory-worker',async()=>'fixture','beta-test',fetcher));
 });
+
+test('family allowances are entered in whole cents with safe micro-dollar accounting',async()=>{
+ const {enroll,mutate}=await betaFixture(),f=await enroll('budget-policy');
+ const policy={capabilities:defaultCapabilities(),paused:true,generationPaused:true,monthlyCents:10000};
+ await mutate('policy',f.id,policy);
+ for(const value of [-1,0.5,Number.MAX_SAFE_INTEGER])await assert.rejects(mutate('policy',f.id,{...policy,monthlyCents:value}));
+});

@@ -67,6 +67,16 @@ export class BuilderClient {
   if(token!==this.generation)return;
   if(!await this.publish(job,token,saved.clientRequestId))return;return job;
  }
+ /** Explicit supervised workspace action after a lost response. Reuse the
+  * durable request exactly. Browser startup and reconnection never call this. */
+ async resendSavedSubmission(input:BuildSubmission){
+  const request=validateBuildSubmission(input),known=await this.lookupSubmission(request);
+  if(known!==null)return known;
+  const token=this.generation,{gameId,baseRevisionId,prompt,clientRequestId}=request;
+  const ack=validateJob(await this.api('/v1/jobs',{gameId,baseRevisionId,prompt,clientRequestId}));
+  if(!await this.publish(ack,token,clientRequestId))return;
+  return ack;
+ }
  /** Restore the exact saved job, including a retry whose acknowledgement was
   * lost. Looking up or following that chain never submits another paid job. */
  private async readLatestJob(jobId:string,token:number):Promise<JobView|undefined>{

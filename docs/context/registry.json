@@ -307,10 +307,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:29:41.787Z",
-      "sourceDigest": "de530a7171d8670de3c4d9d7ab4d2a734125f89e7259438e5de1c2895a8c1c3e",
+      "reviewedAt": "2026-11-25T00:46:58.729Z",
+      "sourceDigest": "50fc81d8d84a5766011910330777ce48723a58e8285a10ad85eba7c440c6f4c5",
       "reviewOutcome": "updated",
-      "reviewReason": "Record scoped remote activities, persistent-profile device transfer and owner-only preview behavior.",
+      "reviewReason": "Document explicit same-request recovery after a network loss in a capability-limited workshop.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -678,10 +678,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:39:27.889Z",
-      "sourceDigest": "e9f3135b77df398de8a5e2421d80c94c1d1f4ab34862790ddacf0c6f7b1a9f76",
+      "reviewedAt": "2026-11-25T00:46:59.596Z",
+      "sourceDigest": "b4b7b940b0d0fb0195fd4544bdc6319f057d1947716ed62c2fa4d5f35a8e12ca",
       "reviewOutcome": "updated",
-      "reviewReason": "Record one guardian per pilot family, approved environment routing and operator-visible runtime readiness and ceiling.",
+      "reviewReason": "Preserve integer spending admission, the effective per-game ceiling and independently authorized family allowances.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -887,10 +887,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:39:28.323Z",
-      "sourceDigest": "924132af0430649993d912e1515e7735dc75db4ea7bd2f8192fa9ec7bf637974",
+      "reviewedAt": "2026-11-25T00:46:59.952Z",
+      "sourceDigest": "64c140c0e78d7f4eb516f5270722fbadd406bd8ddeefc73c71348e001657f016",
       "reviewOutcome": "updated",
-      "reviewReason": "Document source selection, Pages allowlist and independent release, emulator and real-device acceptance gates.",
+      "reviewReason": "Record manual same-request recovery and safe currency conversion in the family acceptance coverage.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

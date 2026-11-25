@@ -23,7 +23,7 @@ function publicFamily(f:Family){
   invitation:f.invitation?{id:f.invitation.id,expiresAt:f.invitation.expiresAt,used:!!f.invitation.usedAt,revoked:!!f.invitation.revokedAt}:null,
   request:f.request??null};
 }
-const cents=(x:unknown)=>{if(typeof x!=='number'||!Number.isSafeInteger(x)||x<0||x>5000)throw Error('INVALID_AMOUNT');return x*10000;};
+const cents=(x:unknown)=>{if(typeof x!=='number'||!Number.isSafeInteger(x)||x<0||!Number.isSafeInteger(x*10000))throw Error('INVALID_AMOUNT');return x*10000;};
 function bool(x:unknown){if(typeof x!=='boolean')throw Error('INVALID_REQUEST');return x;}
 async function throttle(tx:Documents,path:string,limit:number,now:number){
  const last=await tx.get<{start:number;count:number}>(path);

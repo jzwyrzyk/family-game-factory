@@ -6,6 +6,8 @@ import {join} from 'node:path';
 import vm from 'node:vm';
 import {environmentRelease} from '../scripts/beta/environment-release.mjs';
 import {hostingPlan} from '../scripts/beta/prepare-hosting.mjs';
+import {BuilderClient} from '../src/builder/client';
+import {identifyBuildRequest} from '../src/builder/submission';
 import {preparePublic} from '../scripts/beta/prepare-public';
 import {protectedHousehold} from '../server/beta/owner-host';
 
@@ -80,4 +82,18 @@ test('protected nonproduction controller verifies build evidence and stages each
  for(let i=0;i<2;i++){const receipt=await environmentRelease(record,controller,{...opts,mode:'stage'},io);assert.ok(receipt.services.every((r:any)=>r.revision&&r.currentTrafficPreserved));}
  assert.deepEqual(staged,['preview','gateway','household'].map(r=>cfg.services[r].name));
  assert.equal(staged.length,3);
+});
+
+test('manual lost-response recovery resends only the original durable build identity',async()=>{
+ const id='demo-build-request',request=await identifyBuildRequest({gameId:'generated-module',baseRevisionId:null,prompt:'Make a shape puzzle',clientRequestId:id});
+ const client=new BuilderClient({version:1,mode:'unavailable'},()=>{}),writes:unknown[]=[];
+ let accepted=false;client.api=async(path,body)=>{
+  if(path.startsWith('/v1/job-requests/'))return {job:accepted?{jobId:'same-job',status:'queued'}:null};
+  if(path==='/v1/jobs'){writes.push(body);accepted=true;return {jobId:'same-job',status:'queued'};}
+  throw Error('unexpected request');
+ };
+ assert.equal((await client.resendSavedSubmission(request))?.jobId,'same-job');
+ assert.equal((await client.resendSavedSubmission(request))?.jobId,'same-job');
+ assert.deepEqual(writes,[{gameId:request.gameId,baseRevisionId:null,prompt:request.prompt,clientRequestId:id}]);
+ await assert.rejects(client.resendSavedSubmission({...request,prompt:'changed'}));
 });

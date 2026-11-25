@@ -19,7 +19,7 @@ async function confirmAction(action,target,params,description){
  dialog.onclose=()=>dialog.remove();
 }
 const displayMoney=n=>new Intl.NumberFormat(undefined,{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:4}).format(n/1000000);
-function dollars(form,caption,micro){const input=field(form,caption,'number',(micro/1000000).toFixed(2));input.min='0';input.max='50';input.step='.01';return ()=>Math.round(Number(input.value)*100);}
+function dollars(form,caption,micro){const input=field(form,caption,'number',(micro/1000000).toFixed(2));input.min='0';input.step='.01';return ()=>Math.round(Number(input.value)*100);}
 async function refresh(){
  const overview=await request('/manage/state');root.replaceChildren();const platform=card('Platform controls');
  platform.append(el('p','Private Family Beta · '+(overview.policy.participation?'Family access on':'Family access paused')));

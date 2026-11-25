@@ -52,6 +52,10 @@ export async function open(root:HTMLElement){
    const n=read();if(n.submission){const job=await client.lookupSubmission(n.submission);if(!job){status.textContent='Waiting for the original build acknowledgment.';return;}if(active)await client.check(job.jobId);}
    else if(n.job)await client.check(n.job.jobId);else status.textContent='You have no pending build.';
   });
+  action('Send my saved request again',async()=>{
+   const saved=read().submission;if(!saved)throw Error('There is no unacknowledged build to resend.');
+   await client.resendSavedSubmission(saved);
+  });
   const cancel=add('button','Cancel my pending game');
   cancel.onclick=async()=>{const job=read().job;if(!job||!['queued','building','testing'].includes(job.status))return;
    try{await client.cancel(job.jobId);}catch{if(active)status.textContent='Reconnect and check the existing build.';}};
