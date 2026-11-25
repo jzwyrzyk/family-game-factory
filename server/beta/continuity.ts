@@ -22,6 +22,7 @@ function allowed(g:StorageGrant|undefined,f:Family,notice:string,profile:string)
 async function parent(d:FamilyDirectory,tx:Documents,f:Family,raw:string|undefined,key:string,now:number){
  const session=await metadataSession(d,tx,f,raw,key,now),grant=verifySession(cookieValue(internalCookies(raw),'factory_parent'),key,now);
  if(grant.role!=='parent'||grant.familyId!==f.id||grant.deviceId!==session.deviceId)throw Error('FORBIDDEN');
+ return grant;
 }
 /** Guardian UI can narrow or withdraw separately authorized cloud-copy domains.
  * Feature activation remains a deployment policy; no checkbox turns it on. */
@@ -30,7 +31,13 @@ export async function storageConsent(d:FamilyDirectory,id:string,raw:string|unde
   activeFamily(f,p);if(f.request?.kind==='deletion')throw Error('DELETION_PENDING');await parent(d,tx,f,raw,key,now);
   const config=d.config.continuity,current=await tx.get<StorageGrant>(grantPath(d,id));
   if(input!==undefined){
-   exact(input,['notice','profiles','domains','acknowledged']);const enabled=policy(d);
+   exact(input,['notice','profiles','domains','acknowledged']);
+   if(input.acknowledged===true&&Array.isArray(input.profiles)&&!input.profiles.length&&Array.isArray(input.domains)&&!input.domains.length){
+    if(input.notice!==(config?.notice??current?.notice??null))throw Error('STORAGE_CONSENT_REQUIRED');
+    if(current){const withdrawn={...current,id:randomUUID(),profiles:[],domains:[],revokedAt:now};tx.set(grantPath(d,id),withdrawn);tx.create(d.path(id)+'/storage-consents/'+randomUUID(),withdrawn);}
+    return {enabled:config?.enabled===true,notice:config?.notice??current?.notice??null,available:[],profiles:f.profiles??[],selected:null};
+   }
+   const enabled=policy(d);
    if(input.notice!==enabled.notice||input.acknowledged!==true||!Array.isArray(input.profiles)||!Array.isArray(input.domains)||
     input.profiles.length>6||new Set(input.profiles).size!==input.profiles.length||new Set(input.domains).size!==input.domains.length||
     input.profiles.some(v=>typeof v!=='string'||!f.profiles?.includes(v))||input.domains.some(v=>!enabled.domains.includes(v as StorageDomain)||!f.storageDomains?.includes(v as StorageDomain)))throw Error('STORAGE_CONSENT_REQUIRED');
@@ -40,7 +47,7 @@ export async function storageConsent(d:FamilyDirectory,id:string,raw:string|unde
    tx.create(d.path(id)+'/storage-consents/'+randomUUID(),grant);
    return {enabled:true,notice:enabled.notice,available:enabled.domains.filter(x=>f.storageDomains?.includes(x)),profiles:f.profiles??[],selected:grant};
   }
-  return {enabled:config?.enabled===true,notice:config?.notice??null,available:config?.enabled?config.domains.filter(x=>f.storageDomains?.includes(x)):[],profiles:f.profiles??[],selected:current??null};
+  return {enabled:config?.enabled===true,notice:config?.notice??current?.notice??null,available:config?.enabled?config.domains.filter(x=>f.storageDomains?.includes(x)):[],profiles:f.profiles??[],selected:current??null};
  });
 }
 export async function continuityRequest(d:FamilyDirectory,id:string,raw:string|undefined,key:string,path:string,input:unknown,now=Date.now()){
@@ -75,7 +82,7 @@ export async function continuityRequest(d:FamilyDirectory,id:string,raw:string|u
  else if(path==='/v1/storage/changes')exact(body,['profile','after','limit','epoch']);
  else if(path==='/v1/storage/status')exact(body,['profile']);
  else throw Error('NOT_FOUND');
- if(path==='/v1/storage/status')return d.db.run(async tx=>{const grant=await authorize(tx,[]);let guardian=false;try{await parent(d,tx,await d.family(tx,id),raw,key,now);guardian=true;}catch{}return {version:1,epoch:epoch({...grant,domains:grant.domains.filter(x=>x!=='backups'||guardian)}),family:id,profile,profiles:grant.profiles,guardian,domains:grant.domains.filter(x=>config.domains.includes(x)&&(x!=='backups'||guardian))};});
+ if(path==='/v1/storage/status')return d.db.run(async tx=>{const grant=await authorize(tx,[]);let guardian=false,guardianUntil=0;try{guardianUntil=(await parent(d,tx,await d.family(tx,id),raw,key,now)).expiresAt;guardian=true;}catch{}return {version:1,epoch:epoch({...grant,domains:grant.domains.filter(x=>x!=='backups'||guardian)}),family:id,profile,profiles:grant.profiles,guardian,guardianUntil,domains:grant.domains.filter(x=>config.domains.includes(x)&&(x!=='backups'||guardian))};});
  const repository=new DocumentContinuityRepository(d.db,'beta-'+id,async tx=>{
   const grant=await authorize(tx,collections);
   if(path==='/v1/storage/lookup'){

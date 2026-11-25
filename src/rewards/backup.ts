@@ -1,4 +1,5 @@
 import {installCompleteRecovery} from '../storage/complete-backup';
+import {installPrivateCopyControls} from '../storage/private-copy-ui';
 import {LOCAL_JOURNAL_KEY} from '../storage/local-journal';
 import { adultStorageKey, adultWorkspaceId } from '../adult-pilot/storage';
 import { migrateWorkspace, WORKSPACE_KEY, type Workspace } from '../factory/workspace';
@@ -206,6 +207,7 @@ export function installRewardBackupControls(rewards:RewardsController):void {
   if(!exportButton||!importInput||exportButton.dataset.rewardBackups==='true')return;
   exportButton.dataset.rewardBackups='true';
   installCompleteRecovery(rewards);
+  installPrivateCopyControls();
   const flush=()=>{if(!FG.store.loadError){FG.studio?.flushDraft?.();FG.creation?.flush?.();}};
   const fail=(error:unknown)=>{
     const message=error instanceof Error?error.message:'The backup could not be saved.',status=document.getElementById('studioGlobalStatus'),reloading=hasPendingRewardBackup();

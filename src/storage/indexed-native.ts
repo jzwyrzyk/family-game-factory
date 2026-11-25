@@ -112,7 +112,7 @@ export class IndexedNativeStore {
    if(seenProjects.has(id))return;seenProjects.add(id);const projectRow=await this.row(PROJECTS,id);if(!projectRow)throw Error('An original game is unavailable.');this.decodeProject(projectRow);add(projectRow);
    let after:string|null=null;do{const page=await this.records.page(key(id),after,100);for(const pointer of page){add(pointer);const revision=await this.row(REVISIONS,(pointer.value as {revisionId:string}).revisionId);if(!revision)throw Error('A saved version is unavailable.');add(revision);const stored=revision.value as StoredRevision;
     // Original image/rig transfer has a separate authorization and integrity path.
-    if(stored.drawingRigId&&!options.includeArtworkReferences)throw Error('Include this game’s original artwork in a complete private copy first.');
+    if(stored.drawingRigId&&!options.includeArtworkReferences)throw Error('Games with original artwork need a complete recovery copy. Selected-game copying is not available for them yet.');
     const config=await this.row(CONFIGS,stored.configHash);if(!config||await digest(JSON.stringify(config.value))!==stored.configHash)throw Error('Saved settings need recovery.');add(config);
     if(stored.sourceRevisionId){const source=await this.row(REVISIONS,stored.sourceRevisionId);if(!source)throw Error('The copied game’s original version is unavailable.');await collect((source.value as StoredRevision).projectId);}
    }after=page.length===100?page.at(-1)!.id:null;}while(after);

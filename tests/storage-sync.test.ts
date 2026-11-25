@@ -48,6 +48,11 @@ test('withdrawal, operator category removal and current device revocation stop q
  await x.activate();await x.mutate('storage-domains',x.a.id,{domains:[]});await assert.rejects(x.call('read',{collection:'games',id:'game1',version:null}),/DOMAIN_DENIED/);
  await x.activate();await x.mutate('revoke-device',x.a.id,{deviceId:x.session.deviceId});await assert.rejects(x.call('commit',{operation:x.operation('stale',1)}),/UNAUTHENTICATED/);
 });
+test('guardian can withdraw stored copy consent while the feature is disabled',async()=>{
+ const x=await syncFixture();await x.activate();x.d.config.continuity!.enabled=false;
+ await storageConsent(x.d,x.a.id,x.cookies,fixtureKey,{notice:x.d.config.continuity!.notice,profiles:[],domains:[],acknowledged:true});
+ x.d.config.continuity!.enabled=true;await assert.rejects(x.call('commit',{operation:x.operation()}),/CONSENT_REQUIRED/);
+});
 test('incremental feed preserves revisions, tombstones, idempotency and page boundaries',async()=>{
  const s=new ContinuityService(new MemoryContinuityRepository(),true),scope={family:'fixture',profile:'player1'};
  const op=(id:string,n:number,deleted=false):RecordOperation=>({id,scope,changes:[{id:'game',collection:'games',expectedVersion:n,value:deleted?null:{n},deleted}]});

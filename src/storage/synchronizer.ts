@@ -1,6 +1,7 @@
 import {assertRecordValue,operationFingerprint,recordId,scopeKey,type RecordScope,type RecordOperation,type RecordReceipt,type DurableRecord} from './record-contract';
 import {requiredStorageDomains,sequence,storageDomains,type StorageDomain,type ChangePage} from './sync-contract';
 export interface SyncStore {
+ finishRemote?(domains:readonly StorageDomain[]):Promise<void>;
  prepareRemoteOperation?(op:RecordOperation):Promise<RecordOperation>;
  acknowledgeRemote?(op:RecordOperation,receipt:RecordReceipt):Promise<void>;
  pending(limit:number):Promise<RecordOperation[]>;
@@ -10,14 +11,14 @@ export interface SyncStore {
  setSyncCursor(expected:string,next:string):Promise<void>;
 }
 export interface SyncTransport {
- status():Promise<{version:1;epoch:string;domains:StorageDomain[];family?:string;profile?:string;guardian?:boolean}>;
+ status():Promise<{version:1;epoch:string;domains:StorageDomain[];family?:string;profile?:string;profiles?:string[];guardian?:boolean;guardianUntil?:number}>;
  lookup(id:string):Promise<RecordReceipt|null>;
  commit(operation:RecordOperation):Promise<RecordReceipt>;
  read(collection:string,id:string,version?:number):Promise<DurableRecord|null>;
  page?(collection:string,after?:string,limit?:number):Promise<{records:DurableRecord[];next:string|null}>;
  changes(after:string,limit:number,epoch:string):Promise<ChangePage>;
 }
-export type SyncResult={state:'current'|'pending'|'busy'|'offline'|'blocked';sent:number;received:number}|{state:'conflict';sent:number;received:number;operation:RecordOperation;remote:(DurableRecord|null)[]};
+export type SyncResult={state:'current'|'pending'|'busy'|'offline'|'blocked'|'review';sent:number;received:number}|{state:'conflict';sent:number;received:number;operation:RecordOperation;remote:(DurableRecord|null)[]};
 const errorCode=(error:unknown)=>error instanceof Error?error.message:'STORAGE_CONNECTION_INTERRUPTED';
 const lockName=(s:RecordScope)=>'jems-sync:'+scopeKey(s);
 /** One bounded pass, started by authorized application activity or an explicit
@@ -47,12 +48,13 @@ export class ContinuityPump {
     if(op.changes.some(c=>requiredStorageDomains(c.collection).some(d=>!status.domains.includes(d))))throw Error('STORAGE_DOMAIN_DENIED');
     try{
      const wire=await this.store.prepareRemoteOperation?.(op)??op;
-     const receipt=await this.remote.lookup(wire.id)??await this.remote.commit(wire);this.assertAuthorized();
+     this.assertAuthorized();const known=await this.remote.lookup(wire.id);this.assertAuthorized();
+     const receipt=known??await this.remote.commit(wire);this.assertAuthorized();
      if(receipt.operation!==wire.id||receipt.fingerprint!==await operationFingerprint(wire)||JSON.stringify(receipt.versions)!==JSON.stringify(wire.changes.map(c=>({id:c.id,collection:c.collection,version:c.expectedVersion+1}))))throw Error('STORAGE_ACK_MISMATCH');
      if(this.store.acknowledgeRemote)await this.store.acknowledgeRemote(op,receipt);else await this.store.acknowledge(receipt);sent++;
     }catch(error){
      if(errorCode(error)!=='STORAGE_CONFLICT')throw error;
-     const remote=await Promise.all(op.changes.map(c=>this.remote.read(c.collection,c.id)));this.assertAuthorized();
+     this.assertAuthorized();const remote=await Promise.all(op.changes.map(c=>this.remote.read(c.collection,c.id)));this.assertAuthorized();
      return {state:'conflict',sent,received,operation:structuredClone(op),remote};
     }
    }
@@ -73,11 +75,12 @@ export class ContinuityPump {
      assertRecordValue(row.value);this.assertAuthorized();await this.store.acceptRemote([row]);received++;
     }
     const next=JSON.stringify({epoch:status.epoch,after:page.through});await this.store.setSyncCursor(stored,next);stored=next;cursor.after=page.through;
-    if(!page.hasMore)return {state:'current',sent,received};
+    if(!page.hasMore){await this.store.finishRemote?.(status.domains);return {state:'current',sent,received};}
    }
    return {state:'pending',sent,received};
   }catch(error){
    const code=errorCode(error);
+   if(code==='STORAGE_LOCAL_CHANGES')return {state:'review',sent,received};
    if(/(?:DENIED|REQUIRED|DISABLED|UNAUTHENTICATED|PAUSED|INVALID|MISMATCH|REUSED|REVOKED|CONSENT_CHANGED|LOCK_UNAVAILABLE)/.test(code))return {state:'blocked',sent,received};
    if(code==='STORAGE_CONFLICT')return {state:'pending',sent,received};
    return {state:'offline',sent,received};
