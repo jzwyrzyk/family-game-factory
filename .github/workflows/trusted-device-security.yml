@@ -60,7 +60,7 @@ jobs:
         if: steps.beta.outputs.selected == 'true'
         env:
           STORAGE_BROWSER: webkit
-        run: node tests/storage-domains-browser.cjs && node tests/storage-complete-backup-browser.cjs && node tests/storage-indexed-notebook-browser.cjs && node tests/storage-creation-browser.cjs && node tests/storage-authority-browser.cjs && node tests/storage-v1-browser.cjs && node tests/storage-sync-browser.cjs && node tests/studio-native-browser.cjs && node tests/storage-recovery-ui-browser.cjs && node scripts/storage/build-preview.mjs && node tests/storage-native-ui.cjs && node tests/storage-creation-ui.cjs && node tests/studio-native-ui.cjs && node tests/studio-notebook-ui.cjs && node tests/studio-guidance-browser.cjs && node tests/studio-prepare-browser.cjs && node tests/storage-adult-transfer-browser.cjs && node tests/storage-recovery-multiowner-browser.cjs
+        run: node tests/storage-domains-browser.cjs && node tests/storage-complete-backup-browser.cjs && node tests/storage-indexed-notebook-browser.cjs && node tests/storage-creation-browser.cjs && node tests/storage-authority-browser.cjs && node tests/storage-v1-browser.cjs && node tests/storage-sync-browser.cjs && node tests/studio-native-browser.cjs && node tests/storage-recovery-ui-browser.cjs && node scripts/storage/build-preview.mjs && node tests/storage-native-ui.cjs && node tests/storage-creation-ui.cjs && node tests/studio-native-ui.cjs && node tests/studio-notebook-ui.cjs && node tests/studio-guidance-browser.cjs && node tests/studio-prepare-browser.cjs && node tests/storage-adult-transfer-browser.cjs && node tests/storage-recovery-multiowner-browser.cjs && node --import tsx tests/household-recovery-browser.ts
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() && steps.beta.outputs.selected == 'true' }}
         with:
@@ -71,5 +71,6 @@ jobs:
             test-results/complete-recovery-ui/**
             test-results/adult-transfer/**
             test-results/multiowner-recovery/**
+            test-results/household-recovery/**
             test-results/storage-preview-build.json
           retention-days: 7
