@@ -1,5 +1,5 @@
 /** Browser-only scoped recovery vault. No network or deletion. */
-import {recoveryScopeKey,validateRecoveryArchive,type RecoveryScope,type RecoveryArchive,type RecoveryPoint,type RestoreReceipt} from './recovery-format';
+import {RECOVERY_DB,recoveryScopeKey,validateRecoveryArchive,type RecoveryScope,type RecoveryArchive,type RecoveryPoint,type RestoreReceipt} from './recovery-format';
 export * from './recovery-format';
 const request=<T>(r:IDBRequest<T>)=>new Promise<T>((resolve,reject)=>{r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
 const done=(tx:IDBTransaction)=>new Promise<void>((resolve,reject)=>{tx.oncomplete=()=>resolve();tx.onabort=()=>reject(tx.error||Error('Recovery storage could not be saved. Existing work is unchanged.'));tx.onerror=()=>reject(tx.error);});
