@@ -728,7 +728,7 @@ export function installCreationStudio(host: Host) {
     const b = node('button', 'creation-palette-block block-' + item.group); b.type = 'button'; if(!direction||direction==='right')b.dataset.addBlock=item.type;
     if(direction)b.dataset.moveDirection=direction;
     const label=direction?'Move '+direction:item.label;
-    b.setAttribute('aria-label',label);b.title=label;b.append(node('span','creation-command-symbol',direction?directions[direction]:item.icon),node('b','',label));
+    b.setAttribute('aria-label',label);b.title=label;b.append(node('span','creation-command-symbol',direction?directions[direction]:item.icon),node('b','',direction?direction[0].toUpperCase()+direction.slice(1):label));
     b.onclick = () => act(() => {
       mutation(project => {
         if (!selectedProgram) { const program = { id: uid(), actorId: selectedActor, trigger: { type: 'start' as const }, actions: [] as CreationBlock[] }; project.programs.push(program); selectedProgram = program.id; insert = { programId: program.id }; }

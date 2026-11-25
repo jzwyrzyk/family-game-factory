@@ -406,10 +406,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "27c4e7fa6f3025dff65335a284d02dd6a79259ead7c5fd0e2a999134a77971bb",
-      "reviewedAt": "2026-11-25T01:37:01.326Z",
+      "sourceDigest": "97666e5fc0ee8739084b067d633b59636bea4f83e6823ae39e5639f3aaf1d39d",
+      "reviewedAt": "2026-11-25T01:54:56.537Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage.",
+      "reviewReason": "Short direction labels and scoped palette spacing keep all nine first-step controls reachable on the small phone with a challenge open.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
