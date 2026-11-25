@@ -1,3 +1,4 @@
+import { createPageHeader } from '../brand/page-header';
 import { createDashboardCard } from '../brand/dashboard-card';
 import { PAL_CATALOG, palArtworkPath, palDefinition, palLine, type PalId, type PalLineKind } from './catalog';
 import type { PalsView, PalPreferences, OwnedPalView, PalStage } from './model';
@@ -208,19 +209,15 @@ export function createPalsPage(options: PalsPageOptions) {
     }, 1600);
   });
 
-  const header = el('div', 'pals-page-heading');
-  const titleBlock = el('div');
   const back = button('← My games', 'back', 'pals-button pals-quiet');
   back.id = 'jemsPalsBack';
   back.onclick = () => { void perform(() => options.onBack()); };
   const heading = el('h1', '', 'My Pals');
   heading.id = 'jemsPalsTitle';
-  heading.tabIndex = -1;
   const intro = el('p', 'pals-lead');
-  titleBlock.append(heading, intro);
   const total = el('span', 'pals-collection-count');
   total.id = 'jemsPalsCount';
-  header.append(titleBlock, total);
+  const header = createPageHeader(element, { title: heading, description: intro, back, backLabel: 'My Journey', progress: total });
 
   const message = el('div', 'pals-status');
   message.id = 'jemsPalsStatus';
@@ -230,7 +227,7 @@ export function createPalsPage(options: PalsPageOptions) {
   const retry = button('Try again', 'retry');
   retry.onclick = () => { void perform(options.onRetry); };
   const content = el('div', 'pals-content');
-  element.append(back, header, message, retry, content);
+  element.append(header, message, retry, content);
 
   function focusKey() {
     const target = document.activeElement;

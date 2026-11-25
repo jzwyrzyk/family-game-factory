@@ -47,6 +47,7 @@ async function screenshotPixel(page,buffer,x,y){return page.evaluate(async({src,
    if(offline){const artifact=path.resolve(process.env.UI_REVIEW_FILE||'dist-review/jems-ui-review.html');if(process.env.UI_REVIEW_INLINE_HARNESS==='1'){await page.route('http://localhost:43199/',r=>r.fulfill({contentType:'text/html',path:artifact}));await page.goto('http://localhost:43199/',{timeout:120000});}else await page.goto('file://'+artifact,{timeout:120000});await page.waitForFunction(()=>document.querySelector('#loading').hidden);await page.selectOption('#scenario','empty');await page.waitForTimeout(1500);app=page.frames().find(f=>f.parentFrame()===page.mainFrame());await app.waitForFunction(()=>document.getElementById('page-studio-library')?.getAttribute('aria-busy')==='false');await page.selectOption('#destination','journey');await page.waitForTimeout(400);await page.click('#hide');}
    else{await page.route('**/factory-config.json',r=>r.fulfill({contentType:'application/json',body:'{"version":1,"mode":"unavailable"}'}));await page.goto('http://127.0.0.1:'+server.address().port+'/arcade/');await page.waitForFunction(()=>!!window.FG?.studio);await exploreWelcome(page);await page.locator('#studioJourneyTile').click();}
    const capture=async state=>{const card=app.locator('#studioPalsEntry');await card.scrollIntoViewIfNeeded();await app.waitForFunction(()=>document.querySelector('#studioPalsEntry .pals-portrait')?.dataset.state==='ready');const img=card.locator('img'),r=await pixels(img);assert.ok(r.borderClear>.75,`${name} ${state} transparent border`);assert.equal(r.visibility,'visible');const box=await card.boundingBox();if(width<640)assert.ok(box.height<230,`phone card keeps compact proportions: ${box.height}`);assert.ok((await card.boundingBox()).height>=48);await card.screenshot({path:`${out}/${offline?'offline':'app'}-${name}-${state}-card.png`});await app.locator('.jems-world-overview').screenshot({path:`${out}/${offline?'offline':'app'}-${name}-${state}-overview.png`});return {name,state,...r,height:box.height};};
+   await require('./secondary-page-headers.cjs').checkSecondaryHeaders({page,app,out,name,width,height,offline});
    results.push(await capture('starter'));
    const cards=app.locator('.jems-world-overview > button');
    assert.deepEqual(await cards.locator('strong').allTextContents(),['My Gems','My Pals','My Powers']);
@@ -66,7 +67,11 @@ async function screenshotPixel(page,buffer,x,y){return page.evaluate(async({src,
     for(const [button,destination] of [['jemsRewardsWidget','page-jems-rewards'],['journeyPowers','page-lab']]){
      await app.locator('#'+button).focus();await page.keyboard.press('Enter');
      await app.locator('#'+destination).waitFor({state:'visible'});
-     await app.locator('#'+destination+' [data-journey-section="overview"]').click();
+     if(destination==='page-lab' && await app.evaluate(()=>FG.learning.active)){
+      // Leaving optional practice uses the existing My Games exit.
+      await app.locator('#studioNavHome').click();
+      await app.locator('#studioJourneyTile').click();
+     }else await app.locator('#'+destination+' [data-journey-section="overview"]').click();
     }
    }
    if(offline){await page.click('#return');await page.selectOption('#scenario','unlocked');await page.waitForTimeout(1500);app=page.frames().find(f=>f.parentFrame()===page.mainFrame());await app.waitForFunction(()=>document.getElementById('page-studio-library')?.getAttribute('aria-busy')==='false');await page.selectOption('#destination','journey');await page.waitForTimeout(400);await page.click('#hide');}

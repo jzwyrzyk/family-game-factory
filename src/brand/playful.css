@@ -156,23 +156,10 @@ body.studio-review .studio-versions .studio-section-heading h2::after{
 }
 
 /* Math and English have identities outside questions; the actual activity stays calm. */
-body.studio-review #page-lab .page-head{
- background:linear-gradient(100deg,#F2F6FF,#F6EEFF);
- border:1px solid #E2D8FA;border-radius:21px;padding:20px 22px;
- margin-bottom:16px;position:relative;overflow:hidden;
-}
-body.studio-review #page-lab .page-head::after{
- content:'✦';position:absolute;top:9px;right:21px;
- font-size:30px;color:#FFC24D;opacity:.8;pointer-events:none;
-}
-body.studio-review #page-lab .page-head h1{color:#0B1E3B}
 body.studio-review #page-lab .panel:first-child{border-top:4px solid var(--jems-zone-learn-math)}
 body.studio-review #page-lab .panel:last-child{border-top:4px solid var(--jems-zone-build)}
 body.studio-review #page-lab:has(#labSubjectLanguage[aria-pressed='true']) .panel:first-child{
  border-top-color:var(--jems-zone-learn-english);
-}
-body.studio-review #page-lab:has(#labSubjectLanguage[aria-pressed='true']) .page-head{
- background:linear-gradient(100deg,#F8F1FF,#FFF1F3);
 }
 body.studio-review .studio-learning-choice{border-left:4px solid var(--jems-zone-learn-math)}
 body.studio-review .studio-learning-choice:has(#studioSubjectLanguage[aria-pressed='true']){
@@ -194,7 +181,6 @@ body.studio-review .studio-game-subject:has(#studioGameLanguage[aria-pressed='tr
  body.studio-review .jems-world-chip{top:6px;left:7px;padding:4px 7px;font-size:9px}
  body.studio-review .studio-starter .studio-card-info{border-top-width:2px}
  body.studio-review .studio-saved-card{min-height:0}
- body.studio-review #page-lab .page-head{padding:16px}
 }
 @media(prefers-reduced-motion:reduce){
  body.studio-review .studio-hero-sparkles,body.studio-review .jems-empty-workbench,

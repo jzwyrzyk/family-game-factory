@@ -47,7 +47,11 @@ exports.navigate=async function navigate(page,id){
  const target=page.locator(selector);
  if(!await target.isVisible())await page.locator('#studioNavMenu').click();
  await target.click();
- if(selector==='#studioNavScenes'&&await page.locator('#creationIntroduction').isVisible())await page.locator('#creationIntroSkip').click();
+ if(selector==='#studioNavScenes'){
+  await page.locator('#page-creation').waitFor({state:'visible'});
+  await page.waitForFunction(()=>document.activeElement?.matches('#creationHeading, #creationIntroduction h2'));
+  if(await page.locator('#creationIntroSkip').isVisible())await page.locator('#creationIntroSkip').click();
+ }
 };
 /** Retained games are on My Games; no record is created by opening the shelf. */
 exports.openRetainedGame=async function openRetainedGame(page,game,activate=target=>target.click()){

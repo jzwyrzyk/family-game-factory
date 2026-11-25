@@ -65,7 +65,7 @@ start().catch(error=>{document.querySelector('#status').textContent=error.messag
     }, expression);
     await ready('neutral');
     assert.equal(await page.evaluate(() => document.activeElement.tagName), 'BODY', 'The first image load does not choose a focused control');
-    assert.equal(await page.locator('#character option').count(), 23);
+    assert.equal(await page.locator('#character option').count(), 21);
     assert.equal(await page.evaluate(() => window.palsExpressionFixture.resolver.manifest.scope.assetCount), 168);
     assert.equal(requests.filter(url => /\/jems-pals\/.*\.webp/.test(url)).length, 1, 'Opening a portrait loads one image, not the complete roster');
     assert.match(await portrait.locator('img').getAttribute('src'), /\/arcade\/jems-pals\/wink\/base\/neutral-/);

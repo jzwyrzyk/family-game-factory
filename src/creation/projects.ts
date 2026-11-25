@@ -52,7 +52,7 @@ export const CREATION_ASSETS: readonly CreationAsset[] = Object.freeze([
   {id:'pal-kip', label:'Kip', kind:'image', url:'./jems-art/gem_mint.webp', palId:'kip'},
   {id:'pal-riff', label:'Riff', kind:'image', url:'./jems-art/gem_coral.webp', palId:'riff'},
   // Newly created actors pin the selected approved character, form and version.
-  // These coexist with the three unchanged historical token references above.
+  // These coexist with the retained historical token references.
   ...PAL_SCENE_ASSETS,
 ].map(asset=>Object.freeze(asset)) as CreationAsset[]);
 

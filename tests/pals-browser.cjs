@@ -398,7 +398,7 @@ async function installReceiptFixture(page) {
     await page.waitForFunction(() => FG.creation.snapshot()?.status === 'completed');
     await page.click('#creationTapActor');
     await page.waitForFunction(() => FG.creation.snapshot()?.trace.some(entry => entry.type === 'complete' && entry.actionType === 'jump'));
-    await page.waitForFunction(() => FG.creation.snapshot()?.actors.some(actor => actor.speech === 'A discovery! My dance has corners.'));
+    await page.waitForFunction(() => FG.creation.snapshot()?.actors.some(actor => actor.speech === 'What shall we discover?'));
     await page.waitForFunction(() => FG.creation.snapshot()?.status === 'completed');
     const jumps = (await snapshot(page)).trace.filter(entry => entry.type === 'complete' && entry.actionType === 'jump').length;
     await page.click('#creationTapActor');

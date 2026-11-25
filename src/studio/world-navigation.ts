@@ -1,3 +1,4 @@
+import { createPageHeader } from '../brand/page-header';
 import {createIcon} from '../brand/icons';
 
 /** Presentation only: all destinations invoke the host's existing guarded routes. */
@@ -17,10 +18,17 @@ export function installJourneySections(actions:{overview:()=>void;pals:()=>void;
   for(const [,key,label] of routes){const button=document.createElement('button');button.type='button';button.textContent=label;button.dataset.journeySection=key;if(key===current)button.setAttribute('aria-current','page');button.onclick=actions[key];nav.append(button);}
   page.prepend(nav);
  }
- const powers=document.getElementById('page-lab')!;const practice=document.createElement('section');practice.className='jems-powers-practice';practice.setAttribute('aria-label','Thinking adventures');practice.append(destinationTile('journeyScenePractice','Rebuild a scene','Try your coding powers','./jems-blocks.svg',actions.scenes),destinationTile('journeyExperimentPractice','Try an experiment','Make a guess. Try it out.','./jems-workbench.svg',actions.experiments));powers.querySelector('.page-head')?.after(practice);if(!practice.isConnected)powers.append(practice);
+ const powers=document.getElementById('page-lab')!;
+ const oldHeader=powers.querySelector('.page-head')!;
+ const back=document.createElement('button');
+ back.type='button';
+ back.onclick=()=>document.getElementById('studioNavHome')?.click();
+ const header=createPageHeader(powers, { title:oldHeader.querySelector('h1')!, description:oldHeader.querySelector('p')!, back, backLabel:'My Games' });
+ oldHeader.replaceWith(header);
+ const practice=document.createElement('section');practice.className='jems-powers-practice';practice.setAttribute('aria-label','Thinking adventures');practice.append(destinationTile('journeyScenePractice','Rebuild a scene','Try your coding powers','./jems-blocks.svg',actions.scenes),destinationTile('journeyExperimentPractice','Try an experiment','Make a guess. Try it out.','./jems-workbench.svg',actions.experiments));header.after(practice);
  const overview=document.createElement('section');overview.className='jems-world-overview';overview.setAttribute('aria-label','My gems, Pals and powers');
  const page=document.getElementById('page-jems-journey')!;
- page.querySelector('.jems-journey-hero')?.after(overview);
+ page.querySelector('.jems-journey-hero')?.before(overview);
  if(!overview.isConnected)page.append(overview);
  // Rank details remain in the original component; disclosure does not change earned state.
  const trail=page.querySelector('.jems-journey-trail');

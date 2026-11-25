@@ -21,9 +21,6 @@
   box-shadow: 0 4px 14px #4934670a;
   cursor: pointer;
 }
-.jems-dashboard-card:hover { background: #fcfaff; border-color: #aa89d8; }
-.jems-dashboard-card:active { background: #f2eafa; }
-.jems-dashboard-card:focus-visible { outline: 3px solid #7136c9; outline-offset: 3px; }
 .jems-dashboard-art {
   display: flex;
   align-items: center;

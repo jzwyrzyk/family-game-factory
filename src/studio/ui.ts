@@ -1,3 +1,4 @@
+import { createPageHeader } from '../brand/page-header';
 import { createDashboardCard } from '../brand/dashboard-card';
 import {hasParentGuidance,installParentGuidance} from '../family-beta/guidance';
 import {isEarlyGrade} from '../learning/grades';
@@ -306,8 +307,12 @@ export async function installStudio(){
  $('studioSavedSection').querySelector('.studio-section-heading')!.after(originals);
  const collectionBack=iconEl('button','studio-button','arrow','My Games','jems-icon--back') as HTMLButtonElement;
  collectionBack.id='studioCollectionBack';collectionBack.type='button';collectionBack.onclick=()=>act(home);
- $('page-creations').querySelector('.page-head')!.prepend(collectionBack);
- const collectionTitle=$('page-creations').querySelector('h1')!;collectionTitle.tabIndex=-1;
+ const collectionPage=$('page-creations');
+ const collectionActions=collectionPage.querySelector('.page-head')!;
+ const collectionTitle=collectionActions.querySelector('h1')!;
+ collectionActions.before(createPageHeader(collectionPage, {
+  title:collectionTitle, description:collectionActions.querySelector('p')!, back:collectionBack, backLabel:'My Games',
+ }));
  const learningChoice=el('section','studio-learning-choice');learningChoice.id='studioLearningChoice';
  learningChoice.setAttribute('aria-labelledby','studioLearningTitle');
  learningChoice.innerHTML='<div class="studio-learning-copy"><strong id="studioLearningTitle">Learning adventure</strong><small id="studioLearningNote"></small></div><div class="learning-subject-switch" role="group" aria-label="Choose practice subject"><button type="button" id="studioSubjectMath" aria-pressed="true">Math</button><button type="button" id="studioSubjectLanguage" aria-pressed="false">English</button></div>';
@@ -881,7 +886,7 @@ export async function installStudio(){
   if(guardMath())return;stopSpeech();(await flushDraft());(await FG.creation?.flush());
   // The existing learning host enforces the grown-up's allowed subject choices.
   if(subject&&FG.learning.subject!==subject)FG.learning.setSubject(subject);
-  refreshLearningChoice();hideJourney();disposeGame();FG.app.page('lab');route='other';
+  refreshLearningChoice();hideJourney();disposeGame();FG.app.page('lab');route='other';if(!FG.learning.active)focusView($('jemsPowersTitle'));
  }
  async function openRewardActivity(activity:RewardsActivity){
   if(activity==='making'){(await newIdea());return;}
@@ -1678,7 +1683,7 @@ export async function installStudio(){
  $('studioNavRewards').onclick=()=>act(openRewards);
  $('studioSubjectMath').onclick=()=>chooseLearningSubject('math');$('studioSubjectLanguage').onclick=()=>chooseLearningSubject('language');
  $('studioGameMath').onclick=()=>chooseLearningSubject('math');$('studioGameLanguage').onclick=()=>chooseLearningSubject('language');
- $('studioNavPowers').onclick=()=>act(async ()=>{if(guardMath())return;stopSpeech();(await flushDraft());hideJourney();disposeGame();FG.app.page('lab');route='other';});
+ $('studioNavPowers').onclick=()=>act(async ()=>{if(guardMath())return;stopSpeech();(await flushDraft());hideJourney();disposeGame();FG.app.page('lab');route='other';if(!FG.learning.active)focusView($('jemsPowersTitle'));});
  $('studioPlay').onclick=()=>act(playViewed);$('studioKeep').onclick=()=>act(keep);$('studioUndo').onclick=()=>act(undo);
  $('studioRedo').onclick=()=>act(async()=>{const s=current();if(!canChangePlay(s))return;if(s.undone){(await notebook.update(s.id,s.owner,x=>{x.candidate=x.undone!;x.undone=null;}));await playCandidate();return;}if(!s.projectId)return;(await games.redo(s.owner,s.projectId));await playWorking();});
  $('studioCompare').onclick=()=>act(async ()=>{if((await setTab('versions')))$<HTMLDetailsElement>('studioMore').open=false;});$('studioCloseVersions').onclick=()=>act(async ()=>{(await setTab('game'));focusView($('studioReturnToPlay')||$('studioPlay'));});$('studioBackWorking').onclick=()=>act(playWorking);
