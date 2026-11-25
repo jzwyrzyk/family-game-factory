@@ -218,8 +218,10 @@ export function installRewardBackupControls(rewards:RewardsController):void {
     void (async()=>{
       if(FG.store.adultProfileId)throw Error('Switch to a family profile before restoring a family backup.');
       if(file.size>20_000_000)throw Error('That backup is too large.');
+      const owner=FG.store.current().id;
       const raw=await file.text(),plan=validateFamilyRewardBackup(raw,FG.store.validateBackup,rewards.store());
       if(FG.store.backupChangesGrades(plan.base))await FG.verifyParentSettings();
+      if(FG.store.current().id!==owner||FG.store.adultProfileId)throw Error('The selected player changed. Open backup import again.');
       if(!confirm('Restore this backup? Current family progress will be replaced.'))return;
       flush();await withPalsMaintenance(palStore=>rewards.maintenance(store=>applyFamilyRewardBackup(plan,localStorage,store,'restore',palStore)));
       alert('Progress restored successfully.');location.reload();
@@ -230,7 +232,10 @@ export function installRewardBackupControls(rewards:RewardsController):void {
   FG.store.reset=async()=>{
     if(FG.store.adultProfileId)throw Error('Switch to a family profile before resetting family data.');
     if(FG.store.loadError)throw Error('Export the preserved progress or restore a compatible backup before resetting.');
+    const owner=FG.store.current().id;
     const plan=validateFamilyRewardBackup(JSON.stringify(FG.store.emptyBackup()),FG.store.validateBackup,rewards.store());
+    if(FG.store.backupChangesGrades(plan.base))await FG.verifyParentSettings();
+    if(FG.store.current().id!==owner||FG.store.adultProfileId)throw Error('The selected player changed. Open settings again.');
     flush();
     try{await withPalsMaintenance(palStore=>rewards.maintenance(store=>applyFamilyRewardBackup(plan,localStorage,store,'reset',palStore)));location.reload();}
     catch(error){if(hasPendingRewardBackup())location.reload();throw error;}

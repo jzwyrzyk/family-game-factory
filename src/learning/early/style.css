@@ -23,3 +23,4 @@
 .early-leave{align-self:flex-end;min-height:52px;background:#fff;color:#213052;border:2px solid #8b86b2;border-radius:12px;padding:.5em .9em;font-weight:700}
 .early-activity .jems-read-aloud button{min-height:52px}
 @media(min-width:640px) and (min-height:600px){.early-activity .early-counter button{min-width:76px;min-height:76px}}
+.early-activity .early-small-gem{width:25px;height:auto}.early-activity .early-large-gem{width:49px;height:auto}

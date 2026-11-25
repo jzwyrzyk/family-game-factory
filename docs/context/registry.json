@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:37:11.072Z",
-      "sourceDigest": "54082a8d96d58efd645ce96328ff67ee4f76552011e21ec47c9833736b7f5e63",
+      "reviewedAt": "2026-11-25T01:57:26.982Z",
+      "sourceDigest": "28cb322dd37584f756e4f2473c441b935b31ce428fc1dbf140a3e9890ee5604c",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage.",
+      "reviewReason": "Reviewed imported grade holds, two-subject game playback, responsive coding controls, natural checkpoint and authorized restore paths in integrated verification.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -406,10 +406,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "27c4e7fa6f3025dff65335a284d02dd6a79259ead7c5fd0e2a999134a77971bb",
-      "reviewedAt": "2026-11-25T01:37:11.429Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage. Existing operational procedures and acceptance commands still apply to this change.",
+      "sourceDigest": "97666e5fc0ee8739084b067d633b59636bea4f83e6823ae39e5639f3aaf1d39d",
+      "reviewedAt": "2026-11-25T01:57:27.832Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed imported grade holds, two-subject game playback, responsive coding controls, natural checkpoint and authorized restore paths in integrated verification.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -493,10 +493,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "a22bd6c510126d53da38e4abfc5de8bcdc8bc2e2e9fed999f29e1f9aae84086e",
-      "reviewedAt": "2026-11-25T01:00:58.444Z",
+      "sourceDigest": "f15af69b31bfd284f39b6445eb53eff516a602bef7cac1202eb0aa27655f93e2",
+      "reviewedAt": "2026-11-25T01:57:27.874Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
+      "reviewReason": "Reviewed imported grade holds, two-subject game playback, responsive coding controls, natural checkpoint and authorized restore paths in integrated verification.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -641,10 +641,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:44:10.273Z",
-      "sourceDigest": "2b3d3b3a93ab061212d12b4fb725b124efe3d353b584d353cf4de8ca6c5d953d",
+      "reviewedAt": "2026-11-25T01:57:27.920Z",
+      "sourceDigest": "96335bad7b1b5b1196faab3c8ba65fe0ba46c7037e3946875fd504767916e98c",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified early-grade host and speech behavior with synthetic family sessions, eight native games, a live isolated fixture and five browser viewports.",
+      "reviewReason": "Reviewed imported grade holds, two-subject game playback, responsive coding controls, natural checkpoint and authorized restore paths in integrated verification.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:44:10.405Z",
-      "sourceDigest": "0d8669ec8044901cf1afc13656ee35e85915be6c38ce116f7eb8c19edee13914",
+      "reviewedAt": "2026-11-25T01:57:27.964Z",
+      "sourceDigest": "12961fb8c0b7692680a27740b38db2f5fbf1547f8ed87ec0cfe924f64f3dda38",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified early-grade host and speech behavior with synthetic family sessions, eight native games, a live isolated fixture and five browser viewports.",
+      "reviewReason": "Reviewed imported grade holds, two-subject game playback, responsive coding controls, natural checkpoint and authorized restore paths in integrated verification.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1126,10 +1126,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T01:44:10.486Z",
-      "sourceDigest": "92d416561849d70e3b76ccf4efd3ed453b3820000fc2f9b6f50fcf08ecc757cb",
+      "reviewedAt": "2026-11-25T01:57:28.126Z",
+      "sourceDigest": "f40e66eea0ae9d57af85629f89644fd1a6b5b22d74fb91d4db189f4452632925",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified early-grade host and speech behavior with synthetic family sessions, eight native games, a live isolated fixture and five browser viewports.",
+      "reviewReason": "Reviewed imported grade holds, two-subject game playback, responsive coding controls, natural checkpoint and authorized restore paths in integrated verification.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -1,7 +1,7 @@
 import type {Domain, MathItem, SkillDefinition} from '../types';
 import type {Grade} from '../grades';
 
-type Topic = 'touch'|'small'|'count'|'numeral'|'build'|'compare'|'equal'|'shape'|'classify'|'pattern'|'position'|'size'|'join'|'remove'|'missing'|'teen'|'solid'|'compose'|'order'|'compare-numeral';
+type Topic = 'touch'|'small'|'count'|'numeral'|'build'|'compare'|'equal'|'shape'|'classify'|'pattern'|'position'|'size'|'join'|'remove'|'missing'|'teen'|'solid'|'compose'|'order'|'compare-numeral'|'sort-shape'|'sort-size'|'numeral-group'|'attributes';
 type Row = [Topic,string,Domain,string,Topic?];
 const preschool: Row[] = [
  ['touch','Touch each object once','operations','P-MATH 3'],
@@ -17,7 +17,10 @@ const preschool: Row[] = [
  ['position','Find an object in space','geometry','P-MATH 10'],
  ['size','Compare lengths','measurement','P-MATH 8'],
  ['join','Join small collections','operations','P-MATH 6','count'],
- ['remove','Take objects away','operations','P-MATH 6','count']
+ ['remove','Take objects away','operations','P-MATH 6','count'],
+ ['sort-shape','Classify objects by shape','geometry','P-MATH 9','shape'],
+ ['sort-size','Classify objects by size','measurement','P-MATH 8','size'],
+ ['numeral-group','Match a printed numeral to a group','place-value','P-MATH 5','count']
 ];
 const kindergarten: Row[] = [
  ['touch','Count each object','operations','K.CC.B.4a'],
@@ -38,7 +41,11 @@ const kindergarten: Row[] = [
  ['position','Locate an object','geometry','K.G.A.1'],
  ['compose','Join two equal triangles','geometry','K.G.B.6','shape'],
  ['size','Compare two lengths','measurement','K.MD.A.2'],
- ['order','Put quantities in order','operations','K.CC.B.4c','count']
+ ['order','Put quantities in order','operations','K.CC.B.4c','count'],
+ ['sort-shape','Classify shapes by type','data','K.MD.B.3','shape'],
+ ['sort-size','Classify objects by size','data','K.MD.B.3','size'],
+ ['numeral-group','Match numerals and sets through twenty','place-value','K.CC.B.4b','count'],
+ ['attributes','Identify shapes by their attributes','geometry','K.G.B.4','shape']
 ];
 const describe = (rows: Row[],grade: Grade,prefix: string):SkillDefinition[] =>
  rows.map(([topic,title,domain,reference,prior])=>({id:prefix+topic,title,grade,domain,standards:[reference],
@@ -64,6 +71,31 @@ export function earlyMathItem(skill:SkillDefinition,tier:number,seed:number):Mat
    return pool;
  };
  switch(topic){
+  case 'numeral-group':
+    n=pk?1+random(max):random(max+1);prompt=String(n);style='groups';
+    question='Look at the number. Choose its group.';break;
+  case 'attributes':{
+    const examples=[
+      ['triangle','Which shape has three straight sides?'],
+      ['circle','Which shape has no corners?'],
+      ['square','Find four equal straight sides and four square corners.']
+    ];
+    [answer,question]=examples[random(examples.length)];choices=[...shapes];break;
+  }
+  case 'sort-shape':case 'sort-size':{
+    const size=topic==='sort-size';
+    const pool=size?['small-gem','large-gem']:[...shapes];
+    const target=pool[random(pool.length)],width=4+2*tier;
+    const others=pool.filter(value=>value!==target);
+    const board=Array.from({length:width},(_,i)=>i%2===0?target:others[random(others.length)]);
+    for(let i=board.length-1;i>0;i--){const j=random(i+1);[board[i],board[j]]=[board[j],board[i]];}
+    style='sort';prompt=[target,...board].join(' ');
+    question='Tap every '+target.replace('-',' ')+'. Then tap the check mark.';
+    const mask=board.map(value=>value===target?'1':'0');
+    answer=mask.join('');
+    choices=[answer,...[0,1].map(index=>mask.map((bit,i)=>i===index?(bit==='1'?'0':'1'):bit).join(''))];
+    break;
+  }
   case 'touch': question='Tap each picture once. Then tap the check mark.';style='touch';break;
   case 'small': n=1+random(4);question=`Find the group of ${n}.`;style='groups';break;
   case 'count':question='How many do you see?';prompt=group(a);break;
@@ -102,7 +134,7 @@ export function earlyMathItem(skill:SkillDefinition,tier:number,seed:number):Mat
  return {id:`${skill.id}:early1:${(signature>>>0).toString(36)}`,skill:skill.title,skillId:skill.id,grade:skill.grade,tier,question,answer,answerKind:'choice',
   choices:choices.map(value=>({value,label:value})),representation:topic==='numeral'||topic==='compare-numeral'?'symbolic':'visual',
   parameters:{seed,style,prompt,n,object,layout,b},hints:[{text:'Look at one picture at a time.'},{text:'Compare each choice with the question.'},{text:'Try making the group or shape with your hands.'}],
-  workedExample:`The matching answer is ${answer}. Try it together.`};
+  workedExample:style==='sort'?'Choose each picture that matches the example. Leave the other pictures in place.':`The matching answer is ${answer}. Try it together.`};
 }
 export function validEarlyMath(item:MathItem,skill:SkillDefinition):boolean {
  const seed=item.parameters?.seed;

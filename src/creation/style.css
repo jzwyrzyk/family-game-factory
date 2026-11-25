@@ -317,3 +317,10 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
  .early-journey #creationPalette{grid-template-columns:repeat(3,minmax(0,1fr))}
  .early-journey #page-creation.has-scene .creation-view-switch{display:none}
 }
+
+@media(max-width:360px){
+ #creationPalette{gap:4px}
+ #page-creation .creation-palette-block{min-height:52px;flex-direction:column;gap:2px;padding:4px 1px}
+ #page-creation .creation-palette-block .creation-command-symbol{font-size:23px;line-height:1}
+ #page-creation .creation-palette-block>b{font-size:18px;line-height:1.05;white-space:nowrap}
+}

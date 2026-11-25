@@ -27,6 +27,15 @@ async function choose(page,index){await openProfiles(page);await page.locator('#
         await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);
         await page.waitForFunction(()=>window.FG?.learningProfiles&&document.getElementById('page-studio-library')?.getAttribute('aria-busy')==='false');
         assert.equal(await page.locator('#learningProfileDialog').isVisible(),false,'setup does not cover character-first onboarding');
+        const caps=await page.evaluate(async()=>{
+          const before=FG.store.current().grade;
+          let save='',restore='';
+          try{await FG.store.changeLearningProfile({grade:0});}catch(e){save=e.message;}
+          const imported=structuredClone(FG.store.data);imported.profiles[0].grade=-1;
+          try{FG.store.backupChangesGrades(imported);}catch(e){restore=e.message;}
+          return {before,after:FG.store.current().grade,save,restore};
+        });
+        assert.equal(caps.before,caps.after);assert.match(caps.save,/preview/);assert.match(caps.restore,/preview/);
         await editLevel(page);
         assert.match(await page.locator('#learningProfileTitle').textContent(),/Explorer 1/);
         assert.equal(await page.locator('#learningProfileGrade').inputValue(),'1');

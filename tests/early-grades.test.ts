@@ -36,6 +36,13 @@ test('deterministic early items, independently calculated quantities, persisted 
   const {prompt,n}=item.parameters;
   let expected=String(n);
   const topic=earlyMathTopic(skill.id);
+  if(topic==='sort-size'||topic==='sort-shape'){
+   const [match,...board]=String(prompt).split(' ');
+   const mask=board.map(value=>value===match?'1':'0').join('');
+   assert.equal(item.answer,mask);
+   for(let v=0;v<2**board.length;v++){const raw=v.toString(2).padStart(board.length,'0');
+    assert.deepEqual(evaluateAnswer(item,raw),{valid:true,correct:raw===mask,normalized:raw});}
+  }
   if(topic==='count'||topic==='equal')expected=String(prompt).slice(6);
   if(['join','remove','missing'].includes(topic)){
    const [,total,part]=String(prompt).split('-').map(Number);expected=String(topic==='join'?total:total-part);

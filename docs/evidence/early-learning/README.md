@@ -8,14 +8,14 @@ Use Node 22, the repository lockfile and its Chromium installation. Run `npm ci`
 | --- | --- |
 | Parent level selector | Six explicit persisted grades, a denied parent request, a delayed save across a profile switch, and an unchanged sibling |
 | Play and learning | Tap before instruction delivery, declared adult reading, host scoring, disabled game input and an actual resumed game action |
-| Native game matrix | Gem Factory, Mind Your Jems (Gem Mining), Dragon Island Rescue, Splash or Pass, Junkyard Rally, Moon Donut Dash, Robot Route Lab and the retained Bubble Gum Builders construction game |
+| Native game matrix | Gem Factory, Mind Your Jems (Gem Mining), Dragon Island Rescue, Splash or Pass, Junkyard Rally, Moon Donut Dash, Robot Route Lab and both the current Bubble Gum Builders assembly workshop and its retained construction game |
 | Isolated game | Reviewed star-catching fixture, opaque sandbox, host-owned learning, acknowledged round completion and replay |
 | Creation Studio | Add a direction command, inspect the saved project, predict its first movement and check a working program |
 | AI creation | Illustrated handoff, local scene creation and restricted creation mutations on the early profile |
 | Device speech | A simulated local voice completes and replays the instruction. The decoding stimulus remains silent. A separate no-voice journey requires declared grown-up reading before scoring |
 | Viewports | 768 × 1024, 1024 × 768, 1366 × 768, 390 × 844 and 844 × 390 CSS pixels |
 
-The native matrix sends the existing checkpoint event after a real game action. The legacy regression suites also exercise elapsed-play and round-end triggers. Generated game checks use a local reviewed fixture. The gateway responses, speech lifecycle and learner profiles are synthetic. No person supplied a voice recording. The device matrix establishes browser rendering and pointer behavior. Educational efficacy, physical-device ergonomics and acoustic quality require their own evidence.
+Splash or Pass reaches a natural round-end checkpoint. The other native matrix cases send the existing checkpoint event after entering play or performing a game action. The legacy regression suites also exercise elapsed-play and round-end triggers. Generated game checks use a local reviewed fixture. The gateway responses, speech lifecycle and learner profiles are synthetic. No person supplied a voice recording. The device matrix establishes browser rendering and pointer behavior. Educational efficacy, physical-device ergonomics and acoustic quality require their own evidence.
 
 ## Captured journeys
 
@@ -30,9 +30,9 @@ The native matrix sends the existing checkpoint event after a real game action. 
 
 ## Release conditions
 
-1. Obtain project-owner review and the required branch checks for #175, then #176 through the integrated verification draft. Recheck the diff and regression evidence on each new base.
+1. The layout repair #175 has merged at 912fd31. Obtain product-owner review and required branch checks for #176, #177, #178, #179 and #183 in order. Recheck the diff and regression evidence on each new base.
 2. Review the local illustrated assets and the early curriculum with the product owner and a qualified early-learning reviewer. Confirm the spoken directions, listening items and independent reading evidence on target device voices.
-3. Integrate the family beta #170–174 entitlement shell and verified family learner identity. Keep parent-guided paid creation disabled until a server-bound child workflow enforces consent, provider approval and budgets. Preserve the independent Adult Private budget and data boundary.
+3. Reconcile the separate beta audit #180 and rehearsal #181, then integrate the family beta #170–174 entitlement shell and verified family learner identity. Keep parent-guided paid creation disabled until a server-bound child workflow enforces consent, provider approval and budgets. Preserve the independent Adult Private budget and data boundary.
 4. Use authorized adults and synthetic profiles on representative physical hardware in approved DEV/TEST. Real child participation and production release require separate permission and release evidence.
 
 The unchanged study and release requirements also apply to visual assessments, privacy retention, profile migration and recovery. No release authorization is implied by this branch.

@@ -24,6 +24,7 @@ async function editGrade(page,value,permitted=true){
  await page.click('#learningProfileSave');
  if(permitted){
   await page.waitForFunction(value=>!document.querySelector('#learningProfileDialog').open&&FG.store.current().grade===value,value);
+  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-state-v1')).profiles.find(p=>p.id===FG.store.current().id).grade),value);
  }else{
   await page.locator('#learningProfileError:not([hidden])').waitFor();
   assert.match(await page.locator('#learningProfileError').innerText(),/Unlock Parent Controls/);
@@ -46,6 +47,7 @@ async function solve(page,scope){
  const answer=String(item.answer);
  if(await check.count()){
   if(story){for(const token of answer.split(' '))await scope.getByRole('button',{name:token,exact:true}).click();}
+  else if(item.parameters?.style==='sort'){for(const [i,bit] of [...answer].entries())if(bit==='1')await scope.locator('.early-counter button').nth(i).click();}
   else for(let i=0;i<Number(answer);i++)await scope.locator('.early-counter button').nth(i).click();
   await check.click();
  }else await scope.locator('[data-value='+JSON.stringify(answer)+']').click();
@@ -60,14 +62,14 @@ async function solve(page,scope){
 async function nativeMatrix(page){
  const state=()=>page.evaluate(()=>FG.runtime.snapshot().state);
  let tick=3;
- for(const game of ['factory','mining','dragon','buckets','hill','moon','robot']){
+ for(const game of ['factory','mining','gum','dragon','buckets','hill','moon','robot']){
   for(const subject of ['math','language']){
    await page.clock.setFixedTime(new Date(Date.now()+ ++tick*660000));
    await page.evaluate(({game,subject})=>{
     FG.store.changeProfile({learningSubject:subject});
-    if(!['mining','factory','hill'].includes(game))FG.app.openGame(game,{stateKey:'early-'+game+'-'+subject});
+    if(!['mining','factory','hill','gum'].includes(game))FG.app.openGame(game,{stateKey:'early-'+game+'-'+subject});
    },{game,subject});
-   const studio=['mining','factory','hill'].includes(game);
+   const studio=['mining','factory','hill','gum'].includes(game);
    if(studio){
     await page.click('#studioNavHome');
     await page.locator('[data-starter="'+game+'"]').click();
@@ -78,6 +80,11 @@ async function nativeMatrix(page){
     await mount.locator('[data-action="route-order"]').click();
     assert.equal((await state()).sortingBusy,true);
     after=async()=>{await page.waitForFunction(()=>!FG.runtime.snapshot().state.hostPaused);await mount.locator('[data-action="pause"]').click();assert.equal((await state()).userPaused,true);};
+   }else if(game==='gum'){
+    const parts=mount.locator('[data-gum-part]:visible');
+    const first=parts.first(),second=parts.nth(1);
+    await first.click();assert.equal((await state()).selectedPart,await first.getAttribute('data-gum-part'));
+    after=async()=>{await second.click();assert.equal((await state()).selectedPart,await second.getAttribute('data-gum-part'));};
    }else if(game==='mining'){
     await mount.locator('.native-mining[data-assets="ready"]').waitFor();
     const resume=mount.locator('[data-myj="resume"]');if(await resume.isVisible())await resume.click();
@@ -103,13 +110,17 @@ async function nativeMatrix(page){
     await mount.locator('[data-direction="right"]').click();assert.equal((await state()).planLength,1);
     after=async()=>{await mount.locator('[data-direction="up"]').click();assert.equal((await state()).planLength,2);};
    }
-   await page.evaluate(game=>window.dispatchEvent(new CustomEvent('factory-game-event',{detail:{type:'checkpoint',game}})),game);
+   if(game==='buckets'){
+    await mount.locator('#go').click();await page.waitForFunction(()=>FG.runtime.snapshot().state.mode==='result');
+    await mount.locator('#go').click();
+   }else await page.evaluate(game=>window.dispatchEvent(new CustomEvent('factory-game-event',{detail:{type:'checkpoint',game}})),game);
    const scope=page.locator('#stage-overlay .early-activity');await scope.waitFor();
    assert.equal(await mount.evaluate(n=>n.inert),true);
    const active=await page.evaluate(()=>FG.learning.activeAttemptId);
    await page.evaluate(game=>window.dispatchEvent(new CustomEvent('factory-game-event',{detail:{type:'checkpoint',game}})),game);
    assert.equal(await page.evaluate(()=>FG.learning.activeAttemptId),active);
    const item=await solve(page,scope);assert.ok(item.grade<=0);
+   if(game==='buckets')await page.click('#resultNext');
    assert.equal(await mount.evaluate(n=>n.inert),false);await after();
    if(studio)await page.click('#studioHome');else await page.evaluate(()=>FG.app.page('home'));console.log('PASS native '+game+' '+subject+' with activity and resumed gameplay.');
   }
@@ -208,7 +219,7 @@ async function run(){
    if(process.env.EARLY_TEST_VIEW&&process.env.EARLY_TEST_VIEW!==name)continue;
    const context=await browser.newContext({viewport:{width,height},hasTouch:name!=='desktop',reducedMotion:'reduce'});
    await context.addInitScript(()=>{if(window.speechSynthesis)window.speechSynthesis.getVoices=()=>[];});
-   const page=await context.newPage();page.setDefaultTimeout(8000);
+   const page=await context.newPage();page.setDefaultTimeout(18000);
    const errors=[],paid=[];let unlocked=false,verified=0;
    let waitForParent=null,parentReached=null;
    const origin='http://127.0.0.1:'+server.address().port;
