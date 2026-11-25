@@ -21,3 +21,12 @@ export class RecoveryVault {
  async schedule():Promise<{enabled:boolean;intervalHours:number;lastCompleted?:string}>{const key=this.key();return await transaction(['settings'],'readonly',tx=>request(tx.objectStore('settings').get(key)))??{enabled:false,intervalHours:24};}
  async setSchedule(value:{enabled:boolean;intervalHours:number;lastCompleted?:string}){const key=this.key();if(typeof value.enabled!=='boolean'||!Number.isInteger(value.intervalHours)||value.intervalHours<1||value.intervalHours>720||value.lastCompleted!==undefined&&!Number.isFinite(Date.parse(value.lastCompleted)))throw Error('Choose a valid recovery schedule.');await transaction(['settings'],'readwrite',tx=>{tx.objectStore('settings').put(value,key);});}
 }
+
+/** Full before-images belong in IndexedDB, not beside a near-full legacy source
+ * in localStorage. The small pointer is scoped and never grants Adult access. */
+export async function recoveryJournal(id:string,namespace:string,value?:string):Promise<string|undefined>{
+ if(!/^[a-f0-9-]{36}$/.test(id)||!namespace||namespace.length>250)throw Error('The recovery journal identity is invalid.');
+ const key=JSON.stringify(['reward-journal',location.origin,namespace,id]);
+ if(value!==undefined){if(value.length>40_000_000)throw Error('The recovery journal is too large.');await transaction(['settings'],'readwrite',tx=>{tx.objectStore('settings').put(value,key);});return value;}
+ return transaction(['settings'],'readonly',tx=>request(tx.objectStore('settings').get(key)));
+}

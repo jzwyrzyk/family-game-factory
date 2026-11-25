@@ -1,3 +1,4 @@
+import {recoveryJournal} from '../storage/recovery-vault';
 import {installCompleteRecovery} from '../storage/complete-backup';
 import {installPrivateCopyControls} from '../storage/private-copy-ui';
 import {LOCAL_JOURNAL_KEY} from '../storage/local-journal';
@@ -28,6 +29,8 @@ export interface PreparedFamilyRewardBackup {
 interface BackupJournal {
   schema:'jems.reward.backup.journal.v1';phase:'pending'|'committed'|'rolled-back';operation:'restore'|'reset';
   sources:RewardSourceSnapshot;rewards:RewardsRawSnapshot;pals?:PalsRawSnapshot;
+  /** Complete recovery owns these already-restored indexed domains. Their retained legacy bytes never change. */
+  preservedIndexed?:string[];
 }
 const own=(value:object,key:string)=>Object.prototype.hasOwnProperty.call(value,key);
 const object=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
@@ -87,8 +90,8 @@ export function validateFamilyRewardBackup(raw:string,validateBase:(raw:string)=
   return {base,workspace,notebook,creation,problemSolving,rewards,pals,owners};
 }
 
-function snapshotSources(storage:BackupStorage):RewardSourceSnapshot {
-  return Object.fromEntries(REWARD_SOURCE_KEYS.map(key=>[key,storage.getItem(key)])) as RewardSourceSnapshot;
+function snapshotSources(storage:BackupStorage,preserved:readonly string[]=[]):RewardSourceSnapshot {
+  return Object.fromEntries(REWARD_SOURCE_KEYS.filter(key=>!preserved.includes(key)).map(key=>[key,storage.getItem(key)])) as RewardSourceSnapshot;
 }
 function restoreSources(storage:BackupStorage,snapshot:RewardSourceSnapshot):void {
   // Remove the failed replacement first so quota pressure cannot prevent the
@@ -97,15 +100,22 @@ function restoreSources(storage:BackupStorage,snapshot:RewardSourceSnapshot):voi
   for(const key of captured)storage.removeItem(key);
   for(const key of captured)if(snapshot[key]!==null)storage.setItem(key,snapshot[key]!);
 }
-function readJournal(storage:BackupStorage,rewardsNamespace=REWARDS_DB_NAME,palsNamespace=PALS_DB_NAME):BackupJournal|null {
-  const raw=storage.getItem(REWARD_BACKUP_JOURNAL_KEY);if(raw===null)return null;
+async function readJournal(storage:BackupStorage,rewardsNamespace=REWARDS_DB_NAME,palsNamespace=PALS_DB_NAME):Promise<BackupJournal|null> {
+  let raw=storage.getItem(REWARD_BACKUP_JOURNAL_KEY);if(raw===null)return null;
+  const pointer=JSON.parse(raw);
+  if(pointer?.schema==='jems.reward.backup.indexed-journal.v1'){
+    if(Object.keys(pointer).some(key=>!['schema','id','namespace'].includes(key))||pointer.namespace!==rewardsNamespace)throw Error('The indexed recovery journal belongs to another workspace.');
+    raw=await recoveryJournal(pointer.id,rewardsNamespace)??null;if(raw===null)throw Error('The original recovery journal is missing. Saved data has not been overwritten.');
+  }
   if(raw.length>40_000_000)throw Error('The backup recovery journal needs manual recovery. Saved data has not been overwritten.');
   let value:unknown;try{value=JSON.parse(raw);}catch{throw Error('The backup recovery journal is damaged. Saved data has not been overwritten.');}
-  if(!object(value)||Object.keys(value).some(key=>!['schema','phase','operation','sources','rewards','pals'].includes(key))||value.schema!=='jems.reward.backup.journal.v1'||
+  if(!object(value)||Object.keys(value).some(key=>!['schema','phase','operation','sources','rewards','pals','preservedIndexed'].includes(key))||value.schema!=='jems.reward.backup.journal.v1'||
     !['pending','committed','rolled-back'].includes(String(value.phase))||!['restore','reset'].includes(String(value.operation)))throw Error('The backup recovery journal is unsupported. Existing saved work remains protected.');
   const sources=value.sources,rewards=value.rewards;
+  const preserved=value.preservedIndexed??[];
+  if(!Array.isArray(preserved)||new Set(preserved).size!==preserved.length||preserved.some(key=>![WORKSPACE_KEY,STUDIO_KEY,CREATION_KEY].includes(key))||!object(sources)||preserved.some(key=>own(sources,key)))throw Error('The indexed recovery journal is invalid. Existing originals remain protected.');
   if(!object(sources)||Object.keys(sources).some(key=>!(REWARD_SOURCE_KEYS as readonly string[]).includes(key))||
-    LEGACY_REWARD_SOURCE_KEYS.some(key=>!own(sources,key))||Object.values(sources).some(value=>value!==null&&typeof value!=='string')||
+    LEGACY_REWARD_SOURCE_KEYS.some(key=>!preserved.includes(key)&&!own(sources,key))||Object.values(sources).some(value=>value!==null&&typeof value!=='string')||
     !object(rewards)||Object.keys(rewards).some(key=>!['namespace','raw'].includes(key))||rewards.namespace!==rewardsNamespace||!own(rewards,'raw'))throw Error('The backup recovery journal is unsupported. Existing saved work remains protected.');
   assertLosslessRewardJSON(rewards.raw);
   if(own(value,'pals')){
@@ -115,7 +125,13 @@ function readJournal(storage:BackupStorage,rewardsNamespace=REWARDS_DB_NAME,pals
   }
   return value as unknown as BackupJournal;
 }
-function writeJournal(storage:BackupStorage,journal:BackupJournal):void {storage.setItem(REWARD_BACKUP_JOURNAL_KEY,JSON.stringify(journal));}
+async function writeJournal(storage:BackupStorage,journal:BackupJournal,indexedId?:string):Promise<void> {
+ const raw=JSON.stringify(journal);
+ const existing=storage.getItem(REWARD_BACKUP_JOURNAL_KEY),pointer=existing===null?null:JSON.parse(existing);
+ const id=indexedId??(pointer?.schema==='jems.reward.backup.indexed-journal.v1'?pointer.id:undefined);
+ if(id){await recoveryJournal(id,journal.rewards.namespace,raw);storage.setItem(REWARD_BACKUP_JOURNAL_KEY,JSON.stringify({schema:'jems.reward.backup.indexed-journal.v1',id,namespace:journal.rewards.namespace}));}
+ else storage.setItem(REWARD_BACKUP_JOURNAL_KEY,raw);
+}
 function invalidateProblemSolvingView():void {
   // Stores are replaced directly while source writes are paused. Discard an
   // open practice's stale in-memory draft before the coordinator reloads.
@@ -125,29 +141,30 @@ function invalidateProblemSolvingView():void {
 }
 
 /** Host maintenance owns the source-write pause. Nothing is projected here. */
-export async function applyFamilyRewardBackup(plan:PreparedFamilyRewardBackup,storage:BackupStorage,store:RewardsStore,operation:'restore'|'reset'='restore',palStore=new PalsStore(PALS_DB_NAME),audience='family',assertAuthorized:()=>void=()=>{}):Promise<void> {
+export async function applyFamilyRewardBackup(plan:PreparedFamilyRewardBackup,storage:BackupStorage,store:RewardsStore,operation:'restore'|'reset'='restore',palStore=new PalsStore(PALS_DB_NAME),audience='family',assertAuthorized:()=>void=()=>{},preservedIndexed:readonly string[]=[],indexedJournal=false):Promise<void> {
   assertAuthorized();
+  if(new Set(preservedIndexed).size!==preservedIndexed.length||preservedIndexed.some(key=>![WORKSPACE_KEY,STUDIO_KEY,CREATION_KEY].includes(key)))throw Error('Invalid indexed recovery protection.');
   if(storage.getItem(LOCAL_JOURNAL_KEY)!==null)throw Error('Recover the interrupted game save before replacing progress.');
   if(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!==null)throw Error('Finish recovering the previous backup before replacing saved work.');
   if(store.namespace!==adultStorageKey(REWARDS_DB_NAME,audience==='family'?null:audience)||palStore.namespace!==adultStorageKey(PALS_DB_NAME,audience==='family'?null:audience))throw Error('Backups cannot replace another workspace.');
   const rewards=await store.snapshotRawForRecovery();assertLosslessRewardJSON(rewards.raw);
   const pals=await palStore.snapshotRawForRecovery();assertLosslessRewardJSON(pals.raw);
-  const journal:BackupJournal={schema:'jems.reward.backup.journal.v1',phase:'pending',operation,sources:snapshotSources(storage),rewards,pals};
+  const journal:BackupJournal={schema:'jems.reward.backup.journal.v1',phase:'pending',operation,sources:snapshotSources(storage,preservedIndexed),rewards,pals,...(preservedIndexed.length?{preservedIndexed:[...preservedIndexed]}:{})};
   // If this safety copy cannot fit, fail before changing any source or ledger.
-  try{writeJournal(storage,journal);}catch{throw Error('A safety copy could not be saved. Export your current progress before freeing browser space. Nothing was replaced.');}
+  try{await writeJournal(storage,journal,indexedJournal?crypto.randomUUID():undefined);}catch{throw Error('A safety copy could not be saved. Export your current progress before freeing browser space. Nothing was replaced.');}
   try{
     storage.setItem(FAMILY_STATE_KEY,JSON.stringify(plan.base));
-    storage.setItem(WORKSPACE_KEY,JSON.stringify(plan.workspace));
-    storage.setItem(STUDIO_KEY,JSON.stringify(plan.notebook));
-    try{storage.setItem(CREATION_KEY,JSON.stringify(plan.creation));}
+    if(!preservedIndexed.includes(WORKSPACE_KEY))storage.setItem(WORKSPACE_KEY,JSON.stringify(plan.workspace));
+    if(!preservedIndexed.includes(STUDIO_KEY))storage.setItem(STUDIO_KEY,JSON.stringify(plan.notebook));
+    try{if(!preservedIndexed.includes(CREATION_KEY))storage.setItem(CREATION_KEY,JSON.stringify(plan.creation));}
     catch{throw Error('Could not save this creation on this device. Your previous scene data remains protected by the backup safety copy.');}
     try{storage.setItem(PROBLEM_SOLVING_KEY,JSON.stringify(plan.problemSolving));}
     catch{throw Error('Could not save these problem-solving observations. Your previous observations remain protected by the backup safety copy.');}
     assertAuthorized();await store.restore(plan.rewards,{mode:'replace',allowedOwners:plan.owners});
     assertAuthorized();await palStore.restore(plan.pals,{mode:'replace',allowedOwners:plan.owners});
-    assertAuthorized();writeJournal(storage,{...journal,phase:'committed'});
+    assertAuthorized();await writeJournal(storage,{...journal,phase:'committed'});
   }catch(error){
-    try{await store.restoreRawRecovery(journal.rewards);await palStore.restoreRawRecovery(pals);restoreSources(storage,journal.sources);writeJournal(storage,{...journal,phase:'rolled-back'});}
+    try{await store.restoreRawRecovery(journal.rewards);await palStore.restoreRawRecovery(pals);restoreSources(storage,journal.sources);await writeJournal(storage,{...journal,phase:'rolled-back'});}
     catch{throw Error('The backup could not finish and recovery is still pending. Reload Jems to restore the protected original progress.');}
     throw Error('The backup could not be saved. Your original progress was restored. '+(error instanceof Error?error.message:''));
   }finally{
@@ -159,14 +176,15 @@ export async function applyFamilyRewardBackup(plan:PreparedFamilyRewardBackup,st
 /** Testable recovery primitive. A rollback requires a reload because legacy
  * stores may have read a partial replacement before the entrypoint acquired its lock. */
 export async function recoverRewardBackupJournal(storage:BackupStorage,store:RewardsStore,palStore=new PalsStore(PALS_DB_NAME)):Promise<'none'|'cleaned'|'reload'> {
-  const journal=readJournal(storage,store.namespace,palStore.namespace);if(!journal)return 'none';
+  const journal=await readJournal(storage,store.namespace,palStore.namespace);if(!journal)return 'none';
   if(journal.phase==='committed'||journal.phase==='rolled-back'){storage.removeItem(REWARD_BACKUP_JOURNAL_KEY);return 'cleaned';}
   await store.restoreRawRecovery(journal.rewards);
   // Old journals predate Pals; recovering them must leave the collection alone.
   if(journal.pals)await palStore.restoreRawRecovery(journal.pals);
   restoreSources(storage,journal.sources);
-  writeJournal(storage,{...journal,phase:'rolled-back'});return 'reload';
+  await writeJournal(storage,{...journal,phase:'rolled-back'});return 'reload';
 }
+export async function rewardBackupCommitted(storage:BackupStorage,rewardsNamespace:string,palsNamespace:string):Promise<boolean>{return (await readJournal(storage,rewardsNamespace,palsNamespace))?.phase==='committed';}
 export function hasPendingRewardBackup():boolean {try{return localStorage.getItem(adultStorageKey(REWARD_BACKUP_JOURNAL_KEY))!==null||localStorage.getItem(adultStorageKey('jems-complete-restore-pending-v1'))!==null;}catch{return true;}}
 export async function recoverRewardBackup():Promise<void> {
   const outcome=await recoverRewardBackupJournal(localStorage,new RewardsStore(REWARDS_DB_NAME));

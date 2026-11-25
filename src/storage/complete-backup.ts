@@ -1,3 +1,7 @@
+import {REWARDS_DB_NAME} from '../rewards/store';
+import {WORKSPACE_KEY} from '../factory/workspace';
+import {STUDIO_KEY} from '../studio/notebook';
+import {CREATION_KEY} from '../creation/storage';
 import {captureCreationRecovery,mergeCreationRecovery,restoreCreationRecovery,creationSnapshotsOf,type CreationRecoverySnapshot} from './creation-recovery';
 import {captureNotebookRecovery,mergeNotebookRecovery,restoreNotebookRecovery,notebookSnapshotsOf,type NotebookRecoverySnapshot} from './notebook-recovery';
 import {activeRig} from '../drawing/store';
@@ -13,7 +17,7 @@ import {exportArtBundle,validateArtBundle,restoreFamilyArtBundles,type ArtBundle
 import {assemblyHash} from '../creation/private-art';
 import {withPalsMaintenance} from '../pals/service';
 import type {RewardsController} from '../rewards/service';
-import {applyFamilyRewardBackup,captureFamilyRewardPayload,validateFamilyRewardBackup,REWARD_BACKUP_JOURNAL_KEY} from '../rewards/backup';
+import {applyFamilyRewardBackup,captureFamilyRewardPayload,validateFamilyRewardBackup,rewardBackupCommitted} from '../rewards/backup';
 import {assertRewardSourceLockHeld} from '../rewards/write-guard';
 import {buildRecoveryArchive,RecoveryVault,validateRecoveryArchive,type RecoveryArchive,type RecoveryScope} from './recovery-vault';
 
@@ -70,8 +74,8 @@ export async function restoreCompleteRecovery(rewards:RewardsController,archive:
   await refreshCloud();const authorized=()=>{assertRewardSourceLockHeld();if(beta&&Date.now()>=cloudUntil)throw Error('Grown-up recovery access ended. Reopen it to continue.');adultGuard?.();if(adultWorkspaceId()!==adult||location.origin!==vault.scope.origin)throw Error('Recovery access changed.');};
   localStorage.setItem(adultStorageKey(COMPLETE_RESTORE_KEY,adult),JSON.stringify({schema:'jems.complete-restore.v1',scope:vault.scope,pointId:archive.manifest.id,rollbackId}));
   await restoreFamilyArtBundles(snapshot.art,plan.owners,authorized);
-  await restoreCreationRecovery(creationSnapshotsOf(plan.creation,plan.owners),crypto.randomUUID(),authorized);await restoreNotebookRecovery(notebookSnapshotsOf(plan.notebook,plan.owners),crypto.randomUUID(),authorized);await restoreNativeRecovery(nativeSnapshotsOf(plan.workspace,plan.owners),crypto.randomUUID(),authorized);plan.workspace=mergeNativeRecovery(plan.workspace,await captureNativeRecovery(plan.owners,authorized));plan.creation=mergeCreationRecovery(plan.creation,await captureCreationRecovery(plan.owners,authorized));await vault.recordRestore(archive.manifest.id,rollbackId,'art-restored');
-  await refreshCloud();await applyFamilyRewardBackup(plan,adult?adultRecoveryStorage(adult):localStorage,ledger,'restore',pals,adult??'family',authorized);
+  const restoredCreation=await restoreCreationRecovery(creationSnapshotsOf(plan.creation,plan.owners),crypto.randomUUID(),authorized),restoredNotebook=await restoreNotebookRecovery(notebookSnapshotsOf(plan.notebook,plan.owners),crypto.randomUUID(),authorized),restoredNative=await restoreNativeRecovery(nativeSnapshotsOf(plan.workspace,plan.owners),crypto.randomUUID(),authorized);const preservedIndexed=[[CREATION_KEY,restoredCreation],[STUDIO_KEY,restoredNotebook],[WORKSPACE_KEY,restoredNative]].filter(([,owners])=>plan.owners.every(owner=>(owners as string[]).includes(owner))).map(([key])=>key as string);plan.workspace=mergeNativeRecovery(plan.workspace,await captureNativeRecovery(plan.owners,authorized));plan.creation=mergeCreationRecovery(plan.creation,await captureCreationRecovery(plan.owners,authorized));await vault.recordRestore(archive.manifest.id,rollbackId,'art-restored');
+  await refreshCloud();await applyFamilyRewardBackup(plan,adult?adultRecoveryStorage(adult):localStorage,ledger,'restore',pals,adult??'family',authorized,preservedIndexed,true);
   await vault.recordRestore(archive.manifest.id,rollbackId,'complete');localStorage.removeItem(adultStorageKey(COMPLETE_RESTORE_KEY,adult));
  }));return 'restored';
 }
@@ -84,7 +88,7 @@ export async function recoverCompleteRestore(audience='family'):Promise<void>{
  const marker=JSON.parse(raw);if(marker?.schema!=='jems.complete-restore.v1'||marker.scope?.origin!==location.origin||marker.scope?.audience!==audience||typeof marker.rollbackId!=='string'||typeof marker.pointId!=='string')throw Error('The recovery journal is invalid. Your saved work has not been discarded.');
  const guard=()=>{assertRewardSourceLockHeld();if(audience!=='family'&&currentAdultSession()?.profileId!==audience)throw Error('Private parent recovery access ended.');};
  const vault=new RecoveryVault(marker.scope,guard),receipt=await vault.receipt(marker.pointId);
- const rewardJournal=localStorage.getItem(adultStorageKey(REWARD_BACKUP_JOURNAL_KEY,audience==='family'?null:audience)),committed=rewardJournal!==null&&JSON.parse(rewardJournal).phase==='committed';
+ const adult=audience==='family'?null:audience,committed=await rewardBackupCommitted(adult?adultRecoveryStorage(adult):localStorage,adultStorageKey(REWARDS_DB_NAME,adult),adultStorageKey(PALS_DB_NAME,adult));
  if(committed)await vault.recordRestore(marker.pointId,marker.rollbackId,'complete');
  if(receipt?.phase!=='complete'&&!committed){const previous=await decodeCompleteBackup(await vault.read(marker.rollbackId),marker.scope);await restoreFamilyArtBundles(previous.art,marker.scope.owners,guard);await restoreCreationRecovery(previous.creations??[],'rollback-creation-'+marker.rollbackId,guard);await restoreNotebookRecovery(previous.notebooks??[],'rollback-notebook-'+marker.rollbackId,guard);await restoreNativeRecovery(previous.native??[],'rollback-native-'+marker.rollbackId,guard);}
  localStorage.removeItem(key);

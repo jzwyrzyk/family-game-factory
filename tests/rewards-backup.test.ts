@@ -385,3 +385,18 @@ test('maintenance pauses a late workspace write before changing its cached draft
   try{assert.throws(()=>workspace.keep(project.id,OWNER),/restoring saved progress/);assert.deepEqual(workspace.snapshot(),prior);assert.equal(storage.getItem(WORKSPACE_KEY),raw);}
   finally{setRewardSourceMaintenance(false);}
 });
+
+test('complete indexed restore journals only changed legacy sources and retains large originals byte-for-byte',async()=>{
+ const {storage,rewards,pals}=stores(),value=await incoming(),plan=validateFamilyRewardBackup(JSON.stringify(value),validateBase,rewards,pals),kept=[WORKSPACE_KEY,STUDIO_KEY,CREATION_KEY];
+ for(const key of kept)storage.setItem(key,' original indexed migration source '+key+'x'.repeat(1_900_000));
+ const before=Object.fromEntries(kept.map(key=>[key,storage.getItem(key)]));
+ const originalSet=storage.setItem.bind(storage);storage.setItem=(key,raw)=>{if(raw.length>1_000_000)throw Error('quota');originalSet(key,raw);};
+ await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals,'family',()=>{},kept);
+ const journal=JSON.parse(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!);assert.deepEqual(journal.preservedIndexed,kept);for(const key of kept){assert.equal(Object.hasOwn(journal.sources,key),false);assert.equal(storage.getItem(key),before[key]);}
+ assert.equal(await recoverRewardBackupJournal(storage,rewards,pals),'cleaned');for(const key of kept)assert.equal(storage.getItem(key),before[key]);
+ // An interruption restores only the protected mutable keys. Retained indexed
+ // sources never become a journal-owned deletion or replacement target.
+ await applyFamilyRewardBackup(plan,storage,rewards,'restore',pals,'family',()=>{},kept);const pending=JSON.parse(storage.getItem(REWARD_BACKUP_JOURNAL_KEY)!);pending.phase='pending';originalSet(REWARD_BACKUP_JOURNAL_KEY,JSON.stringify(pending));
+ assert.equal(await recoverRewardBackupJournal(storage,rewards,pals),'reload');for(const key of kept)assert.equal(storage.getItem(key),before[key]);
+ const malformed={...pending,preservedIndexed:[FAMILY_STATE_KEY]};originalSet(REWARD_BACKUP_JOURNAL_KEY,JSON.stringify(malformed));await assert.rejects(recoverRewardBackupJournal(storage,rewards,pals),/indexed recovery journal/);
+});

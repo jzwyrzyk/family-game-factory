@@ -8,6 +8,6 @@ export function mergeNativeRecovery(legacy:Workspace,snapshots:NativeRecoverySna
 }
 /** Existing prepared stores restore atomically; missing ones stay on the legacy
  * compatible graph until a separately selected migration build is approved. */
-export async function restoreNativeRecovery(snapshots:NativeRecoverySnapshot[],operation:string,guard:()=>void):Promise<void>{for(const [index,snapshot]of snapshots.entries()){guard();const store=await IndexedNativeStore.open(await nativeScope(snapshot.owner),guard);try{if(await store.isActive())await store.restoreSnapshot(snapshot.workspace,operation+'-'+index);}finally{store.close();}}}
+export async function restoreNativeRecovery(snapshots:NativeRecoverySnapshot[],operation:string,guard:()=>void):Promise<string[]>{const restored:string[]=[];for(const [index,snapshot]of snapshots.entries()){guard();const store=await IndexedNativeStore.open(await nativeScope(snapshot.owner),guard);try{if(await store.isActive()){await store.restoreSnapshot(snapshot.workspace,operation+'-'+index);restored.push(snapshot.owner);}}finally{store.close();}}return restored;}
 
 export function nativeSnapshotsOf(workspace:Workspace,owners:string[]):NativeRecoverySnapshot[]{return owners.map(owner=>{const projects=workspace.projects.filter(p=>p.owner===owner),ids=new Set(projects.map(p=>p.id)),revisions=workspace.revisions.filter(r=>ids.has(r.projectId)),revisionIds=new Set(revisions.map(r=>r.id));return {owner,workspace:validateWorkspace({version:2,projects,revisions,plays:workspace.plays.filter(p=>revisionIds.has(p.revisionId))})};});}
