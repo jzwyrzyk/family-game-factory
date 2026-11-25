@@ -887,10 +887,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:35:19.364Z",
-      "sourceDigest": "b6cf2fa2b69b53fbf33abd2a48842ccc304036872cbb03b6e0d3f21716c035a0",
+      "reviewedAt": "2026-11-25T01:37:54.970Z",
+      "sourceDigest": "ae651679232b9c486756f9b9258da5f86267c07dea578d6ccc746f1594d08eb4",
       "reviewOutcome": "updated",
-      "reviewReason": "Add native form, exact revision, erasure, consent and two-host browser storage checks.",
+      "reviewReason": "Exercise equal backend names in distinct projects and reject a changed routing boundary.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1130,10 +1130,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T01:35:19.742Z",
-      "sourceDigest": "7b4aa563172e40465290ef9f0e1d8aec562ae00f5653c6915deafd0ba0bf1720",
+      "reviewedAt": "2026-11-25T01:37:55.470Z",
+      "sourceDigest": "4f0b15afd8c5a88537c0870bd4101ae2350d84086bcc6ad63e33c3e92dcbd0e2",
       "reviewOutcome": "updated",
-      "reviewReason": "Record integration with the independently approved owner premium ceiling and explicit DEV/TEST gates.",
+      "reviewReason": "Match complete project-scoped load balancer backend identifiers to the reviewed URL map.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
