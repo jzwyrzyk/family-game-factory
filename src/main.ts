@@ -39,7 +39,7 @@ void installRewardWriteGuard().then(async writable=>{
   installProblemSolvingEvidence();
   const rewards=installRewards();
   installRewardBackupControls(rewards);
-  initLiveRemix();
+  await initLiveRemix();
   void initBuilder().then(installAdultProfile);
   installJemsDelight();installOffline();installDrawings();installQualityCards();installParentDashboard();installProblemSolvingProgress();
   await installStudio();installStudioHostNavigation();
