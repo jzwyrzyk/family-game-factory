@@ -1,5 +1,9 @@
 # Synthetic validation evidence
 
+## Creation Studio viewport acceptance
+
+The learner browser suite checks usable workspace dimensions, the viewport and clipping ancestors, and five unobstructed hit points before it taps or clicks a control. On entry, all six First steps controls must pass without scrolling. Longer programs use coordinate wheel or touch input. Each of the eight viewport journeys captures the initial palette and the edited sequence. The zoom check uses Chromium’s own page zoom in a disposable profile. The [Creation Studio acceptance record](../creation-studio/ACCEPTANCE.md#responsive-coding-workspace--november-25-2026) pairs these captures with the reproduced baseline and documents the revised stage-size requirements.
+
 ## CI architecture and performance
 
 Draft #139 extends the merged #154 baseline of 96 leaves to 99. The browser-generated shard gains the long premium capture, existing star-map benchmark and three-game artwork benchmark. Browser now expands to 22 leaves, learning 12, creative 63 and notifications 2. The 13 shards, immutable build/receipt binding, keyless image gate and required contexts stay in effect. [Pilot evidence](../game-intelligence/premium-benchmark/ARTWORK-PILOT.md)
