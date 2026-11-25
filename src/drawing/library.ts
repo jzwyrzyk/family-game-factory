@@ -38,13 +38,18 @@ async function migrateLegacy(database: IDBDatabase) {
   if (!rewardSourceWritable()) return;
   const marker = await artRequest(database.transaction('meta').objectStore('meta').get('legacy-rigs-v1'));
   if (marker) return;
-  const legacy = await new Promise<IDBDatabase | null>((resolve, reject) => {
-    const request = indexedDB.open('family-drawing-rigs-v1');
+  // Opening an absent database is a creation attempt even if its upgrade is
+  // aborted. Use a read-only inventory where supported so ordinary art startup
+  // cannot leave an uncommitted legacy catalog entry behind in the browser.
+  const legacyName='family-drawing-rigs-v1';
+  const exists=!indexedDB.databases||(await indexedDB.databases()).some(row=>row.name===legacyName);
+  const legacy = exists?await new Promise<IDBDatabase | null>((resolve, reject) => {
+    const request = indexedDB.open(legacyName);
     let missing = false;
     request.onupgradeneeded = () => { missing = true; request.transaction!.abort(); };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => missing ? resolve(null) : reject(request.error);
-  });
+  }):null;
   let rigs: SavedRig[] = [], active: { owner: string; id: string }[] = [];
   if (legacy) {
     try {
