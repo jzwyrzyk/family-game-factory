@@ -1,8 +1,10 @@
 # jems delivery state
 
-## Pre-K and kindergarten development stack, November 25, 2026
+## Pre-K and kindergarten source integration, November 25, 2026
 
-The responsive coding repair [#175](https://github.com/jzwyrzyk/family-game-factory/pull/175) merged to main at `912fd31`. Review the drafts in sequence: [grade contracts #176](https://github.com/jzwyrzyk/family-game-factory/pull/176), [curriculum #177](https://github.com/jzwyrzyk/family-game-factory/pull/177), [graphical coding #178](https://github.com/jzwyrzyk/family-game-factory/pull/178), [family journey #179](https://github.com/jzwyrzyk/family-game-factory/pull/179) and [verification #183](https://github.com/jzwyrzyk/family-game-factory/pull/183). #176 now targets main. Each later draft targets its immediate predecessor. Revalidate each authorized merge candidate. Ordinary builds hold early profile selection and import. The separately reviewed family beta audit #180 and integration rehearsal #181 include additional release and storage work. No child or production enrollment has been authorized by this stream.
+The five PRs merged to protected main in order after the responsive coding repair #175. The merge commits were [#176](https://github.com/jzwyrzyk/family-game-factory/pull/176) (`e85553f588`), [#177](https://github.com/jzwyrzyk/family-game-factory/pull/177) (`59465caf1c`), [#178](https://github.com/jzwyrzyk/family-game-factory/pull/178) (`d280f55fda`), [#179](https://github.com/jzwyrzyk/family-game-factory/pull/179) (`7608b8c685`), [#183](https://github.com/jzwyrzyk/family-game-factory/pull/183) (`3bae1a34f2`).
+
+The grade foundation enforces the early-preview gate for grade changes, saved profiles and backup imports. Its 23 grade and backup tests passed locally. All 25 synthetic browser journey checks passed on the reconciled integrated tree. Each PR completed its checks against main before merge. Ordinary builds retain the grade-selection hold. Curriculum and art approval, target-device testing, private family beta integration (#170–174, #180, #181), paid family generation and separate production release authorization remain outstanding.
 
 See the [implementation decision](docs/decisions/2026-11-25-early-learning.md), [curriculum crosswalk](docs/adaptive-math/EARLY-CROSSWALK.md) and [browser evidence](docs/evidence/early-learning/README.md).
 

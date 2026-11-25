@@ -1126,10 +1126,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T01:57:28.126Z",
-      "sourceDigest": "f40e66eea0ae9d57af85629f89644fd1a6b5b22d74fb91d4db189f4452632925",
+      "reviewedAt": "2026-11-25T05:19:31.718Z",
+      "sourceDigest": "452b58c9eb24f99716c78b08d97de70788cc2f20ac6e66a63488c2a7676c6f53",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed imported grade holds, two-subject game playback, responsive coding controls, natural checkpoint and authorized restore paths in integrated verification.",
+      "reviewReason": "Reviewed the delivered early-learning PRs and their protected merge receipts against the integration guide.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
