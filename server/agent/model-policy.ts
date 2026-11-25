@@ -108,13 +108,14 @@ export function stagePolicy(approval:GenerationApproval,stage:ModelStage):Premiu
 export function stageReserve(policy:TokenPolicy,outputTokens=policy.maxOutputTokens):number{
  return Math.ceil(policy.maxInputTokens*policy.inputUsdPerMillion+outputTokens*policy.outputUsdPerMillion);
 }
+export function premiumAttemptReserve(approval:PremiumApproval,stage:'construction'|'repair',plan:boolean,art:boolean):number {
+ const stages=approval.stages;
+ const imageAllowance=art&&approval.images?.enabled?approval.images.maxImages*approval.images.maxMicroUsdPerImage:0;
+ return stageReserve(stages[stage])+stageReserve(stages.review)+(plan?stageReserve(stages.planning):0)+imageAllowance;
+}
 export function premiumJobReserve(approval:PremiumApproval):number {
  validatePremiumApproval(approval);
- const {planning,construction,review,repair}=approval.stages;
- const imageAllowance=approval.images?.enabled?approval.images.maxImages*approval.images.maxMicroUsdPerImage:0;
- // An asset repair may legitimately replan and generate fresh approved images.
- return stageReserve(construction)+approval.maxRepairAttempts*stageReserve(repair)
-  +(1+approval.maxRepairAttempts)*(stageReserve(planning)+stageReserve(review)+imageAllowance);
+ return premiumAttemptReserve(approval,'construction',true,true)+approval.maxRepairAttempts*premiumAttemptReserve(approval,'repair',true,true);
 }
 
 export interface StageUsage {

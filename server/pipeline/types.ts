@@ -34,6 +34,8 @@ export interface Job extends BuildRequest {
  /** Pinned at transactional admission. Absence preserves the legacy worker contract. */
  premiumPolicy?:PremiumPolicyPin;
  premiumUsage?:PremiumUsage;
+ /** Saved edits and explicit retries admit one complete pass at a time. */
+ premiumEditCeilingMicroUsd?:number;
  execution?:ActionExecution;
   /** Internal-only, independently authored and source-validated O5 probe;
    * BuildRequest rejects this field from clients, so it is never user-supplied.

@@ -5,13 +5,13 @@ import {adultPilotJobAllowed} from '../adult-pilot';
 import {draftChildIntentContract} from '../quality/child-intent';
 import {chooseGameForm} from '../quality/game-form';
 import {validateFunctionalGameContract} from '../quality/functional-game-contract';
-import {safeRepairDiagnostic,safeFinalRepairCode,type RepairCategory,type RepairCode,type QualityRepairAxes} from '../quality/repair-diagnostics';
+import {needsAssetRepair,safeRepairDiagnostic,safeFinalRepairCode,type RepairCategory,type RepairCode,type QualityRepairAxes} from '../quality/repair-diagnostics';
 import {applyCurrentQualityPolicy,requireProductionCandidate} from '../quality/quality-policy';
 import {validateQualityEvidence,validateQualityReview,qualityRepairContext,type GameQualityEvidence,type QualityFinding} from '../quality/game-quality';
 import {validateArtifact} from '../pipeline/artifacts';
 import {isGeneratedGame,validateCompiled,type GeneratedGame} from '../agent/generated';
 import {PREMIUM_POLICY_VERSION,isPremiumApproval,validateStageUsage,type PremiumApproval} from '../agent/model-policy';
-import {requirePinnedPremium,settleStoppedJob,type PremiumPilot} from '../pipeline/premium-policy';
+import {fundPremiumEditRepair,requirePinnedPremium,settleStoppedJob,type PremiumPilot} from '../pipeline/premium-policy';
 import type {AgentApproval} from '../agent/openai';
 import type {Repository,Job,PipelineState,CandidateArtifact,AgentInput} from '../pipeline/types';
 import type {WorkerIdentity,WorkerStage} from './identity';
@@ -39,7 +39,7 @@ export interface ActionExecution {
 const WORKFLOW_STAGE_MS=12*60*1000,WORKFLOW_PREPARE_MS=18*60*1000,MAX_ATTEMPTS=3;
 
 export class ActionCoordinator {
- constructor(private repo:Repository,private dispatcher:DispatchPort,private approval:AgentApproval,private leaseMs=900000,private requireVerifiedParentPrivacy=false,private adultPilotMode=false,private premiumPilot?:PremiumPilot){
+ constructor(private repo:Repository,private dispatcher:DispatchPort,private approval:AgentApproval,private leaseMs=900000,private requireVerifiedParentPrivacy=false,private adultPilotMode=false,private premiumPilot?:PremiumPilot,private premiumGameCeiling?:number){
   if(isPremiumApproval(approval))throw Error('LEGACY_APPROVAL_REQUIRED');
  }
  private get stageMs(){return Math.min(this.leaseMs,WORKFLOW_STAGE_MS);}
@@ -117,8 +117,13 @@ export class ActionCoordinator {
   if(e.attempt===0||e.attempt===1||e.attempt===2)e.lastFailure={stage,attempt:e.attempt,
    category:safe.category,code:safe.code,findings:[...(safe.findings||[])],
    ...(safe.qualityAxes?{qualityAxes:{...safe.qualityAxes}}:{})};
-  const maxRepairAttempts=j.premiumPolicy?requirePinnedPremium(j,this.premiumPilot).maxRepairAttempts:2;
+  const premium=j.premiumPolicy?requirePinnedPremium(j,this.premiumPilot):undefined;
+  const maxRepairAttempts=premium?.maxRepairAttempts??2;
   if(e.attempt>=maxRepairAttempts){this.failure(s,j,safeFinalRepairCode(diagnostics,j.independentIntentPlan));return;}
+  if(premium){
+   const denied=fundPremiumEditRepair(s,j,premium,this.premiumGameCeiling,needsAssetRepair(safe.feedback));
+   if(denied){this.failure(s,j,denied);return;}
+  }
   e.attempt++;e.queuedAt=Date.now();e.runId=undefined;e.stage=undefined;e.generateReport=undefined;e.testReport=undefined;e.reviewReport=undefined;
   e.claimAt=undefined;e.dispatchedAt=undefined;e.dispatchPending=true;e.diagnostics=safe.feedback;e.repairCategory=safe.category;
   this.advanceLease(j,'queued');
