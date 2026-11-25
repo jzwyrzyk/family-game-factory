@@ -1,3 +1,4 @@
+import {browserIsolation} from './beta-browser-isolation';
 import {previewBrowser} from './beta-preview-browser';
 import {migrationBrowser} from './beta-migration-browser';
 import assert from 'node:assert/strict';
@@ -64,6 +65,7 @@ async function main(){
     await p.getByRole('button',{name:'Talk about this idea'}).waitFor();assert.equal(await p.getByRole('button',{name:'Build or revise my game'}).count(),0);
     assert.equal((await ctx.request.get(local+'/play/features/games.js')).status(),403);assert.equal((await ctx.request.get(local+'/play/features/remote.js')).status(),200);
     await ctx.close();
+    if(engine==='chromium')await browserIsolation({key:readFileSync(dir+'/key'),cert:readFileSync(dir+'/cert')});
     const durable=await (engine==='webkit'?webkit:chromium).launchPersistentContext(dir+'/migration-'+engine,
      engine==='chromium'&&process.env.BETA_CHROMIUM_PATH?{executablePath:process.env.BETA_CHROMIUM_PATH}:{});
     await migrationBrowser(durable);await previewBrowser(browser);console.log(engine+' passed three layouts, invitation, verification, family profile, play gate, logout, migration and separate-origin preview submission');
