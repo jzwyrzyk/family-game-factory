@@ -19,3 +19,5 @@
 .early-box[data-position=in] .early-picture{bottom:4px;clip-path:inset(0 0 30% 0)}
 
 .early-activity .language-tile{min-height:76px;min-width:76px}.early-activity .language-built{display:flex;justify-content:center;gap:.6rem;min-height:3rem}
+
+.early-activity .early-small-gem{width:25px;height:auto}.early-activity .early-large-gem{width:49px;height:auto}
