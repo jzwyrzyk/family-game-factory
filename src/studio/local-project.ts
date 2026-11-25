@@ -11,7 +11,7 @@ import {IndexedNotebook} from '../storage/indexed-notebook';
 import {publishSourceEvidence,type SourceEvidenceSignal} from '../problem-solving/signals';
 import {indexedStoragePreview,nativeScope} from '../storage/native-workspace';
 import {prepareStudioNativeIntent,recoverStudioNative} from '../storage/studio-native-transaction';
-import {validateWorkspace} from '../factory/workspace';
+import {validateIndexedNativeWorkspace} from '../factory/workspace';
 
 interface ProjectStorage {
   getItem(key:string):string|null;
@@ -103,7 +103,7 @@ export async function saveStudioProject(
    const run=(book:StudioNotebook)=>{
     // The mutation is synchronous; all async preparation keeps the source gate.
     setRewardSourceMaintenance(false);
-    try{if(sourceProjectId===null)book.assertCanCreate();const value=create(new StudioGames(staged,stagedHost),book);if(updateProfile){updateProfile(profile,value);stagedHost.store.save();}return value;}
+    try{if(sourceProjectId===null)book.assertCanCreate();const value=create(new StudioGames(staged,stagedHost,nativeActive?owner:undefined),book);if(updateProfile){updateProfile(profile,value);stagedHost.store.save();}return value;}
     finally{setRewardSourceMaintenance(true);}
    };
    const prepared=notebookActive?await indexedBook.prepareTransaction(run):null;
@@ -112,7 +112,7 @@ export async function saveStudioProject(
    const changes=[...before].filter(([key,value])=>staged.getItem(key)!==value).map(([key,value])=>({key,before:value,after:staged.getItem(key)!}));
    const id=crypto.randomUUID(),extra=[...(prepared?.changes??[]),...(changes.length?await prepareStudioNativeIntent(indexed.records,owner,changes,id):[])];
    guard();
-   if(nativeActive)await indexed.restoreSnapshot(validateWorkspace(JSON.parse(staged.getItem(WORKSPACE_KEY)!)),id,extra);
+   if(nativeActive)await indexed.restoreSnapshot(validateIndexedNativeWorkspace(JSON.parse(staged.getItem(WORKSPACE_KEY)!),owner),id,extra);
    else if(extra.length)await indexed.records.restoreLocal({id,scope,changes:extra});
    if(changes.length)await recoverStudioNative(indexed.records,storage,guard,owner);guard();
    if(changes.some(change=>change.key===FAMILY_STATE_KEY))Object.assign(host.store.current(),profile);

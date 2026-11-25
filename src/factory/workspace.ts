@@ -88,15 +88,19 @@ export function migrateWorkspace(value: unknown): Workspace {
 export class RevisionStore {
   private data: Workspace;
   private raw: string | null;
-  constructor(private storage: StoragePort) {
+  /** Only isolated in-memory compound staging selects this path, after the
+   * caller has established the current indexed authority and exact owner. */
+  static forIndexedStaging(storage:StoragePort,owner:string){return new RevisionStore(storage,{indexedOwner:owner});}
+  constructor(private storage: StoragePort,private readonly staging?:{indexedOwner:string}) {
     this.raw=storage.getItem(WORKSPACE_KEY);
     // Never silently replace corrupt data: caller can keep playing the original arcade.
-    this.data=this.raw===null?empty():migrateWorkspace(JSON.parse(this.raw));
+    this.data=this.parse(this.raw===null?empty():JSON.parse(this.raw));
   }
+  private parse(value:unknown):Workspace{return this.staging?validateIndexedNativeWorkspace(value,this.staging.indexedOwner):migrateWorkspace(value);}
   private read(): Workspace {
     const raw = this.storage.getItem(WORKSPACE_KEY);
     if (raw !== this.raw) {
-      const next = raw === null ? empty() : migrateWorkspace(JSON.parse(raw));
+      const next = this.parse(raw === null ? empty() : JSON.parse(raw));
       this.data = next;
       this.raw = raw;
     }
@@ -105,7 +109,7 @@ export class RevisionStore {
   }
   snapshot(): Workspace { return copy(this.read()); }
   private save(next: Workspace): void {
-    const checked = validateWorkspace(next);
+    const checked = this.staging?validateIndexedNativeWorkspace(next,this.staging.indexedOwner):validateWorkspace(next);
     const raw = JSON.stringify(checked);
     try { this.storage.setItem(WORKSPACE_KEY,raw); } catch { throw Error('Could not save on this device. Your last working version is safe. Free some space and try again.'); }
     this.data = checked;
@@ -146,6 +150,6 @@ export class RevisionStore {
   restore(raw:string):void {
     assertRewardSourceWritable();
     // Explicit replacement may recover corrupt source bytes; ordinary edits may not.
-    this.save(migrateWorkspace(JSON.parse(raw)));
+    this.save(this.parse(JSON.parse(raw)));
   }
 }

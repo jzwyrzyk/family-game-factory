@@ -7,8 +7,8 @@ import type {Revision} from '../factory/workspace';
 /** Both generated formats use the generated revision endpoint; neither is a star catcher. */
 export function isGeneratedRemoteKind(kind: unknown): boolean { return kind === 'generated-module-v1' || kind === 'generated-module-v2'; }
 export class StudioGames {
-  constructor(private storage: StoragePort, private fg: any) {}
-  private store(){return new RevisionStore(this.storage);}
+  constructor(private storage: StoragePort, private fg: any,private indexedStagingOwner?:string) {}
+  private store(){return this.indexedStagingOwner===undefined?new RevisionStore(this.storage):RevisionStore.forIndexedStaging(this.storage,this.indexedStagingOwner);}
   list(owner:string){return this.store().list(owner);}
   create(owner:string,game:GameId,name:string,config:Mechanics,drawingRigId?:string){return this.store().create(owner,game,name,config,undefined,drawingRigId);}
   project(projectId:string,owner:string){return this.store().project(projectId,owner);}
