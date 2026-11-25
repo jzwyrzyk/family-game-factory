@@ -20,7 +20,7 @@ class CompleteRegressionCoverage(unittest.TestCase):
         self.package = json.loads((ROOT / "package.json").read_text())
 
     def test_actual_application_test_command_is_covered_once(self):
-        self.assertEqual(r.verify_coverage(self.package), {"suites": 26, "commands": 40, "shards": 8})
+        self.assertEqual(r.verify_coverage(self.package), {"suites": 26, "commands": 41, "shards": 8})
 
     def test_a_new_top_level_suite_blocks_release_until_assigned(self):
         self.package["scripts"]["test"] += " && npm run test:new-feature"

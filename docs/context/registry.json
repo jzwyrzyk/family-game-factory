@@ -122,7 +122,8 @@
     "docs/game-intelligence/premium-benchmark/*.md",
     "docs/development/*.md",
     "infra/nonproduction/*.md",
-    "docs/development/evidence/*.md"
+    "docs/development/evidence/*.md",
+    "docs/storage/*.md"
   ],
   "areas": [
     {
@@ -143,10 +144,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T18:16:02.638Z",
-      "sourceDigest": "a2b674e124a188be2d394f5c77895271de95374fc3b21b6cd2d67d403951ceff",
-      "reviewOutcome": "updated",
-      "reviewReason": "Recorded the owner-specific retained-game placement and cutover retention exception in a decision; general preserve-work doctrine is unchanged.",
+      "reviewedAt": "2026-11-24T22:31:41.318Z",
+      "sourceDigest": "51f306824b1e0a96f3612c193340eaf381392904bff644f8ffdbbcddb5c688ef",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed recovery and reward persistence contract updates against the doctrine. Child-owned Keep, original artwork, immutable versions, private profile boundaries and no paid replay remain unchanged; no product policy or routed decision document changed.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -494,10 +495,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "4fdd985c5da76076a57ebca31acd176b4afa822b46bd5b97b17fc2a0d428dce0",
-      "reviewedAt": "2026-11-23T05:43:13.311Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Inspected combined notebook chapter expansion and family backup with Notifications, selected helper evidence and pending request identity. New tests preserve exact native game bytes and reward provenance through restore/fork; earning policy, immutable receipts and explicit Keep authority are unchanged.",
+      "sourceDigest": "b92c6eea73581fd2637cb3b74522737ae665edf49c59af6002a4ef192883c9b9",
+      "reviewedAt": "2026-11-24T22:24:27.925Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented shared writer and maintenance coordination: pending project journals block source saves and family replacement, startup recovery precedes reward projection, and existing earning and backup ledger policies remain.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1674,6 +1675,27 @@
           "sourceCommit": "1b83637366247eb27ef8797defd63538f80ce914"
         }
       ]
+    },
+    {
+      "id": "storage",
+      "documents": [
+        "docs/storage/*.md",
+        "docs/child-continuity/F06-STORAGE-RECOVERY-EXPERIMENT.md",
+        "docs/child-continuity/RELIABILITY-2026-11-23.md",
+        "ARCHITECTURE-CURRENT.md"
+      ],
+      "sources": [
+        "src/storage/**",
+        "server/storage/**",
+        "infra/storage/**",
+        "tools/storage-*",
+        "docs/storage/**"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "8b376cd6f135b4fbd1f410d3e6197414f1a19d3309ac220b8109fa2fc277916e",
+      "reviewedAt": "2026-11-24T22:45:14.633Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Recorded all six durable boundaries for the three-source journal and retained prior five-boundary benchmark evidence. Updated current IndexedDB samples without claiming app migration, stable latency SLA or live reliability."
     }
   ]
 }

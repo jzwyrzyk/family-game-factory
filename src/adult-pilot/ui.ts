@@ -1,3 +1,4 @@
+import {recoverLocalProjects} from '../storage/project-recovery';
 import {iconMarkup,setIconLabel} from '../brand/icons';
 import {BuilderClient,type BuilderConfig} from '../builder/client';
 import {activateAdultSession,adultRequestSession,adultSessionVersion,clearAdultSession,onAdultSessionEnded,type AdultProfileSession} from './session';
@@ -223,7 +224,9 @@ export function installAdultProfile(config:BuilderConfig){
     if(!window.dispatchEvent(new CustomEvent('factory-profile-before-change',{cancelable:true,detail:{profileId:data.profileId}}))){
      revoke({...data,base});throw Error('PROFILE_SAVE_FAILED');
     }
-    activated=activateAdultSession(base,data);FG.store.enterAdultProfile(activated.profileId);
+    activated=activateAdultSession(base,data);
+    recoverLocalProjects(localStorage,activated.profileId);
+    FG.store.enterAdultProfile(activated.profileId);
     closeDialog(false);lastEnd='';banner.querySelector<HTMLElement>('#adultProfileExpiry')!.textContent='Access ends at '+new Date(activated.expiresAt).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+'. Switching profiles locks this session.';
     refreshProfile();void capabilities();
    }catch(error){

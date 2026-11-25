@@ -3,6 +3,14 @@
 ## November 25, 2026 · Private Family Beta review stack
 
 Application PRs [A](https://github.com/jzwyrzyk/family-game-factory/pull/170), [B](https://github.com/jzwyrzyk/family-game-factory/pull/171), [C](https://github.com/jzwyrzyk/family-game-factory/pull/172) and [D](https://github.com/jzwyrzyk/family-game-factory/pull/173) precede [E, protected hosting and migration](https://github.com/jzwyrzyk/family-game-factory/pull/174). The private worker has a companion routing change. Synthetic browser and Firestore evidence are separate from deployed DEV/TEST and owner acceptance. No household mapping or family activation has been performed. [Controlled activation and rollback](docs/family-beta/ACTIVATION.md)
+## November 24, 2026 — PR166 storage implementation continuation (not deployed)
+
+Continued original PR166 `1743c9e6560ae9416ec08a23cb660eb06af68351` from refreshed main `13260750b7771beb024cc6a94bf823ee5a4e29ff`. [The storage report](docs/storage/README.md), [inventory](docs/storage/INVENTORY.md) and [rollout/disposition](docs/storage/ROLLOUT.md) distinguish integrated local recovery/copy/reply changes from disabled indexed/cloud/asset preparation and unfinished migration/sync/backup engineering. Existing premium/environment/CI work is retained; no deployment, cloud operation, live data, paid inference, deletion or merge occurred.
+
+Local production build/typecheck and 620 unit cases passed. Navigation/continuity, coach desktop/mobile and Adult desktop/mobile built-app fixtures passed. Chromium recovery tested all six three-source renderer-termination boundaries at desktop/tablet/phone layouts and actual IndexedDB conflict/receipt/paging behavior; 50k-record benchmarks include the observed noisy mid-size sample. [Synthetic exact measurements](docs/storage/evidence/baseline.json) compare original PR166 validation/journal/asset encoding; they are not real-device or live family acceptance. Hosted final-source CI, owner review and deployed TEST remain separate gates, recorded on PR166 when observed. Source adapters do not imply production readiness or completion of all F06 requirements.
+
+The follow-up adds owner-scoped copy reminders and a visible **Check my copy** action. Built-app desktop/tablet/phone fixtures confirm durable identity before the single POST, GET-only recovery after reload, missing receipts retained, quota-failed local completion recoverable, and exact original/transcript preservation. Contrast and 48px touch-target checks passed; the phone capture was inspected. The dedicated notification suite passed 30 cases. First hosted failures in the documentation outcome and release command registration were corrected; their successor gates passed on `af7c054`. The follow-up still requires its own final-source hosted evidence.
+
 
 ## November 24 — premium completion continuation, PR139
 

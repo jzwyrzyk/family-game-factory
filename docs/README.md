@@ -75,3 +75,6 @@ The [original charter](factory-v2-implementation-charter.md), [Assignment 001 tr
 Prefer a link to the detailed contract over a copied version. Add new feature families to this index and to the [review registry](context/registry.json). Keep ephemeral execution logs in scoped evidence directories; preserve decisions and outcomes instead of dumping entire chats into the repository.
 
 For private family operations, use the [owner guide](family-beta/OWNER.md) and [privacy review](family-beta/PRIVACY.md).
+## Storage reliability and scalable persistence
+
+[PR166 storage report](storage/README.md) · [complete source inventory](storage/INVENTORY.md) · [migration, retention and activation boundaries](storage/ROLLOUT.md). Integrated local recovery is distinct from the disabled indexed/cloud preparation and remaining application migration.

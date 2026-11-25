@@ -48,6 +48,8 @@ export function apiHandler(service:JobService,config:HttpConfig,repo?:Repository
     return json(response,200,{revisionId:r.id,projectId:r.projectId,manifest});
    }
    if(path==='/v1/creations'&&request.method==='GET')return json(response,200,(await service.list(session)).map(r=>({...r,game:isGeneratedGame(r.game)?{kind:r.game.kind,title:r.game.title,instructions:r.game.instructions,controls:r.game.controls}:r.game})));
+   const copyReceipt=path.match(/^\/v1\/revisions\/([\w-]+)\/fork\/([\w-]+)$/);
+   if(copyReceipt&&request.method==='GET')return json(response,200,await service.forkReceipt(session,copyReceipt[1],copyReceipt[2]));
    match=path.match(/^\/v1\/revisions\/([\w-]+)\/(preview|keep|undo|fork)$/);
    if(match){const id=match[1];if(match[2]==='preview'&&request.method==='GET'){
      const revision=await service.revision(session,id);
@@ -62,7 +64,7 @@ export function apiHandler(service:JobService,config:HttpConfig,repo?:Repository
      }
      url.searchParams.set('scope',session.familyId);url.searchParams.set('expires',String(expiresAt));url.searchParams.set('cap',signature(config.previewKey,fields));
      return json(response,200,{artifactId:id,projectId:revision.projectId,expiresAt,url:url.href,adapter:revision.adapter,kind:revision.game?.kind,title:isGeneratedGame(revision.game)?revision.game.title:'Catch the Stars'});
-    }if(request.method==='POST'&&match[2]==='fork'){const input=await body(request);if(Object.keys(input).some(k=>k!=='name'))throw Error('INVALID_REQUEST');return json(response,200,await service.fork(session,id,input.name));}if(request.method==='POST'&&match[2]==='keep')return json(response,200,await service.keep(session,id));if(request.method==='POST'&&match[2]==='undo')return json(response,200,await service.undo(session,id));
+    }if(request.method==='POST'&&match[2]==='fork'){const input=await body(request);if(Object.keys(input).some(k=>!['name','clientRequestId'].includes(k)))throw Error('INVALID_REQUEST');return json(response,200,await service.fork(session,id,input.name,input.clientRequestId));}if(request.method==='POST'&&match[2]==='keep')return json(response,200,await service.keep(session,id));if(request.method==='POST'&&match[2]==='undo')return json(response,200,await service.undo(session,id));
    }
    json(response,404,{errorCode:'NOT_FOUND'});
   }catch(error){const raw=(error as Error).message,code=raw==='Forbidden'?'FORBIDDEN':raw;const allowed=['UNAUTHENTICATED','FORBIDDEN','NOT_FOUND','BUILDER_UNAVAILABLE','MODEL_POLICY_UNAVAILABLE','INVALID_REQUEST','PRIVATE_INFORMATION','SPENDING_CUTOFF','GAME_BUDGET_REACHED','RATE_LIMIT','RETRY_LIMIT','IDEMPOTENCY_CONFLICT','NO_PREVIOUS_VERSION','GAME_FORM_UNSUPPORTED','GAME_FORM_REVIEW_REQUIRED','GAME_FORM_BASE_UNVERIFIED','GUARDIAN_CONSENT_REQUIRED','ADULT_PILOT_ACCESS_REQUIRED'];json(response,code==='UNAUTHENTICATED'?401:code==='FORBIDDEN'||code==='ADULT_PILOT_ACCESS_REQUIRED'?403:code==='NOT_FOUND'?404:(code==='BUILDER_UNAVAILABLE'||code==='MODEL_POLICY_UNAVAILABLE')?503:400,{errorCode:allowed.includes(code)?code:'REQUEST_REJECTED'});}

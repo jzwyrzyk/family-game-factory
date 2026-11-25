@@ -164,7 +164,9 @@ export function installCoaching(h:Hooks){
  }
  function present(reply:CoachReply,mode:'model'|'local',captured:StudioSession,turn:{text:string;prior:CoachContext['plan'];origin:Origin;messageId:string;direct:boolean;reviewCurrent:boolean;requestMode:CoachContext['mode']}){
   const before=h.notebook.get(captured.id,captured.owner);
-  h.notebook.update(captured.id,captured.owner,s=>{
+  const question=reply.question,text=reply.text;
+  const texts=[...(text.trim()?[text]:[]),...(reply.suggestions.length&&turn.requestMode==='ideas'?['Some ideas from jems:\n'+reply.suggestions.join('\n')]:[]),...(question?[question]:[])];
+  h.notebook.reply(captured.id,captured.owner,texts,s=>{
    s.design ||= freshDesign();let changed=false;
    const retained=h.notebook.withConversation(s);
    const turnIndex=retained.messages.findIndex(message=>message.id===turn.messageId);
@@ -217,12 +219,9 @@ export function installCoaching(h:Hooks){
    }
   });
   h.onSavedDesignChange?.(before,h.notebook.get(captured.id,captured.owner));
-  const question=reply.question,text=reply.text;
   // The connected coach's reflection and contextual question are the actual
   // conversation. Never replace them with a fixed interview or answer buttons.
-  if(text.trim())h.message(captured,'helper',text);
-  if(reply.suggestions.length&&turn.requestMode==='ideas')h.message(captured,'helper','Some ideas from jems:\n'+reply.suggestions.join('\n'));
-  if(question)h.message(captured,'helper',question);
+  h.render();
   const box=$('coachProposals');box.replaceChildren();
   if(reply.proposedChange&&!isNewIdea(captured)){const proposal=reply.proposedChange;box.append(action('Try this idea: '+proposal.title,()=>{if(isCurrent(captured))return request(proposal.request,'helper',proposal.depth);}));}
   renderPlan();
