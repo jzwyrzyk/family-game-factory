@@ -93,12 +93,28 @@ export function validateFamilyRewardBackup(raw:string,validateBase:(raw:string)=
 function snapshotSources(storage:BackupStorage,preserved:readonly string[]=[]):RewardSourceSnapshot {
   return Object.fromEntries(REWARD_SOURCE_KEYS.filter(key=>!preserved.includes(key)).map(key=>[key,storage.getItem(key)])) as RewardSourceSnapshot;
 }
+/** Preserve the exact string and avoid rewriting an unchanged source. WebKit
+ * accounts string backing width in its storage quota; a Latin-1 source decoded
+ * from a wider archive may otherwise need twice its original space. Retry only
+ * a native quota failure, rebuilding the same code units in bounded 8-bit chunks.
+ * Never remove a current value to make a failed write appear successful. */
+function writeRecoveryValue(storage:BackupStorage,key:string,value:string):void {
+  if(storage.getItem(key)===value)return;
+  try{storage.setItem(key,value);}
+  catch(error){
+    if(typeof DOMException==='undefined'||!(error instanceof DOMException)||error.name!=='QuotaExceededError'||/[^\x00-\xff]/.test(value))throw error;
+    const pieces:string[]=[];
+    for(let offset=0;offset<value.length;offset+=8192){const codes=new Uint8Array(Math.min(8192,value.length-offset));for(let i=0;i<codes.length;i++)codes[i]=value.charCodeAt(offset+i);pieces.push(String.fromCharCode(...codes));}
+    const compact=pieces.join('');if(compact!==value)throw error;
+    storage.setItem(key,compact);
+  }
+}
 function restoreSources(storage:BackupStorage,snapshot:RewardSourceSnapshot):void {
   // Remove the failed replacement first so quota pressure cannot prevent the
   // original values (which already fit alongside the journal) from returning.
   const captured=REWARD_SOURCE_KEYS.filter(key=>own(snapshot,key));
   for(const key of captured)storage.removeItem(key);
-  for(const key of captured)if(snapshot[key]!==null)storage.setItem(key,snapshot[key]!);
+  for(const key of captured)if(snapshot[key]!==null)writeRecoveryValue(storage,key,snapshot[key]!);
 }
 async function readJournal(storage:BackupStorage,rewardsNamespace=REWARDS_DB_NAME,palsNamespace=PALS_DB_NAME):Promise<BackupJournal|null> {
   let raw=storage.getItem(REWARD_BACKUP_JOURNAL_KEY);if(raw===null)return null;
@@ -129,8 +145,8 @@ async function writeJournal(storage:BackupStorage,journal:BackupJournal,indexedI
  const raw=JSON.stringify(journal);
  const existing=storage.getItem(REWARD_BACKUP_JOURNAL_KEY),pointer=existing===null?null:JSON.parse(existing);
  const id=indexedId??(pointer?.schema==='jems.reward.backup.indexed-journal.v1'?pointer.id:undefined);
- if(id){await recoveryJournal(id,journal.rewards.namespace,raw);storage.setItem(REWARD_BACKUP_JOURNAL_KEY,JSON.stringify({schema:'jems.reward.backup.indexed-journal.v1',id,namespace:journal.rewards.namespace}));}
- else storage.setItem(REWARD_BACKUP_JOURNAL_KEY,raw);
+ if(id){await recoveryJournal(id,journal.rewards.namespace,raw);writeRecoveryValue(storage,REWARD_BACKUP_JOURNAL_KEY,JSON.stringify({schema:'jems.reward.backup.indexed-journal.v1',id,namespace:journal.rewards.namespace}));}
+ else writeRecoveryValue(storage,REWARD_BACKUP_JOURNAL_KEY,raw);
 }
 function invalidateProblemSolvingView():void {
   // Stores are replaced directly while source writes are paused. Discard an
@@ -153,12 +169,12 @@ export async function applyFamilyRewardBackup(plan:PreparedFamilyRewardBackup,st
   // If this safety copy cannot fit, fail before changing any source or ledger.
   try{await writeJournal(storage,journal,indexedJournal?crypto.randomUUID():undefined);}catch{throw Error('A safety copy could not be saved. Export your current progress before freeing browser space. Nothing was replaced.');}
   try{
-    storage.setItem(FAMILY_STATE_KEY,JSON.stringify(plan.base));
-    if(!preservedIndexed.includes(WORKSPACE_KEY))storage.setItem(WORKSPACE_KEY,JSON.stringify(plan.workspace));
-    if(!preservedIndexed.includes(STUDIO_KEY))storage.setItem(STUDIO_KEY,JSON.stringify(plan.notebook));
-    try{if(!preservedIndexed.includes(CREATION_KEY))storage.setItem(CREATION_KEY,JSON.stringify(plan.creation));}
+    writeRecoveryValue(storage,FAMILY_STATE_KEY,JSON.stringify(plan.base));
+    if(!preservedIndexed.includes(WORKSPACE_KEY))writeRecoveryValue(storage,WORKSPACE_KEY,JSON.stringify(plan.workspace));
+    if(!preservedIndexed.includes(STUDIO_KEY))writeRecoveryValue(storage,STUDIO_KEY,JSON.stringify(plan.notebook));
+    try{if(!preservedIndexed.includes(CREATION_KEY))writeRecoveryValue(storage,CREATION_KEY,JSON.stringify(plan.creation));}
     catch{throw Error('Could not save this creation on this device. Your previous scene data remains protected by the backup safety copy.');}
-    try{storage.setItem(PROBLEM_SOLVING_KEY,JSON.stringify(plan.problemSolving));}
+    try{writeRecoveryValue(storage,PROBLEM_SOLVING_KEY,JSON.stringify(plan.problemSolving));}
     catch{throw Error('Could not save these problem-solving observations. Your previous observations remain protected by the backup safety copy.');}
     assertAuthorized();await store.restore(plan.rewards,{mode:'replace',allowedOwners:plan.owners});
     assertAuthorized();await palStore.restore(plan.pals,{mode:'replace',allowedOwners:plan.owners});
