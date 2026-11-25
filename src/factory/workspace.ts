@@ -27,6 +27,18 @@ function checkHead(project: Project, expectedHeadId?: string): void {
 export function validateWorkspace(value: unknown): Workspace {
   const d = value as Workspace;
   if (!d || d.version !== 2 || !Array.isArray(d.projects) || !Array.isArray(d.revisions) || !Array.isArray(d.plays) || d.projects.length > 50 || d.revisions.length > 500 || d.plays.length > 1000) throw Error('This workspace backup is not supported.');
+  return validateWorkspaceGraph(d);
+}
+/** Prepared libraries admit records independently. Their reviewed owner-scoped
+ * recovery source keeps the same graph checks without imposing legacy whole-key
+ * count limits. Each record is validated and cloned separately; callers still
+ * enforce their bounded archive and atomic-transaction byte limits. */
+export function validateIndexedNativeWorkspace(value:unknown,owner:string):Workspace {
+  const d=value as Workspace;
+  if(!text(owner,100)||!owner||!d||d.version!==2||!Array.isArray(d.projects)||!Array.isArray(d.revisions)||!Array.isArray(d.plays)||d.projects.some(p=>!p||p.owner!==owner))throw Error('Prepared library belongs to another player or needs recovery.');
+  return validateWorkspaceGraph(d,true);
+}
+function validateWorkspaceGraph(d:Workspace,perRecord=false):Workspace {
   const unique = (items: {id:string}[]) => items.every(x=>x && text(x.id,100) && x.id.length>0) && new Set(items.map(x=>x.id)).size===items.length;
   if (!unique(d.projects) || !unique(d.revisions) || !unique(d.plays)) throw Error('Workspace identifiers are invalid.');
   const projects=new Map(d.projects.map(p=>[p.id,p]));
@@ -58,7 +70,7 @@ export function validateWorkspace(value: unknown): Workspace {
     const playedConfig=validateConfig(out.game, out.config);
     if (Object.entries(playedConfig).some(([key,value])=>validateConfig(project.game,revision.config)[key]!==value)) throw Error('Play evidence does not match its revision.');
   }
-  return copy(d);
+  return perRecord?{version:2,projects:d.projects.map(copy),revisions:d.revisions.map(copy),plays:d.plays.map(copy)}:copy(d);
 }
 // A documented, local-only pre-release schema: each v1 game becomes a root revision.
 export function migrateWorkspace(value: unknown): Workspace {

@@ -1,6 +1,6 @@
 import {IndexedRecords} from './indexed-records';
 import type {RecordScope,RecordChange,DurableRecord,RecordReceipt} from './record-contract';
-import {validateWorkspace,migrateWorkspace,type Project,type Revision,type PlayRecord,type Workspace} from '../factory/workspace';
+import {validateWorkspace,validateIndexedNativeWorkspace,migrateWorkspace,type Project,type Revision,type PlayRecord,type Workspace} from '../factory/workspace';
 import {defaults,validateConfig,isGameId} from '../runtime/manifests';
 import type {GameId,Mechanics,PlayOutcome} from '../runtime/types';
 
@@ -104,7 +104,7 @@ export class IndexedNativeStore {
   await this.ready();const all=async(collection:string)=>{const rows:DurableRecord[]=[];let after:string|null=null;do{const page=await this.records.page(collection,after,100);rows.push(...page);after=page.length===100?page.at(-1)!.id:null;}while(after);return rows;};
   const projects=(await all(PROJECTS)).map(r=>this.decodeProject(r)),owners=new Map(projects.map(p=>[p.id,p]));const revisions:Revision[]=[];
   for(const row of await all(REVISIONS)){const project=owners.get((row.value as StoredRevision).projectId);if(!project)throw Error('A saved version has no owning game.');revisions.push(await this.decodeRevision(row,project));}
-  return {version:2,projects,revisions,plays:(await all(PLAYS)).map(r=>copy(r.value as PlayRecord))};
+  return validateIndexedNativeWorkspace({version:2,projects,revisions,plays:(await all(PLAYS)).map(r=>copy(r.value as PlayRecord))},this.scope.profile);
  }
  /** Enable future selected native writes only for the current, explicitly
   * approved session. The pump independently rechecks remote grants per request. */
@@ -144,7 +144,7 @@ export class IndexedNativeStore {
   await this.ready();if(projectId===null)return {version:2,projects:[],revisions:[],plays:[]};
   const rows=await this.projectRecords(projectId,{includeArtworkReferences:true}),projects=rows.filter(row=>row.collection===PROJECTS).map(row=>this.decodeProject(row)),configs=new Map(rows.filter(row=>row.collection===CONFIGS).map(row=>[row.id,row.value]));
   const revisions=rows.filter(row=>row.collection===REVISIONS).map(row=>{const {configHash,...revision}=row.value as StoredRevision,project=projects.find(p=>p.id===revision.projectId);if(!project||!configs.has(configHash))throw Error('The saved project is incomplete.');return {...revision,config:validateConfig(project.game,configs.get(configHash))};});
-  return validateWorkspace({version:2,projects,revisions,plays:[]});
+  return validateIndexedNativeWorkspace({version:2,projects,revisions,plays:[]},this.scope.profile);
  }
  /** Queue only the game the grown-up selected, together with its immutable
   * revision ancestry. Local values remain unchanged; receipts make retries safe. */
@@ -177,7 +177,7 @@ export class IndexedNativeStore {
   }
   for(const row of rows.filter(r=>r.collection.startsWith('native-history:'))){const revision=revisions.get((row.value as {revisionId:string}).revisionId);if(!revision||row.collection!==key(revision.projectId)||row.id!==historyId(revision)||canonical(row.value)!==canonical({revisionId:revision.id}))throw Error('Private revision history is incomplete.');}
   for(const row of rows.filter(r=>r.collection===REVISIONS)){const revision=revisions.get(row.id)!;if(!rows.some(pointer=>pointer.collection===key(revision.projectId)&&pointer.id===historyId(revision))&&!await this.row(key(revision.projectId),historyId(revision)))throw Error('A private saved version is missing its history entry.');}
-  validateWorkspace({version:2,projects:[...projects.values()],revisions:[...revisions.values()],plays:[...plays.values()]});return changes;
+  validateIndexedNativeWorkspace({version:2,projects:[...projects.values()],revisions:[...revisions.values()],plays:[...plays.values()]},this.scope.profile);return changes;
  }
  async validateRemoteGraph(rows:DurableRecord[]):Promise<void>{await this.remoteChanges(rows);}
  /** A feed is staged by the transport first. Complete graph validation precedes
@@ -219,7 +219,7 @@ export class IndexedNativeStore {
   * revisions and unrelated projects are never removed. Pointer changes are
   * explicit; immutable-ID/content conflicts fail before any mutation. */
  async restoreSnapshot(input:Workspace,operation:string,extraChanges:RecordChange[]=[]):Promise<void>{
-  await this.ready();const checked=validateWorkspace(input),projects=checked.projects.filter(p=>p.owner===this.scope.profile),ids=new Set(projects.map(p=>p.id));
+  await this.ready();const checked=validateIndexedNativeWorkspace(input,this.scope.profile),projects=checked.projects,ids=new Set(projects.map(p=>p.id));
   const revisions=checked.revisions.filter(r=>ids.has(r.projectId)),revisionIds=new Set(revisions.map(r=>r.id));
   if(revisions.some(r=>r.sourceRevisionId&&!revisionIds.has(r.sourceRevisionId)))throw Error('The backup has an unavailable original game.');
   const planned=new Map<string,{collection:string;id:string;value:unknown}>();

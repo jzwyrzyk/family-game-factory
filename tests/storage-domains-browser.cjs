@@ -40,6 +40,22 @@ const {build}=require('esbuild'),{chromium,webkit}=require('playwright');
    const remoteReceipt=await target.applyRemoteGraph(graph,'complete-download'),again=await target.applyRemoteGraph(graph,'complete-download');if(JSON.stringify(remoteReceipt)!==JSON.stringify(again)||remoteReceipt.versions.length!==graph.length+1)throw Error('download receipt not idempotent or incomplete');if((await target.revision(source.id)).config.bucketCount!==4)throw Error('remote mechanics lost');target.close();
    await expect(()=>store.migrateLegacy(raw+' '),'changed migration accepted');store.close();checks.push('resumable native authority, bounded reads, config reuse, CAS, Keep/Undo/Fork');
    const other=await domainTest.IndexedNativeStore.open({family:'other-family',profile:'player1'},()=>{});await expect(()=>other.project(source.id),'cross-family game read');other.close();
+   // Prepared native writes are record-scoped and can legitimately exceed the
+   // legacy whole-key limits. Recovery must retain every admitted original.
+   const empty=JSON.stringify({version:2,projects:[],revisions:[],plays:[]}),large=await domainTest.IndexedNativeStore.open({family:'large-native-source',profile:'player1'},()=>{});await large.migrateLegacy(empty);
+   const games=[];for(let i=0;i<51;i++)games.push(await large.create('buckets','Retained game '+i));
+   let newest=games[0].headId;for(let i=0;i<500;i++)newest=(await large.commit(games[0].id,domainTest.defaults('buckets'),'Retained edition '+i,'',newest)).id;
+   const played=games[1],outcome={game:'buckets',config:domainTest.defaults('buckets'),won:true,level:1,durationMs:100,title:'Retained play',description:'Synthetic recovery evidence',at:'2026-11-25T00:00:00Z'};
+   for(let i=0;i<1001;i++)await large.record(played.id,played.headId,outcome);
+   const full=await large.snapshot();if(full.projects.length!==51||full.revisions.length!==551||full.plays.length!==1001)throw Error('prepared source did not retain beyond legacy limits');
+   const one=await large.snapshotProject(games[0].id);if(one.revisions.length!==501)throw Error('selected prepared history still used legacy cap');
+   const roots=full.projects.map(p=>({p,r:full.revisions.find(r=>r.projectId===p.id&&r.parentId===null)})),projectLimit={version:2,projects:roots.map(({p,r})=>({...p,headId:r.id})),revisions:roots.map(({r})=>r),plays:[]},playLimit={version:2,projects:[played],revisions:full.revisions.filter(r=>r.id===played.headId),plays:full.plays};
+   for(const source of [projectLimit,one,playLimit]){domainTest.validateIndexedNativeWorkspace(source,'player1');let error;try{domainTest.validateWorkspace(source);}catch(e){error=e;}if(error?.message!=='This workspace backup is not supported.')throw Error('legacy aggregate limits changed');}
+   const destination=await domainTest.IndexedNativeStore.open({family:'large-native-target',profile:'player1'},()=>{});await destination.migrateLegacy(empty);await destination.restoreSnapshot(full,'full-large-native-restore');
+   if(JSON.stringify(await destination.snapshot())!==JSON.stringify(full))throw Error('large native restore lost original bytes or graph');
+   const foreign=structuredClone(full);foreign.projects[0].owner='player2';await expect(()=>destination.restoreSnapshot(foreign,'foreign-large-restore'),'foreign prepared owner accepted');
+   const broken=structuredClone(full);broken.revisions.find(r=>r.id===newest).parentId=newest;await expect(()=>destination.restoreSnapshot(broken,'cyclic-large-restore'),'large malformed ancestry accepted');
+   if((await destination.project(games[0].id)).headId!==newest)throw Error('rejected large restore changed live pointer');large.close();destination.close();checks.push('owner-scoped atomic recovery beyond legacy game, revision and play limits');
    // Real original records remain byte-for-byte inline; page only lightweight cards.
    await domainTest.withArtTransaction(['drawings'],'readwrite',tx=>{for(let i=0;i<30;i++){const item={id:'art-'+String(i).padStart(3,'0'),owner:'player1',name:'Original '+i,mime:'image/png',bytes:new ArrayBuffer(4096),preview:new ArrayBuffer(24),sha256:'a'.repeat(64),createdAt:new Date(1700000000000+i).toISOString()};tx.objectStore('drawings').put(item);domainTest.saveDrawingMetadata(tx,item);}const other={id:'other-art',owner:'player2',name:'Private other',mime:'image/png',bytes:new ArrayBuffer(4096),sha256:'b'.repeat(64),createdAt:new Date().toISOString()};tx.objectStore('drawings').put(other);domainTest.saveDrawingMetadata(tx,other);});
    const a=await domainTest.drawingPage('player1',{limit:24}),b=await domainTest.drawingPage('player1',{limit:24,after:a.next});if(a.items.length!==24||b.items.length!==6||a.total!==30||a.items.some(i=>'bytes'in i))throw Error('art catalog hydrated originals or leaked owner');
@@ -47,6 +63,6 @@ const {build}=require('esbuild'),{chromium,webkit}=require('playwright');
    await domainTest.updateDrawing('player1',original.id,{name:'Changed details'});if((await domainTest.drawingPage('player1',{search:'Changed details'})).items.length!==1)throw Error('catalog update missing');checks.push('24-card artwork paging and exact scoped original retrieval');
    return checks;
   });
-  assert.equal(result.length,3);console.log(JSON.stringify({browser:process.env.STORAGE_BROWSER??'chromium',checks:result}));await context.close();
+  assert.equal(result.length,4);console.log(JSON.stringify({browser:process.env.STORAGE_BROWSER??'chromium',checks:result}));await context.close();
  }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});
