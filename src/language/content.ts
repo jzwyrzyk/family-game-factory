@@ -1,3 +1,5 @@
+import {EARLY_LANGUAGE_BANK} from './early';
+import {hasPicture} from '../learning/early/pictures';
 import {withinGrade} from '../learning/grades';
 import {getLanguageSkill, LANGUAGE_SKILLS} from './curriculum';
 import {LANGUAGE_G1} from './data-g1';
@@ -7,7 +9,7 @@ import {LANGUAGE_G4} from './data-g4';
 import type {LanguageItem, LanguageKind, LanguageLevel, LanguageForm} from './types';
 
 export interface LanguageTemplate {
-  kind:LanguageKind; q:string; a:string; d?:string[]; ex:string; t:number; passage?:string;
+  kind:LanguageKind; q:string; a:string; d?:string[]; ex:string; t:number; passage?:string; stimulus?:string;
 }
 export interface LanguageTemplateBank {
   h:string[]; items:LanguageTemplate[];
@@ -27,8 +29,8 @@ export const LANGUAGE_BANK_V1:Readonly<Record<string,LanguageTemplateBank>> = de
   ...LANGUAGE_G1, ...LANGUAGE_G2, ...LANGUAGE_G3, ...LANGUAGE_G4,
 });
 export const LANGUAGE_PACKS:Readonly<Record<string,Readonly<Record<string,LanguageTemplateBank>>>> =
-  Object.freeze({v1:LANGUAGE_BANK_V1});
-export const LANGUAGE_BANK = LANGUAGE_BANK_V1;
+  Object.freeze({v1:LANGUAGE_BANK_V1,v2:deeplyFreeze(EARLY_LANGUAGE_BANK)});
+export const LANGUAGE_BANK = Object.freeze({...LANGUAGE_BANK_V1,...LANGUAGE_PACKS.v2});
 const unit=(random:()=>number):number=>{
   const n=random(); return Number.isFinite(n)?Math.max(0,Math.min(0.999999,n)):0;
 };
@@ -43,24 +45,25 @@ export interface LanguageItemOptions {
 /** Reviewed templates only. Generated game code never authors or grades these items. */
 export function generateLanguageItem(skillId:string,options:LanguageItemOptions={}):LanguageItem {
   const skill=getLanguageSkill(skillId);
-  const bank=LANGUAGE_PACKS[ACTIVE_LANGUAGE_PACK][skillId];
+  const pack=Object.hasOwn(LANGUAGE_PACKS.v2,skillId)?'v2':ACTIVE_LANGUAGE_PACK;
+  const bank=LANGUAGE_PACKS[pack][skillId];
   if(!bank?.items.length)throw Error('Language skill has no reviewed examples: '+skillId);
   const random=options.random||Math.random;
   const tier=Math.max(0,Math.min(2,Math.floor(options.tier??0))) as LanguageLevel;
   const nearest=Math.min(...bank.items.map(x=>Math.abs(x.t-tier)));
   const matches=bank.items.map((item,index)=>({item,index})).filter(x=>Math.abs(x.item.t-tier)===nearest);
-  const notRecent=matches.filter(x=>!options.excludeIds?.includes(skillId+':'+ACTIVE_LANGUAGE_PACK+':'+x.index));
+  const notRecent=matches.filter(x=>!options.excludeIds?.includes(skillId+':'+pack+':'+x.index));
   const eligible=notRecent.length?notRecent:matches;
   const chosen=eligible[Math.floor(unit(random)*eligible.length)];
   const draft=chosen.item;
   const kind=draft.kind;
-  const form:LanguageForm=kind==='word-tiles'?'encoding':kind==='sentence-tiles'||kind==='edit'?'syntax':
+  const form:LanguageForm=kind==='picture-order'?'comprehension':kind==='word-tiles'?'encoding':kind==='sentence-tiles'||kind==='edit'?'syntax':
     kind==='creative'?'expression':skill.domain==='comprehension'?'comprehension':'pattern';
   const choices=kind==='choice' ? shuffle([draft.a,...(draft.d||[])].map(value=>({value,label:value})),random) : undefined;
   const tiles=(kind==='word-tiles'?shuffle(draft.a.split(''),random):
-    kind==='sentence-tiles'?shuffle(draft.a.split(/\s+/),random):undefined);
+    (kind==='picture-order'||kind==='sentence-tiles')?shuffle(draft.a.split(/\s+/),random):undefined);
   return {
-    id:skillId+':'+ACTIVE_LANGUAGE_PACK+':'+chosen.index,contentPack:ACTIVE_LANGUAGE_PACK,
+    id:skillId+':'+pack+':'+chosen.index,contentPack:pack,...(draft.stimulus?{stimulus:draft.stimulus}:{}),
     skillId,title:skill.title,grade:skill.grade,domain:skill.domain,
     kind,form,tier:draft.t as LanguageLevel,question:draft.q,
     ...(draft.passage?{passage:draft.passage}:{}),
@@ -106,6 +109,10 @@ export function languageContentErrors():string[] {
         if(!item.a||!item.d||item.d.length!==3||new Set([item.a,...item.d]).size!==4)errors.push(key+': ambiguous/missing choices');
       } else if(item.kind==='word-tiles'){
         if(!/^[a-z]{3,20}$/i.test(item.a))errors.push(key+': unsupported spelling construction');
+      } else if(item.kind==='picture-order'){
+        const tokens=item.a.split(' ');
+        if(skill.domain!=='listening'||tokens.length<2||tokens.length>3||tokens.some(t=>!hasPicture(t))||new Set(tokens).size!==tokens.length)
+          errors.push(key+': invalid illustrated listening sequence');
       } else if(item.kind==='sentence-tiles'){
         if(item.a.split(/\s+/).length<4)errors.push(key+': incomplete sentence construction');
       } else if(item.kind==='edit'){

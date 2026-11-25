@@ -1,8 +1,8 @@
 /** Host-trusted language-arts contracts. No generated game may grade a child. */
 import type {Grade, LearningContext, LearnerProfile} from '../learning/types';
-export type LanguageDomain = 'phonics'|'spelling'|'vocabulary'|'grammar'|'comprehension'|'writing';
+export type LanguageDomain = 'phonics'|'spelling'|'vocabulary'|'grammar'|'listening'|'phonological-awareness'|'early-reading'|'comprehension'|'writing';
 export type LanguageForm = 'pattern'|'encoding'|'syntax'|'comprehension'|'expression';
-export type LanguageKind = 'choice'|'word-tiles'|'sentence-tiles'|'edit'|'creative';
+export type LanguageKind = 'choice'|'picture-order'|'word-tiles'|'sentence-tiles'|'edit'|'creative';
 export type LanguageLevel = 0|1|2;
 export interface LanguageSkill {
   id:string; title:string; grade:Grade; domain:LanguageDomain;
@@ -12,7 +12,7 @@ export interface LanguageChoice {value:string; label:string}
 export interface LanguageItem {
   id:string; contentPack:string; skillId:string; title:string; grade:Grade; domain:LanguageDomain;
   kind:LanguageKind; form:LanguageForm; tier:LanguageLevel;
-  question:string; passage?:string; choices?:LanguageChoice[]; tiles?:string[];
+  question:string; passage?:string; stimulus?:string; choices?:LanguageChoice[]; tiles?:string[];
   answer?:string; hints:[string,string,string]; explanation:string;
   /** Separate written response from reading assistance. */
   source:'reviewed-local'; purpose?:'focus'|'review'|'confidence'|'prerequisite'|'explore';
