@@ -8,7 +8,7 @@ permissions:
 jobs:
   auth-contract:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -60,7 +60,7 @@ jobs:
         if: steps.beta.outputs.selected == 'true'
         env:
           STORAGE_BROWSER: webkit
-        run: node tests/storage-domains-browser.cjs && node tests/storage-complete-backup-browser.cjs && node tests/storage-indexed-notebook-browser.cjs && node tests/studio-native-browser.cjs
+        run: node tests/storage-domains-browser.cjs && node tests/storage-complete-backup-browser.cjs && node tests/storage-indexed-notebook-browser.cjs && node tests/storage-creation-browser.cjs && node tests/storage-sync-browser.cjs && node tests/studio-native-browser.cjs && node tests/storage-recovery-ui-browser.cjs && node scripts/storage/build-preview.mjs && node tests/storage-native-ui.cjs && node tests/studio-native-ui.cjs && node tests/studio-notebook-ui.cjs
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() && steps.beta.outputs.selected == 'true' }}
         with:
@@ -68,4 +68,5 @@ jobs:
           path: |
             test-results/family-beta/*.png
             test-results/complete-recovery/**
+            test-results/complete-recovery-ui/**
           retention-days: 7

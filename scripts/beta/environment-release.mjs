@@ -36,7 +36,7 @@ export function verifyService(actual,expected){
  const name=expected.metadata.name,spec=actual.spec?.template?.spec,desired=expected.spec.template.spec;
  requireState(actual.metadata?.name===name&&String(actual.metadata.namespace)===expected.metadata.namespace&&actual.metadata.labels?.['cloud.googleapis.com/location']===expected.metadata.labels['cloud.googleapis.com/location']&&actual.metadata.labels?.['jems-environment']===expected.metadata.labels['jems-environment'],'Existing dedicated service identity required.');
  for(const [key,val] of Object.entries(expected.metadata.annotations))requireState(actual.metadata.annotations?.[key]===val,'Existing ingress or direct URL policy differs.');
- requireState(spec?.serviceAccountName===desired.serviceAccountName&&spec.containers?.length===1&&spec.containers.length===1,'Existing runtime principal or capacity differs.');
+ requireState(spec?.serviceAccountName===desired.serviceAccountName&&spec.containers?.length===1,'Existing runtime principal or capacity differs.');
  verifyScaling(actual.spec.template.metadata,expected.spec.template.metadata);
  verifyRuntime(spec,desired);
  const serving=(actual.status?.traffic??[]).filter(t=>(t.percent??0)>0).map(t=>[t.revisionName,t.percent]).sort();
