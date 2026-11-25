@@ -890,10 +890,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T19:08:50.077Z",
+      "reviewedAt": "2026-11-25T19:25:26.470Z",
       "sourceDigest": "11b3abe5222b4b6a66814569457a43d61e8081baeff0efbb327a0e819f190d4e",
       "reviewOutcome": "updated",
-      "reviewReason": "Record exact7299 fifteen-of-sixteen result, verified120-command receipt and all16 beta/two-engine stage passes, native nearquota proof and remainingcloud error; followup preserves assertions through realHTTP with activeSW, partialresponse lostack and sameoperation/singleroot verification.",
+      "reviewReason": "Record the fully passing fc7 application checkpoint: all sixteen hosted workflows, thirteen Arcade shards and 120 commands, sixteen beta outcomes, nineteen WebKit storage commands, actual HTTP cloud retry and native quota recovery; independently verified receipts retain exact source, tree and artifact scope.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1134,10 +1134,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T19:08:50.276Z",
-      "sourceDigest": "b582abd42219f3fbc30bb90cae93f15db977ac17abeeee878ace6198b0895e31",
+      "reviewedAt": "2026-11-25T19:25:26.715Z",
+      "sourceDigest": "c902e9dca192fc1f0be4c0ae610b9b1d5340a01acfaac8198a507f82f578215e",
       "reviewOutcome": "updated",
-      "reviewReason": "Record7299 exactsource/tree/securityartifact and actualWebKit migration/quota outcomes without claiming completeSecurity; followup cloud fixture usesrealHTTP, with nativeWebKit successor acceptance stillrequired and interception hypothesis explicitlyunproven.",
+      "reviewReason": "Record the observed all-green application runtime and inspected evidence with exact source and immutable identities. Closing documentation changes no runtime; current PR checks still bind the review head. Protected merge, provisioning, real devices, owner/provider/legal acceptance and release remain held.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
