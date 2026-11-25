@@ -1,3 +1,4 @@
+import {recoverAdultBackupAfterUnlock} from '../storage/adult-recovery';
 import {recoverLocalProjects} from '../storage/project-recovery';
 import {iconMarkup,setIconLabel} from '../brand/icons';
 import {BuilderClient,type BuilderConfig} from '../builder/client';
@@ -226,6 +227,7 @@ export function installAdultProfile(config:BuilderConfig){
     }
     activated=activateAdultSession(base,data);
     recoverLocalProjects(localStorage,activated.profileId);
+    await recoverAdultBackupAfterUnlock(activated.profileId);
     FG.store.enterAdultProfile(activated.profileId);
     closeDialog(false);lastEnd='';banner.querySelector<HTMLElement>('#adultProfileExpiry')!.textContent='Access ends at '+new Date(activated.expiresAt).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+'. Switching profiles locks this session.';
     refreshProfile();void capabilities();
