@@ -220,13 +220,12 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
   window.addEventListener('resize', scheduleResize);
   window.visualViewport?.addEventListener('resize', scheduleResize);
   const observer = new ResizeObserver(scheduleResize);
-  if (header) observer.observe(header);
-  observer.observe(host);
   const content = new MutationObserver(scheduleResize);
   content.observe(host, { childList: true, subtree: true });
 
   const controller = {
     enter() {
+      const entering = !active;
       if (!active) {
         previousOverflow = { html: document.documentElement.style.overflow, body: document.body.style.overflow };
         document.documentElement.style.overflow = 'hidden'; document.body.style.overflow = 'hidden';
@@ -237,12 +236,21 @@ export function installPlayView(page: HTMLElement, host: HTMLElement) {
       updateReady();
       button.hidden = false;
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      resize(); scheduleResize();
+      resize();
+      // Ordinary Studio can be revealed while its saved revision is still
+      // loading. Observe only the fitted layout we own, after its initial size
+      // is established; inactive host changes need no resize notifications.
+      if (entering) {
+        if (header) observer.observe(header);
+        observer.observe(host);
+      }
+      scheduleResize();
       (host.querySelector<HTMLElement>('[data-game-entry-focus]') ?? host).focus({ preventScroll: true });
     },
     leave() {
       if (!active) return;
       active = false; expanded = false; ++request;
+      observer.disconnect();
       if (document.fullscreenElement === page) void document.exitFullscreen().catch(() => {});
       document.body.classList.remove('studio-playing'); page.classList.remove('studio-play-mode', 'studio-play-expanded');
       notice.hidden = true; updateButton();

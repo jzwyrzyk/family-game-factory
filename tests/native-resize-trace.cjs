@@ -12,6 +12,7 @@ exports.installNativeResizeTrace=function(){
  };
  const record=entry=>{trace.push({...entry,sequence:++nextSequence,at:performance.now()});if(trace.length>40)trace.shift();};
  const current=observer=>[...(observed.get(observer)||[])].map(bounds);
+ window.__nativeResizeSubscriptions=()=>[...observed].map(([observer,targets])=>({observer,targets:[...targets].map(label)}));
  for(const property of ['width','height']){
   const descriptor=Object.getOwnPropertyDescriptor(HTMLCanvasElement.prototype,property);
   Object.defineProperty(HTMLCanvasElement.prototype,property,{...descriptor,set(value){
