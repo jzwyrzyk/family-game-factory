@@ -35,7 +35,7 @@ const origin=(value:unknown):value is string=>typeof value==='string'&&/^https:\
 const canonical=(value:any):string=>value===null?'null':Array.isArray(value)?'['+value.map(canonical).join(',')+']':typeof value==='object'?'{'+Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+canonical(value[k])).join(',')+'}':JSON.stringify(value);
 function enabled(config:HouseholdRecoveryConfig){
  const p=config.householdRecovery;
- if(!p?.enabled)throw Error('GENERATED_RECOVERY_DISABLED');
+ if(p?.enabled!==true)throw Error('GENERATED_RECOVERY_DISABLED');
  if(config.platformMode&&config.platformMode!=='HOUSEHOLD'||!config.householdPrivateHost||config.appOrigin!==config.gatewayOrigin||!origin(config.appOrigin)||!recordId(config.familyId)||!/^[\w-]{1,100}$/.test(config.workspace)||!Array.isArray(p.domains)||BACKUP_DOMAINS.some(d=>!p.domains.includes(d))||p.domains.some(d=>!storageDomains.includes(d)))throw Error('HOUSEHOLD_RECOVERY_CONFIG_REQUIRED');
  const mappings=p.adultMappings??[];
  if(!Array.isArray(mappings)||mappings.length>100||mappings.some(m=>!m||Object.keys(m).some(k=>!['sourceOrigin','sourceAudience','targetAudience'].includes(k))||!origin(m.sourceOrigin)||!adult(m.sourceAudience)||!adult(m.targetAudience)||m.sourceAudience===m.targetAudience&&m.sourceOrigin===config.appOrigin||![config.appOrigin,config.householdPrivateHost!.sourceOrigin].includes(m.sourceOrigin))||new Set(mappings.map(m=>m.sourceAudience+'\0'+m.targetAudience)).size!==mappings.length)throw Error('HOUSEHOLD_RECOVERY_MAPPING_REQUIRED');
