@@ -49,7 +49,7 @@ A local merge-tree rehearsal against family beta and storage rehearsal #181 at `
 
 ## Release conditions
 
-1. The layout repair #175 has merged at 912fd31. Obtain product-owner review and required branch checks for #176, #177, #178, #179 and #183 in order. Recheck the diff and regression evidence on each new base.
+1. The layout repair #175 and early-learning PRs #176, #177, #178, #179 and #183 have merged. See the [delivery record](../../../DELIVERY-STATE.md) for the merge commits.
 2. Review the local illustrated assets and the early curriculum with the product owner and a qualified early-learning reviewer. Confirm the spoken directions, listening items and independent reading evidence on target device voices.
 3. Reconcile the separate beta audit #180 and rehearsal #181, then integrate the family beta #170–174 entitlement shell and verified family learner identity. Keep parent-guided paid creation disabled until a server-bound child workflow enforces consent, provider approval and budgets. Preserve the independent Adult Private budget and data boundary.
 4. Use authorized adults and synthetic profiles on representative physical hardware in approved DEV/TEST. Real child participation and production release require separate permission and release evidence.
