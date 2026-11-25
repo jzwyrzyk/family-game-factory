@@ -43,6 +43,13 @@ exports.checkSecondaryHeaders = async function ({page, app, out, name, width, he
    for (const field of ['x','y','font','color','descriptionFont','backX','backY'])
     assert.equal(metrics[field], reference[field], selector+' '+field+' at '+name);
   } else reference = metrics;
+  if (section === 'pals' && name === 'phone') {
+   const choices = app.locator('.pals-starter-grid button');
+   assert.equal(await choices.count(),2);
+   const lowerEdge = await choices.last().evaluate(el=>el.getBoundingClientRect().bottom);
+   const navTop = await app.locator('.studio-shell-navigation').evaluate(el=>el.getBoundingClientRect().top);
+   assert.ok(lowerEdge <= navTop,'both free choices fit above the mobile navigation');
+  }
   await page.screenshot({path:out+'/'+scope+'-'+name+'-'+section+'.png', animations:'disabled'});
   await page.keyboard.press('Shift+Tab');
   assert.equal(await app.evaluate(()=>document.activeElement.matches('.jems-page-back:focus-visible') && getComputedStyle(document.activeElement).outlineStyle !== 'none'),true,'visible keyboard return action');
@@ -55,8 +62,15 @@ exports.checkSecondaryHeaders = async function ({page, app, out, name, width, he
    await page.keyboard.press('Enter');
    if (section === 'powers') {
     await app.locator('#page-studio-library').waitFor({state:'visible'});
-    if (offline) await require('./studio-entry.cjs').navigate(app,'#studioNavJourney');
-    else await app.locator('#studioJourneyTile').click();
+    if (offline) {
+     // The empty fixture returns to first-visit Home. Open Journey from the
+     // review controls without saving a maker into that fixture.
+     await page.locator('#return').click();
+     await page.selectOption('#destination','journey');
+     await app.locator('#page-jems-journey').waitFor({state:'visible'});
+     await page.locator('#hide').click();
+     await app.locator('#page-jems-journey [data-journey-section="overview"]').click();
+    } else await app.locator('#studioJourneyTile').click();
    }
    await app.waitForFunction(()=>document.activeElement.id === 'jemsJourneyTitle');
   }
