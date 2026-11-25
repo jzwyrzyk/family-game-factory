@@ -87,6 +87,7 @@ export class MappedSyncStore implements SyncStore {
    }
   }
   if(batch.rows.some(row=>requiredStorageDomains(row.collection).some(d=>!domains.includes(d))))throw Error('STORAGE_DOMAIN_DENIED');
+  if(batch.rows.some(row=>row.deleted))throw Error('STORAGE_REMOVAL_REVIEW');
   if(!await this.local.receipt(batch.id))for(const row of batch.rows){
    const id=recordKey(this.localScope,row.collection,row.id),base=await this.get<Base>(this.key('base',id)),current=await this.local.get(row.collection,row.id);
    if(current&&(!base||current.version!==base.localVersion))throw Error('STORAGE_LOCAL_CHANGES');
@@ -103,6 +104,26 @@ export class MappedSyncStore implements SyncStore {
   });
  }
  async getSyncCursor(){return await this.get<string>(this.key('cursor','current'))??'';}
+ async pendingRemovals(){return (await this.get<{id:string;rows:DurableRecord[]}>(this.key('batch','active')))?.rows.filter(row=>row.deleted)??[];}
+ /** Record the exact reviewed removal after the domain safely kept or archived
+  * its originals. This never discards a queued local operation or its history. */
+ async resolveRemovals(rows:DurableRecord[],expectedLocal:{collection:string;id:string;version:number}[]){
+  if(!rows.length||rows.some(row=>!row.deleted)||expectedLocal.length!==rows.length)throw Error('STORAGE_RESPONSE_INVALID');
+  const bases:[string,unknown][]=[],staged:{key:string;row:DurableRecord}[]=[];
+  for(let i=0;i<rows.length;i++){
+   const row=rows[i],expected=expectedLocal[i];if(expected.collection!==row.collection||expected.id!==row.id)throw Error('STORAGE_SCOPE_DENIED');
+   const id=recordKey(this.localScope,row.collection,row.id),key=this.key('staged',id),pending=await this.get<DurableRecord>(key),fingerprint=await rowHash(row),baseKey=this.key('base',id);
+   if(!pending){const base=await this.get<Base>(baseKey);if(base?.remoteVersion===row.version&&base.fingerprint===fingerprint)continue;throw Error('STORAGE_CONFLICT');}
+   if(await rowHash(pending)!==fingerprint||await this.local.hasPending(row.collection,row.id))throw Error('STORAGE_CONFLICT');
+   const local=await this.local.get(row.collection,row.id);if((local?.version??0)!==expected.version)throw Error('STORAGE_LOCAL_CHANGES');
+   bases.push([baseKey,{remoteVersion:row.version,localVersion:local?.version??0,fingerprint} satisfies Base]);staged.push({key,row:pending});
+  }
+  this.assertAuthorized();await new Promise<void>((resolve,reject)=>{const tx=this.db.transaction('state','readwrite'),state=tx.objectStore('state');let failure:unknown;
+   for(const item of staged){const request=state.get(item.key);request.onsuccess=()=>{try{this.assertAuthorized();if(JSON.stringify(request.result)!==JSON.stringify(item.row))throw Error('STORAGE_CONFLICT');state.delete(item.key);}catch(error){failure=error;tx.abort();}};}
+   for(const [key,value]of bases)state.put(value,key);state.delete(this.key('batch','active'));
+   tx.oncomplete=()=>{try{this.assertAuthorized();resolve();}catch(error){reject(error);}};tx.onabort=()=>reject(failure??tx.error);
+  });
+ }
  async setSyncCursor(expected:string,next:string){
   this.assertAuthorized();return new Promise<void>((resolve,reject)=>{const tx=this.db.transaction('state','readwrite'),store=tx.objectStore('state'),key=this.key('cursor','current'),r=store.get(key);let failure:unknown;
    r.onsuccess=()=>{try{this.assertAuthorized();if((r.result??'')!==expected)throw Error('STORAGE_CONFLICT');store.put(next,key);}catch(e){failure=e;tx.abort();}};tx.oncomplete=()=>{try{this.assertAuthorized();resolve();}catch(error){reject(error);}};tx.onabort=()=>reject(failure??tx.error);

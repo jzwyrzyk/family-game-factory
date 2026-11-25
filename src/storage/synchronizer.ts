@@ -18,7 +18,7 @@ export interface SyncTransport {
  page?(collection:string,after?:string,limit?:number):Promise<{records:DurableRecord[];next:string|null}>;
  changes(after:string,limit:number,epoch:string):Promise<ChangePage>;
 }
-export type SyncResult={state:'current'|'pending'|'busy'|'offline'|'blocked'|'review';sent:number;received:number}|{state:'conflict';sent:number;received:number;operation:RecordOperation;remote:(DurableRecord|null)[]};
+export type SyncResult={state:'current'|'pending'|'busy'|'offline'|'blocked'|'review'|'removal';sent:number;received:number}|{state:'conflict';sent:number;received:number;operation:RecordOperation;remote:(DurableRecord|null)[]};
 const errorCode=(error:unknown)=>error instanceof Error?error.message:'STORAGE_CONNECTION_INTERRUPTED';
 const lockName=(s:RecordScope)=>'jems-sync:'+scopeKey(s);
 /** One bounded pass, started by authorized application activity or an explicit
@@ -81,6 +81,7 @@ export class ContinuityPump {
   }catch(error){
    const code=errorCode(error);
    if(code==='STORAGE_LOCAL_CHANGES')return {state:'review',sent,received};
+   if(code==='STORAGE_REMOVAL_REVIEW')return {state:'removal',sent,received};
    if(/(?:DENIED|REQUIRED|DISABLED|UNAUTHENTICATED|PAUSED|INVALID|MISMATCH|REUSED|REVOKED|CONSENT_CHANGED|LOCK_UNAVAILABLE)/.test(code))return {state:'blocked',sent,received};
    if(code==='STORAGE_CONFLICT')return {state:'pending',sent,received};
    return {state:'offline',sent,received};

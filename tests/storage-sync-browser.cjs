@@ -83,6 +83,22 @@ const {build}=require('esbuild'),{chromium,webkit}=require('playwright');
    const beforeInvalid=JSON.stringify(await ui.snapshot()),invalid=structuredClone([...state.values()]);invalid.find(r=>r.collection==='native-revisions').value.hypothesis='Conflicting immutable source';let rejected=false;
    try{await preserve(invalid,[project.id],'invalid-source-review');}catch{rejected=true;}
    if(!rejected||JSON.stringify(await ui.snapshot())!==beforeInvalid)throw Error('keep-both changed an original immutable source');
+   // Remote removal is held for review. Archiving is reversible, preserves the
+   // complete graph and never replays a remote write; lost local acknowledgment
+   // can finish from the same archive receipt without deleting original data.
+   const beforeRemoval=await ui.snapshot(),serverProject=state.get('native-projects:'+project.id);
+   await remote.commit({id:'remote-project-removal',scope:remoteScope,changes:[{id:project.id,collection:'native-projects',expectedVersion:serverProject.version,value:null,deleted:true}]});
+   const afterRemovalWrites=writes;continued.click();await wait(continued);const archive=find('Archive removed games on this device');if(!archive||(await ui.page()).items.length!==2)throw Error('remote removal was not held for review');
+   const archiveNative=ui.archiveRemoteProjects.bind(ui);let loseArchive=true;ui.archiveRemoteProjects=async(...args)=>{const result=await archiveNative(...args);if(loseArchive){loseArchive=false;throw Error('Lost archive acknowledgment');}return result;};
+   archive.click();await wait(archive);if((await ui.page()).items.length!==1||(await ui.archivedPage()).items.length!==1)throw Error('reviewed archive did not hide only its game');
+   archive.click();await wait(archive);const archived=await ui.snapshot();if(archived.projects.length!==beforeRemoval.projects.length||JSON.stringify(archived.revisions)!==JSON.stringify(beforeRemoval.revisions)||!archived.projects.find(p=>p.id===project.id).archived||writes!==afterRemovalWrites)throw Error('archive discarded originals or wrote remotely');
+   const fetchOnline=window.fetch,requestsBeforeLocal=requests;window.fetch=async()=>{throw Error('Offline or remote consent withdrawn');};const reviewLocal=find('Review archived games on this device');reviewLocal.click();await wait(reviewLocal);
+   const restore=find('Restore archived game');if(!restore||restore.hidden)throw Error('archive has no visible recovery action');restore.click();await wait(restore);if(requests!==requestsBeforeLocal)throw Error('local archive recovery required remote access');window.fetch=fetchOnline;
+   if((await ui.page()).items.length!==2||(await ui.archivedPage()).items.length||(await ui.records.pending()).length||!state.get('native-projects:'+project.id).deleted)throw Error('local restore changed remote removal or queued a copy');
+   check.click();await wait(check);const config=[...state.values()].find(r=>r.collection==='native-configs');await remote.commit({id:'remote-shared-original-removal',scope:remoteScope,changes:[{id:config.id,collection:config.collection,expectedVersion:config.version,value:null,deleted:true}]});
+   continued.click();await wait(continued);const keepOriginal=find('Keep reviewed originals on this device');if(!keepOriginal||find('Archive removed games on this device'))throw Error('shared original removal offered unsafe deletion');keepOriginal.click();await wait(keepOriginal);
+   if(!(await ui.records.get(config.collection,config.id))?.value||(await ui.snapshot()).revisions.length!==beforeRemoval.revisions.length)throw Error('reviewed shared original was lost');
+   measureUI('Parent removal review, interrupted archive, local restore, shared-original retention');
    // Responses finishing after a profile change cannot reopen prior game names
    // or conflict details, including an owner switching away and back again.
    for(const action of ['status','changes']){
@@ -91,7 +107,7 @@ const {build}=require('esbuild'),{chromium,webkit}=require('playwright');
     await new Promise(resolve=>setTimeout(resolve,30));
     const section=document.querySelector('#jemsPrivateCopies');if(!section.querySelector('select').hidden||section.textContent.includes('Splash or Pass')||section.textContent.includes('up to date')||section.textContent.includes('Review the changed records'))throw Error('late response exposed previous profile details');
    }
-   ui.close();return {checks:16,writes,localVersion:9,serverVersion:5,measurements};
-  });assert.equal(result.checks,16);console.log(JSON.stringify({browser:engine===webkit?'webkit':'chromium',...result}));
+   ui.close();return {checks:20,writes,localVersion:9,serverVersion:5,measurements};
+  });assert.equal(result.checks,20);console.log(JSON.stringify({browser:engine===webkit?'webkit':'chromium',...result}));
  }finally{await browser?.close();await new Promise(r=>server.close(r));}
 })().catch(e=>{console.error(e);process.exitCode=1;});

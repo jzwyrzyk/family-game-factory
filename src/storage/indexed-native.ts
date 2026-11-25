@@ -30,12 +30,17 @@ export class IndexedNativeStore {
  async isActive(){return (await this.migration())?.complete===true;}
  private async ready(){this.assertAuthorized();if(!await this.isActive())throw Error('Finish preparing saved games before opening this library.');}
  async page(after:string|null=null,limit=24):Promise<{items:Project[];next:string|null}>{
-  await this.ready();const rows=await this.records.page(PROJECTS,after,limit+1),items=rows.slice(0,limit).map(r=>this.decodeProject(r));return {items,next:rows.length>limit?items.at(-1)!.id:null};
+  return this.projectPage(after,limit,false);
+ }
+ async archivedPage(after:string|null=null,limit=24){return this.projectPage(after,limit,true);}
+ private async projectPage(after:string|null,limit:number,archived:boolean):Promise<{items:Project[];next:string|null}>{
+  await this.ready();if(!Number.isInteger(limit)||limit<1||limit>100)throw Error('Choose a bounded game page.');const items:Project[]=[];let cursor=after;
+  for(;;){const rows=await this.records.page(PROJECTS,cursor,limit+1);for(const row of rows){cursor=row.id;const project=this.decodeProject(row);if(!!project.archived!==archived)continue;if(items.length===limit)return {items,next:items.at(-1)!.id};items.push(project);}if(rows.length<limit+1)return {items,next:null};}
  }
  private decodeProject(row:DurableRecord):Project{
-  const p=row.value as Project;if(row.deleted||!p||p.id!==row.id||p.owner!==this.scope.profile||!isGameId(p.game)||typeof p.name!=='string'||typeof p.headId!=='string')throw Error('Saved game metadata needs recovery.');return copy(p);
+  const p=row.value as Project;if(row.deleted||!p||p.id!==row.id||p.owner!==this.scope.profile||!isGameId(p.game)||typeof p.name!=='string'||typeof p.headId!=='string'||p.archived!==undefined&&typeof p.archived!=='boolean')throw Error('Saved game metadata needs recovery.');return copy(p);
  }
- async project(id:string):Promise<Project>{await this.ready();const row=await this.row(PROJECTS,id);if(!row)throw Error('Choose a game in your own profile.');return this.decodeProject(row);}
+ async project(id:string):Promise<Project>{await this.ready();const row=await this.row(PROJECTS,id);if(!row)throw Error('Choose a game in your own profile.');const project=this.decodeProject(row);if(project.archived)throw Error('This game is archived on this device. Restore it in Private copies before opening it.');return project;}
  private async decodeRevision(row:DurableRecord,project:Project):Promise<Revision>{
   const r=row.value as StoredRevision;if(row.deleted||!r||r.id!==row.id||r.projectId!==project.id||r.state!=='private'||typeof r.configHash!=='string'||!Number.isFinite(Date.parse(r.createdAt)))throw Error('Saved version needs recovery.');
   const config=await this.row(CONFIGS,r.configHash);if(!config||config.deleted||await digest(JSON.stringify(config.value))!==r.configHash)throw Error('The saved game settings are missing or damaged. Your earlier versions are preserved.');
@@ -105,7 +110,21 @@ export class IndexedNativeStore {
   * approved session. The pump independently rechecks remote grants per request. */
  enablePrivateCopies(projectId:string,approved:()=>boolean){this.assertAuthorized();if(!approved())throw Error('Private copies need current grown-up permission.');this.privateCopies.set(projectId,approved);}
  disablePrivateCopies(){this.privateCopies.clear();}
+ /** A reviewed remote removal hides only the selected local game cards. Every
+  * original and pointer remains in complete snapshots and can be restored. */
+ async archiveRemoteProjects(projects:{id:string;version:number}[],operation:string):Promise<RecordReceipt>{
+  await this.ready();if(!projects.length||projects.length>50||new Set(projects.map(p=>p.id)).size!==projects.length)throw Error('Choose the games to archive.');
+  const payloadHash=await digest(canonical(projects)),receiptKey='archived-'+await digest(operation),prior=await this.row(CONTROL,receiptKey),receipt=await this.records.receipt(operation);
+  if(receipt){if((prior?.value as {payloadHash?:string})?.payloadHash!==payloadHash)throw Error('STORAGE_OPERATION_REUSED');return receipt;}
+  const changes:RecordChange[]=[];for(const reviewed of projects){const row=await this.row(PROJECTS,reviewed.id);if(!row||row.version!==reviewed.version||await this.records.hasPending(PROJECTS,reviewed.id))throw Error('STORAGE_LOCAL_CHANGES');changes.push(this.change(PROJECTS,row.id,{...this.decodeProject(row),archived:true},row.version));}
+  changes.push(this.change(CONTROL,receiptKey,{operation,payloadHash},prior?.version??0));const result=await this.records.restoreLocal({id:operation,scope:this.scope,changes});this.disablePrivateCopies();return result;
+ }
+ async restoreArchivedProject(id:string,expectedVersion:number){
+  await this.ready();const row=await this.row(PROJECTS,id);if(!row||row.version!==expectedVersion||await this.records.hasPending(PROJECTS,id))throw Error('STORAGE_LOCAL_CHANGES');const project=this.decodeProject(row);if(!project.archived)return;
+  await this.records.commit({id:crypto.randomUUID(),scope:this.scope,changes:[this.change(PROJECTS,id,{...project,archived:false},row.version)]},{enqueue:false});
+ }
  async projectRecords(projectId:string,options:{includeArtworkReferences?:boolean}={}):Promise<DurableRecord[]>{
+
   await this.ready();const found=new Map<string,DurableRecord>(),seenProjects=new Set<string>();
   const add=(row:DurableRecord)=>found.set(row.collection+':'+row.id,row);
   const collect=async(id:string):Promise<void>=>{

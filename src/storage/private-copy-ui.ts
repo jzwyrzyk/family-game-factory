@@ -13,18 +13,26 @@ export function installPrivateCopyControls(){
  const initialMessage='Local work stays on this device. A grown-up can check separately approved private copies.';
  const message=document.createElement('p');message.setAttribute('role','status');message.textContent=initialMessage;
  const choices=document.createElement('select');choices.setAttribute('aria-label','Game to copy');choices.hidden=true;
+ const archivedChoices=document.createElement('select');archivedChoices.setAttribute('aria-label','Archived game to restore');archivedChoices.hidden=true;
  const details=document.createElement('div');details.setAttribute('aria-live','polite');
- section.append(title,message,choices,details);anchor.parentElement!.append(section);
- let captured='',store:IndexedNativeStore|undefined,mapped:MappedSyncStore|undefined,pump:ContinuityPump|undefined,remote:SyncTransport|undefined,approvedUntil=0,busy=false,more:string|null=null,generation=0;
+ section.append(title,message,choices,archivedChoices,details);anchor.parentElement!.append(section);
+ let captured='',store:IndexedNativeStore|undefined,mapped:MappedSyncStore|undefined,pump:ContinuityPump|undefined,remote:SyncTransport|undefined,approvedUntil=0,busy=false,more:string|null=null,archivedMore:string|null=null,generation=0;
  const owner=()=>String(FG.store.current().id),current=(turn:number,profile:string)=>turn===generation&&owner()===profile&&captured===profile;
  const authorized=(turn=generation,profile=captured)=>current(turn,profile)&&Date.now()<approvedUntil;
  const button=(label:string,action:()=>Promise<void>)=>{const b=document.createElement('button');b.type='button';b.className='studio-button';b.textContent=label;b.style.minHeight='48px';b.onclick=async()=>{if(busy)return;busy=true;b.disabled=true;let turn=generation;try{const pending=action();turn=generation;b.disabled=true;await pending;}catch{if(turn===generation){approvedUntil=0;store?.disablePrivateCopies();message.textContent='Private copies are unavailable. Your work and pending copies are still on this device. Check your family controls or connection.';}}finally{if(turn===generation){busy=false;b.disabled=false;}}};section.append(b);return b;};
- const stop=()=>{generation++;approvedUntil=0;store?.disablePrivateCopies();mapped?.close();mapped=undefined;pump=undefined;remote=undefined;store=undefined;captured='';busy=false;details.replaceChildren();choices.replaceChildren();choices.hidden=true;copy.hidden=true;resume.hidden=true;moreButton.hidden=true;message.textContent=initialMessage;for(const b of section.querySelectorAll('button'))b.disabled=false;};
+ const stop=()=>{generation++;approvedUntil=0;store?.disablePrivateCopies();mapped?.close();mapped=undefined;pump=undefined;remote=undefined;store=undefined;captured='';busy=false;details.replaceChildren();choices.replaceChildren();archivedChoices.replaceChildren();choices.hidden=true;archivedChoices.hidden=true;copy.hidden=true;resume.hidden=true;moreButton.hidden=true;restoreArchived.hidden=true;moreArchived.hidden=true;message.textContent=initialMessage;for(const b of section.querySelectorAll('button'))b.disabled=false;};
  async function list(reset=false){
   if(!store)return;const turn=generation,profile=captured,activeStore=store;if(reset){choices.replaceChildren();more=null;}
   const page=await activeStore.page(more,24);if(!current(turn,profile))return;more=page.next;
   for(const project of page.items){const option=document.createElement('option');option.value=project.id;option.textContent=project.name;choices.append(option);}
-  choices.hidden=!choices.options.length;copy.hidden=choices.hidden;moreButton.hidden=!more;
+  choices.hidden=!choices.options.length;copy.hidden=choices.hidden||!authorized();moreButton.hidden=!more||!authorized();
+  if(reset)await listArchived(true);
+ }
+ async function listArchived(reset=false){
+  if(!store)return;const turn=generation,profile=captured,activeStore=store;if(reset){archivedChoices.replaceChildren();archivedMore=null;}
+  const page=await activeStore.archivedPage(archivedMore,24);if(!current(turn,profile))return;archivedMore=page.next;
+  for(const project of page.items){const option=document.createElement('option');option.value=project.id;option.textContent=project.name;archivedChoices.append(option);}
+  archivedChoices.hidden=!archivedChoices.options.length;restoreArchived.hidden=archivedChoices.hidden;moreArchived.hidden=!archivedMore;
  }
  async function connect(){
   stop();busy=true;captured=owner();const turn=generation,profile=captured,transport=continuityTransport(profile),status=await transport.status();if(!current(turn,profile))return;
@@ -40,6 +48,27 @@ export function installPrivateCopyControls(){
  async function run(){
   if(!pump||!mapped||!store||!remote||!authorized())throw Error('STORAGE_CONSENT_REQUIRED');
   const turn=generation,profile=captured,activeStore=store,activeMapped=mapped,activeRemote=remote,result=await pump.runOnce();if(!current(turn,profile))return;details.replaceChildren();
+  if(result.state==='removal'){
+   const rows=await activeMapped.pendingRemovals(),local=await Promise.all(rows.map(row=>activeStore.records.get(row.collection,row.id)));if(!current(turn,profile))return;
+   message.textContent='A private copy was removed elsewhere. Review what to keep on this device. Your saved originals have not been removed.';
+   const removedList=document.createElement('ul');for(let i=0;i<rows.length;i++){const item=document.createElement('li'),value=local[i]?.value as {name?:string;label?:string}|undefined;item.textContent=value?.name??value?.label??'Saved game original';removedList.append(item);}details.append(removedList);
+   const expected=rows.map((row,i)=>({collection:row.collection,id:row.id,version:local[i]?.version??0})),projects=rows.flatMap((row,i)=>row.collection==='native-projects'&&local[i]?[{id:row.id,version:local[i]!.version}]:[]);
+   const choice=(label:string,archive:boolean)=>{const b=document.createElement('button');b.type='button';b.className='studio-button';b.textContent=label;b.onclick=async()=>{
+    if(busy||!authorized(turn,profile))return;busy=true;b.disabled=true;
+    try{
+     const versions=structuredClone(expected);
+     if(archive){const operation='archive-'+await operationFingerprint({id:'reviewed-removal',scope:activeStore.scope,changes:projects.map(p=>({collection:'native-projects',id:p.id,expectedVersion:p.version,value:{remoteVersion:rows.find(row=>row.collection==='native-projects'&&row.id===p.id)!.version}}))});
+      if(!authorized(turn,profile))throw Error('STORAGE_CONSENT_REQUIRED');const receipt=await activeStore.archiveRemoteProjects(projects,operation);
+      for(const version of versions){const saved=receipt.versions.find(v=>v.collection===version.collection&&v.id===version.id);if(saved)version.version=saved.version;}
+     }
+     if(!authorized(turn,profile))throw Error('STORAGE_CONSENT_REQUIRED');await activeMapped.resolveRemovals(rows,versions);activeStore.disablePrivateCopies();
+     if(!current(turn,profile))return;await FG.factory?.refreshPrivateCopies?.();if(!current(turn,profile))return;await list(true);if(!current(turn,profile))return;await run();
+    }catch{if(current(turn,profile))message.textContent='The game or removal changed during review. Your originals remain saved. Check again before choosing.';}
+    finally{if(current(turn,profile)){busy=false;b.disabled=false;}}
+   };details.append(b);};
+   choice('Keep reviewed originals on this device',false);if(projects.length)choice('Archive removed games on this device',true);
+   const note=document.createElement('p');note.textContent='Archiving hides the selected games from the usual library. Their versions and originals remain saved and included in complete recovery copies. Restore an archived game here at any time. Shared original records are preserved.';details.append(note);return;
+  }
   if(result.state==='conflict'){
    message.textContent='This device and a saved private copy have different versions. Both are preserved. Review them before choosing.';
    const preview=document.createElement('details'),summary=document.createElement('summary');summary.textContent='Review the changed records';preview.append(summary);
@@ -70,8 +99,11 @@ export function installPrivateCopyControls(){
   if(result.state==='current'){await activeStore.snapshot();if(!current(turn,profile))return;await FG.factory?.refreshPrivateCopies?.();if(!current(turn,profile))return;await list(true);}
  }
  button('Check private copies',connect);
+ button('Review archived games on this device',async()=>{stop();busy=true;captured=owner();const turn=generation,profile=captured;store=FG.factory?.privateCopyStore?.()??undefined;if(!store){message.textContent='Prepare this device’s saved-game library before reviewing its archived games.';return;}await listArchived(true);if(current(turn,profile))message.textContent='Archived games stay on this device. Restoring one does not create a private copy.';});
  const copy=button('Copy the selected game',async()=>{if(!store||!authorized()||!choices.value)throw Error('STORAGE_CONSENT_REQUIRED');const turn=generation,profile=captured;message.textContent='Preparing the selected game and its saved versions…';await store.queueSelectedCopy(choices.value,()=>authorized(turn,profile));if(!current(turn,profile))return;await run();});copy.hidden=true;
  const resume=button('Continue pending copies',run);resume.hidden=true;
  const moreButton=button('Show more games',async()=>list());moreButton.hidden=true;
+ const restoreArchived=button('Restore archived game',async()=>{if(!store||!current(generation,captured)||!archivedChoices.value)throw Error('STORAGE_SCOPE_DENIED');const turn=generation,profile=captured,activeStore=store,row=await activeStore.records.get('native-projects',archivedChoices.value);if(!row||!current(turn,profile))throw Error('STORAGE_SCOPE_DENIED');await activeStore.restoreArchivedProject(row.id,row.version);if(!current(turn,profile))return;await FG.factory?.refreshPrivateCopies?.();if(!current(turn,profile))return;if(authorized(turn,profile))await list(true);else await listArchived(true);if(current(turn,profile))message.textContent='The archived game is restored on this device. Select it explicitly before making another private copy.';});restoreArchived.hidden=true;
+ const moreArchived=button('Show more archived games',async()=>listArchived());moreArchived.hidden=true;
  addEventListener('factory-profile-changing',stop);addEventListener('pagehide',stop);
 }

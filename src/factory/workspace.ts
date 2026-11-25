@@ -3,7 +3,7 @@ import type { GameId, Mechanics, PlayOutcome } from '../runtime/types';
 import { assertRewardSourceWritable } from '../rewards/write-guard';
 export const WORKSPACE_KEY = 'family-game-factory-workspace-v2';
 export interface Revision { id: string; projectId: string; parentId: string | null; sourceRevisionId?: string; drawingRigId?: string; config: Mechanics; label: string; hypothesis: string; createdAt: string; state: 'private' }
-export interface Project { id: string; owner: string; game: GameId; name: string; headId: string; keptId?:string }
+export interface Project { id: string; owner: string; game: GameId; name: string; headId: string; keptId?:string; archived?:boolean }
 export interface PlayRecord { id: string; revisionId: string; outcome: PlayOutcome; reflection: string }
 export interface Workspace { version: 2; projects: Project[]; revisions: Revision[]; plays: PlayRecord[] }
 export interface StoragePort { getItem(key: string): string | null; setItem(key: string, value: string): void }
@@ -33,7 +33,7 @@ export function validateWorkspace(value: unknown): Workspace {
   const revisions=new Map(d.revisions.map(r=>[r.id,r]));
   const historiesChecked=new Set<string>();
   for (const p of d.projects) {
-    if (!text(p.owner,100) || !text(p.name,60) || !isGameId(p.game) || revisions.get(p.headId)?.projectId!==p.id) throw Error('Invalid game project.');
+    if (!text(p.owner,100) || !text(p.name,60) || !isGameId(p.game) || revisions.get(p.headId)?.projectId!==p.id || p.archived!==undefined&&typeof p.archived!=='boolean') throw Error('Invalid game project.');
     if(p.keptId&&revisions.get(p.keptId)?.projectId!==p.id)throw Error('Invalid kept version.');
   }
   for (const r of d.revisions) {
