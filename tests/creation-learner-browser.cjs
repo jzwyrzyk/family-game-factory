@@ -286,7 +286,9 @@ const complexScene={
         await reach(page.locator(`[data-edit-block="${repeat.actions[1].id}"]`));
         await capture(page,name+'-edited');
         await switchView('play');await pacing(page);await tap(page.locator('#creationRun'));
-        await page.waitForFunction(()=>FG.creation.snapshot()?.status==='running');
+        // The engine starts before its first animation frame paints the playbar.
+        await page.waitForFunction(()=>FG.creation.snapshot()?.status==='running' &&
+          !document.getElementById('creationPause').disabled);
         assert.ok(await page.locator('#creationCanvas').isVisible());
         await tap(page.locator('#creationPause'));
         const paused=await snapshot();assert.equal(paused.status,'paused');

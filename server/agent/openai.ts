@@ -1,3 +1,4 @@
+import {needsAssetRepair} from '../quality/repair-diagnostics';
 import type { AgentAdapter,AgentInput,CandidateArtifact } from '../pipeline/types';
 import { privateGenerationPreflight } from '../quality/private-generation-preflight';
 import { isGeneratedGame,validateGenerated,type GeneratedGame } from './generated';
@@ -166,7 +167,7 @@ export class OpenAIResponsesAgent implements AgentAdapter {
   const evidence=context.qualityEvidence?(previous?validateQualityEvidence(previous,context.qualityEvidence):(()=>{throw Error('QUALITY_EVIDENCE_BINDING_MISMATCH')})()):undefined;
   let plan:GameProductionPlan|undefined,assets:GameAssetPack|undefined;
   if(!legacy){
-   const assetRepair=/\b(?:VISUAL_INCOHERENT_ART|VISUAL_PLACEHOLDER_APPEARANCE)\b/.test(diagnostics||'');
+   const assetRepair=needsAssetRepair(diagnostics||'');
    if(context.plan)plan=assertProductionPlanBinding(context.plan,input,premium);
    else if(previous?.productionPlan&&!assetRepair)plan=assertProductionPlanBinding(previous.productionPlan,input,premium);
    else{

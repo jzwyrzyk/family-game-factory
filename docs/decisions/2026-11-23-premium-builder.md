@@ -23,3 +23,11 @@ See the [pilot contract and rollout](../game-intelligence/PREMIUM-BUILDER.md), [
 ## November 24 completion assessment
 
 The owner authorized repository completion, offline staged accounting/evidence/latency experiments and clean image testing without paid calls or cloud activation. The [completion handoff](../game-intelligence/premium-benchmark/COMPLETION.md) records their limits. Keep full-job admission, serial paid execution and the eight-image policy: the offline SQLite model does not prove distributed production recovery; contact-sheet equivalence has no funded/model/human calibration. The small duplicate-label reduction preserves complete evidence. A higher whole-job cap is a recommendation for owner review, not an accepted spending decision. PR155’s merged disabled environment foundation supersedes older draft-status references.
+
+## November 24 testing ceiling decision
+
+Issue #167 authorizes the existing whole-job policy with a separate Adult Private ceiling of $5. Reserve the reviewed stages and bounded repairs transactionally before dispatch. Keep the staged-admission prototype offline. Revisit the envelope after project price verification and one specifically funded trial. [Economics, acceptance and rollback](../game-intelligence/premium-benchmark/NOVEMBER-26.md)
+
+## November 25 clarification on saved revisions
+
+The owner approved one $5 testing maximum across the initial Build and later paid changes to the same game, with room for multiple revisions when actual costs permit. Keep the complete initial Build reservation. On a saved edit or explicit retry, hold a complete reviewed first pass and fund any necessary repair before dispatch. Preserve Astra High, the independent review and artwork appropriate to the request. Count active holds and conservative unknown charges across branches, retries and billing months. The monthly family allowance and authorization for a paid trial remain separate. [Implementation and validation](https://github.com/jzwyrzyk/family-game-factory/pull/168)
