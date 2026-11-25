@@ -1518,10 +1518,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "2e0416355870d736980e85535f0cb85dbcbbacfcb57e7fb3c0cd066ca6e8d58d",
-      "reviewedAt": "2026-11-25T18:39:42.596Z",
+      "sourceDigest": "9a8c36452deed944bfe0576d7b2334401a537b735d2f247a61f122da1e016789",
+      "reviewedAt": "2026-11-25T18:40:42.754Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented experiment entrance in Creative Studio and retained Powers practice access without evidence or scoring changes.",
+      "reviewReason": "Updated browser navigation to the consolidated experiment entrance and retained exact evidence equality, separately asserting only the explicit intro preference.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
