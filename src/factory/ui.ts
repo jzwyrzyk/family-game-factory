@@ -1,8 +1,9 @@
+import {NativeWorkspace,prepareIndexedNative,indexedStoragePreview} from '../storage/native-workspace';
 import {iconMarkup,setIconLabel} from '../brand/icons';
 import { interpretLearningRequest, learningFormatLabel } from '../learning/policy';
 import { defaults, manifests, isGameId, playableMechanics } from '../runtime/manifests';
 import { examples, interpret, type Intent } from './interpreter';
-import { RevisionStore, type Revision, migrateWorkspace } from './workspace';
+import { type Revision, migrateWorkspace } from './workspace';
 import { DesignCoach } from './coach';
 import { installRemixFallback } from './remix-routing';
 import {profileStorage} from '../adult-pilot/storage';
@@ -12,8 +13,8 @@ const $ = <T extends HTMLElement = HTMLElement>(id:string) => document.getElemen
 const value = (id:string) => $<HTMLInputElement>(id).value;
 function display(key:string,value:number|boolean) { return key==='splashMs'?`${Number(value)/1000} seconds`:typeof value==='boolean'?(value?'On':'Off'):String(value); }
 function option(value:string,label:string) {const o=document.createElement('option');o.value=value;o.textContent=label;return o;}
-function guarded(action:()=>void) {try{action();}catch(err){$('liveStatus').textContent=(err as Error).message;}}
-export function initLiveRemix() {
+async function guarded(action:()=>unknown|Promise<unknown>) {try{await action();}catch(err){$('liveStatus').textContent=(err as Error).message;}}
+export async function initLiveRemix() {
   const host=document.createElement('div');host.id='liveFactory';host.className='panel live-factory';
   host.innerHTML=`<div class="eyebrow">FACTORY 2.0 · LOCAL TOOLS</div><h2>${iconMarkup('edit')} Live Remix</h2><p>Play. Change one thing. See what happens! Your versions stay in this browser. No AI service is connected.</p>
   <div class="live-toolbar"><div><label for="liveGame">Start with a game</label><select id="liveGame"><option value="buckets">Splash or Pass</option><option value="gum">Bubble Gum Builders</option><option value="dragon">Dragon &amp; Meatballs</option><option value="hill">Junkyard Rally</option></select></div><button id="newLiveGame" class="btn secondary">${iconMarkup('add')} Start a remix</button></div>
@@ -31,92 +32,92 @@ export function initLiveRemix() {
   $('page-creations').querySelector('.page-head')!.after(collection);
   const returnButton=document.createElement('button');returnButton.className='btn secondary';returnButton.id='returnLive';setIconLabel(returnButton,'arrow','Back to Live Remix','jems-icon--back');returnButton.hidden=true;returnButton.onclick=()=>FG.app.page('feedback');$('page-game').querySelector('.game-bottom')!.append(returnButton);
   const played=document.createElement('p');played.id='playedVersion';played.className='notice';played.hidden=true;$('page-game').querySelector('.game-topline')!.after(played);
-  let store:RevisionStore;
-  try{store=new RevisionStore(profileStorage(localStorage));}catch(err){$('liveStatus').textContent=`Could not open your remix workspace: ${(err as Error).message} Your data has not been replaced. Original games still work.`;host.querySelectorAll('button,input,select').forEach(el=>(el as HTMLButtonElement).disabled=true);return;}
+  let store:NativeWorkspace;
+  const owner=()=>String(FG.store.current().id);
+  try{store=await NativeWorkspace.open(profileStorage(localStorage),owner);}catch(err){$('liveStatus').textContent=`Could not open your remix workspace: ${(err as Error).message} Your data has not been replaced. Original games still work.`;host.querySelectorAll('button,input,select').forEach(el=>(el as HTMLButtonElement).disabled=true);return;}
   let active:string|null=null,pending:Extract<Intent,{kind:'supported'}>|null=null, pendingPrompt='';
   let currentPlay:{game:GameId;stateKey:string;config:Mechanics;owner:string}|null=null;
   const coach=new DesignCoach();
-  const owner=()=>String(FG.store.current().id);
-  const project=()=>{if(!active)throw Error('Start a remix first.');return store.project(active,owner());};
-  const revision=()=>{const p=project();return store.revision(p.id,owner());};
+  const project=async()=>{if(!active)throw Error('Start a remix first.');return await store.project(active,owner());};
+  const revision=async()=>{const p=(await project());return await store.revision(p.id,owner());};
   // Save the independent build first. A failed workspace write may leave an unused
   // copied slot, but cannot replace the source build or advance the saved head.
-  function withBuildCopy<T>(source:string,create:(revisionId:string)=>T):T {
+  async function withBuildCopy<T>(source:string,create:(revisionId:string)=>Promise<T>):Promise<T> {
     const revisionId=crypto.randomUUID(),profile=FG.store.current(),before=profile.constructionStates;
     const saved=before?.[source];
-    if(saved===undefined)return create(revisionId);
+    if(saved===undefined)return await create(revisionId);
     profile.constructionStates={...before,[revisionId]:JSON.parse(JSON.stringify(saved))};
     if(!FG.store.save()){profile.constructionStates=before;throw Error('Could not save this experiment. Your earlier build is safe.');}
-    try{return create(revisionId);}catch(error){profile.constructionStates=before;FG.store.save();throw error;}
+    try{return await create(revisionId);}catch(error){profile.constructionStates=before;FG.store.save();throw error;}
   }
   function clearPending(){pending=null;pendingPrompt='';$('liveIntent').textContent='';$('liveTry').hidden=true;$('saveNovelIdea').hidden=true;}
   function renderCoach(){
     $('coachEvidence').textContent=coach.summary;$('coachQuestion').textContent=coach.question();$('coachForm').hidden=!coach.question();$('coachReady').textContent=coach.phase==='ready'?(coach.hypothesis?`Your prediction: “${coach.hypothesis}”. Make a change and play to test it.`:'Try your own next change whenever you like.'):'Thoughts are optional. You choose what to test.';
   }
-  function renderComparison(){
-    const p=project(),current=revision(),chosen=store.revision(p.id,owner(),value('compareVersion')||current.id);
+  async function renderComparison(){
+    const p=(await project()),current=(await revision()),chosen=await store.revision(p.id,owner(),value('compareVersion')||current.id);
     const body=$('liveCompare').querySelector('tbody')!;body.replaceChildren();
     for(const m of playableMechanics(p.game,current.config)){const row=document.createElement('tr');[m.label,display(m.key,chosen.config[m.key]),display(m.key,current.config[m.key])].forEach(t=>{const cell=document.createElement('td');cell.textContent=t;row.append(cell)});body.append(row);}
   }
-  function renderCollection(){
-    const box=$('savedRemixes');box.replaceChildren();const projects=store.list(owner());
+  async function renderCollection(){
+    const box=$('savedRemixes');box.replaceChildren();const projects=await store.list(owner());
     if(!projects.length)box.textContent='Try Live Remix to save your first playable version.';
-    projects.forEach(p=>{const button=document.createElement('button');button.className='btn secondary';setIconLabel(button,'play',p.name);button.onclick=()=>guarded(()=>{active=p.id;coach.reset();clearPending();render();FG.app.page('feedback');});box.append(button);});
+    projects.forEach(p=>{const button=document.createElement('button');button.className='btn secondary';setIconLabel(button,'play',p.name);button.onclick=()=>guarded(async()=>{active=p.id;coach.reset();clearPending();await render();FG.app.page('feedback');});box.append(button);});
   }
-  function render(){
-    const projects=store.list(owner());if(!projects.some(p=>p.id===active))active=projects.at(-1)?.id||null;
+  async function render(){
+    const projects=await store.list(owner());if(!projects.some(p=>p.id===active))active=projects.at(-1)?.id||null;
     $('liveProjects').replaceChildren(...projects.map(p=>option(p.id,p.name)));$<HTMLSelectElement>('liveProjects').value=active||'';$<HTMLSelectElement>('liveProjects').disabled=!projects.length;$('liveEditor').hidden=!active;
-    renderCollection();if(!active)return;
-    const p=project(),r=revision(),history=store.history(p.id,owner());$('liveName').textContent=p.name;$('liveVersion').textContent=`${manifests[p.game].name} · version ${history.findIndex(x=>x.id===r.id)+1} · Saved on this device. Learning settings stay the same.`;
+    await renderCollection();if(!active)return;
+    const p=(await project()),r=(await revision()),history=await store.history(p.id,owner());$('liveName').textContent=p.name;$('liveVersion').textContent=`${manifests[p.game].name} · version ${history.findIndex(x=>x.id===r.id)+1} · Saved on this device. Learning settings stay the same.`;
     $('liveMechanics').replaceChildren(...playableMechanics(p.game,r.config).map(m=>{const card=document.createElement('div');card.className='stat';card.textContent=`${m.label}: ${display(m.key,r.config[m.key])}`;return card;}));
     $<HTMLButtonElement>('liveUndo').disabled=!r.parentId;const redo=$<HTMLButtonElement>('liveRedo');if(redo)redo.disabled=!history.some(x=>x.parentId===r.id);$('compareVersion').replaceChildren(...history.map((rev,i)=>option(rev.id,`Version ${i+1}: ${rev.label}`)));$<HTMLSelectElement>('compareVersion').value=r.parentId||r.id;
     $('liveExamples').replaceChildren(...examples[p.game].map(example=>{const button=document.createElement('button');button.type='button';button.className='text-btn';button.textContent=example;button.onclick=()=>{clearPending();$<HTMLInputElement>('livePrompt').value=example;$('livePrompt').focus()};return button;}));
-    $<HTMLInputElement>('livePrompt').placeholder=examples[p.game][0]||'Describe your game idea';renderComparison();renderCoach();
+    $<HTMLInputElement>('livePrompt').placeholder=examples[p.game][0]||'Describe your game idea';await renderComparison();renderCoach();
   }
-  function play(r:Revision){
-    const p=project(),capturedOwner=owner();$('playedVersion').hidden=false;$('playedVersion').textContent=`Playing ${p.name}: ${playableMechanics(p.game,r.config).map(m=>`${m.label} ${display(m.key,r.config[m.key])}`).join(' · ')}`;$('returnLive').hidden=false;
-    FG.app.openGame(p.game,{config:r.config,stateKey:r.id,projectId:p.id,onOutcome:(outcome:PlayOutcome)=>guarded(()=>{
-      const record=store.record(p.id,capturedOwner,r.id,outcome);if(owner()===capturedOwner){coach.observe(record,r);renderCoach();$('playedVersion').textContent=`${coach.summary} Tap “Back to Live Remix” to reflect or change your game.`;}
+  async function play(r:Revision){
+    const p=(await project()),capturedOwner=owner();$('playedVersion').hidden=false;$('playedVersion').textContent=`Playing ${p.name}: ${playableMechanics(p.game,r.config).map(m=>`${m.label} ${display(m.key,r.config[m.key])}`).join(' · ')}`;$('returnLive').hidden=false;
+    FG.app.openGame(p.game,{config:r.config,stateKey:r.id,projectId:p.id,onOutcome:(outcome:PlayOutcome)=>guarded(async()=>{
+      const record=await store.record(p.id,capturedOwner,r.id,outcome);if(owner()===capturedOwner){coach.observe(record,r);renderCoach();$('playedVersion').textContent=`${coach.summary} Tap “Back to Live Remix” to reflect or change your game.`;}
     })});
   }
-  $('newLiveGame').onclick=()=>guarded(()=>{const game=value('liveGame') as GameId;const p=withBuildCopy('original-'+game,id=>store.create(owner(),game,`My ${manifests[game].name}`,defaults(game,FG.store.current().remixes?.[game]||'classic'),id));active=p.id;coach.reset();clearPending();render();$('liveStatus').textContent='Your starting version is saved. Play it, then try a change!';});
-  $('liveProjects').onchange=()=>guarded(()=>{active=value('liveProjects');coach.reset();clearPending();render();});
-  $('liveKeep').onclick=()=>guarded(()=>{store.keep(project().id,owner());$('liveStatus').textContent='Kept! This version is pinned in your private remix history.';});
-  $('livePlay').onclick=()=>guarded(()=>play(revision()));
-  $('livePromptForm').onsubmit=e=>{e.preventDefault();guarded(()=>{clearPending();const p=project(),r=revision(),prompt=value('livePrompt');const mathRequest=interpretLearningRequest(prompt,FG.learning.subject);if(mathRequest){if(mathRequest.kind==='required')$('liveIntent').textContent=mathRequest.message;else{FG.learning.setMode(p.id,mathRequest.mode);$('liveIntent').textContent='Learning format: '+learningFormatLabel(FG.learning.subject,mathRequest.mode)+'. Your learning history stays with you.';}return;}const intent=interpret(p.game,r.config,prompt);pendingPrompt=prompt;
-    if(intent.kind==='supported'){pending=intent;$('liveIntent').textContent=intent.summary;applyPending();}
+  $('newLiveGame').onclick=()=>guarded(async()=>{const game=value('liveGame') as GameId;const p=await withBuildCopy('original-'+game,async id=>await store.create(owner(),game,`My ${manifests[game].name}`,defaults(game,FG.store.current().remixes?.[game]||'classic'),id));active=p.id;coach.reset();clearPending();await render();$('liveStatus').textContent='Your starting version is saved. Play it, then try a change!';});
+  $('liveProjects').onchange=()=>guarded(async()=>{active=value('liveProjects');coach.reset();clearPending();await render();});
+  $('liveKeep').onclick=()=>guarded(async()=>{await store.keep((await project()).id,owner());$('liveStatus').textContent='Kept! This version is pinned in your private remix history.';});
+  $('livePlay').onclick=()=>guarded(async()=>play((await revision())));
+  $('livePromptForm').onsubmit=e=>{e.preventDefault();guarded(async()=>{clearPending();const p=(await project()),r=(await revision()),prompt=value('livePrompt');const mathRequest=interpretLearningRequest(prompt,FG.learning.subject);if(mathRequest){if(mathRequest.kind==='required')$('liveIntent').textContent=mathRequest.message;else{FG.learning.setMode(p.id,mathRequest.mode);$('liveIntent').textContent='Learning format: '+learningFormatLabel(FG.learning.subject,mathRequest.mode)+'. Your learning history stays with you.';}return;}const intent=interpret(p.game,r.config,prompt);pendingPrompt=prompt;
+    if(intent.kind==='supported'){pending=intent;$('liveIntent').textContent=intent.summary;await applyPending();}
     else{$('liveIntent').textContent=intent.message;$('saveNovelIdea').hidden=intent.kind!=='generation-needed';if(intent.kind==='generation-needed')FG.builder?.request({gameId:p.game,baseRevisionId:r.id,config:r.config,prompt});}
   });};
   $('livePrompt').oninput=clearPending;
-  function applyPending(){if(!pending)throw Error('Describe your change first.');const p=project(),intent=pending;const r=withBuildCopy(p.headId,id=>store.commit(p.id,owner(),intent.config,pendingPrompt,coach.hypothesis,id,p.headId));clearPending();render();play(r);}
+  async function applyPending(){if(!pending)throw Error('Describe your change first.');const p=(await project()),intent=pending;const r=await withBuildCopy(p.headId,async id=>await store.commit(p.id,owner(),intent.config,pendingPrompt,coach.hypothesis,id,p.headId));clearPending();await render();await play(r);}
   $('liveTry').onclick=()=>guarded(applyPending);
-  $('saveNovelIdea').onclick=()=>guarded(()=>{if(!FG.store.addFeedback({game:project().game,type:'generation needed',idea:pendingPrompt}))throw Error('Could not save your idea. Keep it here and try again.');$('liveIntent').textContent='Idea saved in My Creations. It has not been built into a game.';$('saveNovelIdea').hidden=true;});
-  const redo=document.createElement('button');redo.id='liveRedo';redo.className='btn secondary';setIconLabel(redo,'undo','Redo latest change','jems-icon--mirror');$('liveUndo').after(redo);redo.onclick=()=>guarded(()=>{store.redo(project().id,owner());clearPending();coach.reset();render();$('liveStatus').textContent='Restored the latest child of this version. Other branches remain in Compare.';});
-  $('liveUndo').onclick=()=>guarded(()=>{store.undo(project().id,owner());clearPending();coach.reset();render();$('liveStatus').textContent='Undone. Your other versions are still in the history.';});
+  $('saveNovelIdea').onclick=()=>guarded(async()=>{if(!FG.store.addFeedback({game:(await project()).game,type:'generation needed',idea:pendingPrompt}))throw Error('Could not save your idea. Keep it here and try again.');$('liveIntent').textContent='Idea saved in My Creations. It has not been built into a game.';$('saveNovelIdea').hidden=true;});
+  const redo=document.createElement('button');redo.id='liveRedo';redo.className='btn secondary';setIconLabel(redo,'undo','Redo latest change','jems-icon--mirror');$('liveUndo').after(redo);redo.onclick=()=>guarded(async()=>{await store.redo((await project()).id,owner());clearPending();coach.reset();await render();$('liveStatus').textContent='Restored the latest child of this version. Other branches remain in Compare.';});
+  $('liveUndo').onclick=()=>guarded(async()=>{await store.undo((await project()).id,owner());clearPending();coach.reset();await render();$('liveStatus').textContent='Undone. Your other versions are still in the history.';});
   $('compareVersion').onchange=()=>guarded(renderComparison);
-  $('playCompare').onclick=()=>guarded(()=>play(store.revision(project().id,owner(),value('compareVersion'))));
-  $('restoreVersion').onclick=()=>guarded(()=>{store.checkout(project().id,owner(),value('compareVersion'));clearPending();coach.reset();render();$('liveStatus').textContent='That version is now your current game. All other versions are kept.';});
-  $('liveForkForm').onsubmit=e=>{e.preventDefault();guarded(()=>{const p=project(),fork=withBuildCopy(p.headId,id=>store.fork(p.id,owner(),value('forkName'),id,p.headId));active=fork.id;clearPending();coach.reset();render();$('liveStatus').textContent='Saved as a new game! Find it in My Creations or come back after reloading.';});};
-  $('coachForm').onsubmit=e=>{e.preventDefault();guarded(()=>{const answer=value('coachAnswer');if(coach.phase==='reflection'&&coach.playId)store.reflect(coach.playId,owner(),answer);coach.answer(answer);$<HTMLInputElement>('coachAnswer').value='';renderCoach();});};
+  $('playCompare').onclick=()=>guarded(async()=>play(await store.revision((await project()).id,owner(),value('compareVersion'))));
+  $('restoreVersion').onclick=()=>guarded(async()=>{await store.checkout((await project()).id,owner(),value('compareVersion'));clearPending();coach.reset();await render();$('liveStatus').textContent='That version is now your current game. All other versions are kept.';});
+  $('liveForkForm').onsubmit=e=>{e.preventDefault();guarded(async()=>{const p=(await project()),fork=await withBuildCopy(p.headId,async id=>await store.fork(p.id,owner(),value('forkName'),id,p.headId));active=fork.id;clearPending();coach.reset();await render();$('liveStatus').textContent='Saved as a new game! Find it in My Creations or come back after reloading.';});};
+  $('coachForm').onsubmit=e=>{e.preventDefault();guarded(async()=>{const answer=value('coachAnswer');if(coach.phase==='reflection'&&coach.playId)await store.reflect(coach.playId,owner(),answer);coach.answer(answer);$<HTMLInputElement>('coachAnswer').value='';renderCoach();});};
   $('coachSkip').onclick=()=>{coach.skip();renderCoach();};
   window.addEventListener('factory-game',event=>{const detail=(event as CustomEvent<{live:boolean;game:GameId;stateKey:string;config?:Mechanics}>).detail;
     currentPlay={game:detail.game,stateKey:detail.stateKey,config:detail.config||defaults(detail.game,FG.store.current().remixes?.[detail.game]||'classic'),owner:owner()};
     if(!detail.live){$('returnLive').hidden=true;$('playedVersion').hidden=true;}});
-  installRemixFallback(event=>guarded(()=>{
+  installRemixFallback(event=>guarded(async()=>{
     const detail=(event as CustomEvent<{game:GameId;prompt?:string}>).detail;if(!detail||!isGameId(detail.game))return;
     const source=currentPlay?.game===detail.game&&currentPlay.owner===owner()?currentPlay:null;
     FG.app.page('feedback'); // Unmount first so the last ride/build state is flushed.
-    const existing=source&&store.snapshot().revisions.find(r=>r.id===source.stateKey&&store.list(owner()).some(p=>p.id===r.projectId));
-    if(existing){active=existing.projectId;store.checkout(active,owner(),existing.id);}
-    else{const config=source?.config||defaults(detail.game,FG.store.current().remixes?.[detail.game]||'classic');const p=withBuildCopy(source?.stateKey||'original-'+detail.game,id=>store.create(owner(),detail.game,`My ${manifests[detail.game].name}`,config,id));active=p.id;}
-    coach.reset();clearPending();render();$<HTMLInputElement>('livePrompt').value=detail.prompt||'';
+    const known=await store.list(owner());const existing=source&&(await store.snapshot()).revisions.find(r=>r.id===source.stateKey&&known.some(p=>p.id===r.projectId));
+    if(existing){active=existing.projectId;await store.checkout(active,owner(),existing.id);}
+    else{const config=source?.config||defaults(detail.game,FG.store.current().remixes?.[detail.game]||'classic');const p=await withBuildCopy(source?.stateKey||'original-'+detail.game,async id=>await store.create(owner(),detail.game,`My ${manifests[detail.game].name}`,config,id));active=p.id;}
+    coach.reset();clearPending();await render();$<HTMLInputElement>('livePrompt').value=detail.prompt||'';
     $('liveStatus').textContent='Your game and build are ready for an experiment. Try a change, compare it, then Keep your favourite.';
-    if(detail.prompt){const intent=interpret(project().game,revision().config,detail.prompt);if(intent.kind==='supported'){pending=intent;pendingPrompt=detail.prompt;applyPending();}else $('liveIntent').textContent=intent.message;}
+    if(detail.prompt){const intent=interpret((await project()).game,(await revision()).config,detail.prompt);if(intent.kind==='supported'){pending=intent;pendingPrompt=detail.prompt;await applyPending();}else $('liveIntent').textContent=intent.message;}
     else $('livePrompt').focus();
   }));
-  window.addEventListener('factory-profile',()=>{store=new RevisionStore(profileStorage(localStorage));$<HTMLInputElement>('livePrompt').value='';$<HTMLInputElement>('coachAnswer').value='';active=null;clearPending();coach.reset();guarded(render);});
+  window.addEventListener('factory-profile',async()=>{store.close();store=await NativeWorkspace.open(profileStorage(localStorage),owner);$<HTMLInputElement>('livePrompt').value='';$<HTMLInputElement>('coachAnswer').value='';active=null;clearPending();coach.reset();guarded(render);});
   window.addEventListener('factory-page',(event)=>{const page=(event as CustomEvent<string>).detail;if(page==='feedback'||page==='creations')guarded(render);if(page==='home'){$('returnLive').hidden=true;$('playedVersion').hidden=true;}});
   // Keep new data in the parent's existing JSON backup without changing the progress schema/key.
-  FG.factory={exportWorkspace:()=>store.snapshot(),validateWorkspace:migrateWorkspace,restoreWorkspace:(data:unknown)=>{store.restore(JSON.stringify(data));active=null;clearPending();coach.reset();render();}};
-  render();
+  FG.factory={exportWorkspace:()=>store.legacySnapshot(),captureWorkspace:()=>store.snapshot(),indexedStoragePreview:indexedStoragePreview(),prepareIndexedWorkspace:async()=>{await prepareIndexedNative(profileStorage(localStorage),owner);store.close();store=await NativeWorkspace.open(profileStorage(localStorage),owner);active=null;await render();},validateWorkspace:migrateWorkspace,restoreWorkspace:(data:unknown)=>{store.restoreLegacy(JSON.stringify(data));active=null;clearPending();coach.reset();void guarded(render);}};
+  await render();
 }
