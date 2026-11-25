@@ -1,6 +1,6 @@
 const $=id=>document.getElementById(id);
 const status=text=>{$('message').textContent=text;};
-const errors={INVALID_INVITATION:'This code cannot be used. Ask your operator for a fresh private code.',INVALID_PARENT_ACCESS:'Check your parent passphrase and try again.',PARENT_LOCKED:'Too many attempts. Try again in 15 minutes.',UNAUTHENTICATED:'Connect this device or sign in again.',FAMILY_ACCESS_PAUSED:'Your workshop is awaiting approval or has been paused. Contact your operator.',PLAY_REQUIRED:'Start a new supervised play session.',RATE_LIMIT:'Please wait a minute before trying again.'};
+const errors={STORAGE_CONSENT_REQUIRED:'Review your private copy choices again.',CONTINUITY_DISABLED:'Private copies are not enabled for this workshop.',STORAGE_DOMAIN_DENIED:'This kind of work is not approved for private copies.',INVALID_INVITATION:'This code cannot be used. Ask your operator for a fresh private code.',INVALID_PARENT_ACCESS:'Check your parent passphrase and try again.',PARENT_LOCKED:'Too many attempts. Try again in 15 minutes.',UNAUTHENTICATED:'Connect this device or sign in again.',FAMILY_ACCESS_PAUSED:'Your workshop is awaiting approval or has been paused. Contact your operator.',PLAY_REQUIRED:'Start a new supervised play session.',RATE_LIMIT:'Please wait a minute before trying again.'};
 export async function request(path,data){
  const res=await fetch(path,{method:data===undefined?'GET':'POST',credentials:'same-origin',cache:'no-store',redirect:'error',headers:data===undefined?{}:{'Content-Type':'application/json','X-Factory-Request':'1'},body:data===undefined?undefined:JSON.stringify(data)});
  const result=await res.json();if(!res.ok)throw Error(errors[result.errorCode]||'This action could not be completed. Check your access or contact the operator.');
@@ -22,8 +22,27 @@ if($('checking'))void (async()=>{
  if(s.connected&&s.status==='active'){location.replace(s.needsProfile?'/grown-ups':'/acknowledge');return;}
  $('checking').textContent=s.connected?'Your workshop is waiting for operator approval.':'This browser needs a trusted-device invitation.';$('loginChoices').hidden=false;
 })().catch(()=>{$('checking').textContent='Connection interrupted. Reload to check this device.';});
+let storageChoices;
+const copyLabels={profiles:'Explorer settings',games:'Games and saved versions',creative:'Coding and creative projects',learning:'Learning history',artwork:'Original artwork',conversation:'Conversations and notebooks',rewards:'Rewards and Gem Pals',notifications:'Notifications',backups:'Complete recovery copies (requires all included categories)'};
+function choices(region,rows,selected){
+ const fieldset=$(region);for(const child of [...fieldset.children])if(child.tagName!=='LEGEND')child.remove();
+ for(const [key,label] of rows){const wrap=document.createElement('label');wrap.className='check';const input=document.createElement('input');input.type='checkbox';input.name=key;input.checked=selected.includes(key);wrap.append(input,document.createTextNode(label));fieldset.append(wrap);}
+}
+async function showStorage(){
+ storageChoices=await request('/entry/storage-consent');const c=storageChoices;
+ $('storageState').textContent=c.enabled?(c.available.length?'Choose what may be copied. Every unchecked category stays local.':'Your operator has not approved private copies for this family.'):'Private copies are not enabled. Work stays on this device.';
+ $('storageConsent').hidden=!c.enabled||!c.available.length;$('withdrawStorage').hidden=!c.selected||!!c.selected.revokedAt;
+ const selected=c.selected?.notice===c.notice&&!c.selected?.revokedAt?c.selected:{profiles:[],domains:[]};
+ choices('storageProfiles',c.profiles.map((id,i)=>[id,'Explorer '+(i+1)]),selected.profiles);
+ choices('storageDomains',c.available.map(id=>[id,copyLabels[id]]),selected.domains);
+}
+bind('storageConsent',async(_,values)=>{
+ await request('/entry/storage-consent',{notice:storageChoices.notice,profiles:storageChoices.profiles.filter(id=>values.has(id)),domains:storageChoices.available.filter(id=>values.has(id)),acknowledged:values.has('acknowledged')});await showStorage();status('Your private copy choices are saved.');
+});
+if($('withdrawStorage'))$('withdrawStorage').onclick=act(async()=>{await request('/entry/storage-consent',{notice:storageChoices.notice,profiles:[],domains:[],acknowledged:true});await showStorage();status('Private transfers have stopped. Existing copies remain available through the privacy request process.');});
 async function showControls(){
  const [devices,privacy,profiles]=await Promise.all([request('/v1/devices'),request('/v1/devices/privacy'),request('/entry/profiles')]);
+ await showStorage();
  $('privacyState').textContent='Processing consent: '+privacy.status+'.';$('profiles').textContent=profiles.ids.length+' explorer profiles.';
  const region=$('devices');region.replaceChildren();for(const d of devices.devices){const p=document.createElement('p');p.append(d.name+' ');const btn=document.createElement('button');btn.textContent='Revoke device';btn.onclick=act(async()=>{if(confirm('Revoke this trusted device?')){await request('/v1/devices/revoke',{deviceId:d.id});location.replace('/login');}});p.append(btn);region.append(p);}
 }
@@ -41,6 +60,7 @@ if($('familyExport'))$('familyExport').onclick=act(async()=>{
   let after='';const values=[];do{const page=await request('/entry/export-receipts',{kind,after});values.push(...page.rows);after=page.next;}while(after);
   data[kind==='usage'?'monthlyUsage':kind]=values;
  }
+ const storage=[];let cursor='';do{const page=await request('/entry/export-storage',{after:cursor});storage.push(...page.rows);cursor=page.next;}while(cursor);data.storageRecords=storage;
  try{const {exportFamilyDevice}=await import('/entry/export-device.js');data.device=await exportFamilyDevice();}
  catch{data.deviceExportIncomplete=true;status('Server records are ready. Device storage needs separate recovery. Keep this device and contact the operator.');}
  const url=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));

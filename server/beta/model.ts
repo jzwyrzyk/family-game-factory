@@ -1,5 +1,6 @@
 import {randomUUID} from 'node:crypto';
 import {PARENT_PRIVACY_NOTICE_VERSION} from '../privacy/parent-consent';
+import {storageDomains,type StorageDomain} from '../../src/storage/sync-contract';
 import type {FamilyParentAuth} from '../trusted-devices';
 
 export const scopes=['games','learning','coding','problemSolving','conversation','generation','remoteSpeech','artwork','adultImport','adultPrivate'] as const;
@@ -24,7 +25,7 @@ export interface Play {digest:string;familyId:string;guardianId:string;deviceId:
 export interface Family {
  id:string;workspace:string;status:'invited'|'pending'|'active'|'suspended'|'revoked';
  guardian:Guardian;capabilities:Capabilities;allowance:number;paused:boolean;generationPaused:boolean;
- invitation?:Invitation;plays:Play[];createdAt:number;profiles?:string[];approvedArt?:string[];
+ invitation?:Invitation;plays:Play[];createdAt:number;profiles?:string[];approvedArt?:string[];storageDomains?:StorageDomain[];
  request?:{id:string;kind:'export'|'deletion';at:number;state:'requested'|'ready'|'deleting'|'completed';approvedAt?:number};
 }
 export interface Policy {version:1;invitations:boolean;participation:boolean;stop:boolean;monthlyLimit:number}
@@ -33,6 +34,7 @@ export interface ProviderEvidence {notice:string;expiresAt:number;provider:'open
 export interface BetaConfig {
  environment:string;hubOrigin:string;workerRoute?:'beta-dev'|'beta-test'|'beta-prod';administrator:{audience:string;subject:string;verifier:Pick<FamilyParentAuth,'salt'|'digest'>};
  ownerActivation:string;operatorContact:string;providerEvidence:ProviderEvidence[];
+ continuity?:{enabled:boolean;notice:string;domains:StorageDomain[]};
 }
 export function validateBeta(config:BetaConfig|undefined,householdWorkspace:string){
  if(!config||config.ownerActivation!=='private-family-beta-v1'||!/^[-a-z0-9]{1,30}$/.test(config.environment)||
@@ -46,6 +48,7 @@ export function validateBeta(config:BetaConfig|undefined,householdWorkspace:stri
   e.provider!==(e.scope==='remoteSpeech'?'google-cloud':'openai')||!Number.isSafeInteger(e.expiresAt)||
   !/^[a-f0-9]{64}$/.test(e.privacyDigest)||!/^[a-f0-9]{64}$/.test(e.safetyDigest)||
   (e.provider==='openai'&&e.zdrApproved!==true))throw Error('PROVIDER_EVIDENCE_REJECTED');
+ if(config.continuity){const c=config.continuity;if(typeof c.enabled!=='boolean'||!/^[-a-z0-9]{8,80}$/.test(c.notice)||!Array.isArray(c.domains)||new Set(c.domains).size!==c.domains.length||c.domains.some(d=>!storageDomains.includes(d)))throw Error('STORAGE_POLICY_REQUIRED');}
  return config;
 }
 export function createFamily(contactRef:string,now=Date.now()):Family{

@@ -1,3 +1,4 @@
+import {storageEmulatorAcceptance} from './storage-sync-emulator';
 import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
 import {Firestore} from '@google-cloud/firestore';
@@ -18,7 +19,7 @@ async function main(){
   const m=new Date().toISOString().slice(0,7);
   assert.deepEqual(await store.run(tx=>tx.get(d.root+'/usage/'+m)),{used:30000,reserved:0});
   assert.equal((await d.repository(f.id===a.id?b.id:a.id).snapshot()).ledgers[f.id],undefined);
-  await mutate('suspend',f.id);console.log('Firestore emulator passed real SDK transactions, independent family authorization, concurrent reservation and settlement.');
+  await mutate('suspend',f.id);await storageEmulatorAcceptance(store);console.log('Firestore emulator passed real SDK transactions, independent family authorization, concurrent reservation and settlement.');
  }finally{await db.terminate();}
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});

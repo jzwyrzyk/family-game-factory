@@ -1,9 +1,10 @@
+import {continuityHttp,storageConsent} from './continuity';
 import {randomUUID} from 'node:crypto';
 import type {IncomingMessage,ServerResponse} from 'node:http';
 import {readJsonBody} from '../http-json';
 import {verifySession} from '../pipeline/auth';
 import {cookieValue,assertActiveTrustedDevice} from '../trusted-devices';
-import {acknowledge,exact,internalCookies,liveSession,logout,redeem,requirePlay} from './access';
+import {acknowledge,exact,internalCookies,liveSession,metadataSession,logout,redeem,requirePlay} from './access';
 import {activeFamily,betaNotice,familyOrigin,participationNotice,uuid,type Capabilities} from './model';
 import {exportApproved,exportReceiptPage,exportWorkspace} from './portability';
 import {previewAdmission,type PreviewRouting} from './preview';
@@ -54,8 +55,7 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
      let connected=false;
      try{
       const session=verifySession(cookieValue(internalCookies(raw),'factory_session'),key);
-      if(session.deviceId&&session.familyId===id){const s=await d.inWorkspace(tx,f,p,s=>s,false);
-       assertActiveTrustedDevice(s,session);connected=true;}
+      if(session.deviceId&&session.familyId===id){await metadataSession(d,tx,f,raw,key);connected=true;}
      }catch{/* No authenticated device. */}
      return {family:true,connected,status:connected?f.status:undefined,needsProfile:connected&&!f.profiles?.length,notice:betaNotice,terms:participationNotice};
     });json(res,200,state);return;
@@ -66,7 +66,7 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    }
    if(req.method==='GET'&&['/acknowledge','/grown-ups'].includes(path)){
     if(!id)throw Error('NOT_FOUND');
-    try{await d.withFamily(id,async(tx,f,p)=>{activeFamily(f,p);await d.inWorkspace(tx,f,p,s=>liveSession(f,s,internalCookies(raw),key,Date.now()),false);});}
+    try{await d.withFamily(id,async(tx,f,p)=>{activeFamily(f,p);await metadataSession(d,tx,f,raw,key);});}
     catch{res.writeHead(303,{Location:'/login'});res.end();return;}
    }
    if(req.method==='GET'&&!path.startsWith('/play/')&&!path.startsWith('/v1/')&&await options.surface?.(req,res,{path,family:id}))return;
@@ -80,19 +80,26 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    if(req.method==='POST'&&(path==='/entry/logout'||path==='/entry/end')){
     exact(await read(req),[]);json(res,200,{ended:true},await logout(d,id,raw,key,path==='/entry/logout'));return;
    }
-   if(path==='/entry/profiles'||path==='/entry/review-art'||['/entry/export','/entry/export-receipts','/entry/export-device.js'].includes(path)){
+   if(path==='/entry/storage-consent'){json(res,200,await storageConsent(d,id,raw,key,req.method==='POST'?await read(req):undefined));return;}
+   if(path.startsWith('/v1/storage/')){await continuityHttp(d,id,raw,key,req,res);return;}
+   if(path==='/entry/profiles'||path==='/entry/review-art'||['/entry/export','/entry/export-receipts','/entry/export-storage','/entry/export-device.js'].includes(path)){
     const body=req.method==='POST'?await read(req):{};
-    exact(body,path==='/entry/review-art'?['digest']:path==='/entry/export-receipts'?['kind','after']:[]);
+    exact(body,path==='/entry/review-art'?['digest']:path==='/entry/export-receipts'?['kind','after']:path==='/entry/export-storage'?['after']:[]);
     const result=await d.withFamily(id,async(tx,f,p)=>{
      activeFamily(f,p);
      const cookies=internalCookies(raw),now=Date.now();
-     const session=await d.inWorkspace(tx,f,p,s=>liveSession(f,s,cookies,key,now),false);
+     const session=await metadataSession(d,tx,f,raw,key,now);
      const parent=verifySession(cookieValue(cookies,'factory_parent'),key,now);
      if(parent.role!=='parent'||parent.familyId!==id||parent.deviceId!==session.deviceId)throw Error('FORBIDDEN');
      if(path.startsWith('/entry/export')){
       exportApproved(f,now);
       if(path==='/entry/export-device.js'){if(req.method!=='GET')throw Error('FORBIDDEN');return {guardianTool:true};}
       if(req.method!=='POST')throw Error('FORBIDDEN');
+      if(path==='/entry/export-storage'){
+       if(typeof body.after!=='string'||body.after&&!/^[a-f0-9]{64}$/.test(body.after))throw Error('INVALID_REQUEST');
+       const rows=await tx.page('factoryContinuity/beta-'+id+'/continuityRecordsV1',body.after,4);
+       return {rows:rows.map(r=>r.value),next:rows.length===4?rows.at(-1)!.id:null};
+      }
       if(path==='/entry/export-receipts')return exportReceiptPage(tx,d.path(id),f,body.kind,body.after);
       const data=await d.inWorkspace(tx,f,p,s=>exportWorkspace(f,s,now),false);
       f.request!.state='completed';tx.set(d.path(id),f);return data;
@@ -112,7 +119,7 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
     try{access=await requirePlay(d,id,raw,key,path==='/play/'?'entry':'check');}
     catch(error){
      if(path!=='/play/'||!(error instanceof Error)||error.message!=='PLAY_REQUIRED')throw error;
-     await d.withFamily(id,async(tx,f,p)=>{activeFamily(f,p);await d.inWorkspace(tx,f,p,s=>liveSession(f,s,internalCookies(raw),key,Date.now()),false);});
+     await d.withFamily(id,async(tx,f,p)=>{activeFamily(f,p);await metadataSession(d,tx,f,raw,key);});
      res.writeHead(303,{Location:'/acknowledge'});res.end();return;
     }
     if(await options.surface?.(req,res,{path,family:id,capabilities:access.capabilities,profiles:access.profiles,expires:access.expires,idleUntil:access.idleUntil}))return;
@@ -139,9 +146,9 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    if(res.headersSent){res.end();return;}
    const reason=e instanceof Error?e.message:'';
    const status=reason==='NOT_FOUND'||reason==='FAMILY_UNAVAILABLE'?404:
-    ['PLAY_REQUIRED','UNAUTHENTICATED'].includes(reason)?401:['RATE_LIMIT','PARENT_LOCKED'].includes(reason)?429:
-    /^(FORBIDDEN|ADMIN_REQUIRED|INVALID_(PARENT_ACCESS|INVITATION)|.*_REQUIRED|FAMILY_ACCESS_PAUSED|INVITATIONS_PAUSED|INVALID_LIFECYCLE|DELETION_PENDING)$/.test(reason)?403:
-    /^(INVALID_|BETA_CAPACITY|RECEIPT_REUSED|REQUEST_PENDING)/.test(reason)?400:503;
+    ['PLAY_REQUIRED','UNAUTHENTICATED'].includes(reason)?401:['STORAGE_CONFLICT','STORAGE_OPERATION_REUSED','STORAGE_CONSENT_CHANGED'].includes(reason)?409:['RATE_LIMIT','PARENT_LOCKED'].includes(reason)?429:
+    /^(FORBIDDEN|ADMIN_REQUIRED|INVALID_(PARENT_ACCESS|INVITATION)|.*_REQUIRED|FAMILY_ACCESS_PAUSED|INVITATIONS_PAUSED|INVALID_LIFECYCLE|DELETION_PENDING|CONTINUITY_DISABLED|CONTINUITY_DENIED|STORAGE_DOMAIN_DENIED)$/.test(reason)?403:
+    /^(INVALID_|STORAGE_(?:CURSOR|PAGE|RECORD|OPERATION)_|BETA_CAPACITY|RECEIPT_REUSED|REQUEST_PENDING)/.test(reason)?400:503;
    json(res,status,{errorCode:status===503?'SERVICE_UNAVAILABLE':reason});
   }
  };

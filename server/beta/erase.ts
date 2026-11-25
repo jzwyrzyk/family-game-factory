@@ -24,11 +24,12 @@ export async function processDeletion(db:Firestore,storage:Storage,config:{envir
    await file.delete({ifGenerationMatch:file.metadata.generation,ignoreNotFound:true});}
  }
  await db.recursiveDelete(db.doc('factoryWorkspaces/'+workspace));
+ await db.recursiveDelete(db.doc('factoryContinuity/'+workspace));
  for(const collection of ['verification','jobs']){
   for(;;){const page=await root.collection(collection).where('familyId','==',id).limit(300).get();if(page.empty)break;
    const batch=db.batch();for(const row of page.docs)batch.delete(row.ref);await batch.commit();}
  }
- for(const path of ['acknowledgments','metadata','usage'])await db.recursiveDelete(family.collection(path));
+ for(const path of ['acknowledgments','metadata','usage','continuity','storage-consents'])await db.recursiveDelete(family.collection(path));
  await db.runTransaction(async tx=>{
   const current=(await tx.get(family)).data() as Family;deletionTarget(current,id,requestId);
   tx.set(family,{id,workspace,status:'revoked',guardian:{id:'retired',contactRef:'retired'},profiles:[],capabilities:defaultCapabilities(),

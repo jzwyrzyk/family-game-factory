@@ -1,3 +1,5 @@
+import {privacyStatus} from '../privacy/parent-consent';
+import {pendingReservations} from './portability';
 import {stopJobs} from './stop-jobs';
 import type {AtomicStore,Documents} from './documents';
 import {closedPolicy,remoteAllowed,remoteScopes,uuid,workspaceOf,type BetaConfig,type Family,type Policy} from './model';
@@ -40,11 +42,13 @@ export class FamilyDirectory {
   const previousMonth=previous?.month===period;
   const before={used:previousMonth?previous!.used:0,reserved:previousMonth?previous!.reserved:0};
   const globalPath=this.root+'/usage/'+period;
-  const total=await tx.get<Usage>(globalPath)??{used:0,reserved:0};
   s.ledgers[f.id]={...before,month:period,allowance:f.allowance,paidEnabled:!p.stop&&!f.paused&&p.participation&&f.status==='active'};
   s.betaScopes=Object.fromEntries(remoteScopes.map(scope=>[scope,remoteAllowed(f,p,this.config.providerEvidence,scope,now)])) as PipelineState['betaScopes'];
   const deviceStatus=()=>(s.devices??[]).map(({id,familyId,expiresAt,lastSeenAt,revokedAt})=>({id,familyId,expiresAt,lastSeenAt,revokedAt:revokedAt??null}));
   const devicesBefore=JSON.stringify(deviceStatus());
+  const administration=()=>({pending:pendingReservations(s),devices:(s.devices??[]).map(({id,familyId,name,expiresAt,lastSeenAt,revokedAt})=>({id,familyId,name,expiresAt,lastSeenAt,revokedAt:revokedAt??null})),
+   choices:s.parentPrivacyChoices??[]});
+  const administrationBefore=JSON.stringify(administration());
   const consentChoices=()=>JSON.stringify((s.parentPrivacyChoices??[]).map(c=>[c.id,c.revokedAt??null]));
   const priorConsent=consentChoices();
   const count=s.jobs.length,result=update(s);
@@ -55,6 +59,7 @@ export class FamilyDirectory {
    if(ledger.month!==period||ledger.allowance!==f.allowance||!Number.isSafeInteger(ledger.reserved)||!Number.isSafeInteger(ledger.used)||
     ledger.reserved<0||used<0)throw Error('INVALID_LEDGER');
    if(used||reserved){
+    const total=await tx.get<Usage>(globalPath)??{used:0,reserved:0};
     const next={used:total.used+used,reserved:total.reserved+reserved};
     if(!Number.isSafeInteger(next.used)||!Number.isSafeInteger(next.reserved)||next.reserved<0||
      (reserved>0&&(!ledger.paidEnabled||period!==month||next.used+next.reserved>p.monthlyLimit||ledger.used+ledger.reserved>f.allowance)))throw Error('SPENDING_CUTOFF');
@@ -67,10 +72,17 @@ export class FamilyDirectory {
    }
    const devices=deviceStatus();
    if(JSON.stringify(devices)!==devicesBefore)tx.set(this.path(f.id)+'/metadata/devices',{devices});
+   const detail=administration();if(JSON.stringify(detail)!==administrationBefore||devicesBefore==='[]')tx.set(this.path(f.id)+'/metadata/administration',detail);
    delete s.betaScopes;
    await writeWorkspace(tx,loaded,art,this.encoding);
   }
   return result;
+ }
+ async administration(tx:Documents,f:Family,p:Policy,now:number){
+  const summary=await tx.get<{pending:ReturnType<typeof pendingReservations>;devices:{id:string;familyId:string;name:string;expiresAt:number;lastSeenAt:number;revokedAt:number|null}[];choices:PipelineState['parentPrivacyChoices']}>(this.path(f.id)+'/metadata/administration');
+  if(!summary)return this.inWorkspace(tx,f,p,s=>({pending:pendingReservations(s),privacy:privacyStatus(s,f.id,now),devices:(s.devices??[]).map(d=>({id:d.id,name:d.name,expiresAt:d.expiresAt,revoked:!!d.revokedAt}))}),false);
+  const state={parentPrivacyChoices:summary.choices,devices:summary.devices.map(({revokedAt,...d})=>({...d,...(revokedAt===null?{}:{revokedAt})}))} as PipelineState;
+  return {pending:summary.pending,privacy:privacyStatus(state,f.id,now),devices:summary.devices.map(d=>({id:d.id,name:d.name,expiresAt:d.expiresAt,revoked:d.revokedAt!==null}))};
  }
  repository(id:string):Repository {
   return {

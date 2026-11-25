@@ -1,3 +1,4 @@
+import {reconcileFamilies} from './beta/reconcile';
 import {platformMode,validateBeta,familyOrigin,uuid,type BetaConfig} from './beta/model';
 import {mappedHouseholdRepository,type HouseholdBinding} from './beta/household';
 import {FamilyDirectory} from './beta/store';
@@ -177,15 +178,11 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
    const {payload}=await jwtVerify(bearer,schedulerKeys,{issuer:['https://accounts.google.com','accounts.google.com'],audience:config.gatewayOrigin,algorithms:['RS256']});
    if(payload.email!==config.schedulerEmail||payload.email_verified!==true)throw Error('FORBIDDEN');
    const index=await d.db.run(tx=>tx.get<{ids:string[]}>(d.root+'/metadata/directory'));
-   let failed=false;
-   for(const id of index?.ids??[]){
-    try{
-     const retired=await d.withFamily(id,async(_tx,f)=>f.request?.kind==='deletion'&&['deleting','completed'].includes(f.request.state));
-     if(retired)continue;
-     const target=await runtime(id);await reconcilePaidReceipts(target.repo);await target.coordinator.tick();
-    }catch{failed=true;}
-   }
-   if(failed)throw Error('RECONCILIATION_INCOMPLETE');
+   await reconcileFamilies(index?.ids??[],async id=>{
+    const retired=await d.withFamily(id,async(_tx,f)=>f.request?.kind==='deletion'&&['deleting','completed'].includes(f.request.state));
+    if(retired)return;
+    const target=await runtime(id);await reconcilePaidReceipts(target.repo);await target.coordinator.tick();
+   });
    res.writeHead(204);res.end();
   }});
 }

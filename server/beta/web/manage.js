@@ -1,7 +1,7 @@
 import {request} from '/entry.js';
 const root=document.getElementById('console'),msg=document.getElementById('message');
 const labels={games:'Approved local games',learning:'Math and English',coding:'Coding studio',problemSolving:'Problem solving',conversation:'AI conversation coaching',generation:'AI game generation and revision',remoteSpeech:'Remote speech',artwork:'Reviewed adult artwork',adultImport:'Adult game importing',adultPrivate:'Adult Private development'};
-function el(tag,txt){const e=document.createElement(tag);if(txt!==undefined)e.textContent=txt;return e;}
+function el(tag,txt){const e=document.createElement(tag);if(tag==='form'){e.method='post';e.addEventListener('submit',event=>event.preventDefault());}if(txt!==undefined)e.textContent=txt;return e;}
 function field(form,label,type='text',value=''){const wrap=el('label',label),input=el('input');input.type=type;if(type==='checkbox'){wrap.className='check';input.checked=value===true;}else{input.value=value;input.required=true;}wrap.append(input);form.append(wrap);return input;}
 function card(title){const section=el('section');section.className='ops';section.append(el('h2',title));root.append(section);return section;}
 let selected='';
@@ -45,6 +45,8 @@ async function refresh(){
  const budget=card('Features and spending'),features={};for(const [key,name] of Object.entries(labels)){features[key]=field(budget,name,'checkbox',f.capabilities[key]);if(['adultPrivate','adultImport'].includes(key))features[key].disabled=true;}
  const cap=dollars(budget,'Family monthly limit (USD)',f.allowance),pause=field(budget,'Pause all remote AI','checkbox',f.paused),gen=field(budget,'Pause generation','checkbox',f.generationPaused);
  button(budget,'Save family policy',()=>confirmAction('policy',id,{capabilities:Object.fromEntries(Object.entries(features).map(([k,v])=>[k,v.checked])),monthlyCents:cap(),paused:pause.checked,generationPaused:gen.checked},'Change features and spending'));
+ const copies=card('Private device copies');copies.append(el('p','This permits a separate guardian choice. Enrollment and AI consent do not authorize copying local work.'));
+ if(overview.storage?.enabled){const options={};for(const domain of overview.storage.domains)options[domain]=field(copies,domain,'checkbox',f.storageDomains.includes(domain));button(copies,'Save allowed copy categories',()=>confirmAction('storage-domains',id,{domains:Object.entries(options).filter(([,input])=>input.checked).map(([domain])=>domain)},'Change allowed private copy categories'));}else copies.append(el('p','Private copies are disabled by the release configuration.'));
  const reviewed=field(budget,'SHA-256 of independently reviewed non-identifying artwork');button(budget,'Approve exact artwork',()=>confirmAction('approve-art',id,{digest:reviewed.value},'Authorize this reviewed image'));
  const usage=card('Usage and pending reservations'),table=el('table');usage.append(table);const head=el('tr');for(const title of ['Month','Used','Reserved'])head.append(el('th',title));table.append(head);for(const u of f.usage){const row=el('tr');for(const val of [u.month,displayMoney(u.used),displayMoney(u.reserved)])row.append(el('td',val));table.append(row);}
  const pending=f.pending??[];usage.append(el('p',pending.length?'Outstanding work':'No outstanding reservations.'));for(const item of pending)usage.append(el('p',item.kind+' · '+item.stage+' · '+displayMoney(item.microUsd)+' · '+item.reference));

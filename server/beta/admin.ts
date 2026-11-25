@@ -1,3 +1,4 @@
+import {storageDomains} from '../../src/storage/sync-contract';
 import {randomUUID} from 'node:crypto';
 import {createRemoteJWKSet,jwtVerify} from 'jose';
 import {checkParentPassphrase,type FamilyParentAuth} from '../trusted-devices';
@@ -19,7 +20,7 @@ export async function verifyAdministrator(assertion:string|undefined,config:{adm
 }
 function publicFamily(f:Family){
  return {id:f.id,status:f.status,contactRef:f.guardian.contactRef,verifiedAt:f.guardian.verifiedAt??null,
-  capabilities:f.capabilities,paused:f.paused,generationPaused:f.generationPaused,allowance:f.allowance,
+  capabilities:f.capabilities,storageDomains:f.storageDomains??[],paused:f.paused,generationPaused:f.generationPaused,allowance:f.allowance,
   invitation:f.invitation?{id:f.invitation.id,expiresAt:f.invitation.expiresAt,used:!!f.invitation.usedAt,revoked:!!f.invitation.revokedAt}:null,
   request:f.request??null};
 }
@@ -44,7 +45,7 @@ export class BetaAdministration {
    const ids=await tx.get<{ids:string[]}>(this.d.root+'/metadata/directory');
    const binding=await tx.get(this.d.root+'/metadata/household');
    const globalUsage=await tx.get<Usage>(this.d.root+'/usage/'+new Date(now).toISOString().slice(0,7));
-   if(!id)return {householdMapped:!!binding,globalUsage:globalUsage??{used:0,reserved:0},mode:'PRIVATE_FAMILY_BETA',policy,evidence:this.d.config.providerEvidence.map(e=>({scope:e.scope,provider:e.provider,expiresAt:e.expiresAt,current:e.expiresAt>now})),
+   if(!id)return {householdMapped:!!binding,globalUsage:globalUsage??{used:0,reserved:0},mode:'PRIVATE_FAMILY_BETA',policy,storage:{enabled:this.d.config.continuity?.enabled===true,domains:this.d.config.continuity?.enabled?this.d.config.continuity.domains:[]},evidence:this.d.config.providerEvidence.map(e=>({scope:e.scope,provider:e.provider,expiresAt:e.expiresAt,current:e.expiresAt>now})),
     families:await Promise.all((ids?.ids??[]).map(async k=>publicFamily(await this.d.family(tx,k))))};
    const f=await this.d.family(tx,id);
    const usage=await Promise.all(Array.from({length:13},async(_,i)=>{
@@ -52,7 +53,7 @@ export class BetaAdministration {
     const u=await tx.get<Usage>(this.d.path(id)+'/usage/'+month);return {month,used:u?.used??0,reserved:u?.reserved??0};
    }));
    if(f.request?.kind==='deletion'&&['deleting','completed'].includes(f.request.state))return {...publicFamily(f),origin:familyOrigin(this.d.config,id),privacy:{status:'withdrawn',noticeVersion:null,scopes:{}},devices:[],pending:[],usage};
-   const detail=await this.d.inWorkspace(tx,f,policy,s=>({pending:pendingReservations(s),privacy:privacyStatus(s,id,now),devices:(s.devices??[]).map(d=>({id:d.id,name:d.name,expiresAt:d.expiresAt,revoked:!!d.revokedAt}))}),false);
+   const detail=await this.d.administration(tx,f,policy,now);
    return {...publicFamily(f),origin:familyOrigin(this.d.config,id),...detail,usage};
   });
  }
@@ -114,6 +115,10 @@ export class BetaAdministration {
      exact(params,[]);if(f.status==='revoked'||(action==='resume'&&(f.status!=='suspended'||!f.guardian.verifiedAt)))throw Error('INVALID_LIFECYCLE');
      if(action!=='resume')await this.d.inWorkspace(tx,f,p,s=>{revokeConsent(s,f.id,now);if(action==='revoke')for(const d of s.devices??[])d.revokedAt=now;},true);
      f.status=action==='resume'?'active':action==='suspend'?'suspended':'revoked';f.plays=[];
+    }else if(action==='storage-domains'){
+     exact(params,['domains']);const config=this.d.config.continuity;
+     if(!config?.enabled||!Array.isArray(params.domains)||new Set(params.domains).size!==params.domains.length||params.domains.some(v=>!storageDomains.includes(v)||!config.domains.includes(v)))throw Error('STORAGE_POLICY_REQUIRED');
+     f.storageDomains=params.domains; // This permits a guardian choice; it is not consent.
     }else if(action==='approve-art'){
      exact(params,['digest']);if(typeof params.digest!=='string'||!/^[0-9a-f]{64}$/.test(params.digest))throw Error('INVALID_REQUEST');
      f.approvedArt??=[];if(f.approvedArt.length>=32)throw Error('BETA_CAPACITY');

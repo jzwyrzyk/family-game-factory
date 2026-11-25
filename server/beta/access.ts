@@ -5,6 +5,7 @@ import type {VerifiedSession} from '../contracts/api';
 import type {PipelineState} from '../pipeline/types';
 import {activeFamily,betaNotice,participationNotice,playIdle,playLifetime,type Family,type Play} from './model';
 import type {FamilyDirectory} from './store';
+import type {Documents} from './documents';
 
 export const digest=(value:string)=>createHash('sha256').update(value).digest('hex');
 export const secret=()=>randomBytes(32).toString('base64url');
@@ -20,6 +21,23 @@ export function liveSession(f:Family,s:PipelineState,cookies:string|undefined,ke
  const session=verifySession(cookieValue(cookies,'factory_session'),key,now);
  if(session.familyId!==f.id||session.role!=='designer'||!session.deviceId)throw Error('UNAUTHENTICATED');
  assertActiveTrustedDevice(s,session,now);return session;
+}
+/** Credential-free device projection, updated atomically with workspace changes.
+ * Absence is a denied admission, never a reason to hydrate child artifacts. */
+export async function metadataSession(directory:FamilyDirectory,tx:Documents,f:Family,raw:string|undefined,key:string,now=Date.now()){
+ const session=verifySession(cookieValue(internalCookies(raw),'factory_session'),key,now);
+ if(session.familyId!==f.id||session.role!=='designer'||!session.deviceId)throw Error('UNAUTHENTICATED');
+ const metadata=await tx.get<{devices:{id:string;familyId:string;revokedAt:number|null;lastSeenAt:number;expiresAt:number}[]}>(directory.path(f.id)+'/metadata/devices');
+ const device=metadata?.devices.find(d=>d.id===session.deviceId&&d.familyId===f.id);
+ if(!device||device.revokedAt!==null||device.expiresAt<=now||device.lastSeenAt+90*86400000<=now)throw Error('UNAUTHENTICATED');
+ return session;
+}
+export async function metadataPlay(directory:FamilyDirectory,tx:Documents,f:Family,raw:string|undefined,key:string,now=Date.now()){
+ const session=await metadataSession(directory,tx,f,raw,key,now),value=cookieValue(raw,'__Host-jems-play');
+ const play=f.plays.find(row=>value&&row.digest===digest(value));
+ if(!play||play.familyId!==f.id||play.deviceId!==session.deviceId||play.guardianId!==f.guardian.id||play.entryPending||
+  play.notice!==betaNotice||play.terms!==participationNotice||play.expires<=now||play.lastActive+playIdle<=now)throw Error('PLAY_REQUIRED');
+ return session;
 }
 export function issueInvitation(f:Family,purpose:'new-family'|'recovery',now:number){
  if(f.status!=='invited'||(purpose==='new-family'&&!!f.guardian.pairedDevice))throw Error('INVALID_LIFECYCLE');
