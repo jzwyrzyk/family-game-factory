@@ -55,7 +55,7 @@ test('protected nonproduction controller verifies build evidence and stages each
  const source='c'.repeat(40),id='11111111-1111-4111-8111-111111111111',trigger='22222222-2222-4222-8222-222222222222';
  const record={descriptor:cfg,source,builds:{gateway:{id,trigger},preview:{id:id.replace(/^1/,'3'),trigger}}};
  const plan=hostingPlan(cfg) as Record<string,any>,controller={enabled:true,projectId:cfg.project,projectNumber:cfg.projectNumber,region:cfg.region};
- const revisions=new Map<string,any[]>(),staged:string[]=[];let wrongImage=false,missingProvenance=false,wrongRuntime=false;
+ const revisions=new Map<string,any[]>(),staged:string[]=[];let wrongImage=false,missingProvenance=false,wrongRuntime=false,wrongBackendProject=false;
  function io(args:string[]){
   const group=args.slice(0,3).join(' ');
   if(group==='builds triggers describe')return {id:trigger,github:{owner:'jzwyrzyk',name:'family-game-factory'}};
@@ -64,7 +64,7 @@ test('protected nonproduction controller verifies build evidence and stages each
    return {id:args[2],buildTriggerId:trigger,status:'SUCCESS',sourceProvenance:missingProvenance?{}:{resolvedRepoSource:{commitSha:source,repoName:'github_jzwyrzyk_family-game-factory'}},substitutions:{COMMIT_SHA:source,REPO_FULL_NAME:'jzwyrzyk/family-game-factory'},
     results:{images:[{name:img.split('@')[0]+':approved',digest:wrongImage?'sha256:'+'f'.repeat(64):img.split('@')[1]}]}};
   }
-  if(group==='compute url-maps describe')return plan.urlMap;
+  if(group==='compute url-maps describe')return wrongBackendProject?{...plan.urlMap,defaultService:plan.urlMap.defaultService.replace(cfg.project,'other-isolated-project')}:plan.urlMap;
   if(group==='compute backend-services describe')return {name:args[3],iap:{enabled:true}};
   if(group==='run services describe'){
    const found=accounts.find(r=>cfg.services[r].name===args[3])!;
@@ -78,6 +78,7 @@ test('protected nonproduction controller verifies build evidence and stages each
   throw Error('Unexpected command');
  }
  const opts={environment:'test',source,mode:'verify'};await environmentRelease(record,controller,opts,io);assert.equal(staged.length,0);
+ wrongBackendProject=true;await assert.rejects(environmentRelease(record,controller,{...opts,mode:'stage'},io),/routing/);assert.equal(staged.length,0);wrongBackendProject=false;
  missingProvenance=true;await assert.rejects(environmentRelease(record,controller,{...opts,mode:'stage'},io),/source|provenance/);assert.equal(staged.length,0);missingProvenance=false;
  wrongImage=true;await assert.rejects(environmentRelease(record,controller,{...opts,mode:'stage'},io),/digest/);assert.equal(staged.length,0);wrongImage=false;
  await assert.rejects(environmentRelease(record,{...controller,enabled:false},{...opts,mode:'stage'},io));

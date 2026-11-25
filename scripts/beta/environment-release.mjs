@@ -35,9 +35,12 @@ export function verifyService(actual,expected){
  requireState(serving.length&&serving.every(t=>typeof t[0]==='string'&&t[0].length>0)&&serving.reduce((n,t)=>n+t[1],0)===100,'Explicit, healthy current traffic required.');
  return JSON.stringify(serving);
 }
-const tail=s=>s.split('/').at(-1);
+function backendResource(value){
+ const match=typeof value==='string'&&value.match(/^(?:https:\/\/(?:www\.googleapis\.com|compute\.googleapis\.com)\/compute\/v1\/)?(projects\/[a-z0-9-]+\/global\/backendServices\/[a-z0-9-]+)$/);
+ requireState(match,'Reviewed global backend resource required.');return match[1];
+}
 function checkRouting(url,expected){
- const canonical=u=>({default:tail(u.defaultService),hosts:u.hostRules.map(h=>[h.pathMatcher,h.hosts.slice().sort()]).sort(),paths:u.pathMatchers.map(p=>[p.name,tail(p.defaultService),(p.pathRules??[]).map(r=>[r.paths.slice().sort(),tail(r.service)]).sort()]).sort()});
+ const canonical=u=>({default:backendResource(u.defaultService),hosts:u.hostRules.map(h=>[h.pathMatcher,h.hosts.slice().sort()]).sort(),paths:u.pathMatchers.map(p=>[p.name,backendResource(p.defaultService),(p.pathRules??[]).map(r=>[r.paths.slice().sort(),backendResource(r.service)]).sort()]).sort()});
  requireState(JSON.stringify(canonical(url))===JSON.stringify(canonical(expected))&&!url.defaultRouteAction&&!url.defaultUrlRedirect&&url.pathMatchers.every(p=>!p.routeRules?.length&&!p.defaultRouteAction&&!p.defaultUrlRedirect&&(p.pathRules??[]).every(r=>!r.routeAction&&!r.urlRedirect)),'Live host and path routing differs.');
 }
 export async function environmentRelease(release,controller,options,io=cloud){
