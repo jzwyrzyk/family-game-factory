@@ -406,10 +406,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "facbfa499f5063b5554efc14d3231dd7f67a8c54f4fadfc0a837cc7efa709f8f",
-      "reviewedAt": "2026-11-25T01:22:10.171Z",
+      "sourceDigest": "b200b551e6ad0a352f759bb480aebb748e7863b5053479f2073b84f686bb1876",
+      "reviewedAt": "2026-11-25T01:35:59.005Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Grown-up creation handoff uses the early profile and preserves the authorization, reporting and local play contracts. Existing operational procedures and acceptance commands still apply to this change.",
+      "reviewReason": "The young learner journey and parent view retain the first-move observation on its own project and revision. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:28:45.083Z",
-      "sourceDigest": "f7748c15606b170461603eaf6bbaa14baa3dd904897416330825101e12ab3404",
+      "reviewedAt": "2026-11-25T01:35:59.065Z",
+      "sourceDigest": "055eab9eb2244e197baefeb57fca24b62acaab79ab3ebc4d3fa083e4cd4cc8ce",
       "reviewOutcome": "updated",
-      "reviewReason": "Parent handoff and reporting preserve the new curriculum and graphical scene changes from the preceding review stages.",
+      "reviewReason": "The young learner journey and parent view retain the first-move observation on its own project and revision.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1487,10 +1487,10 @@
         "tests/parent-dashboard*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3b67bcb6a2bb4ad3cb5f6a8a61b9bc0e0b43169a7e63a6cbf47a3ba5f4588152",
-      "reviewedAt": "2026-11-25T01:15:46.890Z",
+      "sourceDigest": "04d6ff8e0f2e9b0a0103f3ab4676bd8448435d0767877576b52e5581d8177004",
+      "reviewedAt": "2026-11-25T01:35:59.159Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed family handoff, generation restrictions, local coding and games, privacy contracts and declared prompt delivery in parent reports.",
+      "reviewReason": "The young learner journey and parent view retain the first-move observation on its own project and revision.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-19T17:17:56.552Z",

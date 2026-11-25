@@ -217,6 +217,28 @@ function observe(project:CreationProject,durationMs:number,inputs:readonly Chall
 }
 
 const actorAt=(frame:Frame,id:string):Actor|undefined=>frame.snapshot.actors.find(actor=>actor.id===id);
+export const movementChoices=['left','right','up','down','still'] as const;
+export type MovementChoice=typeof movementChoices[number];
+export interface MovementPrediction {choice:MovementChoice;observed:MovementChoice}
+export function predictActor(id:string){
+ if(!Object.hasOwn(earlyRoutes,id))return null;
+ return id==='turn-the-corner'?'robot':'dragon';
+}
+/** The first visibly displaced position in this bounded run. A diagonal tie
+ * or disappearing actor cannot establish a single directional observation. */
+export function firstMovement(project:CreationProject,id:string):MovementChoice|null{
+ const actorId=predictActor(id),goal=getCreationChallenge(id);if(!actorId||!goal)return null;
+ const run=observe(project,goal.durationMs,goal.previewInputs),origin=actorAt(run.frames[0],actorId);
+ if(!origin?.visible||run.limitReached)return null;
+ for(const frame of run.frames){
+  const actor=actorAt(frame,actorId);if(!actor?.visible)return null;
+  const x=actor.x-origin.x,y=actor.y-origin.y;
+  if(Math.max(Math.abs(x),Math.abs(y))<3)continue;
+  if(Math.abs(Math.abs(x)-Math.abs(y))<1)return null;
+  return Math.abs(x)>Math.abs(y)?(x<0?'left':'right'):(y<0?'up':'down');
+ }
+ return 'still';
+}
 const near=(actual:number,expected:number,tolerance=POSITION_TOLERANCE)=>Math.abs(actual-expected)<=tolerance;
 const at=(actor:Actor|undefined,x:number,y:number)=>!!actor&&actor.visible&&near(actor.x,x)&&near(actor.y,y);
 const normalSpeech=(speech:string|null|undefined)=>(speech??'').trim().toLowerCase().replace(/[.!?]+$/,'');

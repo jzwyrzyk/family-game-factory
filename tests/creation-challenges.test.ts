@@ -285,3 +285,11 @@ test('a beginner path accepts equivalent programs and rejects the opposite direc
  correct.programs[0].actions=[{id:'left',type:'move',dx:-80,durationMs:800}];
  fails('first-step',correct,'follow-path');
 });
+
+test('early predictions read actual visible motion independently of the challenge target',async()=>{
+ const {firstMovement,createChallengeStarter,createChallengeTarget}=await import('../src/creation/challenges');
+ assert.equal(firstMovement(createChallengeTarget('first-step'),'first-step'),'right');
+ assert.equal(firstMovement(createChallengeTarget('fix-direction'),'fix-direction'),'left');
+ assert.equal(firstMovement(createChallengeStarter('fix-direction'),'fix-direction'),'right');
+ assert.equal(firstMovement(createChallengeStarter('first-step'),'first-step'),'still');
+});

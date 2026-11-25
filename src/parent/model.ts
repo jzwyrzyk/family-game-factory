@@ -319,6 +319,7 @@ function creationEvidence(workspace: CreationWorkspace | undefined, owner: strin
     if (revisionAt === null || revisionAt > at) continue;
     seen.add(check.id);
     const support = [check.hintUsed ? 'A hint was opened for this scene' : 'No hint recorded for this scene'];
+    if(check.prediction)support.push('Before checking, chose '+check.prediction.choice+'. First movement in the saved scene: '+check.prediction.observed+'.');
     const origin = revision.scene.provenance?.createdBy;
     if (origin === 'starter') support.push('Started from a supplied scene');
     else if (origin === 'assisted') support.push('Assisted scene origin');
