@@ -23,7 +23,7 @@ export class BuilderApiError extends Error {
 export function isKnownBuildRejection(error:unknown):boolean {
  // REQUEST_REJECTED is the gateway's catch-all, including datastore errors;
  // it cannot prove that a request was never admitted.
- return error instanceof BuilderApiError&&['UNAUTHENTICATED','FORBIDDEN','SPENDING_CUTOFF','BUILDER_UNAVAILABLE','RATE_LIMIT','PRIVATE_INFORMATION','INVALID_REQUEST','NOT_FOUND','RETRY_LIMIT','IDEMPOTENCY_CONFLICT','GAME_FORM_UNSUPPORTED','GAME_FORM_REVIEW_REQUIRED','GAME_FORM_BASE_UNVERIFIED','GUARDIAN_CONSENT_REQUIRED','ADULT_PILOT_ACCESS_REQUIRED'].includes(error.message);
+ return error instanceof BuilderApiError&&['UNAUTHENTICATED','FORBIDDEN','SPENDING_CUTOFF','GAME_BUDGET_REACHED','BUILDER_UNAVAILABLE','RATE_LIMIT','PRIVATE_INFORMATION','INVALID_REQUEST','NOT_FOUND','RETRY_LIMIT','IDEMPOTENCY_CONFLICT','GAME_FORM_UNSUPPORTED','GAME_FORM_REVIEW_REQUIRED','GAME_FORM_BASE_UNVERIFIED','GUARDIAN_CONSENT_REQUIRED','ADULT_PILOT_ACCESS_REQUIRED'].includes(error.message);
 }
 const validJobId=(value:unknown):value is string=>typeof value==='string'&&/^[\w-]{1,100}$/.test(value);
 function validateJob(value:JobView,expectedId?:string):JobView {
