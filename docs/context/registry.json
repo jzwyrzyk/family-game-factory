@@ -144,10 +144,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T16:41:35.585Z",
-      "sourceDigest": "33e5fec62df4016adca66f170df129fc94a32acb2319956c40d01993dacb2d54",
+      "reviewedAt": "2026-11-25T17:33:42.672Z",
+      "sourceDigest": "847cc8a38d9c62ea5e19e959a9e924e3e4fca78177f8d13f2f5635fde0d6dee1",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed storage, recovery, creation and reward feature changes against the doctrine: authored ideas, explicit Keep, local participation and separate guardian processing choices are preserved; no learning or product intent was changed.",
+      "reviewReason": "Reviewed the actual native/notebook, recovery and Adult source changes against doctrine: authored work, explicit Keep, local participation, separate guardian choices and held paid authority remain intact; no learning, earning or product intent changed.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -308,10 +308,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T16:41:35.857Z",
-      "sourceDigest": "fa09ea2648a524d0b4cac6eb95bf74e050876a521a4378cd3f9c771068ed3bff",
+      "reviewedAt": "2026-11-25T17:33:42.870Z",
+      "sourceDigest": "b827f96d9445aa01f300606efe26d457952304bf361a6327b2051139b01dd430",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented awaited Studio saves and profile/navigation fences, prepared paginated libraries, original-art protection and Parent recovery while retaining simple child controls and early-guidance gates.",
+      "reviewReason": "Reconciled awaited source readiness with Parent and Help navigation, owner/action fences, explicit retry after failed queues, prepared compound saves and understandable complete-recovery controls; retained all original journey assertions and physical-device limitations.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -408,10 +408,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3788e84fd8a1e42f41b19cf14bc5ac9fb80c6ab21301bf3ba7c0e9077ab4aaaf",
-      "reviewedAt": "2026-11-25T16:41:36.886Z",
+      "sourceDigest": "cc8e4b6b3a2e729b32f5fd154215f0f2bae944ce52a9f6568222059a4ffa8369",
+      "reviewedAt": "2026-11-25T17:33:43.447Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the actual prepared scene authority, 24-item library/history pages, five recent evidence reads, CAS/autosave/Keep and original-preserving complete recovery; ordinary legacy mode remains available.",
+      "reviewReason": "Reviewed scoped prepared-domain capture and restore beyond the old cross-owner aggregate, actual 42-scene recovery and fresh target initialization; per-owner scene validators, authoring semantics, immutable provenance and explicit preparation remain documented.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -495,10 +495,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "99fc5ecf55b1a1f1d99797b6a529f639983f315924d76318e44219fe68269cc0",
-      "reviewedAt": "2026-11-25T16:41:37.002Z",
+      "sourceDigest": "ebcb12014fc5e5b99d28bff4fc5f25de2e8c487970508f0fa7ea1c480c01bdff",
+      "reviewedAt": "2026-11-25T17:33:43.565Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled indexed notebook/scene outbox selection before reward startup, durable acknowledgements and compound recovery; retained semantic reward identities, earned amounts and non-replayed restore behavior.",
+      "reviewReason": "Documented the namespace-bound IndexedDB before-image pointer, prepared source separation, startup journal ordering and same-attempt completion; reviewed milestone projection refresh without changing receipt identities, earned amounts or replay policy.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -679,10 +679,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T16:41:37.123Z",
-      "sourceDigest": "43ef66526e0a108ad92e59e62e6455d77d2f98b77dcdd2b7ead12099058245c1",
+      "reviewedAt": "2026-11-25T17:33:43.674Z",
+      "sourceDigest": "52387014d1ae0d5276bc13cb51ed8a30546aa20a988d9bc88a19ebab052848fd",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled server-controlled beta identity, case-approved suspended-family export, effective notices, new recovery routes and erasure barriers with the family architecture and privacy inventory.",
+      "reviewReason": "Documented protected household original recovery with explicit operator mapping, fresh device and Adult authorization on every operation, strict same-origin POST transport and revocation-aware durable operation barriers; no live service authority added.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -732,10 +732,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T16:41:37.277Z",
-      "sourceDigest": "a74b7f29332775e4e545a7a579d9b4ec313f3b0b128124a950d62d25441cd3aa",
+      "reviewedAt": "2026-11-25T17:33:43.817Z",
+      "sourceDigest": "4f19311d071f73686310b2f9aa095800702709ad0e6c9f6f1eb4773452e11c12",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed unchanged ordinary one-dollar and owner premium five-dollar controls, pre-admission base/fork authorization, content-addressed artifacts and validated original restoration without jobs, paid replay or accounting replacement.",
+      "reviewReason": "Documented trusted original capture and repeated asset repair, immutable source provenance and playback-only mapped copies; admission rejects recovered edit/base/fork lineage before reservation, preserving ordinary and premium limits without importing jobs or accounting.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -828,10 +828,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "b3e481edfed2643404ea6220fdc590f1a31df8f62b639b89c47bd2dc6cf16a70",
-      "reviewedAt": "2026-11-25T16:41:37.587Z",
+      "sourceDigest": "254e5bc24519e6d068053d488e6e6483060cfde1884a725987ff7ed7f6109c48",
+      "reviewedAt": "2026-11-25T17:33:43.991Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed fresh Adult authority checks around asynchronous saves and restores, independent family privacy consent, immutable audience isolation and the recorded requirement for explicit origin/audience mapping.",
+      "reviewReason": "Reconciled fresh source-to-target Adult mapping and grant, original-audience retained-source capture, durable reviewed attempts, stale workspace UI clearing and playback-only remote copies; no credentials, jobs, spending or private authority transfer.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -888,10 +888,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T16:41:37.772Z",
-      "sourceDigest": "be7648b43e7054a2b0e8071a47a6a9c0afe09212173085644c1bca56e910ded1",
+      "reviewedAt": "2026-11-25T17:33:44.145Z",
+      "sourceDigest": "39d154c95803438ec4cd356eb60ebf21bdd17655ce8319142d043c4db657d454",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered new storage UI, authority, legacy migration, sync, recovery and guidance suites in the existing Arcade shard and WebKit security gate; recorded emulator, build identity, package and local failure evidence without narrowing existing checks.",
+      "reviewReason": "Registered multiowner and real HTTPS browser recovery in Chromium and WebKit gates, retained blocked-IDB and async navigation assertions, recorded frozen 677-unit/118-CI/emulator/full-storage evidence and failed initial hosted attempts; duplicate preview ZIP removed only while source/file manifests and all receipts remain.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1131,10 +1131,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T16:41:37.966Z",
-      "sourceDigest": "fe079b2a3766b2592c8fdc131c9eae6f988081291b5300c179a2a542d62e3cc4",
+      "reviewedAt": "2026-11-25T17:33:44.298Z",
+      "sourceDigest": "1e5b7221e9befcda299288b2fcc65af49bd64c7dbae3a347026144a6b6f5d0fc",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded current protected-main assembly, worker21 exact five-job hosted evidence, local failures/corrections and separate final-head hosted, DEV/TEST, device, owner and release gates; no deployment or activation claimed.",
+      "reviewReason": "Recorded exact frozen local head/tree, final benchmark pins and limits, initial four hosted failures, worker21 five-job success and current application186 qualification; deployment, device, provider, owner and protected merge remain distinct gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1519,10 +1519,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "97e5685362c7864e3ba72e373332a432c847b9d55114b0a270d8d26c962ab814",
-      "reviewedAt": "2026-11-25T16:41:38.472Z",
+      "sourceDigest": "ec5644fcbf01f5b6ef58818d76ce999d96b5938d1769bc1775f0e69ded23233d",
+      "reviewedAt": "2026-11-25T17:33:44.490Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The only practice-host change awaits the existing entry guard before opening; episode schemas, authored evaluators, evidence meaning, retention, reporting and the no-new-reward policy are unchanged.",
+      "reviewReason": "Reviewed async practice action catch and browser-negative fixture: a failed awaited Studio entry now reports only to the same owner; episode schemas, evaluators, evidence meaning, retention, reporting and reward rules are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1611,10 +1611,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "7971934fc36321ef4e7112e338d9901d7a00f075307608f9cd54085e35ba9f7d",
-      "reviewedAt": "2026-11-25T16:41:38.608Z",
+      "sourceDigest": "d9d72b37c8acdda8b91cc3cefdfa976fc40b5bd3e503f47e23eab8e5d5312bad",
+      "reviewedAt": "2026-11-25T17:33:44.591Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented metadata/preview pagination, exact-original reads, complete recovery and the maintenance-locked refusal of physical erasure for prepared libraries; safe Archive and compatible art transfers remain available.",
+      "reviewReason": "Documented additive repair of verified missing referenced originals before safety capture, exact hashes and retained rigs, near-quota and interrupted restore; existing bytes and active movement selection are not overwritten by repair and physical deletion remains held for prepared references.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1693,10 +1693,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "8f6b59849ba065f5df318efaaf639fa6463b7c5dd7b2c0f19af48309239a55a1",
-      "reviewedAt": "2026-11-25T16:41:39.227Z",
+      "sourceDigest": "13aeef8b2e22e77da8b1f4f76b87a267101664c2dc39b7327efb6c952b271fd0",
+      "reviewedAt": "2026-11-25T17:33:44.721Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled actual native/notebook/scene adapters, strict resumable authority markers, v1 compatibility and held imported IDs, reviewed conflict/removal choices, full original recovery and explicit rollout/measurement limits."
+      "reviewReason": "Reconciled exact-head bounded notebook mutation cache and measured cold-write costs, independent native validation and compound staging, scoped prepared recovery parts, durable restore attempts, missing-art repair, multiowner/fresh-target receipts, imported-ID/capacity limits and actual versus projected performance."
     }
   ]
 }
