@@ -29,7 +29,7 @@ function coachingHarness(game:'new'|'gum'='new',deferWrites=false){
   dispatchEvent(event:Event){if(event.type==='input')this.lastAction=Promise.resolve(this.oninput?.());for(const listener of this.listeners.get(event.type)||[])listener(event);return true;}
  }
  const get=(id:string)=>{if(!elements.has(id)){const e=new Element();e.id=id;}return elements.get(id) as Element;};
- const documentPort:any={activeElement:null,body:new Element(),createElement:()=>new Element(),getElementById:get};
+ const documentPort:any={documentElement:{dataset:{}},activeElement:null,body:new Element(),createElement:()=>new Element(),getElementById:get};
  for(const id of ['studioPromptForm','studioPrompt','studioVersions','studioPlay','send-row'])get(id);
  const saved=new Map<string,PropertyDescriptor|undefined>();for(const key of ['document','window','fetch'])saved.set(key,Object.getOwnPropertyDescriptor(globalThis,key));
  const storage=new Memory(),book=new StudioNotebook(storage),initial=game==='new'?book.create('child-one','new','Synthetic new game'):book.create('child-one','gum','Synthetic game','fixture-project');let active=initial;
