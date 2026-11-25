@@ -1129,10 +1129,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T15:58:36.798Z",
+      "reviewedAt": "2026-11-25T16:03:31.345Z",
       "sourceDigest": "1b50feb39de5ac9c23d403d0643a5dcbb302c477919af25bb814e04a4dc17206",
       "reviewOutcome": "updated",
-      "reviewReason": "Added read-only artifact-only workflow and review commands; documented that it never deploys or activates services and that PR artifacts retain their source baseline.",
+      "reviewReason": "Pinned the artifact job to Ubuntu 24.04 and Node 24 after Playwright 1.56.1 rejected ubuntu-latest/26.04; moved packaging before browser installation so download delivery survives setup failure. Documented the failed initial attempt.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
