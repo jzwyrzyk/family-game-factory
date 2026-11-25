@@ -308,10 +308,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:46:58.729Z",
-      "sourceDigest": "50fc81d8d84a5766011910330777ce48723a58e8285a10ad85eba7c440c6f4c5",
+      "reviewedAt": "2026-11-25T01:36:39.897Z",
+      "sourceDigest": "a504ab99a4f94aa83421cc7c633696eb31ba59300dcce0fae08b9162dcca5728",
       "reviewOutcome": "updated",
-      "reviewReason": "Document explicit same-request recovery after a network loss in a capability-limited workshop.",
+      "reviewReason": "Retain beta profile initialization together with F06 saved state validation and storage recovery.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -679,10 +679,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:35:18.556Z",
-      "sourceDigest": "8581859ab63317bf63c90f38fccdd9bdeac73b2b54a3f0a88e1be8ad7a7ae74f",
+      "reviewedAt": "2026-11-25T01:36:40.752Z",
+      "sourceDigest": "a179a0a3413ad87eea0ef9360deb3d57009472c24f5a3350967977bc12af66f8",
       "reviewOutcome": "updated",
-      "reviewReason": "Record the erasure hold, server creative-write authorization and protected staging checks.",
+      "reviewReason": "Compose approved owner premium lineage reservations, beta routing, write authorization and F06 artifact decoding.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -732,10 +732,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:35:20.182Z",
-      "sourceDigest": "0eac05be5401124acbdf71f4c32e433c3deea14635fbbd295d0aa1c3c2ae23ab",
+      "reviewedAt": "2026-11-25T01:36:41.400Z",
+      "sourceDigest": "a37dc4757392cef5c65c7a329a7d74ca36a002eaeb765a9771880e9dcb0d80ef",
       "reviewOutcome": "updated",
-      "reviewReason": "Document the verified generation scope for external family seeds and named copies.",
+      "reviewReason": "Keep the owner premium ceiling and fork lineage while retaining beta scope checks and the F06 copy receipt.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -828,10 +828,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "c3ef915d638a6a49e4135b7b178a3a620596c0096c5df39fcdac021dfe41b6ba",
-      "reviewedAt": "2026-11-25T00:18:30.250Z",
+      "sourceDigest": "00da8603166713c434ceaec33d8624f005fe14249b177a8c8503b4133d0a232c",
+      "reviewedAt": "2026-11-25T01:36:41.836Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Document guardian-authorized household export, transfer integrity, assisted migration and verified rollback constraints.",
+      "reviewReason": "Retain separate adult authorization, household binding and F06 protected profile recovery.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -888,10 +888,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:35:19.364Z",
-      "sourceDigest": "b6cf2fa2b69b53fbf33abd2a48842ccc304036872cbb03b6e0d3f21716c035a0",
+      "reviewedAt": "2026-11-25T01:36:42.270Z",
+      "sourceDigest": "7de0fa2a14e556ad47dafcbee28c6d4166b9c8a461959410795675cb5e21e849",
       "reviewOutcome": "updated",
-      "reviewReason": "Add native form, exact revision, erasure, consent and two-host browser storage checks.",
+      "reviewReason": "Combine storage, premium and family isolation contracts, package scripts and browser journeys.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1131,10 +1131,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T01:35:19.742Z",
-      "sourceDigest": "7b4aa563172e40465290ef9f0e1d8aec562ae00f5653c6915deafd0ba0bf1720",
+      "reviewedAt": "2026-11-25T01:36:42.783Z",
+      "sourceDigest": "0e55cdeff8724ec982e3fb846b8c595cc0d0a77590c6874faace3e19706363b9",
       "reviewOutcome": "updated",
-      "reviewReason": "Record integration with the independently approved owner premium ceiling and explicit DEV/TEST gates.",
+      "reviewReason": "Record actual protected-main integration, F06 collisions and separate worker identity.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1388,10 +1388,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:48:30.700Z",
-      "sourceDigest": "da1d6672017313f9719fa8f08a290ad4eddf18f170fc007c87fbf59a6c3b9a84",
+      "reviewedAt": "2026-11-25T01:36:43.299Z",
+      "sourceDigest": "e23530e41099c380962f32ace93dcc12da5789d47b6b7ab83ff4659a20eee1d8",
       "reviewOutcome": "updated",
-      "reviewReason": "Added the browser delivery and synthetic family acceptance contract to the documentation index and routed the private build and feature sources.",
+      "reviewReason": "Keep both sets of feature routes, operating references and the delivery evidence of the combined candidate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
