@@ -1134,10 +1134,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T17:48:14.352Z",
-      "sourceDigest": "3ffcfb4bdb77730faced8d36de07b3bfaa1d1d5ebf1624605b6e028549a320fd",
+      "reviewedAt": "2026-11-25T17:51:01.883Z",
+      "sourceDigest": "ee0a6b8b5aa3a498b3d6ba536f9da0188e5fb4dc78fc086c65503856dcb79eaa",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact frozen local head/tree, final benchmark pins and limits, initial four hosted failures, worker21 five-job success and current application186 qualification; deployment, device, provider, owner and protected merge remain distinct gates. Integrated main1be7e1a and preserved both command groups and isolated UI-review workflow; recorded the withheld conflict-state checks and requirement for new combined-head qualification. Recorded acb119f Security failure and verified screenshot ZIP; standalone workflow now binds artifact/source identity to exact checked-out candidate HEAD rather than merge-base, retaining mismatch rejection and distinguishing candidate from merged UI.",
+      "reviewReason": "Recorded exact frozen local head/tree, final benchmark pins and limits, initial four hosted failures, worker21 five-job success and current application186 qualification; deployment, device, provider, owner and protected merge remain distinct gates. Integrated main1be7e1a and preserved both command groups and isolated UI-review workflow; recorded the withheld conflict-state checks and requirement for new combined-head qualification. Recorded acb119f Security failure and verified screenshot ZIP; standalone workflow now binds artifact/source identity to exact checked-out candidate HEAD rather than merge-base, retaining mismatch rejection and distinguishing candidate from merged UI. Preserved main187 historical merged-tool delivery/acceptance receipts and refreshed the current base to af11650 without conflating that independent merge authorization with this held application continuation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

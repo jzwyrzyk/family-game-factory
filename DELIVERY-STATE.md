@@ -16,10 +16,22 @@ Local correction history is retained: the first combined unit run passed651/660 
 
 Protected main advanced to `1be7e1adc027a061981098f9b3fb7b8949ff1419` through #185’s standalone offline UI review immediately after the candidate push. The continuation integrates that tool and workflow; conflicts preserve both package command groups, architecture sections, ignored build directories and registry routing. No application runtime source changed in #185. GitHub initially withheld the new-head workflows while those conflicts existed; the successor combined head requires all applicable checks.
 
+Latest protected main `af11650ea35a29bb0ef9f6b0aa6edd7d8ee84a9e` adds #187’s dated UI-review delivery receipt, which is preserved below; this second refresh changes no runtime source.
+
 The subsequent `acb119f` hosted security run exposed an actual WebKit tablet operator layout issue after Chromium's complete family journey and WebKit isolation/early-learning had passed. Full-width checkbox sizing squeezed labels; its correction retains the original overflow assertion. The new standalone review fixture also needed to await Parent navigation before submitting its synthetic unlock. [The failure register](docs/family-beta/COMPLETION.md#first-hosted-attempt-and-corrections) retains exact source/run/artifact identity; neither partial pass qualifies the corrected successor head.
 
 No protected-main merge, deployment, cloud provisioning, IAM/WIF change, real household transfer/deletion, invitation, paid request or capability activation was performed by this assignment. DEV/TEST deployment, independently reviewed provider/legal readiness, physical-device and owner acceptance remain separate gates.
 
+
+## Standalone offline UI review integrated, November 25, 2026
+
+Following the owner's authorization to review against current code and merge when ready, [PR #185](https://github.com/jzwyrzyk/family-game-factory/pull/185) merged as `1be7e1adc027a061981098f9b3fb7b8949ff1419`. The reviewed head was `fb34ccedc4e24e32b4be4aadb328f9fa5d74835a`; main remained `0f459f5b29fa3a72c5caf1fa69051475421861f9` throughout the integration review. No product source, original artwork, backend, production release intent or deployment configuration changed. All required checks passed before merge, including the documentation rerun after marking the PR ready.
+
+The permanent capability includes `npm run review:build`, `npm run review:test`, a 16-page / 30-state coverage manifest, synthetic adapters, local findings export and a read-only artifact workflow on relevant main changes. The [successful PR workflow](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45651429813) verified actual `file://` use without a server, four viewports, representative journeys, exports and embedded image decoding with no external requests. The [initial download](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45651429813/artifacts/15039674612) is retained until December 9, 2026; later builds can be regenerated from the workflow or locally.
+
+The [first automatic main workflow](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45666035619) also passed on merged source `1be7e1adc027a061981098f9b3fb7b8949ff1419`, including offline browser tests and both uploads. Its [download](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45666035619/artifacts/15046808586) records that exact merged SHA.
+
+This is source integration of an offline acceptance tool, not production deployment, live-provider acceptance or owner visual sign-off. Generated gameplay and service responses remain labelled simulations; compact Pal assets and early-grade preview status are explicit. Existing Art Studio small-text observations, real-device/audio/Edge limitations and excluded unmerged family-beta work remain in the [acceptance record](docs/ui-review/ACCEPTANCE.md) and [runbook](docs/ui-review/README.md).
 
 ## Pre-K and kindergarten source integration, November 25, 2026
 
