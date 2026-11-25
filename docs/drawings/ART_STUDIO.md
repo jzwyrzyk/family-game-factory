@@ -40,7 +40,7 @@ Changing a library picture's metadata or saving a later rig does not rewrite ear
 
 ## Storage and lifecycle
 
-`family-private-drawings-v1` is upgraded in place to database version 2, with stores for originals, rigs, drafts, selected legacy rig, usage and migration metadata. Existing original records remain compatible. The old draft PR's separate rig database is read once for compatible migration; it is not erased.
+`family-private-drawings-v1` is upgraded in place to database version 2, with stores for originals, rigs, drafts, selected legacy rig, usage and migration metadata. Existing original records remain compatible. Metadata and previews page separately from original bytes, which are read when selected or explicitly backed up. While a prepared native or scene authority exists, physical deletion is blocked under the shared maintenance lock because the legacy usage index cannot prove all references; Archive remains available and preserves original bytes. The old draft PR's separate rig database is read once for compatible migration; it is not erased.
 
 - PNG/JPEG headers, actual decode, maximum byte count and dimensions are checked. Originals retain their hash. Upload decoding is local.
 - Profile identity and the shared source-writer guard are rechecked after asynchronous work and before mutation. The temporary adult profile uses its distinct owner identity. A late decode or save cannot insert art into a newly selected player's view.
@@ -54,7 +54,7 @@ Limits are explicit in `src/drawing/library.ts`: 5 MiB per image, 4096 pixels pe
 
 ## Backups and transfers
 
-The existing family progress JSON continues to contain learning, game and scene records. Art is a separate downloadable bundle; the parent settings now explain the two-file recovery path. The application does not claim cloud synchronization or a complete image backup inside the progress file.
+The existing family progress JSON continues to contain learning, game and scene records. Art remains a separate compatible downloadable bundle. Parent complete recovery copies additionally capture original bytes, rigs, active prepared records and recovery metadata together, with integrity validation, preview and safety rollback. The legacy progress file alone is not a complete image backup. Separately approved cloud recovery stays disabled by default.
 
 | Action | Result |
 | --- | --- |
