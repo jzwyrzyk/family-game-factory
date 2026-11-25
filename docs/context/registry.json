@@ -680,10 +680,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T17:33:43.674Z",
-      "sourceDigest": "52387014d1ae0d5276bc13cb51ed8a30546aa20a988d9bc88a19ebab052848fd",
+      "reviewedAt": "2026-11-25T17:48:13.970Z",
+      "sourceDigest": "7148381ccd08eb1041a75e62b5d42c447553c2fe2f12017ecbcf403efe53ac7f",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented protected household original recovery with explicit operator mapping, fresh device and Adult authorization on every operation, strict same-origin POST transport and revocation-aware durable operation barriers; no live service authority added.",
+      "reviewReason": "Documented protected household original recovery with explicit operator mapping, fresh device and Adult authorization on every operation, strict same-origin POST transport and revocation-aware durable operation barriers; no live service authority added. Reviewed the WebKit operator checkbox/input constraints and wrapping fix against actual desktop/tablet captures; no authorization, typography threshold or clipping relaxation.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -890,10 +890,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T17:36:49.452Z",
-      "sourceDigest": "1eace0b14e9dbcfeeb57064814ac26f75bd41e4cf291cc9e00d0bef266687e0a",
+      "reviewedAt": "2026-11-25T17:48:14.135Z",
+      "sourceDigest": "089e562a57b6ddbe23bf99ceb5b5931b5d231612e9db0b99e496661a49202bd7",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered multiowner and real HTTPS browser recovery in Chromium and WebKit gates, retained blocked-IDB and async navigation assertions, recorded frozen 677-unit/118-CI/emulator/full-storage evidence and failed initial hosted attempts; duplicate preview ZIP removed only while source/file manifests and all receipts remain. Integrated main185 standalone source coverage, offline adapters and file-based browser checks; all existing 118 CI contracts pass after package reconciliation.",
+      "reviewReason": "Registered multiowner and real HTTPS browser recovery in Chromium and WebKit gates, retained blocked-IDB and async navigation assertions, recorded frozen 677-unit/118-CI/emulator/full-storage evidence and failed initial hosted attempts; duplicate preview ZIP removed only while source/file manifests and all receipts remain. Integrated main185 standalone source coverage, offline adapters and file-based browser checks; all existing 118 CI contracts pass after package reconciliation. Preserved the WebKit tablet overflow assertion and added bounded checkbox diagnostics; offline review now awaits actual Parent entry and passes smoke/integration with 356 decoded assets in the documented local harness, while actual hosted file navigation remains required.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1134,10 +1134,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T17:36:49.621Z",
-      "sourceDigest": "2539e5300aa8abd4bc8a63ae3891d6ec71a4923cabb73587338a5ffc4940e564",
+      "reviewedAt": "2026-11-25T17:48:14.352Z",
+      "sourceDigest": "3ffcfb4bdb77730faced8d36de07b3bfaa1d1d5ebf1624605b6e028549a320fd",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact frozen local head/tree, final benchmark pins and limits, initial four hosted failures, worker21 five-job success and current application186 qualification; deployment, device, provider, owner and protected merge remain distinct gates. Integrated main1be7e1a and preserved both command groups and isolated UI-review workflow; recorded the withheld conflict-state checks and requirement for new combined-head qualification.",
+      "reviewReason": "Recorded exact frozen local head/tree, final benchmark pins and limits, initial four hosted failures, worker21 five-job success and current application186 qualification; deployment, device, provider, owner and protected merge remain distinct gates. Integrated main1be7e1a and preserved both command groups and isolated UI-review workflow; recorded the withheld conflict-state checks and requirement for new combined-head qualification. Recorded acb119f Security failure and verified screenshot ZIP; standalone workflow now binds artifact/source identity to exact checked-out candidate HEAD rather than merge-base, retaining mismatch rejection and distinguishing candidate from merged UI.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

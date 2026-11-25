@@ -16,6 +16,8 @@ Local correction history is retained: the first combined unit run passed651/660 
 
 Protected main advanced to `1be7e1adc027a061981098f9b3fb7b8949ff1419` through #185’s standalone offline UI review immediately after the candidate push. The continuation integrates that tool and workflow; conflicts preserve both package command groups, architecture sections, ignored build directories and registry routing. No application runtime source changed in #185. GitHub initially withheld the new-head workflows while those conflicts existed; the successor combined head requires all applicable checks.
 
+The subsequent `acb119f` hosted security run exposed an actual WebKit tablet operator layout issue after Chromium's complete family journey and WebKit isolation/early-learning had passed. Full-width checkbox sizing squeezed labels; its correction retains the original overflow assertion. The new standalone review fixture also needed to await Parent navigation before submitting its synthetic unlock. [The failure register](docs/family-beta/COMPLETION.md#first-hosted-attempt-and-corrections) retains exact source/run/artifact identity; neither partial pass qualifies the corrected successor head.
+
 No protected-main merge, deployment, cloud provisioning, IAM/WIF change, real household transfer/deletion, invitation, paid request or capability activation was performed by this assignment. DEV/TEST deployment, independently reviewed provider/legal readiness, physical-device and owner acceptance remain separate gates.
 
 
