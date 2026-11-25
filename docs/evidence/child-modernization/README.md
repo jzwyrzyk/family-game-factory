@@ -49,7 +49,7 @@ The first candidate standalone run [45677701949](https://github.com/jzwyrzyk/fam
 
 ## Before / after comparisons
 
-These actual offline app captures compare baseline `af11650` and candidate `85faf70` with synthetic review fixtures. They show the landing-page viewport; the workflow screenshots preserve the complete scrollable production journeys.
+These actual offline app captures compare baseline `af11650` and candidate `ca68c4a` with synthetic review fixtures. They show the landing-page viewport; the workflow screenshots preserve the complete scrollable production journeys.
 
 - [My Games](compare-home.webp)
 - [My Journey](compare-journey.webp)

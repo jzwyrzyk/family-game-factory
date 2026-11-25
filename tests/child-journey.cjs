@@ -44,7 +44,7 @@ async function openPhysicalGum(page){
     if(!session)throw Error('Missing saved physical workshop session');
     return session.id;
   });
-  await page.reload();await page.waitForFunction(()=>window.FG?.studio);
+  await page.reload();await page.waitForFunction(()=>window.FG?.studio);await exploreWelcome(page);
   await page.locator(`#studioLibrary [data-session="${originalSession}"] .studio-saved-open`).click();
   await page.waitForSelector('.quality-builder');
 }

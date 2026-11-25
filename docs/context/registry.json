@@ -886,10 +886,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:50:28.685Z",
-      "sourceDigest": "40ba780b707f3cffe453a83b2ce7e6e6a6526ef295a7f66d4c04c4ab9624a41e",
+      "reviewedAt": "2026-11-25T18:52:22.109Z",
+      "sourceDigest": "4c3aeca90c52dc97468bb4dce82fcb26d2e2f377cbb37b46a1fe455bccd6ef2c",
       "reviewOutcome": "updated",
-      "reviewReason": "Retained native concurrent-edit and full-notebook invariants; adjusted visible navigation and hydration waits, with first failures recorded in candidate evidence.",
+      "reviewReason": "Final browser journeys preserve all assertions and visibly complete first-visit selection after a reload before opening the retained physical-game fixture.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
