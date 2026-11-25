@@ -27,7 +27,7 @@ async function checkHillResizeTransition(page){
   for(const viewport of [{width:1400,height:960},{width:390,height:844}]){
    const context=await browser.newContext({viewport,reducedMotion:'reduce'}),page=await context.newPage(),errors=[];let phase='startup';
    page.on('pageerror',error=>{errors.push(error.message);console.error('Native Studio page error',JSON.stringify({phase,viewport,indexedNotebook:process.env.STUDIO_NOTEBOOK==='1',message:error.message}));});page.on('dialog',dialog=>dialog.accept());
-   page.on('console',message=>{if(message.text().startsWith('JEMS_NATIVE_RESIZE_TRACE '))console.error(JSON.stringify({phase,viewport,indexedNotebook:process.env.STUDIO_NOTEBOOK==='1'}),message.text());});
+   page.on('console',message=>{if(message.text().startsWith('JEMS_NATIVE_RESIZE_TRACE ')){const detail=JSON.parse(message.text().slice('JEMS_NATIVE_RESIZE_TRACE '.length));errors.push('Native resize ErrorEvent: '+detail.message);console.error(JSON.stringify({phase,viewport,indexedNotebook:process.env.STUDIO_NOTEBOOK==='1'}),message.text());}});
    await page.addInitScript(installNativeResizeTrace);
    await page.route('**/v1/jobs**',route=>{throw Error('Unexpected paid request '+route.request().url());});
    await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?studio=1`);await page.waitForFunction(()=>FG.studio&&FG.factory);await exploreWelcome(page);
