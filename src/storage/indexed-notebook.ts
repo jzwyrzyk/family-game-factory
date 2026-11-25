@@ -8,12 +8,35 @@ import {deriveStudioNotifications,freshStudioNotificationPreferences,type Studio
 
 const CONTROL='notebook-control',CHUNKS='notebook-chunks',PAYLOADS='notebook-payloads';
 const CHUNK_UNITS=24_000,MAX_PAYLOAD_BYTES=8*1024*1024;
+const MAX_MUTATION_CACHE_BYTES=8*1024*1024;
 const hash=async(raw:string)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(raw)))].map(x=>x.toString(16).padStart(2,'0')).join('');
 const sha=(x:unknown):x is string=>typeof x==='string'&&/^[a-f0-9]{64}$/.test(x);
 const sessionCollection=(generation:string)=>'notebook-sessions:'+generation;
 const chapterCollection=(generation:string)=>'notebook-chapters:'+generation;
-const canonical=(value:any):string|undefined=>value===undefined?undefined:value===null?'null':Array.isArray(value)?'['+value.map(canonical).join(',')+']':typeof value==='object'?'{'+Object.keys(value).sort().map(key=>JSON.stringify(key)+':'+canonical(value[key])).join(',')+'}':JSON.stringify(value);
-const equal=(a:unknown,b:unknown)=>canonical(a)===canonical(b);
+/** Same key-order-independent JSON comparison as the former canonical strings,
+ * without serializing every message/property separately. An own undefined key
+ * still differs from a missing key; array holes retain undefined-slot semantics. */
+const equal=(a:any,b:any):boolean=>{
+ if(a===b)return true;
+ const absent=(value:any)=>value===undefined||typeof value==='function'||typeof value==='symbol';
+ const nil=(value:any)=>value===null||typeof value==='number'&&!Number.isFinite(value);
+ if(absent(a)||absent(b))return absent(a)&&absent(b);
+ if(nil(a)||nil(b))return nil(a)&&nil(b);
+ if(typeof a!=='object'||typeof b!=='object')return false;
+ if(Array.isArray(a)||Array.isArray(b)){
+  if(!Array.isArray(a)||!Array.isArray(b))return false;
+  // Canonical array joining treated a single omitted slot as the empty array.
+  // Persisted JSON never contains one, but keep the comparison's old meaning.
+  const lengthA=a.length===1&&absent(a[0])?0:a.length,lengthB=b.length===1&&absent(b[0])?0:b.length;
+  if(lengthA!==lengthB)return false;
+  if(lengthA===0)return true;
+  for(let i=0;i<a.length;i++)if(!equal(a[i],b[i]))return false;
+  return true;
+ }
+ const keys=Object.keys(a);if(keys.length!==Object.keys(b).length)return false;
+ for(const key of keys)if(!Object.hasOwn(b,key)||!equal(a[key],b[key]))return false;
+ return true;
+};
 type Meta=Omit<Notebook,'sessions'|'conversationChapters'>;
 interface Head {schema:1;generation:string;meta:string;summary:string;sessions:string[];chapters:string[];hasChapters:boolean;sourceHash:string}
 interface Migration {schema:1;sourceHash:string;generation:string;completed:number;total:number;complete:boolean}
@@ -57,9 +80,17 @@ export function deriveNotebookSummary(value:Notebook,owner:string):NotebookSumma
  * No local-only mutation enters the remote outbox. Activation is the caller's
  * explicit storage-preview decision, never a persisted permission grant. */
 export class IndexedNotebook {
+ /** Never exposed to callers. One validated owner snapshot is retained only
+  * within a strict byte bound and for the exact committed head. Public reads,
+  * explicit backups and restore readback continue checking stored originals. */
+ private mutationCache?:{version:number;head:Head;value:Notebook;raw:string};
+ private closed=false;
  private constructor(readonly records:IndexedRecords,readonly scope:RecordScope,private authorized:()=>void,private rewardSaved?:(owner:string)=>void){}
  static async open(scope:RecordScope,authorized:()=>void,rewardSaved?:(owner:string)=>void){return new IndexedNotebook(await IndexedRecords.open(scope,authorized),{...scope},authorized,rewardSaved);}
- close(){this.records.close();}
+ close(){this.closed=true;this.mutationCache=undefined;this.records.close();}
+ private rememberMutation(version:number,head:Head,value:Notebook,raw:string){
+  this.mutationCache=!this.closed&&raw.length<=MAX_MUTATION_CACHE_BYTES&&new TextEncoder().encode(raw).length<=MAX_MUTATION_CACHE_BYTES?{version,head,value,raw}:undefined;
+ }
  private async row(collection:string,id:string){this.authorized();return this.records.get(collection,id);}
  private change(collection:string,id:string,value:unknown,expectedVersion=0,deleted=false):RecordChange{return {collection,id,value,expectedVersion,deleted};}
  private async save(changes:RecordChange[],operation:string=crypto.randomUUID()){this.authorized();return this.records.commit({id:operation,scope:this.scope,changes},{enqueue:false});}
@@ -103,14 +134,16 @@ export class IndexedNotebook {
   await this.immutable(PAYLOADS,id,{schema:1,sha256:id,bytes,units:raw.length,chunks} satisfies Payload);return id;
  }
  private async decode<T>(id:string):Promise<T>{
+  try{
   if(!sha(id))throw Error('NOTEBOOK_PAYLOAD_INVALID');const row=await this.row(PAYLOADS,id),p=row?.value as Payload;
   if(!row||row.deleted||!p||p.schema!==1||p.sha256!==id||!Number.isInteger(p.bytes)||p.bytes<1||p.bytes>MAX_PAYLOAD_BYTES||!Number.isInteger(p.units)||p.units<1||p.units>MAX_PAYLOAD_BYTES||!Array.isArray(p.chunks)||p.chunks.length!==Math.ceil(p.units/CHUNK_UNITS))throw Error('A saved notebook record is missing or damaged.');
   let raw='';for(const key of p.chunks){if(!sha(key))throw Error('NOTEBOOK_CHUNK_INVALID');const part=await this.row(CHUNKS,key);if(!part||part.deleted||typeof part.value!=='string'||part.value.length>CHUNK_UNITS||await hash(part.value)!==key)throw Error('An original notebook page is missing or damaged.');raw+=part.value;}
   if(raw.length!==p.units||new TextEncoder().encode(raw).length!==p.bytes||await hash(raw)!==id)throw Error('NOTEBOOK_CHECKSUM_MISMATCH');return JSON.parse(raw);
+  }catch(error){this.mutationCache=undefined;throw error;}
  }
  private async pointer<T extends {id:string;owner:string}>(collection:string,id:string):Promise<T>{
   const row=await this.row(collection,await hash(id)),pointer=row?.value as Pointer;
-  if(!row||row.deleted||!pointer||pointer.id!==id||pointer.owner!==this.scope.profile||!sha(pointer.payload))throw Error('Choose a saved notebook page in your own profile.');
+  if(!row||row.deleted||!pointer||pointer.id!==id||pointer.owner!==this.scope.profile||!sha(pointer.payload)){this.mutationCache=undefined;throw Error('Choose a saved notebook page in your own profile.');}
   const value=await this.decode<T>(pointer.payload);if(value.id!==id||value.owner!==this.scope.profile)throw Error('NOTEBOOK_SCOPE_DENIED');return value;
  }
  /** Card pages never fetch conversation/design chunks. The stable cursor is
@@ -151,6 +184,7 @@ export class IndexedNotebook {
   * immutable payloads are being read. Retry only this read, with a strict bound;
   * malformed/missing data and authorization errors still fail immediately. */
  async snapshot():Promise<Notebook>{
+  this.mutationCache=undefined;
   for(let attempt=0;;attempt++){
    try{const h=await this.head(),value=await this.snapshotAt(h.value);await this.unchanged(h.row.version);return value;}
    catch(error){if(attempt>=2||!(error instanceof Error)||error.message!=='STORAGE_CONFLICT')throw error;}
@@ -172,8 +206,11 @@ export class IndexedNotebook {
   * Write CPU still validates the bounded owner notebook; only changed records
   * are written. No fire-and-forget mirror or early saved acknowledgment exists. */
  async prepareTransaction<T>(mutate:(book:StudioNotebook)=>T):Promise<PreparedNotebookTransaction<T>>{
-  this.checkOwner();const h=await this.head(),before=await this.snapshotAt(h.value);await this.unchanged(h.row.version);
-  let raw=JSON.stringify(before);const rewards=new Set<string>(),signals:SourceEvidenceSignal[]=[];
+  this.checkOwner();const h=await this.head();
+  if(this.mutationCache&&(this.mutationCache.version!==h.row.version||!equal(this.mutationCache.head,h.value)))this.mutationCache=undefined;
+  const cache=this.mutationCache,before=cache?.value??await this.snapshotAt(h.value);await this.unchanged(h.row.version);
+  let raw=cache?.raw??JSON.stringify(before);if(!cache)this.rememberMutation(h.row.version,h.value,before,raw);
+  const rewards=new Set<string>(),signals:SourceEvidenceSignal[]=[];
   const book=new StudioNotebook({getItem:key=>key===STUDIO_KEY?raw:null,setItem:(key,value)=>{if(key!==STUDIO_KEY)throw Error('NOTEBOOK_KEY_DENIED');raw=value;}},owner=>rewards.add(owner),signal=>signals.push(structuredClone(signal)));
   const result=mutate(book);if(result&&typeof(result as any).then==='function')throw Error('Notebook mutations must finish before saving.');const next=this.own(book.read());
   if(equal(before,next))return {changes:[],value:structuredClone(result),publish:()=>{}};
@@ -188,7 +225,7 @@ export class IndexedNotebook {
   else nextHead=await this.prepareHead(next,h.value.generation,h.value.sourceHash);
   changes.push(this.change(CONTROL,'head',nextHead,h.row.version));
   let published=false;
-  return {changes,value:structuredClone(result),publish:()=>{if(published)return;published=true;for(const owner of rewards){try{this.rewardSaved?.(owner);}catch{}}for(const signal of signals)publishSourceEvidence(signal);}};
+  return {changes,value:structuredClone(result),publish:()=>{if(published)return;published=true;this.rememberMutation(h.row.version+1,nextHead,next,raw);for(const owner of rewards){try{this.rewardSaved?.(owner);}catch{}}for(const signal of signals)publishSourceEvidence(signal);}};
  }
  async transaction<T>(mutate:(book:StudioNotebook)=>T):Promise<T>{const prepared=await this.prepareTransaction(mutate);if(prepared.changes.length)await this.save(prepared.changes);prepared.publish();return prepared.value;}
  async update(id:string,mutate:(session:StudioSession)=>void){return this.transaction(book=>book.update(id,this.scope.profile,mutate));}
@@ -210,6 +247,7 @@ export class IndexedNotebook {
  /** Explicit whole-owner replacement stages a fresh generation; only the head
   * switches atomically. Prior generations/original source remain recoverable. */
  async restore(snapshot:Notebook,operationId:string=crypto.randomUUID()):Promise<'restored'|'already-restored'>{
+  this.mutationCache=undefined;
   this.checkOwner();const value=this.own(snapshot),sourceHash=await hash(JSON.stringify(value)),identity=await hash(operationId),receipt=await this.row('notebook-restores',identity);
   if(receipt){if((receipt.value as any).sourceHash!==sourceHash)throw Error('STORAGE_OPERATION_REUSED');return 'already-restored';}
   const h=await this.head(),generation='restore-'+identity;

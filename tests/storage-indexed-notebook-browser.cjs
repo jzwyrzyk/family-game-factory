@@ -63,12 +63,28 @@ const {build}=require('esbuild'),{chromium,webkit}=require('playwright');
    await expect(()=>store.get(first.id,'player2'),'foreign owner accepted');await expect(()=>store.migrateLegacy(raw+' '),'changed source migration accepted');
    const other=await NotebookTest.IndexedNotebook.open({family:'other-family',profile:'player1'},()=>{});await expect(()=>other.get(first.id),'foreign family read');other.close();
    const otherChild=await NotebookTest.IndexedNotebook.open({family:scope.family,profile:'player2'},()=>{});await otherChild.migrateLegacy(raw);await expect(()=>otherChild.get(first.id),'foreign child read');otherChild.close();checks.push('family, profile, current grant and source-version isolation');
+   // Warm saves reuse only the exact validated head. They do not re-read an
+   // untouched long conversation or stringify each primitive in its history.
+   await store.transaction(()=>undefined);
+   const warmHead=await get('notebook-control','head'),untouched=(await store.records.page('notebook-sessions:'+warmHead.value.generation)).find(r=>r.value.id===second.id);
+   calls.length=0;const stringify=JSON.stringify;let stringifyCalls=0;
+   JSON.stringify=function(...args){stringifyCalls++;return stringify.apply(this,args);};
+   try{await store.update(first.id,s=>{s.draft='Warm validated source';});}finally{JSON.stringify=stringify;}
+   if(calls.some(c=>c.id===untouched.id&&c.collection.startsWith('notebook-sessions:')||c.id===untouched.value.payload))throw Error('warm save reread untouched conversation');
+   if(stringifyCalls>2000)throw Error('warm comparison still serializes every history property: '+stringifyCalls);
+   const stable=await store.version();await store.transaction(book=>{const value=book.read();value.sessions=value.sessions.map(session=>Object.fromEntries(Object.entries(session).reverse()));book.restore(value);});
+   if(await store.version()!==stable)throw Error('object key order changed a semantically identical notebook');
+   const external=await NotebookTest.IndexedNotebook.open(scope,()=>{if(!allowed)throw Error('REVOKED');});
+   await external.update(second.id,s=>{s.draft='Another committed writer';});external.close();
+   await store.update(first.id,s=>{s.draft='Saved after external head';});const combined=await store.snapshot();
+   if(combined.sessions.find(s=>s.id===first.id).draft!=='Saved after external head'||combined.sessions.find(s=>s.id===second.id).draft!=='Another committed writer')throw Error('cached save overwrote a changed authoritative head');
+   checks.push('bounded exact-head write cache avoids unchanged history reads and preserves external commits');
    const snapshot=await store.snapshot(),pointer=(await store.records.page('notebook-sessions:'+(await get('notebook-control','head')).value.generation)).find(r=>r.value.id===second.id),manifest=await get('notebook-payloads',pointer.value.payload),chunk=await get('notebook-chunks',manifest.value.chunks[0]);
    await commit({id:'corrupt-original-fixture',scope,changes:[{collection:'notebook-chunks',id:chunk.id,expectedVersion:chunk.version,value:'CORRUPT'}]},{enqueue:false});
-   await expect(()=>store.get(second.id),'corrupt bytes accepted');await expect(()=>store.snapshot(),'corrupt backup accepted');if(!(await store.get(first.id)).messages.length)throw Error('unrelated session corruption blocked selected read');
+   await expect(()=>store.get(second.id),'corrupt bytes accepted');await expect(()=>store.snapshot(),'corrupt backup accepted');await expect(()=>store.update(first.id,s=>{s.draft='Cannot write through detected corruption';}),'write cache concealed detected source corruption');if(!(await store.get(first.id)).messages.length)throw Error('unrelated session corruption blocked selected read');
    const visible=await store.page(null,10);if(visible.items.length!==snapshot.sessions.length)throw Error('metadata depended on corrupt payload');checks.push('corrupt/missing original fails closed without full-workspace hydration');
    workspace.close();await expect(()=>workspace.whenIdle(),'closed facade barrier accepted');uninstall();store.close();return checks;
   });
-  assert.equal(checks.length,10);console.log(JSON.stringify({browser:process.env.STORAGE_BROWSER??'chromium',checks}));await context.close();
+  assert.equal(checks.length,11);console.log(JSON.stringify({browser:process.env.STORAGE_BROWSER??'chromium',checks}));await context.close();
  }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});
