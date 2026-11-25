@@ -89,6 +89,7 @@ export class BetaAdministration {
    }else{
     const f=await this.d.family(tx,target);
     if(f.request?.kind==='deletion'&&['deleting','completed'].includes(f.request.state))throw Error('INVALID_LIFECYCLE');
+    if(f.request?.kind==='deletion'&&f.request.state==='requested'&&action!=='confirm-deletion')throw Error('DELETION_PENDING');
     if(action==='invite'||action==='recover'){
      exact(params,[]);if(!p.invitations||!p.participation||f.status==='revoked')throw Error('INVITATIONS_PAUSED');
      if(action==='recover'){
@@ -143,7 +144,7 @@ export class BetaAdministration {
     }else if(action==='request-export'||action==='request-deletion'){
      exact(params,[]);if(f.request&&f.request.state!=='completed'&&!(f.request.kind==='export'&&f.request.approvedAt&&f.request.approvedAt+86400000<=now))throw Error('REQUEST_PENDING');
      f.request={id:randomUUID(),kind:action==='request-export'?'export':'deletion',at:now,state:'requested'};
-     if(action==='request-deletion'){await this.d.inWorkspace(tx,f,p,s=>revokeConsent(s,f.id,now),true);f.status='suspended';f.plays=[];}
+     if(action==='request-deletion'){await this.d.inWorkspace(tx,f,p,s=>revokeConsent(s,f.id,now),true);if(f.status!=='revoked')f.status='suspended';f.plays=[];}
     }else throw Error('UNKNOWN_ACTION');
     tx.set(this.d.path(target),f);
    }
