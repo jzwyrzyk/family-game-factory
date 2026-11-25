@@ -15,11 +15,12 @@ export class NativeWorkspace {
  static async open(storage:StoragePort,owner:()=>string){
   const captured=owner();let indexed:IndexedNativeStore|null=null;
   if(indexedStoragePreview()){
+   assertRewardSourceWritable();
    const scope=await nativeScope(captured),check=()=>{if(owner()!==captured)throw Error('The player changed. Reopen this game in its own profile.');assertRewardSourceLockHeld();};
    const candidate=await IndexedNativeStore.open(scope,check);
    try{if(await candidate.isActive()){
     const {recoverStudioNative}=await import('./studio-native-transaction');
-    if(await recoverStudioNative(candidate.records,storage,check,captured)){location.reload();throw Error('Your saved copy is recovered. Reopening Jems…');}
+    if(await recoverStudioNative(candidate.records,storage,check,captured,true)){location.reload();throw Error('Your saved copy is recovered. Reopening Jems…');}
     indexed=await IndexedNativeStore.open(scope,()=>{check();assertRewardSourceWritable();});
    }}finally{candidate.close();}
   }
@@ -53,6 +54,7 @@ export async function prepareIndexedNative(storage:StoragePort,owner:()=>string)
  assertRewardSourceWritable();const captured=owner(),raw=storage.getItem(WORKSPACE_KEY)??JSON.stringify({version:2,projects:[],revisions:[],plays:[]} satisfies Workspace);
  setRewardSourceMaintenance(true);let store:IndexedNativeStore|undefined;
  try{const scope=await nativeScope(captured);store=await IndexedNativeStore.open(scope,()=>{if(owner()!==captured)throw Error('The player changed.');assertRewardSourceLockHeld();});
-  return await store.migrateLegacy(raw,{beforeActivate:()=>{if((storage.getItem(WORKSPACE_KEY)??JSON.stringify({version:2,projects:[],revisions:[],plays:[]}))!==raw)throw Error('Saved games changed while preparing the library. The original work is still active.');}});
+  const prepared=await store.migrateLegacy(raw,{beforeActivate:()=>{if((storage.getItem(WORKSPACE_KEY)??JSON.stringify({version:2,projects:[],revisions:[],plays:[]}))!==raw)throw Error('Saved games changed while preparing the library. The original work is still active.');}});
+  window.dispatchEvent(new CustomEvent('jems:native-authority-changed',{detail:{owner:captured}}));return prepared;
  }finally{store?.close();setRewardSourceMaintenance(false);}
 }

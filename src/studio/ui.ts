@@ -29,8 +29,8 @@ import '../brand/gem-progress.css';
 import '../brand/art-library.css';
 import { installQualityCards } from '../quality/cards';
 import { StudioNotebook, type StudioSession, type Candidate, type PendingJob } from './notebook';
-import { StudioGames, isGeneratedRemoteKind } from './adapter';
-import { saveLocalStudioProject } from './local-project';
+import { AsyncStudioGames as StudioGames, isGeneratedRemoteKind } from './adapter';
+import { saveStudioProject as saveLocalStudioProject } from './local-project';
 import { installStudioRemixRouting } from './host-navigation';
 import { installPlayView } from './play-view';
 import { defaults, manifests, validateConfig } from '../runtime/manifests';
@@ -98,7 +98,7 @@ export async function installStudio(){
  }
  const games=new StudioGames(profileStorage(localStorage),FG), owner=()=>String(FG.store.current().id);
  const guideHost:GuideHost={isDismissed:tip=>notebook.guidance(owner()).dismissedTips.includes(tip),dismiss:tip=>{notebook.dismissGuideTip(owner(),tip);}};
- try{games.export();}catch(error){$('page-home').prepend(el('p','notice','Could not open the studio: '+(error as Error).message));return;}
+ try{await games.ready(String(FG.store.current().id));}catch(error){$('page-home').prepend(el('p','notice','Could not open the studio: '+(error as Error).message));return;}
  let activeId:string|null=null,epoch=0,showing:'working'|'candidate'|'history'='working',mounted=false;
  let remote:BuilderConfig={version:1,mode:'unavailable'};
  configureNaturalNarration(createPrivateNarration(()=>remote,owner));
@@ -879,7 +879,7 @@ export async function installStudio(){
  function savedGumVersion(s:StudioSession):number|null{
   if(s.game!=='gum'||!s.projectId||s.remoteId)return null;
   try{
-   const version=games.revision(s.projectId,s.owner).config.qualityVersion;
+   const version=games.cachedRevision(s.projectId,s.owner)?.config.qualityVersion;
    return typeof version==='number'?version:0;
   }catch{return null;}
  }
@@ -896,12 +896,17 @@ export async function installStudio(){
     const control=document.getElementById(id);if(control)setIconLabel(control,early?'parent':'add',early?FAMILY_CREATION_LABEL:label);
   }
  }
- function renderLibrary(){
+ let libraryRender=0;
+ function renderLibrary(){const actor=owner();void renderLibraryAsync().catch(error=>{if(owner()===actor&&route==='library')status((error as Error).message,true);});}
+ async function renderLibraryAsync(){
+  const requested=++libraryRender,capturedOwner=owner();const projects=await games.list(capturedOwner);
+  for(const session of notebook.list(capturedOwner).filter(s=>s.game==='gum'&&s.projectId&&!s.remoteId))await games.revision(session.projectId!,capturedOwner);
+  if(requested!==libraryRender||owner()!==capturedOwner)return;
   refreshEarlyJourney();
   refreshLearningChoice();
   const entries=notebook.list(owner()),box=$('studioLibrary');box.replaceChildren();
   // Import references to existing local remixes without copying or migrating their data.
-  const unlisted=games.list(owner()).filter(p=>!entries.some(s=>s.projectId===p.id));
+  const unlisted=projects.filter(p=>!entries.some(s=>s.projectId===p.id));
   let importFailure='';
   for(const p of unlisted){
    if(!notebook.capacity().available)break;
@@ -1008,14 +1013,15 @@ export async function installStudio(){
   $<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('creations');route='other';
   document.body.classList.remove('studio-designing');setActiveNav('studioNavHome');focusView(collectionTitle);
  }
- function start(game:GameId){
+ async function start(game:GameId){
+  const startingOwner=owner();for(const prior of notebook.list(startingOwner).filter(s=>s.game===game&&s.projectId&&!s.remoteId))await games.revision(prior.projectId!,startingOwner);if(owner()!==startingOwner)return;
   // The current Gum card opens the assembly workshop. Earlier starter sessions
   // remain unchanged and visible in My jems, with their own saved engine.
   const existing=notebook.list(owner()).find(s=>s.game===game&&s.playOnly&&(game!=='gum'||savedGumVersion(s)===3));if(existing)return open(existing.id);
-  const s=saveLocalStudioProject(profileStorage(localStorage),FG,owner(),(stagedGames,stagedNotebook)=>{
+  const s=(await saveLocalStudioProject(profileStorage(localStorage),FG,owner(),(stagedGames,stagedNotebook)=>{
    const p=stagedGames.create(owner(),game,`My ${names[game]}`,defaults(game,FG.store.current().remixes?.[game]||'classic'));
    return stagedNotebook.create(owner(),game,p.name,p.id,{playOnly:true,message:'Play first. When you want to test an idea, your original game stays safe.'});
-  },notifyRewardSourceSaved);return open(s.id);
+  },notifyRewardSourceSaved));return open(s.id);
  }
  function leaveCreationForStudio(){
   if(guardMath())return false;
@@ -1068,14 +1074,17 @@ export async function installStudio(){
   }
   if(!sameSession||atEnd)box.scrollTop=box.scrollHeight;
  }
- function render(){
-  if(!activeId)return;const s=current(),working=s.projectId?games.revision(s.projectId,s.owner):null;refreshNotifications();
+ let sessionRender=0;
+ function render(){const actor=owner(),view=activeId;void renderAsync().catch(error=>{if(owner()===actor&&activeId===view)status((error as Error).message,true);});}
+ async function renderAsync(){
+  if(!activeId)return;const requested=++sessionRender,s=current(),at=epoch,working=s.projectId?(await games.revision(s.projectId,s.owner)):null;
+  if(requested!==sessionRender||!sameView(s,at))return;refreshNotifications();
   refreshGameSubject();FG.learning.modeControl($('studioMathMode'),s.id);$('studioTitle').textContent=s.name;$('studioStorage').textContent=s.remoteId||s.candidate?.remoteId?'Private family game · local conversation':'Saved on this device';
   renderGemBadge(s);
   const sceneAction=$('studioMakeScene');
   if(sceneAction)setIconLabel(sceneAction,'grid',s.remoteId||s.candidate?.remoteId||['dragon','buckets','robot'].includes(s.game)&&s.projectId?'Animate & code':'Start a separate scene');
-  const n=s.projectId?games.history(s.projectId,s.owner).findIndex(r=>r.id===working?.id)+1:0;
-  $('studioVersion').textContent=showing==='candidate'?((s.experiments||[]).find(e=>e.id===s.candidate?.id)?.label||'Preview')+' · my main game is safe':showing==='history'?'Trying an earlier version':working?`My main game · version ${n}`:s.remoteId?'My main game':'My idea · ready to imagine';
+  const n=working?.label??'';
+  $('studioVersion').textContent=showing==='candidate'?((s.experiments||[]).find(e=>e.id===s.candidate?.id)?.label||'Preview')+' · my main game is safe':showing==='history'?'Trying an earlier version':working?`My main game · ${n}`:s.remoteId?'My main game':'My idea · ready to imagine';
   $('studioPreviewNotice').hidden=showing==='working';
   const creating=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
   const hasIdea=creating&&s.messages.some(m=>m.role==='child');
@@ -1103,7 +1112,7 @@ export async function installStudio(){
   $<HTMLButtonElement>('studioPlay').disabled=!(working||s.remoteId||s.candidate);
   $<HTMLButtonElement>('studioKeep').disabled=!s.candidate||showing!=='candidate'||saving||!!s.candidate.remoteId&&!previewLearning?.ready;$('studioKeep').hidden=!s.candidate||showing!=='candidate';$('studioReady').hidden=!readyExperiment(s);setIconLabel($('studioReady'),'play',s.projectId||s.remoteId?'Try your ready test':'Play my game');$<HTMLButtonElement>('studioHelp').disabled=!(s.projectId||s.remoteId||s.candidate);setIconLabel($('studioPlay'),'play',pausedForTools?'Back to my game':'Play');
   $<HTMLButtonElement>('studioUndo').disabled=!s.candidate&&!working?.parentId&&!s.remoteId;
-  $<HTMLButtonElement>('studioRedo').disabled=!!s.candidate||(!s.undone&&(!working||!games.history(s.projectId!,s.owner).some(r=>r.parentId===working.id)));
+  $<HTMLButtonElement>('studioRedo').disabled=!!s.candidate||(!s.undone&&!working);
   copyRecovery.hidden=!s.pendingCopy;checkCopy.disabled=saving;
   $<HTMLButtonElement>('studioCopy').disabled=!(working||s.remoteId||s.candidate)||saving||!!s.pendingCopy;
   refreshBuildAction();
@@ -1144,41 +1153,44 @@ export async function installStudio(){
    lastOutcome=description;
   }catch(error){status((error as Error).message,true);}
  }
- function playLocal(s:StudioSession,config:Mechanics,key:string,view:typeof showing,revisionId?:string){
+ async function playLocal(s:StudioSession,config:Mechanics,key:string,view:typeof showing,revisionId?:string){
   if(!canChangePlay(s))return false;
   const playedTest=view==='candidate'?s.candidate?.id||s.selectedTest||null:null;
   // Returning from shared Help/Change keeps the originating build reachable.
   // Opening another session or leaving the player already clears this binding.
   const waiting=s.game==='mining'&&waitProject?.owner===s.owner?waitProject:null;
   disposeGame();waitProject=waiting;lastOutcome=null;viewedRevisionId=revisionId||null;remoteViewedId=null;const generation=epoch;showing=view;mountNative();
-  const boundRevision=s.projectId?games.revision(s.projectId,s.owner,revisionId??(view==='candidate'?s.candidate?.baseId??undefined:undefined)):null;
-  FG.app.openGame(s.game,{config,stateKey:key,drawingRigId:boundRevision?.drawingRigId??null,projectId:s.id,onOutcome:(outcome:PlayOutcome)=>{
+  const boundRevision=s.projectId?(await games.revision(s.projectId,s.owner,revisionId??(view==='candidate'?s.candidate?.baseId??undefined:undefined))):null;
+  if(generation!==epoch||owner()!==s.owner||activeId!==s.id)return false;
+  FG.app.openGame(s.game,{config,stateKey:key,drawingRigId:boundRevision?.drawingRigId??null,projectId:s.id,onOutcome:async(outcome:PlayOutcome)=>{
     if(generation!==epoch||s.owner!==owner()||activeId!==s.id)return;
-    if(revisionId&&s.projectId)try{games.record(s.owner,s.projectId,revisionId,outcome);}catch(error){status((error as Error).message,true);}
+    if(revisionId&&s.projectId)try{(await games.record(s.owner,s.projectId,revisionId,outcome));}catch(error){status((error as Error).message,true);}
+    if(generation!==epoch||s.owner!==owner()||activeId!==s.id)return;
     announceOutcome(s,outcome.description||`You ${outcome.won?'finished':'tried'} this round.`,false,playedTest);
   }});
   mounted=true;showStudio();render();setTab('game');enterPlayView();status(view==='candidate'?'Try your test. Your main game has not changed.':view==='history'?'Playing an earlier version for comparison.':'Your main game. Choose Change my game whenever you have an idea.');return true;
  }
- async function playWorking(){const s=current();if(!canChangePlay(s))return;if(s.remoteId){await showRemote(s,s.remoteId,'working');return;}if(!s.projectId){disposeGame();showing='working';$('studioEmpty').hidden=false;showStudio();render();return;}const r=games.revision(s.projectId,s.owner);playLocal(s,validateConfig(s.game as GameId,r.config),r.id,'working',r.id);}
- async function playCandidate(){const s=current(),c=s.candidate;if(!canChangePlay(s))return;if(!c)return playWorking();if(c.remoteId){await showRemote(s,c.remoteId,'candidate');}else playLocal(s,validateConfig(s.game as GameId,c.config),c.id,'candidate');}
+ async function playWorking(){const s=current();if(!canChangePlay(s))return;if(s.remoteId){await showRemote(s,s.remoteId,'working');return;}if(!s.projectId){disposeGame();showing='working';$('studioEmpty').hidden=false;showStudio();render();return;}const r=(await games.revision(s.projectId,s.owner));await playLocal(s,validateConfig(s.game as GameId,r.config),r.id,'working',r.id);}
+ async function playCandidate(){const s=current(),c=s.candidate;if(!canChangePlay(s))return;if(!c)return playWorking();if(c.remoteId){await showRemote(s,c.remoteId,'candidate');}else await playLocal(s,validateConfig(s.game as GameId,c.config),c.id,'candidate');}
  async function playViewed(){
   const s=current();if(!canChangePlay(s))return;
   stopSpeech();
   if(showing==='history'){
    if(remoteViewedId){await showRemote(s,remoteViewedId);return;}
-   if(s.projectId&&viewedRevisionId){const r=games.revision(s.projectId,s.owner,viewedRevisionId);playLocal(s,validateConfig(s.game as GameId,r.config),r.id,'history',r.id);return;}
+   if(s.projectId&&viewedRevisionId){const r=(await games.revision(s.projectId,s.owner,viewedRevisionId));await playLocal(s,validateConfig(s.game as GameId,r.config),r.id,'history',r.id);return;}
   }
   if(showing==='candidate'&&s.candidate)await playCandidate();else await playWorking();
  }
- function showHelp(){
-  const s=current();if(guardMath())return;++viewIntent;
+ async function showHelp(){
+  const s=current(),at=epoch;if(guardMath())return;const helpIntent=++viewIntent;
   if(mounted&&FG.runtime.showHelp?.())return;
   if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;}
   setTab('game');render();$('studioHelpPanel').hidden=false;
   const touch=matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0;
   const native=!remoteViewedId&&s.game!=='new';
   const touchHelp:Record<string,string>={mining:'Hold Left or Right to run into jems. Bring them to the bucket. Run to safety or hold on before the giant shakes; holding spills your bag.',factory:'Find the next gem in the pattern. Tap a bucket, use the glowing machines, then choose paper and send your gift!',moon:'Tap Left or Right to run, and Jump to leap over meteors.',robot:'Tap the arrows to plan a route, then Run to test it.',gum:'Tap a part to add it. Drag to move it. Choose Gum, then another part to stick them together. Choose Test machine to try it.',hill:'Hold the right pedal to drive. Hold the left pedal to brake. You can change your ride in the garage.',buckets:'Tap a bucket to choose it. Watch what happens, then try another round.',dragon:'Use the arrow buttons to move. Tap the jump button to bounce fireballs with your shield.'};
-  const viewedConfig=showing==='candidate'?s.candidate?.config:s.projectId?games.revision(s.projectId,s.owner,showing==='history'?viewedRevisionId||undefined:undefined).config:undefined;
+  const viewedConfig=showing==='candidate'?s.candidate?.config:s.projectId?(await games.revision(s.projectId,s.owner,showing==='history'?viewedRevisionId||undefined:undefined)).config:undefined;
+  if(!sameView(s,at)||helpIntent!==viewIntent)return;
   const oldConstruction=native&&s.game==='gum'&&(viewedConfig?.qualityVersion??0)===0;
   const physicalConstruction=native&&s.game==='gum'&&viewedConfig?.qualityVersion===1;
   const stickerConstruction=native&&s.game==='gum'&&viewedConfig?.qualityVersion===2;
@@ -1224,7 +1236,8 @@ export async function installStudio(){
   }else message(s,'child',request?.displayText||prompt);
   notebook.update(s.id,s.owner,x=>{x.reflection=false;x.playOnly=false;});
   if(s.projectId&&!s.remoteId&&!s.candidate?.remoteId){
-    const working=games.revision(s.projectId,s.owner),config=decision.continueTest&&s.candidate?.config?s.candidate.config:working.config;
+    const working=(await games.revision(s.projectId,s.owner)),config=decision.continueTest&&s.candidate?.config?s.candidate.config:working.config;
+    if(!sameView(s,started))return;
     const intent=interpret(s.game as GameId,config,prompt);
     if(intent.kind==='supported'){
       const before=progressSnapshot(notebook.get(s.id,s.owner));
@@ -1243,7 +1256,8 @@ export async function installStudio(){
     status('Building is offline. Your idea is saved.',true);beginBuildHandoff(s,{phase:'unavailable'});render();return;
   }
   const chosenBase=decision.continueTest?s.candidate:null;
-  const baseId=chosenBase?.remoteId||s.remoteId||(chosenBase?.config?chosenBase.id:s.projectId?games.revision(s.projectId,s.owner).id:null);
+  const baseId=chosenBase?.remoteId||s.remoteId||(chosenBase?.config?chosenBase.id:s.projectId?(await games.revision(s.projectId,s.owner)).id:null);
+  if(!sameView(s,started))return;
   notebook.update(s.id,s.owner,x=>{x.pendingExperiment={parents:decision.parents,depth:decision.depth,origin:decision.origin,baseId,prompt};});
   if(consumedDraft!==undefined)submittedDrafts.set(s.id,consumedDraft);else submittedDrafts.delete(s.id);
   await build(s,prompt,decision.continueTest);
@@ -1255,7 +1269,7 @@ export async function installStudio(){
  async function build(s:StudioSession,prompt:string,continueTest=false){
   if(young()){handOff();return;}
   sending.add(s.id);moreChoices.open=false;const identity=beginBuildHandoff(s,{phase:'sending'});render();status('Sending your idea…');
-  const r=s.projectId?games.revision(s.projectId,s.owner):null;
+  const r=s.projectId?(await games.revision(s.projectId,s.owner)):null;
   const chosen=continueTest?s.candidate:null;
   const input={gameId:s.remoteId||chosen?.remoteId?(isGeneratedRemoteKind(s.remoteKind)?'generated-module':'star-catcher'):s.game,baseRevisionId:chosen?.remoteId||s.remoteId||(chosen?.config?chosen.id:r?.id)||null,prompt,...(r&&!s.remoteId&&!chosen?.remoteId?{config:chosen?.config||r.config}:{})};
   // Request admission ends at the durable ACK, not when a game finishes building.
@@ -1455,13 +1469,16 @@ export async function installStudio(){
      if(s.experiments?.some(e=>e.id===c.id))notebook.keepExperiment(s.id,s.owner,c.id,{revisionId:c.remoteId,baseId:c.baseId,kind:'remote'});
      else notebook.update(s.id,s.owner,x=>{x.remoteId=c.remoteId!;x.candidate=null;x.undone=null;});
     }else if(s.projectId){
-     const latest=games.revision(s.projectId,s.owner);
+     const latest=(await games.revision(s.projectId,s.owner));
+     if(!canChangePlay(s,at))return;
      if(latest.id!==c.baseId&&!confirm('This test started from an earlier main version. Make this whole test the new main game, without silently adding later changes?'))return;
-     const next=games.keep(s.owner,s.projectId,latest.id,c.config!,c.prompt,s.hypothesis,c.id);
-     const contentChanged=Object.entries(c.config!).some(([key,value])=>latest.config[key]!==value)||Object.keys(latest.config).some(key=>!(key in c.config!));
-     if(s.experiments?.some(e=>e.id===c.id))notebook.keepExperiment(s.id,s.owner,c.id,{revisionId:next.id,baseId:c.baseId,kind:'local',contentChanged});
-     else notebook.update(s.id,s.owner,x=>{x.candidate=null;x.undone=null;});
-     message(s,'helper',`Kept your change. Your earlier versions are still available in Versions.`);
+     await saveLocalStudioProject(profileStorage(localStorage),FG,s.owner,(stagedGames,book)=>{
+      const next=stagedGames.keep(s.owner,s.projectId!,latest.id,c.config!,c.prompt,s.hypothesis,c.id);
+      const contentChanged=Object.entries(c.config!).some(([key,value])=>latest.config[key]!==value)||Object.keys(latest.config).some(key=>!(key in c.config!));
+      if(s.experiments?.some(e=>e.id===c.id))book.keepExperiment(s.id,s.owner,c.id,{revisionId:next.id,baseId:c.baseId,kind:'local',contentChanged});
+      else book.update(s.id,s.owner,x=>{x.candidate=null;x.undone=null;});
+      book.message(s.id,s.owner,'helper','Kept your change. Your earlier versions are still available in Versions.');return book.get(s.id,s.owner);
+     },notifyRewardSourceSaved,undefined,s.projectId);
     }else return;
     if(sameView(s,at)){showing='working';keptInThisView=s.id;status('Kept privately. Nothing was published.');updateProfile();celebrateProgress(gemAchievement(gemBefore,notebook.get(s.id,s.owner))||'kept','studioKeep');if(!FG.learning.active)await playWorking();}
   }finally{saving=false;if(activeId===s.id&&owner()===s.owner)render();}
@@ -1469,14 +1486,14 @@ export async function installStudio(){
  async function undo(){
   const s=current(),at=epoch;if(!canChangePlay(s,at))return;
   if(s.candidate){notebook.update(s.id,s.owner,x=>{x.undone=x.candidate;x.candidate=null;});message(s,'helper','Preview undone. Your working game was never overwritten.');await playWorking();render();return;}
-  if(s.remoteId){const r=await clientFor(s).api('/v1/revisions/'+encodeURIComponent(s.remoteId)+'/undo',{});notebook.update(s.id,s.owner,x=>{x.remoteId=r.revisionId;});}
-  else if(s.projectId)games.undo(s.owner,s.projectId);
+  if(s.remoteId){const r=await clientFor(s).api('/v1/revisions/'+encodeURIComponent(s.remoteId)+'/undo',{});if(!sameView(s,at))return;notebook.update(s.id,s.owner,x=>{x.remoteId=r.revisionId;});}
+  else if(s.projectId)(await games.undo(s.owner,s.projectId));
   if(sameView(s,at)){status('Restored the earlier working version.');if(!FG.learning.active)await playWorking();render();}
  }
  async function combineTests(ids:string[]){
   const s=current();if(!canChangePlay(s))return;const tests=ids.map(id=>s.experiments?.find(e=>e.id===id));if(tests.some(e=>!e))throw Error('Choose tests from this game.');
   if(!s.projectId||tests.some(e=>!e!.candidate.config)){status('These built games need a new AI experiment. Describe which ideas to combine in the conversation; the originals will stay safe.');setTab('talk');return;}
-  const main=games.revision(s.projectId,s.owner);if(tests.some(e=>e!.baseId!==main.id))throw Error('These tests started from a different main version. Compare them first and choose the starting version deliberately.');
+  const main=(await games.revision(s.projectId,s.owner));if(!canChangePlay(s))return;if(tests.some(e=>e!.baseId!==main.id))throw Error('These tests started from a different main version. Compare them first and choose the starting version deliberately.');
   const config={...main.config},chosen=new Map<string,number|boolean>();
   for(const e of tests)for(const [k,v] of Object.entries(e!.candidate.config!)){if(v===main.config[k])continue;if(chosen.has(k)&&chosen.get(k)!==v)throw Error('These tests choose different values for '+k+'. Decide which value you want before combining.');chosen.set(k,v);config[k]=v;}
   const checked=validateConfig(s.game as GameId,config),c:Candidate={id:crypto.randomUUID(),baseId:main.id,config:checked,prompt:'Combine '+tests.map(e=>e!.label).join(' + '),summary:tests.map(e=>e!.candidate.summary).join('; ').slice(0,2200)};
@@ -1528,14 +1545,30 @@ export async function installStudio(){
   if(bases.size>1)section.append(el('p','','These builds have different starting versions. Their results are not directly controlled comparisons.'));
   box.prepend(section);
  }
- function renderVersions(){
-  if(!activeId)return;coaching?.renderShelf();const s=current(),box=$('studioVersionCards');box.replaceChildren();
-  if(s.projectId&&!s.remoteId){const currentRevision=games.revision(s.projectId,s.owner);for(const [i,r] of games.history(s.projectId,s.owner).entries()){
-    const card=el('article','studio-version-card');card.append(el('span','jems-version-badge',r.id===currentRevision.id?'Your main version':'Saved version'),el('strong','',`Version ${i+1}${r.id===currentRevision.id?' · working':''}`),el('p','',r.label));
-    const detail=el('p','studio-version-detail',manifests[s.game as GameId].mechanics.map(m=>`${m.label}: ${human(r.config[m.key])}`).join(' · '));card.append(detail);
-    const play=el('button','studio-button','Play this version');play.onclick=()=>act(()=>{if(playLocal(s,validateConfig(s.game as GameId,r.config),r.id,'history',r.id))status('Comparing only. Your working version has not changed.');});
-    const restore=el('button','studio-button','Use this version');restore.onclick=()=>act(async()=>{if(!canChangePlay(s))return;if(current().candidate&&!confirm('Keep your saved conversation, discard the unkept preview, and use this version?'))return;games.checkout(s.owner,s.projectId!,r.id);notebook.update(s.id,s.owner,x=>{x.candidate=null;});await playWorking();renderVersions();});card.append(play,restore);box.append(card);
-  }}else if(s.remoteId){const card=el('article','studio-version-card');card.append(el('strong','','Working game'),el('p','','Kept in the private family workshop.'));const b=el('button','studio-button','Play working game');b.onclick=()=>act(playWorking);card.append(b);const compare=el('button','studio-button','Compare previous');compare.onclick=()=>act(async()=>{const at=epoch;if(!canChangePlay(s,at))return;const c=await clientFor(s).api('/v1/revisions/'+encodeURIComponent(s.remoteId!));if(!canChangePlay(s,at))return;if(!c.parentId){status('This is the first version.');return;}await showRemote(s,c.parentId,'history');});card.append(compare);box.append(card);}
+ let versionsRender=0;
+ function renderVersions(){const actor=owner(),view=activeId;void renderVersionsAsync().catch(error=>{if(actor===owner()&&view===activeId)status((error as Error).message,true);});}
+ async function renderVersionsAsync(){
+  if(!activeId)return;const request=++versionsRender,s=current(),at=epoch,box=$('studioVersionCards');coaching?.renderShelf();box.replaceChildren();
+  if(s.projectId&&!s.remoteId){
+   const currentRevision=await games.revision(s.projectId,s.owner);if(request!==versionsRender||!sameView(s,at))return;
+   let count=0;
+   const append=async(after:string|null)=>{
+    const page=await games.historyPage(s.projectId!,s.owner,after,24);if(request!==versionsRender||!sameView(s,at))return;
+    box.querySelector('[data-more-versions]')?.remove();
+    for(const r of page.items){
+     const card=el('article','studio-version-card');card.append(el('span','jems-version-badge',r.id===currentRevision.id?'Your main version':'Saved version'),el('strong','',`Version ${++count}${r.id===currentRevision.id?' · working':''}`),el('p','',r.label));
+     card.append(el('p','studio-version-detail',manifests[s.game as GameId].mechanics.map(m=>`${m.label}: ${human(r.config[m.key])}`).join(' · ')));
+     const play=el('button','studio-button','Play this version');play.onclick=()=>act(async()=>{if(await playLocal(s,validateConfig(s.game as GameId,r.config),r.id,'history',r.id))status('Comparing only. Your working version has not changed.');});
+     const restore=el('button','studio-button','Use this version');restore.onclick=()=>act(async()=>{
+      if(!canChangePlay(s,at))return;if(current().candidate&&!confirm('Keep your saved conversation, discard the unkept preview, and use this version?'))return;
+      await saveLocalStudioProject(profileStorage(localStorage),FG,s.owner,(stagedGames,book)=>{stagedGames.checkout(s.owner,s.projectId!,r.id);book.update(s.id,s.owner,x=>{x.candidate=null;});return book.get(s.id,s.owner);},notifyRewardSourceSaved,undefined,s.projectId);
+      if(!sameView(s,at))return;await playWorking();renderVersions();
+     });card.append(play,restore);box.append(card);
+    }
+    if(page.next){const more=el('button','studio-button','More saved versions') as HTMLButtonElement;more.dataset.moreVersions='true';more.onclick=()=>act(async()=>{more.disabled=true;try{await append(page.next);}finally{more.disabled=false;}});box.append(more);}
+   };
+   await append(null);if(request!==versionsRender||!sameView(s,at))return;
+  }else if(s.remoteId){const card=el('article','studio-version-card');card.append(el('strong','','Working game'),el('p','','Kept in the private family workshop.'));const b=el('button','studio-button','Play working game');b.onclick=()=>act(playWorking);card.append(b);const compare=el('button','studio-button','Compare previous');compare.onclick=()=>act(async()=>{if(!canChangePlay(s,at))return;const c=await clientFor(s).api('/v1/revisions/'+encodeURIComponent(s.remoteId!));if(!canChangePlay(s,at))return;if(!c.parentId){status('This is the first version.');return;}await showRemote(s,c.parentId,'history');});card.append(compare);box.append(card);}
   if(s.candidate){const card=el('article','studio-version-card is-candidate');card.append(el('strong','','Unkept preview'),el('p','',s.candidate.summary));const b=el('button','studio-button studio-primary','Play preview');b.onclick=()=>act(playCandidate);card.append(b);box.append(card);}
   renderComparison(s,box);
   if(!box.children.length)box.append(el('p','','Your idea is saved. Versions appear when there is a playable game.'));
@@ -1554,10 +1587,10 @@ export async function installStudio(){
       const r=s.pendingCopy?await clientFor(s).api(path+'/'+encodeURIComponent(pending.requestId)):await clientFor(s).api(path,{name:pending.name,clientRequestId:pending.requestId});
       if(!canChangePlay(s,at))return;
       if(!r||typeof r.revisionId!=='string'||!/^[\w-]{1,100}$/.test(r.revisionId))throw Error('The workshop has not confirmed this copy. Your original is safe. Check again later.');
-      saved=saveLocalStudioProject(profileStorage(localStorage),FG,s.owner,(_games,book)=>book.fork(s.id,s.owner,pending.name,null,r.revisionId,pending.requestId),notifyRewardSourceSaved,copyMode);
+      saved=(await saveLocalStudioProject(profileStorage(localStorage),FG,s.owner,(_games,book)=>book.fork(s.id,s.owner,pending.name,null,r.revisionId,pending.requestId),notifyRewardSourceSaved,copyMode));
     }
-    else if(s.projectId){saved=saveLocalStudioProject(profileStorage(localStorage),FG,s.owner,(stagedGames,stagedNotebook)=>{const selected=showing==='candidate'?s.candidate:null;const historical=showing==='history'&&viewedRevisionId?stagedGames.revision(s.projectId!,s.owner,viewedRevisionId):null;const p=stagedGames.fork(s.owner,s.projectId!,name,selected?.config||historical?.config,selected?.prompt||historical?.label,selected?.id||historical?.id);return stagedNotebook.fork(s.id,s.owner,name,p.id,null);},notifyRewardSourceSaved,copyMode);}
-    else saved=saveLocalStudioProject(profileStorage(localStorage),FG,s.owner,(_games,book)=>book.fork(s.id,s.owner,name,null,null),notifyRewardSourceSaved,copyMode);
+    else if(s.projectId){saved=(await saveLocalStudioProject(profileStorage(localStorage),FG,s.owner,(stagedGames,stagedNotebook)=>{const selected=showing==='candidate'?s.candidate:null;const historical=showing==='history'&&viewedRevisionId?stagedGames.revision(s.projectId!,s.owner,viewedRevisionId):null;const p=stagedGames.fork(s.owner,s.projectId!,name,selected?.config||historical?.config,selected?.prompt||historical?.label,selected?.id||historical?.id);return stagedNotebook.fork(s.id,s.owner,name,p.id,null);},notifyRewardSourceSaved,copyMode,s.projectId));}
+    else saved=(await saveLocalStudioProject(profileStorage(localStorage),FG,s.owner,(_games,book)=>book.fork(s.id,s.owner,name,null,null),notifyRewardSourceSaved,copyMode));
     $<HTMLDialogElement>('studioCopyDialog').close();
     if(canChangePlay(s,at)){await open(saved.id);status('Saved as a separate game. Your original game is unchanged.');celebrateJem('copied','studioStatus');}
   }finally{saving=false;render();}
@@ -1590,7 +1623,7 @@ export async function installStudio(){
  $('studioGameMath').onclick=()=>chooseLearningSubject('math');$('studioGameLanguage').onclick=()=>chooseLearningSubject('language');
  $('studioNavPowers').onclick=()=>act(()=>{if(guardMath())return;stopSpeech();flushDraft();hideJourney();disposeGame();FG.app.page('lab');route='other';});
  $('studioPlay').onclick=()=>act(playViewed);$('studioKeep').onclick=()=>act(keep);$('studioUndo').onclick=()=>act(undo);
- $('studioRedo').onclick=()=>act(async()=>{const s=current();if(!canChangePlay(s))return;if(s.undone){notebook.update(s.id,s.owner,x=>{x.candidate=x.undone!;x.undone=null;});await playCandidate();return;}if(!s.projectId)return;games.redo(s.owner,s.projectId);await playWorking();});
+ $('studioRedo').onclick=()=>act(async()=>{const s=current();if(!canChangePlay(s))return;if(s.undone){notebook.update(s.id,s.owner,x=>{x.candidate=x.undone!;x.undone=null;});await playCandidate();return;}if(!s.projectId)return;(await games.redo(s.owner,s.projectId));await playWorking();});
  $('studioCompare').onclick=()=>act(()=>{if(setTab('versions'))$<HTMLDetailsElement>('studioMore').open=false;});$('studioCloseVersions').onclick=()=>act(()=>{setTab('game');focusView($('studioReturnToPlay')||$('studioPlay'));});$('studioBackWorking').onclick=()=>act(playWorking);
  $('studioCopy').onclick=()=>{if(guardMath())return;stopSpeech();++viewIntent;if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;} $<HTMLInputElement>('studioCopyName').value=current().name+' copy';$<HTMLDialogElement>('studioCopyDialog').showModal();$('studioCopyName').focus();};$('studioCopyCancel').onclick=()=>$<HTMLDialogElement>('studioCopyDialog').close();$<HTMLDialogElement>('studioCopyDialog').addEventListener('close',()=>{if(route==='studio'&&!FG.learning.active)focusView($('studioCopy'));});
  $('studioCopyForm').onsubmit=e=>{e.preventDefault();act(()=>copyGame($<HTMLInputElement>('studioCopyName').value.trim()));};
@@ -1647,8 +1680,8 @@ export async function installStudio(){
   onSavedDesignChange,
   onCoachReply:text=>voice?.reply(text),
   onCoachState:state=>{coachConnection=state;if(activeId)render();window.dispatchEvent(new CustomEvent('factory-coach-connection',{detail:{ownerId:owner(),state}}));},
-  rules:()=>{const s=current();if(s.game==='new')return 'New game: rules are being agreed; do not invent recorded outcomes.';const r=s.projectId?games.revision(s.projectId,s.owner):null;return JSON.stringify({game:s.game,instructions:FG.games[s.game]?.instructions,controls:FG.games[s.game]?.controls,settings:r?.config,learningSubject:FG.learning.subject,editable:manifests[s.game as GameId]?.mechanics.map(m=>({key:m.key,label:m.label}))}).slice(0,2000);},
-  localSupported:prompt=>{const s=current();if(!s.projectId||s.remoteId)return false;const info=coaching?.details();return interpret(s.game as GameId,info?.continueTest&&s.candidate?.config?s.candidate.config:games.revision(s.projectId,s.owner).config,prompt).kind==='supported';},
+  rules:()=>{const s=current();if(s.game==='new')return 'New game: rules are being agreed; do not invent recorded outcomes.';const r=s.projectId?games.cachedRevision(s.projectId,s.owner):null;return JSON.stringify({game:s.game,instructions:FG.games[s.game]?.instructions,controls:FG.games[s.game]?.controls,settings:r?.config,learningSubject:FG.learning.subject,editable:manifests[s.game as GameId]?.mechanics.map(m=>({key:m.key,label:m.label}))}).slice(0,2000);},
+  localSupported:prompt=>{const s=current();if(!s.projectId||s.remoteId)return false;const info=coaching?.details(),saved=games.cachedRevision(s.projectId,s.owner);if(!saved)return false;return interpret(s.game as GameId,info?.continueTest&&s.candidate?.config?s.candidate.config:saved.config,prompt).kind==='supported';},
   tryRequest:async(prompt,_origin,_depth,displayText,compiledPlan)=>{await submit({prompt,displayText,compiledPlan});},
   playTest:async id=>{const s=current();if(!canChangePlay(s))return;const test=s.experiments?.find(e=>e.id===id);if(test?.candidate.remoteId){await showRemote(s,test.candidate.remoteId,'candidate',id);return;}notebook.selectExperiment(s.id,s.owner,id);await playCandidate();},playMain:playViewed,combineTests,
   pauseForThinking:()=>{if(guardMath())return false;++viewIntent;if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;status('Your game is waiting. Your build is saved; action games start a new round when you return.');}return true;},
@@ -1762,12 +1795,13 @@ export async function installStudio(){
    // on a previous attempt, recover that exact unlisted project instead of
    // leaving it behind and creating another copy on every retry.
    const listed=new Set(notebook.list(capturedOwner).map(item=>item.projectId));
-   const pending=games.list(capturedOwner).find(item=>item.game==='hill'&&!listed.has(item.id)&&games.revision(item.id,capturedOwner).drawingRigId===rig.id);
+   let pending:Awaited<ReturnType<StudioGames['project']>>|undefined;for(const item of await games.list(capturedOwner)){if(item.game==='hill'&&!listed.has(item.id)&&(await games.revision(item.id,capturedOwner)).drawingRigId===rig.id){pending=item;break;}}
+   if(!stillCurrent())return;
    let projectId='';
-   const session=saveLocalStudioProject(profileStorage(localStorage),FG,capturedOwner,(stagedGames,stagedNotebook)=>{
+   const session=(await saveLocalStudioProject(profileStorage(localStorage),FG,capturedOwner,(stagedGames,stagedNotebook)=>{
     const p=pending??stagedGames.create(capturedOwner,'hill',(source.name+' Rally').slice(0,60),defaults('hill'),rig.id);projectId=p.id;
     return stagedNotebook.create(capturedOwner,'hill',p.name,p.id,{message:'Your own drawing is driving this game. Its saved movement version stays with this adventure. Try it, then decide what you want to change.'});
-   },notifyRewardSourceSaved);
+   },notifyRewardSourceSaved,undefined,pending?.id??null));
    // Actual retained game revisions are authoritative for art usage. Index
    // repair is supplementary and cannot strand an already-saved game.
    void registerArtUsage(capturedOwner,{targetId:projectId,targetKind:'game',drawingId:source.id,rigId:rig.id},()=>owner()===capturedOwner&&rewardSourceWritable()).catch(()=>{});
@@ -1836,7 +1870,8 @@ export async function installStudio(){
    creation.fromStudio({...s,projectId:response.projectId,remoteId:response.revisionId},undefined,response.manifest);return;
   }
   if(!s.projectId||!['dragon','buckets','robot'].includes(s.game)){creation.open();return;}
-  const revision=games.revision(s.projectId,s.owner,showing==='history'&&viewedRevisionId?viewedRevisionId:undefined);
+  const revision=(await games.revision(s.projectId,s.owner,showing==='history'&&viewedRevisionId?viewedRevisionId:undefined));
+  if(owner()!==capturedOwner||epoch!==capturedEpoch||route!=='studio'||activeId!==s.id)return;
   if(showing==='candidate'&&s.candidate?.config)throw Error('Keep this game version first, then use Animate & code to carry that version into a scene.');
   creation.fromStudio(s,revision);
  });

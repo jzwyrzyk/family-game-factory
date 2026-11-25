@@ -1,0 +1,35 @@
+/* Synthetic IndexedDB/native+notebook recovery and actual preview Studio. */
+const assert=require('node:assert/strict'),http=require('node:http');
+const {build}=require('esbuild'),{chromium}=require('playwright');
+(async()=>{
+ const bundle=await build({stdin:{contents:`export * from './src/storage/native-workspace';export * from './src/storage/indexed-native';export * from './src/storage/studio-native-transaction';export * from './src/studio/local-project';export * from './src/studio/notebook';export * from './src/studio/adapter';export * from './src/factory/workspace';export * from './src/storage/family-state';export * from './src/runtime/manifests';export * from './src/rewards/write-guard';`,resolveDir:process.cwd()},define:{'import.meta.env.MODE':'"storage-preview"'},bundle:true,write:false,format:'iife',globalName:'studioTest',platform:'browser'});
+ const server=http.createServer((req,res)=>{res.setHeader('Content-Type',req.url==='/test.js'?'text/javascript':'text/html');res.end(req.url==='/test.js'?bundle.outputFiles[0].text:'<!doctype html><body><script src="/test.js"></script></body>');}).listen(0,'127.0.0.1');await new Promise(resolve=>server.listening?resolve():server.once('listening',resolve));let browser;
+ try{
+  browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,args:['--no-sandbox'],headless:true});const context=await browser.newContext(),page=await context.newPage();await page.goto(`http://127.0.0.1:${server.address().port}`);
+  const checks=await page.evaluate(async()=>{
+   const T=studioTest,owner='player1',profile={id:owner,name:'Synthetic',skills:{},stats:{},constructionStates:{}},data={version:1,profiles:[profile],feedback:[]};let current=profile;
+   const host={store:{current:()=>current,data,save:()=>{localStorage.setItem(T.FAMILY_STATE_KEY,JSON.stringify(data));return true;}}};host.store.save();
+   const legacy=new T.RevisionStore(localStorage),original=legacy.create(owner,'buckets','Original'),book=new T.StudioNotebook(localStorage),session=book.create(owner,'buckets','Original',original.id),raw=localStorage.getItem(T.WORKSPACE_KEY);
+   const scope=await T.nativeScope(owner),indexed=await T.IndexedNativeStore.open(scope,()=>{});await indexed.migrateLegacy(raw);
+   const create=(games,notebook)=>{const project=games.create(owner,'robot','Created in indexed Studio',T.defaults('robot'));return notebook.create(owner,'robot',project.name,project.id);};
+   const created=await T.saveStudioProject(localStorage,host,owner,create);if(localStorage.getItem(T.WORKSPACE_KEY)!==raw)throw Error('Legacy authority changed');if((await indexed.project(created.projectId)).name!==created.name)throw Error('Native half missing');if(book.get(created.id,owner).projectId!==created.projectId)throw Error('Notebook half missing');
+   const api=new T.AsyncStudioGames(localStorage,host);if((await api.revision(created.projectId,owner)).id!==(await indexed.project(created.projectId)).headId)throw Error('Actual adapter read stale legacy');
+   // Local write failure leaves a durable native intent, then restart recovery
+   // completes exact images once without recreating the native graph.
+   let fail=true;const interrupted={getItem:k=>localStorage.getItem(k),removeItem:k=>localStorage.removeItem(k),setItem:(k,v)=>{if(fail&&k===T.STUDIO_KEY)throw Error('Synthetic quota');localStorage.setItem(k,v);}};
+   let rejected=false;try{await T.saveStudioProject(interrupted,host,owner,create);}catch{rejected=true;}if(!rejected)throw Error('Interruption was not exposed');
+   const beforeRecovery=await indexed.page(null,24);if(beforeRecovery.items.length!==3)throw Error('Native committed intent missing');fail=false;
+   if(!await T.recoverStudioNative(indexed.records,localStorage,()=>{},owner,true))throw Error('Pending local half not recovered');if(await T.recoverStudioNative(indexed.records,localStorage,()=>{},owner,true))throw Error('Recovery repeated');if(book.list(owner).length!==3||(await indexed.page(null,24)).items.length!==3)throw Error('Recovery lost or duplicated records');
+   // A completed native Keep also captures the notebook pointer and exact
+   // construction state in the same recoverable operation.
+   const base=await indexed.revision(original.id),candidate={id:'test-candidate',baseId:base.id,config:{...base.config,bucketCount:4},prompt:'Four buckets',summary:'Four buckets'};book.saveExperiment(session.id,owner,candidate);profile.constructionStates[candidate.id]={pieces:[{id:'exact'}]};host.store.save();
+   await T.saveStudioProject(localStorage,host,owner,(games,notebook)=>{const kept=games.keep(owner,original.id,base.id,candidate.config,candidate.prompt,'',candidate.id);notebook.keepExperiment(session.id,owner,candidate.id,{revisionId:kept.id,baseId:base.id,kind:'local',contentChanged:true});return notebook.get(session.id,owner);},undefined,undefined,original.id);
+   const kept=await indexed.revision(original.id);if(kept.id===base.id||book.get(session.id,owner).candidate!==null||profile.constructionStates[kept.id].pieces[0].id!=='exact')throw Error('Keep crossed authorities');if(localStorage.getItem(T.WORKSPACE_KEY)!==raw)throw Error('Keep rewrote legacy workspace');
+   // Unknown source bytes block deterministic replay and remain untouched.
+   const before=localStorage.getItem(T.STUDIO_KEY),changes=await T.prepareStudioNativeIntent(indexed.records,owner,[{key:T.STUDIO_KEY,before,after:before+' '}]);await indexed.restoreSnapshot(await indexed.snapshotProject(null),'unknown-source',changes);localStorage.setItem(T.STUDIO_KEY,before+'\n');rejected=false;try{await T.recoverStudioNative(indexed.records,localStorage,()=>{},owner,true);}catch{rejected=true;}if(!rejected||localStorage.getItem(T.STUDIO_KEY)!==before+'\n')throw Error('Unknown bytes overwritten');localStorage.setItem(T.STUDIO_KEY,before);await T.recoverStudioNative(indexed.records,localStorage,()=>{},owner,true);
+   current={...profile,id:'player2'};rejected=false;try{await api.revision(original.id,owner);}catch{rejected=true;}if(!rejected)throw Error('Stale profile read');
+   const other=await T.IndexedNativeStore.open(await T.nativeScope('player2'),()=>{});rejected=false;try{await other.project(original.id);}catch{rejected=true;}other.close();if(!rejected)throw Error('Cross-profile native access');indexed.close();
+   return ['actual async authority','atomic native/local intent','interrupted local writes recover once','Keep preserves construction and notebook','unknown source preserved','profile switch denied'];
+  });assert.equal(checks.length,6);console.log(JSON.stringify({checks}));await context.close();
+ }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
+})().catch(error=>{console.error(error);process.exitCode=1;});
