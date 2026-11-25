@@ -36,6 +36,7 @@ export class NotebookWorkspace {
  static async fromIndexed(indexed:IndexedNotebook,owner:()=>string){const result=new NotebookWorkspace(null,indexed,owner,indexed.scope.profile);await result.refresh(indexed.scope.profile);return result;}
  private check(owner=this.captured){if(this.invalidated)throw Error('Reload Jems to open the prepared notebook.');if(owner!==this.captured||this.owner()!==this.captured)throw Error('The player changed. Reopen this idea in its own profile.');}
  close(){this.invalidated=true;window.removeEventListener('jems:notebook-authority-changed',this.authorityChanged);this.loaded.clear();this.indexed?.close();}
+ async whenIdle():Promise<void>{await this.queue;this.check();}
  list(owner:string):NotebookCard[]{this.check(owner);return structuredClone(this.cards);}
  pendingSessions():StudioSession[]{this.check();return this.cards.filter(c=>c.pendingCopy||c.pendingSubmission||c.needsReadyRecovery||['queued','building','testing'].includes(c.jobStatus??'')).slice(0,8).flatMap(c=>{const session=this.loaded.get(c.id);return session?[structuredClone(session)]:[];});}
  summary():NotebookSummary {this.check();return structuredClone(this.view);}
@@ -92,12 +93,12 @@ export class NotebookWorkspace {
   const captured=this.captured;
   const work=this.queue.catch(()=>{}).then(async()=>{this.check(captured);assertRewardSourceWritable();const run=(book:StudioNotebook)=>{this.staged=book;try{return callback(book);}finally{this.staged=null;}};
    const result=this.indexed?await this.indexed.transaction(run):run(this.legacy!);this.check(captured);await this.refresh(captured);return result;});
-  this.queue=work.catch(()=>{});return work;
+  this.queue=work;return work;
  }
  /** Shared native/notebook local transaction. The caller commits these changes
   * with the native delta in one IndexedRecords transaction, then publishes. */
  async prepareTransaction<T>(callback:(book:StudioNotebook)=>T){
-  this.check();if(!this.indexed)throw Error('Use the legacy project transaction for this notebook.');
+  await this.queue.catch(()=>{});this.check();if(!this.indexed)throw Error('Use the legacy project transaction for this notebook.');
   const prepared=await this.indexed.prepareTransaction(book=>{this.staged=book;try{return callback(book);}finally{this.staged=null;}});
   return {...prepared,publish:async()=>{prepared.publish();await this.refresh();}};
  }
