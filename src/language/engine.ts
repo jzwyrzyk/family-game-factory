@@ -75,7 +75,7 @@ function trustedItem(item:unknown):item is LanguageItem {
   const skill=LANGUAGE_SKILLS.find(s=>s.id===item.skillId);
   if(!skill||item.grade!==skill.grade||item.domain!==skill.domain||
      typeof item.title!=='string'||item.title.length>150)return false;
-  const form=skill.domain==='listening'&&template.kind==='sentence-tiles'?'comprehension':template.kind==='word-tiles'?'encoding':template.kind==='sentence-tiles'||template.kind==='edit'?'syntax':
+  const form=template.kind==='picture-order'?'comprehension':template.kind==='word-tiles'?'encoding':template.kind==='sentence-tiles'||template.kind==='edit'?'syntax':
     template.kind==='creative'?'expression':skill.domain==='comprehension'?'comprehension':'pattern';
   if(item.form!==form)return false;
   if(item.purpose!==undefined&&!['focus','review','confidence','prerequisite','explore'].includes(item.purpose))return false;
@@ -90,7 +90,7 @@ function trustedItem(item:unknown):item is LanguageItem {
       new Set(choices.map((c:any)=>c?.value)).size===4&&
       expected.every(v=>choices.some((c:any)=>c?.value===v&&c.label===v));
   }
-  if(template.kind==='word-tiles'||template.kind==='sentence-tiles'){
+  if(template.kind==='picture-order'||template.kind==='word-tiles'||template.kind==='sentence-tiles'){
     if(item.choices!==undefined||!Array.isArray(item.tiles))return false;
     const expected=template.kind==='word-tiles'?template.a.split(''):template.a.split(/\s+/);
     return JSON.stringify([...item.tiles].sort())===JSON.stringify([...expected].sort());

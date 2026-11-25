@@ -2,7 +2,7 @@
 import type {Grade, LearningContext, LearnerProfile} from '../learning/types';
 export type LanguageDomain = 'phonics'|'spelling'|'vocabulary'|'grammar'|'listening'|'phonological-awareness'|'early-reading'|'comprehension'|'writing';
 export type LanguageForm = 'pattern'|'encoding'|'syntax'|'comprehension'|'expression';
-export type LanguageKind = 'choice'|'word-tiles'|'sentence-tiles'|'edit'|'creative';
+export type LanguageKind = 'choice'|'picture-order'|'word-tiles'|'sentence-tiles'|'edit'|'creative';
 export type LanguageLevel = 0|1|2;
 export interface LanguageSkill {
   id:string; title:string; grade:Grade; domain:LanguageDomain;

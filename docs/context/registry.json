@@ -641,8 +641,8 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:26:05.525Z",
-      "sourceDigest": "2eddc8222c4b50c193bbb17d9d4b3aa91bb2e5059364a74e4ad644f18a5a58ce",
+      "reviewedAt": "2026-11-25T01:28:36.451Z",
+      "sourceDigest": "ba7dc4c367bbca5eb5553c243ce5e8c549b4cbefb0446959037ff3a216c63aec",
       "reviewOutcome": "updated",
       "reviewReason": "Graphical scene controls and early challenges integrate with the reviewed early listening and mathematics activities.",
       "reviewHistory": [
@@ -884,8 +884,8 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:26:05.573Z",
-      "sourceDigest": "fceb8b2f20a335969a0c4d19a1469895601361abacd8ea3cb11e4b9ba6fe1916",
+      "reviewedAt": "2026-11-25T01:28:36.503Z",
+      "sourceDigest": "f7748c15606b170461603eaf6bbaa14baa3dd904897416330825101e12ab3404",
       "reviewOutcome": "unchanged",
       "reviewReason": "Graphical scene controls and early challenges integrate with the reviewed early listening and mathematics activities. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [

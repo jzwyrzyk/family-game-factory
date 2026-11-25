@@ -60,7 +60,7 @@ test('every early literacy skill has several local examples at every tier, uniqu
   const items=EARLY_LANGUAGE_BANK[skill.id].items.filter(i=>i.t===t);
   assert.ok(new Set(items.map(i=>i.q+'|'+i.a+'|'+i.stimulus)).size>=3,skill.id);
   for(const i of items){
-   if(i.kind==='sentence-tiles'){assert.equal(skill.domain,'listening');assert.ok(i.a.split(' ').length>=2);}
+   if(i.kind==='picture-order'){assert.equal(skill.domain,'listening');assert.ok(i.a.split(' ').length>=2);}
    else assert.equal(new Set([i.a,...i.d!]).size,4);
    if(skill.domain==='early-reading'){assert.ok(i.stimulus);assert.ok(!i.q.split(/\W+/).includes(i.a));}
   }
