@@ -144,10 +144,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T22:31:41.318Z",
-      "sourceDigest": "51f306824b1e0a96f3612c193340eaf381392904bff644f8ffdbbcddb5c688ef",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed recovery and reward persistence contract updates against the doctrine. Child-owned Keep, original artwork, immutable versions, private profile boundaries and no paid replay remain unchanged; no product policy or routed decision document changed.",
+      "reviewedAt": "2026-11-25T01:40:03.851Z",
+      "sourceDigest": "8c6d8984be9b0e252d39d00ab77a7566a873b8104abbbb24c69998d843d69b2d",
+      "reviewOutcome": "updated",
+      "reviewReason": "Review the 912fd31 responsive coding controls and their browser evidence alongside the synthetic family storage, privacy and generation boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -408,10 +408,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "482735f18da73dc2717818519b69041157875e060d638d4286730881211c0c3a",
-      "reviewedAt": "2026-11-24T23:48:29.113Z",
+      "sourceDigest": "9608bbaaf56a5fd927ebb44eee00bb84a1cfff00ac185e4c5e5998fbab4dd8bb",
+      "reviewedAt": "2026-11-25T01:40:04.262Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed exposing the existing editor leave and save behavior to the reduced capability workshop without changing project serialization.",
+      "reviewReason": "Review the 912fd31 responsive coding controls and their browser evidence alongside the synthetic family storage, privacy and generation boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -888,10 +888,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:38:19.632Z",
-      "sourceDigest": "78ab473a901f1e56a2c5dfe3a17d14e5f682dcc3fa4cd49deb0ad3f0a71fbd50",
+      "reviewedAt": "2026-11-25T01:40:04.608Z",
+      "sourceDigest": "fa36e587f55aa0a439488dbeada60b66e9fea4d1045120912ba42e20f6f46efd",
       "reviewOutcome": "updated",
-      "reviewReason": "Exercise equal backend names in distinct projects along with isolated-workshop and F06 regression coverage.",
+      "reviewReason": "Review the 912fd31 responsive coding controls and their browser evidence alongside the synthetic family storage, privacy and generation boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1138,10 +1138,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T01:38:20.254Z",
-      "sourceDigest": "6dd47a55e4afdce38c63b8a3578f59c514c0f00aae2121161e8e6d7b4287ddb5",
+      "reviewedAt": "2026-11-25T01:40:05.006Z",
+      "sourceDigest": "e51ae105f693c9027463f7d93e0db2d6df17b592b8a5fb20c2647e8486a5e781",
       "reviewOutcome": "updated",
-      "reviewReason": "Require full project-scoped backends for the combined storage, owner development and beta candidate.",
+      "reviewReason": "Review the 912fd31 responsive coding controls and their browser evidence alongside the synthetic family storage, privacy and generation boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
