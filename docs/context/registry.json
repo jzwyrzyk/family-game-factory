@@ -890,10 +890,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T19:58:31.097Z",
-      "sourceDigest": "f54bc27518e01ac825ec6c9ff715f536c562d294280f2a79ee2266a82c72d152",
+      "reviewedAt": "2026-11-25T20:19:00.931Z",
+      "sourceDigest": "d257fd50d6c0fbd5df15ccfd79307e06534ef4c864d2104219596d73e379b2e6",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact a11d WebKit Back cancellation and the test-only correction: only that exact WebKit error reaches mandatory settled public-document and fresh server-denial assertions. All other errors propagate. Real Back and the explicitly simulated persisted-pageshow handler replay retain pageerrors and later capability checks; new classifier negatives are included by the existing required beta test wildcard.",
+      "reviewReason": "Preserved acb1118 failures and exact artifacts. Added a real TLS held-status negative/positive regression proving the intermediate login readiness defect, plus bounded native observer diagnostics across document reloads. Existing required browser commands retain all original assertions and now fail on native ErrorEvents even when Chromium omits pageerror; diagnostics do not request extra frames or claim an unproved runtime correction.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1134,10 +1134,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T19:58:31.637Z",
-      "sourceDigest": "622cb4a3bacf38d46c2ce11973b290f10ea34ddef56ae847cd9828c0104cb46d",
+      "reviewedAt": "2026-11-25T20:19:01.546Z",
+      "sourceDigest": "7e799ed32bb96f504e8aa52d7e9f2b36787035727bd51e3309a7cb8451744769",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded a11d fifteen passing workflows, independently verified full Arcade and Security artifacts, native WebKit resize acceptance, and the separate entry failure. Added exact isolated/integrated history-harness correction pins and complete local Chromium results; source runtime, defaults and held release boundaries are unchanged, and current PR exact-head checks govern readiness.",
+      "reviewReason": "Recorded acb1118 fifteen passing workflows, independently verified full Arcade receipt and two separate Security failures. Documented the exact settled-landing correction and local proof while leaving the remaining native resize cause unresolved pending hosted diagnostics; no release or current-head acceptance claim is inferred from older green runs.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
