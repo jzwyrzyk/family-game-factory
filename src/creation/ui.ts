@@ -237,13 +237,13 @@ export function installCreationStudio(host: Host) {
     else { frame = 0; last = 0; }
   }
   function animate() { cancelAnimationFrame(frame); last = 0; frame = requestAnimationFrame(loop); }
-  function learningThen(action: () => void) {
+  async function learningThen(action: () => void|Promise<void>) {
     if (locked() || !isCurrent()) return;
     if (recoveryPending) { status(recoveryMessage, true); return; }
     const target = $('creationLearning'), beforeOwner = sceneOwner, beforeId = entryId;
-    const done = () => { target.hidden = true; if (isCurrent() && beforeOwner === owner() && beforeId === entryId) action(); };
+    const done = () => { target.hidden = true; if (isCurrent() && beforeOwner === owner() && beforeId === entryId) void act(action); };
     const asked = FG.learning.checkpoint(target, { gameId: 'creation', projectId: entryId, versionId: revisionId }, done, { onLeave: () => host.home() });
-    if (asked) { stop(); setWorkspaceView('play'); target.hidden = false; } else action();
+    if (asked) { stop(); setWorkspaceView('play'); target.hidden = false; } else await action();
   }
   async function run(record = false) {
     assertEditing(); setWorkspaceView('play'); $('creationFeedback').hidden = true; await saveVersion();
@@ -259,7 +259,7 @@ export function installCreationStudio(host: Host) {
       status('');
     }
     assertEditing();
-    learningThen(() => { stop(); freshEngine(); engine!.start(); if (record) beginRecording(); animate(); });
+    await learningThen(() => { stop(); freshEngine(); engine!.start(); if (record) beginRecording(); animate(); });
   }
   async function mutation(change: (project: CreationProject) => void, rerender = true) {
     assertEditing(); stop(); $('creationFeedback').hidden = true;
@@ -324,8 +324,7 @@ export function installCreationStudio(host: Host) {
   async function create(kind: 'dragon' | 'buckets' | 'robot' | 'blank') { const project = await (await store()).create(owner(), createStarterProject(kind)); await loadScene(project.id); }
   async function challenge(id: string) { const project = await (await store()).create(owner(), { ...createChallengeStarter(id), id: uid() }, { challengeId: id }); await loadScene(project.id); }
   async function scenesByActivity() {
-    const current = await store(), projects = await current.list(owner());
-    return projects.sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));
+    return (await store()).listByActivity(owner());
   }
   async function continueChallenge(id: string) {
     const latest = (await scenesByActivity()).find(project => project.challengeId === id);
@@ -1080,13 +1079,13 @@ export function installCreationStudio(host: Host) {
         const saved = existing || await (await store()).create(owner(), project); sourceSessionId = session.id; await loadScene(saved.id);
       });
     },
-    export: async () => await (await store()).read(), validate: validateCreationWorkspace,
+    export: () => {if(import.meta.env.MODE==='storage-preview')throw Error('Use captureWorkspace or the complete recovery copy for this preview.');return new CreationStore(profileStorage(localStorage),owner).read();},captureWorkspace:async()=>await (await store()).read(),validate: validateCreationWorkspace,
     pendingRewards: async (owner: string) => await (await store()).pendingRewards(owner),
     acknowledgeRewards: async (owner: string, ids: string[]) => await (await store()).acknowledgeRewards(owner, ids),
-    backup: () => { if(indexedAuthority)throw Error('Use the complete recovery copy for these prepared scenes.');const legacy=new CreationStore(profileStorage(localStorage),owner);try{return {factoryCreation:legacy.read()};}catch(error){const raw=legacy.recoveryRaw;if(raw===null)throw error;return {factoryCreationRecoveryRaw:raw};}},
+    backup: () => { if(import.meta.env.MODE==='storage-preview')throw Error('Use the complete recovery copy for these prepared scenes.');const legacy=new CreationStore(profileStorage(localStorage),owner);try{return {factoryCreation:legacy.read()};}catch(error){const raw=legacy.recoveryRaw;if(raw===null)throw error;return {factoryCreationRecoveryRaw:raw};}},
     rawSnapshot: () => profileStorage(localStorage).getItem(CREATION_KEY),
     restoreRawSnapshot: (raw: string | null) => { const storage = profileStorage(localStorage); if (raw === null) storage.removeItem(CREATION_KEY); else storage.setItem(CREATION_KEY, raw); },
-    restore: async (value: unknown) => { await (await store()).restore(value); },
+    restore: (value:unknown)=>{if(import.meta.env.MODE==='storage-preview')throw Error('Restore the complete recovery copy for prepared scenes.');new CreationStore(profileStorage(localStorage),owner).restore(value);},
     flush: async () => { if (visible && sceneOwner === owner()) await saveVersion(); },
     snapshot: () => engine?.snapshot() || null,
     scene: () => scene ? clone(scene) : null,

@@ -1,3 +1,4 @@
+import {assertRewardSourceLockHeld,setRewardSourceMaintenance} from '../rewards/write-guard';
 /** Private immutable image bytes. Metadata and visibility can change; the image cannot. */
 import { ART_LIMITS, artOwner, artRequest, assertArtWrite, checkArtCapacity, deriveArtUsages, withArtTransaction, saveDrawingMetadata, ownerArtRecords, type DrawingMetadata, type ArtGuard, type ArtUsage } from '../drawing/library';
 import type { SavedRig } from '../drawing/store';
@@ -145,7 +146,16 @@ function usedByRetainedGame(owner: string, rigs: SavedRig[]): boolean {
 
 async function removeDrawing(owner: string, id: string, includeRigs: boolean, guard?: ArtGuard) {
   assertArtWrite(owner, guard);
-  return withArtTransaction(['drawings', 'rigs', 'active', 'drafts', 'usage'], 'readwrite', async transaction => {
+  // Erasure spans two local databases. Hold the existing source maintenance
+  // gate through the reference check and art commit; ordinary migration/scene
+  // writes cannot publish new references while this original is removed.
+  setRewardSourceMaintenance(true);
+  const check=()=>{assertRewardSourceLockHeld();const current=(window as any).FG?.store?.current?.()?.id;if(current!==undefined&&String(current)!==owner||guard&&!guard())throw Error('The player changed. Reopen this artwork.');};
+  try{
+    const [{IndexedRecords},{nativeScope}]=await Promise.all([import('../storage/indexed-records'),import('../storage/native-workspace')]);
+    const records=await IndexedRecords.open(await nativeScope(owner),check);
+    try{if(await records.get('native-control','migration')||await records.get('creation-control','migration'))throw Error('This player has a prepared game or scene library. Archive this artwork to keep every retained creation safe. Original erasure is unavailable for prepared libraries.');}finally{records.close();}
+  return await withArtTransaction(['drawings', 'rigs', 'active', 'drafts', 'usage'], 'readwrite', async transaction => {
     const store = transaction.objectStore('drawings'), all = await artRequest(store.getAll()) as Drawing[];
     const item = all.find(original => original.id === id && original.owner === owner);
     if (!item) throw Error('Choose a drawing from this profile.');
@@ -153,13 +163,14 @@ async function removeDrawing(owner: string, id: string, includeRigs: boolean, gu
     const indexed = await artRequest(transaction.objectStore('usage').getAll()) as ArtUsage[];
     const usage = deriveArtUsages(owner, all, rigs, indexed).filter(use => use.drawingId === id);
     if (all.some(original => original.owner === owner && original.sourceId === id) || usage.length || usedByRetainedScene(owner, item, rigs) || usedByRetainedGame(owner, rigs) || !includeRigs && rigs.length) throw Error('A saved version, game or scene still uses this artwork. Archive it to hide it while keeping those creations safe.');
-    assertArtWrite(owner, guard);
+    check();
     store.delete(id); transaction.objectStore('drawingMetadata').delete(id); for (const use of indexed) if (use.owner === owner && use.drawingId === id) transaction.objectStore('usage').delete(use.id);
     for (const rig of rigs) transaction.objectStore('rigs').delete(rig.id);
     transaction.objectStore('drafts').delete(JSON.stringify([owner, id]));
     const active = await artRequest(transaction.objectStore('active').get(owner)) as { id: string } | undefined;
     if (active && rigs.some(rig => rig.id === active.id)) transaction.objectStore('active').delete(owner);
   });
+  }finally{setRewardSourceMaintenance(false);}
 }
 /** Legacy image action never removes physical revisions as an incidental effect. */
 export const deleteDrawing = (owner: string, id: string, guard?: ArtGuard) => removeDrawing(owner, id, false, guard);
