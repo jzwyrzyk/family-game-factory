@@ -1,5 +1,15 @@
 # jems delivery state
 
+## Standalone offline UI review integrated, November 25, 2026
+
+Following the owner's authorization to review against current code and merge when ready, [PR #185](https://github.com/jzwyrzyk/family-game-factory/pull/185) merged as `1be7e1adc027a061981098f9b3fb7b8949ff1419`. The reviewed head was `fb34ccedc4e24e32b4be4aadb328f9fa5d74835a`; main remained `0f459f5b29fa3a72c5caf1fa69051475421861f9` throughout the integration review. No product source, original artwork, backend, production release intent or deployment configuration changed. All required checks passed before merge, including the documentation rerun after marking the PR ready.
+
+The permanent capability includes `npm run review:build`, `npm run review:test`, a 16-page / 30-state coverage manifest, synthetic adapters, local findings export and a read-only artifact workflow on relevant main changes. The [successful PR workflow](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45651429813) verified actual `file://` use without a server, four viewports, representative journeys, exports and embedded image decoding with no external requests. The [initial download](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45651429813/artifacts/15039674612) is retained until December 9, 2026; later builds can be regenerated from the workflow or locally.
+
+The [first automatic main workflow](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45666035619) also passed on merged source `1be7e1adc027a061981098f9b3fb7b8949ff1419`, including offline browser tests and both uploads. Its [download](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45666035619/artifacts/15046808586) records that exact merged SHA.
+
+This is source integration of an offline acceptance tool, not production deployment, live-provider acceptance or owner visual sign-off. Generated gameplay and service responses remain labelled simulations; compact Pal assets and early-grade preview status are explicit. Existing Art Studio small-text observations, real-device/audio/Edge limitations and excluded unmerged family-beta work remain in the [acceptance record](docs/ui-review/ACCEPTANCE.md) and [runbook](docs/ui-review/README.md).
+
 ## Pre-K and kindergarten source integration, November 25, 2026
 
 The five PRs merged to protected main in order after the responsive coding repair #175. The merge commits were [#176](https://github.com/jzwyrzyk/family-game-factory/pull/176) (`e85553f588`), [#177](https://github.com/jzwyrzyk/family-game-factory/pull/177) (`59465caf1c`), [#178](https://github.com/jzwyrzyk/family-game-factory/pull/178) (`d280f55fda`), [#179](https://github.com/jzwyrzyk/family-game-factory/pull/179) (`7608b8c685`), [#183](https://github.com/jzwyrzyk/family-game-factory/pull/183) (`3bae1a34f2`).

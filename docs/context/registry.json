@@ -1129,10 +1129,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T16:09:16.085Z",
-      "sourceDigest": "3a94ad20cdb0bbb8e7f53413c941efc646ebd390faf5ae55daac35dca38ddf58",
+      "reviewedAt": "2026-11-25T17:36:36.252Z",
+      "sourceDigest": "daba507b43d8960af873c01ab8c48adbca09a017e44e6f6c168e5ac1b6f0b8c6",
       "reviewOutcome": "updated",
-      "reviewReason": "Separated immediate HTML upload from later evidence upload so screenshot packaging cannot withhold the primary deliverable; recorded the successful tests and failed upload distinctly.",
+      "reviewReason": "Recorded authorized PR185 merge and successful first automatic main artifact workflow with exact source and download, preserving all acceptance and deployment limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
