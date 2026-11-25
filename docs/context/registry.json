@@ -406,10 +406,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "eb6193e0977d8af435af318e449eeaabe8be15f99708b7efc679a5aad7c6d7ae",
-      "reviewedAt": "2026-11-25T00:50:44.900Z",
+      "sourceDigest": "3588727c1c12a79916b8a7d1bc015172fd8be36a5507c752c3a873318057bc41",
+      "reviewedAt": "2026-11-25T00:58:13.627Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The Creation Studio contract and acceptance table specify the six reachable actions, pane sizing, compact view and tool controls, whole-pane scrolling and revised fitted-stage floors.",
+      "reviewReason": "The learner test now waits for the first visible playback frame. The workspace criteria and viewport evidence continue to require an enabled, unclipped Pause control before input.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:50:45.093Z",
-      "sourceDigest": "2443e06d67577b9ff8593cc949344fa32e5a448fa223452d32210f1a274de91b",
+      "reviewedAt": "2026-11-25T00:57:56.395Z",
+      "sourceDigest": "ed9e9b43a562dbc20f4d7e75384716950a344827e004002f853184ddb6090e9e",
       "reviewOutcome": "updated",
-      "reviewReason": "The acceptance record maps eight production-build viewport captures to ancestor-clipped hit testing, coordinate input, physical gestures in Chromium emulation, zoom, rotation and fullscreen recovery.",
+      "reviewReason": "The evidence index and Creation Studio matrix document geometry, hit tests and gesture-driven journeys. Playback waits for the first rendered Pause control before its coordinate hit test.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
