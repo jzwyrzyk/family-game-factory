@@ -1,7 +1,6 @@
 import {earlyInstruction} from './early/audio';
 import {mountEarlyMath} from './early/render';
 import {isEarlyGrade} from './grades';
-import './early/style.css';
 import { beginAttempt, finishAttempt, selectItem, submitAnswer, useHint, type Attempt } from './engine';
 import type { LearnerProfile, LearningContext, LearningMode, MathItem } from './types';
 import { interactionKind, quantityPlaces, renderMathVisual } from './visuals';

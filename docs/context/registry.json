@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:21:50.865Z",
-      "sourceDigest": "61685bfaf269fc2cfda71c515fd81d039880c5ee1e98777618a2ea51eb6f7cb5",
+      "reviewedAt": "2026-11-25T01:25:55.342Z",
+      "sourceDigest": "7c9b34c881e247473677c1e8c154fa5d0b0bd62c1d370e67081fb5ecc7e57bfe",
       "reviewOutcome": "updated",
-      "reviewReason": "The illustrated early skill catalog and its reviewed language version extend the existing host and retain older grade selection.",
+      "reviewReason": "The shared shell loads responsive learning styles. Reviewed picture sequences record ordered listening evidence with tap controls.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -641,10 +641,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:21:51.254Z",
-      "sourceDigest": "6f55a2e6a9299923ecc2174fd95f3ef6899da1c60185671dfb6c3b5fd3801eb1",
+      "reviewedAt": "2026-11-25T01:25:55.800Z",
+      "sourceDigest": "2eddc8222c4b50c193bbb17d9d4b3aa91bb2e5059364a74e4ad644f18a5a58ce",
       "reviewOutcome": "updated",
-      "reviewReason": "The illustrated early skill catalog and its reviewed language version extend the existing host and retain older grade selection.",
+      "reviewReason": "The shared shell loads responsive learning styles. Reviewed picture sequences record ordered listening evidence with tap controls.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:21:51.345Z",
-      "sourceDigest": "0600dcd9e2e1d8fb46eea526f22bf6e1b7804e1511aa3dd83640b36554795eff",
+      "reviewedAt": "2026-11-25T01:25:55.879Z",
+      "sourceDigest": "ea465343b2142428af55550731a96de554dc321d0ee3fcbac452e8e02a342184",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The illustrated early skill catalog and its reviewed language version extend the existing host and retain older grade selection. Existing operational procedures and acceptance commands still apply to this change.",
+      "reviewReason": "The shared shell loads responsive learning styles. Reviewed picture sequences record ordered listening evidence with tap controls. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

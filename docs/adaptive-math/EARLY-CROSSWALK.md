@@ -77,3 +77,5 @@ Michigan's Early Childhood Standards of Quality for Birth to Kindergarten were a
 The counting and construction tasks accept taps. Numeral identification uses spoken number names. Concrete changes to collections and within-ten operations use separate skill records. Listening tasks record responses under listening, vocabulary or sound awareness. A written stimulus used for recognition stays silent. Sound matching uses spoken whole-word anchors. Raw consonant spellings are never passed to speech as isolated phonemes.
 
 All pictured content is served from the application origin. Candidate food, animal and familiar-object illustrations are locally rasterized Noto artwork with notices in public/early-pictures. Owner artwork and curriculum review are pending. New content has no educator or child efficacy validation.
+
+Story sequencing also uses the host’s tile evaluator. The learner taps two or three event pictures in narrated order, can undo any choice, and submits the completed sequence. This records listening evidence.

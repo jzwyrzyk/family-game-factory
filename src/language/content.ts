@@ -56,7 +56,7 @@ export function generateLanguageItem(skillId:string,options:LanguageItemOptions=
   const chosen=eligible[Math.floor(unit(random)*eligible.length)];
   const draft=chosen.item;
   const kind=draft.kind;
-  const form:LanguageForm=kind==='word-tiles'?'encoding':kind==='sentence-tiles'||kind==='edit'?'syntax':
+  const form:LanguageForm=skill.domain==='listening'&&kind==='sentence-tiles'?'comprehension':kind==='word-tiles'?'encoding':kind==='sentence-tiles'||kind==='edit'?'syntax':
     kind==='creative'?'expression':skill.domain==='comprehension'?'comprehension':'pattern';
   const choices=kind==='choice' ? shuffle([draft.a,...(draft.d||[])].map(value=>({value,label:value})),random) : undefined;
   const tiles=(kind==='word-tiles'?shuffle(draft.a.split(''),random):
