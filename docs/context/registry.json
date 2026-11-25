@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:36:43.746Z",
-      "sourceDigest": "d7facbd62e16e696f79df4191ab1840a3eaf0a7d4ee40cf4bccb00bc6c2ec730",
+      "reviewedAt": "2026-11-25T04:08:36.418Z",
+      "sourceDigest": "1601de6d45f999fad86e80b9279d3f154ed552153ff889753cdea514929140e3",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage.",
+      "reviewReason": "Reviewed the foundational grade eligibility and backup controls against the preceding integration stage.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -493,10 +493,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "a22bd6c510126d53da38e4abfc5de8bcdc8bc2e2e9fed999f29e1f9aae84086e",
-      "reviewedAt": "2026-11-25T01:00:58.444Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
+      "sourceDigest": "f15af69b31bfd284f39b6445eb53eff516a602bef7cac1202eb0aa27655f93e2",
+      "reviewedAt": "2026-11-25T04:08:36.793Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Reviewed the foundational grade eligibility and backup controls against the preceding integration stage. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
