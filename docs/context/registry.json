@@ -309,10 +309,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:08:59.776Z",
-      "sourceDigest": "27bad4076a2a75bc6bc5f98d2e95c0f49724a812bd6184953d1e7e5d0fdf33a4",
+      "reviewedAt": "2026-11-25T18:50:01.961Z",
+      "sourceDigest": "9df3ac99749104a8317e88981c08cfb2f1c96a401700698ee4d8d2c2cf724252",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled awaited source readiness with Parent and Help navigation, owner/action fences, explicit retry after failed queues, prepared compound saves and understandable complete-recovery controls; retained all original journey assertions and physical-device limitations. Reviewed guidance mounting in the already-installed Parent settings panel, independent of late builder configuration; retained current learner, default-off supervision and server-authorized processing scope gates.",
+      "reviewReason": "Family architecture describes pagehide/profile/superseded cancellation of read-only readiness probes, fresh checks after safe history reload and unchanged paid-request semantics; deterministic delayed-status regression preserves zero browser errors.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -496,10 +496,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "ebcb12014fc5e5b99d28bff4fc5f25de2e8c487970508f0fa7ea1c480c01bdff",
-      "reviewedAt": "2026-11-25T17:33:43.565Z",
+      "sourceDigest": "8abff69badaf5e4321ad79c8580fb4c56b04d57761e9be3f7519c642c7562106",
+      "reviewedAt": "2026-11-25T18:50:02.598Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the namespace-bound IndexedDB before-image pointer, prepared source separation, startup journal ordering and same-attempt completion; reviewed milestone projection refresh without changing receipt identities, earned amounts or replay policy.",
+      "reviewReason": "Storage rollout records exact no-op restore writes and one native-quota-only lossless Latin-1 retry, including journal and rollback; 25 contracts retain original sources and permanent-quota/wide-text failure behavior, without earning or retention changes.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -890,10 +890,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:24:22.462Z",
-      "sourceDigest": "b696d4cfe63ff03668bb2beca62d45a1f942556cd84499e0c4f8ccdddf47a1f2",
+      "reviewedAt": "2026-11-25T18:50:02.705Z",
+      "sourceDigest": "9143fa63eb073e025dd0e5fe3fc37815c979f9ff4c02d85975a1daf99a2e275c",
       "reviewOutcome": "updated",
-      "reviewReason": "Retain 9a WebKit migration failure and verified prior corrections, negative-before/positive-after real-IDB legacy probe, scoped Chromium migration evidence and all 19 independent WebKit commands with prerequisite checks and aggregate failure.",
+      "reviewReason": "Retain 7cc fifteen-of-sixteen outcome, independent 120-command receipt and WebKit failures; new held-status and held-art reproductions fail before/pass after, independent beta stages retain aggregate failure, and unchanged 20,000-code-unit quota margin covers changed and unchanged restores.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1134,10 +1134,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T18:24:22.675Z",
-      "sourceDigest": "c92be405fefc48a69cc81d34ec7f7d58800c15ecd827c285437af5a71a053140",
+      "reviewedAt": "2026-11-25T18:50:02.867Z",
+      "sourceDigest": "d3d513e17abde7770a7608ebd2c6fc48a23925cc67a5bf08ae2158751bfd49c8",
       "reviewOutcome": "updated",
-      "reviewReason": "Record exact 9a source and security artifact, passing guidance/operator fixes, undiagnosed later household export abort and successor evidence requirement; no deployment or activation claim.",
+      "reviewReason": "Record exact 7cc source/tree and observed Arcade/security/offline outcomes plus independently verified artifact hashes; corrected-source hosted browser acceptance remains required and no release authorization is implied.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1615,10 +1615,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "5ae76c00c8fa87f1d5cb93f46f5dc3a45dade591a28ca6af666fb513f6f84abf",
-      "reviewedAt": "2026-11-25T18:24:22.313Z",
+      "sourceDigest": "8b3ecf6682dac371e9270e8477be8e589ef1b5a810f91953afcd86b75dd87fff",
+      "reviewedAt": "2026-11-25T18:50:03.037Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Art Studio now states database version 3 and drawing catalog, inventory-aware absent legacy lookup, visible inventory failures and retained existing/no-inventory readers; 46 real-IDB contracts preserve original art and rig ancestry.",
+      "reviewReason": "Recovery now completes initial art preparation before maintenance and rechecks audience; held-inventory actual-app regression retains original art, cloud lost-ack retry and single immutable root checks. Art readiness also covers exact read-only request cancellation.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1697,10 +1697,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "13aeef8b2e22e77da8b1f4f76b87a267101664c2dc39b7327efb6c952b271fd0",
-      "reviewedAt": "2026-11-25T17:33:44.721Z",
+      "sourceDigest": "18b933d6e8a56f3b05e01944d099956324a5654bc728c3a18d0cc160908e6e86",
+      "reviewedAt": "2026-11-25T18:50:03.148Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled exact-head bounded notebook mutation cache and measured cold-write costs, independent native validation and compound staging, scoped prepared recovery parts, durable restore attempts, missing-art repair, multiowner/fresh-target receipts, imported-ID/capacity limits and actual versus projected performance."
+      "reviewReason": "Rollout records capture readiness ordering, lossless exact-string and bounded quota retry for legacy recovery, preserved protected rollback and no additional capacity or deletion; benchmark pins and native WebKit evidence limits remain explicit."
     }
   ]
 }
