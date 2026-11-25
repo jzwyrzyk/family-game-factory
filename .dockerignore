@@ -11,6 +11,8 @@
 !src/builder/submission.ts
 !src/storage/
 !src/storage/record-contract.ts
+!src/learning/
+!src/learning/grades.ts
 !src/studio/
 !src/studio/design.ts
 !src/studio/creation-readiness.ts

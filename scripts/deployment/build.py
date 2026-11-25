@@ -19,7 +19,7 @@ SANDBOX='ghcr.io/jzwyrzyk/family-game-factory-sandbox'
 SANDBOX_SCOPE=['.dockerignore','server/sandbox','server/agent/game-assets.cjs','server/quality/game-quality-evidence.cjs']
 REQUIRED_SANDBOX_FILES=['server/sandbox/Dockerfile','server/sandbox/worker.cjs','server/sandbox/quality-capture.cjs','server/sandbox/source-validator.cjs','server/agent/game-assets.cjs','server/quality/game-quality-evidence.cjs']
 BUILDER='factory-service-builder@'+PROJECT+'.iam.gserviceaccount.com'
-SERVICE_SCOPE=['package.json','package-lock.json','.dockerignore','server','src/runtime/types.ts','src/runtime/manifests.ts','src/builder/submission.ts','src/storage/record-contract.ts','src/studio/design.ts','src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/creation/model.ts','src/creation/projects.ts','src/pals/catalog.ts','src/pals/catalog-artwork.generated.ts']
+SERVICE_SCOPE=['package.json','package-lock.json','.dockerignore','server','src/runtime/types.ts','src/runtime/manifests.ts','src/builder/submission.ts','src/storage/record-contract.ts','src/learning/grades.ts','src/studio/design.ts','src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/creation/model.ts','src/creation/projects.ts','src/pals/catalog.ts','src/pals/catalog-artwork.generated.ts']
 REQUIRED_APIS={'cloudbuild.googleapis.com','artifactregistry.googleapis.com','logging.googleapis.com','storage.googleapis.com','iam.googleapis.com'}
 
 
