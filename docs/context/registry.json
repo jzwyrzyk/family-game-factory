@@ -309,10 +309,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T17:33:42.870Z",
-      "sourceDigest": "b827f96d9445aa01f300606efe26d457952304bf361a6327b2051139b01dd430",
+      "reviewedAt": "2026-11-25T18:08:59.776Z",
+      "sourceDigest": "27bad4076a2a75bc6bc5f98d2e95c0f49724a812bd6184953d1e7e5d0fdf33a4",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled awaited source readiness with Parent and Help navigation, owner/action fences, explicit retry after failed queues, prepared compound saves and understandable complete-recovery controls; retained all original journey assertions and physical-device limitations.",
+      "reviewReason": "Reconciled awaited source readiness with Parent and Help navigation, owner/action fences, explicit retry after failed queues, prepared compound saves and understandable complete-recovery controls; retained all original journey assertions and physical-device limitations. Reviewed guidance mounting in the already-installed Parent settings panel, independent of late builder configuration; retained current learner, default-off supervision and server-authorized processing scope gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -890,10 +890,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T17:48:14.135Z",
-      "sourceDigest": "089e562a57b6ddbe23bf99ceb5b5931b5d231612e9db0b99e496661a49202bd7",
+      "reviewedAt": "2026-11-25T18:09:00.427Z",
+      "sourceDigest": "020c50eb1bdb57fe7dcf32824d84baaf8afd0f28a45f8587bfeee2d50bdc3de9",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered multiowner and real HTTPS browser recovery in Chromium and WebKit gates, retained blocked-IDB and async navigation assertions, recorded frozen 677-unit/118-CI/emulator/full-storage evidence and failed initial hosted attempts; duplicate preview ZIP removed only while source/file manifests and all receipts remain. Integrated main185 standalone source coverage, offline adapters and file-based browser checks; all existing 118 CI contracts pass after package reconciliation. Preserved the WebKit tablet overflow assertion and added bounded checkbox diagnostics; offline review now awaits actual Parent entry and passes smoke/integration with 356 decoded assets in the documented local harness, while actual hosted file navigation remains required.",
+      "reviewReason": "Registered multiowner and real HTTPS browser recovery in Chromium and WebKit gates, retained blocked-IDB and async navigation assertions, recorded frozen 677-unit/118-CI/emulator/full-storage evidence and failed initial hosted attempts; duplicate preview ZIP removed only while source/file manifests and all receipts remain. Integrated main185 standalone source coverage, offline adapters and file-based browser checks; all existing 118 CI contracts pass after package reconciliation. Preserved the WebKit tablet overflow assertion and added bounded checkbox diagnostics; offline review now awaits actual Parent entry and passes smoke/integration with 356 decoded assets in the documented local harness, while actual hosted file navigation remains required. Added controlled held-configuration regression that fails on the original build and passes on corrected Chromium, with original navigation/consent assertions plus failure DOM/error JSON and screenshots; exact new-head WebKit remains required.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1134,10 +1134,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T17:51:01.883Z",
-      "sourceDigest": "ee0a6b8b5aa3a498b3d6ba536f9da0188e5fb4dc78fc086c65503856dcb79eaa",
+      "reviewedAt": "2026-11-25T18:09:00.599Z",
+      "sourceDigest": "79e3922b7ec88e02e5840180d38e9818344074aae2e0c36815cbb74d35a96192",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact frozen local head/tree, final benchmark pins and limits, initial four hosted failures, worker21 five-job success and current application186 qualification; deployment, device, provider, owner and protected merge remain distinct gates. Integrated main1be7e1a and preserved both command groups and isolated UI-review workflow; recorded the withheld conflict-state checks and requirement for new combined-head qualification. Recorded acb119f Security failure and verified screenshot ZIP; standalone workflow now binds artifact/source identity to exact checked-out candidate HEAD rather than merge-base, retaining mismatch rejection and distinguishing candidate from merged UI. Preserved main187 historical merged-tool delivery/acceptance receipts and refreshed the current base to af11650 without conflating that independent merge authorization with this held application continuation.",
+      "reviewReason": "Recorded exact frozen local head/tree, final benchmark pins and limits, initial four hosted failures, worker21 five-job success and current application186 qualification; deployment, device, provider, owner and protected merge remain distinct gates. Integrated main1be7e1a and preserved both command groups and isolated UI-review workflow; recorded the withheld conflict-state checks and requirement for new combined-head qualification. Recorded acb119f Security failure and verified screenshot ZIP; standalone workflow now binds artifact/source identity to exact checked-out candidate HEAD rather than merge-base, retaining mismatch rejection and distinguishing candidate from merged UI. Preserved main187 historical merged-tool delivery/acceptance receipts and refreshed the current base to af11650 without conflating that independent merge authorization with this held application continuation. Preserved c423550 hosted guided-entry failure and successful actual file review, identifying the demonstrated missing-host dependency rather than the disproven API-publication suspicion; successor exact-head checks remain the readiness gate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
