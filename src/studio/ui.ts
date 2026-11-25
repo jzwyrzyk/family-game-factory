@@ -1797,7 +1797,17 @@ export async function installStudio(){
  // without a second automatic navigation overriding a child's early choice.
  (await home());
  await readWelcomeArt();
- FG.studio={version:1,flushDraft:flushForCapture,open:(id:string)=>open(id),home,exportNotebook:()=>notebook.legacySnapshot(),captureNotebook:async()=>{await flushForCapture();return notebook.snapshot();},prepareIndexedNotebook:async()=>{await flushDraft();await prepareIndexedNotebook(profileStorage(localStorage),owner);location.reload();},mode:()=>remote.mode};
+ async function prepareNotebook(options:{deferReload?:boolean}={}){
+  const captured=owner();await flushDraft();if(owner()!==captured)throw Error('The player changed. Reopen saved work.');
+  await prepareIndexedNotebook(profileStorage(localStorage),owner);
+  if(!options.deferReload){location.reload();return;}
+  // Parent prepares the other domains before its single final reload. Keep
+  // hidden scene guidance and other read projections on the new authority.
+  const previous=notebook,next=await NotebookWorkspace.open(profileStorage(localStorage),owner,notifyRewardSourceSaved);
+  if(owner()!==captured){next.close();throw Error('The player changed. Reopen saved work.');}
+  notebook=next;notebookOwner=captured;previous.close();
+ }
+ FG.studio={version:1,flushDraft:flushForCapture,open:(id:string)=>open(id),home,exportNotebook:()=>notebook.legacySnapshot(),captureNotebook:async()=>{await flushForCapture();return notebook.snapshot();},prepareIndexedNotebook:prepareNotebook,mode:()=>remote.mode};
  let palsInterface:ReturnType<typeof installPalsInterface>;
  const creation=installCreationStudio({
   guidance:guideHost,
