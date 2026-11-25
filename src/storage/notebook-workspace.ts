@@ -38,7 +38,10 @@ export class NotebookWorkspace {
  static async fromIndexed(indexed:IndexedNotebook,owner:()=>string){const result=new NotebookWorkspace(null,indexed,owner,indexed.scope.profile);await result.refresh(indexed.scope.profile);return result;}
  private check(owner=this.captured){if(this.invalidated)throw Error('Reload Jems to open the prepared notebook.');if(owner!==this.captured||this.owner()!==this.captured)throw Error('The player changed. Reopen this idea in its own profile.');}
  close(){this.invalidated=true;window.removeEventListener('jems:notebook-authority-changed',this.authorityChanged);this.loaded.clear();this.indexed?.close();}
- async whenIdle():Promise<void>{await this.queue;this.check();}
+ /** A failed operation still rejects its own caller. This barrier only waits
+  * for queued work to settle, so an earlier quota failure cannot disable safe
+  * reads, export, or a later explicit recovery attempt. */
+ async whenIdle():Promise<void>{await this.queue.catch(()=>{});this.check();}
  list(owner:string):NotebookCard[]{this.check(owner);return structuredClone(this.cards);}
  pendingSessions():StudioSession[]{this.check();return this.cards.filter(c=>c.pendingCopy||c.pendingSubmission||c.needsReadyRecovery||['queued','building','testing'].includes(c.jobStatus??'')).slice(0,8).flatMap(c=>{const session=this.loaded.get(c.id);return session?[structuredClone(session)]:[];});}
  summary():NotebookSummary {this.check();return structuredClone(this.view);}
