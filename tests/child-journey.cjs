@@ -82,9 +82,17 @@ async function localJourney(browser,url,device,viewport){
   await exploreWelcome(page);
   await assertTouchDevice(page,device,'after initial navigation');
   // The approved hierarchy puts destinations before curated games; scroll to the full playable card.
-  await page.locator('#studioStarters [data-starter]').first().scrollIntoViewIfNeeded();
-  const first=await page.locator('#studioStarters [data-starter]').first().boundingBox();
-  assert.ok(first&&first.y>=0&&first.y+first.height<=viewport.height,'a complete playable choice is reachable below the destinations');
+  await page.evaluate(()=>document.fonts.ready);
+  const firstCard=page.locator('#studioStarters [data-starter]').first();
+  // Center the card after font layout settles. Nearest-edge scrolling can leave
+  // its Play control behind the mobile bottom navigation.
+  await firstCard.evaluate(node=>node.scrollIntoView({block:'center',behavior:'instant'}));
+  const first=await firstCard.boundingBox();
+  assert.ok(first&&first.y>=0&&first.y+first.height<=viewport.height,`a complete playable choice is reachable below the destinations: ${JSON.stringify(first)}`);
+  assert.equal(await firstCard.evaluate(node=>{
+    const box=node.getBoundingClientRect();
+    return [box.top+5,box.bottom-5].every(y=>node.contains(document.elementFromPoint(box.left+box.width/2,y)));
+  }),true,'the complete playable choice is unobstructed by fixed navigation');
   await assertTargets(page,['#studioNavHome','#studioNavCreate','#studioNavMenu','#studioProfileSummary','#studioNew']);
   await page.click('#studioNavMenu');
   await assertTargets(page,['#studioNavJourney']);

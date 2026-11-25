@@ -122,10 +122,16 @@ async function collectionJourney(browser,base,device,viewport){
   assert.equal(await page.locator('.studio-nav > button:visible').count(),3,'the compact shell has three primary actions');
   for(const id of NAV)assert.equal(await page.locator('#'+id).count(),1,id+' retains one authoritative route control');
   if(device==='phone'){
-   await page.locator('#studioStarters [data-starter]').first().scrollIntoViewIfNeeded();
-   const firstGame=await page.locator('#studioStarters [data-starter]').first().boundingBox();
+   await page.evaluate(()=>document.fonts.ready);
+   const firstCard=page.locator('#studioStarters [data-starter]').first();
+   await firstCard.evaluate(node=>node.scrollIntoView({block:'center',behavior:'instant'}));
+   const firstGame=await firstCard.boundingBox();
    assert.ok(firstGame&&firstGame.y>=0&&firstGame.y+firstGame.height<=viewport.height,
-     'the approved destination-first hierarchy keeps a complete playable game reachable by scrolling');
+     `the approved destination-first hierarchy keeps a complete playable game reachable by scrolling: ${JSON.stringify(firstGame)}`);
+   assert.equal(await firstCard.evaluate(node=>{
+     const box=node.getBoundingClientRect();
+     return [box.top+5,box.bottom-5].every(y=>node.contains(document.elementFromPoint(box.left+box.width/2,y)));
+   }),true,'fixed navigation does not cover the playable card');
   }
   for(const id of NAV.slice(0,2))assert.equal(await page.locator('#'+id).isVisible(),true,id+' stays in the primary navigation');
   await page.click('#studioNavMenu');
