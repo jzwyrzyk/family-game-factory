@@ -4,7 +4,7 @@
 
 ## Current integrated implementation
 
-The combined candidate now selects actual `NativeWorkspace`, `NotebookWorkspace` and Creation record authorities in the explicitly built `storage-preview` application, after user-invoked resumable preparation. Ordinary builds retain compatible legacy sources. Cards, selected records and committed notebook presentation summaries avoid reading every conversation or revision during navigation; saves await durable commit. Whole-owner notebook reconstruction still occurs during writes, and retained legacy originals, immutable payloads/history and recovery copies increase occupied bytes. These tradeoffs are measured rather than hidden behind the earlier isolated-record throughput result. Profiles, Math/English and APS retain their bounded atomic source formats; lazy Parent capture avoids an unnecessary startup report scan.
+The combined candidate now selects actual `NativeWorkspace`, `NotebookWorkspace` and Creation record authorities in the explicitly built `storage-preview` application, after user-invoked resumable preparation. Ordinary builds retain compatible legacy sources. Cards, selected records and committed notebook presentation summaries avoid reading every conversation or revision during navigation; saves await durable commit. Whole-owner notebook validation and projection still occur during writes, and retained legacy originals, immutable payloads/history and recovery copies increase occupied bytes. These tradeoffs are measured rather than hidden behind the earlier isolated-record throughput result. Profiles, Math/English and APS retain their bounded atomic source formats; lazy Parent capture avoids an unnecessary startup report scan.
 
 Actual same-origin continuity routes and the native private-copy controls bind current device, guardian, profile and category consent. Local/server versions are separate, uncertain acknowledgments use receipt lookup, and explicit Keep both preserves a playable branch before resolving the original conflict. Complete Parent recovery captures active sources and original drawing/rig/draft bytes; preview, rollback, interrupted recovery and private cloud-copy controls are integrated. The private schedule, split encoder, remote continuity and migrations remain off unless explicitly selected and authorized. [Rollout and compatibility](ROLLOUT.md) gives the current operational contract; the November 24 section below is preserved history.
 
@@ -14,11 +14,78 @@ The source-backed acceptance includes real IndexedDB notebook tests (ten scenari
 
 The [v2 main baseline](evidence/application-main-0f459f5-v2.json) adds actual visible draft editing and durable flush, IDB request/payload counters, per-key source occupancy, current/history/vault logical footprint, startup CPU observations and a delivered-build digest. It uses protected main `0f459f5`, Chromium `156.0.8078.79`, five samples and the same 5/25/50-project and 100/2,500/14,000-message libraries as the earlier receipt. Original-art bytes are unchanged. Baseline medians are 966/1,832/2,191 ms to application readiness, 329/676/1,571 ms to open the saved game, and 45/138/211 ms for the real draft/flush interaction. These supersede no historical observation: the older v1 run used fewer counters and shared-host conditions differed.
 
-Use `STORAGE_BENCHMARK_AUTHORITY=indexed` only against a `storage-preview` build. The harness invokes the actual Parent preparation button, reloads once, verifies all three active native/notebook/Creation authorities, and exercises their real domain methods and visible UI. Run the default build separately. The comparable candidate v2 receipt is pending final-source measurement; no improvement percentage or overall readiness score is claimed from the baseline alone. The game-library fixture's profile source is 1,134 UTF-8 bytes and has no populated learning/APS history: its 0–0.1 ms baseline profile-save median is not a worst-case profile/learning result. The separate bounded-source results below measure populated histories.
+Use `STORAGE_BENCHMARK_AUTHORITY=indexed` only against a `storage-preview` build. The harness invokes the actual Parent preparation button, reloads once, verifies all three active native/notebook/Creation authorities, and exercises their real domain methods and visible UI. Run the default build separately. The pinned comparisons below distinguish ordinary and prepared builds from later hosted acceptance; no overall readiness percentage is claimed. The game-library fixture's profile source is 1,134 UTF-8 bytes and has no populated learning/APS history: its 0–0.1 ms baseline profile-save median is not a worst-case profile/learning result. The separate bounded-source results below measure populated histories.
 
 The preserved [prepared `595a926` checkpoint](evidence/application-indexed-595a926-regression.json) identified a serious write-latency tradeoff and led to a focused notebook optimization. It is not substituted for the later final measurement. Small/medium/large readiness medians were 651/682/2,066 ms, but actual durable draft editing took **120/353/2,152 ms**, against main's 45/138/211 ms. At the large size, cold saved-game opening took 3,685 ms and a source draft transaction took 1,367 ms. The first measured draft transaction made 377 observed object-store read calls and 53 writes, reading about 3.94 MB and writing 0.743 MB of logical payload; recursive equality caused 462,759 instrumented `JSON.stringify` calls. Prepared-build startup read only 1,706 localStorage code units and 0.508 MB of IDB payload, against main's 87.35 million code units and 10.78 MB. Reducing startup hydration therefore did not, by itself, make writes faster.
 
 This checkpoint verified complete recovery at all three sizes: capture medians 0.288/1.706/13.283 seconds, and one successful restore plus reload per size at 1.157/4.504/35.507 seconds. Complete receipts, every original PNG hash, saved-session identity and original native revision were checked after reload. The earlier [large `b7b9004` failure](evidence/recovery-large-b7b9004-failure.json) is retained: a localStorage safety journal could not fit, rollback ran, and the receipt did **not** complete. Moving that journal to the existing IndexedDB vault and preserving prepared legacy originals repaired the failure; a reload without a committed receipt was never counted as recovery success. The final harness additionally hashes every original message and native revision definition after restoration.
+
+### Application comparison at pinned checkpoints
+
+The [ordinary receipt](evidence/application-ordinary-a56cadd.json) and [optimized prepared receipt](evidence/application-indexed-683bf5c.json) use five samples at each size, the same built-application fixture and Chromium 156 as the v2 main baseline. Each receipt pins source/tree, harness hash and delivered-build digest. These are measurement checkpoints; later recovery/access fixes and the final hosted head have their own acceptance receipts. They must not be relabeled as measurements of that later head. Ordinary and optimized prepared runs were serial; the shared host still had other engineering activity. No physical-device, production-network, billing or stable latency SLA is inferred.
+
+Every cell below gives **small / medium / large** median milliseconds. The library has 5/25/50 native projects, 5/100/450 initial revisions, 5/25/70 notebook sessions and 100/2,500/14,000 original messages. Each sample retains another native revision. All three prepared authorities are activated through Parent, but this fixture has no saved Creation scenes; Creation correctness tests are separate from scene-library performance. The populated profile/learning/APS probe below is also separate.
+
+| Operation | Main `0f459f5` | Ordinary `a56cadd` | Prepared `683bf5c` |
+| --- | ---: | ---: | ---: |
+| Reload to app ready | 966 / 1832 / 2191 | 1893 / 833 / 809 | 379 / 457 / 467 |
+| Visible home library | 136 / 265 / 394 | 183 / 93 / 123 | 153 / 154 / 208 |
+| Saved card to Studio open | 329 / 676 / 1571 | 528 / 255 / 345 | 186 / 318 / 857 |
+| Actual visible draft + durable flush | 45 / 138 / 211 | 96 / 53 / 202 | 58 / 141 / 287 |
+| Draft through newly opened source adapter | 1.5 / 21.5 / 91.8 | 1.1 / 7.2 / 44.0 | 27.9 / 117.1 / 438.6 |
+| Immutable native revision save | 0.3 / 2.9 / 13.6 | 0.8 / 2.0 / 4.5 | 6.0 / 9.2 / 9.3 |
+| Source list / first native page | 0.8 / 5.7 / 17.9 | 0.2 / 2.5 / 9.3 | 1.9 / 4.3 / 4.4 |
+| Selected native revision lookup | 0.1 / <0.1 / 0.1 | <0.1 / 0.2 / <0.1 | 1.6 / 2.3 / 2.1 |
+
+The prepared path reduces repeated startup source hydration and uses a bounded, validated notebook cache keyed to the exact committed head. It retains authorization, head/CAS checks and fresh integrity validation for explicit captures. The large visible draft improves from the preserved 2,152 ms checkpoint to 287 ms, but remains slower than main’s 211 ms and the ordinary candidate’s 202 ms. A first write through a newly opened adapter still reconstructs and validates the owner notebook; its 439 ms large result is a real remaining cost. Metadata paging and durability are not constant-time writes. Small ordinary startup is slower than its medium/large samples; those observations are retained rather than selecting a favorable ordering.
+
+The separate [warm source-write diagnostic](evidence/notebook-warm-write-604c6e6.json) isolates only the notebook change, using an identical 4.19 MB, 70-session/14,000-message source and one warmed write per variant. It observes 708.3→260.3 ms, 380→28 adapter reads, 4,548,199→6,010 read bytes and 462,740→1,904 stringify calls. Both variants write 443,189 bytes in 22 record changes. Its adapter counters and single-sample warm fixture are distinct from the full application’s object-store counters; it is explanatory evidence, not another UI percentile.
+
+### Recovery, artwork and retained footprint
+
+| Operation, small / medium / large | Main `0f459f5` | Ordinary `a56cadd` | Prepared `683bf5c` |
+| --- | ---: | ---: | ---: |
+| Progress/domain export, median ms | 0.4 / 7.4 / 28.2 | 0.3 / 6.4 / 27.5 | 14.3 / 107.9 / 512.1 |
+| Progress/domain restore, median ms | 0.8 / 14.4 / 63.0 | 0.7 / 10.6 / 48.1 | 46.3 / 318.1 / 1322.7 |
+| Original-art export, median ms | 100.8 / 848.5 / 1554.3 | 114.5 / 644.9 / 1275.7 | 65.0 / 443.1 / 1408.1 |
+| Original-art idempotent restore, median ms | 81.7 / 680.3 / 1144.0 | 132.5 / 377.8 / 1119.8 | 54.5 / 384.9 / 1083.4 |
+| Complete capture + local vault save, median s | Not present | 0.499 / 1.851 / 3.700 | 0.256 / 1.258 / 4.059 |
+| Vault read + checksum verification, median ms | Not present | 65.3 / 203.0 / 482.7 | 30.0 / 241.5 / 723.9 |
+| Complete restore + reload, one observation s | Not present | 1.915 / 6.365 / 8.975 | 1.007 / 4.699 / 13.545 |
+| First complete archive, MB | Not present | 0.48 / 4.86 / 15.94 | 0.52 / 5.52 / 19.51 |
+
+Progress/domain operations exclude originals, rewards and Pals and must not be called complete backups. Both candidate builds pass complete receipts and SHA checks for every original PNG, every original message/session identity and every original native revision definition after all three restores; pending restore journals are absent. These timing runs restore the reviewed point into the existing synthetic library. Separate source-loss and fresh-target tests establish restoration without the original record database, including 82 notebook sessions, 52 native games and 42 coding scenes across two prepared owners. First-restore timings do not establish a later-disaster retry SLA.
+
+The single Parent preparation operation, including its final reload, took 0.808 / 1.242 / 3.014 seconds. Original PNGs remain 336,612 / 3,146,610 / 9,260,556 bytes, with 336,612 / 684,427 / 1,517,028 derived-preview bytes. No original is compressed, discarded or replaced to obtain these results. The metadata index keeps another preview projection to avoid opening original-image records during library startup.
+
+Logical IndexedDB payload MB after the **first → fifth** sample, including retained history and complete recovery points:
+
+| Build | Small | Medium | Large |
+| --- | ---: | ---: | ---: |
+| Main `0f459f5` | 0.67 → 0.67 | 3.83 → 3.83 | 10.78 → 10.78 |
+| Ordinary `a56cadd` | 1.50 → 2.02 | 9.38 → 12.41 | 28.23 → 42.92 |
+| Prepared `683bf5c` | 1.79 → 2.85 | 12.34 → 14.43 | 41.86 → 45.37 |
+
+MB means 1,000,000 bytes. These are serialized logical payloads, not browser disk pages, indexes or billed storage. Main has no complete recovery points in this sequence. Original localStorage sources remain about 0.029 / 0.608 / 3.315 MB; prepared migration preserves those originals. The repeated measurement sequence deliberately creates five retained recovery points and explicit source-restoration generations, so its growth is not a forecast of one ordinary edit. Content reuse reduces some duplicate bytes, while immutable history, source originals, preview projections and rollback points increase retained occupancy. No automatic garbage collection or retention deadline is assumed.
+
+### Large-library CPU, serialization and I/O
+
+The following counters are from the **first large sample** unless labeled median. JSON/localStorage instrumentation adds overhead. UTF-16 code units are not UTF-8 network bytes. IDB counters cover object-store `get/getAll/openCursor/add/put`, omitting index cursors, key reads and browser disk overhead. The full receipts preserve every sample, p95 UI distributions, browser storage estimates and per-store footprint.
+
+| Observation | Main `0f459f5` | Ordinary `a56cadd` | Prepared `683bf5c` |
+| --- | ---: | ---: | ---: |
+| Startup localStorage read code units | 87,349,289 | 24,257,227 | 1,706 |
+| Startup JSON parsed / serialized, million code units | 170.93 / 85.71 | 32.18 / 25.57 | 0.38 / 0.07 |
+| Startup IDB read payload MB | 10.7798 | 0.0003 | 0.5088 |
+| UI draft JSON stringify calls | 849 | 800 | 1,781 |
+| UI draft localStorage write code units | 3,136,967 | 3,136,967 | 0 |
+| UI draft IDB read calls / write calls | 0 / 0 | 0 / 0 | 95 / 53 |
+| UI draft IDB read / write payload MB | 0.00 / 0.00 | 0.00 / 0.00 | 0.46 / 0.74 |
+| Startup CDP TaskDuration / ScriptDuration, median ms | 2093 / 226 | 784 / 23 | 445 / 35 |
+| Startup observed JS heap, median MB | 74.31 | 66.84 | 135.70 |
+| Measured page-lifetime TaskDuration, median ms | 7440 | 8959 | 10831 |
+
+CDP values describe renderer observations, not isolated CPU-core consumption or peak physical memory. The separate `performance.memory` heap observation rises to 135.70 MB in the prepared large fixture; raw samples vary with allocation and garbage collection, and this is not evidence of reduced peak memory. Page-lifetime measurements include the explicit backup and footprint traversal; main lacks the new complete-backup operation, so that total is not an equal-work speed comparison. The source list uses a 24-game first page in the prepared build and a complete bounded list in the legacy build. Startup reductions come from narrower reads and lazy reports; write/history amplification and extra verification still have costs. Cloud database billing cannot be inferred from these local counters.
 
 ### Bounded profiles, learning and APS
 
@@ -39,7 +106,7 @@ These formats remain whole-key stores and their byte amplification is unchanged.
 
 An additional **simultaneous capacity stress case fails on both source versions**: six profiles with 120 attempts in each subject and 250 fact summaries each form a valid 4,949,267-byte profile source. Adding a valid 548,373-byte APS source exceeds this Chromium origin's localStorage quota. Both previously stored source strings remain unchanged after the rejected write. This is an observed existing capacity limit, not a successful save or a new candidate regression. Per-domain schema bounds (including the 1,500-fact cap) do not promise that every maximum fits together with other localStorage sources. A future migration of these bounded domains needs separate engineering and compatibility acceptance; the prepared native/notebook/Creation path does not remove this limit.
 
-## Actual application measurements on current main
+## Preserved v1 application baseline
 
 `CHROMIUM_PATH=/usr/bin/chromium node tools/storage-application-benchmark.cjs TARGET OUTPUT.json` runs the built application with only loopback requests. It creates records through the actual `RevisionStore`, `StudioNotebook` and original-drawing store, reloads the real Studio, opens a saved game from its visible card, and measures source operations in real browser storage. The [main baseline JSON](evidence/application-main-0f459f5.json) pins the full source/tree, Chromium version, five samples per size, counters and process metrics. It is distinct from the older isolated 50,000-record adapter benchmark.
 
@@ -58,7 +125,7 @@ An additional **simultaneous capacity stress case fails on both source versions*
 | Legacy progress JSON export / restore, median ms | 0.5 / 0.7 | 4.7 / 9.7 | 28.8 / 64.2 |
 | Original-art bundle export / idempotent restore, median ms | 1,227.9 / 716.1 | 882.8 / 786.4 | 2,012.6 / 1,577.5 |
 
-These are main-baseline measurements, not before/after improvement claims. The full combined-candidate run is required after source integration. The legacy progress measurement excludes artwork, rewards and Pals; original artwork is measured separately. The complete recovery handler must be measured separately once integrated so a progress-only JSON operation cannot be presented as a complete family backup. All original PNG hashes are distinct in this fixture; original/preview copies are deliberate and not counted as redundant art revisions.
+These are historical v1 main-baseline measurements, not the v2 before/after comparison above. The legacy progress measurement excludes artwork, rewards and Pals; original artwork is measured separately. The integrated complete recovery handler is measured separately above so a progress-only JSON operation is not presented as a complete family backup. All original PNG hashes are distinct in this fixture; original/preview copies are deliberate and not counted as redundant art revisions.
 
 The browser is desktop emulation on a shared Linux host, with warm HTTP cache and instrumented `JSON`/localStorage operations. The nonmonotonic small/medium startup and artwork samples are retained; CPU scheduling, decoder/cache state and other concurrent tests affect them. The raw report retains median/p95 and every sample rather than hiding slow runs. Each sample adds a retained revision, preserving the final-source caps. Heap and CDP Task/ScriptDuration are observations, not isolated peak memory or physical-device CPU estimates. localStorage counters count cumulative UTF-16 code units read/written, not network bytes or billed database operations. Final comparison uses the same fixture, browser and instrumentation.
 
