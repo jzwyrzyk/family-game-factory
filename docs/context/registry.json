@@ -1689,7 +1689,8 @@
         "server/storage/**",
         "infra/storage/**",
         "tools/storage-*",
-        "docs/storage/**"
+        "docs/storage/**",
+        "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
       "sourceDigest": "8b376cd6f135b4fbd1f410d3e6197414f1a19d3309ac220b8109fa2fc277916e",

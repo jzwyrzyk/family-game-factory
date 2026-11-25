@@ -1,5 +1,16 @@
 # jems delivery state
 
+## November 25, 2026 — current-main family and storage continuation under verification
+
+The authoritative continuation begins from protected main `0f459f5b29fa3a72c5caf1fa69051475421861f9`, includes the original #166/#170–174/#180 histories, and preserves #181 solely as historical evidence. Actual native game, notebook and scene authorities, original recovery, explicit conflict/removal handling, family privacy workflows and early-learning compatibility are integrated. Unapproved migration, remote processing, cloud recovery and generated-original recovery remain disabled by default. [Requirement status and exact-source acceptance](docs/family-beta/COMPLETION.md) and [the consolidated activation runbook](docs/family-beta/ACTIVATION.md) govern review and subsequent operations. This dated checkpoint does not claim final hosted acceptance or deployment.
+
+The private [worker continuation #21](https://github.com/family-game-factory-lab/family-game-factory-worker/pull/21) is based on #20 at head `7f7e1255c7592218c79385c92c51c85da2fa08d8`, tree `454289e23af9f070995b9183c26e8a2210b9d802`. [Hosted run45647505271](https://github.com/family-game-factory-lab/family-game-factory-worker/actions/runs/45647505271) passed all five jobs on attempt1: four offline combinations covering held premium #19 and DEV #16, plus isolated public service packaging. Current production pins and both protected mains remain unchanged.
+
+Local correction history is retained: the first combined unit run passed651/660 and exposed nine builder tests whose DOM fixture lacked the new non-beta document flag; the corrected suite passed660/660. Async profile reopening hid Parent after selecting a learner; its correction passes the actual four-layout reporting journey. Protected artwork correctly rejected a test's ordinary deletion call, so the recovery fixture now simulates original storage loss directly while retaining all recovery assertions. One browser attempt was invalidated by a benchmark command writing the wrong output directory; a later attempt read a transient merge-conflict marker during source assembly. Those orchestration attempts are not acceptance evidence. Final browser checks run only against a frozen committed tree. Final-source hosted checks and measured performance receipts remain recorded with their own identities. No assertion, visual tolerance, paid boundary or mandatory release gate was weakened.
+
+No merge, deployment, cloud provisioning, IAM/WIF change, real household transfer/deletion, invitation, paid request or capability activation occurred. DEV/TEST deployment, independently reviewed provider/legal readiness, physical-device and owner acceptance remain separate gates.
+
+
 ## Pre-K and kindergarten source integration, November 25, 2026
 
 The five PRs merged to protected main in order after the responsive coding repair #175. The merge commits were [#176](https://github.com/jzwyrzyk/family-game-factory/pull/176) (`e85553f588`), [#177](https://github.com/jzwyrzyk/family-game-factory/pull/177) (`59465caf1c`), [#178](https://github.com/jzwyrzyk/family-game-factory/pull/178) (`d280f55fda`), [#179](https://github.com/jzwyrzyk/family-game-factory/pull/179) (`7608b8c685`), [#183](https://github.com/jzwyrzyk/family-game-factory/pull/183) (`3bae1a34f2`).
