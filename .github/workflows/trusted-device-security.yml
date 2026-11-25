@@ -49,16 +49,23 @@ jobs:
           node scripts/beta/test-emulator.mjs "$RUNNER_TEMP/jems-firestore.jar"
       - name: Build private application and separately scoped feature files
         if: steps.beta.outputs.selected == 'true'
-        run: npm run build:family-beta
+        run: npm run build && npm run build:family-beta
       - name: Prepare browsers for synthetic family journeys
         if: steps.beta.outputs.selected == 'true'
         run: npx playwright install --with-deps chromium webkit
       - name: Chromium and WebKit private entry and responsive acceptance
         if: steps.beta.outputs.selected == 'true'
         run: node --import tsx tests/beta-browser.ts
+      - name: WebKit transactional storage and complete recovery
+        if: steps.beta.outputs.selected == 'true'
+        env:
+          STORAGE_BROWSER: webkit
+        run: node tests/storage-domains-browser.cjs && node tests/storage-complete-backup-browser.cjs
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() && steps.beta.outputs.selected == 'true' }}
         with:
           name: private-family-synthetic-layouts-${{ github.sha }}
-          path: test-results/family-beta/*.png
+          path: |
+            test-results/family-beta/*.png
+            test-results/complete-recovery/**
           retention-days: 7
