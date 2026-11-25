@@ -55,12 +55,13 @@ test('protected nonproduction controller verifies build evidence and stages each
  const source='c'.repeat(40),id='11111111-1111-4111-8111-111111111111',trigger='22222222-2222-4222-8222-222222222222';
  const record={descriptor:cfg,source,builds:{gateway:{id,trigger},preview:{id:id.replace(/^1/,'3'),trigger}}};
  const plan=hostingPlan(cfg) as Record<string,any>,controller={enabled:true,projectId:cfg.project,projectNumber:cfg.projectNumber,region:cfg.region};
- const revisions=new Map<string,any[]>(),staged:string[]=[];let wrongImage=false;
+ const revisions=new Map<string,any[]>(),staged:string[]=[];let wrongImage=false,missingProvenance=false,wrongRuntime=false;
  function io(args:string[]){
   const group=args.slice(0,3).join(' ');
+  if(group==='builds triggers describe')return {id:trigger,github:{owner:'jzwyrzyk',name:'family-game-factory'}};
   if(args[0]==='builds'){
    const img=args[2]===id?cfg.gatewayImage:cfg.previewImage;
-   return {id:args[2],buildTriggerId:trigger,status:'SUCCESS',substitutions:{COMMIT_SHA:source,REPO_FULL_NAME:'jzwyrzyk/family-game-factory'},
+   return {id:args[2],buildTriggerId:trigger,status:'SUCCESS',sourceProvenance:missingProvenance?{}:{resolvedRepoSource:{commitSha:source}},substitutions:{COMMIT_SHA:source,REPO_FULL_NAME:'jzwyrzyk/family-game-factory'},
     results:{images:[{name:img.split('@')[0]+':approved',digest:wrongImage?'sha256:'+'f'.repeat(64):img.split('@')[1]}]}};
   }
   if(group==='compute url-maps describe')return plan.urlMap;
@@ -69,18 +70,20 @@ test('protected nonproduction controller verifies build evidence and stages each
    const found=accounts.find(r=>cfg.services[r].name===args[3])!;
    return {...plan[found],status:{traffic:[{revisionName:args[3]+'-prior',percent:100}]}};
   }
-  if(group==='run revisions list')return revisions.get(args[4])??[];
+  if(group==='run revisions list')return (revisions.get(args[4])??[]).map(r=>wrongRuntime?{...r,spec:{...r.spec,serviceAccountName:'unreviewed'}}:r);
   if(group==='run services update'){
    assert.ok(args.includes('--no-traffic'));const service=args[3],image=args[args.indexOf('--image')+1],suffix=args[args.indexOf('--revision-suffix')+1];
-   revisions.set(service,[{metadata:{name:service+'-'+suffix,labels:{'serving.knative.dev/service':service}},status:{imageDigest:image,conditions:[{type:'Ready',status:'True'}]}}]);staged.push(service);return {};
+   revisions.set(service,[{spec:plan[accounts.find(r=>cfg.services[r].name===service)!].spec.template.spec,metadata:{name:service+'-'+suffix,labels:{'serving.knative.dev/service':service}},status:{imageDigest:image,conditions:[{type:'Ready',status:'True'}]}}]);staged.push(service);return {};
   }
   throw Error('Unexpected command');
  }
  const opts={environment:'test',source,mode:'verify'};await environmentRelease(record,controller,opts,io);assert.equal(staged.length,0);
+ missingProvenance=true;await assert.rejects(environmentRelease(record,controller,{...opts,mode:'stage'},io),/source/);assert.equal(staged.length,0);missingProvenance=false;
  wrongImage=true;await assert.rejects(environmentRelease(record,controller,{...opts,mode:'stage'},io),/digest/);assert.equal(staged.length,0);wrongImage=false;
  await assert.rejects(environmentRelease(record,{...controller,enabled:false},{...opts,mode:'stage'},io));
  for(let i=0;i<2;i++){const receipt=await environmentRelease(record,controller,{...opts,mode:'stage'},io);assert.ok(receipt.services.every((r:any)=>r.revision&&r.currentTrafficPreserved));}
  assert.deepEqual(staged,['preview','gateway','household'].map(r=>cfg.services[r].name));
+ wrongRuntime=true;await assert.rejects(environmentRelease(record,controller,{...opts,mode:'stage'},io),/identity/);
  assert.equal(staged.length,3);
 });
 

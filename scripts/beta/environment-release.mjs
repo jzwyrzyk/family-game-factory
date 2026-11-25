@@ -5,21 +5,32 @@ import {hostingPlan} from './prepare-hosting.mjs';
 const requireState=(condition,reason)=>{if(!condition)throw Error(reason);};
 const uuid=/^[a-f\d]{8}(?:-[a-f\d]{4}){3}-[a-f\d]{12}$/;
 const cloud=args=>JSON.parse(execFileSync('gcloud',[...args,'--format=json','--quiet'],{encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:180000,maxBuffer:8*1024*1024}));
-export function verifyBuild(build,record,source,image){
+export function verifyBuild(build,record,source,image,trigger){
  requireState(uuid.test(record.id)&&uuid.test(record.trigger)&&build.id===record.id&&build.buildTriggerId===record.trigger&&build.status==='SUCCESS','Reviewed Cloud Build trigger and successful build required.');
- const resolved=build.sourceProvenance?.resolvedRepoSource?.commitSha??build.sourceProvenance?.resolvedGitSource?.revision??build.substitutions?.COMMIT_SHA;
+ const provenance=build.sourceProvenance;
+ const git=provenance?.resolvedGitSource;
+ const resolved=git?.revision??provenance?.resolvedRepoSource?.commitSha;
+ const repository='https://github.com/jzwyrzyk/family-game-factory';
+ const bound=git ? [repository,repository+'.git'].includes(git.url) :
+  trigger?.id===record.trigger&&trigger?.github?.owner==='jzwyrzyk'&&trigger?.github?.name==='family-game-factory';
+ requireState(bound,'Verified build repository provenance required.');
  requireState(resolved===source&&build.substitutions?.REPO_FULL_NAME==='jzwyrzyk/family-game-factory','Build source does not match the reviewed repository and commit.');
  requireState(build.results?.images?.some(i=>i.name.replace(/:[^/:]+$/,'')+'@'+i.digest===image),'Build output digest differs from the reviewed image.');
+}
+function verifyRuntime(spec,desired){
+ const container=spec?.containers?.[0],approved=desired.containers[0];
+ requireState(spec?.serviceAccountName===desired.serviceAccountName&&spec.containers?.length===1&&container&&!container.command?.length&&!container.args?.length,'Runtime identity or command differs.');
+ const env=container.env??[];
+ requireState(env.length===approved.env.length&&approved.env.every(e=>env.some(row=>row.name===e.name&&row.value===e.value&&!row.valueFrom)),'Runtime environment differs.');
+ const volumes=spec.volumes??[],secret=volumes[0]?.secret,target=desired.volumes[0].secret,mounts=container.volumeMounts??[];
+ requireState(volumes.length===1&&volumes[0].name==='config'&&secret?.secretName===target.secretName&&secret.items?.length===1&&secret.items[0].key===target.items[0].key&&secret.items[0].path==='config.json'&&mounts.length===1&&mounts[0].name==='config'&&mounts[0].mountPath==='/var/run/jems'&&!mounts[0].subPath,'Immutable configuration mount differs.');
 }
 export function verifyService(actual,expected){
  const name=expected.metadata.name,spec=actual.spec?.template?.spec,desired=expected.spec.template.spec;
  requireState(actual.metadata?.name===name&&String(actual.metadata.namespace)===expected.metadata.namespace&&actual.metadata.labels?.['cloud.googleapis.com/location']===expected.metadata.labels['cloud.googleapis.com/location']&&actual.metadata.labels?.['jems-environment']===expected.metadata.labels['jems-environment'],'Existing dedicated service identity required.');
  for(const [key,val] of Object.entries(expected.metadata.annotations))requireState(actual.metadata.annotations?.[key]===val,'Existing ingress or direct URL policy differs.');
  requireState(spec?.serviceAccountName===desired.serviceAccountName&&spec.containers?.length===1&&String(actual.spec.template.metadata?.annotations?.['autoscaling.knative.dev/maxScale'])===expected.spec.template.metadata.annotations['autoscaling.knative.dev/maxScale'],'Existing runtime principal or capacity differs.');
- const env=spec.containers[0].env??[];for(const e of desired.containers[0].env)requireState(env.some(row=>row.name===e.name&&row.value===e.value),'Existing approved runtime settings differ.');
- requireState(!env.some(e=>/API_KEY|NARRATION_APPROVED|AUDIO_APPROVED/.test(e.name)&&e.value!=='false'),'Unexpected provider settings.');
- const volume=spec.volumes?.find(v=>v.name==='config')?.secret,target=desired.volumes[0].secret;
- requireState(volume?.secretName===target.secretName&&volume.items?.some(i=>i.key===target.items[0].key&&i.path==='config.json')&&spec.containers[0].volumeMounts?.some(m=>m.name==='config'&&m.mountPath==='/var/run/jems'),'Immutable mounted private configuration differs.');
+ verifyRuntime(spec,desired);
  const serving=(actual.status?.traffic??[]).filter(t=>(t.percent??0)>0).map(t=>[t.revisionName,t.percent]).sort();
  requireState(serving.length&&serving.every(t=>typeof t[0]==='string'&&t[0].length>0)&&serving.reduce((n,t)=>n+t[1],0)===100,'Explicit, healthy current traffic required.');
  return JSON.stringify(serving);
@@ -36,7 +47,7 @@ export async function environmentRelease(release,controller,options,io=cloud){
  const common=['--project',c.project,'--region',c.region],regionless=['--project',c.project,'--global'];
  for(const role of ['gateway','preview']){
   const b=builds?.[role];requireState(b&&uuid.test(b.id)&&uuid.test(b.trigger),'Missing approved builder identity.');
-  verifyBuild(io(['builds','describe',b.id,...common]),b,source,c[role+'Image']);
+  verifyBuild(io(['builds','describe',b.id,...common]),b,source,c[role+'Image'],io(['builds','triggers','describe',b.trigger,...common]));
  }
  checkRouting(io(['compute','url-maps','describe',plan.urlMap.name,...regionless]),plan.urlMap);
  for(const [role,name] of Object.entries(c.backends)){
@@ -57,8 +68,9 @@ export async function environmentRelease(release,controller,options,io=cloud){
    io(['run','services','update',serviceName,'--image',image,'--revision-suffix',suffix,'--no-traffic',...common]);
    candidate=revisions().find(r=>r.metadata.name===revision);
   }
+  if(candidate)verifyRuntime(candidate.spec,plan[role].spec.template.spec);
   if(mode==='stage'||candidate)requireState(candidate?.metadata?.labels?.['serving.knative.dev/service']===serviceName&&candidate.status?.conditions?.some(v=>v.type==='Ready'&&v.status==='True')&&
-    (candidate.status.imageDigest===image||candidate.status.imageDigest===image.split('@')[1]||candidate.spec?.containers?.[0]?.image===image),'Candidate image or readiness differs.');
+    (candidate.status.imageDigest===image||candidate.status.imageDigest===image.split('@')[1]),'Candidate image or readiness differs.');
   requireState(verifyService(service(role),plan[role])===before[role],'Serving percentages changed. Freeze and review existing revisions.');
   receipt.services.push({role,revision:candidate?revision:null,digest:image.split('@')[1],currentTrafficPreserved:true});
  }
