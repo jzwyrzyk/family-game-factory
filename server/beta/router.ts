@@ -7,7 +7,7 @@ import {verifySession} from '../pipeline/auth';
 import {cookieValue,assertActiveTrustedDevice} from '../trusted-devices';
 import {acknowledge,renewParticipation,exact,internalCookies,liveSession,metadataSession,logout,redeem,requirePlay} from './access';
 import {activeFamily,verifiedGuardian,needsNoticeRenewal,betaNotice,familyOrigin,participationNotice,uuid,type Capabilities} from './model';
-import {exportApproved,exportReceiptPage,exportStorageMetadataPage,exportWorkspace} from './portability';
+import {exportGuardian,authorizeFamilyExport,unlockFamilyExport,exportReceiptPage,exportStorageMetadataPage,exportWorkspace} from './portability';
 import {previewAdmission,type PreviewRouting} from './preview';
 import {BetaAdministration,verifyAdministrator} from './admin';
 import type {FamilyDirectory} from './store';
@@ -58,7 +58,8 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
       const session=verifySession(cookieValue(internalCookies(raw),'factory_session'),key);
       if(session.deviceId&&session.familyId===id){await metadataSession(d,tx,f,raw,key);connected=true;}
      }catch{/* No authenticated device. */}
-     return {family:true,connected,status:connected?f.status:undefined,needsNoticeRenewal:connected&&needsNoticeRenewal(f),needsProfile:connected&&!f.profiles?.length,notice:betaNotice,terms:participationNotice};
+     let exportReady=false;if(connected)try{exportGuardian(f);exportReady=true;}catch{/* No approved case. */}
+     return {family:true,connected,status:connected?f.status:undefined,exportReady,needsNoticeRenewal:connected&&needsNoticeRenewal(f),needsProfile:connected&&!f.profiles?.length,notice:betaNotice,terms:participationNotice};
     });json(res,200,state);return;
    }
    if(req.method==='POST'&&!id&&path==='/entry/workshop'){
@@ -70,12 +71,19 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
     try{const renewal=await d.withFamily(id,async(tx,f,p)=>{verifiedGuardian(f,p);await metadataSession(d,tx,f,raw,key);return needsNoticeRenewal(f);});if(renewal&&path!=='/renew-participation'){res.writeHead(303,{Location:'/renew-participation'});res.end();return;}}
     catch{res.writeHead(303,{Location:'/login'});res.end();return;}
    }
+   if(req.method==='GET'&&path==='/privacy-export'){
+    if(!id)throw Error('NOT_FOUND');
+    await d.withFamily(id,async(tx,f)=>{exportGuardian(f);await metadataSession(d,tx,f,raw,key);});
+   }
    if(req.method==='GET'&&!path.startsWith('/play/')&&!path.startsWith('/v1/')&&await options.surface?.(req,res,{path,family:id}))return;
    if(!id)throw Error('NOT_FOUND');
    if(req.method==='POST'&&path==='/entry/redeem'){
     const {pairingCode,cookies}=await redeem(d,id,await read(req),key);json(res,200,{pairingCode},cookies);return;
    }
    if(req.method==='POST'&&path==='/entry/renew-participation'){json(res,200,await renewParticipation(d,id,await read(req),internalCookies(raw),key));return;}
+   if(req.method==='POST'&&path==='/entry/privacy-export-unlock'){
+    const result=await unlockFamilyExport(d,id,await read(req),raw,key);json(res,200,{unlocked:true,expiresAt:result.expiresAt},[result.cookie]);return;
+   }
    if(req.method==='POST'&&path==='/entry/acknowledge'){
     const cookie=await acknowledge(d,id,await read(req),internalCookies(raw),key);json(res,200,{enter:'/play/'},[cookie]);return;
    }
@@ -91,13 +99,11 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
     const body=req.method==='POST'?await read(req):{};
     exact(body,path==='/entry/review-art'?['digest']:['/entry/export-receipts','/entry/export-storage-metadata'].includes(path)?['kind','after']:path==='/entry/export-storage'?['after']:[]);
     const result=await d.withFamily(id,async(tx,f,p)=>{
-     activeFamily(f,p);
+     const isExport=path.startsWith('/entry/export');if(!isExport)activeFamily(f,p);
      const cookies=internalCookies(raw),now=Date.now();
      const session=await metadataSession(d,tx,f,raw,key,now);
-     const parent=verifySession(cookieValue(cookies,'factory_parent'),key,now);
-     if(parent.role!=='parent'||parent.familyId!==id||parent.deviceId!==session.deviceId)throw Error('FORBIDDEN');
-     if(path.startsWith('/entry/export')){
-      exportApproved(f,now);
+     if(isExport){
+      authorizeFamilyExport(f,p,session,raw,key,now);
       if(path==='/entry/export-device.js'){if(req.method!=='GET')throw Error('FORBIDDEN');return {guardianTool:true};}
       if(req.method!=='POST')throw Error('FORBIDDEN');
       if(path==='/entry/export-storage'){
@@ -110,6 +116,8 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
       const data=await d.inWorkspace(tx,f,p,s=>exportWorkspace(f,s,now),false);
       f.request!.state='completed';tx.set(d.path(id),f);return data;
      }
+     const parent=verifySession(cookieValue(cookies,'factory_parent'),key,now);
+     if(parent.role!=='parent'||parent.familyId!==id||parent.deviceId!==session.deviceId)throw Error('FORBIDDEN');
      if(path==='/entry/review-art'){
       if(req.method!=='POST'||typeof body.digest!=='string'||!f.capabilities.artwork||!f.approvedArt?.includes(body.digest))throw Error('ART_REVIEW_REQUIRED');
       return {approved:true};
@@ -139,7 +147,7 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    if(!path.startsWith('/v1/')||path==='/v1/sessions'||path.startsWith('/v1/sessions/adult/')||path.startsWith('/v1/worker/')||
     path.startsWith('/v1/internal/')||req.headers['x-factory-adult-session']!==undefined)throw Error('FORBIDDEN');
    if(entryRoutes.includes(path)){
-    await d.withFamily(id,async(_tx,f,p)=>{if(path==='/v1/sessions/renew'){if(f.status==='pending'&&p.participation)return;verifiedGuardian(f,p);return;}
+    await d.withFamily(id,async(_tx,f,p)=>{if(path==='/v1/sessions/renew'){if(f.status==='pending'&&p.participation)return;if(f.status==='suspended'){exportGuardian(f);return;}verifiedGuardian(f,p);return;}
      activeFamily(f,p);if(['/v1/sessions/enroll','/v1/devices/invite'].includes(path)&&!p.invitations)throw Error('INVITATIONS_PAUSED');});
    }else{
     const access=await requirePlay(d,id,raw,key,'check'),preview=path.match(/^\/v1\/revisions\/([\w-]+)\/preview$/);

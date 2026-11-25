@@ -20,6 +20,7 @@ bind('renewParticipation',async(f,v)=>{const {notice,terms}=await current();awai
 bind('ack',async(f,v)=>{const {notice,terms}=await current();await request('/entry/acknowledge',{adult:v.has('adult'),supervise:v.has('supervise'),avoidIdentifying:v.has('avoidIdentifying'),passphrase:v.get('passphrase'),notice,terms});f.reset();location.replace('/play/');});
 if($('checking'))void (async()=>{
  let s=await current();if(!s.connected){try{await request('/v1/sessions/renew',{});s=policy=await request('/entry/status');}catch{/* Show enrollment choices. */}}
+ if(s.connected&&s.status==='suspended'&&s.exportReady){location.replace('/privacy-export');return;}
  if(s.connected&&s.status==='active'){location.replace(s.needsNoticeRenewal?'/renew-participation':s.needsProfile?'/grown-ups':'/acknowledge');return;}
  $('checking').textContent=s.connected?'Your workshop is waiting for operator approval.':'This browser needs a trusted-device invitation.';$('loginChoices').hidden=false;
 })().catch(()=>{$('checking').textContent='Connection interrupted. Reload to check this device.';});
@@ -48,6 +49,7 @@ async function showControls(){
  const region=$('devices');region.replaceChildren();for(const d of devices.devices){const p=document.createElement('p');p.append(d.name+' ');const btn=document.createElement('button');btn.textContent='Revoke device';btn.onclick=act(async()=>{if(confirm('Revoke this trusted device?')){await request('/v1/devices/revoke',{deviceId:d.id});location.replace('/login');}});p.append(btn);region.append(p);}
 }
 bind('parentUnlock',async(f,v)=>{await request('/v1/devices/unlock',{parentPassphrase:v.get('passphrase')});f.reset();await showControls();$('familyControls').hidden=false;});
+bind('exportUnlock',async(f,v)=>{await request('/entry/privacy-export-unlock',{parentPassphrase:v.get('passphrase')});f.reset();$('familyControls').hidden=false;});
 if($('addProfile'))$('addProfile').onclick=act(async()=>{await request('/entry/profiles',{});await showControls();});
 if($('inviteDevice'))$('inviteDevice').onclick=act(async()=>{$('deviceCode').textContent=(await request('/v1/devices/invite',{})).invitation;});
 if($('withdraw'))$('withdraw').onclick=act(async()=>{if(confirm('Withdraw remote processing consent for this family?')){await request('/v1/devices/privacy/revoke',{});await showControls();}});
@@ -61,7 +63,7 @@ if($('familyExport'))$('familyExport').onclick=act(async()=>{
   let after='';const values=[];do{const page=await request('/entry/export-receipts',{kind,after});values.push(...page.rows);after=page.next;}while(after);
   data[kind==='usage'?'monthlyUsage':kind]=values;
  }
- data.storageMetadata={};for(const kind of ['storage-consents','backup-scans','backup-schedules','backup-operations']){
+ data.storageMetadata={};for(const kind of ['storage-consents','backup-scans','backup-schedules','backup-operations','generated-restores']){
   let after='';const values=[];do{const page=await request('/entry/export-storage-metadata',{kind,after});values.push(...page.rows);after=page.next;}while(after);data.storageMetadata[kind]=values;
  }
  const storage=[];let cursor='';do{const page=await request('/entry/export-storage',{after:cursor});storage.push(...page.rows);cursor=page.next;}while(cursor);data.storageRecords=storage;

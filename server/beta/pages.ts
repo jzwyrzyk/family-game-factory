@@ -41,6 +41,8 @@ export function publicPage(path:string,config:Pick<BetaConfig,'operatorContact'>
  }else if(path==='/renew-participation'){
   title='Review the updated family notices';body='<h1>'+title+'</h1><p>Your saved work stays here. Review the current notices to continue. Optional remote processing stays off until its separate choices are verified again.</p>'+terms+
    form('renewParticipation',check('adult','I am the verified adult guardian. I have read the updated privacy notice and participation terms.')+pass(),'Accept updated notices');
+ }else if(path==='/privacy-export'){
+  title='Download your approved family export';body='<h1>'+title+'</h1><p>Your operator has released this privacy case. Use your parent passphrase on this trusted device to download your family records. This does not restart play or optional processing.</p>'+form('exportUnlock',pass(),'Unlock this export')+'<section id="familyControls" hidden><button id="familyExport">Download approved family export</button></section>';
  }else if(path==='/grown-ups'){
   title='Family privacy and profiles';body='<h1>'+title+'</h1>'+form('parentUnlock',pass(),'Unlock family controls')+
    '<section id="familyControls" hidden><h2>Explorer profiles</h2><p>Use a workshop nickname. Jems needs no real name, age or school.</p><div id="profiles"></div><button id="addProfile">Add an explorer</button><h2>Privacy choices</h2>'+terms+

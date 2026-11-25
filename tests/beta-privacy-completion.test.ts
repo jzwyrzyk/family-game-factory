@@ -4,11 +4,13 @@ import {randomUUID} from 'node:crypto';
 import {createServer,request} from 'node:http';
 import type {AddressInfo} from 'node:net';
 import {processDeletion} from '../server/beta/erase';
-import {betaFixture,fixtureKey} from './beta-fixture';
+import {betaFixture,fixtureKey,parent,cookieHeader} from './beta-fixture';
 import {requirePlay} from '../server/beta/access';
 import {signSession} from '../server/pipeline/auth';
 import {familyOrigin} from '../server/beta/model';
 import {betaRouter} from '../server/beta/router';
+import {betaHosting} from '../server/beta/hosting';
+import {trustedDeviceHandler} from '../server/trusted-devices';
 
 /** In-memory executor double: records every destructive call. No provider calls. */
 function executor(records:Map<string,any>,objects:string[]){
@@ -31,7 +33,7 @@ test('verified erasure waits for unsettled storage writes, then removes all scop
  await mutate('request-deletion',a.id);const requestId=(await d.withFamily(a.id,async(_tx,f)=>f)).request!.id;
  await mutate('confirm-deletion',a.id,{requestId,receipt:'synthetic-approved-erasure'});
  const family=await d.withFamily(a.id,async(_tx,f)=>f),path=d.path(a.id),workspace=family.workspace;
- const metadata=['acknowledgments','metadata','usage','continuity','storage-consents','backup-scans'];
+ const metadata=['acknowledgments','metadata','usage','continuity','storage-consents','backup-scans','generated-restores'];
  const operation=`factoryBackupSchedules/${workspace}/activeOperations/${randomUUID()}`;
  const records=new Map<string,any>([[path,family],[operation,{schema:'jems.backup-operation.v1',familyId:a.id,profile:'synthetic',purpose:'artifact-write',startedAt:1}]]);
  for(const root of ['factoryWorkspaces','factoryContinuity','factoryBackupSchedules'])records.set(`${root}/${workspace}/records/synthetic`,{source:'retained until settled'});
@@ -59,7 +61,7 @@ test('approved guardian export includes paged storage consent, schedule and unre
  const {d,enroll,mutate}=await betaFixture(),a=await enroll('export-all-storage'),b=await enroll('export-other-storage');
  const session=(await requirePlay(d,a.id,a.cookies,fixtureKey,'check')).session;
  const cookies=a.cookies+'; __Host-factory_parent='+signSession({...session,role:'parent'},fixtureKey);
- const kinds=['storage-consents','backup-scans','backup-schedules','backup-operations'];
+ const kinds=['storage-consents','backup-scans','backup-schedules','backup-operations','generated-restores'];
  const collection=(id:string,kind:string)=>kind==='backup-schedules'?`factoryBackupSchedules/beta-${id}/points`:kind==='backup-operations'?`factoryBackupSchedules/beta-${id}/activeOperations`:d.path(id)+'/'+kind;
  await d.db.run(async tx=>{for(const kind of kinds){for(let i=0;i<5;i++)tx.set(collection(a.id,kind)+'/'+String(i).padStart(64,'0'),{synthetic:kind+'-'+i});tx.set(collection(b.id,kind)+'/'+'a'.repeat(64),{synthetic:'OTHER FAMILY PRIVATE METADATA'});}});
  const handler=betaRouter(d,fixtureKey,{runtime:async()=>async()=>{throw Error('NOT_FOUND');}}),server=createServer((req,res)=>void handler(req,res));await new Promise<void>(ok=>server.listen(0,'127.0.0.1',ok));
@@ -73,5 +75,73 @@ test('approved guardian export includes paged storage consent, schedule and unre
   assert.ok((await call(a.id,{kind:'../metadata',after:''})).status>=400);
   assert.ok((await call(a.id,{kind:kinds[0],after:'../'})).status>=400);
   assert.ok((await call(a.id,{},cookies,'GET')).status>=400);
+ }finally{server.closeAllConnections();await new Promise<void>(ok=>server.close(()=>ok()));}
+});
+
+test('suspended guardian downloads only its approved privacy case with a separate live-device parent proof',async()=>{
+ const {d,enroll,mutate}=await betaFixture(),a=await enroll('paused-privacy'),b=await enroll('other-privacy');
+ const session=(await requirePlay(d,a.id,a.cookies,fixtureKey,'check')).session;
+ await d.repository(a.id).transaction(s=>s.revisions.push({id:randomUUID(),familyId:a.id,projectId:'preserved',parentId:null,game:{kind:'star-catcher-v1',target:5,seconds:15}}));
+ await mutate('suspend',a.id);
+ let runtimeCalls=0;
+ const route=betaRouter(d,fixtureKey,{runtime:async id=>async(req,res)=>{runtimeCalls++;await trustedDeviceHandler(d.repository(id),{familyId:id,sessionKey:fixtureKey,appOrigin:familyOrigin(d.config,id),firstParty:true})(req,res);},surface:betaHosting('.',d.config,'https://viewer.example')});
+ const server=createServer((req,res)=>void route(req,res));await new Promise<void>(ok=>server.listen(0,'127.0.0.1',ok));
+ const call=(path:string,body?:unknown,cookies=a.cookies,id=a.id,originOverride?:string)=>new Promise<{status:number;body:any;text:string;cookies:string[]}>((ok,fail)=>{
+  const origin=familyOrigin(d.config,id),req=request({host:'127.0.0.1',port:(server.address() as AddressInfo).port,path,method:body===undefined?'GET':'POST',headers:{Host:new URL(origin).host,Origin:originOverride??origin,Cookie:cookies,'Content-Type':'application/json','X-Factory-Request':'1'}},res=>{
+   let text='';res.on('data',chunk=>text+=chunk);res.on('end',()=>{let body;try{body=JSON.parse(text);}catch{}ok({status:res.statusCode!,body,text,cookies:res.headers['set-cookie']??[]});});
+  });req.on('error',fail);req.end(body===undefined?undefined:JSON.stringify(body));
+ });
+ const release=async()=>{await mutate('request-export',a.id);const f=await d.withFamily(a.id,async(_tx,f)=>f);await mutate('release-export',a.id,{requestId:f.request!.id,receipt:'synthetic-export-'+randomUUID()});};
+ try{
+  assert.equal((await call('/entry/privacy-export-unlock',{parentPassphrase:parent})).status,403);
+  assert.equal((await call('/privacy-export')).status,403);
+  const expired=a.cookies.replace(/__Host-factory_session=[^;]+/,'__Host-factory_session='+signSession({...session,expiresAt:Date.now()-1},fixtureKey));
+  assert.equal((await call('/v1/sessions/renew',{},expired)).status,403);
+  await release();
+  const renewed=await call('/v1/sessions/renew',{},expired);assert.equal(renewed.status,200);assert.equal(runtimeCalls,1);
+  assert.equal((await call('/entry/privacy-export-unlock',{parentPassphrase:parent},cookieHeader(renewed.cookies))).status,200);
+  assert.equal((await call('/entry/status')).body.exportReady,true);
+  const page=await call('/privacy-export');assert.equal(page.status,200);assert.match(page.text,/id="exportUnlock"/);assert.ok(!page.text.includes('id="privacyChoice"'));
+  assert.equal((await call('/entry/privacy-export-unlock',{parentPassphrase:parent},a.cookies,a.id,familyOrigin(d.config,b.id))).status,403);
+  assert.equal((await call('/entry/privacy-export-unlock',{parentPassphrase:parent},b.cookies)).status,401);
+  assert.equal((await call('/entry/privacy-export-unlock',{parentPassphrase:'incorrect parent passphrase'})).status,403);
+  assert.equal((await d.repository(a.id).snapshot()).parentAuth![a.id].failedAttempts,1);
+  assert.equal((await call('/entry/export',{})).status,403);
+  const oldParent=a.cookies+'; __Host-factory_parent='+signSession({...session,role:'parent'},fixtureKey);
+  assert.equal((await call('/entry/export',{},oldParent)).status,403);
+  const unlocked=await call('/entry/privacy-export-unlock',{parentPassphrase:parent});assert.equal(unlocked.status,200);
+  assert.equal(unlocked.cookies.length,1);assert.match(unlocked.cookies[0],/^__Host-jems-export=/);assert.match(unlocked.cookies[0],/Secure; HttpOnly; SameSite=Strict/);
+  assert.ok(unlocked.body.expiresAt<=Date.now()+15*60000);
+  const proof=a.cookies+'; '+cookieHeader(unlocked.cookies);
+  const exported=await call('/entry/export',{},proof);assert.equal(exported.status,200);assert.equal(exported.body.familyId,a.id);assert.equal(exported.body.revisions[0].projectId,'preserved');
+  assert.ok(!exported.text.includes('secretHash'));assert.ok(!exported.text.includes('family-export:'));
+  for(const [path,body] of [['/entry/export-receipts',{kind:'acknowledgments',after:''}],['/entry/export-storage-metadata',{kind:'generated-restores',after:''}],['/entry/export-storage',{after:''}]] as const)assert.equal((await call(path,body,proof)).status,200,path);
+  for(const [path,body] of [['/entry/check',undefined],['/play/',undefined],['/entry/profiles',undefined],['/entry/storage-consent',undefined],['/entry/parent-guidance',{}],['/v1/devices/unlock',{parentPassphrase:parent}],['/v1/jobs',{}]] as const)assert.ok((await call(path,body,proof)).status>=400,path);
+  assert.equal(runtimeCalls,1);assert.equal((await d.withFamily(a.id,async(_tx,f)=>f)).status,'suspended');
+  await d.withFamily(a.id,async(tx,f)=>{f.status='active';tx.set(d.path(a.id),f);});
+  const renamed=a.cookies+'; '+cookieHeader(unlocked.cookies).replace('__Host-jems-export=','__Host-factory_parent=');
+  assert.equal((await call('/entry/profiles',undefined,renamed)).status,401,'Renaming the export proof cannot mint normal parent authority.');
+  await d.withFamily(a.id,async(tx,f)=>{f.status='suspended';tx.set(d.path(a.id),f);});
+  assert.ok((await call('/entry/export',{},proof,b.id)).status>=400);
+  await d.withFamily(a.id,async(tx,f)=>{f.guardian.noticeVersion='earlier-notice';tx.set(d.path(a.id),f);});
+  await mutate('platform','platform',{invitations:false,participation:false,stop:true,monthlyCents:100});
+  assert.equal((await call('/entry/export',{},proof)).status,200,'Privacy access does not renew participation or processing notices.');
+  await release(); // A new case must not inherit the earlier export-only proof.
+  assert.equal((await call('/entry/export',{},proof)).status,403);
+  const fresh=await call('/entry/privacy-export-unlock',{parentPassphrase:parent});assert.equal(fresh.status,200);
+  const freshProof=a.cookies+'; '+cookieHeader(fresh.cookies);
+  await d.withFamily(a.id,async(tx,f)=>{f.request!.approvedAt=Date.now()-86400001;tx.set(d.path(a.id),f);});
+  assert.equal((await call('/entry/export',{},freshProof)).status,403);
+  assert.equal((await call('/entry/privacy-export-unlock',{parentPassphrase:parent})).status,403);
+  await release();
+  await d.withFamily(a.id,async(tx,f)=>{delete f.guardian.receiptDigest;tx.set(d.path(a.id),f);});
+  assert.equal((await call('/entry/privacy-export-unlock',{parentPassphrase:parent})).status,403);
+  await d.withFamily(a.id,async(tx,f)=>{f.guardian.receiptDigest='synthetic-restored-receipt';tx.set(d.path(a.id),f);});
+  await mutate('revoke-device',a.id,{deviceId:session.deviceId});
+  assert.equal((await call('/entry/privacy-export-unlock',{parentPassphrase:parent})).status,401);
+  assert.equal((await call('/entry/export',{},freshProof)).status,401);
+  await mutate('revoke',a.id);
+  assert.equal((await call('/entry/privacy-export-unlock',{parentPassphrase:parent})).status,403);
+  assert.equal((await call('/privacy-export')).status,403);
  }finally{server.closeAllConnections();await new Promise<void>(ok=>server.close(()=>ok()));}
 });

@@ -54,7 +54,7 @@ test('entry documents protect native form handling even before their module runs
  const {publicPage}=await import('../server/beta/pages');
  const {betaHosting}=await import('../server/beta/hosting');
  const {fixtureConfig}=await import('./beta-fixture');
- for(const path of ['/invitation','/recovery','/device','/grown-ups','/acknowledge','/renew-participation']){
+ for(const path of ['/invitation','/recovery','/device','/grown-ups','/acknowledge','/renew-participation','/privacy-export']){
   const html=publicPage(path,fixtureConfig,true)!;
   const forms=Array.from(html.matchAll(/<form\b[^>]*>/g),m=>m[0]);
   assert.ok(forms.length,path);
