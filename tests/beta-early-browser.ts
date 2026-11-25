@@ -57,7 +57,7 @@ export async function earlyBetaBrowser(tls:ServerOptions,engine:'chromium'|'webk
     const key=${JSON.stringify(readinessProbeKey)},documentId=crypto.randomUUID();
     window.__nativeReadinessDocument=documentId;window.__nativeReadinessArmed=false;
     const record=event=>{const entries=JSON.parse(sessionStorage.getItem(key)||'[]');entries.push({document:documentId,...event});sessionStorage.setItem(key,JSON.stringify(entries.slice(-40)));};
-    addEventListener('pagehide',()=>{if(window.__nativeReadinessArmed)record({event:'pagehide'});});
+    addEventListener('pagehide',event=>{if(window.__nativeReadinessArmed)record({event:'pagehide',trusted:event.isTrusted});});
     window.__armNativeReadiness=()=>{
      if(window.__nativeReadinessArmed)throw Error('Readiness probe already armed');
      window.__nativeReadinessArmed=true;const nativeFetch=window.fetch;let sequence=0;
@@ -78,6 +78,21 @@ export async function earlyBetaBrowser(tls:ServerOptions,engine:'chromium'|'webk
    page.on('request',request=>{if(readinessRequest(request.url()))networkEvents.push({event:'request',url:request.url(),page:page.url()});});
    page.on('requestfailed',request=>{if(readinessRequest(request.url()))networkEvents.push({event:'requestfailed',url:request.url(),page:page.url(),failure:request.failure()});});
    page.on('response',response=>{if(readinessRequest(response.url()))networkEvents.push({event:'response',url:response.url(),status:response.status()});});
+   const holdReadiness=async()=>{
+    heldStatusPaths.clear();pendingStatus=new Promise<void>(resolve=>{releaseStatus=resolve;});
+    const reachedServer=new Promise<void>(resolve=>{statusPairSeen=resolve;});
+    const nativeRequests=Promise.all(statusPaths.map(path=>page.waitForRequest(request=>request.url()===origin+path)));
+    await page.evaluate(()=>{(window as any).__armNativeReadiness();window.dispatchEvent(new Event('factory-session-restored'));});
+    let timeout:ReturnType<typeof setTimeout>|undefined;
+    try{await Promise.race([Promise.all([reachedServer,nativeRequests]),new Promise<never>((_resolve,reject)=>{timeout=setTimeout(()=>reject(Error('Both real HTTPS readiness requests must reach the held server.')),10000);})]);}
+    finally{clearTimeout(timeout);}
+    const outgoing=await page.evaluate(key=>{const document=(window as any).__nativeReadinessDocument,events=JSON.parse(sessionStorage.getItem(key)||'[]').filter((event:any)=>event.document===document);return {document,requests:events.filter((event:any)=>event.event==='start')};},readinessProbeKey);
+    assert.deepEqual(outgoing.requests.map((request:any)=>request.path).sort(),statusPaths,'Both availability reads are genuinely pending over HTTPS before navigation.');
+    assert.ok(outgoing.requests.every((request:any)=>request.hasSignal&&!request.aborted),'Both pending reads carry a live native abort signal.');
+    return {...outgoing,nativeRequests:await nativeRequests};
+   };
+   const readinessEvents=(document:string)=>page.evaluate(({key,document})=>JSON.parse(sessionStorage.getItem(key)||'[]').filter((event:any)=>event.document===document),{key:readinessProbeKey,document});
+   const releaseReadiness=()=>{releaseStatus();pendingStatus=undefined;};
    try{
    assert.equal((await ctx.request.get(origin+'/play/synthetic-fixture.js',{maxRedirects:0})).status(),401,'The actual router protects the synthetic module before enrollment.');
    for(const pair of family.cookies.split('; ')){const at=pair.indexOf('=');await ctx.addCookies([{name:pair.slice(0,at),value:pair.slice(at+1),url:origin,secure:true,httpOnly:true,sameSite:'Strict'}]);}
@@ -107,27 +122,22 @@ export async function earlyBetaBrowser(tls:ServerOptions,engine:'chromium'|'webk
    assert.equal(creativeRequests,0,'Grade settings and parent unlock never send remote creative content.');
    const state=await d.repository(family.id).snapshot();assert.equal(state.jobs.length,0);assert.equal(state.revisions.length,0);assert.equal(state.parentPrivacyChoices?.length??0,0);
    await page.waitForFunction(()=>document.getElementById('page-studio-library')?.getAttribute('aria-busy')==='false');
-   pendingStatus=new Promise<void>(resolve=>{releaseStatus=resolve;});
-   const statusReachedServer=new Promise<void>(resolve=>{statusPairSeen=resolve;});
-   await page.evaluate(()=>{(window as any).__armNativeReadiness();window.dispatchEvent(new Event('factory-session-restored'));});
-   let statusTimeout:ReturnType<typeof setTimeout>|undefined;
-   try{await Promise.race([statusReachedServer,new Promise<never>((_resolve,reject)=>{statusTimeout=setTimeout(()=>reject(Error('Both real HTTPS readiness requests must reach the held server.')),10000);})]);}
-   finally{clearTimeout(statusTimeout);}
-   const outgoing=await page.evaluate(key=>{const document=(window as any).__nativeReadinessDocument,events=JSON.parse(sessionStorage.getItem(key)||'[]').filter((event:any)=>event.document===document);return {document,requests:events.filter((event:any)=>event.event==='start')};},readinessProbeKey);
-   assert.deepEqual(outgoing.requests.map((request:any)=>request.path).sort(),statusPaths,'Both availability reads are genuinely pending over HTTPS before navigation.');
-   assert.ok(outgoing.requests.every((request:any)=>request.hasSignal&&!request.aborted),'Both pending reads carry a live native abort signal.');
-   await page.reload();await page.waitForURL('**/acknowledge');
-   const outgoingEvents=await page.evaluate(({key,document})=>JSON.parse(sessionStorage.getItem(key)||'[]').filter((event:any)=>event.document===document),{key:readinessProbeKey,document:outgoing.document});
-   const hiddenAt=outgoingEvents.findIndex((event:any)=>event.event==='pagehide');
-   assert.ok(hiddenAt>=0,'The real reload dispatches pagehide in the outgoing document.');
-   assert.deepEqual(outgoingEvents.slice(hiddenAt+1).filter((event:any)=>event.event==='abort').map((event:any)=>event.id).sort(),outgoing.requests.map((request:any)=>request.id).sort(),'Pagehide explicitly aborts both held native readiness signals; browser network cancellation alone is insufficient.');
-   releaseStatus();pendingStatus=undefined;
+   const outgoing=await holdReadiness();
+   // WebKit may reject fetch before pagehide. Verify real network cancellation
+   // without assuming that the document's abort controller runs first.
+   const cancelled=outgoing.nativeRequests.map(held=>page.waitForEvent('requestfailed',{predicate:request=>request===held}));
+   const [cancelledRequests]=await Promise.all([Promise.all(cancelled),page.reload()]);
+   assert.ok(cancelledRequests.every(request=>request.failure()),'Both held requests are cancelled by the real navigation.');
+   await page.waitForURL('**/acknowledge');
+   const outgoingEvents=await readinessEvents(outgoing.document);
+   assert.ok(outgoingEvents.some((event:any)=>event.event==='pagehide'&&event.trusted),'The actual navigation dispatched a trusted pagehide.');
+   releaseReadiness();
    await page.getByLabel('Parent passphrase').fill(parent);for(const checkbox of await page.getByRole('checkbox').all())await checkbox.check();
    await Promise.all([...statusPaths.map(path=>page.waitForResponse(response=>response.url()===origin+path&&response.status()===404)),page.getByRole('button',{name:'Enter Jems'}).click()]);
    await page.waitForFunction(()=>Boolean((window as any).FG?.studio));
    assert.equal(await page.evaluate(()=>(window as any).__nativeReadinessArmed),false,'The replacement document uses untouched native fetch for fresh status responses.');
    assert.notEqual(await page.evaluate(()=>(window as any).__nativeReadinessDocument),outgoing.document,'Fresh readiness belongs to the replacement document.');
-   console.log(JSON.stringify({engine,readinessLifecycle:{heldNativeRequests:outgoing.requests.length,explicitPagehideAborts:2,freshDocumentResponses:2}}));
+   console.log(JSON.stringify({engine,nativeReadinessNavigation:{heldNativeRequests:outgoing.requests.length,cancelledNetworkRequests:2,explicitAbortsObserved:outgoingEvents.filter((event:any)=>event.event==='abort').length,freshDocumentResponses:2}}));
    assert.deepEqual(await page.evaluate(()=>(window as any).FG.store.familyProfiles().map((p:any)=>p.grade)),[-1,0,1,2,3,4]);
    // Supervised creation is a distinct, default-off source contract. Only synthetic
    // owner evidence enables it here; no provider/worker is installed in this server.
@@ -137,6 +147,16 @@ export async function earlyBetaBrowser(tls:ServerOptions,engine:'chromium'|'webk
    await mutate('policy',family.id,{capabilities:{...defaultCapabilities(),generation:true},paused:false,generationPaused:false,monthlyCents:100});
    const choice=await submitParentPrivacyChoice(d.repository(family.id),{...session,role:'parent'},{noticeVersion:betaNotice,guardianAffirmed:true,providerAcknowledged:true,scopes:{generation:true,conversation:false,remoteSpeech:false}});
    await recordExternalGuardianVerification(d.repository(family.id),{familyId:family.id,choiceId:choice.choiceId,receipt:'synthetic-browser-guidance',verifiedByOwner:true});
+   // Separately exercise the actual cancellation handler before a browser can
+   // preempt it. This is explicitly a simulated lifecycle notification, followed
+   // by the existing real reload; it is not a claim about native event ordering.
+   const controlled=await holdReadiness();
+   await page.evaluate(()=>dispatchEvent(new PageTransitionEvent('pagehide',{persisted:false})));
+   const controlledEvents=await readinessEvents(controlled.document),hiddenAt=controlledEvents.findIndex((event:any)=>event.event==='pagehide'&&!event.trusted);
+   assert.ok(hiddenAt>=0,'The handler probe is explicitly an untrusted simulated pagehide.');
+   assert.deepEqual(controlledEvents.slice(hiddenAt+1).filter((event:any)=>event.event==='abort').map((event:any)=>event.id).sort(),controlled.requests.map((request:any)=>request.id).sort(),'The pagehide handler explicitly aborts both live native signals.');
+   releaseReadiness();
+   console.log(JSON.stringify({engine,simulatedPagehideHandler:{heldNativeRequests:2,explicitNativeSignalAborts:2,simulatedNotification:true}}));
    // Configuration is deliberately unresolved while the local Parent controls
    // mount and supervise this learner. Neither guidance nor its navigation may
    // depend on the asynchronous builder connection panel being installed.
