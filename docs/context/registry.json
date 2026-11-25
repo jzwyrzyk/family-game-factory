@@ -678,10 +678,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:46:59.596Z",
-      "sourceDigest": "b4b7b940b0d0fb0195fd4544bdc6319f057d1947716ed62c2fa4d5f35a8e12ca",
+      "reviewedAt": "2026-11-25T01:35:18.556Z",
+      "sourceDigest": "8581859ab63317bf63c90f38fccdd9bdeac73b2b54a3f0a88e1be8ad7a7ae74f",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserve integer spending admission, the effective per-game ceiling and independently authorized family allowances.",
+      "reviewReason": "Record the erasure hold, server creative-write authorization and protected staging checks.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -731,10 +731,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:29:42.946Z",
-      "sourceDigest": "0f1f37b8cc49596140865356db055d78ef013365641a8c2ffdda38afdc5b9d85",
+      "reviewedAt": "2026-11-25T01:35:20.182Z",
+      "sourceDigest": "0eac05be5401124acbdf71f4c32e433c3deea14635fbbd295d0aa1c3c2ae23ab",
       "reviewOutcome": "updated",
-      "reviewReason": "Document the protected owner's POST grant, revision audience and independent preview key.",
+      "reviewReason": "Document the verified generation scope for external family seeds and named copies.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -763,10 +763,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:14.278Z",
-      "sourceDigest": "aa4fa458b8d743d5d1eb9fb44439ce3493a98b21ff2aabaf3ed9c6e78a8985f3",
+      "reviewedAt": "2026-11-25T01:35:18.926Z",
+      "sourceDigest": "d34dfb31513842d9c0754119a2cf1f28446e4fadc365318a1cef28657b6df42c",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated Coach v2 seven-dimension readiness and selection-aware compiler with full retained conversation history and capacity preflight. Reviewed exact helper attribution after chapter restore, conservative receipt settlement, independent narration month rollover and shared post-body admission; live-model and child acceptance remain separate.",
+      "reviewReason": "Describe the server-side recovery cache, bounded reply lifetime and idle-family sweep.",
       "reviewHistory": [
         {
           "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
@@ -887,10 +887,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:46:59.952Z",
-      "sourceDigest": "64c140c0e78d7f4eb516f5270722fbadd406bd8ddeefc73c71348e001657f016",
+      "reviewedAt": "2026-11-25T01:35:19.364Z",
+      "sourceDigest": "b6cf2fa2b69b53fbf33abd2a48842ccc304036872cbb03b6e0d3f21716c035a0",
       "reviewOutcome": "updated",
-      "reviewReason": "Record manual same-request recovery and safe currency conversion in the family acceptance coverage.",
+      "reviewReason": "Add native form, exact revision, erasure, consent and two-host browser storage checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1130,10 +1130,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T00:39:28.873Z",
-      "sourceDigest": "1e5df9e71d522801a6c25ad1ee5d8712475dc6c2fd23750550dc58b56904f29e",
+      "reviewedAt": "2026-11-25T01:35:19.742Z",
+      "sourceDigest": "7b4aa563172e40465290ef9f0e1d8aec562ae00f5653c6915deafd0ba0bf1720",
       "reviewOutcome": "updated",
-      "reviewReason": "Describe protected controller policy for future public-only Pages retirement and the source-preserving rollback path.",
+      "reviewReason": "Record integration with the independently approved owner premium ceiling and explicit DEV/TEST gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
