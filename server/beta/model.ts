@@ -49,7 +49,7 @@ export function validateBeta(config:BetaConfig|undefined,householdWorkspace:stri
   e.provider!==(e.scope==='remoteSpeech'?'google-cloud':'openai')||!Number.isSafeInteger(e.expiresAt)||
   !/^[a-f0-9]{64}$/.test(e.privacyDigest)||!/^[a-f0-9]{64}$/.test(e.safetyDigest)||
   (e.provider==='openai'&&e.zdrApproved!==true))throw Error('PROVIDER_EVIDENCE_REJECTED');
- if(config.continuity){const c=config.continuity;if(typeof c.enabled!=='boolean'||!/^[-a-z0-9]{8,80}$/.test(c.notice)||!Array.isArray(c.domains)||new Set(c.domains).size!==c.domains.length||c.domains.some(d=>!storageDomains.includes(d)))throw Error('STORAGE_POLICY_REQUIRED');}
+ if(config.continuity){const c=config.continuity;if(typeof c.enabled!=='boolean'||c.generatedRecovery!==undefined&&typeof c.generatedRecovery!=='boolean'||!/^[-a-z0-9]{8,80}$/.test(c.notice)||!Array.isArray(c.domains)||new Set(c.domains).size!==c.domains.length||c.domains.some(d=>!storageDomains.includes(d)))throw Error('STORAGE_POLICY_REQUIRED');}
  return config;
 }
 export function createFamily(contactRef:string,now=Date.now()):Family{
