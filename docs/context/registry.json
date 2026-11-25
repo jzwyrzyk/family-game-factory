@@ -564,10 +564,10 @@
         "src/archetypes/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T04:08:52.154Z",
-      "sourceDigest": "5724f5d35ec88cc328b8c315085c1bc1e96473f58ddafa7f1f766ab8c8c8b298",
+      "reviewedAt": "2026-11-25T19:43:25.391Z",
+      "sourceDigest": "ba9a6743d805944944e22daec9c76063a7814ac413be0c022eaef0c5330d1fd8",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated the Mining visual-evidence contract to the inspected PR134 unified-player captures, with prior receipt preserved. Gameplay rules, artwork, shared Help lifecycle and compatibility contracts are unchanged by the exact hosted PNG import.",
+      "reviewReason": "Documented the minimal Hill resize lifecycle correction: initial sizing remains immediate, observer/window resizing coalesces outside observer delivery, and disposal cancels pending work. Actual geometry, physics, pause/repaint, fork/reload and owner saves remain covered without changing controls or saved formats.",
       "reviewHistory": [
         {
           "sourceCommit": "5dbe8e497862c921e5eed2d075241a772df8e04f",
@@ -890,10 +890,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T19:25:26.470Z",
-      "sourceDigest": "11b3abe5222b4b6a66814569457a43d61e8081baeff0efbb327a0e819f190d4e",
+      "reviewedAt": "2026-11-25T19:43:25.913Z",
+      "sourceDigest": "ee45b6e62e5a1c20ce6d074b4ca829f52077c14c81275cb528f779fa585e7ac2",
       "reviewOutcome": "updated",
-      "reviewReason": "Record the fully passing fc7 application checkpoint: all sixteen hosted workflows, thirteen Arcade shards and 120 commands, sixteen beta outcomes, nineteen WebKit storage commands, actual HTTP cloud retry and native quota recovery; independently verified receipts retain exact source, tree and artifact scope.",
+      "reviewReason": "Recorded the strict WebKit ResizeObserver failure at23ad, all fifteen other passing workflows, independently verified exact-source receipt and artifacts, and causal real-observer negative/positive regression. The existing native Studio command remains in full Arcade and WebKit manifests; no error suppression, tolerance change, skipped gate or claimed native Chromium warning reproduction.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1134,10 +1134,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T19:25:26.715Z",
-      "sourceDigest": "c902e9dca192fc1f0be4c0ae610b9b1d5340a01acfaac8198a507f82f578215e",
+      "reviewedAt": "2026-11-25T19:43:26.410Z",
+      "sourceDigest": "995d16c39fd0e5adb66243c370044b66bc882fced7a45051fa95b9a2651a93fc",
       "reviewOutcome": "updated",
-      "reviewReason": "Record the observed all-green application runtime and inspected evidence with exact source and immutable identities. Closing documentation changes no runtime; current PR checks still bind the review head. Protected merge, provisioning, real devices, owner/provider/legal acceptance and release remain held.",
+      "reviewReason": "Preserved the historical fully green fc7 checkpoint and recorded the later23ad failure and verified partial successes. Documented corrected-source local acceptance with exact isolated/integration pins; current PR186 exact-head hosted qualification controls review readiness and all release/real-data holds remain.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
