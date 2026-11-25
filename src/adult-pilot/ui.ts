@@ -222,6 +222,10 @@ export function installAdultProfile(config:BuilderConfig){
     if(attempt!==request||!dialog.open){
      if(typeof data.sessionToken==='string')revoke({...data,base});return;
     }
+    // Indexed notebook writes must finish before changing their owner. The
+    // newly issued Adult grant is revoked if the old draft cannot be saved.
+    try{await FG.studio?.flushDraft?.();}catch{revoke({...data,base});throw Error('PROFILE_SAVE_FAILED');}
+    if(attempt!==request||!dialog.open){revoke({...data,base});return;}
     if(!window.dispatchEvent(new CustomEvent('factory-profile-before-change',{cancelable:true,detail:{profileId:data.profileId}}))){
      revoke({...data,base});throw Error('PROFILE_SAVE_FAILED');
     }
