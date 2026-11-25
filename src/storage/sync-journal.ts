@@ -119,5 +119,17 @@ export class MappedSyncStore implements SyncStore {
   await this.put([[this.key('plan',op.id),{localFingerprint:await operationFingerprint(op),remote} satisfies Plan],
    [this.key('resolution',remote.id),{localOperation:op.id,priorPlan:plan,reviewedRemote,at:Date.now()}]]);
  }
+ /** The native adapter has durably preserved the reviewed remote ancestry.
+  * Record only exact matching local bytes; differing mutable project pointers
+  * remain pending for the separate explicit CAS resolution. */
+ async rememberPreservedRemote(rows:DurableRecord[]){
+  const entries:[string,unknown][]=[];
+  for(const row of rows){
+   this.assertAuthorized();const local=await this.local.get(row.collection,row.id);if(!local||await rowHash({...local,version:1})!==await rowHash({...row,version:1}))continue;
+   const key=this.key('base',recordKey(this.localScope,row.collection,row.id)),prior=await this.get<Base>(key);if(prior&&prior.remoteVersion>row.version)continue;
+   entries.push([key,{remoteVersion:row.version,localVersion:local.version,fingerprint:await rowHash(row)} satisfies Base]);
+  }
+  await this.put(entries);
+ }
 }
 async function rowHash(row:DurableRecord){return operationFingerprint({id:'row',scope:{family:'hash',profile:'hash'},changes:[{id:row.id,collection:row.collection,expectedVersion:row.version,value:row.value,deleted:row.deleted}]});}
