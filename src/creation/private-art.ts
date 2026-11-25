@@ -1,5 +1,5 @@
 /** Trusted local-art adapter. Private pixels never become a URL or a model input. */
-import { drawing, drawings, drawingBlob } from '../assets/private-drawings';
+import { drawing, drawingPage, drawingBlob } from '../assets/private-drawings';
 import { rigById, listRigs } from '../drawing/store';
 import { validateAssembly, type DrawingAssembly } from '../drawing/model';
 import { layerCanvas } from '../drawing/segmentation';
@@ -41,10 +41,10 @@ export async function artChoice(owner:string,selection:ArtSelection,current:()=>
   return {drawingId:source.id,assetId:privateArtId({kind:'image',id:source.id,sha256:source.sha256}),label:source.name,detail:'Original artwork'};
 }
 export async function listArtChoices(owner:string,current:()=>boolean=()=>true):Promise<ArtChoice[]> {
-  const [sources,rigs]=await Promise.all([drawings(owner),listRigs(owner)]);
+  const [sources,rigs]=await Promise.all([drawingPage(owner,{limit:100,archived:false}),listRigs(owner)]);
   if(!current())throw stale();
   const choices:ArtChoice[]=[];
-  for(const source of sources.filter(source=>!source.archived)){
+  for(const source of sources.items){
     choices.push({drawingId:source.id,assetId:privateArtId({kind:'image',id:source.id,sha256:source.sha256}),label:source.name,detail:'Original artwork'});
     const latest=rigs.find(rig=>rig.assembly.sourceId===source.id&&rig.assembly.sourceSha256===source.sha256);
     if(latest)choices.push({drawingId:source.id,rigId:latest.id,assetId:privateArtId({kind:'rig',id:latest.id,sha256:await assemblyHash(latest.assembly)}),label:source.name,detail:'Latest saved cutout design'});

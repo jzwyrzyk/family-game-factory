@@ -1,5 +1,5 @@
 /** Private immutable image bytes. Metadata and visibility can change; the image cannot. */
-import { ART_LIMITS, artOwner, artRequest, assertArtWrite, checkArtCapacity, deriveArtUsages, withArtTransaction, type ArtGuard, type ArtUsage } from '../drawing/library';
+import { ART_LIMITS, artOwner, artRequest, assertArtWrite, checkArtCapacity, deriveArtUsages, withArtTransaction, saveDrawingMetadata, ownerArtRecords, type DrawingMetadata, type ArtGuard, type ArtUsage } from '../drawing/library';
 import type { SavedRig } from '../drawing/store';
 import { adultStorageKey } from '../adult-pilot/storage';
 
@@ -69,7 +69,7 @@ export async function prepareDrawing(owner: string, name: string, file: Blob): P
 }
 
 export async function drawings(owner: string): Promise<Drawing[]> {
-  artOwner(owner); return withArtTransaction(['drawings'], 'readonly', async transaction => (await artRequest(transaction.objectStore('drawings').getAll()) as Drawing[]).filter(item => item.owner === owner));
+  artOwner(owner); return withArtTransaction(['drawings'], 'readonly', async transaction => ownerArtRecords<Drawing>(transaction,'drawings',owner));
 }
 export async function drawing(owner: string, id: string): Promise<Drawing> {
   artOwner(owner);
@@ -87,7 +87,7 @@ export async function saveDrawing(owner: string, name: string, file: Blob, sourc
       if (!source) throw Error('Original drawing not found in this profile.');
       item.sourceId = sourceId; item.sourceSha256 = source.sha256; item.category = source.category || 'other';
     }
-    checkArtCapacity([...all, item]); assertArtWrite(owner, guard); store.add(item); return item;
+    checkArtCapacity([...all, item]); assertArtWrite(owner, guard); store.add(item); saveDrawingMetadata(transaction,item); return item;
   });
 }
 export async function updateDrawing(owner: string, id: string, changes: { name?: string; category?: DrawingCategory; archived?: boolean }, guard?: ArtGuard): Promise<Drawing> {
@@ -99,7 +99,7 @@ export async function updateDrawing(owner: string, id: string, changes: { name?:
     const store = transaction.objectStore('drawings'), item = await artRequest(store.get(id)) as Drawing | undefined;
     if (!item || item.owner !== owner) throw Error('Choose artwork from this profile.');
     const updated = { ...item, ...changes, ...(changes.name !== undefined ? { name: changes.name.trim() } : {}), updatedAt: new Date().toISOString() };
-    assertArtWrite(owner, guard); store.put(updated); return updated;
+    assertArtWrite(owner, guard); store.put(updated); saveDrawingMetadata(transaction,updated); return updated;
   });
 }
 
@@ -154,7 +154,7 @@ async function removeDrawing(owner: string, id: string, includeRigs: boolean, gu
     const usage = deriveArtUsages(owner, all, rigs, indexed).filter(use => use.drawingId === id);
     if (all.some(original => original.owner === owner && original.sourceId === id) || usage.length || usedByRetainedScene(owner, item, rigs) || usedByRetainedGame(owner, rigs) || !includeRigs && rigs.length) throw Error('A saved version, game or scene still uses this artwork. Archive it to hide it while keeping those creations safe.');
     assertArtWrite(owner, guard);
-    store.delete(id); for (const use of indexed) if (use.owner === owner && use.drawingId === id) transaction.objectStore('usage').delete(use.id);
+    store.delete(id); transaction.objectStore('drawingMetadata').delete(id); for (const use of indexed) if (use.owner === owner && use.drawingId === id) transaction.objectStore('usage').delete(use.id);
     for (const rig of rigs) transaction.objectStore('rigs').delete(rig.id);
     transaction.objectStore('drafts').delete(JSON.stringify([owner, id]));
     const active = await artRequest(transaction.objectStore('active').get(owner)) as { id: string } | undefined;
@@ -166,3 +166,16 @@ export const deleteDrawing = (owner: string, id: string, guard?: ArtGuard) => re
 /** The Art Studio's explicit erase action removes unused art and all its movement versions. */
 export const deleteArtwork = (owner: string, id: string, guard?: ArtGuard) => removeDrawing(owner, id, true, guard);
 export function drawingBlob(item: Drawing) { return new Blob([item.bytes], { type: item.mime }); }
+
+export interface DrawingPageQuery {after?:[string,string];limit?:number;search?:string;category?:DrawingCategory;archived?:boolean}
+export async function drawingPage(owner:string,query:DrawingPageQuery={}):Promise<{items:DrawingMetadata[];next:[string,string]|null;total:number}>{
+ artOwner(owner);const limit=query.limit??24;
+ if(!Number.isInteger(limit)||limit<1||limit>100||query.after&&(!Array.isArray(query.after)||query.after.length!==2||query.after.some(x=>typeof x!=='string'))||query.search!==undefined&&typeof query.search!=='string'||query.category!==undefined&&!DRAWING_CATEGORIES.includes(query.category))throw Error('Choose an available art page.');
+ return withArtTransaction(['drawingMetadata'],'readonly',async transaction=>{
+  const store=transaction.objectStore('drawingMetadata'),total=await artRequest(store.index('owner').count(IDBKeyRange.only(owner)));
+  const range=IDBKeyRange.bound([owner,'',''],[owner,...(query.after??['\uffff','\uffff'])],false,!!query.after);
+  const items:DrawingMetadata[]=[],search=(query.search??'').trim().toLowerCase();
+  await new Promise<void>((resolve,reject)=>{const request=store.index('ownerCreated').openCursor(range,'prev');request.onerror=()=>reject(request.error);request.onsuccess=()=>{const cursor=request.result;if(!cursor||items.length>limit){resolve();return;}const item=cursor.value as DrawingMetadata;if((query.archived===undefined||Boolean(item.archived)===query.archived)&&(!query.category||(item.category??'other')===query.category)&&(!search||item.name.toLowerCase().includes(search)))items.push(item);cursor.continue();};});
+  const hasMore=items.length>limit;if(hasMore)items.pop();const last=items.at(-1);return {items,next:hasMore&&last?[last.createdAt,last.id]:null,total};
+ });
+}

@@ -1,20 +1,31 @@
 import {assertRecordValue,operationFingerprint,recordKey,scopeKey,recordId,type RecordScope,type RecordOperation,type DurableRecord,type RecordReceipt} from './record-contract';
 const DB='jems-records-preparation-v1';
-/** Repository preparation only: no application startup import or legacy migration.
- * A commit atomically saves records, history, receipt and synchronization outbox.
- */
+/** Atomic domain records. Callers select local-only persistence explicitly; a
+ * queued operation is still subject to independent server consent and gates. */
 export class IndexedRecords {
  constructor(private db:IDBDatabase,private scope:RecordScope,private assertAuthorized:()=>void){}
  static open(scope:RecordScope,assertAuthorized:()=>void):Promise<IndexedRecords>{
   assertAuthorized();if(!recordId(scope.family)||!recordId(scope.profile))return Promise.reject(Error('STORAGE_SCOPE_INVALID'));
-  return new Promise((resolve,reject)=>{const r=indexedDB.open(DB,1);r.onupgradeneeded=()=>{for(const name of ['records','history','receipts','outbox','pending'])r.result.createObjectStore(name);};r.onerror=()=>reject(r.error);r.onblocked=()=>reject(Error('STORAGE_UPGRADE_BLOCKED'));r.onsuccess=()=>{try{assertAuthorized();r.result.onversionchange=()=>r.result.close();resolve(new IndexedRecords(r.result,{...scope},assertAuthorized));}catch(e){r.result.close();reject(e);}};});
+  return new Promise((resolve,reject)=>{const r=indexedDB.open(DB,2);r.onupgradeneeded=()=>{for(const name of ['records','history','receipts','outbox','pending','meta'])if(!r.result.objectStoreNames.contains(name))r.result.createObjectStore(name);const outbox=r.transaction!.objectStore('outbox');if(!outbox.indexNames.contains('scopeSequence'))outbox.createIndex('scopeSequence',['queueScope','queueSequence']);
+   const rows:{key:IDBValidKey;operation:RecordOperation}[]=[],cursor=outbox.openCursor();
+   cursor.onsuccess=()=>{if(cursor.result){rows.push({key:cursor.result.key,operation:cursor.result.value});cursor.result.continue();return;}
+    // The previous preparation format had no queue order. Recover its actual
+    // version dependencies once; no operation or receipt is discarded.
+    const writes=new Map<string,number>(),depends=rows.map(()=>new Set<number>());
+    rows.forEach(({operation},i)=>operation.changes.forEach(c=>writes.set(JSON.stringify([scopeKey(operation.scope),c.collection,c.id,c.expectedVersion+1]),i)));
+    rows.forEach(({operation},i)=>operation.changes.forEach(c=>{const prior=writes.get(JSON.stringify([scopeKey(operation.scope),c.collection,c.id,c.expectedVersion]));if(prior!==undefined&&prior!==i)depends[i].add(prior);}));
+    const done=new Set<number>();let sequence=0;
+    while(done.size<rows.length){let progress=false;for(let i=0;i<rows.length;i++)if(!done.has(i)&&[...depends[i]].every(j=>done.has(j))){const row=rows[i];outbox.put({...row.operation,queueScope:scopeKey(row.operation.scope),queueSequence:++sequence},row.key);done.add(i);progress=true;}if(!progress){r.transaction!.abort();return;}}
+    r.transaction!.objectStore('meta').put(sequence,'sequence');
+   };
+  };r.onerror=()=>reject(r.error);r.onblocked=()=>reject(Error('STORAGE_UPGRADE_BLOCKED'));r.onsuccess=()=>{try{assertAuthorized();r.result.onversionchange=()=>r.result.close();resolve(new IndexedRecords(r.result,{...scope},assertAuthorized));}catch(e){r.result.close();reject(e);}};});
  }
  close(){this.db.close();}
- async commit(operation:RecordOperation):Promise<RecordReceipt>{
+ async commit(operation:RecordOperation,options:{enqueue?:boolean}={}):Promise<RecordReceipt>{
   const op=structuredClone(operation),fingerprint=await operationFingerprint(op);this.assertAuthorized();
   if(scopeKey(op.scope)!==scopeKey(this.scope))throw Error('STORAGE_SCOPE_DENIED');
   return new Promise((resolve,reject)=>{
-   const tx=this.db.transaction(['records','history','receipts','outbox','pending'],'readwrite'),records=tx.objectStore('records'),receipts=tx.objectStore('receipts');
+   const tx=this.db.transaction(['records','history','receipts','outbox','pending','meta'],'readwrite'),records=tx.objectStore('records'),receipts=tx.objectStore('receipts');
    let result:RecordReceipt,failed:unknown;
    const abort=(error:unknown)=>{failed=error;tx.abort();};
    tx.onabort=()=>reject(failed??tx.error);tx.onerror=()=>{};tx.oncomplete=()=>resolve(result);
@@ -28,9 +39,9 @@ export class IndexedRecords {
        result={operation:op.id,fingerprint,versions:[]};
        for(const change of op.changes){const k=recordKey(this.scope,change.collection,change.id),version=change.expectedVersion+1;
         const record:DurableRecord={id:change.id,collection:change.collection,version,value:change.value,deleted:change.deleted??false};
-        records.put(record,k);tx.objectStore('pending').put(op.id,k);tx.objectStore('history').add(record,JSON.stringify([k,version]));result.versions.push({id:change.id,collection:change.collection,version});
+        records.put(record,k);if(options.enqueue!==false)tx.objectStore('pending').put(op.id,k);tx.objectStore('history').add(record,JSON.stringify([k,version]));result.versions.push({id:change.id,collection:change.collection,version});
        }
-       receipts.add(result,receiptKey);tx.objectStore('outbox').add(op,receiptKey);
+       receipts.add(result,receiptKey);if(options.enqueue!==false){const sequence=tx.objectStore('meta').get('sequence');sequence.onsuccess=()=>{try{this.assertAuthorized();const next=(sequence.result??0)+1;if(!Number.isSafeInteger(next))throw Error('STORAGE_SEQUENCE_EXHAUSTED');tx.objectStore('meta').put(next,'sequence');tx.objectStore('outbox').add({...op,queueScope:scopeKey(this.scope),queueSequence:next},receiptKey);}catch(e){abort(e);}};}
       }catch(e){abort(e);}
      };}
     }catch(e){abort(e);}
@@ -45,13 +56,31 @@ export class IndexedRecords {
    tx.oncomplete=()=>resolve(result);tx.onabort=()=>reject(tx.error);tx.onerror=()=>reject(tx.error);
   });
  }
- /** Bounded durable queue, ordered by opaque operation ID. A synchronizer must
-  * respect expectedVersion dependencies; unresolved conflicts stay in this queue. */
+ /** Exact indexed lookup; opening one game never reads the family library. */
+ async get(collection:string,id:string):Promise<DurableRecord|null>{
+  this.assertAuthorized();if(!recordId(collection)||!recordId(id))throw Error('STORAGE_RECORD_INVALID');
+  return this.readValue('records',recordKey(this.scope,collection,id));
+ }
+ private readValue(store:string,key:IDBValidKey):Promise<any>{
+  this.assertAuthorized();return new Promise((resolve,reject)=>{const tx=this.db.transaction(store),request=tx.objectStore(store).get(key);let value:any;
+   request.onsuccess=()=>{try{this.assertAuthorized();value=request.result??null;}catch(e){reject(e);tx.abort();}};tx.oncomplete=()=>resolve(value);tx.onabort=()=>reject(tx.error);tx.onerror=()=>{};
+  });
+ }
+ /** Bounded durable queue in commit order, never lexical operation-id order. */
  pending(limit=100):Promise<RecordOperation[]>{
   this.assertAuthorized();if(!Number.isInteger(limit)||limit<1||limit>200)throw Error('STORAGE_PAGE_INVALID');
-  const prefix=JSON.stringify([scopeKey(this.scope)]).slice(0,-1)+',';
-  return new Promise((resolve,reject)=>{const tx=this.db.transaction('outbox'),values:RecordOperation[]=[];const r=tx.objectStore('outbox').openCursor(IDBKeyRange.bound(prefix,prefix+'\uffff',false,true));
-   r.onsuccess=()=>{try{this.assertAuthorized();if(r.result&&values.length<limit){values.push(r.result.value);r.result.continue();}}catch(e){reject(e);tx.abort();}};tx.oncomplete=()=>resolve(values);tx.onabort=()=>reject(tx.error);
+  return new Promise((resolve,reject)=>{const tx=this.db.transaction('outbox'),values:RecordOperation[]=[];
+   const request=tx.objectStore('outbox').index('scopeSequence').openCursor(IDBKeyRange.bound([scopeKey(this.scope),0],[scopeKey(this.scope),Number.MAX_SAFE_INTEGER]));
+   request.onsuccess=()=>{try{this.assertAuthorized();if(request.result&&values.length<limit){const {queueScope,queueSequence,...operation}=request.result.value;values.push(operation);request.result.continue();}}catch(e){reject(e);tx.abort();}};
+   tx.oncomplete=()=>resolve(values);tx.onabort=()=>reject(tx.error);tx.onerror=()=>{};
+  });
+ }
+ async getSyncCursor():Promise<string>{return await this.readValue('meta','cursor:'+scopeKey(this.scope))??'';}
+ setSyncCursor(expected:string,next:string):Promise<void>{
+  this.assertAuthorized();if(typeof expected!=='string'||typeof next!=='string'||expected.length>1024||next.length>1024)throw Error('STORAGE_CURSOR_INVALID');
+  return new Promise((resolve,reject)=>{const tx=this.db.transaction('meta','readwrite'),key='cursor:'+scopeKey(this.scope),request=tx.objectStore('meta').get(key);let failure:unknown;
+   request.onsuccess=()=>{try{this.assertAuthorized();if((request.result??'')!==expected)throw Error('STORAGE_CURSOR_CONFLICT');tx.objectStore('meta').put(next,key);}catch(e){failure=e;tx.abort();}};
+   tx.oncomplete=()=>resolve();tx.onabort=()=>reject(failure??tx.error);tx.onerror=()=>{};
   });
  }
  /** Apply an authorized server page atomically. Pending local changes conflict;

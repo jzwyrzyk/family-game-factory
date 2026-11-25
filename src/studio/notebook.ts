@@ -65,7 +65,7 @@ function chaptersFor(notebook:Notebook,session:StudioSession):ConversationChapte
 function conversationContext(notebook:Notebook,session:StudioSession):StudioSession {
   return {...session,messages:[...chaptersFor(notebook,session).flatMap(page=>page.messages),...session.messages]};
 }
-export function validateNotebook(input: unknown): Notebook {
+export function validateNotebook(input: unknown,clone=true): Notebook {
   const n = input as Notebook;
   if (!n || n.version !== 1 || !Array.isArray(n.sessions) || n.sessions.length > NOTEBOOK_CAPACITY || !n.active || typeof n.active !== 'object' || Array.isArray(n.active)) throw Error('This studio notebook is not supported. Your saved data was not replaced.');
   if(Object.keys(n).some(k=>!['version','sessions','active','avatars','rewardOutbox','guidance','conversationChapters','notifications'].includes(k)))throw Error('Unknown studio data; not restored.');
@@ -137,35 +137,37 @@ export function validateNotebook(input: unknown): Notebook {
     if(facts.some(fact=>!n.sessions.some(s=>s.owner===fact.owner)||!['maker.milestone','game.developed'].includes(fact.kind)||
       fact.kind==='game.developed'&&!n.sessions.some(s=>s.owner===fact.owner&&(s.rewardProjectId??s.projectId??s.id)===fact.sourceId)))throw Error('Invalid studio reward receipt.');
   }
-  return copy(n);
+  return clone?copy(n):n;
 }
 export class StudioNotebook {
   private cachedRaw:string|null|undefined;
   private cachedNotebook:Notebook|undefined;
   constructor(private storage: StoragePort,private onRewardSourceSaved?:(owner:string)=>void) { this.read(); }
-  read(): Notebook {
+  private load(): Notebook {
     const raw=this.storage.getItem(STUDIO_KEY);
     if(raw!==this.cachedRaw||!this.cachedNotebook){
       const validated=raw===null?fresh():validateNotebook(JSON.parse(raw));
       this.cachedRaw=raw;this.cachedNotebook=validated;
     }
-    return copy(this.cachedNotebook); // No caller can mutate the validated cache.
+    return this.cachedNotebook; // Internal read-only view; public results copy only their projection.
   }
+  read(): Notebook {return copy(this.load());}
   private write<T>(fn:(n:Notebook)=>T):T {
     assertRewardSourceWritable();
     // Re-read on every synchronous transaction: don't overwrite a newer workspace snapshot.
     const n=this.read();
     const previousFacts=new Set((n.rewardOutbox??[]).map(fact=>fact.owner+'|'+rewardFactId(fact)));
-    const previous=new Map([...new Set(n.sessions.map(s=>s.owner))].map(owner=>[owner,builderJourney(n.sessions.map(s=>conversationContext(n,s)),owner).level]));
-    const result=fn(n); validateNotebook(n);
+    const previous=new Map([...new Set(n.sessions.map(s=>s.owner))].map(owner=>[owner,builderJourney(n.sessions,owner).level]));
+    const result=fn(n); validateNotebook(n,false);
     // Only a new saved transition creates a receipt. Reading or restoring an old
     // notebook never retroactively mints its existing maker history.
     for(const owner of new Set(n.sessions.map(s=>s.owner))){
-      const before=previous.get(owner)??0,after=builderJourney(n.sessions.map(s=>conversationContext(n,s)),owner).level;
+      const before=previous.get(owner)??0,after=builderJourney(n.sessions,owner).level;
       for(let level=before+1;level<=after;level++)n.rewardOutbox=enqueueRewardFact(n.rewardOutbox??[],createRewardFact({owner,kind:'maker.milestone',level:level as 1|2|3|4,occurredAt:Date.now()}));
     }
-    validateNotebook(n);
-    try { this.storage.setItem(STUDIO_KEY, JSON.stringify(n)); } catch { throw Error('Could not save this notebook. Your working game is safe. Export a backup before freeing browser space.'); }
+    validateNotebook(n,false);
+    const raw=JSON.stringify(n);
+    try { this.storage.setItem(STUDIO_KEY, raw); this.cachedRaw=raw;this.cachedNotebook=n; } catch { throw Error('Could not save this notebook. Your working game is safe. Export a backup before freeing browser space.'); }
     const changedOwners=new Set((n.rewardOutbox??[]).filter(fact=>!previousFacts.has(fact.owner+'|'+rewardFactId(fact))).map(fact=>fact.owner));
     for(const owner of changedOwners){
       // Notification only, never an award. If projection is unavailable, the
@@ -175,18 +177,18 @@ export class StudioNotebook {
     return copy(result);
   }
   /** Read views include original words from linked pages; read() is the export format. */
-  list(owner:string):StudioSession[] {const n=this.read();return n.sessions.filter(s=>s.owner===owner).map(s=>conversationContext(n,s)).sort((a,b)=>b.updated.localeCompare(a.updated));}
-  capacity(){const n=this.read(),chapters=n.conversationChapters?.length??0;return {limit:NOTEBOOK_CAPACITY,retained:n.sessions.length+chapters,active:n.sessions.filter(s=>!s.archived).length,archived:n.sessions.filter(s=>s.archived).length,chapters,available:NOTEBOOK_CAPACITY-n.sessions.length-chapters};}
-  assertCanCreate(){assertNotebookCapacity(this.read());}
-  conversationPage(id:string,owner:string){const s=this.read().sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');return {count:s.messages.length,available:CONVERSATION_PAGE_CAPACITY-s.messages.length};}
+  list(owner:string):StudioSession[] {const n=this.load();return copy(n.sessions.filter(s=>s.owner===owner).map(s=>conversationContext(n,s)).sort((a,b)=>b.updated.localeCompare(a.updated)));}
+  capacity(){const n=this.load(),chapters=n.conversationChapters?.length??0;return {limit:NOTEBOOK_CAPACITY,retained:n.sessions.length+chapters,active:n.sessions.filter(s=>!s.archived).length,archived:n.sessions.filter(s=>s.archived).length,chapters,available:NOTEBOOK_CAPACITY-n.sessions.length-chapters};}
+  assertCanCreate(){assertNotebookCapacity(this.load());}
+  conversationPage(id:string,owner:string){const s=this.load().sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');return {count:s.messages.length,available:CONVERSATION_PAGE_CAPACITY-s.messages.length};}
   /** Expand a mutable callback's current page for provenance/readiness checks only. */
   withConversation(session:StudioSession):StudioSession {
-    const n=this.read();if(!n.sessions.some(s=>s.id===session.id&&s.owner===session.owner))throw Error('Choose a game in your own profile.');
-    return conversationContext(n,session);
+    const n=this.load();if(!n.sessions.some(s=>s.id===session.id&&s.owner===session.owner))throw Error('Choose a game in your own profile.');
+    return copy(conversationContext(n,session));
   }
   assertMessageCapacity(id:string,owner:string,count=1):void {
     if(!Number.isInteger(count)||count<1||count>CONVERSATION_PAGE_CAPACITY)throw Error('Invalid conversation capacity request.');
-    const n=this.read(),s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');
+    const n=this.load(),s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');
     if(s.messages.length+count>CONVERSATION_PAGE_CAPACITY){assertNotebookCapacity(n);throw new ConversationCapacityError();}
   }
   /** Refuse a paid conversation when its existing idea ledger is already full.
@@ -199,7 +201,7 @@ export class StudioNotebook {
   /** Optional hints are profile preferences, not evidence or a completed journey. */
   guidance(owner:string):GuidePreferences {
     if(!ident(owner))throw Error('Invalid player.');
-    return guidanceFor(this.read(),owner);
+    return copy(guidanceFor(this.load(),owner));
   }
   dismissWelcome(owner:string):GuidePreferences {
     if(!ident(owner))throw Error('Invalid player.');
@@ -215,7 +217,7 @@ export class StudioNotebook {
   }
   notificationPreferences(owner:string):StudioNotificationPreferences {
     if(!ident(owner))throw Error('Invalid player.');
-    const preferences=this.read().notifications;
+    const preferences=this.load().notifications;
     return preferences&&Object.hasOwn(preferences,owner)?validateStudioNotificationPreferences(preferences[owner]):freshStudioNotificationPreferences();
   }
   acknowledgeNotifications(owner:string,items:readonly StudioNotificationRef[]):StudioNotificationPreferences {
@@ -237,14 +239,14 @@ export class StudioNotebook {
   }
   avatar(owner:string):BuilderAvatar|null {
     if(!ident(owner))throw Error('Invalid player.');
-    return this.read().avatars?.[owner]??null;
+    return this.load().avatars?.[owner]??null;
   }
   setAvatar(owner:string,choice:BuilderAvatar|null):BuilderAvatar|null {
     if(!ident(owner)||choice!==null&&choice!=='spark'&&choice!=='nova')throw Error('Choose one of the two builder characters.');
     return this.write(n=>{n.avatars={...n.avatars};if(choice===null)delete n.avatars[owner];else n.avatars[owner]=choice;return choice;});
   }
-  get(id:string,owner:string):StudioSession {const n=this.read(),s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');return conversationContext(n,s);}
-  last(owner:string):StudioSession|null {const n=this.read(),s=n.sessions.find(s=>s.id===n.active[owner]&&s.owner===owner);return s&&!s.archived&&!s.resumeDismissed?conversationContext(n,s):null;}
+  get(id:string,owner:string):StudioSession {const n=this.load(),s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');return copy(conversationContext(n,s));}
+  last(owner:string):StudioSession|null {const n=this.load(),s=n.sessions.find(s=>s.id===n.active[owner]&&s.owner===owner);return s&&!s.archived&&!s.resumeDismissed?copy(conversationContext(n,s)):null;}
   dismissResume(id:string,owner:string){return this.update(id,owner,s=>{s.resumeDismissed=true;});}
   archive(id:string,owner:string){return this.update(id,owner,s=>{if(s.pendingCopy)throw Error('Finish checking your saved copy before putting this jem away.');if(s.pendingSubmission)throw Error('Check your saved request before putting this jem away.');if(s.job&&['queued','building','testing'].includes(s.job.status))throw Error('Stop the build before putting this jem away.');s.archived=true;s.resumeDismissed=true;});}
   unarchive(id:string,owner:string){return this.update(id,owner,s=>{s.archived=false;s.resumeDismissed=false;});}
