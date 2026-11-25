@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {createServer} from 'node:https';
 import type {AddressInfo} from 'node:net';
-import {mkdtempSync,readFileSync,rmSync} from 'node:fs';
+import {mkdtempSync,readFileSync,rmSync,mkdirSync,writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {execFileSync} from 'node:child_process';
@@ -71,7 +71,8 @@ async function main(){
   const writesBefore=seen.filter(row=>row.path==='/v1/recovery/generated/capture').length;
   assert.equal(await page.evaluate(async()=>{try{await (window as any).recoveryTest.requestAdultRecovery('/v1/recovery/generated/capture',{requestId:'revoked-browser-attempt'});return false;}catch{return true;}}),true);
   assert.equal(seen.filter(row=>row.path==='/v1/recovery/generated/capture').length,writesBefore,'revoked real session preflight stops the POST');
-  console.log(JSON.stringify({browser:engine===chromium?'chromium':'webkit',realHttps:true,headerRewriting:false,actualFamilyFetch:true,actualHouseholdHandler:true,mappingCaptureListPreviewRestore:true,strictPostGate:true,revokedPreflightDenied:true}));
+  const receipt={browser:engine===chromium?'chromium':'webkit',realHttps:true,headerRewriting:false,actualFamilyFetch:true,actualHouseholdHandler:true,mappingCaptureListPreviewRestore:true,strictPostGate:true,revokedPreflightDenied:true};
+  mkdirSync('test-results/household-recovery',{recursive:true});writeFileSync(`test-results/household-recovery/${receipt.browser}.json`,JSON.stringify(receipt,null,2));console.log(JSON.stringify(receipt));
  }finally{await browser?.close();await tunnel.close();server.closeAllConnections();await new Promise<void>(ok=>server.close(()=>ok()));rmSync(directory,{recursive:true,force:true});}
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});
