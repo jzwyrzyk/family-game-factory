@@ -44,12 +44,13 @@ function backendResource(value){
 }
 function checkRouting(url,expected){
  const canonical=u=>({default:backendResource(u.defaultService),hosts:u.hostRules.map(h=>[h.pathMatcher,h.hosts.slice().sort()]).sort(),paths:u.pathMatchers.map(p=>[p.name,backendResource(p.defaultService),(p.pathRules??[]).map(r=>[r.paths.slice().sort(),backendResource(r.service)]).sort()]).sort()});
- requireState(JSON.stringify(canonical(url))===JSON.stringify(canonical(expected))&&!url.defaultRouteAction&&!url.defaultUrlRedirect&&url.pathMatchers.every(p=>!p.routeRules?.length&&!p.defaultRouteAction&&!p.defaultUrlRedirect&&(p.pathRules??[]).every(r=>!r.routeAction&&!r.urlRedirect)),'Live host and path routing differs.');
+ requireState(JSON.stringify(canonical(url))===JSON.stringify(canonical(expected))&&!url.defaultRouteAction&&!url.defaultUrlRedirect&&!url.headerAction&&url.pathMatchers.every(p=>!p.routeRules?.length&&!p.defaultRouteAction&&!p.defaultUrlRedirect&&!p.headerAction&&(p.pathRules??[]).every(r=>!r.routeAction&&!r.urlRedirect&&!r.headerAction)),'Live host and path routing differs.');
 }
 export function verifyBackend(backend,role,c,io){
  const name=c.backends[role],resource='projects/'+c.project+'/global/backendServices/'+name;
  requireState(backend.name===name&&backendResource(backend.selfLink)===resource&&!backend.enableCDN&&
-  backend.protocol==='HTTP'&&backend.loadBalancingScheme==='EXTERNAL_MANAGED','Unexpected backend identity, protocol or caching.');
+  backend.protocol==='HTTP'&&backend.loadBalancingScheme==='EXTERNAL_MANAGED'&&
+  !backend.customRequestHeaders?.length&&!backend.customResponseHeaders?.length,'Unexpected backend identity, protocol, headers or caching.');
  const guarded=role==='management'||role==='household';
  requireState((backend.iap?.enabled===true)===guarded,'Backend IAP boundary differs.');
  const targets=backend.backends??[];
