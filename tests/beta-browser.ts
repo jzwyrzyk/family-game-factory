@@ -16,6 +16,7 @@ import {betaRouter} from '../server/beta/router';
 import {betaHosting} from '../server/beta/hosting';
 import {trustedDeviceHandler} from '../server/trusted-devices';
 import {familyOrigin,defaultCapabilities} from '../server/beta/model';
+import {backToEndedPlayEntry,assertEndedPlayEntry} from './beta-back';
 
 async function entryBrowser(browser:Browser,engine:string,tls:ServerOptions,out:string){
  const {d,invite,mutate}=await betaFixture(),family=await invite('browser-adult'),origin=familyOrigin(d.config,family.id);
@@ -56,6 +57,7 @@ async function entryBrowser(browser:Browser,engine:string,tls:ServerOptions,out:
     await mutate('policy',family.id,{capabilities:defaultCapabilities(),monthlyCents:0,paused:true,generationPaused:true});
     await p.goto(local+'/grown-ups');await p.getByLabel('Parent passphrase').fill(parent);await p.getByRole('button',{name:'Unlock family controls'}).click();
     await p.getByRole('button',{name:'Add an explorer'}).click();await p.getByText(/explorer profiles\./).waitFor();
+    const publicBeforePlay=p.url();assert.equal(publicBeforePlay,local+'/grown-ups');
     await p.goto(local+'/acknowledge');await p.screenshot({path:out+'/'+engine+'-acknowledgment.png',fullPage:true});
     await p.getByLabel('Parent passphrase').fill(parent);for(const box of await p.getByRole('checkbox').all())await box.check();
     await p.getByRole('button',{name:'Enter Jems'}).click();await p.waitForURL('**/play/');
@@ -63,7 +65,15 @@ async function entryBrowser(browser:Browser,engine:string,tls:ServerOptions,out:
     assert.equal(await p.evaluate(async()=>(await navigator.serviceWorker.getRegistrations()).length),0);
     await p.getByRole('button',{name:'End play'}).click();await p.waitForURL(/\/(?:login|acknowledge)$/);
     const denied=await ctx.request.get(local+'/play/',{maxRedirects:0});assert.ok([303,401].includes(denied.status()));if(denied.status()===303)assert.equal(denied.headers().location,'/acknowledge');
-    await p.goBack();assert.equal(await p.locator('#studioLibraryTitle').count(),0);assert.deepEqual(errors,[]);
+    await backToEndedPlayEntry(p,ctx,engine,publicBeforePlay);assert.equal(await p.locator('#studioLibraryTitle').count(),0);assert.deepEqual(errors,[]);
+    // Simulate only the BFCache pageshow notification, exercising the actual
+    // entry.js handler. Observe a fresh same-origin document and recheck every
+    // ended-session condition; this is not evidence of native WebKit BFCache.
+    const reload=p.waitForRequest(request=>request.isNavigationRequest()&&request.frame()===p.mainFrame()&&request.url()===publicBeforePlay);
+    await p.evaluate(()=>{(window as any).__beforePersistedShow=true;setTimeout(()=>dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true})),0);});
+    await reload;await p.waitForFunction(()=>!('__beforePersistedShow' in window));
+    await assertEndedPlayEntry(p,ctx,publicBeforePlay);assert.deepEqual(errors,[]);
+    console.log(JSON.stringify({engine,endedPlayBack:true,simulatedPersistedPageShowReload:true,privateDocumentAbsent:true,playAuthorizationDenied:true}));
     await mutate('policy',family.id,{capabilities:{...defaultCapabilities(),games:false,coding:false,learning:false,problemSolving:false,conversation:true},monthlyCents:0,paused:true,generationPaused:true});
     await p.goto(local+'/acknowledge');await p.getByLabel('Parent passphrase').fill(parent);for(const box of await p.getByRole('checkbox').all())await box.check();
     await p.getByRole('button',{name:'Enter Jems'}).click();await p.getByRole('button',{name:'My creative workshop'}).click();
