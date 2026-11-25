@@ -3,12 +3,7 @@ const assert=require('node:assert/strict');
 const {chromium}=require('playwright');
 const {start}=require('./browser-server.cjs');
 const fs=require('node:fs');
-const SECONDARY_DESTINATIONS=[
- ['studioNavScenes','Create & code'],
- ['studioNavNotifications',/^Notifications, \d+ new, \d+ in progress$/],
- ['studioNavJourney','My journey'],['studioNavRewards','My rewards'],
- ['studioNavPals','My Pals'],['studioNavPowers','My Powers'],['studioNavProblemSolving','Try an idea'],
-];
+const SECONDARY_DESTINATIONS=[['studioNavScenes','Creative Studio'],['studioNavNotifications',/^Notifications, \d+ new, \d+ in progress$/],['studioNavJourney','My Journey']];
 async function approvedIcons(page,basePath){
  const icons=await page.locator('svg.jems-icon').evaluateAll(elements=>elements.map(icon=>({
   name:icon.dataset.jemsIcon,hidden:icon.getAttribute('aria-hidden'),focusable:icon.getAttribute('focusable'),
@@ -81,9 +76,9 @@ async function currentNavigation(page,id){
    const color=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--jems-blue').trim());
    assert.equal(color.toUpperCase(),'#2E6BFF');
    assert.deepEqual(await page.locator('#studioStarters [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['factory','mining','gum','hill'],'four curated Ready to Play games keep their intended order');
-   assert.equal(await page.locator('#page-studio-library #studioOriginals').count(),0,'Home keeps only the four Ready to Play games');
-   assert.deepEqual(await page.locator('#page-creations #studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'retained games belong to My Creations');
-   assert.equal(await page.locator('#page-creations #studioOriginalsTitle').textContent(),'Play your games');
+   assert.equal(await page.locator('#page-studio-library #studioOriginals').count(),1,'Home retains originals below the four curated games');
+   assert.deepEqual(await page.locator('#page-studio-library #studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'retained games belong to My jems');
+   assert.equal(await page.locator('#page-studio-library #studioOriginalsTitle').textContent(),'Your original games');
    // Keep three primary actions in one row, every secondary route in the drawer,
    // and the selected maker clear of home actions even at a narrow 320px width.
    if(label==='mobile'){

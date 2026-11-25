@@ -17,7 +17,7 @@ export function installArtEntryPoints({homeAction,libraryTools,open}:ArtEntryOpt
     setIconLabel(element,'edit',label);element.onclick=open;
     return element;
   };
-  byId('creationShelfImport').after(button('creationArtStudio','My Art','creation-button'));
+  byId('creationFreeShelf').querySelector('.creation-shelf-heading')!.append(button('creationArtStudio','My Art','creation-button'));
   byId('page-creations').querySelector('.page-head')!.append(button('collectionArtStudio','My Art'));
 
   const picture=button('studioUseDrawing','Use my picture');

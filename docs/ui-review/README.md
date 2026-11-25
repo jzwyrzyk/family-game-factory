@@ -1,6 +1,6 @@
 # Standalone UI review
 
-The review build packages the merged Jems UI into one downloadable `jems-ui-review.html`. Open it in current Chrome or Edge, including with the computer disconnected. No server, extension, account, real family data or AI service is needed.
+The review build packages the checked-out Jems UI into one downloadable `jems-ui-review.html`. Open it in current Chrome or Edge, including with the computer disconnected. No server, extension, account, real family data or AI service is needed.
 
 The toolbar selects an experience, supported learning grade, effective iframe viewport, page/journey state and synthetic scenario. Fit display scales the live frame; the frame's CSS viewport still matches the selected dimensions and uses the product's responsive rules. Choose 100% to inspect physical text size, or hide the toolbar. Flag concerns after clicking an affected control, edit/delete findings, mark pages reviewed, and export Markdown or JSON. Findings use a separate browser-local key with an in-memory fallback. Export before closing if persistence is unavailable.
 
@@ -31,7 +31,7 @@ All six grade values are available through the merged `early-preview` compile mo
 
 ## Inventory and maintenance
 
-`coverage.json` contains 16 discovered page containers, 30 selectable intermediate states, 11 journey families and 9 scenario choices at the initial baseline. Counts describe available review entrances; they are not proof of every possible combination or human acceptance. Retained legacy screens are explicitly labelled. `review:coverage` scans source page IDs and fails for new unlisted pages. New journeys and conditional dialogs still need human source review. Update the manifest, fixtures and tests together when main changes.
+`coverage.json` contains 16 discovered page containers, 32 selectable intermediate states, 14 journey families and 9 scenario choices at the initial baseline. Counts describe available review entrances; they are not proof of every possible combination or human acceptance. Retained legacy screens are explicitly labelled. `review:coverage` scans source page IDs and fails for new unlisted pages. New journeys and conditional dialogs still need human source review. Update the manifest, fixtures and tests together when main changes.
 
 `excluded-prs.json` is a dated inventory of significant open work checked on November 25, 2026. It is not a live PR-status service. In particular, the unmerged family-beta chain contains new-family entry, recovery, administration and privacy operations that must not appear in the merged review. The existing merged trusted-device and adult-session controls remain available.
 
@@ -43,10 +43,14 @@ Scenario scope is explicit: first-time/empty clear records, populated adds sampl
 
 A managed local browser can prohibit `file://` by administrator policy. `UI_REVIEW_INLINE_HARNESS=1 npm run review:test` is an explicit development fallback that fulfills one loopback navigation from memory (no server). That result is only DOM/interaction evidence, not proof that file navigation succeeded. GitHub Actions runs the actual `file://` check on stock Chromium and uploads the HTML, manifest and test evidence without deployment credentials.
 
-The workflow is additive, read-only, and independent of production releases. It runs on relevant main changes and sandbox-tool PRs. Review findings never upload automatically. Real-device, Edge-specific, speech/audio, accessibility and owner acceptance remain separate evidence. The HTML's coverage dialog is the authoritative per-artifact list of known deviations.
+The workflow is additive, read-only, and independent of production releases. It runs on relevant main changes and application/sandbox-tool PRs. Review findings never upload automatically. Real-device, Edge-specific, speech/audio, accessibility and owner acceptance remain separate evidence. The HTML's coverage dialog is the authoritative per-artifact list of known deviations.
 
 The artifact workflow pins Ubuntu 24.04 because the repository’s Playwright 1.56.1 cannot install on Ubuntu 26.04. Initial workflow attempts encountered this runner incompatibility before building. The corrected job builds the HTML before browser setup, so a browser-install failure still leaves a downloadable artifact with explicitly incomplete validation.
 
 Additional integration checks add a Jump block and run the real scene engine, upload a synthetic local PNG into the art library, issue a simulated device invitation, and decode every embedded image. [Initial acceptance observations](ACCEPTANCE.md) record existing product UI concerns separately.
 
 The primary download uploads immediately after the build, separately from browser evidence. Download availability does not by itself imply passing tests: check the run’s test step or the acceptance notes. Screenshot names use portable characters for Windows extraction.
+
+## Child experience candidate, November 25
+
+The modernization candidate includes the consolidated My Journey sections, Make/Rebuild/experiment landing, optional live movement introduction, My Art, the revised Home/menu, and saved-concept Build states. The toolbar labels the represented source as **candidate branch** or **merged main**; downloads use the exact represented SHA. PR builds check out and package the PR head rather than its merge base. The workflow also runs the production-bundle four-viewport modernization journey and uploads complete screenshots under `child-modernization/`. The offline review remains synthetic and separate from DEV deployment or owner acceptance. See the [decision](../decisions/2026-11-25-child-experience-modernization.md) and [acceptance record](../evidence/child-modernization/README.md).

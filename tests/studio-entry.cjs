@@ -33,10 +33,13 @@ exports.navigate=async function navigate(page,id){
  if(await page.locator('#page-creation.has-scene').isVisible())await page.locator('#creationHome').click();
  const sections={'#studioNavPals':'pals','#studioNavRewards':'rewards','#studioNavPowers':'powers','#jemsRewardsWidget':'rewards'};
  if(sections[selector]){
+  const current=page.locator('.page:not(.hidden) [data-journey-section="'+sections[selector]+'"]');
+  if(await current.isVisible()){await current.click();return;}
   await exports.navigate(page,'#studioNavJourney');
   await page.locator('#page-jems-journey [data-journey-section="'+sections[selector]+'"]').click();return;
  }
  if(selector==='#studioNavProblemSolving'){
+  if(await page.locator('#journeyExperimentPractice').isVisible()){await page.locator('#journeyExperimentPractice').click();return;}
   await exports.navigate(page,'#studioNavScenes');
   await page.locator('#creationTryIdea').click();return;
  }

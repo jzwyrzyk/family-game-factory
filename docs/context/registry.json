@@ -144,10 +144,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T02:09:44.110Z",
-      "sourceDigest": "17c4fa9cace49f73718df0e43de278fc4a9ac40d938ac605caa0d22c72963cac",
+      "reviewedAt": "2026-11-25T18:39:37.209Z",
+      "sourceDigest": "01fe519fcdb1d1a6fa3d016639f4dd3fa923d3679185d89d6005c47087c174c3",
       "reviewOutcome": "updated",
-      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
+      "reviewReason": "Recorded owner-approved Art reference, canonical destinations, saved-concept Build and transient intro in doctrine and modernization decision.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -307,10 +307,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T02:09:44.215Z",
-      "sourceDigest": "f7e68329f9fa5f777aa383ac4bed0b1adc2c58b15943e91189c5552ea9537ae3",
+      "reviewedAt": "2026-11-25T18:39:37.940Z",
+      "sourceDigest": "e01ba2dec679fd304373d9d004a53e23f9c86bff0e115658a69c022db0743dfa",
       "reviewOutcome": "updated",
-      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
+      "reviewReason": "Updated Home hierarchy, menu, Journey, guidance and readability contracts; moved retained games to My jems with version-library access.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -407,10 +407,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "2d596e7af62766c696ddb6480a4d2169a9526b522d7c5bd8a0c6a126cc72a15a",
-      "reviewedAt": "2026-11-25T02:09:44.619Z",
+      "sourceDigest": "8a107f8ed70d3d53642329e79ed06ecdb2692b2929541ecc0685d567f87a14f7",
+      "reviewedAt": "2026-11-25T18:39:39.531Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
+      "reviewReason": "Documented three Creative Studio entrances, contextual My Art return, real optional intro and existing engine/storage/checking preservation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -494,10 +494,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "f15af69b31bfd284f39b6445eb53eff516a602bef7cac1202eb0aa27655f93e2",
-      "reviewedAt": "2026-11-25T01:57:27.874Z",
+      "sourceDigest": "455e71ef0ae1435a0c8ec38bf0fd9f9eb0cf0b5a06064b626703e808566ec21a",
+      "reviewedAt": "2026-11-25T18:39:40.173Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed imported grade holds, two-subject game playback, responsive coding controls, natural checkpoint and authorized restore paths in integrated verification.",
+      "reviewReason": "Documented Journey location for gems and achievements while preserving balances, reasons and all award authority.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -761,10 +761,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-23T05:43:14.278Z",
-      "sourceDigest": "aa4fa458b8d743d5d1eb9fb44439ce3493a98b21ff2aabaf3ed9c6e78a8985f3",
+      "reviewedAt": "2026-11-25T18:39:40.971Z",
+      "sourceDigest": "f42ba445f7f88327ddb8ed6c59b54c976169fa5db68b62ef75a07f348f86cc3b",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated Coach v2 seven-dimension readiness and selection-aware compiler with full retained conversation history and capacity preflight. Reviewed exact helper attribution after chapter restore, conservative receipt settlement, independent narration month rollover and shared post-body admission; live-model and child acceptance remain separate.",
+      "reviewReason": "Documented empty-composer completion, exactly-once draft coaching and explicit renewed Build after updated recap.",
       "reviewHistory": [
         {
           "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
@@ -886,10 +886,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T16:09:15.573Z",
-      "sourceDigest": "b8ed2e9ef6aed6949405a013cf1260152d33833e48987af33be7684ff5115283",
+      "reviewedAt": "2026-11-25T18:40:04.269Z",
+      "sourceDigest": "efcf48c9748b0fb23f111d328707ebd65ebac692a2fbf3ef3ed558301831710e",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded successful actual file:// smoke and integration checks in run 45650993855; sanitized screenshot filenames after the evidence upload rejected a colon.",
+      "reviewReason": "Preserved evidence assertions while updating real entry journeys for the explicit intro preference and consolidated routes; documented candidate test limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1129,10 +1129,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T17:36:36.252Z",
-      "sourceDigest": "daba507b43d8960af873c01ab8c48adbca09a017e44e6f6c168e5ac1b6f0b8c6",
+      "reviewedAt": "2026-11-25T18:39:41.947Z",
+      "sourceDigest": "bc008f03a736dcdb18015a00d589e0df145f7dd4d063608610e08126446d4b69",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded authorized PR185 merge and successful first automatic main artifact workflow with exact source and download, preserving all acceptance and deployment limits.",
+      "reviewReason": "Recorded candidate-only implementation, excluded concurrent PR186, no release actions and offline/DEV evidence distinction.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1518,10 +1518,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "131112bdd156f599674b42b406109871c4a0cd428db58a4a618071f86967fb55",
-      "reviewedAt": "2026-11-25T01:22:10.336Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Grown-up creation handoff uses the early profile and preserves the authorization, reporting and local play contracts. Existing operational procedures and acceptance commands still apply to this change.",
+      "sourceDigest": "2e0416355870d736980e85535f0cb85dbcbbacfcb57e7fb3c0cd066ca6e8d58d",
+      "reviewedAt": "2026-11-25T18:39:42.596Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented experiment entrance in Creative Studio and retained Powers practice access without evidence or scoring changes.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1571,10 +1571,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "ace76e79cea7593c27303b594bc7515e4e1bb748304de5aac88982689974daaf",
-      "reviewedAt": "2026-11-22T18:39:36.906Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the 48-image scene contact sheets, exact artwork and color preservation, retained authored props and documented remaining fringes; this is rendering support rather than replacement character art.",
+      "sourceDigest": "07a7e458005e54be81bd5c496f92d72dea05404c419f96d60477a2c012a94ee3",
+      "reviewedAt": "2026-11-25T18:39:43.231Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "README navigation placement changed only; no character references, anatomy, forms, artwork bytes, asset approvals or design methodology changed.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1610,10 +1610,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "38e5940ba3f7e89ed9353f01f65b9702bb3b04792db98f4db9c377158730dd8c",
-      "reviewedAt": "2026-11-23T18:16:03.593Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed art ownership and immutable reference contract; only native-game navigation in fixture setup changes, with no artwork store, adapter, export or dependency mutation.",
+      "sourceDigest": "d402857b8e4bc2d1f372a27cf0c0f6926847aa176beaf7d3d315f5215f9fe5ce",
+      "reviewedAt": "2026-11-25T18:39:44.076Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Recorded original composition preservation, readability repair and owner-bound contextual return to game, scene or character choice.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1654,10 +1654,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "56651655d4d633e4b13f6f648dde41b07155523146b067d4e85bb0ac8e3a45a4",
-      "reviewedAt": "2026-11-23T18:16:03.677Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed Pal ownership and recovery contract; browser fixture enters moved native cards through My Creations, without changing Pal assets, collection, growth or rewards.",
+      "sourceDigest": "78b5622271804f18563ee41f8c6b9dd03130d27714906f58e40d9b6efd4c1526",
+      "reviewedAt": "2026-11-25T18:39:44.458Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented Journey collection entry; original portrait rendering, entitlements, growth and owner-scoped state remain authoritative.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",

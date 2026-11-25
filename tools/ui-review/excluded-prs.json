@@ -1,5 +1,10 @@
 [
   {
+    "number": 186,
+    "title": "Concurrent family-beta, storage and owner-premium integration (excluded from this candidate)",
+    "url": "https://github.com/jzwyrzyk/family-game-factory/pull/186"
+  },
+  {
     "number": 181,
     "title": "Independent integration rehearsal for family beta, storage and owner premium",
     "url": "https://github.com/jzwyrzyk/family-game-factory/pull/181"
@@ -11,27 +16,27 @@
   },
   {
     "number": 174,
-    "title": "Private family beta E • authenticated hosting, migration and controlled activation",
+    "title": "Private family beta E \u2022 authenticated hosting, migration and controlled activation",
     "url": "https://github.com/jzwyrzyk/family-game-factory/pull/174"
   },
   {
     "number": 173,
-    "title": "Private family beta D • verified privacy operations and protected previews",
+    "title": "Private family beta D \u2022 verified privacy operations and protected previews",
     "url": "https://github.com/jzwyrzyk/family-game-factory/pull/173"
   },
   {
     "number": 172,
-    "title": "Private family beta C — branded entry, private play and owner dashboard",
+    "title": "Private family beta C \u2014 branded entry, private play and owner dashboard",
     "url": "https://github.com/jzwyrzyk/family-game-factory/pull/172"
   },
   {
     "number": 171,
-    "title": "Private family beta B — guardian onboarding, operations and admission",
+    "title": "Private family beta B \u2014 guardian onboarding, operations and admission",
     "url": "https://github.com/jzwyrzyk/family-game-factory/pull/171"
   },
   {
     "number": 170,
-    "title": "Private family beta A — isolate workspaces and spending records",
+    "title": "Private family beta A \u2014 isolate workspaces and spending records",
     "url": "https://github.com/jzwyrzyk/family-game-factory/pull/170"
   },
   {
@@ -46,12 +51,12 @@
   },
   {
     "number": 60,
-    "title": "[Draft] Jems Objective 2 — Math & ELA independent assessment instruments, 915 slots and secure scoring",
+    "title": "[Draft] Jems Objective 2 \u2014 Math & ELA independent assessment instruments, 915 slots and secure scoring",
     "url": "https://github.com/jzwyrzyk/family-game-factory/pull/60"
   },
   {
     "number": 54,
-    "title": "[Draft] Jems Learning Evidence v1 — grade 1–4 benchmarks, independent assessments & scoring",
+    "title": "[Draft] Jems Learning Evidence v1 \u2014 grade 1\u20134 benchmarks, independent assessments & scoring",
     "url": "https://github.com/jzwyrzyk/family-game-factory/pull/54"
   },
   {

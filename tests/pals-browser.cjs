@@ -423,7 +423,7 @@ async function installReceiptFixture(page) {
     mark('one-click editable playground, repeated real tap events, authored edit, explicit Keep and reload');
 
     phase = 'adding a Pal to another scene';
-    await page.click('#creationBack'); await page.click('[data-creation-starter="blank"]');
+    await page.click('#creationBack'); await page.click('#creationFreeMode'); await page.click('[data-creation-starter="blank"]');
     const beforeAdd = await scene(page);
     await page.click('#creationAddActor');await page.click('#creationAddPal');
     const afterAdd = await scene(page);

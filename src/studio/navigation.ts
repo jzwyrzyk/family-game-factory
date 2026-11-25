@@ -153,12 +153,13 @@ export function installStudioNavigation(options: StudioNavigationOptions) {
   });
 
   function currentDestination() {
-    const active = dialog.querySelector<HTMLElement>('[aria-current="page"]');
-    menu.classList.toggle('has-current-destination', !!active);
-    menu.dataset.currentDestination = active?.id ?? '';
+    const active = nav.querySelector<HTMLElement>('[aria-current="page"]');
+    menu.classList.toggle('has-current-destination', !!active&&active.id!=='studioNavHome'&&active.id!=='studioNavCreate');
+    const aliases:Record<string,string>={studioNavPals:'studioNavJourney',studioNavRewards:'studioNavJourney',studioNavPowers:'studioNavJourney',studioNavProblemSolving:'studioNavScenes'};
+    menu.dataset.currentDestination = active ? aliases[active.id]||active.id : '';
   }
   const currentObserver = new MutationObserver(currentDestination);
-  currentObserver.observe(dialog, { subtree: true, attributes: true, attributeFilter: ['aria-current'] });
+  currentObserver.observe(nav, { subtree: true, attributes: true, attributeFilter: ['aria-current'] });
   currentDestination();
   window.addEventListener('factory-page', close);
   window.addEventListener('factory-profile-before-change', close);

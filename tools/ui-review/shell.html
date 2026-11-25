@@ -38,7 +38,7 @@ window.__jemsReview={asset,assetKeys,config:{experience:'child',grade:1,scenario
 }};
 const host=window.__jemsReview;
 function status(text){$('status').textContent=text;}
-$('baseline').textContent='Merged baseline '+PAYLOAD.sha.slice(0,12)+' · '+assetKeys.length+' embedded assets';
+$('baseline').textContent=PAYLOAD.sourceKind+' · '+PAYLOAD.sha.slice(0,12)+' · '+assetKeys.length+' embedded assets';
 for(const [label,list] of [['Pages',manifest.pages],['Journey states',manifest.states]]){const group=document.createElement('optgroup');group.label=label;for(const r of list){const o=document.createElement('option');o.value=r.action;o.textContent=r.label;group.append(o);}$('destination').append(group);}
 for(const name of manifest.scenarios){const o=document.createElement('option');o.value=name;o.textContent=name.replace(/^./,c=>c.toUpperCase());$('scenario').append(o);}
 function size(){const sizes={desktop:[1440,900],landscape:[1180,820],portrait:[820,1180],mobile:[390,844],actual:[innerWidth,innerHeight]};const [w,h]=sizes[$('device').value];frame.width=w;frame.height=h;const available=$('stage').clientWidth-(document.body.classList.contains('toolbar-hidden')?0:36);const scale=$('zoom').value==='fit'?Math.min(1,available/w):1;frame.style.transform='scale('+scale+')';frame.style.transformOrigin='top left';$('viewport').style.width=w*scale+'px';$('viewport').style.height=h*scale+'px';$('dimensions').textContent=w+' × '+h+' CSS pixels · displayed at '+Math.round(scale*100)+'%';}

@@ -59,12 +59,12 @@ export function createRewardsPage(options: RewardsPageOptions) {
   element.setAttribute('aria-labelledby', 'jemsRewardsTitle');
 
   const toolbar = node('div', 'jems-rewards-toolbar');
-  const back = button('jems-rewards-back', '← My jems', options.onBack);
+  const back = button('jems-rewards-back', '← My Journey', options.onBack);
   back.id = 'jemsRewardsBack';
-  const heading = node('h1', '', 'My rewards');
+  const heading = node('h1', '', 'Gems & achievements');
   heading.id = 'jemsRewardsTitle';
   heading.tabIndex = -1;
-  const journeyLink = button('jems-rewards-secondary', 'My journey', options.onOpenJourney);
+  const journeyLink = button('jems-rewards-secondary', 'My Journey', options.onOpenJourney);
   journeyLink.id = 'jemsRewardsJourney';
   toolbar.append(back, heading, journeyLink);
 

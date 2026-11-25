@@ -6,6 +6,8 @@ These records explain durable choices without turning chat history into another 
 
 ## Index
 
+- [November 25: one child-facing Jems world](2026-11-25-child-experience-modernization.md) — owner-approved navigation, landing-page reference, purpose-driven scenes and unified Send/Build concept. Supersedes earlier menu and retained-game placement only.
+
 | Record | Decision | Status | Source |
 | --- | --- | --- | --- |
 | [DEV → TEST → PROD](2026-11-23-dev-test-prod.md) | Independent private PR previews, permanent isolated TEST and exact-release approval through the existing production controller; zero routine Cloud Shell | Accepted operating direction; source foundation and deployed completion separate | Owner's November 23 automated environment assignment, superseding previous unimplemented DEV/staging proposals |

@@ -1,5 +1,9 @@
 # My Pals: companions for learning and creation
 
+## Pals inside My Journey — November 25, 2026
+
+Enter through **My Journey → My Pals**, including the overview’s free-starter/equipped-Pal entrance. This supersedes the standalone Home banner and top-level menu entry. Approved portraits, Welcome, Take along, Base/Grown, collection eligibility and Create with my Pal remain on the existing guarded controller. An optional Pal entrance remains inside Make a scene. No artwork or growth rule changes. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
+
 **Scope:** the companion foundation in this checkout. This document describes source behavior, integration contracts and acceptance requirements. It does not establish a merge, deployment, observed child engagement or educational benefit; dated evidence belongs in [delivery state](../../DELIVERY-STATE.md).
 
 The owner requested the complementary companion system, then authorized implementation with funny encouragement, a useful collection, visible progress and easy use in children's games. The owner also asked for a practical balance between engagement and the heavy subscription/addiction patterns of comparable products. Character artwork remains a separate development conversation. [ADR0012](../decisions/0012-pals-from-earned-activity.md) records this scope alongside the existing [shared Rewards contract](../rewards/README.md).

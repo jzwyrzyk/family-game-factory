@@ -587,6 +587,7 @@ export function createPalsWidget(options: { state: PalsViewState; onOpen: () => 
       open.append(createPalPortrait(pal.id, pal.stage));
       copy.append(el('strong', '', definition.name), el('span', '', pal.stageName));
     } else {
+      if(ready(state)&&!pal)open.append(createPalPortrait('glim',1));
       copy.append(el('strong', '', 'My Pals'), el('span', '', state.loading ? 'Opening your crew…' : state.error ? 'Open your collection to retry' : 'Choose your free Pal'));
     }
     open.append(copy, el('span', 'pals-widget-arrow', '→'));

@@ -1,5 +1,9 @@
 # Problem-solving observations
 
+## Experiments inside Creative Studio — November 25, 2026
+
+The canonical entrance is **Creative Studio → Try an experiment**, with a contextual return to Creative Studio. My Journey → My Powers also links to the same authored practice. `?problem-solving=1` and existing guarded controls remain compatible. Prediction, test, result and revision retain their original evidence and assistance semantics; the introduction in Creative Studio records none of these observations. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
+
 **Scope:** an owner-authorized formative feature alongside Math, Language Arts and computational practice. Development began November 19, 2026 from `5f2c97e6fdbbd90845fcc274298c8052221d94f6`, after PR62. Source implementation, merge, deployment and educational validation remain separate; see [delivery state](../../DELIVERY-STATE.md).
 
 The feature keeps specific evidence of what a learner chose, tested, understood or revised. It combines quiet records from existing activities with optional short, authored reasoning challenges. It does not infer a general ability score from a conversation, the quality of an AI-generated game, or time spent playing.

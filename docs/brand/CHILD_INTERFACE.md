@@ -78,3 +78,7 @@ Early activities offer pictured answers, audio replay, mute, a declared grown-up
 A young profile starting one of the retained native games hears a short first action after browser activation. Replay and mute appear with game tools. Opening a checkpoint stops the previous instruction. Leaving play or switching profiles disposes its reader. The handoff and scene introduction also respect that profile’s early-learning mute choice.
 
 In the graphical editor, Jump and Dance display existing Spark poses with their direction or music symbols. Focus motion respects the device’s reduced-motion preference. Empty sets use a framed empty group. Objects in nonempty sets have individual picture descriptions so a screen reader can enumerate them.
+
+## Shared landing-page reference
+
+The existing My Art composition is the owner-approved visual standard for Home, My Journey and Creative Studio: illustrated purpose, readable task cards, one clear primary next action, and progressive details. Preserve its artwork and original composition while repairing undersized text. My Journey groups actual Pals, gems, achievements and powers; Creative Studio separates Make a scene, Rebuild a scene and Try an experiment. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md).

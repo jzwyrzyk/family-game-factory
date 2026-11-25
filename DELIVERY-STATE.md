@@ -1,5 +1,12 @@
 # jems delivery state
 
+## Child experience modernization candidate, November 25, 2026
+
+The owner's comprehensive modernization is implemented on `codex/child-experience-modernization-20261125`, based on current protected main `af11650ea35a29bb0ef9f6b0aa6edd7d8ee84a9e`. Home, canonical navigation, My Journey, Creative Studio and the saved-concept Build flow are updated; My Art remains the visual reference. The [decision](docs/decisions/2026-11-25-child-experience-modernization.md) records data/guard boundaries and the [acceptance record](docs/evidence/child-modernization/README.md) maps workstreams, visual evidence, tests, integration and remaining acceptance.
+
+The standalone workflow now builds the exact PR head, labels candidate versus main, and uploads the actual app HTML plus complete four-viewport journeys. This is candidate source and synthetic review evidence. Concurrent family-beta/storage PR186 is excluded. Owner acceptance, hosted test disposition and private DEV/TEST evidence are recorded on the PR; no merge, deployment, activation, paid generation or destructive migration is authorized or performed here.
+
+
 ## Standalone offline UI review integrated, November 25, 2026
 
 Following the owner's authorization to review against current code and merge when ready, [PR #185](https://github.com/jzwyrzyk/family-game-factory/pull/185) merged as `1be7e1adc027a061981098f9b3fb7b8949ff1419`. The reviewed head was `fb34ccedc4e24e32b4be4aadb328f9fa5d74835a`; main remained `0f459f5b29fa3a72c5caf1fa69051475421861f9` throughout the integration review. No product source, original artwork, backend, production release intent or deployment configuration changed. All required checks passed before merge, including the documentation rerun after marking the PR ready.

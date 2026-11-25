@@ -6,7 +6,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {once}=require('node:events');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome,openProfiles}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
 const KEY='family-game-factory-problem-solving-v1';
 
 async function narrationJourney(browser,url){
@@ -101,7 +101,7 @@ async function narrationJourney(browser,url){
    await page.route('**/factory-config.json',r=>r.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'unavailable'})}));
    const activate=async s=>{
     const l=typeof s==='string'?page.locator(s):s;
-    if(typeof s==='string'&&/^#(?:studioNav(?:Scenes|Journey|Rewards|Pals|Powers|ProblemSolving)|jemsRewardsWidget|studioJourneyHelp)$/.test(s)&&!await l.isVisible())await activate('#studioNavMenu');
+    if(typeof s==='string'&&/^#(?:studioNav(?:Scenes|Journey|Rewards|Pals|Powers|ProblemSolving)|jemsRewardsWidget|studioJourneyHelp)$/.test(s)&&!await l.isVisible()){await navigate(page,s);return;}
     device==='touch'?await l.tap():await l.click();
    };
    const phase=()=>page.locator('#page-problem-solving').getAttribute('data-phase');
@@ -133,7 +133,10 @@ async function narrationJourney(browser,url){
     await activate('#studioNavScenes');await onlyPage('page-creation');
     await activate('#studioNavProblemSolving');await onlyPage('page-problem-solving');
     assert.equal(await page.evaluate(()=>document.body.classList.contains('creation-open')),false);
-    assert.equal(await page.evaluate(()=>JSON.stringify(FG.studio.exportNotebook())),notebookBefore,'navigation cannot earn or rewrite making evidence');
+    const afterNavigation=await page.evaluate(()=>FG.studio.exportNotebook()),beforeNavigation=JSON.parse(notebookBefore);
+    assert.deepEqual(afterNavigation.guidance,{player1:{welcomeDismissed:false,dismissedTips:['studio-intro']}},'explicit Skip records only its owner-scoped presentation preference');
+    delete afterNavigation.guidance;delete beforeNavigation.guidance;
+    assert.deepEqual(afterNavigation,beforeNavigation,'navigation cannot earn or rewrite making evidence');
     if(device==='touch'){
       await page.setViewportSize({width:320,height:740});await overflow();
       const buttons=await page.locator('.studio-nav > button').evaluateAll(nodes=>nodes.map(node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};}));

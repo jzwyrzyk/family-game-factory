@@ -1,5 +1,9 @@
 # First creation, small hints, and a useful return
 
+## Modernized returning experience — November 25, 2026
+
+Character-first entry and all existing build handoff/continuation priorities remain. Returning Home now places one Invent a game hero before My Journey / My Art / Creative Studio, one contextual continuation, Ready to Play jems and My jems. The header Create shares the guarded new-idea handler. Build is separate from the required input form; reviewed accumulated conversation needs no repeated entry. An optional Creative Studio first try has its own owner-scoped guidance tip and is not maker or learning evidence. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
+
 **Decisions:** [First-creation journey](../decisions/2026-11-19-first-creation-journey.md), accepted November 19; [character-first navigation](../decisions/2026-11-20-character-first-navigation.md), accepted November 20; and [guided conversation and Build handoff](../decisions/2026-11-20-guided-chat-creation.md), requested November 20 and clarified November 21, 2026 (America/New_York). The owner rejected provisional suggested-answer buttons and delegation: the conversation coach must guide the child to their own answers, and a new game requires enough coherent child-provided detail. This contract describes the corrected requirements; [delivery state](../../DELIVERY-STATE.md) separates source verification, publication, merge and deployment.
 
 ## Experience

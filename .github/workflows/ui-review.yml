@@ -33,20 +33,26 @@ jobs:
         shell: bash
         run: echo "UI_REVIEW_BASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - run: npm run review:build
+        env:
+          UI_REVIEW_SOURCE_KIND: ${{ github.event_name == 'pull_request' && 'candidate branch' || 'merged main' }}
       - name: Upload the standalone download
         uses: actions/upload-artifact@v4
         with:
-          name: jems-ui-review-${{ github.sha }}
+          name: jems-ui-review-${{ env.UI_REVIEW_BASE_SHA }}
           path: dist-review/
           retention-days: 14
           if-no-files-found: error
           compression-level: 6
       - run: npx playwright install --with-deps chromium
       - run: npm run review:test
+      - name: Capture complete candidate journeys
+        run: npm run build && npm run test:child-modernization
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: jems-ui-review-evidence-${{ github.sha }}
-          path: test-results/ui-review/
+          name: jems-ui-review-evidence-${{ env.UI_REVIEW_BASE_SHA }}
+          path: |
+            test-results/ui-review/
+            test-results/child-modernization/
           retention-days: 14
           compression-level: 6

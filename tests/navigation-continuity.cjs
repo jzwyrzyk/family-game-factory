@@ -130,7 +130,7 @@ async function collectionJourney(browser,base,device,viewport){
   await page.click('#studioNavMenu');
   for(const id of NAV.slice(2))assert.equal(await page.locator('#'+id).isVisible(),true,id+' is discoverable in Menu');
   await page.click('#studioMenuClose');
-  const entry=page.getByRole('button',{name:'My Creations',exact:true});
+  const entry=page.getByRole('button',{name:'Saved ideas & versions',exact:true});
   assert.equal(await entry.getAttribute('id'),'studioSavedIdeas');
   const target=await entry.boundingBox();assert.ok(target&&target.height>=44,'collection entry is a touch-sized target');
   await entry.focus();await page.keyboard.press('Enter');

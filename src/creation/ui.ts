@@ -140,6 +140,8 @@ export function installCreationStudio(host: Host) {
   const status = (message: string, error = false) => { $('creationStatus').textContent = message; $('creationStatus').classList.toggle('is-error', error); };
   const readingTools=node('div','creation-reading-tools'); readingTools.id='creationReadingTools';
   function readingText() {
+    if(!introduction.element.hidden)return 'Can you reach the gem? Choose arrows. Press Play. See what happens. You can skip for now.';
+    if(!$('creationWelcome').hidden)return 'Creative Studio. Make a scene, rebuild a scene, or try an experiment. Choose what you want to make.';
     const message=$('creationStatus').textContent?.trim();
     const feedback=$('creationFeedback');
     if(scene && !feedback.hidden && feedback.textContent?.trim())return [message,feedback.textContent,$('creationChallengeBrief').querySelector('.creation-hint')?.textContent].filter(Boolean).join('. ');
@@ -1040,6 +1042,8 @@ export function installCreationStudio(host: Host) {
   document.addEventListener('visibilitychange', () => { if (document.hidden && visible) { stop(); paint(); } });
   const api = {
     open, openChallenges,
+    openMake(){act(()=>{if(enter())shelf('free');});},
+    openIntroduction(){act(()=>{if(!enter())return;shelf();$('creationShelf').hidden=true;introduction.show();});},
     async openArt(selection:ArtSelection){
       if(!enter())return;
       try{shelf();}catch(error){status((error as Error).message,true);return;}

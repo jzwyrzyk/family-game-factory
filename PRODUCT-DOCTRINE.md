@@ -107,6 +107,12 @@ The owner's November 19, 2026 direction adds [formative problem-solving observat
 
 The [parent area](docs/parent-progress/README.md) should help a parent see what happened, inspect the supporting example, and choose a useful next step. Keep Math, Language Arts, Computational Thinking and Problem Solving distinct. Clearly separate recent retained records from accumulated skill history, and observed task performance from standards coverage or validated assessment results. Unknown evidence is not a deficit; recorded help is context for teaching. Explain connections to familiar products and frameworks without converting scores or implying an overall grade level. Recommendations and exports must remain profile-specific and grounded in existing records. See the [parent reporting decision](docs/decisions/2026-11-19-parent-evidence-reporting.md).
 
+## Child destinations and visual standard
+
+The [November 25 modernization decision](docs/decisions/2026-11-25-child-experience-modernization.md) consolidates the child mental model: **My Games → Invent a game → play and improve → My Journey**. **My Art** holds drawings and **Creative Studio** offers Make a scene, Rebuild a scene and Try an experiment. Notifications retains one continuation authority. My Journey gathers Pals, lifetime gems, achievements, maker progression and powers through progressive disclosure; these concepts keep their distinct evidence and economies.
+
+**The existing Art Studio establishes the visual quality standard for Jems landing pages.** Preserve its artwork and composition while sharing navy headings, purple emphasis, soft gradients, readable white action cards and purposeful whitespace. A child's ordinary home keeps one hero action, then My Journey / My Art / Creative Studio, meaningful continuation, Ready to Play jems and My jems. Existing first-character onboarding remains creation-first.
+
 ## 7. The experience must work across devices and retain its identity
 
 Follow [Child interface: clear at six](docs/brand/CHILD_INTERFACE.md): remove redundant reading load, keep visible child labels at least 18px and main instructions at 20px, and check foreground/background contrast in the actual composed task and its help/error states. Question screens lead with the actual question; assessment interpretation belongs in parent reporting. Optional reading uses a deliberately chosen warm female local voice with truthful availability and immediate cancellation. Device audio quality remains a separate acceptance check.

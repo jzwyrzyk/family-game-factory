@@ -109,7 +109,8 @@ async function browserZoom(port){
     const page=await context.newPage(), {tap,reach}=await inputs(page,false);
     await page.route('**/factory-config.json',r=>r.fulfill({json:{version:1,mode:'unavailable'}}));
     await page.goto(`http://127.0.0.1:${port}/arcade/?creation=1`);
-    await tap(page.locator('[data-creation-starter="blank"]'));
+    if(await page.locator('#creationIntroduction').isVisible())await tap(page.locator('#creationIntroSkip'));
+        await tap(page.locator('#creationFreeMode'));await tap(page.locator('[data-creation-starter="blank"]'));
     await tap(page.locator('[data-add-block="move"]'));
     const authored=await page.evaluate(()=>FG.creation.scene());
     const settings=await context.newPage();
@@ -196,7 +197,8 @@ const complexScene={
         await pacing(page);
         await capture(page,name+'-shelf');
         await readableSurface(page,name+' shelf');
-        await tap(page.locator('[data-creation-starter="blank"]'));
+        if(await page.locator('#creationIntroduction').isVisible())await tap(page.locator('#creationIntroSkip'));
+        await tap(page.locator('#creationFreeMode'));await tap(page.locator('[data-creation-starter="blank"]'));
         const initial=await scene(),id=initial.id;
         assert.equal(await page.locator('#creationSimpleMode').getAttribute('aria-pressed'),'true','First steps is the ordinary entrance');
         assert.equal(await page.locator('#creationFullMode').getAttribute('aria-pressed'),'false');

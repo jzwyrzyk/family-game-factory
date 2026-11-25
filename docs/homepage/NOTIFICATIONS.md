@@ -1,5 +1,9 @@
 # Notifications and the Home continuation card
 
+## Home placement — November 25, 2026
+
+The November 25 Home hierarchy places the existing single continuation **after the three destination tiles and before Ready to Play jems**. Priority, unread badges, acknowledgment tokens, owner filtering and non-interrupting completion remain unchanged. No second continuation or build banner is added. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
+
 The [November 22 decision](../decisions/2026-11-22-unified-game-notifications.md) replaces the dark build shelf with one white Home card and an owner-scoped Notifications page. It extends the existing [homepage](README.md), [play view](PLAY_VIEW.md) and [child continuity](../child-continuity/README.md) contracts.
 
 ## What a child sees

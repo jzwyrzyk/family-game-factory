@@ -38,6 +38,14 @@ The [delivery ledger](DELIVERY-STATE.md) owns current source and deployment iden
 
 The [reliability integration matrix](docs/child-continuity/RELIABILITY-2026-11-23.md) maps all five audit components to implementation, tests, storage compatibility and staged rollback. F06 remains partial; linked chat pages do not remove independent evidence/store capacity limits.
 
+## Child experience modernization candidate
+
+`src/studio/world-navigation.ts` supplies presentation-only destination cards and My Journey section navigation. Existing host callbacks retain owner, save and learning guards. `modernization.css` and `src/creation/landing.css` share the Art Studio visual reference; no activity engine or artwork file is replaced. Home embeds the retained native cards alongside owned notebook entries and contextual saved-library access. The legacy route controls remain compatible but are not extra menu entries.
+
+`src/creation/introduction.ts` runs a transient first-visit scene with the existing `SceneEngine` and `CreationStage`. The only durable change is the existing notebook guidance tip `studio-intro`, saved on explicit skip/finish. No scene, reward or assessment write occurs. A rollback needs a compatible guidance reader. My Art retains original/version storage and uses an owner-bound transient return target for its originating game or scene.
+
+The completion button is outside `studioPromptForm`. Send retains the existing coach path; Build on an empty composer compiles all eligible saved intent. A new draft after a ready review is passed once through the same coach and requires a new explicit Build after its recap. Busy, stale, uncertain and pending-submission checks stay in the existing host and backend. [Decision and preservation boundaries](docs/decisions/2026-11-25-child-experience-modernization.md).
+
 ## System boundaries
 
 ### Bubble Gum assembly candidate — November 22, 2026

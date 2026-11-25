@@ -158,7 +158,7 @@ async function firstCreationConversation(browser,url){
   // New unsent thoughts are not silently folded into a previously reviewed game.
   const draft='Keep this thought for a different version.';
   await page.fill('#studioPrompt',draft);
-  await page.waitForFunction(()=>document.getElementById('studioSend').disabled);
+  assert.equal(await page.locator('#studioSend').isEnabled(),true,'Build can check the saved correction without duplicating it');
   assert.equal(f.requests.length,0);
   await page.fill('#studioPrompt','');await page.waitForFunction(()=>document.getElementById('studioSend').disabled===false);
   const submission=page.waitForRequest(request=>request.url().endsWith('/v1/jobs')&&request.method()==='POST');
@@ -216,13 +216,14 @@ async function sentCorrections(browser,url){
   assert.equal(f.requests.length,0);
   const originalReview=(await session(page)).design.creationReview.fingerprint;
   await page.fill('#studioPrompt',correction);
-  await page.click('#studioSend');
+  await page.locator('#studioSend').evaluate(button=>{button.click();button.click();});
   await page.waitForFunction(()=>document.getElementById('coachModeStatus').classList.contains('is-thinking'));
   assert.equal(await page.locator('#studioSend').isDisabled(),true,'an earlier verdict cannot authorize an unreviewed correction');
   assert.equal(f.requests.length,0,'sending a correction never builds');
   assert.equal(await page.locator('#studioBuildHandoff').isVisible(),false,'coaching is not presented as game generation');
   finishAssessment();await page.waitForFunction(()=>document.getElementById('studioSend').disabled===false);
   const current=await session(page);
+  assert.equal(current.messages.filter(m=>m.role==='child'&&m.text===correction).length,1,'rapid repeated Build processes the unsent correction exactly once');
   assert.notEqual(current.design.creationReview.fingerprint,originalReview,'the new assessment is bound to the revised child intent');
   assert.equal(current.design.plan.fun.value,'Actually make it calm instead.');
   assert.equal(current.design.plan.fun.origin,'child');

@@ -26,8 +26,8 @@ const {start}=require('./browser-server.cjs');
   const profiles=()=>openProfiles(page);
   assert.deepEqual(await page.locator('#studioStarters [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['factory','mining','gum','hill'],'four curated Ready to Play games keep their intended order');
   assert.equal(await page.locator('#page-studio-library #studioOriginals').count(),0,'Home keeps only the four Ready to Play games');
-  assert.deepEqual(await page.locator('#page-creations #studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'retained games belong to My Creations');
-  assert.equal(await page.locator('#page-creations #studioOriginalsTitle').textContent(),'Play your games');
+  assert.deepEqual(await page.locator('#page-studio-library #studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter)),['dragon','buckets'],'retained games belong to My jems');
+  assert.equal(await page.locator('#page-studio-library #studioOriginalsTitle').textContent(),'Your original games');
   await page.screenshot({path:`test-results/studio-library-${device}.png`,fullPage:true});
   await page.click('[data-starter="gum"]');
   // This suite exercises the preserved physical builder; newly created games

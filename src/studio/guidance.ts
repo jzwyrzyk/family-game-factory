@@ -7,7 +7,6 @@ export type GuideTipId = typeof GUIDE_TIP_IDS[number];
 export type GuidePreferences = { welcomeDismissed: boolean; dismissedTips: GuideTipId[] };
 export type GuideCopy = { title: string; description: string };
 export const GUIDE_TIPS: Readonly<Record<GuideTipId, GuideCopy>> = {
-  'studio-intro': {title:'Your first steps',description:'Choose arrows and play to see your instructions move a character.'},
   idea: { title: 'Start with your idea', description: 'Start with something you imagine. Jems will help you choose how it looks and plays before you build.' },
   waiting: { title: 'Play while it is being made', description: 'Your idea stays here while you play. We will tell you when your game is ready to try.' },
   ready: { title: 'Your game is ready to try', description: 'Open your game whenever you are ready. You can finish what you are playing first.' },
@@ -18,6 +17,7 @@ export const GUIDE_TIPS: Readonly<Record<GuideTipId, GuideCopy>> = {
   scenes: { title: 'Make a little story', description: 'Give a character actions, then press Play. The blocks change this scene; a linked game keeps its own saved version.' },
   practice: { title: 'Watch, try, make it yours', description: 'Watch the scene, try your own instructions, and check what happens. Hints are here whenever you need them.' },
   progress: { title: 'Different ways to grow', description: 'Gems celebrate completed activities. Your maker level follows your creations. My Powers shows what you have been practicing.' },
+  'studio-intro': {title:'Your first steps',description:'Choose arrows and play to see your instructions move a character.'},
 };
 
 export const isGuideTipId = (value: unknown): value is GuideTipId =>

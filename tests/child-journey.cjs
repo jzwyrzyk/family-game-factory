@@ -81,11 +81,13 @@ async function localJourney(browser,url,device,viewport){
   await page.goto(url);await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
   await exploreWelcome(page);
   await assertTouchDevice(page,device,'after initial navigation');
+  // The approved hierarchy puts destinations before curated games; scroll to the full playable card.
+  await page.locator('#studioStarters [data-starter]').first().scrollIntoViewIfNeeded();
   const first=await page.locator('#studioStarters [data-starter]').first().boundingBox();
-  assert.ok(first&&first.y>=0&&first.y+first.height<=viewport.height,'a complete playable game choice is in the first viewport');
+  assert.ok(first&&first.y>=0&&first.y+first.height<=viewport.height,'a complete playable choice is reachable below the destinations');
   await assertTargets(page,['#studioNavHome','#studioNavCreate','#studioNavMenu','#studioProfileSummary','#studioNew']);
   await page.click('#studioNavMenu');
-  await assertTargets(page,['#studioNavPowers']);
+  await assertTargets(page,['#studioNavJourney']);
   await page.click('#studioMenuClose');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
   await journeyScreenshot(page,device,'first-screen');

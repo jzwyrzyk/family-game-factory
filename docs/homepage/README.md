@@ -12,19 +12,21 @@ The [Notifications contract](NOTIFICATIONS.md) supersedes the former duplicate b
 
 ## Child mental model
 
-1. **I have an idea:** “Invent a game” opens the existing conversational Studio. Talking or saving an idea must not imply a build was completed; “Try a change” remains separate.
-2. **I want to have fun now:** Home keeps four Ready to Play jems (Factory, Mining, Bubble Gum and Rally). **My Creations → Play your games** contains the existing Dragon and Splash or Pass cards, with the same whole-card play actions. Saved authored Moon/Robot games remain supported without default tiles.
-3. **I already started something:** a compact, recognizable Continue row prioritizes ready results and unfinished creative intentions before ordinary recent play. Saved creations remain selectable and segregated by the active player; an archived or dismissed-resume item is not recommended.
-4. **I want to keep exploring:** the Studio's My Games button always returns here. My Powers and family settings remain available, without becoming competing first-screen calls to action.
-5. **Something takes time or is unavailable:** the single continuation card and Notifications page keep pending work discoverable without interrupting play; the homepage never promises new AI builds when the private builder is unavailable.
-6. **I want my games, ideas or drawings:** **My Creations** opens the retained collection and saved variants, with an explicit **My Games** button to return.
-7. **I have a picture:** **Art Studio** sits beside **Invent a game** before the catalogue. It opens the current player's upload, camera, drawing and reusable-art space. An unavailable online builder does not block this local destination.
+The [November 25 modernization](../decisions/2026-11-25-child-experience-modernization.md) supersedes earlier menu and retained-card placement. Returning Home follows:
 
-## My Creations keeps games, ideas and drawings reachable
+1. Original illustrated hero: **What jems will you make today?**, **Imagine it. Play it. Make it yours.**, and one **Invent a game** action.
+2. Equal illustrated destinations: **My Journey**, **My Art**, **Creative Studio**.
+3. One contextual Continue / Notifications card, only for meaningful saved work, with unchanged priority and dismissal rules.
+4. **Ready to Play jems**: Gem Factory, Mind Your Jems!, Bubble Gum Builders and Junkyard Rally with their original artwork and engines.
+5. **My jems**: retained Dragon Island and Splash or Pass, eligible owned saved games/variants and **Saved ideas & versions** for the original collection, family notebook and history. An illustrated empty state invites an invention; no placeholder game is seeded.
 
-The [November 23 placement decision](../decisions/2026-11-23-retained-games-in-my-creations.md) moves the existing `dragon` and `buckets` cards into **Play your games** here; Home retains `factory`, `mining`, `gum` and `hill`. Moving the cards does not filter saved variants, seed replacement projects or migrate data. Opening My Creations performs no project write. An explicit Play reuses the current owner's existing play-only project when present; otherwise it uses normal transactional creation. Saved remixes remain individually selectable with their original owners, heads, kept versions, configurations and revision ancestry. The moved cards retain shared artwork, touch targets, reduced-motion behavior and readable labels.
+The hero omits ordinary workshop administration. Actual service unavailability remains visible. First visits still select Spark or Nova and enter creation; no home reorganization bypasses that gate.
 
-The ordinary shell has **My Games**, **Create** and a labelled **Menu**. The menu groups **Create & code** and **Art Studio** under Make; **Notifications**, **My journey**, **My rewards** and **My Pals** under Your world; **My Powers**, **Try an idea** and subject choice under Learn & explore; parent dashboard and **Private parent session** under Grown-ups; and Journey help under Help. Parent access and help remain visible during first character selection. Existing route handlers retain their save and learning guards. **My Creations** is a supporting action on the homepage, below the Continue area. It opens the existing collection through guarded Studio navigation with the description **Your games, ideas and drawings**.
+The header keeps **My Games**, **Create**, **Menu**, and the active profile. Make contains **Invent a game**, **Creative Studio**, **My Art**. Your world contains **My Journey** and **Notifications**. Learning mode retains authorized Math/English selection. Grown-ups and Help retain existing access and recovery controls. Inside My Journey, section navigation connects maker overview, Pals, Gems & achievements and My Powers without reopening Menu. Creative Studio contains the experiment entrance.
+
+## Saved ideas and versions remain reachable
+
+**Saved ideas & versions** in My jems opens the existing collection through guarded navigation. Moving native cards to Home does not recreate projects, change their IDs, migrate content or broaden visibility. Play reuses the existing current-owner play-only project when present, through the existing transaction. The four curated games remain separate from the retained personal defaults.
 
 Preserve the collection's existing ownership semantics. **Our idea notebook** remains shared among family profiles, including older ideas without an assigned profile. **My drawings** remains specific to the current player. Modern Studio games continue to use their existing per-player notebook and revision storage. Restoring this route does not migrate records, assign ownership to older ideas, or change their stored text.
 

@@ -8,22 +8,22 @@
     },
     {
       "id": "studio",
-      "label": "Make a Game / conversation",
+      "label": "Invent a game / conversation",
       "action": "create"
     },
     {
       "id": "creations",
-      "label": "My Creations",
+      "label": "Saved ideas & versions",
       "action": "creations"
     },
     {
       "id": "creation",
-      "label": "Creative Studio / Coding",
+      "label": "Creative Studio",
       "action": "coding"
     },
     {
       "id": "art-studio",
-      "label": "Art Studio / drawings",
+      "label": "My Art",
       "action": "art"
     },
     {
@@ -43,12 +43,12 @@
     },
     {
       "id": "jems-rewards",
-      "label": "Rewards / gems / achievements",
+      "label": "Gems & achievements",
       "action": "rewards"
     },
     {
       "id": "jems-pals",
-      "label": "Gem Pals / collection & growth",
+      "label": "My Pals",
       "action": "pals"
     },
     {
@@ -232,6 +232,16 @@
       "id": "privacy",
       "label": "Parent: guardian consent",
       "action": "privacy"
+    },
+    {
+      "id": "coding-make",
+      "label": "Creative Studio: choose a world",
+      "action": "coding-make"
+    },
+    {
+      "id": "coding-intro",
+      "label": "Creative Studio: optional movement introduction",
+      "action": "coding-intro"
     }
   ],
   "journeys": [
@@ -245,7 +255,10 @@
     "Gem Pals \u2192 choose / inspect \u2192 growth \u2192 create with Pal",
     "Rewards \u2192 gems \u2192 achievements \u2192 maker journey",
     "Notifications \u2192 build status \u2192 open saved creation",
-    "Trusted devices \u2192 invitation \u2192 guardian choices \u2192 private adult session"
+    "Trusted devices \u2192 invitation \u2192 guardian choices \u2192 private adult session",
+    "My Games \u2192 My Journey \u2192 My Pals / Gems & achievements / My Powers \u2192 practice",
+    "Creative Studio \u2192 first-visit movement \u2192 skip / finish \u2192 Make / Rebuild / experiment",
+    "Ready saved conversation \u2192 unsent correction \u2192 explicit Build \u2192 updated review \u2192 explicit Build"
   ],
   "scenarios": [
     "normal",

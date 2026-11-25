@@ -16,7 +16,7 @@ const harness=process.env.UI_REVIEW_INLINE_HARNESS==='1';
  // Current responsive surfaces use the actual iframe viewport, with no app CSS overrides.
  for(const [device,width]of (process.env.UI_REVIEW_FOCUS?[]:[['desktop',1440],['landscape',1180],['portrait',820],['mobile',390]])){
   await page.selectOption('#device',device);assert.equal(await app().evaluate(()=>innerWidth),width);
-  for(const action of ['home','coding','coding-editor','coding-challenge','art','art-draw','parent','parent:evidence','pals','rewards','math']){await go(action);const overflow=await app().evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));if(overflow.scroll>overflow.width+2)overflows.push({device,action,...overflow});await page.screenshot({path:`test-results/ui-review/${device}-${action.replace(/[^a-z0-9-]/gi,'-')}.png`});}
+  for(const action of ['home','journey','coding','coding-intro','coding-make','coding-editor','coding-challenge','art','art-draw','parent','parent:evidence','pals','rewards','math']){await go(action);const overflow=await app().evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));if(overflow.scroll>overflow.width+2)overflows.push({device,action,...overflow});await page.screenshot({path:`test-results/ui-review/${device}-${action.replace(/[^a-z0-9-]/gi,'-')}.png`});}
  }
  await page.selectOption('#device','desktop');await go('coach-confirm');await app().waitForFunction(()=>!document.getElementById('studioSend').disabled);
  assert.match(await app().locator('#studioMessages').innerText(),/simulated build/);
