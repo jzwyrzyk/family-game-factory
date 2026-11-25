@@ -28,11 +28,16 @@ function verifyRuntime(spec,desired){
  const volumes=spec.volumes??[],secret=volumes[0]?.secret,target=desired.volumes[0].secret,mounts=container.volumeMounts??[];
  requireState(volumes.length===1&&volumes[0].name==='config'&&secret?.secretName===target.secretName&&secret.items?.length===1&&secret.items[0].key===target.items[0].key&&secret.items[0].path==='config.json'&&mounts.length===1&&mounts[0].name==='config'&&mounts[0].mountPath==='/var/run/jems'&&!mounts[0].subPath,'Immutable configuration mount differs.');
 }
+function verifyScaling(actual,expected){
+ for(const key of ['autoscaling.knative.dev/minScale','autoscaling.knative.dev/maxScale'])
+  requireState(String(actual?.annotations?.[key])===expected.annotations[key],'Runtime scaling policy differs.');
+}
 export function verifyService(actual,expected){
  const name=expected.metadata.name,spec=actual.spec?.template?.spec,desired=expected.spec.template.spec;
  requireState(actual.metadata?.name===name&&String(actual.metadata.namespace)===expected.metadata.namespace&&actual.metadata.labels?.['cloud.googleapis.com/location']===expected.metadata.labels['cloud.googleapis.com/location']&&actual.metadata.labels?.['jems-environment']===expected.metadata.labels['jems-environment'],'Existing dedicated service identity required.');
  for(const [key,val] of Object.entries(expected.metadata.annotations))requireState(actual.metadata.annotations?.[key]===val,'Existing ingress or direct URL policy differs.');
- requireState(spec?.serviceAccountName===desired.serviceAccountName&&spec.containers?.length===1&&String(actual.spec.template.metadata?.annotations?.['autoscaling.knative.dev/maxScale'])===expected.spec.template.metadata.annotations['autoscaling.knative.dev/maxScale'],'Existing runtime principal or capacity differs.');
+ requireState(spec?.serviceAccountName===desired.serviceAccountName&&spec.containers?.length===1&&spec.containers.length===1,'Existing runtime principal or capacity differs.');
+ verifyScaling(actual.spec.template.metadata,expected.spec.template.metadata);
  verifyRuntime(spec,desired);
  const serving=(actual.status?.traffic??[]).filter(t=>(t.percent??0)>0).map(t=>[t.revisionName,t.percent]).sort();
  requireState(serving.length&&serving.every(t=>typeof t[0]==='string'&&t[0].length>0)&&serving.reduce((n,t)=>n+t[1],0)===100,'Explicit, healthy current traffic required.');
@@ -93,7 +98,7 @@ export async function environmentRelease(release,controller,options,io=cloud){
    io(['run','services','update',serviceName,'--image',image,'--revision-suffix',suffix,'--no-traffic',...common]);
    candidate=revisions().find(r=>r.metadata.name===revision);
   }
-  if(candidate)verifyRuntime(candidate.spec,plan[role].spec.template.spec);
+  if(candidate){verifyRuntime(candidate.spec,plan[role].spec.template.spec);verifyScaling(candidate.metadata,plan[role].spec.template.metadata);}
   if(mode==='stage'||candidate)requireState(candidate?.metadata?.labels?.['serving.knative.dev/service']===serviceName&&candidate.status?.conditions?.some(v=>v.type==='Ready'&&v.status==='True')&&
     (candidate.status.imageDigest===image||candidate.status.imageDigest===image.split('@')[1]),'Candidate image or readiness differs.');
   requireState(verifyService(service(role),plan[role])===before[role],'Serving percentages changed. Freeze and review existing revisions.');

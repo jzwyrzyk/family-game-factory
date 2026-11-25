@@ -1,11 +1,11 @@
 /* Built application acceptance for the explicitly selected storage-preview. */
-const assert=require('node:assert/strict'),fs=require('node:fs'),{build}=require('esbuild'),{chromium}=require('playwright');
+const assert=require('node:assert/strict'),fs=require('node:fs'),{build}=require('esbuild'),{chromium,webkit}=require('playwright');
 const {start}=require('./browser-server.cjs');
 (async()=>{
- const directory='test-results/storage-preview-build';if(!fs.existsSync(directory+'/index.html'))throw Error('Build with vite build --mode storage-preview --outDir test-results/storage-preview-build first.');
+ const directory=process.env.STUDIO_BUILD_DIR||'test-results/storage-preview';if(!fs.existsSync(directory+'/index.html'))throw Error('Build with vite build --mode storage-preview --outDir test-results/storage-preview first.');
  const fixture=await build({stdin:{contents:`export * from './src/factory/workspace';export * from './src/runtime/manifests';`,resolveDir:process.cwd()},bundle:true,write:false,format:'iife',globalName:'nativeFixture',platform:'browser'});
- const server=start(directory);await new Promise(resolve=>server.listening?resolve():server.once('listening',resolve));let browser;
- try{browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH,args:['--no-sandbox']});
+ const server=start(directory);await new Promise(resolve=>server.listening?resolve():server.once('listening',resolve));let browser,engine;
+ try{engine=process.env.STORAGE_BROWSER==='webkit'?webkit:chromium;browser=await engine.launch({...(engine===chromium?{executablePath:process.env.CHROMIUM_PATH,args:['--no-sandbox']}:{}),headless:true});
   for(const [name,viewport]of [['desktop',{width:1280,height:900}],['tablet',{width:820,height:1180}]]){
    const context=await browser.newContext({viewport}),page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));page.on('dialog',dialog=>dialog.accept());
    await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?arcade=1`);await page.waitForFunction(()=>window.FG?.factory&&window.FG?.builder);await page.addScriptTag({content:fixture.outputFiles[0].text});
