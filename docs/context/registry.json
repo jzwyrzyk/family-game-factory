@@ -888,10 +888,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:36:42.270Z",
-      "sourceDigest": "7de0fa2a14e556ad47dafcbee28c6d4166b9c8a461959410795675cb5e21e849",
+      "reviewedAt": "2026-11-25T01:38:19.632Z",
+      "sourceDigest": "78ab473a901f1e56a2c5dfe3a17d14e5f682dcc3fa4cd49deb0ad3f0a71fbd50",
       "reviewOutcome": "updated",
-      "reviewReason": "Combine storage, premium and family isolation contracts, package scripts and browser journeys.",
+      "reviewReason": "Exercise equal backend names in distinct projects along with isolated-workshop and F06 regression coverage.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1131,10 +1131,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T01:36:42.783Z",
-      "sourceDigest": "0e55cdeff8724ec982e3fb846b8c595cc0d0a77590c6874faace3e19706363b9",
+      "reviewedAt": "2026-11-25T01:38:20.254Z",
+      "sourceDigest": "6dd47a55e4afdce38c63b8a3578f59c514c0f00aae2121161e8e6d7b4287ddb5",
       "reviewOutcome": "updated",
-      "reviewReason": "Record actual protected-main integration, F06 collisions and separate worker identity.",
+      "reviewReason": "Require full project-scoped backends for the combined storage, owner development and beta candidate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
