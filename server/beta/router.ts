@@ -19,7 +19,7 @@ export function json(res:ServerResponse,status:number,data:unknown,cookies?:stri
 }
 const read=(req:IncomingMessage)=>readJsonBody(req,4096,{invalidJsonError:'INVALID_REQUEST',emptyObject:true});
 export function betaRouter(d:FamilyDirectory,key:string,options:{
- runtime:(id:string)=>Promise<Handler>;operatorReadiness?:{jobCeilingMicroUsd:number;generationDispatch:boolean;coachBridge:boolean;speechBridge:boolean};preview?:PreviewRouting;worker?:Handler;scheduler?:Handler;surface?:Surface;adminIdentity?:typeof verifyAdministrator;
+ runtime:(id:string)=>Promise<Handler>;operatorReadiness?:{jobCeilingMicroUsd:number;generationDispatch:boolean;coachBridge:boolean;speechBridge:boolean};preview?:PreviewRouting;worker?:Handler;scheduler?:Handler;generatedRecovery?:(id:string,req:IncomingMessage,res:ServerResponse)=>Promise<void>;surface?:Surface;adminIdentity?:typeof verifyAdministrator;
 }):Handler {
  const hub=new URL(d.config.hubOrigin),admin=new BetaAdministration(d);
  return async(req,res)=>{
@@ -82,10 +82,12 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    if(req.method==='POST'&&(path==='/entry/logout'||path==='/entry/end')){
     exact(await read(req),[]);json(res,200,{ended:true},await logout(d,id,raw,key,path==='/entry/logout'));return;
    }
+   if(path.startsWith('/v1/recovery/generated/')){if(!options.generatedRecovery)throw Error('NOT_FOUND');await options.generatedRecovery(id,req,res);return;}
    if(path==='/entry/storage-consent'){json(res,200,await storageConsent(d,id,raw,key,req.method==='POST'?await read(req):undefined));return;}
    if(path.startsWith('/v1/storage/')){await continuityHttp(d,id,raw,key,req,res);return;}
    if(req.method==='POST'&&(path==='/entry/profile-settings'||path==='/entry/parent-guidance')){json(res,200,await (path==='/entry/profile-settings'?changeLearnerSetting:parentGuidance)(d,id,await read(req),internalCookies(raw),key));return;}
    if(path==='/entry/profiles'||path==='/entry/review-art'||['/entry/export','/entry/export-receipts','/entry/export-storage-metadata','/entry/export-storage','/entry/export-device.js'].includes(path)){
+
     const body=req.method==='POST'?await read(req):{};
     exact(body,path==='/entry/review-art'?['digest']:['/entry/export-receipts','/entry/export-storage-metadata'].includes(path)?['kind','after']:path==='/entry/export-storage'?['after']:[]);
     const result=await d.withFamily(id,async(tx,f,p)=>{

@@ -1,3 +1,4 @@
+import {generatedRecoveryHttp,runGeneratedCloudRecovery} from './beta/generated-recovery';
 import {cloudBackupSchedule,runFamilyCloudRecovery,familyBackupLedger} from './beta/recovery';
 import {reconcileFamilies} from './beta/reconcile';
 import {platformMode,validateBeta,familyOrigin,uuid,type BetaConfig} from './beta/model';
@@ -162,6 +163,7 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
  return betaRouter(d,config.sessionKey,{operatorReadiness:{jobCeilingMicroUsd:config.maxJobMicroUsd,
   generationDispatch:paidExecutionAllowed(config.active,process.env.FACTORY_ACTIONS_APPROVED)&&config.approval?.enabled===true&&!!beta.workerRoute&&!!config.workerApprovedSha,
   coachBridge:!!coachConfig(process.env).enabled&&!!config.coachPrivateOrigin,speechBridge:!!speechConfig(process.env).approved&&!!config.coachPrivateOrigin},preview:{environment:beta.environment,hubOrigin:beta.hubOrigin,previewOrigin:config.previewOrigin,previewKey:config.previewKey},surface:surface??betaHosting('dist-family-beta',beta,config.previewOrigin),runtime:async id=>(await runtime(id)).handler,
+  generatedRecovery:(id,req,res)=>generatedRecoveryHttp(d,id,req.headers.cookie,config.sessionKey,req,res,profile=>familyBackupLedger(db,d,config.artifactBucket!,id,profile,false)),
   worker:async(req,res)=>{
    const id=req.url?.match(/^\/v1\/worker\/jobs\/([a-f0-9-]+)\/(?:claim|report|status)$/)?.[1];
    const bearer=req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];
@@ -185,7 +187,9 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
     if(retired)return;
     const target=await runtime(id);await reconcilePaidReceipts(target.repo);await target.coordinator.tick();
     await runFamilyCloudRecovery(d,id,profile=>familyBackupLedger(db,d,config.artifactBucket!,id,profile));
+    await runGeneratedCloudRecovery(d,id,profile=>familyBackupLedger(db,d,config.artifactBucket!,id,profile));
    });
+
    res.writeHead(204);res.end();
   }});
 }
