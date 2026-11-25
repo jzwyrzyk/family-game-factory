@@ -27,7 +27,13 @@ export async function operatorBrowser(tls:ServerOptions,engine:'chromium'|'webki
    await page.getByLabel('Family monthly limit (USD)').fill('0.21');await page.getByRole('button',{name:'Save family policy',exact:true}).click();await confirm();
    const created=await d.db.run(async tx=>{const directory=await tx.get<{ids:string[]}>(d.root+'/metadata/directory');return Promise.all(directory!.ids.map(id=>d.family(tx,id)));});
    const newly=created.find(f=>f.guardian.contactRef==='operator-new')!;assert.equal(newly.allowance,210000);assert.equal(newly.paused,true);assert.equal(newly.capabilities.adultPrivate,false);assert.ok(newly.invitation?.revokedAt);
-   for(const [width,height] of [[1440,900],[768,1024]]){await page.setViewportSize({width,height});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:'test-results/family-beta/'+engine+'-operator-'+width+'.png',fullPage:true});}
+   for(const [width,height] of [[1440,900],[768,1024]]){
+    await page.setViewportSize({width,height});
+    const layout=await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll<HTMLElement>('main *')].map(node=>({tag:node.tagName,id:node.id,text:node.textContent?.trim().slice(0,100),left:node.getBoundingClientRect().left,right:node.getBoundingClientRect().right,width:node.getBoundingClientRect().width})).filter(box=>box.left<0||box.right>innerWidth)}));
+    await page.screenshot({path:'test-results/family-beta/'+engine+'-operator-'+width+'.png',fullPage:true});
+    assert.ok(layout.scrollWidth<=layout.width,JSON.stringify(layout));
+    assert.ok(await page.locator('.check input').evaluateAll(inputs=>inputs.every(input=>input.getBoundingClientRect().width<=24)),'Checkboxes retain their compact control box.');
+   }
    await page.getByLabel('Choose a family').selectOption(existing.id);await page.getByRole('button',{name:'Request family deletion',exact:true}).click();await confirm();
    await page.getByRole('heading',{name:'Deletion in progress',exact:true}).waitFor();
    for(const action of ['Resume verified family','Start credential recovery','Save family policy','Withdraw processing consent','Request family export'])assert.equal(await page.getByRole('button',{name:action,exact:true}).count(),0);
