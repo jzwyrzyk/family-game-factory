@@ -38,6 +38,9 @@ export function publicPage(path:string,config:Pick<BetaConfig,'operatorContact'>
     check('supervise',"I will supervise my child's use and understand that AI-generated content may contain errors.")+
     check('avoidIdentifying','I will avoid entering personal or identifying information about my child.')+pass(),'Enter Jems')+
     '<p>'+link('/grown-ups','Family privacy and profiles','textlink')+'</p>';
+ }else if(path==='/renew-participation'){
+  title='Review the updated family notices';body='<h1>'+title+'</h1><p>Your saved work stays here. Review the current notices to continue. Optional remote processing stays off until its separate choices are verified again.</p>'+terms+
+   form('renewParticipation',check('adult','I am the verified adult guardian. I have read the updated privacy notice and participation terms.')+pass(),'Accept updated notices');
  }else if(path==='/grown-ups'){
   title='Family privacy and profiles';body='<h1>'+title+'</h1>'+form('parentUnlock',pass(),'Unlock family controls')+
    '<section id="familyControls" hidden><h2>Explorer profiles</h2><p>Use a workshop nickname. Jems needs no real name, age or school.</p><div id="profiles"></div><button id="addProfile">Add an explorer</button><h2>Privacy choices</h2>'+terms+

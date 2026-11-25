@@ -35,6 +35,16 @@ async function refresh(){
  button(create,'Create family',()=>confirmAction('create','new',{contactRef:ref.value},'Create this family'));
  if(!selected)return;const id=selected,f=await request('/manage/family/'+id);const account=card(f.contactRef);
  account.append(el('p','Status: '+f.status),el('p','Workshop: '+f.origin),el('p','Guardian participation: '+(f.verifiedAt?'verified '+new Date(f.verifiedAt).toLocaleDateString():'awaiting verification')));
+ if(f.request?.kind==='deletion'){
+  const privacy=card(f.request.state==='completed'?'Deletion completed':'Deletion in progress');
+  privacy.append(el('p','Access stays closed while this verified deletion case is handled. Family recovery and feature changes are unavailable.'),el('p','Case: '+f.request.id+' · '+f.request.state));
+  if(f.request.state==='requested'){
+   const ref=field(privacy,'Independent privacy-request verification reference','password');
+   button(privacy,'Confirm irreversible deletion',()=>confirmAction('confirm-deletion',id,{requestId:f.request.id,receipt:ref.value},'Confirm irreversible deletion for this request'));
+   const pending=f.pending??[];privacy.append(el('p',pending.length?'Outstanding reservations must settle before confirmation.':'No outstanding reservations.'));
+  }
+  return;
+ }
  if(f.status==='invited')button(account,'Issue or replace invitation',()=>confirmAction('invite',id,{},'Issue private invitation'));
  if(f.invitation&&!f.invitation.used&&!f.invitation.revoked)button(account,'Revoke current invitation',()=>confirmAction('revoke-invite',id,{},'Revoke invitation'));
  if(f.status==='pending'){const pair=field(account,'Code provided by the independently contacted adult','password'),receipt=field(account,'External verification reference','password');button(account,'Confirm guardian participation',()=>confirmAction('verify',id,{pairingCode:pair.value,receipt:receipt.value},'Record independent verification'));}

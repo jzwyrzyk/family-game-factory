@@ -1,6 +1,8 @@
+import {operatorBrowser} from './beta-operator-browser';
+import {earlyBetaBrowser} from './beta-early-browser';
 import {browserIsolation} from './beta-browser-isolation';
 import {previewBrowser} from './beta-preview-browser';
-import {migrationBrowser} from './beta-migration-browser';
+import {migrationBrowser,applicationMigrationBrowser} from './beta-migration-browser';
 import assert from 'node:assert/strict';
 import {createServer} from 'node:https';
 import type {AddressInfo} from 'node:net';
@@ -28,11 +30,22 @@ async function main(){
  let local='';await new Promise<void>(ok=>server.listen(0,'127.0.0.1',ok));local='https://127.0.0.1:'+(server.address() as AddressInfo).port;
  const out='test-results/family-beta';mkdirSync(out,{recursive:true});
  try{
+  const engines=(process.env.BETA_BROWSERS??'chromium,webkit').split(',');
+  if(process.env.CI&&(!engines.includes('chromium')||!engines.includes('webkit')))throw Error('Hosted beta acceptance requires Chromium and WebKit.');
   let completed=0;
-  for(const engine of (process.env.BETA_BROWSERS??'chromium,webkit').split(',')){
+  for(const engine of engines){
    if(!['chromium','webkit'].includes(engine))throw Error('Unknown browser');
    const browser=await (engine==='webkit'?webkit:chromium).launch(engine==='chromium'&&process.env.BETA_CHROMIUM_PATH?{executablePath:process.env.BETA_CHROMIUM_PATH}:{});
    try{
+    const noScript=await browser.newContext({ignoreHTTPSErrors:true,javaScriptEnabled:false}),native=await noScript.newPage();
+    const nativeRequests:string[]=[];native.on('request',request=>nativeRequests.push(request.url()));
+    await native.goto(local+'/invitation');
+    const marker='synthetic-native-form-credential-marker-value';
+    await native.locator('[name=invitation]').fill(marker);await native.locator('[name=passphrase]').fill('synthetic native parent passphrase');await native.getByRole('checkbox').check();
+    await native.getByRole('button',{name:'Pair this device'}).click({noWaitAfter:true});
+    await native.waitForTimeout(100); // Let the blocked native navigation report to the browser request observer.
+    assert.equal(native.url(),local+'/invitation');assert.ok(nativeRequests.every(url=>!url.includes(marker)&&!url.includes('passphrase')));
+    await noScript.close();
     const ctx=await browser.newContext({ignoreHTTPSErrors:true}),p=await ctx.newPage();
     const assets=new Set<string>();p.on('request',r=>assets.add(r.url()));const errors:string[]=[];p.on('pageerror',e=>errors.push(e.message));
     for(const [w,h] of [[1440,900],[768,1024],[390,844]]){
@@ -65,10 +78,12 @@ async function main(){
     await p.getByRole('button',{name:'Talk about this idea'}).waitFor();assert.equal(await p.getByRole('button',{name:'Build or revise my game'}).count(),0);
     assert.equal((await ctx.request.get(local+'/play/features/games.js')).status(),403);assert.equal((await ctx.request.get(local+'/play/features/remote.js')).status(),200);
     await ctx.close();
-    if(engine==='chromium')await browserIsolation({key:readFileSync(dir+'/key'),cert:readFileSync(dir+'/cert')});
+    await browserIsolation({key:readFileSync(dir+'/key'),cert:readFileSync(dir+'/cert')},engine as 'chromium'|'webkit');
+    await earlyBetaBrowser({key:readFileSync(dir+'/key'),cert:readFileSync(dir+'/cert')},engine as 'chromium'|'webkit');
+    await operatorBrowser({key:readFileSync(dir+'/key'),cert:readFileSync(dir+'/cert')},engine as 'chromium'|'webkit');
     const durable=await (engine==='webkit'?webkit:chromium).launchPersistentContext(dir+'/migration-'+engine,
      engine==='chromium'&&process.env.BETA_CHROMIUM_PATH?{executablePath:process.env.BETA_CHROMIUM_PATH}:{});
-    await migrationBrowser(durable);await previewBrowser(browser);console.log(engine+' passed three layouts, invitation, verification, family profile, play gate, logout, migration and separate-origin preview submission');
+    await migrationBrowser(durable);await applicationMigrationBrowser(await browser.newContext(),engine);await previewBrowser(browser);console.log(engine+' passed three layouts, invitation, verification, family profile, play gate, logout, migration and separate-origin preview submission');
    }finally{await browser.close();}
   }
  }finally{server.closeAllConnections();await new Promise<void>(ok=>server.close(()=>ok()));rmSync(dir,{recursive:true});}

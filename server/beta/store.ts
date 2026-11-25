@@ -1,5 +1,6 @@
 import {privacyStatus} from '../privacy/parent-consent';
 import {pendingReservations} from './portability';
+import {assertLearnerWrite,attributeLearnerJobs,reconcileGuidedJobs} from './guidance';
 import {stopJobs} from './stop-jobs';
 import type {AtomicStore,Documents} from './documents';
 import {closedPolicy,remoteAllowed,remoteScopes,uuid,workspaceOf,type BetaConfig,type Family,type Policy} from './model';
@@ -51,7 +52,7 @@ export class FamilyDirectory {
   const administrationBefore=JSON.stringify(administration());
   const consentChoices=()=>JSON.stringify((s.parentPrivacyChoices??[]).map(c=>[c.id,c.revokedAt??null]));
   const priorConsent=consentChoices();
-  const count=s.jobs.length,result=update(s);
+  const count=s.jobs.length;if(write){assertLearnerWrite(f,s,this.config);reconcileGuidedJobs(f,s,this.config);}const result=update(s);if(write)attributeLearnerJobs(f,s,count);
   if(write){
    assertOwnership();
    if(priorConsent!==consentChoices())stopJobs(s);

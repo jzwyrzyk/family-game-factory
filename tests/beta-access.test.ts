@@ -72,3 +72,24 @@ test('family allowances are entered in whole cents with safe micro-dollar accoun
  await mutate('policy',f.id,policy);
  for(const value of [-1,0.5,Number.MAX_SAFE_INTEGER])await assert.rejects(mutate('policy',f.id,{...policy,monthlyCents:value}));
 });
+
+test('current-notice renewal preserves identity and saved work, revokes optional scopes and rejects stale authority',async()=>{
+ const {renewParticipation}=await import('../server/beta/access');
+ const {betaNotice,participationNotice}=await import('../server/beta/model');
+ const {d,enroll,mutate}=await betaFixture(),a=await enroll('notice-renewal'),b=await enroll('notice-other');
+ const before=await d.withFamily(a.id,async(_tx,f)=>f);
+ await d.repository(a.id).transaction(s=>{s.revisions.push({id:'retained',familyId:a.id,projectId:'original',parentId:null,game:null});s.parentPrivacyChoices=[{id:'synthetic-choice',familyId:a.id,deviceId:before.guardian.pairedDevice!,guardianSubject:'synthetic-parent',noticeVersion:betaNotice,scopes:{generation:true,conversation:false,remoteSpeech:false},requestedAt:Date.now()-1000,expiresAt:Date.now()+100000}];});
+ await d.withFamily(a.id,async(tx,f)=>{f.guardian.participationVersion='prior-terms';f.guardian.noticeVersion='prior-notice';tx.set(d.path(f.id),f);});
+ await assert.rejects(requirePlay(d,a.id,a.cookies,fixtureKey,'check'),/CURRENT_NOTICE_REQUIRED/);
+ const input={adult:true,notice:betaNotice,terms:participationNotice,passphrase:acknowledgments.passphrase};
+ await assert.rejects(renewParticipation(d,a.id,{...input,terms:'prior-terms'},internalCookies(a.cookies),fixtureKey),/ACKNOWLEDGMENT/);
+ await assert.rejects(renewParticipation(d,a.id,input,internalCookies(b.cookies),fixtureKey),/UNAUTHENTICATED/);
+ await assert.rejects(renewParticipation(d,a.id,{...input,passphrase:'wrong parent passphrase'},internalCookies(a.cookies),fixtureKey),/INVALID_PARENT_ACCESS/);
+ assert.equal((await d.repository(a.id).snapshot()).parentAuth![a.id].failedAttempts,1);
+ await renewParticipation(d,a.id,input,internalCookies(a.cookies),fixtureKey);
+ const after=await d.withFamily(a.id,async(_tx,f)=>f),state=await d.repository(a.id).snapshot();
+ assert.equal(after.guardian.id,before.guardian.id);assert.equal(after.guardian.receiptDigest,before.guardian.receiptDigest);assert.equal(after.guardian.participationVersion,participationNotice);assert.equal(after.guardian.noticeVersion,betaNotice);assert.equal(after.plays.length,0);
+ assert.equal(state.revisions[0].id,'retained');assert.ok(state.parentPrivacyChoices![0].revokedAt);assert.equal(verifiedParentScope(state,a.id,'generation'),false);
+ await acknowledge(d,a.id,acknowledgments,internalCookies(a.cookies),fixtureKey);
+ await mutate('request-deletion',a.id);await assert.rejects(renewParticipation(d,a.id,input,internalCookies(a.cookies),fixtureKey),/PAUSED/);
+});

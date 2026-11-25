@@ -1,3 +1,4 @@
+import {hasParentGuidance,installParentGuidance} from '../family-beta/guidance';
 import {isEarlyGrade} from '../learning/grades';
 import {createEarlyHandoff,FAMILY_CREATION_LABEL} from './early-handoff';
 
@@ -90,7 +91,7 @@ export async function installStudio(){
  if(!FG?.app||!FG?.store)return;
  const rewards=installRewards();
  const pals=installPals(rewards);
- const young=()=>isEarlyGrade(FG.store.current().grade);
+ const young=()=>isEarlyGrade(FG.store.current().grade)&&!hasParentGuidance(String(FG.store.current().id));
  const handOff=createEarlyHandoff(()=>openParent(true),()=>home(),()=>creation.open(),()=>pals.state,()=>String(FG.store.current().id));
  let notebook:StudioNotebook;
  try{notebook=new StudioNotebook(profileStorage(localStorage),notifyRewardSourceSaved);}catch(error){
@@ -1850,7 +1851,9 @@ export async function installStudio(){
  installStudioNavigation({nav,headerTools,helpButton,rewards:rewardsWidget.element,subjects:learningChoice,
   openArt:()=>act(()=>artStudio.open()),openParent:()=>act(()=>openParent()),
  });
+ installParentGuidance();
  refreshEarlyJourney();
+ window.addEventListener('factory-parent-guidance',()=>{refreshEarlyJourney();if(young()&&route==='studio')home();});
  window.addEventListener('factory-learning-settings',refreshEarlyJourney);
  window.addEventListener('factory-profile',refreshEarlyJourney);
  window.addEventListener('factory-early-handoff',event=>{if(young()){event.preventDefault();handOff();}});

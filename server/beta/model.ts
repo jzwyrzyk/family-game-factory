@@ -1,3 +1,4 @@
+import type {LearnerSetting,ParentGuidance} from './guidance';
 import {randomUUID} from 'node:crypto';
 import {PARENT_PRIVACY_NOTICE_VERSION} from '../privacy/parent-consent';
 import {storageDomains,type StorageDomain} from '../../src/storage/sync-contract';
@@ -20,24 +21,24 @@ export function platformMode(value:unknown):'HOUSEHOLD'|'PRIVATE_FAMILY_BETA'{
  throw Error('PLATFORM_MODE_UNAVAILABLE');
 }
 export interface Invitation {id:string;purpose:'new-family'|'recovery';digest:string;expiresAt:number;issuedAt:number;usedAt?:number;revokedAt?:number}
-export interface Guardian {id:string;contactRef:string;pairedDevice?:string;pairingDigest?:string;participationVersion?:string;verifiedAt?:number;receiptDigest?:string}
+export interface Guardian {id:string;contactRef:string;pairedDevice?:string;pairingDigest?:string;participationVersion?:string;noticeVersion?:string;participationRenewedAt?:number;verifiedAt?:number;receiptDigest?:string}
 export interface Play {digest:string;familyId:string;guardianId:string;deviceId:string;notice:string;terms:string;at:number;lastActive:number;expires:number;entryPending:boolean}
 export interface Family {
  id:string;workspace:string;status:'invited'|'pending'|'active'|'suspended'|'revoked';
  guardian:Guardian;capabilities:Capabilities;allowance:number;paused:boolean;generationPaused:boolean;
- invitation?:Invitation;plays:Play[];createdAt:number;profiles?:string[];approvedArt?:string[];storageDomains?:StorageDomain[];
+ invitation?:Invitation;plays:Play[];createdAt:number;profiles?:string[];profileSettings?:Record<string,LearnerSetting>;parentGuidance?:ParentGuidance[];approvedArt?:string[];storageDomains?:StorageDomain[];
  request?:{id:string;kind:'export'|'deletion';at:number;state:'requested'|'ready'|'deleting'|'completed';approvedAt?:number};
 }
 export interface Policy {version:1;invitations:boolean;participation:boolean;stop:boolean;monthlyLimit:number}
 export const closedPolicy=():Policy=>({version:1,invitations:false,participation:false,stop:true,monthlyLimit:0});
 export interface ProviderEvidence {notice:string;expiresAt:number;provider:'openai'|'google-cloud';privacyDigest:string;safetyDigest:string;scope:RemoteScope;zdrApproved?:boolean}
 export interface BetaConfig {
- environment:string;hubOrigin:string;workerRoute?:'beta-dev'|'beta-test'|'beta-prod';administrator:{audience:string;subject:string;verifier:Pick<FamilyParentAuth,'salt'|'digest'>};
+ environment:string;hubOrigin:string;earlyLearningPreview?:boolean;parentGuidedCreation?:boolean;workerRoute?:'beta-dev'|'beta-test'|'beta-prod';administrator:{audience:string;subject:string;verifier:Pick<FamilyParentAuth,'salt'|'digest'>};
  ownerActivation:string;operatorContact:string;providerEvidence:ProviderEvidence[];
  continuity?:{enabled:boolean;notice:string;domains:StorageDomain[]};
 }
 export function validateBeta(config:BetaConfig|undefined,householdWorkspace:string){
- if(!config||config.ownerActivation!=='private-family-beta-v1'||!/^[-a-z0-9]{1,30}$/.test(config.environment)||
+ if(!config||config.earlyLearningPreview!==undefined&&typeof config.earlyLearningPreview!=='boolean'||config.parentGuidedCreation!==undefined&&typeof config.parentGuidedCreation!=='boolean'||config.ownerActivation!=='private-family-beta-v1'||!/^[-a-z0-9]{1,30}$/.test(config.environment)||
   (config.workerRoute!==undefined&&(!['beta-dev','beta-test','beta-prod'].includes(config.workerRoute)||config.workerRoute!=='beta-'+config.environment.split('-')[0]))||
   !/^https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)+$/.test(config.hubOrigin)||
   !/^[^\s@<>]+@[^\s@<>]+\.[A-Za-z]{2,}$/.test(config.operatorContact)||
@@ -66,11 +67,14 @@ export function workspaceOf(family:Family){
 }
 export function remoteAllowed(family:Family,policy:Policy,evidence:ProviderEvidence[],scope:RemoteScope,now:number){
  return policy.participation===true&&policy.stop===false&&family.status==='active'&&!family.paused&&
-  family.guardian.participationVersion===participationNotice&&!!family.guardian.receiptDigest&&
+  family.guardian.participationVersion===participationNotice&&family.guardian.noticeVersion===betaNotice&&!!family.guardian.receiptDigest&&
   family.capabilities[scope]===true&&(scope!=='generation'||!family.generationPaused)&&
   evidence.some(e=>e.scope===scope&&e.expiresAt>now&&e.notice===betaNotice);
 }
+export function verifiedGuardian(family:Family,policy:Policy){
+ if(!policy.participation||family.status!=='active'||!family.guardian.verifiedAt||!family.guardian.receiptDigest||family.request?.kind==='deletion')throw Error('FAMILY_ACCESS_PAUSED');
+}
+export function needsNoticeRenewal(family:Family){return family.guardian.participationVersion!==participationNotice||family.guardian.noticeVersion!==betaNotice;}
 export function activeFamily(family:Family,policy:Policy){
- if(!policy.participation||family.status!=='active'||!family.guardian.verifiedAt||!family.guardian.receiptDigest||
-    family.guardian.participationVersion!==participationNotice)throw Error('FAMILY_ACCESS_PAUSED');
+ verifiedGuardian(family,policy);if(needsNoticeRenewal(family))throw Error('CURRENT_NOTICE_REQUIRED');
 }

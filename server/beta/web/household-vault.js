@@ -1,13 +1,15 @@
 // Runs on the selected device. No network, cookies, sessionStorage or cached application code.
 const journalKey = 'jems-household-transfer-in-progress-v1';
+const recoveryTransferKey = 'jems-recovery-origin-transfer-v1';
 const dataKeys = new Set(['family-game-factory-state-v1','family-game-factory-workspace-v2',
  'family-game-factory-studio-v1','family-game-factory-creation-v1','family-game-factory-problem-solving-v1',
  'family-game-factory-pending-build-v1','family-game-factory-reward-backup-journal-v1',
  'splash-or-pass-highscore-v3','factory-game-sound-v1','jems.reading-voice.v1']);
 const databaseNames = new Set(['family-game-factory-rewards-v1','family-game-factory-pals-v1',
- 'family-private-drawings-v1','family-drawing-rigs-v1','jems-records-preparation-v1']);
+ 'family-private-drawings-v1','family-drawing-rigs-v1','jems-records-preparation-v1','jems-recovery-vault-v1']);
 const baseName = name => name.replace(/^family-game-factory-adult:adult:[a-f\d-]{36}:/i,'');
 function reviewed(name, db=false) {
+ if(!db&&name===recoveryTransferKey)return false; // Completion provenance is checked separately, never application data.
  const base=baseName(name);
  if(db ? databaseNames.has(base) : dataKeys.has(base)||/^jems-beta-remote-v1:[a-f\d-]{36}$/.test(base)||/^family-game-factory-pending-submission-v1:[\w:-]+$/.test(base))return true;
  if(name!==journalKey && /^(family-|factory-|jems[.-]|splash-or-pass)/.test(name))throw Error('Unreviewed Jems storage. Keep the original device and contact the operator.');
@@ -77,18 +79,20 @@ async function readDatabase(name){
  try{
   const names=[...db.objectStoreNames].sort(sort);
   const tx=names.length?db.transaction(names):null;
-  const stores=await Promise.all(names.map(async name=>{
-   const os=tx.objectStore(name);
+  const stores=await Promise.all(names.map(async storeName=>{
+   const os=tx.objectStore(storeName);
    if(os.autoIncrement)throw Error('Unreviewed automatic key generator. Keep the source.');
    const indexes=[...os.indexNames].sort(sort).map(n=>{const i=os.index(n);return {name:n,keyPath:i.keyPath,unique:i.unique,multiEntry:i.multiEntry};});
    const [keys,values]=await Promise.all([request(os.getAllKeys()),request(os.getAll())]);
-   return {name,keyPath:os.keyPath,indexes,rows:await Promise.all(keys.map(async(k,i)=>[await pack(k),await pack(values[i])]))};
+   if((baseName(name)==='jems-records-preparation-v1'&&storeName==='pending'||baseName(name)==='jems-recovery-vault-v1'&&storeName==='preparing')&&values.length)throw Error('Finish pending storage recovery on the original device before moving this household.');
+   return {name:storeName,keyPath:os.keyPath,indexes,rows:await Promise.all(keys.map(async(k,i)=>[await pack(k),await pack(values[i])]))};
   }));
   return {name,version:db.version,stores};
  }finally{db.close();}
 }
 async function inventory() {
  const local=Object.keys(localStorage).filter(n=>reviewed(n)).sort(sort).map(n=>[n,localStorage.getItem(n)]);
+ if(local.some(([name])=>baseName(name)==='family-game-factory-reward-backup-journal-v1'))throw Error('Finish pending backup recovery on the original device before moving this household.');
  const databases=await Promise.all((await originDatabases()).map(readDatabase));
  return {local,databases};
 }
@@ -98,6 +102,7 @@ async function digest(value){
 export async function exportHousehold(mapping){
  validateMap(mapping,location.origin);
  if(mapping.sourceOrigin!==location.origin||localStorage.getItem(journalKey))throw Error('Select the original household device.');
+ if(localStorage.getItem(recoveryTransferKey))throw Error('This household already has transferred recovery points. Keep this origin and ask for a chained recovery migration before moving it again.');
  const data=await inventory();
  if(!data.local.length&&!data.databases.length)throw Error('No household records found in this browser partition.');
  if(await digest(data)!==await digest(await inventory()))throw Error('Household data changed. Close other tabs and retry.');
@@ -126,25 +131,29 @@ export async function restoreHousehold(mapping,archive,rollback=false){
  if(!navigator.locks)throw Error('This browser cannot lock a household transfer.');
  return navigator.locks.request(journalKey,async()=>{
   const data=archive.body.data,journal=localStorage.getItem(journalKey);
+  const recoveryTransfer=JSON.stringify({schema:'jems.recovery-origin-transfer.v1',...mapping,archiveSha256:archive.sha256});
+  const priorTransfer=localStorage.getItem(recoveryTransferKey);
+  if(priorTransfer!==null&&priorTransfer!==recoveryTransfer)throw Error('A different household recovery transfer is already recorded.');
   const local=new Map(data.local),dbs=new Map(data.databases.map(db=>[db.name,db]));
   if(data.local.length!==local.size||dbs.size!==data.databases.length||(!local.size&&!dbs.size)||
      [...local].some(([k,v])=>typeof k!=='string'||!reviewed(k)||typeof v!=='string')||
      [...dbs.keys()].some(k=>typeof k!=='string'||!reviewed(k,true)))throw Error('Unexpected archive inventory.');
   const current=await inventory(),same=await digest(current)===await digest(data);
   if(journal!==null&&journal!==archive.sha256)throw Error('A different transfer is pending.');
-  if(!journal && same && !rollback)return {complete:true};
+  if(!journal && same && !rollback){if(dbs.has('jems-recovery-vault-v1'))localStorage.setItem(recoveryTransferKey,recoveryTransfer);return {complete:true};}
   if(!journal && (rollback||current.local.length||current.databases.length))throw Error('The destination already contains household data.');
   if(current.local.some(([k,v])=>local.get(k)!==v))throw Error('Local data changed during transfer.');
   for(const db of current.databases)if(!dbs.has(db.name)||await digest(db)!==await digest(dbs.get(db.name)))throw Error('Database changed during transfer.');
   if(rollback){
    for(const db of current.databases)await request(indexedDB.deleteDatabase(db.name));
    for(const [name] of current.local)localStorage.removeItem(name);
-   localStorage.removeItem(journalKey);return {rolledBack:true};
+   localStorage.removeItem(recoveryTransferKey);localStorage.removeItem(journalKey);return {rolledBack:true};
   }
   localStorage.setItem(journalKey,archive.sha256);
   for(const db of data.databases)if(!current.databases.some(d=>d.name===db.name))await createDatabase(db);
   for(const [k,v] of local)if(localStorage.getItem(k)===null)localStorage.setItem(k,v);
   if(await digest(await inventory())!==await digest(data))throw Error('Read-back verification failed. Retain the source and archive.');
+  if(dbs.has('jems-recovery-vault-v1'))localStorage.setItem(recoveryTransferKey,recoveryTransfer);
   localStorage.removeItem(journalKey);return {complete:true};
  });
 }

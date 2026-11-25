@@ -3,7 +3,8 @@ import {verifySession} from '../pipeline/auth';
 import {assertActiveTrustedDevice,checkParentPassphrase,cookieValue,deviceCredentials,firstPartyCookie,newParentAuth,newTrustedDevice} from '../trusted-devices';
 import type {VerifiedSession} from '../contracts/api';
 import type {PipelineState} from '../pipeline/types';
-import {activeFamily,betaNotice,participationNotice,playIdle,playLifetime,type Family,type Play} from './model';
+import {stopJobs} from './stop-jobs';
+import {activeFamily,verifiedGuardian,needsNoticeRenewal,betaNotice,participationNotice,playIdle,playLifetime,type Family,type Play} from './model';
 import type {FamilyDirectory} from './store';
 import type {Documents} from './documents';
 
@@ -60,7 +61,7 @@ export async function redeem(directory:FamilyDirectory,id:string,input:unknown,k
    s.parentAuth={[id]:newParentAuth(input.passphrase)};(s.devices??=[]).push(device);
   },true);
   f.status='pending';invite.usedAt=now;
-  f.guardian.pairingDigest=digest(pair);f.guardian.pairedDevice=device.id;f.guardian.participationVersion=participationNotice;
+  f.guardian.pairingDigest=digest(pair);f.guardian.pairedDevice=device.id;f.guardian.participationVersion=participationNotice;f.guardian.noticeVersion=betaNotice;
   tx.set(directory.path(id),f);
   return {pairingCode:pair,cookies:deviceCredentials(device,deviceSecret,key,now).map(firstPartyCookie)};
  });
@@ -110,7 +111,7 @@ export async function requirePlay(directory:FamilyDirectory,id:string,raw:string
    action==='entry'&&!play.entryPending||action!=='entry'&&play.entryPending)throw Error('PLAY_REQUIRED');
   if(action==='entry'){play.entryPending=false;tx.set(directory.path(id),f);}
   if(action==='activity'&&now-play.lastActive>=60000){play.lastActive=now;tx.set(directory.path(id),f);}
-  return {familyId:id,capabilities:f.capabilities,profiles:f.profiles??[],expires:play.expires,idleUntil:play.lastActive+playIdle,session};
+  return {familyId:id,capabilities:f.capabilities,profiles:f.profiles??[],profileSettings:f.profileSettings??{},expires:play.expires,idleUntil:play.lastActive+playIdle,session};
  });
 }
 export async function logout(directory:FamilyDirectory,id:string,raw:string|undefined,key:string,forget:boolean,now=Date.now()){
@@ -118,11 +119,42 @@ export async function logout(directory:FamilyDirectory,id:string,raw:string|unde
   let session:VerifiedSession|undefined;
   try{session=verifySession(cookieValue(internalCookies(raw),'factory_session'),key,now);}catch{/* Expired authentication can still end its matching play. */}
   const playHash=digest(cookieValue(raw,'__Host-jems-play')??'');
+  const deviceId=session?.familyId===id?session.deviceId:f.plays.find(r=>r.digest===playHash)?.deviceId;
   f.plays=f.plays.filter(r=>r.digest!==playHash&&!(session?.familyId===id&&session.deviceId===r.deviceId));
-  if(forget&&session?.familyId===id)await directory.inWorkspace(tx,f,p,s=>{
-   const d=s.devices?.find(d=>d.id===session?.deviceId&&d.familyId===id);if(d)d.revokedAt=now;
+  const guided=(f.parentGuidance??[]).some(g=>g.deviceId===deviceId);
+  if(guided)f.parentGuidance=f.parentGuidance!.filter(g=>g.deviceId!==deviceId);
+  if(guided||forget&&session?.familyId===id)await directory.inWorkspace(tx,f,p,s=>{
+   if(forget&&session?.familyId===id){const d=s.devices?.find(d=>d.id===session?.deviceId&&d.familyId===id);if(d)d.revokedAt=now;}
   },true);
   tx.set(directory.path(id),f);
  });
  return [playCookie('',0),...(forget?['session','device','parent','adult'].map(name=>firstPartyCookie('factory_'+name+'=; Path=/; Secure; HttpOnly; SameSite=None; Partitioned; Max-Age=0')):[])];
+}
+
+/** Renew notices for the already independently verified guardian. This grants no processing scope. */
+export async function renewParticipation(directory:FamilyDirectory,id:string,input:unknown,cookies:string|undefined,key:string,now=Date.now()){
+ exact(input,['adult','notice','terms','passphrase']);
+ if(input.adult!==true||input.notice!==betaNotice||input.terms!==participationNotice||typeof input.passphrase!=='string'||input.passphrase.length<12||input.passphrase.length>128)throw Error('ACKNOWLEDGMENT_REQUIRED');
+ const passphrase=input.passphrase;
+ const result=await directory.withFamily(id,async(tx,f,p)=>{
+  verifiedGuardian(f,p);const needsRenewal=needsNoticeRenewal(f);
+  const session=await directory.inWorkspace(tx,f,p,s=>{
+   const session=liveSession(f,s,cookies,key,now);
+   if(!checkParentPassphrase(s.parentAuth?.[id],passphrase,now))return null;
+   if(needsRenewal){
+    for(const choice of s.parentPrivacyChoices??[])if(choice.familyId===id&&choice.revokedAt===undefined)choice.revokedAt=now;
+    s.coachConsent=(s.coachConsent??[]).filter(choice=>choice.familyId!==id);stopJobs(s);
+   }
+   return session;
+  },true);
+  if(!session)return false; // Persist failed-passphrase throttling.
+  if(needsRenewal){
+   f.guardian.participationVersion=participationNotice;f.guardian.noticeVersion=betaNotice;f.guardian.participationRenewedAt=now;f.plays=[];f.parentGuidance=[];
+   tx.set(directory.path(id),f);
+   tx.create(directory.path(id)+'/acknowledgments/'+randomUUID(),{kind:'notice-renewal',familyId:id,deviceId:session.deviceId,guardianId:f.guardian.id,notice:betaNotice,terms:participationNotice,at:now,expiresAt:now});
+  }
+  return true;
+ });
+ if(!result)throw Error('INVALID_PARENT_ACCESS');
+ return {renewed:true,processingConsent:'not-granted'};
 }

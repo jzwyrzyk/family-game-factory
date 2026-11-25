@@ -1,7 +1,8 @@
+import {betaProfileSettings,saveBetaLearningGrade} from '../family-beta/guidance';
 import {isGrade,isEarlyGrade} from '../learning/grades';
 import {getSkill} from '../learning/curriculum';
 import {validateFamilyState as validate} from '../storage/family-state';
-/* Family Game Factory — local-only, versioned state. No network calls. */
+/* Versioned device state. Beta grade changes also save minimal parent-authorized metadata. */
 import { profileGrade, validateLearning } from '../learning/engine';
 import {validateLanguage} from '../language/engine';
 import {LANGUAGE_SKILLS} from '../language/curriculum';
@@ -51,6 +52,8 @@ function load(){
  }
 }
 let data = load(),familyData=null,adultProfileId=null;
+const serverSettings=betaProfileSettings();
+for(const profile of data.profiles){if(serverSettings[profile.id])profile.grade=serverSettings[profile.id].grade;}
 function persist(){if(loadError)return false;try{assertRewardSourceWritable();localStorage.setItem(adultStorageKey(KEY),JSON.stringify(data));return true}catch(e){console.warn('Local saving unavailable',e);return false}}
 function pendingRewards(owner){if(loadError)throw Error(loadError);const raw=localStorage.getItem(adultStorageKey(KEY));if(!raw)return [];const saved=JSON.parse(raw);if(!validate(saved))throw Error('Saved learning rewards need recovery.');const p=saved.profiles.find(profile=>profile.id===owner);return p?validateRewardOutbox(p.rewardOutbox):[];}
 function acknowledgeRewards(owner,ids){assertRewardSourceWritable();const p=data.profiles.find(profile=>profile.id===owner);if(!p)throw Error('Choose the player who earned these rewards.');const prior=p.rewardOutbox;const removed=new Set(ids),next=validateRewardOutbox(prior).filter(fact=>!removed.has(rewardFactId(fact)));if(next.length===validateRewardOutbox(prior).length)return;p.rewardOutbox=next;if(!persist()){p.rewardOutbox=prior;throw Error('The reward was saved, but its activity receipt still needs a retry.');}}
@@ -83,6 +86,8 @@ async function changeLearningProfile(patch,stillOpen=()=>true){
  if(!FG.verifyParentSettings)throw Error('Unlock Parent Controls on a trusted family device to change the learning level.');
  await FG.verifyParentSettings();
  }
+ if(owner!==current()||!stillOpen()||FG.learning?.active)throw Error('The player or activity changed. Open settings again.');
+ if(Object.hasOwn(patch,'grade'))await saveBetaLearningGrade(owner.id,patch.grade);
  if(owner!==current()||!stillOpen()||FG.learning?.active)throw Error('The player or activity changed. Open settings again.');
  applyProfile(patch);
 }

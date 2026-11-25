@@ -1,18 +1,19 @@
 import {continuityHttp,storageConsent} from './continuity';
+import {changeLearnerSetting,parentGuidance,withLearnerRequest} from './guidance';
 import {randomUUID} from 'node:crypto';
 import type {IncomingMessage,ServerResponse} from 'node:http';
 import {readJsonBody} from '../http-json';
 import {verifySession} from '../pipeline/auth';
 import {cookieValue,assertActiveTrustedDevice} from '../trusted-devices';
-import {acknowledge,exact,internalCookies,liveSession,metadataSession,logout,redeem,requirePlay} from './access';
-import {activeFamily,betaNotice,familyOrigin,participationNotice,uuid,type Capabilities} from './model';
+import {acknowledge,renewParticipation,exact,internalCookies,liveSession,metadataSession,logout,redeem,requirePlay} from './access';
+import {activeFamily,verifiedGuardian,needsNoticeRenewal,betaNotice,familyOrigin,participationNotice,uuid,type Capabilities} from './model';
 import {exportApproved,exportReceiptPage,exportWorkspace} from './portability';
 import {previewAdmission,type PreviewRouting} from './preview';
 import {BetaAdministration,verifyAdministrator} from './admin';
 import type {FamilyDirectory} from './store';
 
 type Handler=(req:IncomingMessage,res:ServerResponse)=>Promise<void>;
-export type Surface=(req:IncomingMessage,res:ServerResponse,context:{path:string;family?:string;capabilities?:Capabilities;administrator?:boolean;guardianTool?:boolean;expires?:number;idleUntil?:number;profiles?:string[]})=>Promise<boolean>;
+export type Surface=(req:IncomingMessage,res:ServerResponse,context:{path:string;family?:string;capabilities?:Capabilities;administrator?:boolean;guardianTool?:boolean;expires?:number;idleUntil?:number;profiles?:string[];profileSettings?:Record<string,{grade:number;version:number}>})=>Promise<boolean>;
 export function json(res:ServerResponse,status:number,data:unknown,cookies?:string[]){
  res.writeHead(status,{'Content-Type':'application/json; charset=utf-8',...(cookies?{'Set-Cookie':cookies}:{})});res.end(JSON.stringify(data));
 }
@@ -57,16 +58,16 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
       const session=verifySession(cookieValue(internalCookies(raw),'factory_session'),key);
       if(session.deviceId&&session.familyId===id){await metadataSession(d,tx,f,raw,key);connected=true;}
      }catch{/* No authenticated device. */}
-     return {family:true,connected,status:connected?f.status:undefined,needsProfile:connected&&!f.profiles?.length,notice:betaNotice,terms:participationNotice};
+     return {family:true,connected,status:connected?f.status:undefined,needsNoticeRenewal:connected&&needsNoticeRenewal(f),needsProfile:connected&&!f.profiles?.length,notice:betaNotice,terms:participationNotice};
     });json(res,200,state);return;
    }
    if(req.method==='POST'&&!id&&path==='/entry/workshop'){
     const input:unknown=await read(req);exact(input,['code']);if(!uuid(input.code))throw Error('INVALID_REQUEST');
     json(res,200,{origin:familyOrigin(d.config,input.code)});return;
    }
-   if(req.method==='GET'&&['/acknowledge','/grown-ups'].includes(path)){
+   if(req.method==='GET'&&['/acknowledge','/grown-ups','/renew-participation'].includes(path)){
     if(!id)throw Error('NOT_FOUND');
-    try{await d.withFamily(id,async(tx,f,p)=>{activeFamily(f,p);await metadataSession(d,tx,f,raw,key);});}
+    try{const renewal=await d.withFamily(id,async(tx,f,p)=>{verifiedGuardian(f,p);await metadataSession(d,tx,f,raw,key);return needsNoticeRenewal(f);});if(renewal&&path!=='/renew-participation'){res.writeHead(303,{Location:'/renew-participation'});res.end();return;}}
     catch{res.writeHead(303,{Location:'/login'});res.end();return;}
    }
    if(req.method==='GET'&&!path.startsWith('/play/')&&!path.startsWith('/v1/')&&await options.surface?.(req,res,{path,family:id}))return;
@@ -74,6 +75,7 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    if(req.method==='POST'&&path==='/entry/redeem'){
     const {pairingCode,cookies}=await redeem(d,id,await read(req),key);json(res,200,{pairingCode},cookies);return;
    }
+   if(req.method==='POST'&&path==='/entry/renew-participation'){json(res,200,await renewParticipation(d,id,await read(req),internalCookies(raw),key));return;}
    if(req.method==='POST'&&path==='/entry/acknowledge'){
     const cookie=await acknowledge(d,id,await read(req),internalCookies(raw),key);json(res,200,{enter:'/play/'},[cookie]);return;
    }
@@ -82,6 +84,7 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    }
    if(path==='/entry/storage-consent'){json(res,200,await storageConsent(d,id,raw,key,req.method==='POST'?await read(req):undefined));return;}
    if(path.startsWith('/v1/storage/')){await continuityHttp(d,id,raw,key,req,res);return;}
+   if(req.method==='POST'&&(path==='/entry/profile-settings'||path==='/entry/parent-guidance')){json(res,200,await (path==='/entry/profile-settings'?changeLearnerSetting:parentGuidance)(d,id,await read(req),internalCookies(raw),key));return;}
    if(path==='/entry/profiles'||path==='/entry/review-art'||['/entry/export','/entry/export-receipts','/entry/export-storage','/entry/export-device.js'].includes(path)){
     const body=req.method==='POST'?await read(req):{};
     exact(body,path==='/entry/review-art'?['digest']:path==='/entry/export-receipts'?['kind','after']:path==='/entry/export-storage'?['after']:[]);
@@ -118,11 +121,11 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
     let access;
     try{access=await requirePlay(d,id,raw,key,path==='/play/'?'entry':'check');}
     catch(error){
-     if(path!=='/play/'||!(error instanceof Error)||error.message!=='PLAY_REQUIRED')throw error;
-     await d.withFamily(id,async(tx,f,p)=>{activeFamily(f,p);await metadataSession(d,tx,f,raw,key);});
-     res.writeHead(303,{Location:'/acknowledge'});res.end();return;
+     if(path!=='/play/'||!(error instanceof Error)||!['PLAY_REQUIRED','CURRENT_NOTICE_REQUIRED'].includes(error.message))throw error;
+     await d.withFamily(id,async(tx,f,p)=>{verifiedGuardian(f,p);await metadataSession(d,tx,f,raw,key);});
+     res.writeHead(303,{Location:error.message==='CURRENT_NOTICE_REQUIRED'?'/renew-participation':'/acknowledge'});res.end();return;
     }
-    if(await options.surface?.(req,res,{path,family:id,capabilities:access.capabilities,profiles:access.profiles,expires:access.expires,idleUntil:access.idleUntil}))return;
+    if(await options.surface?.(req,res,{path,family:id,capabilities:access.capabilities,profiles:access.profiles,profileSettings:access.profileSettings,expires:access.expires,idleUntil:access.idleUntil}))return;
     throw Error('NOT_FOUND');
    }
    if(path==='/entry/activity'&&req.method==='POST'||path==='/entry/check'&&req.method==='GET'){
@@ -133,7 +136,7 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    if(!path.startsWith('/v1/')||path==='/v1/sessions'||path.startsWith('/v1/sessions/adult/')||path.startsWith('/v1/worker/')||
     path.startsWith('/v1/internal/')||req.headers['x-factory-adult-session']!==undefined)throw Error('FORBIDDEN');
    if(entryRoutes.includes(path)){
-    await d.withFamily(id,async(_tx,f,p)=>{if(path==='/v1/sessions/renew'&&f.status==='pending'&&p.participation)return;
+    await d.withFamily(id,async(_tx,f,p)=>{if(path==='/v1/sessions/renew'){if(f.status==='pending'&&p.participation)return;verifiedGuardian(f,p);return;}
      activeFamily(f,p);if(['/v1/sessions/enroll','/v1/devices/invite'].includes(path)&&!p.invitations)throw Error('INVITATIONS_PAUSED');});
    }else{
     const access=await requirePlay(d,id,raw,key,'check'),preview=path.match(/^\/v1\/revisions\/([\w-]+)\/preview$/);
@@ -141,12 +144,17 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
      json(res,200,await previewAdmission(d,options.preview,access.session,raw,preview[1]));return;}
    }
    req.headers.cookie=internalCookies(raw);
-   await (await options.runtime(id))(req,res);
+   const creative=req.method==='POST'&&(/^(?:\/v1\/jobs(?:\/[^/]+\/retry)?|\/v1\/revisions(?:\/[^/]+\/(?:fork))?|\/v1\/coach(?:\/audio)?)$/.test(path));
+   if(creative){
+    const access=await requirePlay(d,id,raw,key,'check'),profileId=req.headers['x-jems-learner'],token=req.headers['x-jems-parent-guidance'];
+    if(typeof profileId!=='string'||!access.profiles.includes(profileId)||token!==undefined&&typeof token!=='string')throw Error('LEARNER_REQUIRED');
+    await withLearnerRequest({session:access.session,profileId,token,scope:path==='/v1/coach'?'conversation':path==='/v1/coach/audio'?'remoteSpeech':'generation'},async()=>{await (await options.runtime(id))(req,res);});
+   }else await (await options.runtime(id))(req,res);
   }catch(e){
    if(res.headersSent){res.end();return;}
    const reason=e instanceof Error?e.message:'';
    const status=reason==='NOT_FOUND'||reason==='FAMILY_UNAVAILABLE'?404:
-    ['PLAY_REQUIRED','UNAUTHENTICATED'].includes(reason)?401:['STORAGE_CONFLICT','STORAGE_OPERATION_REUSED','STORAGE_CONSENT_CHANGED'].includes(reason)?409:['RATE_LIMIT','PARENT_LOCKED'].includes(reason)?429:
+    ['PLAY_REQUIRED','UNAUTHENTICATED'].includes(reason)?401:['PROFILE_VERSION_CONFLICT','STORAGE_CONFLICT','STORAGE_OPERATION_REUSED','STORAGE_CONSENT_CHANGED'].includes(reason)?409:['RATE_LIMIT','PARENT_LOCKED'].includes(reason)?429:
     /^(FORBIDDEN|ADMIN_REQUIRED|INVALID_(PARENT_ACCESS|INVITATION)|.*_REQUIRED|FAMILY_ACCESS_PAUSED|INVITATIONS_PAUSED|INVALID_LIFECYCLE|DELETION_PENDING|CONTINUITY_DISABLED|CONTINUITY_DENIED|STORAGE_DOMAIN_DENIED)$/.test(reason)?403:
     /^(INVALID_|STORAGE_(?:CURSOR|PAGE|RECORD|OPERATION)_|BETA_CAPACITY|RECEIPT_REUSED|REQUEST_PENDING)/.test(reason)?400:503;
    json(res,status,{errorCode:status===503?'SERVICE_UNAVAILABLE':reason});
