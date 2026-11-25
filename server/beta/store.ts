@@ -8,7 +8,7 @@ import {readWorkspace,writeWorkspace} from '../pipeline/workspace-state';
 export interface Usage {used:number;reserved:number}
 export class FamilyDirectory {
  readonly root:string;
- constructor(readonly db:AtomicStore,readonly config:BetaConfig,private artifacts:(workspace:string)=>PrivateArtifacts|undefined=()=>undefined){
+ constructor(readonly db:AtomicStore,readonly config:BetaConfig,private artifacts:(workspace:string)=>PrivateArtifacts|undefined=()=>undefined,private encoding:{splitGamePayloads?:boolean}={}){
   this.root='factoryBeta/'+config.environment;
  }
  path(id:string){if(!uuid(id))throw Error('INVALID_FAMILY');return this.root+'/families/'+id;}
@@ -68,7 +68,7 @@ export class FamilyDirectory {
    const devices=deviceStatus();
    if(JSON.stringify(devices)!==devicesBefore)tx.set(this.path(f.id)+'/metadata/devices',{devices});
    delete s.betaScopes;
-   await writeWorkspace(tx,loaded,art);
+   await writeWorkspace(tx,loaded,art,this.encoding);
   }
   return result;
  }

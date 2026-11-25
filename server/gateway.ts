@@ -17,6 +17,7 @@ import {narrationHttpHandler} from './coach/narration-http';
 import {PrivateNarrationBridge} from './coach/private-narration-bridge';
 import {coachConfig,coachHandler} from './coach/http';
 import {GcsPrivateArtifacts} from './storage/artifacts';
+import {artifactEncoding} from './storage/encoding-policy';
 import {createServer} from 'node:http';
 import {loadGatewayConfig} from './private-config';
 import {startBootstrap} from './bootstrap';
@@ -47,6 +48,7 @@ export interface GatewayConfig {
  approval:AgentApproval;maxJobMicroUsd:number;workspace:string;projectId?:string;artifactBucket?:string;localFile?:string;schedulerEmail?:string;
  /** Optional private identity-authenticated coach executor URL, never the OpenAI API URL. */
  coachPrivateOrigin?:string;
+ storageEncoding?:'private-game-v2';
 }
 export function paidExecutionAllowed(configActive:boolean,approvalFlag:string|undefined){return configActive&&approvalFlag==='true';}
 /** An explicitly requested but unavailable pilot must never select legacy code generation. */
@@ -59,6 +61,7 @@ export function approvedPremiumPilot(config:GatewayConfig,requested:boolean,adul
  return {approval:config.premiumApproval,workerSha:config.premiumWorkerApprovedSha};
 }
 export async function createGateway(config:GatewayConfig,tenantRepo?:Repository){
+ const encoding=artifactEncoding(config);
  if((platformMode(config.platformMode)==='PRIVATE_FAMILY_BETA')!==!!tenantRepo)throw Error('BETA_GATEWAY_REQUIRED');
  for(const origin of [config.appOrigin,config.gatewayOrigin,config.previewOrigin]){const url=new URL(origin);if(url.origin!==origin||url.protocol!=='https:')throw Error('HTTPS_ORIGINS_REQUIRED');}
  if(new URL(config.previewOrigin).hostname===new URL(config.appOrigin).hostname||new URL(config.previewOrigin).hostname===new URL(config.gatewayOrigin).hostname)throw Error('SEPARATE_PREVIEW_HOST_REQUIRED');
@@ -87,9 +90,9 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
   const b=config.householdBudgetBinding;
   if(tenantRepo||config.localFile||b.familyId!==config.familyId||b.workspace!==config.workspace||!config.projectId)throw Error('HOUSEHOLD_MAPPING_REQUIRED');
   mapped=mappedHouseholdRepository(firestoreStore(new Firestore({projectId:config.projectId})),b,
-   config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,b.workspace):undefined);
+   config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,b.workspace):undefined,encoding);
  }
- const repo=tenantRepo??mapped??(config.localFile?await FileRepository.open(config.localFile):new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace,config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,config.workspace):undefined));
+ const repo=tenantRepo??mapped??(config.localFile?await FileRepository.open(config.localFile):new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace,config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,config.workspace):undefined,encoding));
  await reconcilePaidReceipts(repo);
  const agent={kind:'metered-api' as const,available:paidEnabled,generate:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}};
  const service=new JobService(repo,agent,{test:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}},{allowMock:false,maxUnits:config.maxJobMicroUsd,premiumMaxJobMicroUsd:config.premiumMaxJobMicroUsd,timeoutMs:900000,maxRetries:2,requireVerifiedParentPrivacy:!adult.enabled,adultPilotMode:adult.enabled,premiumPilot,premiumConfigured:!!config.premiumApproval,premiumUnavailable});
@@ -137,7 +140,7 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
     new URL(config.previewOrigin).hostname.endsWith('.'+new URL(beta.hubOrigin).hostname)||
     (config.active&&!beta.workerRoute)||config.sessionKey.length<32||config.previewKey.length<32||config.sessionKey===config.previewKey)throw Error('BETA_CONFIGURATION_REQUIRED');
  const db=new Firestore({projectId:config.projectId});
- const d=new FamilyDirectory(firestoreStore(db),beta,workspace=>new GcsPrivateArtifacts(config.artifactBucket!,workspace));
+ const d=new FamilyDirectory(firestoreStore(db),beta,workspace=>new GcsPrivateArtifacts(config.artifactBucket!,workspace),artifactEncoding(config));
  const runtimes=new Map<string,ReturnType<typeof createGateway>>();
  const runtime=(id:string)=>{
   if(!uuid(id))throw Error('INVALID_FAMILY');

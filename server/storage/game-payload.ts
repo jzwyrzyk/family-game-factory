@@ -38,6 +38,9 @@ export async function readGameManifest(ref:GamePayloadRef,store:PrivateArtifacts
   seen.add(b.index);validateRef(b.ref);bytes+=b.ref.bytes;
  }
  if(m.code){validateRef(m.code);bytes+=m.code.bytes;if(!m.game.compiled||Object.hasOwn(m.game.compiled,'code'))throw Error('PRIVATE_GAME_MANIFEST_REJECTED');}
+ const assets=m.game.assets?.assets;
+ if(assets!==undefined&&(!Array.isArray(assets)||assets.length!==seen.size||assets.some((_:unknown,i:number)=>!seen.has(i))))throw Error('PRIVATE_GAME_MANIFEST_REJECTED');
+ if(m.game.compiled&&!m.code)throw Error('PRIVATE_GAME_MANIFEST_REJECTED');
  if(bytes>8*1024*1024)throw Error('PRIVATE_ARTIFACT_QUOTA_REACHED');
  return m;
 }

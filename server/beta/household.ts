@@ -33,7 +33,7 @@ export async function bindHousehold(db:AtomicStore,b:HouseholdBinding,apply:bool
    savedRevisions:workspace.state.revisions.length,adultPermits:workspace.state.adultPilotPermits?.length??0};
  });
 }
-export function mappedHouseholdRepository(db:AtomicStore,b:HouseholdBinding,artifacts?:PrivateArtifacts):Repository{
+export function mappedHouseholdRepository(db:AtomicStore,b:HouseholdBinding,artifacts?:PrivateArtifacts,encoding:{splitGamePayloads?:boolean}={}):Repository{
  const root=location(b);
  async function run<T>(tx:Documents,operation:(s:PipelineState)=>T,write:boolean){
   const binding=await tx.get<HouseholdBinding>(root+'/metadata/household');
@@ -56,7 +56,7 @@ export function mappedHouseholdRepository(db:AtomicStore,b:HouseholdBinding,arti
     tx.set(path,usage);tx.set(root+'/householdUsage/'+next.month,{used:next.used,reserved:next.reserved});
    }
    if(!open)next.paidEnabled=original.paidEnabled;
-   delete s.platformSpendingStopped;await writeWorkspace(tx,loaded,artifacts);
+   delete s.platformSpendingStopped;await writeWorkspace(tx,loaded,artifacts,encoding);
   }
   return result;
  }

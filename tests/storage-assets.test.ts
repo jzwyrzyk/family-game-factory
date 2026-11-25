@@ -2,6 +2,30 @@ import {test} from 'node:test';import assert from 'node:assert/strict';import {c
 import {encodeArtifacts,decodeArtifacts,type PrivateArtifacts,type ArtifactRef} from '../server/storage/artifacts';
 import {traceGameReferences,type GamePayloadRef} from '../server/storage/game-payload';
 import type {PipelineState} from '../server/pipeline/types';
+import {artifactEncoding} from '../server/storage/encoding-policy';
+import {FixtureDocuments} from '../server/beta/documents';
+import {FamilyDirectory} from '../server/beta/store';
+import {createFamily} from '../server/beta/model';
+import {fixtureConfig} from './beta-fixture';
+test('split encoding requires an explicit private configuration and durable artifact store',()=>{
+ assert.deepEqual(artifactEncoding({artifactBucket:'private-bucket'}),{});
+ assert.deepEqual(artifactEncoding({artifactBucket:'private-bucket',storageEncoding:'private-game-v2'}),{splitGamePayloads:true});
+ for(const value of [{storageEncoding:true},{storageEncoding:'private-game-v3'},{storageEncoding:'private-game-v2'},
+  {storageEncoding:'private-game-v2',artifactBucket:'private-bucket',localFile:'local.json'}])assert.throws(()=>artifactEncoding(value));
+});
+test('configured family repository writes split payloads and old and new readers preserve exact games',async()=>{
+ const db=new FixtureDocuments(),art=memoryArtifacts(),family=createFamily('synthetic-art-owner');
+ const enabled=new FamilyDirectory(db,fixtureConfig,()=>art.store,{splitGamePayloads:true});
+ await db.run(async tx=>tx.create(enabled.path(family.id),family));
+ const source=revisionFixture(2).revisions.map(r=>({...r,familyId:family.id}));
+ await enabled.repository(family.id).transaction(s=>{s.revisions.push(...source);});
+ const raw=await db.run(tx=>tx.get<{json:string}>('factoryWorkspaces/'+family.workspace+'/state/current/chunks/0'));
+ assert.equal(JSON.parse(raw!.json).revisions[0].game.storage,'private-game-v2');
+ assert.deepEqual((await enabled.repository(family.id).snapshot()).revisions,source);
+ const compatibleReader=new FamilyDirectory(db,fixtureConfig,()=>art.store);
+ assert.deepEqual((await compatibleReader.repository(family.id).snapshot()).revisions,source);
+ assert.equal(art.values.size,4); // two manifests, one original asset and one compiled payload
+});
 export function memoryArtifacts(){const values=new Map<string,Buffer>();const store:PrivateArtifacts={put:async bytes=>{const ref:ArtifactRef={storage:'private-artifact-v1',sha256:createHash('sha256').update(bytes).digest('hex'),bytes:bytes.length};values.set(ref.sha256,Buffer.from(bytes));return ref;},get:async ref=>{const bytes=values.get(ref.sha256);if(!bytes)throw Error('unavailable');return Buffer.from(bytes);}};return {store,values};}
 export function revisionFixture(count=50):PipelineState {
  const state:PipelineState={version:1,jobs:[],revisions:[],active:{},ledgers:{},audit:[]};
@@ -35,4 +59,15 @@ test('identical artwork never shares object identities across family or Adult au
  const packed=await encodeArtifacts(source,store,{splitGamePayloads:true}),metadata=JSON.parse(packed);
  const manifests=metadata.revisions.map((r:any)=>JSON.parse(values.get(r.game.manifest.sha256)!.toString()));assert.equal(new Set(manifests.map((m:any)=>m.blobs[0].ref.sha256)).size,3);assert.equal(new Set(manifests.map((m:any)=>m.code.sha256)).size,3);
  assert.deepEqual(await decodeArtifacts(packed,store),source);metadata.revisions[0].game=metadata.revisions[1].game;await assert.rejects(decodeArtifacts(JSON.stringify(metadata),store),/AUDIENCE/);
+});
+test('a hash-valid manifest with a missing original asset or code reference is rejected',async()=>{
+ const source=revisionFixture(1),{store,values}=memoryArtifacts(),packed=await encodeArtifacts(source,store,{splitGamePayloads:true});
+ const metadata=JSON.parse(packed),original=JSON.parse(values.get(metadata.revisions[0].game.manifest.sha256)!.toString());
+ for(const missing of ['blobs','code']){
+  const changed=structuredClone(original);if(missing==='blobs')changed.blobs=[];else delete changed.code;
+  metadata.revisions[0].game.manifest=await store.put(Buffer.from(JSON.stringify(changed)));
+  await assert.rejects(decodeArtifacts(JSON.stringify(metadata),store),/MANIFEST_REJECTED/);
+  assert.equal((await traceGameReferences([metadata.revisions[0].game],store)).complete,false);
+ }
+ assert.deepEqual(await decodeArtifacts(packed,store),source);
 });

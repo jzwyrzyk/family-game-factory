@@ -1,3 +1,4 @@
+import './storage-workspace.test';
 import './storage-backup.test';
 import './storage-remote-copy.test';
 import './storage-continuity.test';

@@ -13,14 +13,16 @@ export async function readWorkspace(tx:Documents,workspace:string,artifacts?:Pri
  const state:PipelineState=head?await decodeArtifacts(parts.map(v=>v!.json).join(''),artifacts):
   {version:1,jobs:[],revisions:[],active:{},ledgers:{},audit:[]};
  if(state.version!==1)throw Error('PERSISTENCE_SCHEMA_REJECTED');
- return {root,chunks,state};
+ return {root,chunks,state,originalParts:parts.map(v=>v!.json)};
 }
 export async function writeWorkspace(tx:Documents,workspace:Awaited<ReturnType<typeof readWorkspace>>,artifacts?:PrivateArtifacts,encoding:{splitGamePayloads?:boolean}={}){
  const serialized=await encodeArtifacts(workspace.state,artifacts,encoding);
  if(Buffer.byteLength(serialized)>3*1024*1024)throw Error('WORKSPACE_CAPACITY_REACHED');
  const points=Array.from(serialized);
  const chunks=Math.ceil(points.length/250000);
+ const parts=Array.from({length:chunks},(_,i)=>points.slice(i*250000,(i+1)*250000).join(''));
+ if(chunks===workspace.chunks&&parts.every((json,i)=>json===workspace.originalParts[i]))return;
  tx.set(workspace.root,{version:1,chunks,updatedAt:Date.now()});
- for(let i=0;i<chunks;i++)tx.set(workspace.root+'/chunks/'+i,{json:points.slice(i*250000,(i+1)*250000).join('')});
+ for(let i=0;i<chunks;i++)if(parts[i]!==workspace.originalParts[i])tx.set(workspace.root+'/chunks/'+i,{json:parts[i]});
  for(let i=chunks;i<workspace.chunks;i++)tx.delete(workspace.root+'/chunks/'+i);
 }
