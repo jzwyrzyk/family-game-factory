@@ -20,12 +20,14 @@ export function cloudBackupSchedule(d:FamilyDirectory):BackupSchedule {
 /** Background authorization uses the separately recorded, still-current guardian
  * storage choices. Enrollment, generation permission and parent login alone do
  * not authorize a snapshot. Every read/write transaction rechecks these grants. */
-export async function authorizeScheduledRecovery(d:FamilyDirectory,tx:Documents,id:string,profile:string){
+export async function authorizeBackupData(d:FamilyDirectory,tx:Documents,id:string,profile:string,scheduled=false){
  const f=await d.family(tx,id),policy=await d.policy(tx);activeFamily(f,policy);const config=d.config.continuity;
  const grant=await tx.get<{version:number;notice:string;participation:string;guardianNotice:string;renewedAt:number;guardian:string;profiles:string[];domains:string[];revokedAt?:number}>(d.path(id)+'/continuity/authorization');
- if(!cloudBackupSchedule(d).enabled||!config?.enabled||f.request?.kind==='deletion'||!f.profiles?.includes(profile)||!grant||grant.version!==1||grant.notice!==config.notice||grant.participation!==participationNotice||grant.guardianNotice!==betaNotice||grant.renewedAt!==((f.guardian as {participationRenewedAt?:number}).participationRenewedAt??0)||grant.guardian!==f.guardian.id||grant.revokedAt!==undefined||!grant.profiles.includes(profile)||f.profiles.some(owner=>!grant.profiles.includes(owner))||BACKUP_DOMAINS.some(domain=>!config.domains.includes(domain)||!f.storageDomains?.includes(domain)||!grant.domains.includes(domain)))throw Error('BACKUP_SCHEDULE_DENIED');
+ if(scheduled&&!cloudBackupSchedule(d).enabled||!config?.enabled||f.request?.kind==='deletion'||!f.profiles?.includes(profile)||!grant||grant.version!==1||grant.notice!==config.notice||grant.participation!==participationNotice||grant.guardianNotice!==betaNotice||grant.renewedAt!==((f.guardian as {participationRenewedAt?:number}).participationRenewedAt??0)||grant.guardian!==f.guardian.id||grant.revokedAt!==undefined||!grant.profiles.includes(profile)||f.profiles.some(owner=>!grant.profiles.includes(owner))||BACKUP_DOMAINS.some(domain=>!config.domains.includes(domain)||!f.storageDomains?.includes(domain)||!grant.domains.includes(domain)))throw Error('BACKUP_SCHEDULE_DENIED');
  return {family:f,grant};
 }
+export const backupIneligible=(error:unknown)=>error instanceof Error&&/^(BACKUP_SCHEDULE_DENIED|FAMILY_ACCESS_PAUSED|CURRENT_NOTICE_REQUIRED|DELETION_PENDING|FAMILY_UNAVAILABLE)$/.test(error.message);
+export const authorizeScheduledRecovery=(d:FamilyDirectory,tx:Documents,id:string,profile:string)=>authorizeBackupData(d,tx,id,profile,true);
 /** Bounded scanner of already authorized COMPLETE cloud copies. It never reads
  * local device stores, admits paid work, migrates household data or erases data.
  * Complete roots and every chunk are pinned to immutable version 1, so racing
@@ -36,7 +38,7 @@ export async function runFamilyCloudRecovery(d:FamilyDirectory,id:string,ledgerF
  const offset=profiles.length?Math.floor(now/schedule.intervalMs)%profiles.length:0;for(const profile of [...profiles.slice(offset),...profiles.slice(0,offset)].slice(0,6)){
   const authorize=async(tx:Documents)=>{await authorizeScheduledRecovery(d,tx,id,profile);};
   // Families without the independent grants are simply ineligible, not errors.
-  try{await d.db.run(authorize,true);}catch(error){if((error as Error).message==='BACKUP_SCHEDULE_DENIED')continue;throw error;}
+  try{await d.db.run(authorize,true);}catch(error){if(backupIneligible(error))continue;throw error;}
   const scope={family:id,profile},service=new ContinuityService(new DocumentContinuityRepository(d.db,'beta-'+id,authorize),true);
   const statePath=d.path(id)+'/backup-scans/'+createHash('sha256').update(profile).digest('hex');
   let state=await d.db.run(async tx=>{await authorize(tx);return await tx.get<ScheduleState>(statePath)??{after:''};},true);
@@ -59,12 +61,12 @@ export async function runFamilyCloudRecovery(d:FamilyDirectory,id:string,ledgerF
  return {copied,pending};
 }
 
-export function familyBackupLedger(db:Firestore,d:FamilyDirectory,bucket:string,id:string,profile:string):BackupScheduleLedger {
- const authorize=()=>d.db.run(tx=>authorizeScheduledRecovery(d,tx,id,profile),true).then(()=>{}),artifacts=new GcsPrivateArtifacts(bucket,'beta-'+id);
+export function familyBackupLedger(db:Firestore,d:FamilyDirectory,bucket:string,id:string,profile:string,scheduled=true):BackupScheduleLedger {
+ const authorize=()=>d.db.run(tx=>authorizeBackupData(d,tx,id,profile,scheduled),true).then(()=>{}),artifacts=new GcsPrivateArtifacts(bucket,'beta-'+id);
  return new FirestoreBackupScheduleLedger(db,'beta-'+id,JSON.stringify([id,profile,'backups']),{
-  put:async bytes=>guardedBackupOperation(d,id,profile,'artifact-write',tx=>authorizeScheduledRecovery(d,tx,id,profile),()=>artifacts.put(bytes),createHash('sha256').update(bytes).digest('hex')),get:async ref=>{await authorize();return artifacts.get(ref);}
+  put:async bytes=>guardedBackupOperation(d,id,profile,'artifact-write',tx=>authorizeBackupData(d,tx,id,profile,scheduled),()=>artifacts.put(bytes),createHash('sha256').update(bytes).digest('hex')),get:async ref=>{await authorize();return artifacts.get(ref);}
  },async native=>{
   const readonly:Documents={get:async<T>(path:string)=>{const row=await native.get(db.doc(path));return row.exists?row.data() as T:undefined;},page:async()=>{throw Error('BACKUP_AUTH_QUERY_UNSUPPORTED');},set:()=>{throw Error('BACKUP_AUTH_READ_ONLY');},create:()=>{throw Error('BACKUP_AUTH_READ_ONLY');},delete:()=>{throw Error('BACKUP_AUTH_READ_ONLY');}};
-  await authorizeScheduledRecovery(d,readonly,id,profile);
+  await authorizeBackupData(d,readonly,id,profile,scheduled);
  });
 }
