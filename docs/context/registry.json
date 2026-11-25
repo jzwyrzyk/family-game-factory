@@ -890,10 +890,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T19:43:25.913Z",
-      "sourceDigest": "ee45b6e62e5a1c20ce6d074b4ca829f52077c14c81275cb528f779fa585e7ac2",
+      "reviewedAt": "2026-11-25T19:58:31.097Z",
+      "sourceDigest": "f54bc27518e01ac825ec6c9ff715f536c562d294280f2a79ee2266a82c72d152",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the strict WebKit ResizeObserver failure at23ad, all fifteen other passing workflows, independently verified exact-source receipt and artifacts, and causal real-observer negative/positive regression. The existing native Studio command remains in full Arcade and WebKit manifests; no error suppression, tolerance change, skipped gate or claimed native Chromium warning reproduction.",
+      "reviewReason": "Recorded exact a11d WebKit Back cancellation and the test-only correction: only that exact WebKit error reaches mandatory settled public-document and fresh server-denial assertions. All other errors propagate. Real Back and the explicitly simulated persisted-pageshow handler replay retain pageerrors and later capability checks; new classifier negatives are included by the existing required beta test wildcard.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1134,10 +1134,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T19:43:26.410Z",
-      "sourceDigest": "995d16c39fd0e5adb66243c370044b66bc882fced7a45051fa95b9a2651a93fc",
+      "reviewedAt": "2026-11-25T19:58:31.637Z",
+      "sourceDigest": "622cb4a3bacf38d46c2ce11973b290f10ea34ddef56ae847cd9828c0104cb46d",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved the historical fully green fc7 checkpoint and recorded the later23ad failure and verified partial successes. Documented corrected-source local acceptance with exact isolated/integration pins; current PR186 exact-head hosted qualification controls review readiness and all release/real-data holds remain.",
+      "reviewReason": "Recorded a11d fifteen passing workflows, independently verified full Arcade and Security artifacts, native WebKit resize acceptance, and the separate entry failure. Added exact isolated/integrated history-harness correction pins and complete local Chromium results; source runtime, defaults and held release boundaries are unchanged, and current PR exact-head checks govern readiness.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
