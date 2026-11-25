@@ -641,8 +641,8 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:25:55.800Z",
-      "sourceDigest": "2eddc8222c4b50c193bbb17d9d4b3aa91bb2e5059364a74e4ad644f18a5a58ce",
+      "reviewedAt": "2026-11-25T01:28:26.927Z",
+      "sourceDigest": "ba7dc4c367bbca5eb5553c243ce5e8c549b4cbefb0446959037ff3a216c63aec",
       "reviewOutcome": "updated",
       "reviewReason": "The shared shell loads responsive learning styles. Reviewed picture sequences record ordered listening evidence with tap controls.",
       "reviewHistory": [
@@ -884,8 +884,8 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:25:55.879Z",
-      "sourceDigest": "ea465343b2142428af55550731a96de554dc321d0ee3fcbac452e8e02a342184",
+      "reviewedAt": "2026-11-25T01:28:27.006Z",
+      "sourceDigest": "f7c6425492a64dbbce6e5a6c945d4da0a52265a76e708e8548f61a45295a3346",
       "reviewOutcome": "unchanged",
       "reviewReason": "The shared shell loads responsive learning styles. Reviewed picture sequences record ordered listening evidence with tap controls. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [

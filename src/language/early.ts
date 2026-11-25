@@ -92,7 +92,7 @@ function addGrade(grade:Grade,prefix:string,topics:Topic[]){
   if(key==='sequence'){
    for(const tier of [0,1,2])for(const [story,...events] of stories){
     const sequence=events.slice(0,grade===-1&&tier===0?2:3);
-    items.push({kind:'sentence-tiles',q:story+' Tap these pictures in story order.',a:sequence.join(' '),
+    items.push({kind:'picture-order',q:story+' Tap these pictures in story order.',a:sequence.join(' '),
      ex:'In the story, the pictures appear in this order: '+sequence.join(', ')+'.',t:tier});
    }
   }

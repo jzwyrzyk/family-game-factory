@@ -158,9 +158,9 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
       grid.append(b);
     }
     work.append(grid);
-  } else if((item.kind==='word-tiles'||item.kind==='sentence-tiles')&&item.tiles){
-    const sentence=item.kind==='sentence-tiles';
-    const pictureOrder=early&&sentence&&item.skillId.endsWith('-sequence');
+  } else if((item.kind==='picture-order'||item.kind==='word-tiles'||item.kind==='sentence-tiles')&&item.tiles){
+    const pictureOrder=item.kind==='picture-order';
+    const sentence=pictureOrder||item.kind==='sentence-tiles';
     const selected:number[]=[];const tray=make('div','language-tile-tray');
     const output=make('output','language-built');output.setAttribute('aria-live','polite');
     output.setAttribute('aria-label',pictureOrder?'Pictures in your story':sentence?'Sentence you built':'Word you built');
