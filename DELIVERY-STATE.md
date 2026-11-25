@@ -2,7 +2,7 @@
 
 ## November 25, 2026 · Private Family Beta review stack
 
-Application PRs [A](https://github.com/jzwyrzyk/family-game-factory/pull/170), [B](https://github.com/jzwyrzyk/family-game-factory/pull/171), [C](https://github.com/jzwyrzyk/family-game-factory/pull/172) and [D](https://github.com/jzwyrzyk/family-game-factory/pull/173) precede the protected-hosting and migration candidate. The private worker has a companion routing change. Synthetic browser and Firestore evidence are separate from deployed DEV/TEST and owner acceptance. No household mapping or family activation has been performed. [Controlled activation and rollback](docs/family-beta/ACTIVATION.md)
+Application PRs [A](https://github.com/jzwyrzyk/family-game-factory/pull/170), [B](https://github.com/jzwyrzyk/family-game-factory/pull/171), [C](https://github.com/jzwyrzyk/family-game-factory/pull/172) and [D](https://github.com/jzwyrzyk/family-game-factory/pull/173) precede [E, protected hosting and migration](https://github.com/jzwyrzyk/family-game-factory/pull/174). The private worker has a companion routing change. Synthetic browser and Firestore evidence are separate from deployed DEV/TEST and owner acceptance. No household mapping or family activation has been performed. [Controlled activation and rollback](docs/family-beta/ACTIVATION.md)
 
 ## November 24 — premium completion continuation, PR139
 

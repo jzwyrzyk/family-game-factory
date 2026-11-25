@@ -4,6 +4,7 @@ import {mkdtemp,readdir,readFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import vm from 'node:vm';
+import {environmentRelease} from '../scripts/beta/environment-release.mjs';
 import {hostingPlan} from '../scripts/beta/prepare-hosting.mjs';
 import {preparePublic} from '../scripts/beta/prepare-public';
 import {protectedHousehold} from '../server/beta/owner-host';
@@ -46,4 +47,37 @@ test('owner application files require the dedicated IAP subject on the exact hou
  assert.equal((await get('/factory-config.json','synthetic-owner','alternate.run.app')).status,403);
  assert.ok((await get('/factory-config.json','synthetic-owner')).body.includes('https://owner.example'));
  assert.equal((await get('/sw.js','synthetic-owner')).status,403);
+});
+
+test('protected nonproduction controller verifies build evidence and stages each approved revision once with serving traffic preserved',async()=>{
+ const source='c'.repeat(40),id='11111111-1111-4111-8111-111111111111',trigger='22222222-2222-4222-8222-222222222222';
+ const record={descriptor:cfg,source,builds:{gateway:{id,trigger},preview:{id:id.replace(/^1/,'3'),trigger}}};
+ const plan=hostingPlan(cfg) as Record<string,any>,controller={enabled:true,projectId:cfg.project,projectNumber:cfg.projectNumber,region:cfg.region};
+ const revisions=new Map<string,any[]>(),staged:string[]=[];let wrongImage=false;
+ function io(args:string[]){
+  const group=args.slice(0,3).join(' ');
+  if(args[0]==='builds'){
+   const img=args[2]===id?cfg.gatewayImage:cfg.previewImage;
+   return {id:args[2],buildTriggerId:trigger,status:'SUCCESS',substitutions:{COMMIT_SHA:source,REPO_FULL_NAME:'jzwyrzyk/family-game-factory'},
+    results:{images:[{name:img.split('@')[0]+':approved',digest:wrongImage?'sha256:'+'f'.repeat(64):img.split('@')[1]}]}};
+  }
+  if(group==='compute url-maps describe')return plan.urlMap;
+  if(group==='compute backend-services describe')return {name:args[3],iap:{enabled:true}};
+  if(group==='run services describe'){
+   const found=accounts.find(r=>cfg.services[r].name===args[3])!;
+   return {...plan[found],status:{traffic:[{revisionName:args[3]+'-prior',percent:100}]}};
+  }
+  if(group==='run revisions list')return revisions.get(args[4])??[];
+  if(group==='run services update'){
+   assert.ok(args.includes('--no-traffic'));const service=args[3],image=args[args.indexOf('--image')+1],suffix=args[args.indexOf('--revision-suffix')+1];
+   revisions.set(service,[{metadata:{name:service+'-'+suffix,labels:{'serving.knative.dev/service':service}},status:{imageDigest:image,conditions:[{type:'Ready',status:'True'}]}}]);staged.push(service);return {};
+  }
+  throw Error('Unexpected command');
+ }
+ const opts={environment:'test',source,mode:'verify'};await environmentRelease(record,controller,opts,io);assert.equal(staged.length,0);
+ wrongImage=true;await assert.rejects(environmentRelease(record,controller,{...opts,mode:'stage'},io),/digest/);assert.equal(staged.length,0);wrongImage=false;
+ await assert.rejects(environmentRelease(record,{...controller,enabled:false},{...opts,mode:'stage'},io));
+ for(let i=0;i<2;i++){const receipt=await environmentRelease(record,controller,{...opts,mode:'stage'},io);assert.ok(receipt.services.every((r:any)=>r.revision&&r.currentTrafficPreserved));}
+ assert.deepEqual(staged,['preview','gateway','household'].map(r=>cfg.services[r].name));
+ assert.equal(staged.length,3);
 });

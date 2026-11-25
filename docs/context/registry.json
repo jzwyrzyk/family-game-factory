@@ -678,10 +678,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:29:42.599Z",
-      "sourceDigest": "799951bcf2974a3cb1461f0d27df0d6edd34cf0679fe1ff7eb31c9f85504cb54",
+      "reviewedAt": "2026-11-25T00:36:05.217Z",
+      "sourceDigest": "68a9dce57220bf1bb3b9f6c8293fd741466ac2c78e2f428d6dd3d634acb8604d",
       "reviewOutcome": "updated",
-      "reviewReason": "Record paginated guardian exports, content-free pending reservations and household preview verification.",
+      "reviewReason": "Document the opt-in zero-traffic staging contract and household ownership check across receipt stores.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -887,10 +887,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:29:43.286Z",
-      "sourceDigest": "70319a5ef48f296025ee61b72f4d09eb4bda115202dcf945e16ec9ac26fac1bc",
+      "reviewedAt": "2026-11-25T00:36:05.577Z",
+      "sourceDigest": "6dc47a81b78236f2f13fc89a2bd42ef88b73582f6c3e9ee4582532e8f6044ade",
       "reviewOutcome": "updated",
-      "reviewReason": "Cover durable WebKit migration, scoped creative controls and household preview revocation.",
+      "reviewReason": "Cover live-service and candidate identity verification using the synthetic cloud adapter and existing environment contracts.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1130,10 +1130,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T00:29:43.678Z",
-      "sourceDigest": "1d906dcea4ef9c51ab206288dccae085fba76b1437c596f5d9267ef564765518",
+      "reviewedAt": "2026-11-25T00:36:05.947Z",
+      "sourceDigest": "9cdfad207005d5821b2b5d98025215a8e4befff3ffc94be37ad4d77a3e2f13fa",
       "reviewOutcome": "updated",
-      "reviewReason": "Match protected nonproduction scaling to the existing environment controller.",
+      "reviewReason": "Describe the protected GitHub verify and stage controls, provenance, read-back, setup blockers and independent traffic approval.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

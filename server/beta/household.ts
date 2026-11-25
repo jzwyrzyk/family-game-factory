@@ -12,7 +12,7 @@ function location(b:HouseholdBinding){
  return 'factoryBeta/'+b.environment;
 }
 function checkOwnership(s:PipelineState,b:HouseholdBinding){
- if([...s.jobs,...s.revisions,...s.devices??[],...s.invitations??[],...s.audit,...s.parentPrivacyChoices??[],...s.adultPilotPermits??[]].some(r=>r.familyId!==b.familyId)||
+ if([...s.jobs,...s.revisions,...s.devices??[],...s.invitations??[],...s.audit,...s.coachConsent??[],...s.audioReceipts??[],...s.coachReceipts??[],...s.narrationReceipts??[],...s.adultPilotSessions??[],...s.parentPrivacyChoices??[],...s.adultPilotPermits??[]].some(r=>r.familyId!==b.familyId)||
   [...Object.keys(s.ledgers),...Object.keys(s.parentAuth??{})].some(k=>k!==b.familyId))throw Error('HOUSEHOLD_OWNER_MISMATCH');
 }
 export async function bindHousehold(db:AtomicStore,b:HouseholdBinding,apply:boolean,artifacts?:PrivateArtifacts){
