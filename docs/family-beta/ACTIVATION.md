@@ -1,6 +1,6 @@
 # Private Family Beta activation and rollback
 
-The application, storage and private-worker changes are source candidates. The November 25 completion assignment authorizes repository engineering, synthetic tests and hosted CI only. It does **not** authorize any provisioning, protected-main merge, real invitation, production deployment, paid request, real-data transfer or deletion. Use this single runbook when the necessary later authority and authenticated access exist. An Actions check or merge does not supply that authority. Record a dated operator, exact source SHA, image digest, environment and observed result for each step; keep credentials, contact details and underlying private verification evidence out of GitHub. [Combined requirement and evidence register](COMPLETION.md)
+The family application and F06 storage are on protected application main through #186. Private worker #20 and #21 remain held because advancing worker main would invalidate the approved production execution SHA. The source merge leaves family activation, provisioning, paid use, real invitations, household data operations and release subject to the stage-specific decisions below. [Protected-main integration](COMPLETION.md#protected-main-integration)
 
 ## Nine-stage activation plan
 
