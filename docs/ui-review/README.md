@@ -1,0 +1,46 @@
+# Standalone UI review
+
+The review build packages the merged Jems UI into one downloadable `jems-ui-review.html`. Open it in current Chrome or Edge, including with the computer disconnected. No server, extension, account, real family data or AI service is needed.
+
+The toolbar selects an experience, supported learning grade, effective iframe viewport, page/journey state and synthetic scenario. Fit display scales the live frame; the frame's CSS viewport still matches the selected dimensions and uses the product's responsive rules. Choose 100% to inspect physical text size, or hide the toolbar. Flag concerns after clicking an affected control, edit/delete findings, mark pages reviewed, and export Markdown or JSON. Findings use a separate browser-local key with an in-memory fallback. Export before closing if persistence is unavailable.
+
+## Regenerate
+
+From a clean checkout with Node 22+, Python 3 and Pillow:
+
+```sh
+npm ci
+python3 -m pip install Pillow==11.3.0
+npm run review:build
+npm run review:test
+```
+
+The file is written to `dist-review/jems-ui-review.html`. `UI_REVIEW_OUT` changes the output directory. `UI_REVIEW_BASE_SHA` records a specific represented source; the build rejects a source mismatch in application files. Normally the checkout's HEAD is recorded. The artifact includes the full SHA, build timestamp, route manifest, limits and excluded-PR inventory. On main the SHA is the merged source. PR review builds must not be described as merged application changes.
+
+`UI_REVIEW_EXACT_ASSETS=1 npm run review:build` retains original asset bytes (approximately 303 MiB at the initial baseline). The default uses maximum-768px, quality-90 WebP derivatives of the original Gem Pal images, preserving aspect ratio and transparency. Other artwork and fonts are exact. This makes the initial artifact approximately 55 MiB. No generated/replacement art is used and `public/` is never edited. Full-resolution art approval is outside the compact artifact.
+
+## Implementation boundary
+
+`tools/ui-review/entry.ts` installs synthetic profiles, reporting records and optional saved creations, rewards and companions before dynamically importing the real `src/main.ts`. The ordinary application, including its CSS, native game engines, educational presentations, coding, drawing and parent reporting, is bundled with esbuild. The production build never imports these review files.
+
+`bootstrap.js` replaces service transports before application initialization. It uses reserved `.invalid` fixture origins, deterministic scripted coaching and queued/building/testing/ready/error job transitions. Generated gameplay is a labelled embedded transport fixture with the real host learning protocol. Native games retain their merged engines. Authentication, passphrases, invitations and consent states are illustrative responses only. Never enter real credentials.
+
+The build-only service-worker substitution, inline SVG symbol references, URL-to-embedded-blob mapping, isolated synthetic localStorage/IndexedDB names and review navigation adapter are explicit deviations. Source UI files are not edited. A restrictive CSP independently denies external connections, images, scripts, frames and native form submissions. WebSocket, EventSource, XHR, beacons, microphone and external navigation are unavailable. Browser-local synthetic saves are allowed. No cloud configuration, production deployment or paid generation is part of this tool.
+
+All six grade values are available through the merged `early-preview` compile mode. The ordinary application build still excludes Pre-K/Kindergarten selection. The sandbox does not promote that preview capability into production.
+
+## Inventory and maintenance
+
+`coverage.json` contains 16 discovered page containers, 30 selectable intermediate states, 11 journey families and 9 scenario choices at the initial baseline. Counts describe available review entrances; they are not proof of every possible combination or human acceptance. Retained legacy screens are explicitly labelled. `review:coverage` scans source page IDs and fails for new unlisted pages. New journeys and conditional dialogs still need human source review. Update the manifest, fixtures and tests together when main changes.
+
+`excluded-prs.json` is a dated inventory of significant open work checked on November 25, 2026. It is not a live PR-status service. In particular, the unmerged family-beta chain contains new-family entry, recovery, administration and privacy operations that must not appear in the merged review. The existing merged trusted-device and adult-session controls remain available.
+
+Scenario scope is explicit: first-time/empty clear records, populated adds sample saved creations and receipts, long-content adds a longer library, unlocked seeds synthetic Pal/reward activity, locked denies simulated service availability, loading holds service work, and error fails coach/build responses. The toolbar can release pending work or restore normal responses before the product retry action. This does not manufacture a generic error overlay on every page.
+
+## Tests and CI
+
+`review:test` opens the HTML using `file://` in Chromium with no server. It checks route reachability, four live iframe viewport sizes, representative creation/build/play/learning, welcome, grades, adult profile, feedback downloads, toolbar visibility, broken images and unexpected network requests. It records overflow observations separately because the review must preserve product UI defects. Existing product tests are not replaced or reduced.
+
+A managed local browser can prohibit `file://` by administrator policy. `UI_REVIEW_INLINE_HARNESS=1 npm run review:test` is an explicit development fallback that fulfills one loopback navigation from memory (no server). That result is only DOM/interaction evidence, not proof that file navigation succeeded. GitHub Actions runs the actual `file://` check on stock Chromium and uploads the HTML, manifest and test evidence without deployment credentials.
+
+The workflow is additive, read-only, and independent of production releases. It runs on relevant main changes and sandbox-tool PRs. Review findings never upload automatically. Real-device, Edge-specific, speech/audio, accessibility and owner acceptance remain separate evidence. The HTML's coverage dialog is the authoritative per-artifact list of known deviations.
