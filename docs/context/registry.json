@@ -143,10 +143,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:11:52.744Z",
+      "reviewedAt": "2026-11-25T01:22:00.340Z",
       "sourceDigest": "a406cc00d0d419c26e60d03d106cf6db4676876a97cb2b2458e12a8549b5c5b4",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed grade-based coding presentation, saved scene compatibility and four additional bounded path challenges against the Creation Studio contract and child interface.",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Early scene instructions use device speech while the existing authoring interpreter and ordinary creator controls remain available. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:08:27.254Z",
-      "sourceDigest": "0647aa7f3aae2971f49e1726466d14543ec9fcaeaf279893a585d19569549dd2",
+      "reviewedAt": "2026-11-25T01:22:00.442Z",
+      "sourceDigest": "5b3d2ea1a544092e9fca8710648e3eac013846793e44d36e31cf084d629b4ae9",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the early question catalogs, visual activities, device-only narration, legacy content assertions and skill crosswalk against the affected source.",
+      "reviewReason": "Early scene instructions use device speech while the existing authoring interpreter and ordinary creator controls remain available.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -406,10 +406,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "53fd96a8015440c8d11a5edcbc9f5f6dc9ce16636d9504ad168eb6bffcc63588",
-      "reviewedAt": "2026-11-25T01:11:52.892Z",
+      "sourceDigest": "facbfa499f5063b5554efc14d3231dd7f67a8c54f4fadfc0a837cc7efa709f8f",
+      "reviewedAt": "2026-11-25T01:22:00.930Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed grade-based coding presentation, saved scene compatibility and four additional bounded path challenges against the Creation Studio contract and child interface.",
+      "reviewReason": "Early scene instructions use device speech while the existing authoring interpreter and ordinary creator controls remain available.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -641,10 +641,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:08:27.725Z",
-      "sourceDigest": "9fec009f3c58c9dbff07f3168ca7772fc5f0383e91aefb58269e130e1f95587c",
+      "reviewedAt": "2026-11-25T01:22:00.973Z",
+      "sourceDigest": "6f55a2e6a9299923ecc2174fd95f3ef6899da1c60185671dfb6c3b5fd3801eb1",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the early question catalogs, visual activities, device-only narration, legacy content assertions and skill crosswalk against the affected source.",
+      "reviewReason": "Early scene instructions use device speech while the existing authoring interpreter and ordinary creator controls remain available.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:11:52.992Z",
-      "sourceDigest": "3b0d4b1a060053dedb3410aa3d1dd768fbd147cecfda744c2ec6259a9ae6343c",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed grade-based coding presentation, saved scene compatibility and four additional bounded path challenges against the Creation Studio contract and child interface.",
+      "reviewedAt": "2026-11-25T01:22:01.023Z",
+      "sourceDigest": "1e5dbadc8e3521315f1de56f549e083cac83d1ac0ee265eb17a6e32a162ddbae",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Early scene instructions use device speech while the existing authoring interpreter and ordinary creator controls remain available. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1514,10 +1514,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "15cad784d99b9b82376f99ca755f2ff7b8d8e0308ed815cf17fefa097d1b6865",
-      "reviewedAt": "2026-11-25T01:00:58.912Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
+      "sourceDigest": "131112bdd156f599674b42b406109871c4a0cd428db58a4a618071f86967fb55",
+      "reviewedAt": "2026-11-25T01:22:01.132Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Early scene instructions use device speech while the existing authoring interpreter and ordinary creator controls remain available. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",

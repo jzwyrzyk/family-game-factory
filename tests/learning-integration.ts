@@ -1,3 +1,4 @@
+import {authorizeLearningParent} from './learning-parent-fixture.cjs';
 /** Production-shell integration; all game content here is a named local fixture. No model calls. */
 import assert from 'node:assert/strict';
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs';
@@ -63,6 +64,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     await page.goto(base);await page.waitForFunction(()=>window.FG?.learning&&window.FG?.factory);
     await page.getByRole('button',{name:'Grown-ups',exact:true}).click();
     await page.locator('[data-parent-tab="settings"]').click();
+    await authorizeLearningParent(page);
     assert.deepEqual(await page.locator('#parentGrade option').evaluateAll(nodes=>nodes.map(n=>(n as HTMLOptionElement).value)),['1','2','3','4']);
     assert.equal(await page.locator('#parentRate').getAttribute('min'),'1');
     for(const grade of [1,2,3,4]){
@@ -207,8 +209,9 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
     // let the worker and browser callbacks continue in real time throughout.
     await page.clock.install();
     await page.goto(base);await page.waitForFunction(()=>window.FG?.learning);await page.addScriptTag({content:bridge});
-    await page.evaluate(({html,channel,artifactId,kind})=>{
-      const w=window as any;window.FG.store.changeProfile({grade:4,focus:'adaptive',rate:1,hints:true,punish:false});
+    await authorizeLearningParent(page);
+    await page.evaluate(async ({html,channel,artifactId,kind})=>{
+      const w=window as any;await window.FG.store.changeLearningProfile({grade:4,focus:'adaptive',rate:1,hints:true,punish:false});
       w.previewRounds=[];w.previewMessages=[];
       const host=document.createElement('section');host.id='math-preview-fixture';host.style.cssText='position:relative;width:100%;max-width:760px;margin:20px auto;height:760px;';
       const frame=document.createElement('iframe');frame.id='math-fixture-frame';frame.title='Audited learning preview fixture';frame.sandbox.add('allow-scripts');frame.style.cssText='width:100%;height:760px;border:0;';
@@ -314,7 +317,8 @@ async function qualityNativeJourney(browser:Browser,base:string,device:typeof de
   const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
   try{
     await page.clock.install();await page.goto(base);await page.waitForFunction(()=>window.FG?.learning);
-    await page.evaluate(()=>{window.FG.store.changeProfile({grade:2,focus:'adaptive',rate:1,punish:false});window.FG.app.openGame('hill');});
+    await authorizeLearningParent(page);
+    await page.evaluate(async ()=>{await window.FG.store.changeLearningProfile({grade:2,focus:'adaptive',rate:1,punish:false});window.FG.app.openGame('hill');});
     const hill=page.locator('.quality-hill'),state=()=>page.evaluate(()=>window.FG.runtime.snapshot().state);
     await hill.getByRole('button',{name:'Let’s drive',exact:true}).click();
     await page.keyboard.down('ArrowRight');await page.clock.runFor(12_000);await page.keyboard.up('ArrowRight');
@@ -354,7 +358,7 @@ async function archivedProtocolJourney(browser:Browser,base:string,bridge:string
   const html=renderGenerated(generatedFixture(true,'quality-runtime-v2.0.2'),artifactId,channel).html;
   try{
     await page.goto(base);await page.waitForFunction(()=>window.FG?.learning);await page.addScriptTag({content:bridge});
-    await page.evaluate(({html,channel,artifactId})=>{
+    await page.evaluate(async ({html,channel,artifactId})=>{
       const w=window as any,host=document.createElement('section'),frame=document.createElement('iframe');host.style.cssText='height:760px;position:relative';frame.id='archived-learning-preview';frame.title='Archived runtime test';frame.sandbox.add('allow-scripts');frame.style.cssText='width:100%;height:760px';host.append(frame);document.getElementById('page-home')!.prepend(host);
       w.archivedLearning=w.PreviewLearningTest.attachPreviewLearning(frame,{channel,artifactId,ownerId:window.FG.store.current().id});frame.srcdoc=html;
     },{html,channel,artifactId});

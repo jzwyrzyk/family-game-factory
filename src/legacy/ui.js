@@ -97,10 +97,10 @@ function renderFeedback(){const box=$('feedbackList');box.replaceChildren();cons
 function populateSkills(){
  const selected=$('parentSkill').value,grade=parseGradeOption($('parentGrade').value);$('parentSkill').replaceChildren();
  const all=document.createElement('option');all.value='';all.textContent='Let the learning model choose';$('parentSkill').append(all);
- for(const skill of FG.learning.mathSkills.filter(x=>withinGrade(x.grade,grade))){const o=document.createElement('option');o.value=skill.id;o.textContent=`${gradeLabel(skill.grade)} · ${skill.title}`;$('parentSkill').append(o);}
+ for(const skill of FG.learning.mathSkills.filter(x=>withinGrade(x.grade,grade)&&(isEarlyGrade(grade)||!isEarlyGrade(x.grade)))){const o=document.createElement('option');o.value=skill.id;o.textContent=`${gradeLabel(skill.grade)} · ${skill.title}`;$('parentSkill').append(o);}
  if([...$('parentSkill').options].some(x=>x.value===selected))$('parentSkill').value=selected;
  const lang=$('parentLanguageSkill'),prior=lang.value;lang.replaceChildren();const auto=document.createElement('option');auto.value='';auto.textContent='Let the language model choose';lang.append(auto);
- for(const skill of FG.learning.languageSkills.filter(x=>withinGrade(x.grade,grade))){const option=document.createElement('option');option.value=skill.id;option.textContent=gradeLabel(skill.grade)+' · '+skill.title;lang.append(option);}
+ for(const skill of FG.learning.languageSkills.filter(x=>withinGrade(x.grade,grade)&&(isEarlyGrade(grade)||!isEarlyGrade(x.grade)))){const option=document.createElement('option');option.value=skill.id;option.textContent=gradeLabel(skill.grade)+' · '+skill.title;lang.append(option);}
  if([...lang.options].some(x=>x.value===prior))lang.value=prior;
  const choice=$('parentSubject').value;$('parentMathSettings').hidden=choice==='language';$('parentLanguageSettings').hidden=choice==='math';
  $('parentPunish').closest('label').hidden=choice==='language';
