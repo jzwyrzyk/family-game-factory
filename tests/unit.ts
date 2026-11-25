@@ -1,3 +1,4 @@
+import './storage-cloud-recovery.test';
 import './storage-sync.test';
 import './storage-workspace.test';
 import './storage-recovery-scheduler.test';

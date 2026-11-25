@@ -105,7 +105,7 @@ class ServiceBuildTests(unittest.TestCase):
             git('init','-q')
             files=['package.json','package-lock.json','.dockerignore','server/Dockerfile.gateway','server/Dockerfile.preview',
                    'server/gateway.ts','server/private-config.ts','src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts',
-                   'src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/builder/submission.ts','src/storage/record-contract.ts','src/storage/sync-contract.ts','src/learning/grades.ts',
+                   'src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/builder/submission.ts','src/storage/record-contract.ts','src/storage/sync-contract.ts','src/storage/cloud-recovery.ts','src/storage/recovery-format.ts','src/learning/grades.ts',
                    'src/creation/model.ts','src/creation/projects.ts',
                    'src/pals/catalog.ts','src/pals/catalog-artwork.generated.ts',
                    'server/key.pem','server/config.json','server/config.private.json','server/service-account.json','server/credentials.json',
@@ -124,7 +124,7 @@ class ServiceBuildTests(unittest.TestCase):
                     archive,digest=b.source_archive(root,staged,sha);hashes.append(digest)
                     with tarfile.open(archive) as tar:
                         names=tar.getnames()
-                        self.assertEqual(set(names),set(files[:20]))
+                        self.assertEqual(set(names),set(files[:22]))
                         self.assertEqual(tar.extractfile('server/gateway.ts').read(),b'reviewed server/gateway.ts')
             self.assertEqual(hashes[0],hashes[1])
 
@@ -145,7 +145,7 @@ class ServiceBuildTests(unittest.TestCase):
                     'server/coach/private-executor.ts','server/trusted-devices.ts','server/http-json.ts','server/privacy/parent-consent.ts',
                     'server/adult-pilot.ts','server/pipeline/auth.ts',
                     'src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts',
-                    'src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/builder/submission.ts','src/storage/record-contract.ts','src/storage/sync-contract.ts','src/learning/grades.ts',
+                    'src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/builder/submission.ts','src/storage/record-contract.ts','src/storage/sync-contract.ts','src/storage/cloud-recovery.ts','src/storage/recovery-format.ts','src/learning/grades.ts',
                     'src/pals/catalog.ts','src/pals/catalog-artwork.generated.ts',
                     'src/creation/model.ts','src/creation/projects.ts']
             for name in inputs:write(name,'reviewed '+name)

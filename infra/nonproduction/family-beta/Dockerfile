@@ -18,7 +18,7 @@ COPY --chown=node:node package.json ./
 COPY --from=builder --chown=node:node /source/server ./server
 COPY --chown=node:node src/runtime/types.ts src/runtime/manifests.ts ./src/runtime/
 COPY --chown=node:node src/builder/submission.ts ./src/builder/
-COPY --chown=node:node src/storage/record-contract.ts src/storage/sync-contract.ts ./src/storage/
+COPY --chown=node:node src/storage/record-contract.ts src/storage/sync-contract.ts src/storage/cloud-recovery.ts src/storage/recovery-format.ts ./src/storage/
 COPY --chown=node:node src/learning/grades.ts ./src/learning/
 COPY --chown=node:node src/studio/design.ts src/studio/creation-readiness.ts src/studio/conversation-view.ts ./src/studio/
 COPY --chown=node:node src/creation/model.ts src/creation/projects.ts ./src/creation/

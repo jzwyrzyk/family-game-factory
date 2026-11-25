@@ -49,7 +49,7 @@ jobs:
           node scripts/beta/test-emulator.mjs "$RUNNER_TEMP/jems-firestore.jar"
       - name: Build private application and separately scoped feature files
         if: steps.beta.outputs.selected == 'true'
-        run: npm run build && npm run build:family-beta
+        run: npm run build && npm run build:family-beta && node scripts/beta/build.mjs --early-preview
       - name: Prepare browsers for synthetic family journeys
         if: steps.beta.outputs.selected == 'true'
         run: npx playwright install --with-deps chromium webkit

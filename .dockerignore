@@ -12,6 +12,8 @@
 !src/storage/
 !src/storage/record-contract.ts
 !src/storage/sync-contract.ts
+!src/storage/cloud-recovery.ts
+!src/storage/recovery-format.ts
 !src/learning/
 !src/learning/grades.ts
 !src/studio/
