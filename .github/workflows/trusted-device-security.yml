@@ -60,7 +60,7 @@ jobs:
         if: steps.beta.outputs.selected == 'true'
         env:
           STORAGE_BROWSER: webkit
-        run: node tests/storage-domains-browser.cjs && node tests/storage-complete-backup-browser.cjs
+        run: node tests/storage-domains-browser.cjs && node tests/storage-complete-backup-browser.cjs && node tests/storage-indexed-notebook-browser.cjs && node tests/studio-native-browser.cjs
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() && steps.beta.outputs.selected == 'true' }}
         with:
