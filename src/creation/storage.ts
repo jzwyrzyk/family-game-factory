@@ -1,3 +1,4 @@
+import {movementChoices,predictActor,type MovementPrediction} from './challenges';
 /** Local immutable creation history. Autosave is recovery, never an implicit Keep. */
 import type { CreationProject } from './model';
 import { validateEditableProject } from './projects';
@@ -15,6 +16,7 @@ export interface CreationRevision {
 }
 export interface CreationDraft {projectId:string;baseRevisionId:string;scene:CreationProject;updatedAt:string}
 export interface CreationAttempt {
+  prediction?:MovementPrediction;
   id:string;projectId:string;revisionId:string;challengeId:string;passed:boolean;hintUsed:boolean;checkedAt:string;
 }
 export interface CreationWorkspace {
@@ -74,7 +76,9 @@ export function validateCreationWorkspace(value:unknown):CreationWorkspace {
   }
   const attempts=new Set<string>();
   for(const a of data.attempts){
-    if(!object(a,['id','projectId','revisionId','challengeId','passed','hintUsed','checkedAt'])||!ident(a.id)||attempts.has(a.id)||!projects.has(a.projectId)||revisions.get(a.revisionId)?.projectId!==a.projectId||!ident(a.challengeId)||projects.get(a.projectId)?.challengeId!==a.challengeId||typeof a.passed!=='boolean'||typeof a.hintUsed!=='boolean'||!date(a.checkedAt))invalid();
+    if(!object(a,['id','projectId','revisionId','challengeId','passed','hintUsed','checkedAt','prediction'])||!ident(a.id)||attempts.has(a.id)||!projects.has(a.projectId)||revisions.get(a.revisionId)?.projectId!==a.projectId||!ident(a.challengeId)||projects.get(a.projectId)?.challengeId!==a.challengeId||typeof a.passed!=='boolean'||typeof a.hintUsed!=='boolean'||!date(a.checkedAt))invalid();
+    if(a.prediction!==undefined&&(!predictActor(a.challengeId)||!object(a.prediction,['choice','observed'])||
+      !movementChoices.includes(a.prediction.choice)||!movementChoices.includes(a.prediction.observed)))invalid();
     attempts.add(a.id);
   }
   if(data.rewardOutbox!==undefined){
@@ -183,12 +187,12 @@ export class CreationStore {
   markHintUsed(id:string,owner:string):CreationEntry {
     return this.write(data=>{const p=this.entry(data,id,owner);if(!p.challengeId)throw Error('This scene has no challenge hint.');p.hintUsed=true;p.updatedAt=now();return p;});
   }
-  recordAttempt(id:string,owner:string,expectedRevisionId:string,result:{challengeId:string;passed:boolean;hintUsed:boolean}):CreationAttempt {
+  recordAttempt(id:string,owner:string,expectedRevisionId:string,result:{challengeId:string;passed:boolean;hintUsed:boolean;prediction?:MovementPrediction}):CreationAttempt {
     return this.write(data=>{const p=this.entry(data,id,owner);this.expect(p,expectedRevisionId);
       if(!p.challengeId||p.challengeId!==result.challengeId||typeof result.passed!=='boolean'||typeof result.hintUsed!=='boolean')throw Error('This check does not belong to the selected challenge.');
       const hintUsed=!!(p.hintUsed||result.hintUsed||data.attempts.some(a=>a.projectId===id&&a.hintUsed));
       if(hintUsed)p.hintUsed=true;
-      const attempt:CreationAttempt={id:uid(),projectId:id,revisionId:p.headId,challengeId:p.challengeId,passed:result.passed,hintUsed,checkedAt:now()};
+      const attempt:CreationAttempt={id:uid(),projectId:id,revisionId:p.headId,challengeId:p.challengeId,passed:result.passed,hintUsed,checkedAt:now(),...(result.prediction?{prediction:result.prediction}:{})};
       data.attempts.push(attempt);
       if(attempt.passed)data.rewardOutbox=enqueueRewardFact(data.rewardOutbox??[],createRewardFact({owner,kind:'scene.challenge',sourceId:attempt.challengeId,occurredAt:attempt.checkedAt}));
       return attempt;});

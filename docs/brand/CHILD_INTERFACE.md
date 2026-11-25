@@ -68,3 +68,5 @@ The playable view owns the available viewport and contains required learning ove
 The [accepted repair decision](../decisions/2026-11-20-learning-readability-and-narration.md) covers question presentation, semantic contrast, local narration and compact-navigation type size. Broader library copy, thumbnails, Pal artwork, subject defaults and optional-practice exits are separate work and must not be represented as delivered by this patch.
 
 Render the actual candidate, inspect its captures, and retain the exact test/build provenance. Automated browser checks establish the tested states; they do not establish physical-device audio quality, child comprehension or educational effectiveness.
+
+Early learning uses generous illustrated answer targets, spoken prompts, replay and an explicit grown-up reading alternative. First steps presents arrows, actions, an event control and ordered commands. Optional exact values remain in the editor. Compare the stage, palette, sequence and playback controls together on portrait, landscape and short viewports.

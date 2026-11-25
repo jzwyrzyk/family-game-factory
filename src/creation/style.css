@@ -296,3 +296,31 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
   #creationPalette { grid-template-columns:repeat(6,minmax(0,1fr)); }
   .creation-palette-block { flex-direction:row; }
 }
+
+.creation-command-symbol{font-size:1.7rem;font-weight:800;line-height:1}
+[data-graphical=true] .creation-command-symbol{font-size:2.25rem}
+[data-graphical=true] .creation-palette-block{min-height:64px}
+[data-graphical=true] .creation-palette-block>b{font-size:18px}
+[data-graphical=true] .creation-block-summary{min-height:52px}
+[data-graphical=true] .block-motion .creation-command-symbol{color:#244b7e}
+[data-graphical=true] .block-story .creation-command-symbol{color:#753d74}
+[data-graphical=true] .block-control .creation-command-symbol{color:#70501a}
+
+.creation-prediction summary{min-height:48px;cursor:pointer;align-content:center}
+.creation-prediction-choices{display:flex;gap:8px;flex-wrap:wrap}
+.creation-prediction-choices button{min-height:56px;min-width:56px;font-size:26px}
+.creation-prediction-choices [aria-pressed=true]{outline:3px solid #7040c7;background:#ece4ff}
+@media (min-width:740px) and (max-height:600px) and (orientation:landscape){
+ .early-journey #page-creation.has-scene:not(.creation-expanded-view) .creation-workspace-grid{grid-template-columns:minmax(0,42fr) minmax(0,58fr);grid-template-rows:minmax(0,1fr)}
+ .early-journey #page-creation.has-scene:not(.creation-expanded-view) .creation-stage-column,.early-journey #page-creation.has-scene:not(.creation-expanded-view) .creation-code-card{display:flex}
+ .early-journey .creation-stage-card{width:100%}
+ .early-journey #creationPalette{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .early-journey #page-creation.has-scene .creation-view-switch{display:none}
+}
+
+@media(max-width:360px){
+ #creationPalette{gap:4px}
+ #page-creation .creation-palette-block{min-height:52px;flex-direction:column;gap:2px;padding:4px 1px}
+ #page-creation .creation-palette-block .creation-command-symbol{font-size:23px;line-height:1}
+ #page-creation .creation-palette-block>b{font-size:18px;line-height:1.05;white-space:nowrap}
+}
