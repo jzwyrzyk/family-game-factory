@@ -31,8 +31,8 @@ function choices(region,rows,selected){
 }
 async function showStorage(){
  storageChoices=await request('/entry/storage-consent');const c=storageChoices;
- $('storageState').textContent=c.enabled?(c.available.length?'Choose what may be copied. Every unchecked category stays local.':'Your operator has not approved private copies for this family.'):'Private copies are not enabled. Work stays on this device.';
- $('storageConsent').hidden=!c.enabled||!c.available.length;$('withdrawStorage').hidden=!c.selected||!!c.selected.revokedAt;
+ $('storageState').textContent=c.enabled?(c.available.length?(c.reviewRequired?'Your earlier copy choices are no longer active. Review the current choices before restarting transfers.':'Choose what may be copied. Every unchecked category stays local.'):'Your operator has not approved private copies for this family.'):'Private copies are not enabled. Work stays on this device.';
+ $('storageConsent').hidden=!c.enabled||!c.available.length;$('withdrawStorage').hidden=!c.withdrawable;
  const selected=c.selected?.notice===c.notice&&!c.selected?.revokedAt?c.selected:{profiles:[],domains:[]};
  choices('storageProfiles',c.profiles.map((id,i)=>[id,'Explorer '+(i+1)]),selected.profiles);
  choices('storageDomains',c.available.map(id=>[id,copyLabels[id]]),selected.domains);

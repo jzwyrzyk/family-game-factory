@@ -16,8 +16,11 @@ const renewed=(f:Family)=>(f.guardian as Family['guardian']&{participationRenewe
 const grantPath=(d:FamilyDirectory,id:string)=>d.path(id)+'/continuity/authorization';
 const epoch=(grant:StorageGrant)=>grant.id+'-'+createHash('sha256').update(JSON.stringify([grant.notice,grant.participation,grant.guardianNotice,grant.renewedAt,grant.profiles.slice().sort(),grant.domains.slice().sort()])).digest('hex');
 function policy(d:FamilyDirectory){const c=d.config.continuity;if(!c?.enabled)throw Error('CONTINUITY_DISABLED');return c;}
+function currentGrant(g:StorageGrant|undefined,f:Family,notice:string|undefined):g is StorageGrant {
+ return !!g&&g.version===1&&g.notice===notice&&g.participation===participationNotice&&g.guardianNotice===betaNotice&&g.renewedAt===renewed(f)&&g.guardian===f.guardian.id&&g.revokedAt===undefined;
+}
 function allowed(g:StorageGrant|undefined,f:Family,notice:string,profile:string){
- if(!g||g.version!==1||g.notice!==notice||g.participation!==participationNotice||g.guardianNotice!==betaNotice||g.renewedAt!==renewed(f)||g.guardian!==f.guardian.id||g.revokedAt!==undefined||!g.profiles.includes(profile)||!f.profiles?.includes(profile))throw Error('STORAGE_CONSENT_REQUIRED');return g;
+ if(!currentGrant(g,f,notice)||!g.profiles.includes(profile)||!f.profiles?.includes(profile))throw Error('STORAGE_CONSENT_REQUIRED');return g;
 }
 async function parent(d:FamilyDirectory,tx:Documents,f:Family,raw:string|undefined,key:string,now:number){
  const session=await metadataSession(d,tx,f,raw,key,now),grant=verifySession(cookieValue(internalCookies(raw),'factory_parent'),key,now);
@@ -47,7 +50,8 @@ export async function storageConsent(d:FamilyDirectory,id:string,raw:string|unde
    tx.create(d.path(id)+'/storage-consents/'+randomUUID(),grant);
    return {enabled:true,notice:enabled.notice,available:enabled.domains.filter(x=>f.storageDomains?.includes(x)),profiles:f.profiles??[],selected:grant};
   }
-  return {enabled:config?.enabled===true,notice:config?.notice??current?.notice??null,available:config?.enabled?config.domains.filter(x=>f.storageDomains?.includes(x)):[],profiles:f.profiles??[],selected:current??null};
+  const effective=currentGrant(current,f,config?.notice);
+  return {enabled:config?.enabled===true,notice:config?.notice??current?.notice??null,available:config?.enabled?config.domains.filter(x=>f.storageDomains?.includes(x)):[],profiles:f.profiles??[],selected:effective?current:null,withdrawable:!!current&&current.revokedAt===undefined,reviewRequired:!!current&&current.revokedAt===undefined&&!effective};
  });
 }
 export async function continuityRequest(d:FamilyDirectory,id:string,raw:string|undefined,key:string,path:string,input:unknown,now=Date.now()){
