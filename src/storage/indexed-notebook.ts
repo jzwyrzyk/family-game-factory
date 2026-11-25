@@ -146,8 +146,16 @@ export class IndexedNotebook {
   for(const id of h.chapters)chapters.push(await this.pointer<ConversationChapter>(chapterCollection(h.generation),id));
   return this.own({...meta,sessions,...(h.hasChapters?{conversationChapters:chapters}:{})});
  }
- /** Full reads are explicit backup/write operations, never card/open reads. */
- async snapshot():Promise<Notebook>{const h=await this.head(),value=await this.snapshotAt(h.value);await this.unchanged(h.row.version);return value;}
+ /** Full reads are explicit backup/write operations, never card/open reads.
+  * A concurrent save or reward acknowledgement can advance the head while
+  * immutable payloads are being read. Retry only this read, with a strict bound;
+  * malformed/missing data and authorization errors still fail immediately. */
+ async snapshot():Promise<Notebook>{
+  for(let attempt=0;;attempt++){
+   try{const h=await this.head(),value=await this.snapshotAt(h.value);await this.unchanged(h.row.version);return value;}
+   catch(error){if(attempt>=2||!(error instanceof Error)||error.message!=='STORAGE_CONFLICT')throw error;}
+  }
+ }
  private async prepareHead(value:Notebook,generation:string,sourceHash:string):Promise<Head>{
   const {sessions,conversationChapters,...meta}=value;
   return {schema:1,generation,meta:await this.encode(meta),summary:await this.encode(deriveNotebookSummary(value,this.scope.profile)),sessions:sessions.map(s=>s.id),chapters:(conversationChapters??[]).map(c=>c.id),hasChapters:conversationChapters!==undefined,sourceHash};

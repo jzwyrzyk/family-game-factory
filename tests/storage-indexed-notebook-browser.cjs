@@ -27,6 +27,15 @@ const {build}=require('esbuild'),{chromium,webkit}=require('playwright');
    const payloads=await store.records.page('notebook-payloads');if(!payloads.some(r=>r.value.bytes>256*1024&&r.value.chunks.length>1))throw Error('large record was not chunked');
    if((await store.records.pending()).length)throw Error('local-only history uploaded');checks.push('oversized immutable chunking and no local-only outbox');
    const sourceSnapshot=await store.snapshot(),summary=await store.summary();same(summary,NotebookTest.deriveNotebookSummary(sourceSnapshot,'player1'),'summary differs from original notebook logic');
+   // A real concurrent commit during capture must cause a fresh consistent
+   // read, while repeated pointer changes stop after three attempts.
+   const observedGet=store.records.get;let advanceCapture=true;
+   store.records.get=async(collection,id)=>{const row=await observedGet(collection,id);if(advanceCapture&&collection.startsWith('notebook-sessions:')){advanceCapture=false;await store.update(first.id,s=>{s.draft='Saved while capture was reading';});}return row;};
+   const retriedCapture=await store.snapshot();if(advanceCapture||retriedCapture.sessions.find(s=>s.id===first.id).draft!=='Saved while capture was reading')throw Error('concurrent capture did not return the current complete notebook');
+   let headReads=0;store.records.get=async(collection,id)=>{const row=await observedGet(collection,id);if(collection==='notebook-control'&&id==='head'&&++headReads%2===0){await store.records.commit({id:'capture-race-'+headReads,scope,changes:[{collection,id,expectedVersion:row.version,value:row.value}]},{enqueue:false});return observedGet(collection,id);}return row;};
+   let captureFailure;try{await store.snapshot();}catch(error){captureFailure=error;}store.records.get=observedGet;
+   if(captureFailure?.message!=='STORAGE_CONFLICT'||headReads!==6)throw Error('capture retry was unbounded or returned a mixed snapshot');
+   await store.update(first.id,s=>{s.draft=sourceSnapshot.sessions.find(item=>item.id===first.id).draft;});
    for(let mask=0;mask<8;mask++){const context={unknownSessionIds:new Set(mask&1?[first.id]:[]),unconfirmedSessionIds:new Set(mask&2?[first.id]:[]),sendingSessionIds:new Set(mask&4?[first.id]:[])};same(await store.notifications(context),NotebookTest.deriveStudioNotifications(book.list('player1'),'player1',context,book.notificationPreferences('player1')),'notification projection changed meaning');}
    const firstPointer=(await store.records.page('notebook-sessions:'+(await get('notebook-control','head')).value.generation)).find(r=>r.value.id===first.id);calls.length=0;await store.summary();if(calls.some(c=>c.id===firstPointer.value.payload))throw Error('summary hydrated session');checks.push('atomic bounded journey, preferences and transient notification projections match source logic');
    const evidence=[];const uninstall=NotebookTest.installEvidenceReceiver(s=>evidence.push(s));
