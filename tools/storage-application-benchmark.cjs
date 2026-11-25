@@ -1,15 +1,22 @@
 /* Synthetic actual-application benchmark. Never connects to a provider or live gateway.
- * Run after building TARGET: node tools/storage-application-benchmark.cjs TARGET OUTPUT.json
+ * Build TARGET first: node tools/storage-application-benchmark.cjs TARGET OUTPUT.json
  * Optional STORAGE_BENCHMARK_SAMPLES (default 5). No speed threshold gates correctness. */
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const {execFileSync}=require('node:child_process');
+const {createHash}=require('node:crypto');
 const {buildSync}=require('esbuild');
 const {chromium}=require('playwright');
 const root=path.resolve(process.argv[2]||'.'),output=path.resolve(process.argv[3]||'test-results/storage-application-benchmark.json');
-const samples=Number(process.env.STORAGE_BENCHMARK_SAMPLES||5);
+const samples=Number(process.env.STORAGE_BENCHMARK_SAMPLES||5),indexedMode=process.env.STORAGE_BENCHMARK_AUTHORITY==='indexed';
 assert.ok(Number.isInteger(samples)&&samples>=1&&samples<=25);
+const trackedChanges=execFileSync('git',['diff','--name-only','HEAD'],{cwd:root,encoding:'utf8'}).trim().split('\n').filter(Boolean);
+assert.ok(!trackedChanges.some(name=>/^(src\/|public\/|index\.html$|vite\.config|package(?:-lock)?\.json$)/.test(name)),'Commit application changes before measuring exact-source evidence.');
+const bundleFiles=[];
+function inventory(directory){for(const entry of fs.readdirSync(directory,{withFileTypes:true})){const file=path.join(directory,entry.name);if(entry.isDirectory())inventory(file);else{const bytes=fs.readFileSync(file);bundleFiles.push({path:path.relative(path.join(root,'dist'),file),bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')});}}}
+inventory(path.join(root,'dist'));bundleFiles.sort((a,b)=>a.path.localeCompare(b.path));
+const builtFilesSha256=createHash('sha256').update(JSON.stringify(bundleFiles)).digest('hex');
 const completeRecovery=fs.existsSync(path.join(root,'src/storage/complete-backup.ts'));
 const bridge=buildSync({stdin:{contents:`
  import {RevisionStore,WORKSPACE_KEY} from './src/factory/workspace';
@@ -19,15 +26,21 @@ const bridge=buildSync({stdin:{contents:`
  import {exportArtBundle,restoreArtBundle} from './src/drawing/transfer';
  export {RevisionStore,StudioNotebook,WORKSPACE_KEY,STUDIO_KEY,defaults,saveDrawing,drawings,exportArtBundle,restoreArtBundle};
  ${completeRecovery?"export {RecoveryVault} from './src/storage/recovery-vault';":''}
-`,resolveDir:root,loader:'ts'},bundle:true,platform:'browser',format:'iife',globalName:'StorageBenchmark',write:false}).outputFiles[0].text;
+ ${indexedMode?"export {NativeWorkspace} from './src/storage/native-workspace';export {NotebookWorkspace} from './src/storage/notebook-workspace';":''}
+`,resolveDir:root,loader:'ts'},bundle:true,platform:'browser',format:'iife',globalName:'StorageBenchmark',write:false,define:{'import.meta.env.MODE':JSON.stringify(indexedMode?'storage-preview':'production')}}).outputFiles[0].text;
 const metricsScript=()=>{
- const counter={getCalls:0,getCodeUnits:0,setCalls:0,setCodeUnits:0,parseCalls:0,parseCodeUnits:0,parseMs:0,stringifyCalls:0,stringifyCodeUnits:0,stringifyMs:0};
+ const counter={getCalls:0,getCodeUnits:0,setCalls:0,setCodeUnits:0,parseCalls:0,parseCodeUnits:0,parseMs:0,stringifyCalls:0,stringifyCodeUnits:0,stringifyMs:0,idbGetCalls:0,idbCursorSteps:0,idbPutCalls:0,idbReadPayloadBytes:0,idbWritePayloadBytes:0};
  const get=Storage.prototype.getItem,set=Storage.prototype.setItem,parse=JSON.parse,stringify=JSON.stringify;
  Storage.prototype.getItem=function(k){const value=get.call(this,k);if(this===localStorage){counter.getCalls++;counter.getCodeUnits+=value?.length||0;}return value;};
  Storage.prototype.setItem=function(k,v){if(this===localStorage){counter.setCalls++;counter.setCodeUnits+=String(v).length;}return set.call(this,k,v);};
  JSON.parse=function(...args){const start=performance.now();try{return parse.apply(this,args);}finally{counter.parseCalls++;counter.parseCodeUnits+=String(args[0]).length;counter.parseMs+=performance.now()-start;}};
  JSON.stringify=function(...args){const start=performance.now(),value=stringify.apply(this,args);counter.stringifyCalls++;counter.stringifyCodeUnits+=value?.length||0;counter.stringifyMs+=performance.now()-start;return value;};
- window.storageBenchmarkMetrics={read:()=>({...counter}),reset:()=>{for(const k of Object.keys(counter))counter[k]=0;}};
+ // Logical serialized metadata plus original binary lengths. These are host
+ // payload observations, not browser page/index overhead or billed I/O bytes.
+ const payloadBytes=value=>{const seen=new Set();let binary=0;const visit=x=>{if(x&&typeof x==='object'&&!seen.has(x)){seen.add(x);if(x instanceof ArrayBuffer||ArrayBuffer.isView(x)){binary+=x.byteLength;return;}if(x instanceof Blob){binary+=x.size;return;}for(const v of Object.values(x))visit(v);}};visit(value);try{return new TextEncoder().encode(stringify(value)??'').length+binary;}catch{return binary;}};
+ for(const method of ['get','getAll','openCursor']){const original=IDBObjectStore.prototype[method];IDBObjectStore.prototype[method]=function(...args){counter.idbGetCalls++;const request=original.apply(this,args);request.addEventListener('success',()=>{if(method==='openCursor'){if(request.result){counter.idbCursorSteps++;counter.idbReadPayloadBytes+=payloadBytes(request.result.value);}}else counter.idbReadPayloadBytes+=payloadBytes(request.result);});return request;};}
+ for(const method of ['put','add']){const original=IDBObjectStore.prototype[method];IDBObjectStore.prototype[method]=function(value,...args){counter.idbPutCalls++;counter.idbWritePayloadBytes+=payloadBytes(value);return original.call(this,value,...args);};}
+ window.storageBenchmarkMetrics={read:()=>({...counter}),reset:()=>{for(const k of Object.keys(counter))counter[k]=0;},payloadBytes};
 };
 const summarize=values=>{const sorted=[...values].sort((a,b)=>a-b);return {median:sorted[Math.floor(sorted.length/2)],p95:sorted[Math.ceil(sorted.length*.95)-1],samples:values};};
 (async()=>{
@@ -64,49 +77,62 @@ const summarize=values=>{const sorted=[...values].sort((a,b)=>a-b);return {media
     }
     return {owner,firstProject:made[0],workspaceRevisions:store.snapshot().revisions.length,sessionId:'synthetic-session-0',artwork:{originalCount,pixels:size,originalBytes,previewBytes}};
    },{projects,revisionsPerProject,sessions,messages});
+   let migration=null;
+   if(indexedMode){
+    const start=performance.now();await page.evaluate(async()=>{if(!FG.factory?.prepareIndexedWorkspace||!FG.studio?.prepareIndexedNotebook)throw Error('The actual application lacks explicit native/notebook preparation controls');await FG.factory.prepareIndexedWorkspace();await FG.studio.prepareIndexedNotebook();});migration={nativeAndNotebookMs:performance.now()-start};
+   }
    const runs=[];
    for(let run=0;run<samples;run++){
+    const cdp=await context.newCDPSession(page);await cdp.send('Performance.enable');
     const nav=performance.now();await page.reload();await page.waitForFunction(()=>window.FG?.studio&&window.FG?.store&&!document.getElementById('jemsWriterNotice'));
     const readyMs=performance.now()-nav;
     const startup=await page.evaluate(()=>({counters:storageBenchmarkMetrics.read(),heapBytes:performance.memory?.usedJSHeapSize??null,domNodes:document.querySelectorAll('*').length}));
-    const cdp=await context.newCDPSession(page);await cdp.send('Performance.enable');
+    startup.processMetrics=(await cdp.send('Performance.getMetrics')).metrics.filter(m=>['TaskDuration','ScriptDuration','JSHeapUsedSize','JSHeapTotalSize'].includes(m.name));
     const uiStart=performance.now();await page.evaluate(()=>FG.studio.home());await page.locator('[data-session="synthetic-session-0"] .studio-saved-open').waitFor();
     const libraryMs=performance.now()-uiStart;
     const openStart=performance.now();await page.locator('[data-session="synthetic-session-0"] .studio-saved-open').click();await page.waitForFunction(()=>document.querySelector('#studioTitle')?.textContent?.includes('Synthetic'));
     const openMs=performance.now()-openStart;
+    await page.locator('#studioChange').click();await page.locator('#studioPrompt').waitFor({state:'visible'});
+    await page.evaluate(()=>{storageBenchmarkMetrics.reset();document.getElementById('studioDraftStatus').textContent='';});
+    const uiSaveStart=performance.now();await page.locator('#studioPrompt').fill('Synthetic actual UI thought '+run);await page.locator('#studioPrompt').blur();await page.evaluate(()=>FG.studio.flushDraft());await page.waitForFunction(()=>/saved on this device/i.test(document.getElementById('studioDraftStatus')?.textContent||''));
+    const uiSaveDraft={ms:performance.now()-uiSaveStart,counters:await page.evaluate(()=>storageBenchmarkMetrics.read())};
     await page.addScriptTag({content:bridge});
-    const operations=await page.evaluate(async({seed,run})=>{
-     const {RevisionStore,StudioNotebook,exportArtBundle,restoreArtBundle,drawings}=StorageBenchmark,store=new RevisionStore(localStorage),book=new StudioNotebook(localStorage),out={};
-     const measure=(name,fn)=>{storageBenchmarkMetrics.reset();const t=performance.now();const result=fn();out[name]={ms:performance.now()-t,counters:storageBenchmarkMetrics.read()};return result;};
-     measure('list',()=>{const a=store.list(seed.owner),b=book.list(seed.owner);if(!a.length||!b.length)throw Error('Missing synthetic data');});
-     measure('openSavedRecord',()=>store.revision(seed.firstProject.id,seed.owner));
-     measure('saveDraft',()=>book.update(seed.sessionId,seed.owner,s=>{s.draft='Synthetic saved thought '+run;}));
-     measure('saveRevision',()=>{const p=store.project(seed.firstProject.id,seed.owner),r=store.revision(p.id,seed.owner);return store.commit(p.id,seed.owner,r.config,'Measured revision '+run,'Retain the last working game',undefined,p.headId);});
-     const raw=measure('legacyExport',()=>JSON.stringify({profiles:FG.store.data,workspace:store.snapshot(),notebook:book.read()}));
+    const operations=await page.evaluate(async({seed,run,indexedMode})=>{
+     const {RevisionStore,StudioNotebook,NativeWorkspace,NotebookWorkspace,exportArtBundle,restoreArtBundle,drawings}=StorageBenchmark,out={};let store,book;
+     const measure=async(name,fn)=>{storageBenchmarkMetrics.reset();const t=performance.now();const result=await fn();out[name]={ms:performance.now()-t,counters:storageBenchmarkMetrics.read()};return result;};
+     await measure('openDomainAdapters',async()=>{store=indexedMode?await NativeWorkspace.open(localStorage,()=>FG.store.current().id):new RevisionStore(localStorage);book=indexedMode?await NotebookWorkspace.open(localStorage,()=>FG.store.current().id):new StudioNotebook(localStorage);if(indexedMode&&(!store.indexed||!book.indexed))throw Error('Actual indexed authority was not activated');});
+     await measure('list',async()=>{const a=indexedMode?(await store.page(seed.owner,null,24)).items:store.list(seed.owner),b=book.list(seed.owner);if(!a.length||!b.length)throw Error('Missing synthetic data');});
+     await measure('openSavedRecord',()=>store.revision(seed.firstProject.id,seed.owner));
+     await measure('saveDraft',()=>book.update(seed.sessionId,seed.owner,s=>{s.draft='Synthetic saved thought '+run;}));
+     await measure('saveRevision',async()=>{const p=await store.project(seed.firstProject.id,seed.owner),r=await store.revision(p.id,seed.owner);return store.commit(p.id,seed.owner,r.config,'Measured revision '+run,'Retain the last working game',undefined,p.headId);});
+     await measure('profileSave',()=>FG.store.save());
+     const raw=await measure('legacyExport',async()=>JSON.stringify({profiles:FG.store.data,workspace:await store.snapshot(),notebook:indexedMode?await book.snapshot():book.read()}));
      out.legacyExport.utf8Bytes=new TextEncoder().encode(raw).length;
-     measure('legacyRestoreValidation',()=>{const value=JSON.parse(raw);store.restore(JSON.stringify(value.workspace));book.restore(value.notebook);});
+     await measure('legacyRestoreValidation',async()=>{const value=JSON.parse(raw);if(indexedMode)await store.indexed.restoreSnapshot(value.workspace,'benchmark-restore-native-'+run);else store.restore(JSON.stringify(value.workspace));await book.restore(value.notebook,'benchmark-restore-notebook-'+run);});
      const artStart=performance.now(),artBundle=await exportArtBundle(seed.owner);out.artExport={ms:performance.now()-artStart,utf8Bytes:new TextEncoder().encode(JSON.stringify(artBundle)).length};
      const restoreStart=performance.now();await restoreArtBundle(seed.owner,artBundle);out.artRestore={ms:performance.now()-restoreStart};
      const originals=await drawings(seed.owner);out.artwork={count:originals.length,uniqueHashes:new Set(originals.map(x=>x.sha256)).size,originalBytes:originals.reduce((n,x)=>n+x.bytes.byteLength,0)};
-     out.localStorage={keys:localStorage.length,utf8Bytes:Object.keys(localStorage).reduce((sum,key)=>sum+new TextEncoder().encode(localStorage.getItem(key)||'').length,0),codeUnits:Object.keys(localStorage).reduce((sum,key)=>sum+(localStorage.getItem(key)||'').length,0)};
-     return out;
-    },{seed,run});
+     out.localStorage={keys:localStorage.length,byKey:Object.fromEntries(Object.keys(localStorage).sort().map(key=>[key,new TextEncoder().encode(localStorage.getItem(key)||'').length])),utf8Bytes:Object.keys(localStorage).reduce((sum,key)=>sum+new TextEncoder().encode(localStorage.getItem(key)||'').length,0),codeUnits:Object.keys(localStorage).reduce((sum,key)=>sum+(localStorage.getItem(key)||'').length,0)};
+     if(indexedMode){store.close();book.close();}return out;
+    },{seed,run,indexedMode});
+    operations.uiSaveDraft=uiSaveDraft;
     if(completeRecovery){
-     const start=performance.now();await page.evaluate(()=>{const button=document.getElementById('recovery-save');if(!button)throw Error('Missing integrated recovery control');button.click();});
+     const start=performance.now();await page.evaluate(()=>{const button=document.getElementById('recovery-save');if(!button)throw Error('Missing integrated recovery control');document.getElementById('jemsRecoveryStatus').textContent='';button.click();});
      await page.waitForFunction(()=>document.getElementById('jemsRecoveryStatus')?.textContent==='Complete recovery copy saved on this device.');
      operations.completeRecovery={captureAndSaveMs:performance.now()-start,...await page.evaluate(async()=>{
       const scope={origin:location.origin,audience:'family',owners:FG.store.familyProfiles().map(p=>p.id)},vault=new StorageBenchmark.RecoveryVault(scope,()=>{}),start=performance.now(),point=(await vault.list(undefined,1))[0],archive=await vault.read(point.id);
       return {readAndVerifyMs:performance.now()-start,archiveBytes:new TextEncoder().encode(JSON.stringify(archive)).length,parts:point.parts.length,uniqueChunks:Object.keys(archive.chunks).length,logicalPartBytes:point.parts.reduce((n,p)=>n+p.size,0)};
      })};
     }
+    operations.indexedFootprint=await page.evaluate(async()=>{const rows=[];for(const info of await indexedDB.databases()){if(!info.name)continue;const db=await new Promise((resolve,reject)=>{const request=indexedDB.open(info.name);request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});for(const name of db.objectStoreNames){const row={database:info.name,store:name,records:0,logicalPayloadBytes:0};await new Promise((resolve,reject)=>{const tx=db.transaction(name),cursor=tx.objectStore(name).openCursor();cursor.onsuccess=()=>{if(cursor.result){row.records++;row.logicalPayloadBytes+=storageBenchmarkMetrics.payloadBytes(cursor.result.value);cursor.result.continue();}};tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});rows.push(row);}db.close();}return {stores:rows,logicalPayloadBytes:rows.reduce((n,r)=>n+r.logicalPayloadBytes,0),browserEstimate:await navigator.storage.estimate()};});
     const processMetrics=(await cdp.send('Performance.getMetrics')).metrics.filter(m=>['TaskDuration','ScriptDuration','JSHeapUsedSize','JSHeapTotalSize'].includes(m.name));await cdp.detach();
     runs.push({readyMs,libraryMs,openMs,startup,operations,processMetrics});
    }
    assert.deepEqual(errors,[],'application page errors');
-   rows.push({scenario,projects,revisionsPerProject,initialRevisions:seed.workspaceRevisions,sessions,messagesPerSession:messages,artwork:seed.artwork,metrics:Object.fromEntries(['readyMs','libraryMs','openMs'].map(key=>[key,summarize(runs.map(r=>r[key]))])),runs});
+   rows.push({scenario,projects,revisionsPerProject,initialRevisions:seed.workspaceRevisions,sessions,messagesPerSession:messages,artwork:seed.artwork,migration,metrics:Object.fromEntries(['readyMs','libraryMs','openMs'].map(key=>[key,summarize(runs.map(r=>r[key]))])),runs});
    await context.close();console.log('Measured '+scenario);
   }
-  const report={schema:'jems.storage.application-benchmark.v1',observedAt:new Date().toISOString(),source:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),gitTree:execFileSync('git',['rev-parse','HEAD^{tree}'],{cwd:root,encoding:'utf8'}).trim(),scope:'Synthetic data generated with actual application RevisionStore/StudioNotebook, built Jems UI, real Chromium localStorage/IndexedDB; desktop emulation on one shared Linux host. No network provider or cloud data. Native record operations use the production source classes. Legacy export/restore timing excludes originals, rewards, Pals and cloud; full backup is measured separately.',instrumentation:'Synchronous JSON and localStorage instrumentation adds overhead; byte counters are UTF-16 code units, separately exported UTF-8 bytes. Startup includes browser navigation and readiness wait. Process metrics are CDP observations, not isolated CPU or physical-device memory. Samples share warm HTTP cache and accumulate one retained revision per sample.',browser:await browser.version(),samples,rows};
+  const report={schema:'jems.storage.application-benchmark.v2',authority:indexedMode?'explicit-storage-preview-indexed':'default-legacy',observedAt:new Date().toISOString(),source:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),gitTree:execFileSync('git',['rev-parse','HEAD^{tree}'],{cwd:root,encoding:'utf8'}).trim(),trackedNonApplicationChanges:trackedChanges,build:{directory:'dist',fileCount:bundleFiles.length,bytes:bundleFiles.reduce((n,x)=>n+x.bytes,0),builtFilesSha256,provenance:'Build TARGET from this committed source before running; this digest identifies measured delivered bytes, not a hosted build attestation.'},scope:'Synthetic data generated with actual application RevisionStore/StudioNotebook, built Jems UI, real Chromium localStorage/IndexedDB; desktop emulation on one shared Linux host. No network provider or cloud data. Native/notebook record operations use the actual selected authority. The legacyExport/legacyRestoreValidation key names retain comparison compatibility; indexed runs snapshot/restore the active indexed sources. They exclude originals, rewards, Pals and cloud; full backup is measured separately.',instrumentation:'Synchronous JSON and localStorage instrumentation adds overhead; byte counters are UTF-16 code units, separately exported UTF-8 bytes. Startup includes browser navigation and readiness wait. IDB counters include logical JSON and binary payloads; footprint includes immutable history and retained original migration sources separately from localStorage, but omits browser index/page overhead. Original baseline v1 lacked these IDB counters and UI draft timing; compare v2 only. Process metrics are CDP observations of startup and the complete measured page lifetime (including explicit footprint traversal), not isolated CPU or physical-device memory. Samples share warm HTTP cache and accumulate one retained revision per sample.',browser:await browser.version(),samples,rows};
   fs.mkdirSync(path.dirname(output),{recursive:true});fs.writeFileSync(output,JSON.stringify(report,null,2)+'\n');console.log(output);
  }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});
