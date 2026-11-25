@@ -61,6 +61,9 @@ if($('familyExport'))$('familyExport').onclick=act(async()=>{
   let after='';const values=[];do{const page=await request('/entry/export-receipts',{kind,after});values.push(...page.rows);after=page.next;}while(after);
   data[kind==='usage'?'monthlyUsage':kind]=values;
  }
+ data.storageMetadata={};for(const kind of ['storage-consents','backup-scans','backup-schedules','backup-operations']){
+  let after='';const values=[];do{const page=await request('/entry/export-storage-metadata',{kind,after});values.push(...page.rows);after=page.next;}while(after);data.storageMetadata[kind]=values;
+ }
  const storage=[];let cursor='';do{const page=await request('/entry/export-storage',{after:cursor});storage.push(...page.rows);cursor=page.next;}while(cursor);data.storageRecords=storage;
  try{const {exportFamilyDevice}=await import('/entry/export-device.js');data.device=await exportFamilyDevice();}
  catch{data.deviceExportIncomplete=true;status('Server records are ready. Device storage needs separate recovery. Keep this device and contact the operator.');}

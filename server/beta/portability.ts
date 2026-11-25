@@ -1,6 +1,6 @@
 import type {Documents} from './documents';
 import type {Family} from './model';
-import {uuid} from './model';
+import {uuid,workspaceOf} from './model';
 import type {PipelineState} from '../pipeline/types';
 
 export function exportApproved(f:Family,now:number){
@@ -30,4 +30,18 @@ export function pendingReservations(s:PipelineState){
   ...((s.audioReceipts??[]).filter(r=>r.state==='running').map(r=>({kind:'speech',r}))),
   ...((s.narrationReceipts??[]).filter(r=>r.state==='running').map(r=>({kind:'narration',r})))];
  return [...jobs,...calls.map(({kind,r})=>({kind,reference:r.reservationId??r.id,stage:'reserved',microUsd:r.reserved}))];
+}
+
+/** Case-approved parent export of scoped consent and recovery operation metadata.
+ * Full original recovery bytes are already present in the versioned continuity
+ * records; schedule manifests retain their immutable source/artifact references. */
+export async function exportStorageMetadataPage(tx:Documents,path:string,f:Family,kind:unknown,after:unknown){
+ const workspace=workspaceOf(f),collections:Record<string,string>={
+  'storage-consents':path+'/storage-consents','backup-scans':path+'/backup-scans',
+  'backup-schedules':'factoryBackupSchedules/'+workspace+'/points',
+  'backup-operations':'factoryBackupSchedules/'+workspace+'/activeOperations'
+ };
+ if(typeof kind!=='string'||!Object.hasOwn(collections,kind)||typeof after!=='string'||after&&!/^[a-zA-Z0-9_-]{1,160}$/.test(after))throw Error('INVALID_REQUEST');
+ const rows=await tx.page<Record<string,unknown>>(collections[kind],after,4);
+ return {rows:rows.map(row=>({id:row.id,value:row.value})),next:rows.length===4?rows.at(-1)!.id:null};
 }

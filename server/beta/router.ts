@@ -7,7 +7,7 @@ import {verifySession} from '../pipeline/auth';
 import {cookieValue,assertActiveTrustedDevice} from '../trusted-devices';
 import {acknowledge,renewParticipation,exact,internalCookies,liveSession,metadataSession,logout,redeem,requirePlay} from './access';
 import {activeFamily,verifiedGuardian,needsNoticeRenewal,betaNotice,familyOrigin,participationNotice,uuid,type Capabilities} from './model';
-import {exportApproved,exportReceiptPage,exportWorkspace} from './portability';
+import {exportApproved,exportReceiptPage,exportStorageMetadataPage,exportWorkspace} from './portability';
 import {previewAdmission,type PreviewRouting} from './preview';
 import {BetaAdministration,verifyAdministrator} from './admin';
 import type {FamilyDirectory} from './store';
@@ -85,9 +85,9 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    if(path==='/entry/storage-consent'){json(res,200,await storageConsent(d,id,raw,key,req.method==='POST'?await read(req):undefined));return;}
    if(path.startsWith('/v1/storage/')){await continuityHttp(d,id,raw,key,req,res);return;}
    if(req.method==='POST'&&(path==='/entry/profile-settings'||path==='/entry/parent-guidance')){json(res,200,await (path==='/entry/profile-settings'?changeLearnerSetting:parentGuidance)(d,id,await read(req),internalCookies(raw),key));return;}
-   if(path==='/entry/profiles'||path==='/entry/review-art'||['/entry/export','/entry/export-receipts','/entry/export-storage','/entry/export-device.js'].includes(path)){
+   if(path==='/entry/profiles'||path==='/entry/review-art'||['/entry/export','/entry/export-receipts','/entry/export-storage-metadata','/entry/export-storage','/entry/export-device.js'].includes(path)){
     const body=req.method==='POST'?await read(req):{};
-    exact(body,path==='/entry/review-art'?['digest']:path==='/entry/export-receipts'?['kind','after']:path==='/entry/export-storage'?['after']:[]);
+    exact(body,path==='/entry/review-art'?['digest']:['/entry/export-receipts','/entry/export-storage-metadata'].includes(path)?['kind','after']:path==='/entry/export-storage'?['after']:[]);
     const result=await d.withFamily(id,async(tx,f,p)=>{
      activeFamily(f,p);
      const cookies=internalCookies(raw),now=Date.now();
@@ -103,6 +103,7 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
        const rows=await tx.page('factoryContinuity/beta-'+id+'/continuityRecordsV1',body.after,4);
        return {rows:rows.map(r=>r.value),next:rows.length===4?rows.at(-1)!.id:null};
       }
+      if(path==='/entry/export-storage-metadata')return exportStorageMetadataPage(tx,d.path(id),f,body.kind,body.after);
       if(path==='/entry/export-receipts')return exportReceiptPage(tx,d.path(id),f,body.kind,body.after);
       const data=await d.inWorkspace(tx,f,p,s=>exportWorkspace(f,s,now),false);
       f.request!.state='completed';tx.set(d.path(id),f);return data;
