@@ -1,0 +1,51 @@
+name: CI performance observations
+
+# Activated only when this definition is present on the default branch.
+# Metadata reporting never changes required statuses or authorizes evidence reuse.
+on:
+  workflow_run:
+    workflows: [Arcade journeys]
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: ci-performance-${{ github.event.workflow_run.id }}-${{ github.event.workflow_run.run_attempt }}
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out trusted default-branch reporting code
+        uses: actions/checkout@v4
+        with:
+          # workflow_run's github.sha belongs to the default branch. Never use
+          # workflow_run.head_sha, a PR checkout, or downloaded executable files.
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Summarize completed run metadata and all attempts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPORT_REPOSITORY: ${{ github.repository }}
+          REPORT_RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          node scripts/ci/report-performance.mjs \
+            --repository "$REPORT_REPOSITORY" \
+            --runs "$REPORT_RUN_ID" \
+            --baseline-config ops/ci-performance.json \
+            --out "$RUNNER_TEMP/ci-performance/report.json" \
+            --summary "$GITHUB_STEP_SUMMARY"
+      - name: Retain metadata report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-performance-${{ github.event.workflow_run.id }}-attempt-${{ github.event.workflow_run.run_attempt }}
+          path: ${{ runner.temp }}/ci-performance/report.json
+          if-no-files-found: error
+          retention-days: 30

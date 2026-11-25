@@ -38,6 +38,7 @@ async function pressV1Control(page,frame,control){
  }
 }
 async function main(game,independentIntentPlan,captureQuality=false){
+ const start=performance.now();
  validateSource(game);const v2=game.kind==='generated-module-v2';
  if(game.assets)validateAssetPack(game.assets);
  if(independentIntentPlan&&!v2)throw Error('INTENT_PLAN_REQUIRES_V2');
@@ -46,7 +47,9 @@ async function main(game,independentIntentPlan,captureQuality=false){
  if(game.assets)compiled.assetsHash=assetPackHash(game.assets);
  if(v2){const runtime=runtimeBundle();compiled.runtimeVersion=runtime.version;compiled.runtimeHash=runtime.hash;Object.assign(compiled.tests,{input:false,resources:false,pause:false});}
  let independentIntentPasses=0,qualityEvidence;
+ const compiledAt=performance.now();
  const browser=await chromium.launch({executablePath:process.env.WORKER_BROWSER_PATH||undefined,headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--disable-background-networking']});
+ const launchedAt=performance.now();let testedAt=launchedAt;
  try{
   for(const [device,viewport]of [['desktop',{width:1000,height:800}],['mobile',{width:375,height:812}]]){
    const context=await browser.newContext({viewport,hasTouch:device==='mobile'}),page=await context.newPage();let external=0;await context.route('**/*',r=>{external++;return r.abort();});
@@ -81,13 +84,14 @@ async function main(game,independentIntentPlan,captureQuality=false){
     compiled.tests[device]=true;compiled.tests.replay=true;compiled.tests.isolation=true;
    }finally{await context.close();}
   }
+  testedAt=performance.now();
   if(captureQuality)qualityEvidence=await collectQualityEvidence(browser,tested);
  }finally{await browser.close();}
  if(independentIntentPlan){
   if(independentIntentPasses!==2)throw Error('INTENT_ATTESTATION_REQUIRED');
   compiled.tests.intent=true;
  }
- return {game:tested,...(qualityEvidence?{qualityEvidence}:{})};
+ return {game:tested,...(qualityEvidence?{qualityEvidence}:{}),timings:{compileAndValidate:Math.round(compiledAt-start),browserSetup:Math.round(launchedAt-compiledAt),playtest:Math.round(testedAt-launchedAt),captureAndClose:Math.round(performance.now()-testedAt)}};
 }
 if(require.main===module){let input='';process.stdin.on('data',c=>{input+=c;if(Buffer.byteLength(input)>4*1024*1024)process.exit(2)});process.stdin.on('end',()=>{
  const value=JSON.parse(input);

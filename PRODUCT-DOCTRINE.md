@@ -53,6 +53,8 @@ The owner's [November 22 Bubble Gum correction](docs/decisions/2026-11-22-bubble
 
 ## 3. Choose the simplest method that preserves the intent
 
+The premium builder plans the artwork and its playable roles together. Side, top-down, isometric and guided perspective use a bounded 2D canvas. Preserve the chosen view, action and payoff. Ask the creator about an indispensable spatial action the runtime cannot represent. [Artwork-first pilot](docs/game-intelligence/premium-benchmark/ARTWORK-PILOT.md)
+
 Choose a game's form from its actions and consequences. Rendering (2D or true 3D), input, simulation, visual style and goal/free-play mode are independent decisions. A robot does not imply 3D; a launch animation does not imply physical simulation.
 
 Use actual physics when weight, contact, balance, momentum, suspension or another physical cause materially determines the requested experience, or when it is an explicit requirement. Preserve verified existing mechanics when editing a saved game. If an essential requirement exceeds the runtime's capabilities, explain the gap or resolve the choice; do not silently substitute an easier experience and claim completion. Reusable game families should support invention rather than confine every idea to the same game.
@@ -146,6 +148,15 @@ Preserve deterministic identity, authorization, spending, isolation and version 
 
 For the accepted temporary development scope, the adult profile lives on the existing site and its authenticated switch makes approved AI tools available directly. Keep a permanent **Menu → Grown-ups → Private parent session** entry that explains missing connection, disabled testing, required approval or current access. Its visibility grants no authority. Keep adult test work separate from child profiles and retain server authorization; a profile label is not evidence of consent or age. Conversation, game building and dictation each report their actual availability. [ADR0005](docs/decisions/0005-temporary-adult-profile.md) records the owner's one-site requirement, temporary scope and removal condition. It does not change the child's Send, Build, Keep or learning contracts.
 
+## 9. Fast development requires visible acceptance and stable release
+
+The owner should develop Jems as a product without administering its infrastructure. Follow [DEV → TEST → PROD](docs/development/DEV-TEST-PROD.md): independent private PR previews, one permanent integrated TEST website, and exact tested-release approval before the existing controlled production promotion. Ordinary merges do not imply production deployment. Keep synthetic and real-provider evidence, automated results, owner visual judgment, observed play and learning effectiveness distinct.
+
+Routine operations must be automated through GitHub and scoped cloud identities without Cloud Shell. DEV and TEST may not use production family data, model credentials or deployment authority. Preserve saved user work and compatible recovery. [The accepted method](docs/decisions/2026-11-23-dev-test-prod.md) supersedes older standalone environment proposals; delivery evidence determines which parts are actually available.
 ## Changing this doctrine
 
 Update the affected principle and its linked detailed contract in the same PR as a material behavior change. Record a consequential choice and its source in [a decision record](docs/decisions/README.md). Distinguish an owner decision, a research hypothesis and an implementation observation. Automated maintenance may flag conflicts and stale evidence; it must not silently rewrite product intent or turn a proposal into an accepted decision.
+
+## Pre-K through Grade 4
+
+Parents explicitly select Pre-K, Kindergarten or Grades 1–4. Pre-K and Kindergarten use illustrated, audio-led play and local visual coding. Creating an AI game requires a grown-up handoff and separately authorized family processing. The child's selected grade sets a learning ceiling across subjects and Stretch. Reading access, game difficulty, adult access and provider permissions each retain their own controls.

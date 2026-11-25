@@ -8,7 +8,9 @@ These records explain durable choices without turning chat history into another 
 
 | Record | Decision | Status | Source |
 | --- | --- | --- | --- |
+| [DEV → TEST → PROD](2026-11-23-dev-test-prod.md) | Independent private PR previews, permanent isolated TEST and exact-release approval through the existing production controller; zero routine Cloud Shell | Accepted operating direction; source foundation and deployed completion separate | Owner's November 23 automated environment assignment, superseding previous unimplemented DEV/staging proposals |
 | [Retained games in My Creations](2026-11-23-retained-games-in-my-creations.md) | Move Dragon/Buckets cards into My Creations, preserve every variant and retain four Home games; scope the owner's retention exception to this cutover | Accepted for implementation; source and live acceptance separate | Owner's November 23 retained-games and production-cutover direction |
+| [Premium game builder](2026-11-23-premium-builder.md) | Use Astra High for all Adult Private premium game construction and repair, with separately approved planning and review | Accepted; PR139 and PR168 merged, with the $5 cumulative game/revision ceiling. Activation and provider compatibility remain separate. | Owner's November 23 premium builder assignment |
 | [Direct operations](2026-11-20-direct-operations.md) | Eliminate routine command/output relay through a reusable cloud identity; brief notice for larger in-scope fixes | Accepted operating intent; reconciled diagnostic source, prior environment evidence separate from current access; no-merge preparation hold | Owner's November 20 access-efficiency discussion and November 21 preparation-only continuation |
 | [0001](0001-child-led-creation.md) | Child-led creation and explicit version promotion | Accepted, retrospectively documented | Owner-approved coaching standard |
 | [0002](0002-intent-faithful-game-forms.md) | Choose intent-faithful game forms using independent axes | Accepted, retrospectively documented | Game Intelligence standards and Bubble Gum decision |
@@ -34,12 +36,10 @@ These records explain durable choices without turning chat history into another 
 | [Gem Pal expression runtime](2026-11-20-pal-expression-runtime.md) | Versioned 184-image original-roster exports, isolated expression previews and a finite Wink Base opacity pilot | Accepted for implementation; release acceptance separate | Owner approved the completed core artwork and integration work, November 20, 2026 |
 
 | [Approved Pal collection](2026-11-21-approved-pal-collection.md) | Connect all 24 approved character neutrals to actual collection, two free starter choices, earned forms and versioned scene use while retaining saved IDs | Accepted for implementation and release after verification | Owner confirmed the starter-art gap and authorized the complete fix and subsequent cutover, November 21 |
-| [First-learner coding](2026-11-22-first-learner-coding.md) | Put a larger scene before a compact beginner action dock; disclose fuller controls without rewriting saved programs; composite approved Pal paper backgrounds in the scene renderer | Accepted for implementation; candidate verification and release separate | Owner's November 22 coding-learning usability and Pal-background overhaul request |
+| [First-learner coding](2026-11-22-first-learner-coding.md) | Share space between the stage and an accessible coding workspace, with Code and Play views on constrained screens; disclose fuller controls without rewriting saved programs; composite approved Pal paper backgrounds in the scene renderer | Accepted for implementation; candidate verification and release separate | Owner's November 22 coding-learning usability and Pal-background overhaul request |
 | [Jem Factory play clarity](2026-11-22-factory-play-clarity.md) | Make patterns prominent, mount sorting controls on the machine, recycle missed cuts and increase pattern difficulty after two completed cycles | Accepted for implementation; verification and release separate | Owner's November 22 request to preserve the Factory's beauty and finishing play while making its actions clearer and consequential |
 
 | [Bubble Gum assembly](2026-11-22-bubble-gum-assembly.md) | Recognizable objects, structural gum joins, varied puzzles and extended replayable adventures in the shared player | Accepted owner direction; initial tuning awaits play review | Owner's November 22 comprehensive overhaul request |
-
-| [Private game-construction model direction](2026-11-23-game-construction-model-direction.md) | Owner-selected “Astra High” capability target for adult-private game construction; provider model ID, effort, budget and separate review scope require verification | Accepted intent; PR139 branch implementation only, not merged or activated | Owner's November 23 game-generation comparison and Codex handoff; executable source and worker links in the record |
 
 **Accepted describes the choice, not a deployment, feature completion or universal validation.** The first records summarize decisions already present in the repository. They do not invent a new approval. Dates distinguish when a record was written from when a decision was made.
 
@@ -80,3 +80,5 @@ Never copy private child content, credentials or restricted evidence into this p
 - [November 20: readable learning surfaces and friendly narration](2026-11-20-learning-readability-and-narration.md) — question-first copy, semantic light/dark separation, readable type and deliberate local female voice selection.
 
 - [November 21: explicit profile levels, fitted play and persistent reading](2026-11-21-profile-play-and-reading.md) — conservative per-profile learning setup, common viewport/fullscreen, shared read-aloud and separately approved natural narration.
+
+- [Pre-K and kindergarten](2026-11-25-early-learning.md) records grade compatibility, authorization and release dependencies.

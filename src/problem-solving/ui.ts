@@ -109,7 +109,7 @@ export function installProblemSolvingPractice(host: Host) {
     intro.append(image('./jems-art/character_spark_wave.webp', 'ps-companion'), node('p', '', 'A small adventure for your next big idea. Pick one to begin.'));
     body.append(intro);
     const cards = node('div', 'ps-cards');
-    for (const task of practiceTasksForGrade(Number(FG.store.current().grade) || 1)) {
+    for (const task of practiceTasksForGrade(FG.store.current().grade)) {
       const draft = store().draft(owner(), task.id), card = button('', 'ps-card'); card.dataset.psTask = task.id;
       card.append(image(task.thumbnail, 'ps-card-art'));
       const copy = node('span', 'ps-card-copy'), action = node('b', '', draft ? 'Continue my idea ' : 'Let’s try '); action.append(createIcon('arrow'));
@@ -253,7 +253,7 @@ export function installProblemSolvingPractice(host: Host) {
       if (!host.enter()) return;
       visible = true; activeOwner = owner(); page.classList.remove('hidden');
       if (id) {
-        const task = getPracticeTask(id), allowed = practiceTasksForGrade(Number(FG.store.current().grade) || 1).some(item => item.id === task.id);
+        const task = getPracticeTask(id), allowed = practiceTasksForGrade(FG.store.current().grade).some(item => item.id === task.id);
         if (!allowed) { renderShelf(); return; } start(task);
       } else renderShelf();
     });

@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { runtimeBundle } from '../sandbox/bundle-v2.cjs';
 import type { CreationProject } from '../../src/creation/model';
 import { validateGeneratedCreationManifest } from '../../src/creation/projects';
+import {requirePlannedAssets} from '../quality/art-direction';
 import {assetPackHash,validateAssetPack,type GameAssetPack} from './game-assets';
 import type {GameQualityReview} from '../quality/game-quality';
 import {validateSuggestedPlaythrough,validateGameProductionPlan,type SuggestedPlaythrough,type GameProductionPlan} from '../quality/presentation-plan';
@@ -26,9 +27,12 @@ export function validateGenerated(value:unknown):GeneratedGame {
  if(!isGeneratedGame(g)||Object.keys(g).some(k=>!['kind','title','instructions','source','controls','assets','playthrough','productionPlan','creationManifest'].includes(k))||typeof g.title!=='string'||g.title.trim().length<1||g.title.length>60||typeof g.instructions!=='string'||g.instructions.length<5||g.instructions.length>250||typeof g.source!=='string'||Buffer.byteLength(g.source)>30000||g.source.length<30||!Array.isArray(g.controls)||g.controls.length>5||new Set(g.controls).size!==g.controls.length||g.controls.some(k=>!['left','right','up','down','action'].includes(k)))throw Error('GENERATED_ARTIFACT_REJECTED');
  if(g.assets!==undefined&&g.kind!=='generated-module-v2')throw Error('ASSETS_REQUIRE_V2');
  const assets=g.assets===undefined?undefined:validateAssetPack(g.assets);
- const playthrough=g.playthrough===undefined?undefined:validateSuggestedPlaythrough(g.playthrough);
  const productionPlan=g.productionPlan===undefined?undefined:validateGameProductionPlan(g.productionPlan);
+ const premium=productionPlan?.version==='game-production-plan-v2';
+ if(premium&&g.kind!=='generated-module-v2')throw Error('PREMIUM_PLAN_REQUIRES_V2');
+ const playthrough=g.playthrough===undefined?undefined:validateSuggestedPlaythrough(g.playthrough,premium);
  if(assets&&productionPlan&&assets.style!==productionPlan.presentationStyle)throw Error('ASSET_STYLE_MISMATCH');
+ if(premium&&productionPlan.artDirection)requirePlannedAssets(productionPlan.artRequests,productionPlan.artDirection,assets?.assets||[]);
  const creationManifest=g.creationManifest==null?undefined:validateGeneratedCreationManifest(g.creationManifest);
  return {kind:g.kind,title:g.title,instructions:g.instructions,source:g.source,controls:[...g.controls],...(assets?{assets}:{}),...(playthrough?{playthrough}:{}),...(productionPlan?{productionPlan}:{}),...(creationManifest?{creationManifest}:{})};
 }

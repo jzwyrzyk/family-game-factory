@@ -13,8 +13,11 @@ export async function verifyV1InputOrdering(browser:Browser){
   await page.clock.install({time});await page.clock.pauseAt(new Date(time.getTime()+1000));
   const code=transformSync(hopper.source,{loader:'ts',format:'iife',globalName:'GameModule'}).code;
   const game={...hopper,compiled:{code,sourceHash:hash(hopper.source),codeHash:hash(code),tests:{desktop:true,mobile:true,replay:true,isolation:true}}};
-  await page.setContent('<iframe sandbox="allow-scripts" style="width:100%;height:900px;border:0"></iframe>');
-  await page.locator('iframe').evaluate((el,html)=>(el as HTMLIFrameElement).srcdoc=html,renderGenerated(game,'v1-input-fixture','v1-input-channel').html);
+  const html=renderGenerated(game,'v1-input-fixture','v1-input-channel').html;
+  await page.route('http://127.0.0.1/fixture-game',route=>route.fulfill({contentType:'text/html',body:html}));
+  await page.route('http://127.0.0.1/fixture-host',route=>route.fulfill({contentType:'text/html',
+   body:'<iframe sandbox="allow-scripts" src="/fixture-game" style="width:100%;height:900px;border:0"></iframe>'}));
+  await page.goto('http://127.0.0.1/fixture-host');
   const frame=page.frameLocator('iframe'),canvas=frame.locator('#game'),action=frame.locator('[data-control="action"]');
   // Force skips animation-based actionability while the clock is deliberately
   // frozen; Playwright still dispatches ordinary pointer/mouse input events.

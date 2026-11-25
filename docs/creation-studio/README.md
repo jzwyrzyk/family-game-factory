@@ -6,7 +6,7 @@
 
 **Art Studio support:** merged [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23) adds private original drawings and exact saved cutout versions to local scenes. The section below describes that source behavior; the [acceptance record](ACCEPTANCE.md) and [delivery state](../../DELIVERY-STATE.md) retain its development checks and subsequent merge receipt separately from the earlier PR62 merge. First-creation guidance is now combined with this merged source; delivery evidence distinguishes that integration's local and hosted checks from the earlier receipts.
 
-**First-learner UI candidate:** the owner's [November 22 refinement](../decisions/2026-11-22-first-learner-coding.md) adds the stage-first **First steps** view and optional fuller controls described below. It is stacked on PR125 source `1340d041145ffba4322ccb8262188b7cf2c7b6c4`, preserving shared reading, profile and play-view behavior. This candidate is separate from the historical merges above; current verification and release status belongs in the [acceptance record](ACCEPTANCE.md) and delivery state.
+**First-learner UI candidate:** the owner's [November 22 refinement](../decisions/2026-11-22-first-learner-coding.md) introduced **First steps** and optional fuller controls. The November 25 workspace correction updates their layout. It is stacked on PR125 source `1340d041145ffba4322ccb8262188b7cf2c7b6c4`, preserving shared reading, profile and play-view behavior. This candidate is separate from the historical merges above; current verification and release status belongs in the [acceptance record](ACCEPTANCE.md) and delivery state.
 
 ## Product purpose and boundaries
 
@@ -102,7 +102,9 @@ Free creation offers Dragon, Buckets, Robot, and blank starters, actor placement
 
 ### First steps and More tools
 
-**First steps** is the default presentation. The fitted workspace puts a large stage above a compact coding dock. My Games, My scenes, playback, Try tap, Undo, Keep and Full screen remain available; optional tools and long content scroll within their own areas. Fullscreen keeps the exit and trusted learning overlay inside the same workspace. An unavailable or refused browser fullscreen request uses a truthfully labeled expanded view.
+**First steps** is the default presentation. The fitted workspace shares its width equally between stage and code on desktop and landscape tablets. Portrait tablets give the stage 35% and code 65% of the available rows. At widths up to 700 CSS pixels or heights up to 600 CSS pixels, a scene opens in Code. The Code and Play buttons switch views of the same project. The stage’s Play button runs the program. Watch, Check and a due learning activity bring their stage into view.
+
+All six First steps actions appear first in the code pane. Adding a block reveals its selected editor. Children can swipe the whole pane to reach a long sequence, use the reorder and remove buttons, or choose an insertion point to return to the palette. On compact screens, Characters & tools contains character selection, scene settings and the More tools switch. My Games, My scenes, playback, Try tap, Undo, Keep and Full screen remain available. Fullscreen keeps the exit and trusted learning overlay inside the same workspace. An unavailable or refused browser fullscreen request uses a truthfully labeled expanded view.
 
 The initial action palette is **Move, Jump, Say, Dance, Wait and Repeat**; the **Ready for three gems** condition exercise also exposes **If**. The ordered program stays visible, and playback highlights its executing block. Selecting a block reveals its controls rather than expanding every parameter simultaneously. Movement uses **Direction** and numeric **Steps**, preserving exact distances such as the existing 120-step tap exercise. Jump and time choices retain an honest Custom option for saved values that do not match a preset. Opening the simpler view does not snap values or convert absolute, diagonal or nested actions.
 
@@ -204,3 +206,20 @@ The compact shell keeps Create primary, with Create & code under Menu → Make a
 Creation Studio keeps a speaker control available above the shelf and scene workspace. An explicit tap reads the current directions, the selected rebuild challenge and revealed hint, or visible scene-check feedback. The character picker has its own accessible speaker control while its dialog is open. The next tap stops reading; changing scene, editing, opening a learning checkpoint, leaving or switching players stops pending and active narration. No speech starts automatically, and reading directions does not add a hint or award learning evidence. See the [shared read-aloud contract](../speech/READ_ALOUD.md) for natural/device voice selection and actual-playback evidence boundaries.
 
 The [Pal scene rendering contract](PAL_SCENE_RENDERING.md) records the exact image scope, reviewed negative-space openings, immutable source boundary, and compositing evidence.
+
+## Early graphical coding
+
+First steps gives each direction a tap-to-add arrow. Every arrow inserts an ordinary relative move with the original interpreter's duration, distance and revision semantics. Sequence blocks show their direction. Grade 2 and above keep labels alongside the command symbols. More tools exposes exact values on every profile. The responsive stage and workspace come from #175.
+
+| Grade | Concept / activity | Developmental reference | Support level | Evidence |
+|---|---|---|---|---|
+| Pre-K | One step right, correct the direction | CSTA 2026 EK-PRO-TR-07 | Introduced | A bounded run follows the target direction and stops |
+| Kindergarten | Follow a two-leg path and repeat it in a second scene | Michigan 1A-AP-10, CSTA 2026 EK-PRO-PD-04 | Practiced | Ordered visible movement and stationary landmarks |
+| Kindergarten | Repetition and taps | Michigan 1A-AP-10, CAL ScratchJr event and motion activities | Partially supported | Bounce and tap schedules checked on the saved version |
+| Grade 1 | Longer routes and repair | CSTA 2026 E1-PRO-PD-04 and E1-PRO-TR-07 | Practiced | Saved-version behavior and recorded hint use |
+
+The introductory sequence starts with one step, follows with correcting a direction, and introduces turning before transfer to the meadow. These are suggested prerequisites. Children can also experiment freely. A passing trace cannot establish a prediction the child never supplied. The parent report describes what the version did.
+
+Sources reviewed November 25, 2026 include the [2026 CSTA PK–12 edition](https://csteachers.org/2026-csta-pk-12-computer-science-standards/), [Michigan's adopted K–12 CS standards](https://www.michigan.gov/mde/services/academic-standards/michigan-k-12-computer-science-standards) and [Boston College's Coding as Another Language Kindergarten ScratchJr curriculum](https://sites.bc.edu/codingasanotherlanguage/curricula/scratchjr-curricula/kindergarten-scratchjr/). The CSTA 2026 edition has grade-specific identifiers. Michigan's state framework retains its adopted K–2 identifiers.
+
+On the four early directional challenges, **Predict a move** accepts an optional tap before checking a specific scene. The bounded evaluator samples the first visible displacement. Equal diagonal movement, a hidden actor or an execution limit yields no directional observation. Changing the scene invalidates the pending choice. The saved check can contain a pair of direction labels for the parent. A correct scene or a Run click alone contributes no prediction response.

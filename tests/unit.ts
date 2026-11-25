@@ -57,6 +57,12 @@ import './generated-art.test';
 import './illustrations.test';
 import './presentation-quality.test';
 import './quality-pipeline.test';
+import './premium-model-policy.test';
+import './premium-pipeline.test';
+import './premium-production.test';
+import './premium-benchmark.test';
+import './premium-art.test';
+import './premium-feasibility.test';
 import './gem-factory-physics.test';
 import './gem-factory-pattern.test';
 import './gem-factory-cut.test';
@@ -77,3 +83,5 @@ import './drawing-engine.test';
 
 import './bubble-gum-rules.test';
 import './bubble-gum-journey.test';
+
+import './early-grades.test';

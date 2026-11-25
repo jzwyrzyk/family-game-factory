@@ -20,9 +20,9 @@ Keep decorative reward popups out of an active creation conversation and fitted 
 
 An explicit Build receives immediate, focused acknowledgement. Pending submission and an accepted build use different truthful states. Once accepted, offer **Play while I wait** and **Stay here** in the focused handoff. Use approved artwork, short copy and large controls; no fictitious time estimate is needed. Ordinary background readiness remains a visible, explicit action and never reopens a dismissed dialog or interrupts play. The [first-creation contract](../child-journey/FIRST-CREATION.md#build-handoff-and-recovery) defines the state and focus boundaries.
 
-### First coding puts the scene first
+### First coding puts the actions within reach
 
-The owner's [November 22 coding refinement](../decisions/2026-11-22-first-learner-coding.md) makes **First steps** the ordinary scene editor. Give the stage the largest visual role, with a compact action dock, a readable ordered program and a clear Play action. Keep exits, Undo and Keep easy to find. A first learner should not need to understand coordinates, variables, signal names or several scripts to make a character move.
+The owner's [November 22 coding refinement](../decisions/2026-11-22-first-learner-coding.md) makes **First steps** the ordinary scene editor. Give the stage and code comparable space in landscape. In portrait, reserve about two thirds of the available workspace for code. On constrained screens, offer Code and Play views. All six beginner actions must be immediately visible and tappable on entering Code. Keep exits, Undo and Keep easy to find. A first learner should not need to understand coordinates, variables, signal names or several scripts to make a character move.
 
 Reveal one block's useful controls when selected. Put additional authoring tools and scene settings behind explicit choices. Simplification must preserve exact custom values, nested blocks, existing programs and saved references. It must not substitute a supplied solution for the child's sequence or make an existing exercise impossible to solve. Start and tap choices select their own programs, so exploring a different event never erases the first program.
 
@@ -68,3 +68,13 @@ The playable view owns the available viewport and contains required learning ove
 The [accepted repair decision](../decisions/2026-11-20-learning-readability-and-narration.md) covers question presentation, semantic contrast, local narration and compact-navigation type size. Broader library copy, thumbnails, Pal artwork, subject defaults and optional-practice exits are separate work and must not be represented as delivered by this patch.
 
 Render the actual candidate, inspect its captures, and retain the exact test/build provenance. Automated browser checks establish the tested states; they do not establish physical-device audio quality, child comprehension or educational effectiveness.
+
+Early learning uses generous illustrated answer targets, spoken prompts, replay and an explicit grown-up reading alternative. First steps presents arrows, actions, an event control and ordered commands. Optional exact values remain in the editor. Compare the stage, palette, sequence and playback controls together on portrait, landscape and short viewports.
+
+## Early learner journeys
+
+Early activities offer pictured answers, audio replay, mute, a declared grown-up reading option and large tap targets. Children can select and undo story tiles without dragging. A printed decoding target stays visible and silent. A tap before instruction delivery leaves the attempt open. Use the shared Spark and owned-Pal art in the creation handoff. In the scene editor, a child can add direction blocks by tapping. On narrow phones Code and Play share the workspace through adjacent controls. Expand or use fullscreen to work with either view.
+
+A young profile starting one of the retained native games hears a short first action after browser activation. Replay and mute appear with game tools. Opening a checkpoint stops the previous instruction. Leaving play or switching profiles disposes its reader. The handoff and scene introduction also respect that profile’s early-learning mute choice.
+
+In the graphical editor, Jump and Dance display existing Spark poses with their direction or music symbols. Focus motion respects the device’s reduced-motion preference. Empty sets use a framed empty group. Objects in nonempty sets have individual picture descriptions so a screen reader can enumerate them.

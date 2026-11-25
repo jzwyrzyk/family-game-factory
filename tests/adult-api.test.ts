@@ -212,6 +212,7 @@ test('temporary adult mode can use the existing GitHub Pages origin and routes p
    approval:{enabled:false,approvalId:'synthetic',model:'synthetic',inputUsdPerMillion:1,outputUsdPerMillion:1,
     maxInputTokens:1000,maxOutputTokens:1000,priceReviewedOn:new Date().toISOString().slice(0,10)},
    maxJobMicroUsd:1000,workspace:familyId,localFile:join(directory,'state.json')};
+  await assert.rejects(createGateway({...config,maxJobMicroUsd:1_000_001,premiumMaxJobMicroUsd:5_000_000}),/JOB_BUDGET_REQUIRED/);
   const gateway=await createGateway(config),listener=await listen((req,res)=>void gateway.handler(req,res));server=listener.server;
   const response=await fetch(listener.url+'/v1/sessions/adult/unlock',{method:'POST',
    headers:{Origin:origin,'Content-Type':'application/json','X-Factory-Request':'1'},body:JSON.stringify({parentPassphrase:'synthetic test passphrase'})});

@@ -1,0 +1,186 @@
+[
+  {
+    "headRefName": "handoff/jems-coach-stage-20261123",
+    "number": 143,
+    "title": "Archive reviewed Coach staging helper for direct Cloud Shell download",
+    "head": "9c90427ad4942d9372b3bbd15b5649a27b49f4ef",
+    "overlap": [
+      "DELIVERY-STATE.md",
+      "docs/context/registry.json"
+    ]
+  },
+  {
+    "headRefName": "docs/jems-game-construction-model-intent-20261123",
+    "number": 138,
+    "title": "docs: reconcile adult game-model direction and merged release controls",
+    "head": "d3414af3dd7672db5681dbe5801eaccf0d7c7934",
+    "overlap": [
+      "ARCHITECTURE-CURRENT.md",
+      "DELIVERY-STATE.md",
+      "docs/README.md",
+      "docs/context/registry.json",
+      "docs/decisions/README.md",
+      "docs/game-intelligence/PRESENTATION-QUALITY.md",
+      "docs/operations/PHASE_2.md",
+      "docs/operations/PRODUCTION_ACTIVATION.md"
+    ]
+  },
+  {
+    "headRefName": "ops/pr115-coordinated-chat-release-20261121",
+    "number": 116,
+    "title": "Prepare coordinated production release for the creation chat repair",
+    "head": "2e2dd35a5420d85f1fda7e3af0c8454a6f63639a",
+    "overlap": [
+      "DELIVERY-STATE.md",
+      "docs/context/registry.json"
+    ]
+  },
+  {
+    "headRefName": "ops/gateway-repair-release-tool",
+    "number": 113,
+    "title": "ops: add reviewed gateway repair release and traffic recovery operator",
+    "head": "19f4b5b9a69cea7a0ea5482a01fd58873d71a507",
+    "overlap": [
+      "docs/context/registry.json"
+    ]
+  },
+  {
+    "headRefName": "ops/deployment-receipts-20261121",
+    "number": 110,
+    "title": "Preserve production repair helpers and verified deployment receipts",
+    "head": "5ff7b64501d5b75e0bf54842e55a137b7ea1eeda",
+    "overlap": [
+      "DELIVERY-STATE.md",
+      "docs/context/registry.json"
+    ]
+  },
+  {
+    "headRefName": "docs/pr108-production-handoff-20261121",
+    "number": 109,
+    "title": "Recover retired PR108 candidates and complete backend/web cutover",
+    "head": "1505b1ff34c5a5e0f9b0514b9ba18de29860dafd",
+    "overlap": [
+      "DELIVERY-STATE.md",
+      "docs/context/registry.json"
+    ]
+  },
+  {
+    "headRefName": "feat/isolated-dev-workbench-20261120",
+    "number": 106,
+    "title": "Add isolated DEV with fast previews and adult-only AI test access",
+    "head": "8734e9b2bd19756f2801365619376c2ce5697d9d",
+    "overlap": [
+      "ARCHITECTURE-CURRENT.md",
+      "DELIVERY-STATE.md",
+      "docs/README.md",
+      "docs/adult-pilot/VOICE_RELEASE_AND_UAT.md",
+      "docs/context/registry.json",
+      "docs/decisions/README.md",
+      "package.json",
+      "server/actions/coordinator.ts",
+      "server/gateway.ts",
+      "server/pipeline/http.ts",
+      "server/pipeline/service.ts",
+      "server/pipeline/types.ts"
+    ]
+  },
+  {
+    "headRefName": "fix/retired-coach-audit-20261120",
+    "number": 105,
+    "title": "Allow known retired non-serving coach revision during adult activation audit",
+    "head": "32a65582667a23122e46f213863fcdc03df4bf43",
+    "overlap": [
+      "docs/context/registry.json"
+    ]
+  },
+  {
+    "headRefName": "fix/tablet-touch-release-20261119",
+    "number": 84,
+    "title": "test: stabilize tablet touch and private drawing release checks",
+    "head": "be949f985223615a6887e1bfb5d4baad601569b9",
+    "overlap": [
+      "DELIVERY-STATE.md",
+      "docs/context/registry.json"
+    ]
+  },
+  {
+    "headRefName": "feature/jems-posthog-pilot",
+    "number": 83,
+    "title": "Add optional PostHog creation and art reuse pilot",
+    "head": "1385c9fb41ccb41ceab71fc2bbd273a52580dafa",
+    "overlap": [
+      ".github/workflows/test.yml",
+      "ARCHITECTURE-CURRENT.md",
+      "DELIVERY-STATE.md",
+      "PRODUCT-DOCTRINE.md",
+      "docs/README.md",
+      "docs/context/MAINTENANCE.md",
+      "docs/context/registry.json",
+      "docs/decisions/README.md",
+      "docs/game-intelligence/PRESENTATION-QUALITY.md",
+      "package.json",
+      "server/gateway.ts",
+      "server/openapi.json",
+      "server/pipeline/http.ts",
+      "server/pipeline/types.ts"
+    ]
+  },
+  {
+    "headRefName": "research/jems-assessment-instruments-v1",
+    "number": 60,
+    "title": "[Draft] Jems Objective 2 \u2014 Math & ELA independent assessment instruments, 915 slots and secure scoring",
+    "head": "be3c3cd964d88530afecbd5b1a5252ac5723a54c",
+    "overlap": [
+      "package.json"
+    ]
+  },
+  {
+    "headRefName": "research/jems-learning-evidence-v1",
+    "number": 54,
+    "title": "[Draft] Jems Learning Evidence v1 \u2014 grade 1\u20134 benchmarks, independent assessments & scoring",
+    "head": "d34d25d77ced34859d9f2296d4b4b36929378e7b",
+    "overlap": [
+      "package.json"
+    ]
+  },
+  {
+    "headRefName": "research/edit-intelligence-v1-20261118",
+    "number": 50,
+    "title": "Edit Intelligence v1: saved-game edit manifest and safe native fast-edit preview",
+    "head": "1acb0901601aadf9eb6d4d0a7b278b82131535be",
+    "overlap": []
+  },
+  {
+    "headRefName": "feature/jems-release-automation-foundation-20261118",
+    "number": 45,
+    "title": "Jems Release Automation v1 \u2014 verified one-command Pages release foundation",
+    "head": "f9062d4ed116b2d7516da4dddd4e9232584284f0",
+    "overlap": []
+  },
+  {
+    "headRefName": "feature/28-private-conversation-inference",
+    "number": 31,
+    "title": "[P0 Draft] Child-led AI conversation: private inference, parental safeguards and tablet speech",
+    "head": "1585f71703bd6e7ac33d08317fa080add490b505",
+    "overlap": [
+      "package.json",
+      "server/gateway.ts",
+      "server/pipeline/types.ts"
+    ]
+  },
+  {
+    "headRefName": "safety/wave-01-policy-emergency-gates",
+    "number": 29,
+    "title": "[Draft] P0 Wave 01: safety policy contract, fail-closed cloud gates and emergency stop",
+    "head": "cac96300e5b9e5577c820c463135360f979b3c19",
+    "overlap": [
+      "package.json",
+      "server/actions/coordinator.ts",
+      "server/gateway.ts",
+      "server/pipeline/http.ts",
+      "server/pipeline/service.ts",
+      "server/pipeline/types.ts",
+      "tests/unit.ts"
+    ]
+  }
+]

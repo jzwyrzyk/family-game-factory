@@ -1,0 +1,259 @@
+{
+  "origin": "mock-adapter-transport",
+  "actualModelComparison": "pending",
+  "paidCalls": 0,
+  "trials": [
+    {
+      "caseId": "fox-and-leaves",
+      "lane": "legacy",
+      "requestHash": "0ef058ae92cfaf45243bc8cc6f066f5e1b4926d23be7a0fb21fe0040499ca1ca",
+      "plan": "game-production-plan-v1",
+      "calls": [
+        {
+          "stage": "family_game_plan",
+          "model": "synthetic-legacy",
+          "effort": "medium"
+        },
+        {
+          "stage": "family_game_module",
+          "model": "synthetic-legacy",
+          "effort": "medium"
+        }
+      ]
+    },
+    {
+      "caseId": "fox-and-leaves",
+      "lane": "premium",
+      "requestHash": "0ef058ae92cfaf45243bc8cc6f066f5e1b4926d23be7a0fb21fe0040499ca1ca",
+      "plan": "game-production-plan-v2",
+      "calls": [
+        {
+          "stage": "family_game_plan",
+          "model": "gpt-6.2-sol",
+          "effort": "high"
+        },
+        {
+          "stage": "family_game_module",
+          "model": "gpt-6.2-astra",
+          "effort": "high"
+        }
+      ]
+    },
+    {
+      "caseId": "lantern-climber",
+      "lane": "legacy",
+      "requestHash": "5c9e5b33926ba199ab7244edbc22f9114edc47df1bde649ca71780b5f8451f67",
+      "plan": "game-production-plan-v1",
+      "calls": [
+        {
+          "stage": "family_game_plan",
+          "model": "synthetic-legacy",
+          "effort": "medium"
+        },
+        {
+          "stage": "family_game_module",
+          "model": "synthetic-legacy",
+          "effort": "medium"
+        }
+      ]
+    },
+    {
+      "caseId": "lantern-climber",
+      "lane": "premium",
+      "requestHash": "5c9e5b33926ba199ab7244edbc22f9114edc47df1bde649ca71780b5f8451f67",
+      "plan": "game-production-plan-v2",
+      "calls": [
+        {
+          "stage": "family_game_plan",
+          "model": "gpt-6.2-sol",
+          "effort": "high"
+        },
+        {
+          "stage": "family_game_module",
+          "model": "gpt-6.2-astra",
+          "effort": "high"
+        }
+      ]
+    },
+    {
+      "caseId": "echo-garden",
+      "lane": "legacy",
+      "requestHash": "7524c6d4816a2e33c366a69dda2357617b4658ecdfbce3556c4df48abc92e5c3",
+      "plan": "game-production-plan-v1",
+      "calls": [
+        {
+          "stage": "family_game_plan",
+          "model": "synthetic-legacy",
+          "effort": "medium"
+        },
+        {
+          "stage": "family_game_module",
+          "model": "synthetic-legacy",
+          "effort": "medium"
+        }
+      ]
+    },
+    {
+      "caseId": "echo-garden",
+      "lane": "premium",
+      "requestHash": "7524c6d4816a2e33c366a69dda2357617b4658ecdfbce3556c4df48abc92e5c3",
+      "plan": "game-production-plan-v2",
+      "calls": [
+        {
+          "stage": "family_game_plan",
+          "model": "gpt-6.2-sol",
+          "effort": "high"
+        },
+        {
+          "stage": "family_game_module",
+          "model": "gpt-6.2-astra",
+          "effort": "high"
+        }
+      ]
+    },
+    {
+      "caseId": "balancing-bridge",
+      "lane": "legacy",
+      "requestHash": "01e57a165467ee14d35f2a73ee73108ead58262b1dbd76216455dfa7deab6e9f",
+      "plan": "game-production-plan-v1",
+      "calls": [
+        {
+          "stage": "family_game_plan",
+          "model": "synthetic-legacy",
+          "effort": "medium"
+        },
+        {
+          "stage": "family_game_module",
+          "model": "synthetic-legacy",
+          "effort": "medium"
+        }
+      ]
+    },
+    {
+      "caseId": "balancing-bridge",
+      "lane": "premium",
+      "requestHash": "01e57a165467ee14d35f2a73ee73108ead58262b1dbd76216455dfa7deab6e9f",
+      "plan": "game-production-plan-v2",
+      "calls": [
+        {
+          "stage": "family_game_plan",
+          "model": "gpt-6.2-sol",
+          "effort": "high"
+        },
+        {
+          "stage": "family_game_module",
+          "model": "gpt-6.2-astra",
+          "effort": "high"
+        }
+      ]
+    },
+    {
+      "caseId": "star-map",
+      "lane": "legacy",
+      "requestHash": "b7e20a64c52898185b0687e3a1731b9bf7b91c878d6905c2347ef46bc6ecb0c8",
+      "plan": "game-production-plan-v1",
+      "calls": [
+        {
+          "stage": "family_game_plan",
+          "model": "synthetic-legacy",
+          "effort": "medium"
+        },
+        {
+          "stage": "family_game_module",
+          "model": "synthetic-legacy",
+          "effort": "medium"
+        }
+      ]
+    },
+    {
+      "caseId": "star-map",
+      "lane": "premium",
+      "requestHash": "b7e20a64c52898185b0687e3a1731b9bf7b91c878d6905c2347ef46bc6ecb0c8",
+      "plan": "game-production-plan-v2",
+      "calls": [
+        {
+          "stage": "family_game_plan",
+          "model": "gpt-6.2-sol",
+          "effort": "high"
+        },
+        {
+          "stage": "family_game_module",
+          "model": "gpt-6.2-astra",
+          "effort": "high"
+        }
+      ]
+    },
+    {
+      "caseId": "coral-studio",
+      "lane": "legacy",
+      "requestHash": "91fdbdd693d91c1eebfcd3815338430983342eb98e95d5244b1e0be5141389e5",
+      "plan": "game-production-plan-v1",
+      "calls": [
+        {
+          "stage": "family_game_plan",
+          "model": "synthetic-legacy",
+          "effort": "medium"
+        },
+        {
+          "stage": "family_game_module",
+          "model": "synthetic-legacy",
+          "effort": "medium"
+        }
+      ]
+    },
+    {
+      "caseId": "coral-studio",
+      "lane": "premium",
+      "requestHash": "91fdbdd693d91c1eebfcd3815338430983342eb98e95d5244b1e0be5141389e5",
+      "plan": "game-production-plan-v2",
+      "calls": [
+        {
+          "stage": "family_game_plan",
+          "model": "gpt-6.2-sol",
+          "effort": "high"
+        },
+        {
+          "stage": "family_game_module",
+          "model": "gpt-6.2-astra",
+          "effort": "high"
+        }
+      ]
+    },
+    {
+      "caseId": "moon-parade",
+      "lane": "legacy",
+      "requestHash": "d277bf64bd93a06ffd06c98b973f4fcdf3372bebec485a05593b059921ad4de9",
+      "plan": "game-production-plan-v1",
+      "calls": [
+        {
+          "stage": "family_game_plan",
+          "model": "synthetic-legacy",
+          "effort": "medium"
+        },
+        {
+          "stage": "family_game_module",
+          "model": "synthetic-legacy",
+          "effort": "medium"
+        }
+      ]
+    },
+    {
+      "caseId": "moon-parade",
+      "lane": "premium",
+      "requestHash": "d277bf64bd93a06ffd06c98b973f4fcdf3372bebec485a05593b059921ad4de9",
+      "plan": "game-production-plan-v2",
+      "calls": [
+        {
+          "stage": "family_game_plan",
+          "model": "gpt-6.2-sol",
+          "effort": "high"
+        },
+        {
+          "stage": "family_game_module",
+          "model": "gpt-6.2-astra",
+          "effort": "high"
+        }
+      ]
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import {profileGrade} from '../learning/engine';
 import { report, type Attempt } from '../learning/engine';
 import { reportLanguage, type LanguageAttempt } from '../language/engine';
 import { CreationStore } from '../creation/storage';
@@ -50,5 +51,5 @@ export function captureParentSnapshot(FG: any, range: ParentRange = 30, now = Da
   } else input.unavailable!['problem-solving'] = 'not-connected';
   if (String(FG.store.current().id) !== ownerId) throw Error('The selected learner changed. Reopen their report.');
   if (FG.store.loadError) warnings.unshift(String(FG.store.loadError));
-  return { ownerId, name: String(profile.name || 'Your learner'), grade: Number(profile.grade || 1), adult: ownerId.startsWith('adult:'), dashboard: buildParentDashboard(input), warnings };
+  return { ownerId, name: String(profile.name || 'Your learner'), grade: profileGrade(profile), adult: ownerId.startsWith('adult:'), dashboard: buildParentDashboard(input), warnings };
 }

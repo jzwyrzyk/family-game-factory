@@ -46,3 +46,18 @@ export function syntheticReviewAnswer(){
 export function syntheticQualityReview(game:GeneratedGame,evidence=syntheticQualityEvidence(game)){
  return bindQualityReview(game,evidence,syntheticReviewAnswer());
 }
+
+// Synthetic receipt/transport fixtures, never a substitute for captured play.
+export function fixturePremiumPlanProposal(request:any={}){
+ return {...fixturePlanProposal(request),artDirection:{version:'art-direction-v1',view:'side',scenery:'Paper workshop',actionSpace:'Open table',lightingPalette:'Warm amber from the left',foreground:'Moving piece above table',sheetId:null,columns:0,rows:0,subjects:[{id:'piece',role:'object',supply:'native',pose:'Sliding',displayWidth:64,displayHeight:64,pivotX:0.5,pivotY:1,footprint:0.6}]},design:{
+  consequence:'The selected piece slides into place.',purpose:'Try different piece arrangements.',world:'A paper workshop and a moving cutout.',
+  mood:'Calm and bright.',controls:'Use Action on the keyboard or its touch button.',feedback:'The piece settles into place.',
+  recovery:'Choose another piece and try again.',payoffState:'playing',
+  interactions:[{action:'Place the piece.',input:'action',consequence:'The chosen piece visibly moves.'}]
+ }};
+}
+export function syntheticPremiumReviewAnswer(){
+ return {...syntheticReviewAnswer(),observations:(['desktop','tablet'] as const).map(device=>({
+  interaction:0,device,actionIndex:0,captureId:device+'-progress'
+ }))};
+}

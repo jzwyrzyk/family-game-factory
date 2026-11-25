@@ -1,0 +1,534 @@
+{
+  "independentRoute": {
+    "source": "9bff1a36bb9603b3be83524b668adc6ee35b9acb3f8aa4d403d144c79c69ae61",
+    "probes": [
+      {
+        "id": "return-and-find-ribbon",
+        "covers": [
+          "rider",
+          "paths",
+          "reward"
+        ],
+        "actions": [
+          {
+            "kind": "hold",
+            "button": "right",
+            "frames": 48
+          },
+          {
+            "kind": "hold",
+            "button": "right",
+            "frames": 48
+          },
+          {
+            "kind": "hold",
+            "button": "left",
+            "frames": 48
+          },
+          {
+            "kind": "hold",
+            "button": "right",
+            "frames": 48
+          },
+          {
+            "kind": "hold",
+            "button": "right",
+            "frames": 48
+          }
+        ],
+        "checkpoints": [
+          {
+            "after": 0,
+            "outcome": "playing",
+            "observations": [
+              {
+                "kind": "visible",
+                "key": "rider"
+              },
+              {
+                "kind": "hidden",
+                "key": "plank0"
+              }
+            ]
+          },
+          {
+            "after": 1,
+            "outcome": "playing",
+            "observations": [
+              {
+                "kind": "visible",
+                "key": "plank0"
+              }
+            ]
+          },
+          {
+            "after": 2,
+            "outcome": "playing",
+            "observations": [
+              {
+                "kind": "hidden",
+                "key": "plank0"
+              },
+              {
+                "kind": "visible",
+                "key": "board0"
+              }
+            ]
+          },
+          {
+            "after": 4,
+            "outcome": "playing",
+            "observations": [
+              {
+                "kind": "visible",
+                "key": "bloom0"
+              },
+              {
+                "kind": "hidden",
+                "key": "prize"
+              }
+            ]
+          },
+          {
+            "after": 5,
+            "outcome": "won",
+            "observations": [
+              {
+                "kind": "visible",
+                "key": "prize"
+              },
+              {
+                "kind": "visible",
+                "key": "rider"
+              }
+            ]
+          }
+        ],
+        "deterministicReplay": true
+      }
+    ]
+  },
+  "schedules": [
+    {
+      "mode": "serial",
+      "contract": "0743e6ddceed2d04c1e30be92e5b3668e232f0fec310b8056f097d9e02ed8d89",
+      "codeHash": "76260af8b1623cd82e1c2ec96bf74a02b79b1e8eaac5127c43c315a554e4c09b",
+      "assetsHash": "fa13f91be80b4781878600dfb1fe376d51035322267034dbf4c4d2b07df99ba1",
+      "compileMs": 3.6625699999858625,
+      "extractMs": 72.84253300001728,
+      "wallMs": 79.55841800000053
+    },
+    {
+      "mode": "overlap",
+      "contract": "0743e6ddceed2d04c1e30be92e5b3668e232f0fec310b8056f097d9e02ed8d89",
+      "codeHash": "76260af8b1623cd82e1c2ec96bf74a02b79b1e8eaac5127c43c315a554e4c09b",
+      "assetsHash": "fa13f91be80b4781878600dfb1fe376d51035322267034dbf4c4d2b07df99ba1",
+      "extractMs": 73.9782750000013,
+      "compileMs": 78.33165499998722,
+      "wallMs": 78.52004199998919
+    },
+    {
+      "mode": "overlap",
+      "contract": "0743e6ddceed2d04c1e30be92e5b3668e232f0fec310b8056f097d9e02ed8d89",
+      "codeHash": "76260af8b1623cd82e1c2ec96bf74a02b79b1e8eaac5127c43c315a554e4c09b",
+      "assetsHash": "fa13f91be80b4781878600dfb1fe376d51035322267034dbf4c4d2b07df99ba1",
+      "extractMs": 69.93041199998697,
+      "compileMs": 73.575256000011,
+      "wallMs": 73.83741199999349
+    },
+    {
+      "mode": "serial",
+      "contract": "0743e6ddceed2d04c1e30be92e5b3668e232f0fec310b8056f097d9e02ed8d89",
+      "codeHash": "76260af8b1623cd82e1c2ec96bf74a02b79b1e8eaac5127c43c315a554e4c09b",
+      "assetsHash": "fa13f91be80b4781878600dfb1fe376d51035322267034dbf4c4d2b07df99ba1",
+      "compileMs": 1.937326999992365,
+      "extractMs": 75.07731000002241,
+      "wallMs": 80.01490900001954
+    }
+  ],
+  "firstPassMicroUsd": 751942,
+  "workerTimingsMs": {
+    "compileAndValidate": 81,
+    "browserSetup": 387,
+    "playtest": 23625,
+    "captureAndClose": 12188
+  },
+  "version": "premium-art-trial-v1",
+  "sourceCommit": "685f3b4d9faba3e25581df7e7e498a34327cc541",
+  "id": "horse",
+  "pairedCase": null,
+  "requestHash": "9bff1a36bb9603b3be83524b668adc6ee35b9acb3f8aa4d403d144c79c69ae61",
+  "fixtureHash": "189adeda30d443f2c35a52e0a25357908ac8222347d779b3bd98f6d767ed2e2f",
+  "sourceHash": "ea6f143e0051efb10b15763a5e424e8cb57975c48a10edc3858cdf1cd8af3788",
+  "codeHash": "41b9f22e04fc63bd2dbd464a9534e653a711df8ccc69c05683821a688fddd46c",
+  "runtimeHash": "6a214bbed95e8ec138f78bad2f86a26dee9fc271587a223c97b738b36c289fc0",
+  "artifactHash": "88191b4c5883bb17df9006979cfff051481079a2d8c4125340699f47dd36a1a8",
+  "assetsHash": "e34e4d6263fb6d42ec347723199d9563f169460c1a3d99765338a2f0306755ea",
+  "htmlHash": "abcb7f5c1aa7f45f184463f912b78ca239198951610d1f4b6a3f43a0f47d7d39",
+  "dependencies": "f32a85a87902007ea21891f835db6652e311d10efaa79ddbd90ebfadde00250d",
+  "sandboxDependencies": "0b91bf7edbade27c761ad8d1086f6d5dee176101e1d118dc4207de5512aa2b6d",
+  "sceneHash": "df0730323524dd2ad5f68019f46bc2a37dff5018d59ef84cc16a833183f1e2e7",
+  "sheetHash": "7a1d3b673c684c54efc7cfc7137e738370b74ce3ac5a51df1fd7523280f8496e",
+  "assetIds": [
+    {
+      "id": "valley",
+      "sha256": "df0730323524dd2ad5f68019f46bc2a37dff5018d59ef84cc16a833183f1e2e7",
+      "width": 720,
+      "height": 400
+    },
+    {
+      "id": "horse",
+      "sha256": "4dccce168c0e4eec78ba84db59ffe34c6eeb7be840231a27ea393089a99b6374",
+      "width": 512,
+      "height": 1024
+    },
+    {
+      "id": "ribbon",
+      "sha256": "33386785482874a6a73ff676ae597c957f06f31f8095dcbe2f091561e8d3366f",
+      "width": 512,
+      "height": 1024
+    }
+  ],
+  "evidenceHash": "3b9343896ddef31e1d79d5741e9da0b982056abb22a94ecfac8c29b360aba067",
+  "tests": {
+    "desktop": true,
+    "mobile": true,
+    "replay": true,
+    "isolation": true,
+    "input": true,
+    "resources": true,
+    "pause": true,
+    "intent": true
+  },
+  "captures": [
+    {
+      "id": "desktop-initial-0",
+      "device": "desktop",
+      "phase": "initial",
+      "tick": 8,
+      "width": 720,
+      "height": 750,
+      "sha256": "8bdf3970771459f457351a104ac5357df400d7ae28a8d7387700143f28c83761"
+    },
+    {
+      "id": "desktop-interaction-1",
+      "device": "desktop",
+      "phase": "interaction",
+      "tick": 70,
+      "width": 720,
+      "height": 750,
+      "sha256": "8c7f21d8b83716b57b784e23000abc1f0c0ef79e50883ed049108344f1673292"
+    },
+    {
+      "id": "desktop-interaction-2",
+      "device": "desktop",
+      "phase": "interaction",
+      "tick": 178,
+      "width": 720,
+      "height": 750,
+      "sha256": "449b4f551fb5345575fc699999472d468add879bf27d04a6badd6762f8b2c319"
+    },
+    {
+      "id": "desktop-outcome-3",
+      "device": "desktop",
+      "phase": "outcome",
+      "tick": 277,
+      "width": 720,
+      "height": 750,
+      "sha256": "b69bfd722bc99433dc14bace8410dffa7fc601e741b286fe9614a09e875b4d9f"
+    },
+    {
+      "id": "tablet-initial-0",
+      "device": "tablet",
+      "phase": "initial",
+      "tick": 5,
+      "width": 600,
+      "height": 683,
+      "sha256": "9d2fac780f7f88ffdd77fb2719734c264b7501a08439b1ca97c7c6f511de73c1"
+    },
+    {
+      "id": "tablet-interaction-1",
+      "device": "tablet",
+      "phase": "interaction",
+      "tick": 64,
+      "width": 600,
+      "height": 683,
+      "sha256": "a696fc96cab2a827abb8a53b932889e486d13ce0a27acb2b38a3e3b5cd654c9c"
+    },
+    {
+      "id": "tablet-interaction-2",
+      "device": "tablet",
+      "phase": "interaction",
+      "tick": 171,
+      "width": 600,
+      "height": 683,
+      "sha256": "ff7705c96211b26136fae6329bc5c302f91093bb3f7cf7a5b78c3099c428ac73"
+    },
+    {
+      "id": "tablet-outcome-3",
+      "device": "tablet",
+      "phase": "outcome",
+      "tick": 267,
+      "width": 600,
+      "height": 683,
+      "sha256": "e869d697bf4417b4b030c71124fe5a1bef07623e557a8081c308c3a678c92840"
+    }
+  ],
+  "sessions": [
+    {
+      "device": "desktop",
+      "inputs": 5,
+      "visibleChanges": 5,
+      "simulatedTicks": 277,
+      "outcome": "won",
+      "replay": true,
+      "pause": true,
+      "touch": false,
+      "consoleErrors": 0,
+      "actionTrace": [
+        {
+          "action": {
+            "type": "hold",
+            "control": "left",
+            "frames": 42
+          },
+          "index": 0,
+          "startTick": 18,
+          "endTick": 70,
+          "beforeHash": "ed0f91e37d8be0c51c1355c082c50be6258fa0083ea7d9c18af4be2f59b1cd87",
+          "afterHash": "96674efc23ddc24b0406a456d082085892142a74ab7ac2fa2937f615d5b98cb4"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "left",
+            "frames": 42
+          },
+          "index": 1,
+          "startTick": 80,
+          "endTick": 129,
+          "beforeHash": "d49303c65e0d2bebe7b6faf70f811c65d5f5e639536c5a417dc0a182b2358c08",
+          "afterHash": "22a7eec5956ae3541fed1e94ca56d393895c898671f331330c7dc0ac490bc796"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "right",
+            "frames": 42
+          },
+          "index": 2,
+          "startTick": 129,
+          "endTick": 178,
+          "beforeHash": "22a7eec5956ae3541fed1e94ca56d393895c898671f331330c7dc0ac490bc796",
+          "afterHash": "c140df9005163303d984b334a798a3ce95ddb1b1bad2429f6099cb17ffae4f09"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "left",
+            "frames": 42
+          },
+          "index": 3,
+          "startTick": 190,
+          "endTick": 238,
+          "beforeHash": "84943a9e6954e14bbcfd38a7f0cee2101ad4de88f489eb319ca7ca8a62fc1ec8",
+          "afterHash": "b4ec0ad7575b76f60d759a3370b863b89d73eb048ecf0de50163fdce61da6585"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "right",
+            "frames": 42
+          },
+          "index": 4,
+          "startTick": 238,
+          "endTick": 277,
+          "beforeHash": "b4ec0ad7575b76f60d759a3370b863b89d73eb048ecf0de50163fdce61da6585",
+          "afterHash": "06b534fb0e1d13ef07d9e3f7642b13d0dcb4880b4f39fac9c89d2060ac5b9c8e"
+        }
+      ]
+    },
+    {
+      "device": "tablet",
+      "inputs": 5,
+      "visibleChanges": 5,
+      "simulatedTicks": 267,
+      "outcome": "won",
+      "replay": true,
+      "pause": true,
+      "touch": true,
+      "consoleErrors": 0,
+      "actionTrace": [
+        {
+          "action": {
+            "type": "hold",
+            "control": "left",
+            "frames": 42
+          },
+          "index": 0,
+          "startTick": 15,
+          "endTick": 64,
+          "beforeHash": "a7489fb1076e15d07767a5ca1dc27acfaf106851e1375174c4653ff4f7168de2",
+          "afterHash": "4839debb4b90b93e36e3368024ee61b4cabebeda3f381b7cfc6989d0dd7a1d70"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "left",
+            "frames": 42
+          },
+          "index": 1,
+          "startTick": 74,
+          "endTick": 122,
+          "beforeHash": "5a9a6c9a73a072115360b5997e2a91867437721377fbb62cc7c423afeaf78dd9",
+          "afterHash": "3c317bc92373518f01a23b00d0ec3968d99e5cda20653319ac6330c0fb386390"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "right",
+            "frames": 42
+          },
+          "index": 2,
+          "startTick": 122,
+          "endTick": 171,
+          "beforeHash": "3c317bc92373518f01a23b00d0ec3968d99e5cda20653319ac6330c0fb386390",
+          "afterHash": "58cb1bdb14a95a79a0adcd1a7a79104c9609d274d79c295e82639c2e6c646703"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "left",
+            "frames": 42
+          },
+          "index": 3,
+          "startTick": 181,
+          "endTick": 229,
+          "beforeHash": "a572acc738ffeb0b3c72f2b078d8e77fe2626ab6150c068fff0bee41bf9313d3",
+          "afterHash": "67a1aa0bc914699870c726fe1b698ab0aaffb04bd56d0e593f0bcbc008f80f6c"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "right",
+            "frames": 42
+          },
+          "index": 4,
+          "startTick": 229,
+          "endTick": 267,
+          "beforeHash": "67a1aa0bc914699870c726fe1b698ab0aaffb04bd56d0e593f0bcbc008f80f6c",
+          "afterHash": "ee072e184808af82c401a4f99fa7b5ffbbd70fdc244c7a556fbdbad505ab9a95"
+        }
+      ]
+    }
+  ],
+  "origin": "authored-fixture-mock-provider",
+  "paidCalls": 0,
+  "actualProviderCharges": null,
+  "measuredAcceptance": null,
+  "queueMs": null,
+  "marks": [
+    {
+      "stage": "fixture setup",
+      "elapsedMs": 3
+    },
+    {
+      "stage": "mock planning",
+      "elapsedMs": 25
+    },
+    {
+      "stage": "mock image 1",
+      "elapsedMs": 30
+    },
+    {
+      "stage": "mock image 2",
+      "elapsedMs": 33
+    },
+    {
+      "stage": "mock construction",
+      "elapsedMs": 178
+    },
+    {
+      "stage": "assembled candidate",
+      "elapsedMs": 184
+    },
+    {
+      "stage": "isolated browser test and capture",
+      "elapsedMs": 37198
+    },
+    {
+      "stage": "mock review",
+      "elapsedMs": 37277
+    },
+    {
+      "stage": "mock repair",
+      "elapsedMs": 37410
+    },
+    {
+      "stage": "mock planning",
+      "elapsedMs": 37467
+    },
+    {
+      "stage": "fixture repair and replan complete",
+      "elapsedMs": 37468
+    }
+  ],
+  "bounds": [
+    {
+      "stage": "planning",
+      "images": 0,
+      "textBytesAndFraming": 12542,
+      "screenshotTokens": 0,
+      "inputBound": 12542
+    },
+    {
+      "stage": "construction",
+      "images": 0,
+      "textBytesAndFraming": 28607,
+      "screenshotTokens": 0,
+      "inputBound": 28607
+    },
+    {
+      "stage": "review",
+      "images": 8,
+      "textBytesAndFraming": 16233,
+      "screenshotTokens": 32768,
+      "inputBound": 49001
+    },
+    {
+      "stage": "repair",
+      "images": 8,
+      "textBytesAndFraming": 26872,
+      "screenshotTokens": 32768,
+      "inputBound": 59640
+    },
+    {
+      "stage": "planning",
+      "images": 2,
+      "textBytesAndFraming": 13943,
+      "screenshotTokens": 8192,
+      "inputBound": 22135
+    }
+  ],
+  "stageCeilings": {
+    "planning": {
+      "input": 22135,
+      "output": 3000
+    },
+    "construction": {
+      "input": 28607,
+      "output": 6000
+    },
+    "review": {
+      "input": 49001,
+      "output": 3000
+    },
+    "repair": {
+      "input": 59640,
+      "output": 6000
+    }
+  },
+  "assumedImageMicroUsd": 50000,
+  "wholeJobReservationMicroUsd": 1790520,
+  "capMicroUsd": 1000000
+}

@@ -1,9 +1,11 @@
+import {EARLY_MATH} from './early/math';
 import type { Domain, Grade, SkillDefinition } from './types';
 
 const skill = (id: string, title: string, grade: Grade, domain: Domain, standards: string[], prerequisites: string[], description: string): SkillDefinition => ({id,title,grade,domain,standards,prerequisites,description});
 
 /** A bounded supplemental progression, not a claim of complete grade-level assessment. */
 export const SKILLS: SkillDefinition[] = [
+ ...EARLY_MATH,
  skill('g1-add-10','Add within 10',1,'operations',['1.OA.C.6'],[],'Combine two quantities and count on within ten.'),
  skill('g1-subtract-10','Subtract within 10',1,'operations',['1.OA.C.6'],['g1-add-10'],'Take away or find the difference within ten.'),
  skill('g1-make-ten','Make ten',1,'operations',['1.OA.C.6'],['g1-add-10'],'Find the missing part of ten.'),

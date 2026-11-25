@@ -1,35 +1,164 @@
 name: Arcade journeys
-on: [push, pull_request]
-# Keep source-head push checks and prospective-merge PR checks independent.
-# A new head still cancels superseded runs within its own event and branch.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      force_full:
+        description: Run every regression shard (manual runs always remain full)
+        type: boolean
+        default: true
+      legacy_creative_shadow:
+        description: Also run the complete original Creative chain for a migration benchmark
+        type: boolean
+        default: false
+permissions:
+  contents: read
+  actions: read
+# Activation is a reviewed source change paired with the independent release
+# verifier migration. It is not a mutable repository variable or PR input.
+env:
+  CI_MAIN_REUSE_POLICY: protected-main-equivalence-v1
+# Cancel only superseded validation of the same PR/main branch, never releases.
 concurrency:
-  group: arcade-journeys-${{ github.event_name }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  group: arcade-journeys-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
-  notifications:
+  prepare:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      has-shards: ${{ steps.plan.outputs.has-shards }}
+      image: ${{ steps.plan.outputs.image }}
+      mode: ${{ steps.plan.outputs.mode }}
+      plan-id: ${{ steps.plan-upload.outputs.artifact-id }}
+      plan-digest: ${{ steps.plan.outputs.plan-digest }}
+      build-id: ${{ steps.build-upload.outputs.artifact-id }}
+      build-digest: ${{ steps.pack.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Prove complete coverage and failure-closed orchestration
+        run: npm run test:ci
+      - name: Verify shared DEV and TEST full-evidence contract
+        run: python3 -m unittest discover -s tests -p test_environment_ci_evidence.py -v
+      - name: Classify exact source using trusted base policy
+        id: plan
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
+          CI_FORCE_FULL: ${{ inputs.force_full || false }}
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/prepare-plan.mjs
+      - name: Record advisory dependency consumers without narrowing coverage
+        run: node scripts/ci/dependency-shadow.mjs
+      - name: Documentation integrity
+        run: npm run docs:check
+      - name: Operations, provenance and release-transition contracts
+        run: npm run test:ops
+      - name: Preserve selection and reuse explanations
+        id: plan-upload
+        uses: actions/upload-artifact@v4
+        if: always() && steps.plan.outcome == 'success'
+        with:
+          name: arcade-plan-${{ github.run_attempt }}
+          path: |
+            ci-plan.json
+            ci-reuse.json
+            ci-dependency-shadow.json
+          retention-days: 30
+          if-no-files-found: error
+      - run: npm ci
+        if: steps.plan.outputs.has-shards == 'true'
+      - name: Build exact source once
+        if: steps.plan.outputs.has-shards == 'true'
+        run: npm run build
+      - name: Bind complete production bundle to source and dependencies
+        id: pack
+        if: steps.plan.outputs.has-shards == 'true'
+        run: node scripts/ci/build-artifact.mjs pack
+      - uses: actions/upload-artifact@v4
+        id: build-upload
+        if: steps.plan.outputs.has-shards == 'true'
+        with:
+          name: arcade-build-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            ci-build.tar
+            ci-build.json
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
+  shards:
+    name: shard (${{ matrix.shard }})
+    needs: prepare
+    if: needs.prepare.outputs.has-shards == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    env:
+      CI_BUILD_DIGEST: ${{ needs.prepare.outputs.build-digest }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci
+      - uses: actions/cache@v4
+        id: chromium
+        with:
+          path: ~/.cache/ms-playwright
+          key: chromium-ubuntu24-${{ hashFiles('package-lock.json') }}
       - run: npx playwright install chromium
-      - run: npm run build
-      - name: Notifications, saved work and reading continuity
-        run: npm run test:studio-notifications
-      - uses: actions/upload-artifact@v4
+        if: steps.chromium.outputs.cache-hit != 'true'
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ needs.prepare.outputs.build-id }}
+          merge-multiple: true
+      - name: Verify immutable build bytes and exact source
+        run: node scripts/ci/build-artifact.mjs verify
+      - name: Run every assigned command once and preserve every failure
+        env:
+          CI_SHARD: ${{ matrix.shard }}
+        run: node scripts/ci/run-suite.mjs "$CI_SHARD"
+      - name: Save authoritative shard receipt
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: notifications-evidence
+          name: ci-receipt-${{ github.run_attempt }}-${{ matrix.shard }}
+          path: test-results/ci/${{ matrix.shard }}.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Save browser and acceptance evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: arcade-evidence-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
           path: test-results/
-          if-no-files-found: ignore
-  private-coach-image:
-    # No provider key, cloud identity or funded API endpoint is available here.
+          retention-days: ${{ github.ref == 'refs/heads/main' && 30 || 7 }}
+          compression-level: 0
+          if-no-files-found: warn
+  image-isolation:
+    needs: prepare
+    if: needs.prepare.outputs.image == 'true'
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Build dedicated isolated coach image
         run: docker build --file server/Dockerfile.coach --tag jems-private-coach:ci .
       - name: Prove inactive image starts and refuses inference
@@ -48,176 +177,215 @@ jobs:
           test "$seen" = "1"
           test "$(docker inspect --format '{{.State.Running}}' "$id")" = "true"
   browser:
-    # Playwright 1.56.1 supports Ubuntu 24.04; ubuntu-latest can move to unsupported OS versions.
+    # Stable required check. Missing/cancelled/failed selected shards fail closed.
+    needs: [prepare, shards, image-isolation]
+    if: always()
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npx playwright install chromium
-      - name: Build production
-        id: build
-        run: npm run build
-      # These suites are independent once the production bundle exists. Preserve
-      # every failure while still collecting the rest of the required evidence.
-      - name: Unit and contract checks
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:unit
-      - name: Earned gem progress contracts
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:gem-progress
-      - name: Lifetime rewards and durable source integration
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:rewards
-      - name: Deployment configuration checks
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:deployment
-      - name: Arcade journey
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: node tests/journeys.cjs
-      - name: Live remix journey
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: node tests/live-remix.cjs
-      - name: Builder journey
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: node --import tsx tests/builder-browser.ts
-      - name: Build actions
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: node --import tsx tests/actions-e2e.ts
-      - name: Independent intent gameplay browser tests
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:intent-playtest
-      - name: Repair and retest in existing sandbox worker
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:intent-repair-browser
-      - name: Generated worker security
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: node --import tsx tests/generated-worker-security.ts
-      - name: Approved artwork and archived runtime compatibility
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:generated-art
-      - name: Actual normal-motion review captures and input receipts
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:quality-capture
-      - name: Restored games
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: node tests/restored-games.cjs
-      - name: Offline shell
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: node tests/offline-shell.cjs
-      - name: Construction touch controls
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: node tests/construction-touch.cjs
-      - name: Private drawings
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: node tests/private-drawings.cjs
-      - name: Real agent activation status
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:real-agent
-      - uses: actions/upload-artifact@v4
-        if: always()
+      - uses: actions/download-artifact@v4
         with:
-          name: browser-evidence
-          path: test-results/
-          if-no-files-found: ignore
+          artifact-ids: ${{ needs.prepare.outputs.plan-id }}
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        if: needs.prepare.outputs.has-shards == 'true'
+        with:
+          pattern: ci-receipt-${{ github.run_attempt }}-*
+          path: ci-receipts
+      - name: Require exact planned receipts and successful jobs
+        env:
+          CI_PLAN_DIGEST: ${{ needs.prepare.outputs.plan-digest }}
+          CI_PREPARE_RESULT: ${{ needs.prepare.result }}
+          CI_SHARDS_RESULT: ${{ needs.shards.result }}
+          CI_IMAGE_RESULT: ${{ needs.image-isolation.result }}
+          CI_BUILD_DIGEST: ${{ needs.prepare.outputs.build-digest }}
+        run: node scripts/ci/aggregate.mjs browser
   learning:
+    # Stable required check. Missing/cancelled/failed selected shards fail closed.
+    needs: [prepare, shards, image-isolation]
+    if: always()
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npx playwright install chromium
-      - name: Build production
-        id: build
-        run: npm run build
-      - name: Learning activities
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:learning-ui
-      - name: Learning integration
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:learning-integration
-      - name: Language activities
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:language-ui
-      - name: Language subject integration
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:language-integration
-      - name: Learning persistence and pacing
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: node tests/learning-repair.cjs
-      - name: Problem-solving evidence and authored practice
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:problem-solving
-      - name: Problem-solving desktop and touch journeys
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:problem-solving-browser
-      - uses: actions/upload-artifact@v4
-        if: always()
+      - uses: actions/download-artifact@v4
         with:
-          name: learning-evidence
-          path: test-results/
-          if-no-files-found: ignore
+          artifact-ids: ${{ needs.prepare.outputs.plan-id }}
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        if: needs.prepare.outputs.has-shards == 'true'
+        with:
+          pattern: ci-receipt-${{ github.run_attempt }}-*
+          path: ci-receipts
+      - name: Require exact planned receipts and successful jobs
+        env:
+          CI_PLAN_DIGEST: ${{ needs.prepare.outputs.plan-digest }}
+          CI_PREPARE_RESULT: ${{ needs.prepare.result }}
+          CI_SHARDS_RESULT: ${{ needs.shards.result }}
+          CI_IMAGE_RESULT: ${{ needs.image-isolation.result }}
+          CI_BUILD_DIGEST: ${{ needs.prepare.outputs.build-digest }}
+        run: node scripts/ci/aggregate.mjs learning
   creative:
+    # Stable required check. Missing/cancelled/failed selected shards fail closed.
+    needs: [prepare, shards, image-isolation]
+    if: always()
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ needs.prepare.outputs.plan-id }}
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        if: needs.prepare.outputs.has-shards == 'true'
+        with:
+          pattern: ci-receipt-${{ github.run_attempt }}-*
+          path: ci-receipts
+      - name: Require exact planned receipts and successful jobs
+        env:
+          CI_PLAN_DIGEST: ${{ needs.prepare.outputs.plan-digest }}
+          CI_PREPARE_RESULT: ${{ needs.prepare.result }}
+          CI_SHARDS_RESULT: ${{ needs.shards.result }}
+          CI_IMAGE_RESULT: ${{ needs.image-isolation.result }}
+          CI_BUILD_DIGEST: ${{ needs.prepare.outputs.build-digest }}
+        run: node scripts/ci/aggregate.mjs creative
+  notifications:
+    # Stable required check. Missing/cancelled/failed selected shards fail closed.
+    needs: [prepare, shards, image-isolation]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ needs.prepare.outputs.plan-id }}
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        if: needs.prepare.outputs.has-shards == 'true'
+        with:
+          pattern: ci-receipt-${{ github.run_attempt }}-*
+          path: ci-receipts
+      - name: Require exact planned receipts and successful jobs
+        env:
+          CI_PLAN_DIGEST: ${{ needs.prepare.outputs.plan-digest }}
+          CI_PREPARE_RESULT: ${{ needs.prepare.result }}
+          CI_SHARDS_RESULT: ${{ needs.shards.result }}
+          CI_IMAGE_RESULT: ${{ needs.image-isolation.result }}
+          CI_BUILD_DIGEST: ${{ needs.prepare.outputs.build-digest }}
+        run: node scripts/ci/aggregate.mjs notifications
+  private-coach-image:
+    # Stable required check. Missing/cancelled/failed selected shards fail closed.
+    needs: [prepare, shards, image-isolation]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ needs.prepare.outputs.plan-id }}
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        if: needs.prepare.outputs.has-shards == 'true'
+        with:
+          pattern: ci-receipt-${{ github.run_attempt }}-*
+          path: ci-receipts
+      - name: Require exact planned receipts and successful jobs
+        env:
+          CI_PLAN_DIGEST: ${{ needs.prepare.outputs.plan-digest }}
+          CI_PREPARE_RESULT: ${{ needs.prepare.result }}
+          CI_SHARDS_RESULT: ${{ needs.shards.result }}
+          CI_IMAGE_RESULT: ${{ needs.image-isolation.result }}
+          CI_BUILD_DIGEST: ${{ needs.prepare.outputs.build-digest }}
+        run: node scripts/ci/aggregate.mjs private-coach-image
+  validation-evidence:
+    needs: [prepare, shards, image-isolation, browser, learning, creative, notifications, private-coach-image]
+    # PR/manual receipts exercise this path, but the independent verifier accepts
+    # only completed successful first-attempt main-push runs as reusable evidence.
+    if: github.run_attempt == 1 && needs.prepare.outputs.mode == 'full'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ needs.prepare.outputs.build-id }}
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ci-receipt-${{ github.run_attempt }}-*
+          path: ci-receipts
+      - name: Bind full validation to candidate identity
+        run: node scripts/ci/validation-evidence.mjs create ci-receipts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arcade-validation-${{ github.sha }}-${{ github.run_attempt }}
+          path: validation-evidence.json
+          retention-days: 30
+          if-no-files-found: error
+  legacy-creative-shadow:
+    needs: prepare
+    if: github.event_name == 'workflow_dispatch' && inputs.legacy_creative_shadow
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      CI_BUILD_DIGEST: ${{ needs.prepare.outputs.build-digest }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci
       - run: npx playwright install chromium
-      - name: Build production
-        id: build
-        run: npm run build
-      - name: Physical and generated games
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:quality
-      - name: Studio journeys
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:studio
-      - name: Illustrated gem journey
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:gem-journey
-      - name: Saved collections and default navigation continuity
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:navigation-continuity
-      - name: Rewards layout, earning and persistence journeys
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:rewards-browser
-      - name: Collectible Pals, recovery and scene contracts
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:pals
-      - name: Companion collection and playable creation journeys
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:pals-browser
-      - name: Editable creation contracts and behavioral challenges
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:creation
-      - name: Private Art Studio contracts
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:art
-      - name: Art library, physical drawings and portable scenes
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:art-browser
-      - name: Creation desktop and touch journeys
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:creation-browser
-      - name: Design coach checks
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:coach
-      - name: Child journey and recovery
-        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
-        run: npm run test:child-journey
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ needs.prepare.outputs.build-id }}
+          merge-multiple: true
+      - run: node scripts/ci/build-artifact.mjs verify
+      - name: Original Creative order with unchanged assertions
+        run: node scripts/ci/run-suite.mjs legacy-creative
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: creative-evidence
+          name: legacy-creative-shadow-${{ github.run_id }}-${{ github.run_attempt }}
           path: test-results/
-          if-no-files-found: ignore
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error

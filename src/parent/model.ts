@@ -1,3 +1,4 @@
+import type {Grade} from '../learning/grades';
 /** Read-only parent reporting over existing host evidence. No new scoring or storage. */
 import type { Attempt } from '../learning/engine';
 import type { LanguageAttempt } from '../language/engine';
@@ -60,7 +61,7 @@ export interface ParentEvidence {
   subject: ParentSubjectId;
   skillId: string;
   skillTitle: string;
-  grade?: number;
+  grade?: Grade;
   standards: string[];
   at: number;
   prompt: string;
@@ -93,7 +94,7 @@ export interface ParentSkillRow {
   id: string;
   subject: ParentSubjectId;
   title: string;
-  grade?: number;
+  grade?: Grade;
   standards: string[];
   state: string;
   stateLabel: string;
@@ -254,12 +255,15 @@ function practiceEvidence(subject: 'math' | 'language', attempts: readonly (Atte
     const first = legacy ? undefined : attempt.answers[0];
     const last = legacy ? undefined : attempt.answers.at(-1);
     // A missing hint timestamp cannot prove the first response preceded that hint.
-    const firstUnaided = !!first && !(hintUsed && (!hints.length || hints.some(time => time <= first.at)))
+    const adultRead=attempt.promptDelivery==='grown-up';
+    const firstUnaided = !!first && !adultRead && !(hintUsed && (!hints.length || hints.some(time => time <= first.at)))
       && !(readAloud && language!.readTargetAt! <= first.at);
     const retried = (math?.legacy?.reportedAttempts ?? attempt.answers.length) > 1;
     const completed = attempt.outcome === 'completed' && attempt.correct;
-    const independent = completed && attempt.independent && !hintUsed && !readAloud && !retried;
+    const independent = completed && attempt.independent && !hintUsed && !readAloud && !retried && !adultRead;
     const support: string[] = [];
+    if(adultRead)support.push('Grown-up reported reading the instruction');
+    if(attempt.promptDelivery==='audio')support.push('Spoken instruction played');
     if (hintUsed) support.push('Strategy or answer hint recorded');
     if (readAloud) support.push('Target read aloud');
     if (retried) support.push('Another response recorded');
@@ -267,9 +271,9 @@ function practiceEvidence(subject: 'math' | 'language', attempts: readonly (Atte
     if (legacy) support.push('Older summary; original responses unavailable');
     let outcomeLabel = 'No completed result yet', observation = 'This activity is still open. No result was inferred.';
     if (completed) {
-      outcomeLabel = independent ? 'First-response success' : hintUsed ? 'Completed with a hint' : readAloud ? 'Completed with read-aloud support' : 'Completed after another try';
+      outcomeLabel = independent ? 'First-response success' : adultRead ? 'Completed with grown-up support' : hintUsed ? 'Completed with a hint' : readAloud ? 'Completed with read-aloud support' : 'Completed after another try';
       observation = independent ? 'Answered correctly on the first recorded response without an in-app hint.'
-        : readAloud ? 'Completed with the target read aloud. This is supported language practice, not independent reading evidence.'
+        : adultRead ? 'A grown-up reported reading the prompt before the response.' : readAloud ? 'Completed with the target read aloud. This is supported language practice, not independent reading evidence.'
         : hintUsed ? 'Completed this activity with a recorded hint.' : 'Completed this activity after another response.';
       if (legacy) observation = independent ? 'An older record reports first-try success without recorded help; original responses are unavailable.'
         : 'An older record reports supported completion; original responses are unavailable.';
@@ -315,6 +319,7 @@ function creationEvidence(workspace: CreationWorkspace | undefined, owner: strin
     if (revisionAt === null || revisionAt > at) continue;
     seen.add(check.id);
     const support = [check.hintUsed ? 'A hint was opened for this scene' : 'No hint recorded for this scene'];
+    if(check.prediction)support.push('Before checking, chose '+check.prediction.choice+'. First movement in the saved scene: '+check.prediction.observed+'.');
     const origin = revision.scene.provenance?.createdBy;
     if (origin === 'starter') support.push('Started from a supplied scene');
     else if (origin === 'assisted') support.push('Assisted scene origin');

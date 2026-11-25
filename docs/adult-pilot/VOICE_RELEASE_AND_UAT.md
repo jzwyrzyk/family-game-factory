@@ -2,6 +2,10 @@
 
 **Code integration; deployment and paid-provider acceptance are separate.** This feature uses the existing Jems frontend, gateway, preview service and private AI execution. It does not need another website or an adult-only frontend hostname.
 
+## Environment acceptance
+
+The [DEV → TEST → PROD method](../development/DEV-TEST-PROD.md) now governs development and release environments. Preserve this document's same-site adult profile, permit, tab-proof and child-isolation contracts within each applicable installation. A separate nonproduction TEST installation does not authorize an adult-only production hostname or copy production grants. TEST acceptance must exercise the real authorized conversation → Build → Test/Review → Play → Edit → Keep → Reload journey with synthetic profiles and its own explicitly funded provider scope. A disconnected frontend or initial deployed browser smoke cannot satisfy this requirement; full nonproduction integration remains separately evidenced in [delivery state](../../DELIVERY-STATE.md).
+
 ## The profile switch is the activation
 
 1. On the current Jems site, open **Menu → Grown-ups → Private parent session**. The same entry appears in Parent Settings. It remains visible before character selection and when the workshop is disconnected or private testing is disabled. The optional **Adult (development)** profile choice is still shown only when server status enables it.
@@ -62,6 +66,8 @@ Conversation still requires `FACTORY_COACH_APPROVED`, `FACTORY_COACH_PRIVACY_APP
 Remote Google speech still requires `FACTORY_COACH_AUDIO_APPROVED`, `FACTORY_COACH_AUDIO_PRIVACY_APPROVED`, `FACTORY_COACH_AUDIO_PROVIDER_VERIFIED`, approved project/region, restricted Speech IAM, reviewed data-logging configuration and prices, and browser microphone permission. Adult authority is the permit plus recent session; it is not a fabricated value for `FACTORY_COACH_AUDIO_PARENT_CONSENT_APPROVED`. Recording starts only on request. **Finish → editable transcript → Send** remains the flow.
 
 Game generation retains private worker source/image pins, WIF identities, gVisor isolation, replay/idempotency controls, approvals and spend reservation. Jobs retain their adult authorization binding so later dispatch and completion cannot borrow an unrelated session. Adult-generated games are separated from child access, including reads and previews. Model, speech and infrastructure spending are reviewed separately.
+
+Adult Private can also select the separately approved premium builder. Unlocking the adult session grants access only to the configured route. Its status is available through the existing authenticated builder endpoint. To revert just the builder, disable premium admission, drain and settle premium jobs, and retain readers for their saved revisions. The private coach, speech and other adult functions keep their own controls. See the [premium configuration, UAT and rollback sequence](../game-intelligence/PREMIUM-BUILDER.md#post-cutover-activation-and-rollback).
 
 ## Acceptance on the existing site
 

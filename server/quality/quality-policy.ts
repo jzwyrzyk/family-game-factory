@@ -1,5 +1,6 @@
 import {isGeneratedGame,type GeneratedGame} from '../agent/generated';
 import type {Job,PlayableGame} from '../pipeline/types';
+import {choiceSources} from './production-design';
 import {presentationRequestHash,validateGameProductionPlan} from './presentation-plan';
 
 /** Existing v1 revisions retain their legacy repair contract. Every new real
@@ -12,11 +13,16 @@ export function needsCurrentQuality(base:PlayableGame|null|undefined):boolean {
 export function applyCurrentQualityPolicy(job:Job,base:PlayableGame|null|undefined):void {
  if(job.adapter==='metered-api'&&needsCurrentQuality(base))job.qualityRequired='game-quality-v1';
 }
-export function requireProductionCandidate(job:Pick<Job,'qualityRequired'|'prompt'|'baseRevisionId'>,game:PlayableGame):void {
- if(!job.qualityRequired)return;
+export function requireProductionCandidate(job:Pick<Job,'qualityRequired'|'prompt'|'baseRevisionId'|'premiumPolicy'>,game:PlayableGame):void {
+ if(!job.qualityRequired){
+  if(isGeneratedGame(game)&&game.productionPlan?.version==='game-production-plan-v2')throw Error('PRODUCTION_PLAN_BINDING_MISMATCH');
+  return;
+ }
  if(!isGeneratedGame(game)||game.kind!=='generated-module-v2')throw Error('CURRENT_QUALITY_REQUIRES_V2');
  const plan=validateGameProductionPlan(game.productionPlan);
- if(plan.requestHash!==presentationRequestHash(job.prompt)||plan.baseRevisionId!==(job.baseRevisionId||'new')||
+ const premium=!!job.premiumPolicy;
+ if(premium!==(plan.version==='game-production-plan-v2')||plan.version==='game-production-plan-v2'&&JSON.stringify(plan.choiceSources)!==JSON.stringify(choiceSources(job.prompt))||
+    plan.requestHash!==presentationRequestHash(job.prompt)||plan.baseRevisionId!==(job.baseRevisionId||'new')||
     !game.assets||game.assets.style!==plan.presentationStyle||!game.playthrough?.length)
   throw Error('PRODUCTION_PLAN_BINDING_MISMATCH');
 }

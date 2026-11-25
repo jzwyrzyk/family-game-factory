@@ -1,0 +1,556 @@
+{
+  "schedules": [
+    {
+      "mode": "serial",
+      "contract": "842aa88c018cd896ec67cbdd2c2d5763e2512d21fe93248853f10d8527dccb4c",
+      "codeHash": "cfdb02a550461dc5555c39f4bee64f1498d58a79a71fd752fe26e66d04ca1757",
+      "assetsHash": "f173e4e3fbf9fb11647958ad056c12a7ab1ddef899a1b15e6db7633b3e807e50",
+      "compileMs": 11.577467000010074,
+      "extractMs": 101.16161999999895,
+      "wallMs": 115.55571600000258
+    },
+    {
+      "mode": "overlap",
+      "contract": "842aa88c018cd896ec67cbdd2c2d5763e2512d21fe93248853f10d8527dccb4c",
+      "codeHash": "cfdb02a550461dc5555c39f4bee64f1498d58a79a71fd752fe26e66d04ca1757",
+      "assetsHash": "f173e4e3fbf9fb11647958ad056c12a7ab1ddef899a1b15e6db7633b3e807e50",
+      "extractMs": 71.00805999999284,
+      "compileMs": 74.93932099999802,
+      "wallMs": 75.22082600000431
+    },
+    {
+      "mode": "overlap",
+      "contract": "842aa88c018cd896ec67cbdd2c2d5763e2512d21fe93248853f10d8527dccb4c",
+      "codeHash": "cfdb02a550461dc5555c39f4bee64f1498d58a79a71fd752fe26e66d04ca1757",
+      "assetsHash": "f173e4e3fbf9fb11647958ad056c12a7ab1ddef899a1b15e6db7633b3e807e50",
+      "extractMs": 64.11064800000167,
+      "compileMs": 67.62137399999483,
+      "wallMs": 67.75099099999352
+    },
+    {
+      "mode": "serial",
+      "contract": "842aa88c018cd896ec67cbdd2c2d5763e2512d21fe93248853f10d8527dccb4c",
+      "codeHash": "cfdb02a550461dc5555c39f4bee64f1498d58a79a71fd752fe26e66d04ca1757",
+      "assetsHash": "f173e4e3fbf9fb11647958ad056c12a7ab1ddef899a1b15e6db7633b3e807e50",
+      "compileMs": 2.03511100000469,
+      "extractMs": 58.75054100000125,
+      "wallMs": 63.41864399999031
+    }
+  ],
+  "firstPassMicroUsd": 764902,
+  "workerTimingsMs": {
+    "compileAndValidate": 59,
+    "browserSetup": 165,
+    "playtest": 11513,
+    "captureAndClose": 53542
+  },
+  "version": "premium-art-trial-v1",
+  "sourceCommit": "0c80098ea44f1ccd8fb4bec46c89478e0a6559b1",
+  "id": "fox",
+  "pairedCase": "fox-and-leaves",
+  "requestHash": "0ef058ae92cfaf45243bc8cc6f066f5e1b4926d23be7a0fb21fe0040499ca1ca",
+  "fixtureHash": "d168ebd685c26e1b35d1ecd45d6f1025382c86559ba9e31ae5231f7900bbc849",
+  "sourceHash": "46a347e28aae35a61d79d333dc96bac522a9929c1f94e55d53707d9c1b86076e",
+  "codeHash": "e1d2dacfea6bbd2540e778585a7100141a5fc12599979c831aaec6c9fd2cc983",
+  "runtimeHash": "6a214bbed95e8ec138f78bad2f86a26dee9fc271587a223c97b738b36c289fc0",
+  "artifactHash": "f91ccc5745aeaa2354653d5c6c91b6807897dd4c5e79b7064e3451edacce181d",
+  "assetsHash": "470a60dd40f30d9e031d45a92cd64ed5fa92b2a66c0d405a0bacb2f3fbd765f5",
+  "htmlHash": "eda196065a361f2dc2d8795e8f01e85d49a90d184720af05d31ee82010454c4a",
+  "dependencies": "f32a85a87902007ea21891f835db6652e311d10efaa79ddbd90ebfadde00250d",
+  "sandboxDependencies": "0b91bf7edbade27c761ad8d1086f6d5dee176101e1d118dc4207de5512aa2b6d",
+  "sceneHash": "a67bd00f27ba0c4f7fbede8e349e4fe1171c1fb698775da0e67d0c8fbc7c9591",
+  "sheetHash": "895cecddf1291b0ab755a4bbc241ed476eb5dfbac0025f87507485d93a0d8ebb",
+  "assetIds": [
+    {
+      "id": "forest",
+      "sha256": "a67bd00f27ba0c4f7fbede8e349e4fe1171c1fb698775da0e67d0c8fbc7c9591",
+      "width": 720,
+      "height": 400
+    },
+    {
+      "id": "fox",
+      "sha256": "8d706bd6fe56e95cada1e3489988c4a64cd5089d0bbb7fd10b0f2fcfbe251205",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "id": "duck",
+      "sha256": "36e456ffc1cd48625032edf4da5d09b08549c7b6b772e08c09c680186acb2f2f",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "id": "leaf",
+      "sha256": "a86958a7bfd5abe928487c83fee68a12947251fe630f4e9f2cf8173aa88b9527",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "id": "twirl",
+      "sha256": "a6d1b882335aebb9cc23ea3df4500e4b0350e289f283679d2557d5f51a54f325",
+      "width": 512,
+      "height": 512
+    }
+  ],
+  "evidenceHash": "957dec9696dc4f3bdf6aebbcd79c0592902b7b28a61aec0f6488e68901e4fa65",
+  "tests": {
+    "desktop": true,
+    "mobile": true,
+    "replay": true,
+    "isolation": true,
+    "input": true,
+    "resources": true,
+    "pause": true
+  },
+  "captures": [
+    {
+      "id": "desktop-initial-0",
+      "device": "desktop",
+      "phase": "initial",
+      "tick": 4,
+      "width": 720,
+      "height": 750,
+      "sha256": "7158f6eefb28fceb052ab483f414214caa5db5a01fec0c001e62f3424dcc98e0"
+    },
+    {
+      "id": "desktop-interaction-1",
+      "device": "desktop",
+      "phase": "interaction",
+      "tick": 164,
+      "width": 720,
+      "height": 750,
+      "sha256": "26bc2bbd717b49b903b053462e1161380196960e2b80448e506c508a16e2c61b"
+    },
+    {
+      "id": "desktop-interaction-2",
+      "device": "desktop",
+      "phase": "interaction",
+      "tick": 321,
+      "width": 720,
+      "height": 750,
+      "sha256": "2f5af93ebf99f3785ea00128669254589cf4e62b33e65f5e0691459b7be6f95e"
+    },
+    {
+      "id": "desktop-outcome-3",
+      "device": "desktop",
+      "phase": "outcome",
+      "tick": 1523,
+      "width": 720,
+      "height": 750,
+      "sha256": "2f741d7682767d579dee70fd694a17ba088f8cb2c6ac20eb7f556efce55aefa3"
+    },
+    {
+      "id": "tablet-initial-0",
+      "device": "tablet",
+      "phase": "initial",
+      "tick": 2,
+      "width": 600,
+      "height": 683,
+      "sha256": "ff1d4e06742ba6088c6908fc6c838021ab81c3a67efbe0a106e2b408c4893d87"
+    },
+    {
+      "id": "tablet-interaction-1",
+      "device": "tablet",
+      "phase": "interaction",
+      "tick": 162,
+      "width": 600,
+      "height": 683,
+      "sha256": "b38603a7d2f706bcfdad068ab556e46474a4c3b5f873f4bfd25a352b8e442ef0"
+    },
+    {
+      "id": "tablet-interaction-2",
+      "device": "tablet",
+      "phase": "interaction",
+      "tick": 322,
+      "width": 600,
+      "height": 683,
+      "sha256": "59c852985ad3fdb1e803c56f578e1a19528a3533b42ad3bd7e8d40003623479b"
+    },
+    {
+      "id": "tablet-outcome-3",
+      "device": "tablet",
+      "phase": "outcome",
+      "tick": 1525,
+      "width": 600,
+      "height": 683,
+      "sha256": "dadb4abe567fee29bd076ab857b0619279b73b24365f37131f3da88b32f8fa96"
+    }
+  ],
+  "sessions": [
+    {
+      "device": "desktop",
+      "inputs": 10,
+      "visibleChanges": 10,
+      "simulatedTicks": 1523,
+      "outcome": "won",
+      "replay": true,
+      "pause": true,
+      "touch": false,
+      "consoleErrors": 0,
+      "actionTrace": [
+        {
+          "action": {
+            "type": "hold",
+            "control": "action",
+            "frames": 144
+          },
+          "index": 0,
+          "startTick": 14,
+          "endTick": 163,
+          "beforeHash": "b1d392110a47dc88e8ef6e82d70316f03643e1fce61aad651801acbe2a349c4d",
+          "afterHash": "ad253b8ea3969dfabb7d63d539d700e47be9c00028946584a9685bd86cbc9557"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "down",
+            "frames": 144
+          },
+          "index": 1,
+          "startTick": 173,
+          "endTick": 321,
+          "beforeHash": "b35424ff01cf49a1a5c5fe5a7cfd2680789d9e15fd83303a3bb4b99962b24d67",
+          "afterHash": "de790d397859b0a98a36e330f8e946681b429eaeec7f5a1ea5e933334d50bfa9"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "action",
+            "frames": 144
+          },
+          "index": 2,
+          "startTick": 332,
+          "endTick": 482,
+          "beforeHash": "78836240b6a7713e143d5f7d1366a6ebddabd471b53a621cf1a1ae4b4b00d899",
+          "afterHash": "9e8cd5b6c4b24ba8883a82da01dbd3ad802e341c4cc7551a0e1f0ca5718daa64"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "down",
+            "frames": 144
+          },
+          "index": 3,
+          "startTick": 482,
+          "endTick": 633,
+          "beforeHash": "9e8cd5b6c4b24ba8883a82da01dbd3ad802e341c4cc7551a0e1f0ca5718daa64",
+          "afterHash": "360579c970caed962144cad3b5429b4504d299222d0b7fb0e3035c83c7f15ba4"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "action",
+            "frames": 144
+          },
+          "index": 4,
+          "startTick": 633,
+          "endTick": 783,
+          "beforeHash": "360579c970caed962144cad3b5429b4504d299222d0b7fb0e3035c83c7f15ba4",
+          "afterHash": "1c362d8a751643fc3c9521ecd0f0f9cd6df6dc8b28c1aa3c366c448922d267ee"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "down",
+            "frames": 144
+          },
+          "index": 5,
+          "startTick": 783,
+          "endTick": 933,
+          "beforeHash": "1c362d8a751643fc3c9521ecd0f0f9cd6df6dc8b28c1aa3c366c448922d267ee",
+          "afterHash": "10870054d64f107b1f77e8e784b125e69877eb21ed088f94ab4e6269a3ff5332"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "action",
+            "frames": 144
+          },
+          "index": 6,
+          "startTick": 933,
+          "endTick": 1083,
+          "beforeHash": "10870054d64f107b1f77e8e784b125e69877eb21ed088f94ab4e6269a3ff5332",
+          "afterHash": "ab2b1d024bc440ce6d19687ce49a058d87aca7fb0c5db8ec5faa5bf0918537b0"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "down",
+            "frames": 144
+          },
+          "index": 7,
+          "startTick": 1083,
+          "endTick": 1235,
+          "beforeHash": "ab2b1d024bc440ce6d19687ce49a058d87aca7fb0c5db8ec5faa5bf0918537b0",
+          "afterHash": "72f9b7508b4e6c38ebfbb28215041b279f0b16d553111f73ca60d5db860e56db"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "action",
+            "frames": 144
+          },
+          "index": 8,
+          "startTick": 1235,
+          "endTick": 1384,
+          "beforeHash": "72f9b7508b4e6c38ebfbb28215041b279f0b16d553111f73ca60d5db860e56db",
+          "afterHash": "7c3308ac19f7c5a3702d5441599e872f12ed0ef9588f031517b95f4b8e87934d"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "down",
+            "frames": 144
+          },
+          "index": 9,
+          "startTick": 1385,
+          "endTick": 1523,
+          "beforeHash": "9094afd1c8100c03f55108885cd3366fdf69f1636b3289b01acfad0305396956",
+          "afterHash": "71d1cbca2032c05fc8542c9f7c5ad4d1d81b68cd11f420edcf2b49d16b8a80e3"
+        }
+      ]
+    },
+    {
+      "device": "tablet",
+      "inputs": 10,
+      "visibleChanges": 10,
+      "simulatedTicks": 1525,
+      "outcome": "won",
+      "replay": true,
+      "pause": true,
+      "touch": true,
+      "consoleErrors": 0,
+      "actionTrace": [
+        {
+          "action": {
+            "type": "hold",
+            "control": "action",
+            "frames": 144
+          },
+          "index": 0,
+          "startTick": 13,
+          "endTick": 162,
+          "beforeHash": "34cbae8f6c2d19421dec7c6a0ce8df9f445416186b612678b70870f64cbaa048",
+          "afterHash": "1a5060d1a21988b1789943b123ed8591eda0b54e4fedcce359250d6ea745872e"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "down",
+            "frames": 144
+          },
+          "index": 1,
+          "startTick": 171,
+          "endTick": 322,
+          "beforeHash": "b89a371858e38bf58a59d523e18b3106fecabf95da8e947bcbea3e98e055e657",
+          "afterHash": "ebbb351d9d63e8be5eecbc152c91efada92f03cd91c07c206c1190f5648f084e"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "action",
+            "frames": 144
+          },
+          "index": 2,
+          "startTick": 331,
+          "endTick": 483,
+          "beforeHash": "f87a8bd283dcc56df081906132f34b53e0f8c1f353326eeb8606b6bf298fde61",
+          "afterHash": "dc9c559c8b64635e690016d71719c125b6e7d3be02bee30c1274fce19c7d7330"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "down",
+            "frames": 144
+          },
+          "index": 3,
+          "startTick": 483,
+          "endTick": 634,
+          "beforeHash": "dc9c559c8b64635e690016d71719c125b6e7d3be02bee30c1274fce19c7d7330",
+          "afterHash": "2ccc904d4bc30a1705328b7f601a2eb08e0c173052a518b7349d623a542fe2a2"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "action",
+            "frames": 144
+          },
+          "index": 4,
+          "startTick": 634,
+          "endTick": 785,
+          "beforeHash": "2ccc904d4bc30a1705328b7f601a2eb08e0c173052a518b7349d623a542fe2a2",
+          "afterHash": "5899aa61953228c9f06544f49d0310997c7f73ec12917250b98a88532da7b61e"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "down",
+            "frames": 144
+          },
+          "index": 5,
+          "startTick": 786,
+          "endTick": 935,
+          "beforeHash": "780a2dfbc29ef2599a5d8b4e0d620bf5e99b320d83965bd27c03f471d19bfcb5",
+          "afterHash": "d01c748b584d27f7fa9fc3b7b41b9fb2507819312f27d375acc6634af0ae32aa"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "action",
+            "frames": 144
+          },
+          "index": 6,
+          "startTick": 936,
+          "endTick": 1086,
+          "beforeHash": "693072d9de2042b224e45ca58df05685790e7b0c54e3b3a46de50f075da46c65",
+          "afterHash": "bfc73933a9f665aa9654190ecfafeb9789905f04a666d01c9a4e26f8ff3c86f6"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "down",
+            "frames": 144
+          },
+          "index": 7,
+          "startTick": 1086,
+          "endTick": 1235,
+          "beforeHash": "bfc73933a9f665aa9654190ecfafeb9789905f04a666d01c9a4e26f8ff3c86f6",
+          "afterHash": "72f9b7508b4e6c38ebfbb28215041b279f0b16d553111f73ca60d5db860e56db"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "action",
+            "frames": 144
+          },
+          "index": 8,
+          "startTick": 1235,
+          "endTick": 1386,
+          "beforeHash": "72f9b7508b4e6c38ebfbb28215041b279f0b16d553111f73ca60d5db860e56db",
+          "afterHash": "6d85fd03f22053f39bbed39b6a29a7bd9ba072e59d4c0de0861d5635f1f3774f"
+        },
+        {
+          "action": {
+            "type": "hold",
+            "control": "down",
+            "frames": 144
+          },
+          "index": 9,
+          "startTick": 1386,
+          "endTick": 1525,
+          "beforeHash": "6d85fd03f22053f39bbed39b6a29a7bd9ba072e59d4c0de0861d5635f1f3774f",
+          "afterHash": "71d1cbca2032c05fc8542c9f7c5ad4d1d81b68cd11f420edcf2b49d16b8a80e3"
+        }
+      ]
+    }
+  ],
+  "origin": "authored-fixture-mock-provider",
+  "paidCalls": 0,
+  "actualProviderCharges": null,
+  "measuredAcceptance": null,
+  "queueMs": null,
+  "marks": [
+    {
+      "stage": "fixture setup",
+      "elapsedMs": 2
+    },
+    {
+      "stage": "mock planning",
+      "elapsedMs": 15
+    },
+    {
+      "stage": "mock image 1",
+      "elapsedMs": 31
+    },
+    {
+      "stage": "mock image 2",
+      "elapsedMs": 32
+    },
+    {
+      "stage": "mock construction",
+      "elapsedMs": 127
+    },
+    {
+      "stage": "assembled candidate",
+      "elapsedMs": 134
+    },
+    {
+      "stage": "isolated browser test and capture",
+      "elapsedMs": 65894
+    },
+    {
+      "stage": "mock review",
+      "elapsedMs": 65959
+    },
+    {
+      "stage": "mock repair",
+      "elapsedMs": 66071
+    },
+    {
+      "stage": "mock planning",
+      "elapsedMs": 66113
+    },
+    {
+      "stage": "fixture repair and replan complete",
+      "elapsedMs": 66114
+    }
+  ],
+  "bounds": [
+    {
+      "stage": "planning",
+      "images": 0,
+      "textBytesAndFraming": 12837,
+      "screenshotTokens": 0,
+      "inputBound": 12837
+    },
+    {
+      "stage": "construction",
+      "images": 0,
+      "textBytesAndFraming": 29796,
+      "screenshotTokens": 0,
+      "inputBound": 29796
+    },
+    {
+      "stage": "review",
+      "images": 8,
+      "textBytesAndFraming": 17662,
+      "screenshotTokens": 32768,
+      "inputBound": 50430
+    },
+    {
+      "stage": "repair",
+      "images": 8,
+      "textBytesAndFraming": 29056,
+      "screenshotTokens": 32768,
+      "inputBound": 61824
+    },
+    {
+      "stage": "planning",
+      "images": 2,
+      "textBytesAndFraming": 15004,
+      "screenshotTokens": 8192,
+      "inputBound": 23196
+    }
+  ],
+  "stageCeilings": {
+    "planning": {
+      "input": 23196,
+      "output": 3000
+    },
+    "construction": {
+      "input": 29796,
+      "output": 6000
+    },
+    "review": {
+      "input": 50430,
+      "output": 3000
+    },
+    "repair": {
+      "input": 61824,
+      "output": 6000
+    }
+  },
+  "assumedImageMicroUsd": 50000,
+  "wholeJobReservationMicroUsd": 1827464,
+  "capMicroUsd": 1000000
+}
