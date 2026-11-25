@@ -1,5 +1,7 @@
 # Jems DEV → TEST → PROD
 
+The private family beta candidate adds dedicated service definitions for authenticated hub and per-family origins, an independently protected household and an isolated preview. The existing static PR preview alone cannot exercise first-party invitation, IAP or callback routing. Its synthetic evidence, a deployed DEV/TEST receipt and real-device owner acceptance are recorded separately. [Private family activation](../family-beta/ACTIVATION.md) The manual family candidate lane reuses protected main, full CI receipts and the existing federated principal. It can verify prepared infrastructure or stage reviewed revisions at zero traffic on three named nonproduction services.
+
 **Authority:** the owner's November 23, 2026 (America/New_York) assignment, “Jems — Automated DEV / TEST / PROD Architecture,” authorizes assessment and implementation through reviewed PRs. [The decision](../decisions/2026-11-23-dev-test-prod.md) records the method and supersession. This is the authoritative development and release contract; its requirements are not a claim of completed deployment.
 
 **Implementation baseline:** main `28fe3311036f8ef9f3bfc623c522432499c08113`. The new environment tools are a disabled source foundation pending reviewed setup and deployed acceptance. [Delivery state](../../DELIVERY-STATE.md) records actual observations. [Setup](SETUP.md) identifies the additional authority required; [costs](COSTS.md) distinguishes estimates from spending approval.

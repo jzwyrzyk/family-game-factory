@@ -6,6 +6,7 @@ import {assertActiveTrustedDevice} from '../trusted-devices';
 /** Longer than either provider deadline (25s text / 15s speech), but finite
  * across gateway restarts. It is never renewed by polling or a provider retry.
  */
+export const COACH_RECEIPT_TTL_MS=15*60_000;
 export const PAID_RECEIPT_LEASE_MS=60_000;
 export interface PaidReceipt {
  id:string;familyId:string;subject:string;month:string;reserved:number;at:number;
@@ -66,7 +67,10 @@ export async function reconcilePaidReceipts(repo:Repository,session?:VerifiedSes
   assertActiveTrustedDevice(state,session,now);
  }
  const receipts=[...(state.coachReceipts??[]),...(state.audioReceipts??[])];
- if(!receipts.some(r=>(!session||r.familyId===session.familyId)&&expired(r,now)))return state;
+ const expiredReply=(r:NonNullable<PipelineState['coachReceipts']>[number],at:number)=>
+  !!r.reply && r.state!=='running' && (r.recoveredAt??r.at)<at-COACH_RECEIPT_TTL_MS && (!session||r.familyId===session.familyId);
+ const cleanup=!!state.betaScopes&&state.coachReceipts?.some(r=>expiredReply(r,now));
+ if(!cleanup&&!receipts.some(r=>(!session||r.familyId===session.familyId)&&expired(r,now)))return state;
  return repo.transaction(current=>{
   const now=Date.now();
   if(session){
@@ -74,6 +78,7 @@ export async function reconcilePaidReceipts(repo:Repository,session?:VerifiedSes
    assertActiveTrustedDevice(current,session,now);
   }
   expirePaidReceipts(current,now,session?.familyId);
+  if(current.betaScopes)for(const r of current.coachReceipts??[])if(expiredReply(r,now))delete r.reply;
   return current;
  });
 }

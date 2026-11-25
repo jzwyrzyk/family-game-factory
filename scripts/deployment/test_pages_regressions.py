@@ -16,6 +16,19 @@ class PagesReleaseRegressionGates(unittest.TestCase):
         self.build, remainder = self.workflow.split("  regressions:\n", 1)
         self.regressions, self.deploy = remainder.split("  deploy:\n", 1)
 
+    def test_retired_public_site_cannot_republish_a_historical_application(self):
+        spec = importlib.util.spec_from_file_location("pages_policy", ROOT / "scripts/beta/pages-policy.py")
+        policy = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(policy)
+        record = {"version": 1, "mode": "welcome-only", "hubOrigin": "https://invited.example", "operatorContact": "adult@example.invalid"}
+        self.assertEqual(policy.delivery_policy(record)["mode"], "welcome-only")
+        for changed in ({"mode": "public"}, {"hubOrigin": "http://app.example"}, {"operatorContact": "bad\noutput=x"}):
+            with self.assertRaises(ValueError):
+                policy.delivery_policy({**record, **changed})
+        self.assertLess(self.build.index("python3 scripts/beta/pages-policy.py"), self.build.index('git checkout --detach'))
+        self.assertIn("PUBLIC_ASSET_INVENTORY_REJECTED", self.build)
+        self.assertIn("if: steps.delivery.outputs.mode == 'household'", self.build)
+
     def test_every_covered_shard_is_mandatory(self):
         matrix = json.loads(re.search(r"shard: (\[.*\])", self.regressions).group(1))
         self.assertEqual(matrix, list(r.SHARDS))

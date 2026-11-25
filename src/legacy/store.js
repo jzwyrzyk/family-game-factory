@@ -22,8 +22,14 @@ const profiles = [
   {id:'player2',name:'Explorer 2',icon:'🚀',age:9,grade:1,focus:'adaptive',intensity:'gentle',rate:3,hints:true,punish:false,skills:{},stats:{},mathWindow:[],learningSetupComplete:false},
   {id:'player3',name:'Explorer 3',icon:'🦄',age:5,grade:1,focus:'add',intensity:'gentle',rate:2,hints:true,punish:false,skills:{},stats:{},mathWindow:[],learningSetupComplete:false}
 ];
+const pilotIds=typeof document!=='undefined'&&document.documentElement?.getAttribute('data-family-profiles');
+if(pilotIds){
+ const ids=JSON.parse(pilotIds);
+ if(!Array.isArray(ids)||ids.length<1||ids.length>6||ids.some(id=>typeof id!=='string'||!/^[a-f0-9-]{36}$/.test(id)))throw Error('Invalid workshop profiles');
+ const template=profiles[0];profiles.splice(0,profiles.length,...ids.map((id,i)=>({...structuredClone(template),id,name:'Explorer '+(i+1),age:undefined})));
+}
 const learningIntensities = ['gentle','balanced','stretch'];
-const empty = () => ({version:1,activeProfile:'player1',profiles:JSON.parse(JSON.stringify(profiles)),feedback:[],createdAt:Date.now()});
+const empty = () => ({version:1,activeProfile:profiles[0].id,profiles:JSON.parse(JSON.stringify(profiles)),feedback:[],createdAt:Date.now()});
 function normalize(value){for(const p of value.profiles){p.grade=profileGrade(p);p.intensity=learningIntensities.includes(p.intensity)?p.intensity:'gentle';p.learningSetupComplete=p.learningSetupComplete===true;p.learningSubject=p.learningSubject==='language'?'language':'math';p.allowSubjectSwitch=p.allowSubjectSwitch===true;p.languageFocus=Array.isArray(p.languageFocus)?p.languageFocus.filter(id=>typeof id==='string'&&LANGUAGE_SKILLS.some(s=>s.id===id)).slice(0,12):[];p.rate=Math.max(1,Math.min(8,Number(p.rate)||3));p.mathModes=Object.fromEntries(Object.entries(p.mathModes||{}).filter(([k,v])=>/^[\w:-]{1,160}$/.test(k)&&!['__proto__','constructor','prototype'].includes(k)&&['checkpoint','interaction','both'].includes(v)));p.skillFocus=Array.isArray(p.skillFocus)?p.skillFocus.filter(v=>typeof v==='string'&&getSkill(v)).slice(0,12):[];}return value;}
 let loadError=null,recoveryRaw=null;
 function load(){
@@ -33,6 +39,10 @@ function load(){
   if(!validate(stored)){
    loadError='Saved progress uses an unsupported format or contains damaged learning history. It has not been reset or overwritten. Export the saved data before restoring a compatible backup.';
    return validate(stored,false)?stored:empty();
+  }
+  if(pilotIds){
+   if(stored.profiles.some(p=>!profiles.some(profile=>profile.id===p.id)))throw Error('Family profile mapping required');
+   for(const p of profiles)if(!stored.profiles.some(profile=>profile.id===p.id))stored.profiles.push(structuredClone(p));
   }
   recoveryRaw=null;return normalize(stored);
  }catch(e){

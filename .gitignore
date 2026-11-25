@@ -18,3 +18,5 @@ validation-evidence.json
 
 # Local output from the production request-evidence client.
 /diagnostics-output/
+
+/dist-family-beta/

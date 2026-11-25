@@ -1031,7 +1031,7 @@ export function installCreationStudio(host: Host) {
   window.addEventListener('factory-learning-active', event => { if (visible && (event as CustomEvent).detail) { stop(); } });
   document.addEventListener('visibilitychange', () => { if (document.hidden && visible) { stop(); paint(); } });
   const api = {
-    open, openChallenges,
+    open, openChallenges, close:leave,
     async openArt(selection:ArtSelection){
       if(!enter())return;
       try{shelf();}catch(error){status((error as Error).message,true);return;}

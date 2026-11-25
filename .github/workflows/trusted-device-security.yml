@@ -8,9 +8,24 @@ permissions:
 jobs:
   auth-contract:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Select family beta integration dependencies
+        id: beta
+        env:
+          BASE_REV: ${{ github.event.pull_request.base.sha || github.event.before }}
+          SOURCE_REV: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          selected=true
+          if git cat-file -e "$BASE_REV^{commit}" && git cat-file -e "$SOURCE_REV^{commit}"; then
+            git diff --name-only "$BASE_REV" "$SOURCE_REV" > "$RUNNER_TEMP/family-beta-paths"
+            if ! grep -Eq '^(server/|src/|public/|scripts/beta/|infra/nonproduction/family-beta/|tests/beta-|index.html|package(-lock)?.json|.github/workflows/trusted-device-security.yml)' "$RUNNER_TEMP/family-beta-paths"; then selected=false; fi
+          fi
+          echo "selected=$selected" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -24,3 +39,26 @@ jobs:
         run: node --import tsx tests/trusted-devices.test.ts
       - name: Browser-session renewal and paid POST idempotency
         run: node --import tsx tests/session-client.test.ts
+      - name: Private family beta isolation and authorization
+        if: steps.beta.outputs.selected == 'true'
+        run: node --import tsx --test tests/beta-*.test.ts
+      - name: Exercise Firestore transaction contention against the local emulator
+        if: steps.beta.outputs.selected == 'true'
+        run: |
+          curl -fsSL --retry 3 https://storage.googleapis.com/firebase-preview-drop/emulator/cloud-firestore-emulator-v1.19.8.jar -o "$RUNNER_TEMP/jems-firestore.jar"
+          node scripts/beta/test-emulator.mjs "$RUNNER_TEMP/jems-firestore.jar"
+      - name: Build private application and separately scoped feature files
+        if: steps.beta.outputs.selected == 'true'
+        run: npm run build:family-beta
+      - name: Prepare browsers for synthetic family journeys
+        if: steps.beta.outputs.selected == 'true'
+        run: npx playwright install --with-deps chromium webkit
+      - name: Chromium and WebKit private entry and responsive acceptance
+        if: steps.beta.outputs.selected == 'true'
+        run: node --import tsx tests/beta-browser.ts
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && steps.beta.outputs.selected == 'true' }}
+        with:
+          name: private-family-synthetic-layouts-${{ github.sha }}
+          path: test-results/family-beta/*.png
+          retention-days: 7

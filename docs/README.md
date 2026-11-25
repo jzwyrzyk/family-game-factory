@@ -1,5 +1,9 @@
 # jems documentation map
 
+Private family operating procedures are in the [owner guide](family-beta/OWNER.md) and the [consolidated activation and rollback checklist](family-beta/ACTIVATION.md).
+
+[Private family beta architecture and trust boundaries](family-beta/ARCHITECTURE.md) covers the household baseline, independent family accounts, protected browser delivery, approved entry artwork and the synthetic browser acceptance contract.
+
 CI and validation: [architecture, complete workflow audit, coverage, benchmarks and evidence reuse](evidence/README.md#ci-architecture-and-performance).
 
 Start with the canonical references below. Feature documents remain the detailed contracts; this index keeps them discoverable without copying all of their content into an engineering handbook.
@@ -73,3 +77,5 @@ Prefer a link to the detailed contract over a copied version. Add new feature fa
 ## Storage reliability and scalable persistence
 
 [PR166 storage report](storage/README.md) · [complete source inventory](storage/INVENTORY.md) · [migration, retention and activation boundaries](storage/ROLLOUT.md). Integrated local recovery is distinct from the disabled indexed/cloud preparation and remaining application migration.
+
+For private family operations, use the [owner guide](family-beta/OWNER.md) and [privacy review](family-beta/PRIVACY.md).
