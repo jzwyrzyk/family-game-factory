@@ -1,7 +1,6 @@
 import {earlyInstruction} from '../learning/early/audio';
 import {picture,hasPicture} from '../learning/early/pictures';
 import {isEarlyGrade} from '../learning/grades';
-import '../learning/early/style.css';
 import {setIconLabel,type IconName} from '../brand/icons';
 import {beginLanguageAttempt,finishLanguageAttempt,recordLanguageReadAloud,saveCreativeDraft,
   selectLanguageItem,submitLanguageAnswer,useLanguageHint,type LanguageAttempt} from './engine';
@@ -161,18 +160,24 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     work.append(grid);
   } else if((item.kind==='word-tiles'||item.kind==='sentence-tiles')&&item.tiles){
     const sentence=item.kind==='sentence-tiles';
+    const pictureOrder=early&&sentence&&item.skillId.endsWith('-sequence');
     const selected:number[]=[];const tray=make('div','language-tile-tray');
     const output=make('output','language-built');output.setAttribute('aria-live','polite');
-    output.setAttribute('aria-label',sentence?'Sentence you built':'Word you built');
-    const hint=make('p','language-tile-instruction',sentence?'Tap the words in the order they belong.':'Tap the letters to build the word.');
+    output.setAttribute('aria-label',pictureOrder?'Pictures in your story':sentence?'Sentence you built':'Word you built');
+    const hint=make('p','language-tile-instruction',pictureOrder?'Tap the pictures in story order.':sentence?'Tap the words in the order they belong.':'Tap the letters to build the word.');
     const tiles=item.tiles.map((token,i)=>{
       const b=button(token,'language-tile');b.dataset.tile=String(i);
+      if(pictureOrder){b.replaceChildren(picture(token));b.setAttribute('aria-label',token);}
       on(b,'click',()=>{if(locked||selected.includes(i))return;selected.push(i);redraw();});
       tray.append(b);return b;
     });
     function assembled(){return selected.map(i=>item.tiles![i]).join(sentence?' ':'');}
     function redraw(){
       const text=assembled();output.textContent=text||'Your '+(sentence?'sentence':'word')+' will appear here';
+      if(pictureOrder){
+        output.replaceChildren(...selected.map(i=>picture(item.tiles![i])));
+        output.setAttribute('aria-label','Your story: '+selected.map(i=>item.tiles![i]).join(', '));
+      }
       tiles.forEach((b,i)=>b.disabled=locked||selected.includes(i));
       check.disabled=locked||selected.length===0;
       undo.disabled=locked||selected.length===0;
@@ -180,7 +185,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     }
     const controls=make('div','language-tile-actions');
     const undo=button('Undo last','language-secondary','undo'),clear=button('Clear','language-secondary','close');
-    const check=button('Check my '+(sentence?'sentence':'word'),'language-primary','check');
+    const check=button(pictureOrder?'Check my story':'Check my '+(sentence?'sentence':'word'),'language-primary','check');
     check.dataset.action='check-tiles';
     on(undo,'click',()=>{selected.pop();redraw();});
     on(clear,'click',()=>{selected.length=0;redraw();});

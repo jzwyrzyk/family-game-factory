@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:22:09.766Z",
-      "sourceDigest": "b5749001a597e77fd9309dfc70c8dc9dc94ae0a03b90e3903c3eab163c4acad8",
+      "reviewedAt": "2026-11-25T01:26:14.095Z",
+      "sourceDigest": "02ef2e95ef3315a57f5bf3e189fb2a8f878cb56f7dce390bb915e62366b114a9",
       "reviewOutcome": "updated",
-      "reviewReason": "Grown-up creation handoff uses the early profile and preserves the authorization, reporting and local play contracts.",
+      "reviewReason": "Parent handoff and reporting preserve the new curriculum and graphical scene changes from the preceding review stages.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -641,10 +641,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:22:10.213Z",
-      "sourceDigest": "6f55a2e6a9299923ecc2174fd95f3ef6899da1c60185671dfb6c3b5fd3801eb1",
+      "reviewedAt": "2026-11-25T01:26:14.463Z",
+      "sourceDigest": "2eddc8222c4b50c193bbb17d9d4b3aa91bb2e5059364a74e4ad644f18a5a58ce",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Grown-up creation handoff uses the early profile and preserves the authorization, reporting and local play contracts. Existing operational procedures and acceptance commands still apply to this change.",
+      "reviewReason": "Parent handoff and reporting preserve the new curriculum and graphical scene changes from the preceding review stages. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:22:10.258Z",
-      "sourceDigest": "1e5dbadc8e3521315f1de56f549e083cac83d1ac0ee265eb17a6e32a162ddbae",
+      "reviewedAt": "2026-11-25T01:26:14.507Z",
+      "sourceDigest": "fceb8b2f20a335969a0c4d19a1469895601361abacd8ea3cb11e4b9ba6fe1916",
       "reviewOutcome": "updated",
-      "reviewReason": "Grown-up creation handoff uses the early profile and preserves the authorization, reporting and local play contracts.",
+      "reviewReason": "Parent handoff and reporting preserve the new curriculum and graphical scene changes from the preceding review stages.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
