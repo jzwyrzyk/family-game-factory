@@ -1,0 +1,57 @@
+/* Real IndexedDB notebook authority: synthetic data, no gateway/provider. */
+const assert=require('node:assert/strict'),http=require('node:http');
+const {build}=require('esbuild'),{chromium,webkit}=require('playwright');
+(async()=>{
+ const bundle=await build({stdin:{contents:`export * from './src/storage/indexed-notebook';export * from './src/storage/notebook-workspace';export * from './src/studio/notebook';export * from './src/storage/indexed-records';export * from './src/problem-solving/signals';export * from './src/studio/notifications';export * from './src/rewards/service';`,resolveDir:process.cwd()},bundle:true,write:false,format:'iife',globalName:'NotebookTest',platform:'browser',define:{'import.meta.env.MODE':'"test"'}});
+ const server=http.createServer((req,res)=>{res.setHeader('Content-Type',req.url==='/test.js'?'text/javascript':'text/html');res.end(req.url==='/test.js'?bundle.outputFiles[0].text:'<!doctype html><body><script src="/test.js"></script>');}).listen(0,'127.0.0.1');await new Promise(resolve=>server.listening?resolve():server.once('listening',resolve));
+ let browser;try{
+  const engine=process.env.STORAGE_BROWSER==='webkit'?webkit:chromium;browser=await engine.launch({...(engine===chromium?{executablePath:process.env.CHROMIUM_PATH,args:['--no-sandbox']}:{}),headless:true});const context=await browser.newContext(),page=await context.newPage();await page.goto(`http://127.0.0.1:${server.address().port}/`);
+  const checks=await page.evaluate(async()=>{
+   const checks=[],expect=async(fn,message)=>{try{await fn();}catch{return;}throw Error(message);},same=(a,b,label)=>{if(JSON.stringify(a)!==JSON.stringify(b))throw Error(label);};
+   const source=new Map(),port={getItem:k=>source.get(k)??null,setItem:(k,v)=>source.set(k,v)},book=new NotebookTest.StudioNotebook(port),scope={family:'notebook-family',profile:'player1'};
+   const first=book.create('player1','new','Saved moon'),second=book.create('player1','new','Saved dragon');book.create('player2','new','Another child');
+   book.message(first.id,'player1','child','An original blue moon.');book.continueConversation(first.id,'player1');book.message(first.id,'player1','child','Retain this later page.');
+   const large=book.read();large.sessions.find(s=>s.id===second.id).messages=Array.from({length:200},(_,i)=>({id:'original-'+i,role:i%2?'helper':'child',text:('Original '+i+' 🚀 ').repeat(100).slice(0,2100),at:'2026-11-25T00:00:00Z'}));book.restore(large);book.setAvatar('player1','spark');
+   const raw=port.getItem(NotebookTest.STUDIO_KEY),original=JSON.parse(raw);let allowed=true;
+   let store=await NotebookTest.IndexedNotebook.open(scope,()=>{if(!allowed)throw Error('REVOKED');});
+   await expect(()=>store.migrateLegacy(raw,{batchSize:1,onBatch:()=>{throw Error('Synthetic process interruption');}}),'migration interruption absent');
+   if(await store.isActive())throw Error('partial notebook exposed');if((await store.migration()).completed!==1)throw Error('progress lost');store.close();
+   store=await NotebookTest.IndexedNotebook.open(scope,()=>{if(!allowed)throw Error('REVOKED');});await store.migrateLegacy(raw,{batchSize:1});await store.migrateLegacy(raw);
+   same(port.getItem(NotebookTest.STUDIO_KEY),raw,'legacy originals changed');same((await store.snapshot()).sessions,original.sessions.filter(s=>s.owner==='player1'),'owner source data lost');checks.push('resumable source-bound migration retains exact messages, designs, provenance and original source');
+   const calls=[],get=store.records.get.bind(store.records);store.records.get=async(collection,id)=>{calls.push({collection,id});return get(collection,id);};
+   const cards=await store.page(null,1),next=await store.page(cards.next,1);if(cards.items.length!==1||next.items.length!==1||cards.items[0].id===next.items[0].id||'messages'in cards.items[0])throw Error('metadata paging');
+   if(calls.some(c=>c.collection==='notebook-chunks'||c.collection==='notebook-payloads'))throw Error('card page hydrated conversation');
+   calls.length=0;const opened=await store.get(first.id);same(opened.messages,book.get(first.id,'player1').messages,'chapter history differs');
+   if(opened.messages.length!==2)throw Error('linked messages missing');checks.push('bounded metadata pages and targeted selected conversation/chapter reads');
+   const held=await store.get(second.id);same(held.messages,large.sessions.find(s=>s.id===second.id).messages,'oversized text or Unicode altered');
+   const payloads=await store.records.page('notebook-payloads');if(!payloads.some(r=>r.value.bytes>256*1024&&r.value.chunks.length>1))throw Error('large record was not chunked');
+   if((await store.records.pending()).length)throw Error('local-only history uploaded');checks.push('oversized immutable chunking and no local-only outbox');
+   const sourceSnapshot=await store.snapshot(),summary=await store.summary();same(summary,NotebookTest.deriveNotebookSummary(sourceSnapshot,'player1'),'summary differs from original notebook logic');
+   for(let mask=0;mask<8;mask++){const context={unknownSessionIds:new Set(mask&1?[first.id]:[]),unconfirmedSessionIds:new Set(mask&2?[first.id]:[]),sendingSessionIds:new Set(mask&4?[first.id]:[])};same(await store.notifications(context),NotebookTest.deriveStudioNotifications(book.list('player1'),'player1',context,book.notificationPreferences('player1')),'notification projection changed meaning');}
+   const firstPointer=(await store.records.page('notebook-sessions:'+(await get('notebook-control','head')).value.generation)).find(r=>r.value.id===first.id);calls.length=0;await store.summary();if(calls.some(c=>c.id===firstPointer.value.payload))throw Error('summary hydrated session');checks.push('atomic bounded journey, preferences and transient notification projections match source logic');
+   const evidence=[];const uninstall=NotebookTest.installEvidenceReceiver(s=>evidence.push(s));
+   const prior=await store.get(first.id),competing=await Promise.allSettled([store.update(first.id,s=>{s.draft='Device one';}),store.update(first.id,s=>{s.draft='Device two';})]);
+   if(competing.filter(x=>x.status==='fulfilled').length!==1||evidence.length!==1)throw Error('concurrent notebook save/evidence was not atomic');
+   const saved=await store.get(first.id),commit=store.records.commit.bind(store.records);store.records.commit=async(op,options)=>{if(op.changes.some(c=>c.collection==='notebook-control'&&c.id==='head'))throw new DOMException('Synthetic quota','QuotaExceededError');return commit(op,options);};
+   await expect(()=>store.update(first.id,s=>{s.draft='Must never publish';}),'quota accepted');same((await store.get(first.id)).draft,saved.draft,'quota changed live data');if(evidence.length!==1)throw Error('failed save published learning evidence');store.records.commit=commit;checks.push('CAS concurrent writer rejection and no evidence or success before durable save');
+   const backup=await store.snapshot();await store.message(first.id,'child','Newer work');if(await store.restore(backup,'reviewed-restore')!=='restored')throw Error('restore missing');
+   await store.message(first.id,'child','Work after restore');if(await store.restore(backup,'reviewed-restore')!=='already-restored')throw Error('duplicate restore receipt missing');if(!(await store.get(first.id)).messages.some(m=>m.text==='Work after restore'))throw Error('duplicate restore erased newer work');
+   const changed=structuredClone(backup);changed.sessions[0].name='A different replacement';await expect(()=>store.restore(changed,'reviewed-restore'),'reused restore identity accepted');checks.push('complete scoped backup, atomic generation restore and duplicate replacement protection');
+   let owner='player1';const workspace=await NotebookTest.NotebookWorkspace.fromIndexed(store,()=>owner);await workspace.load(first.id,owner);
+   await Promise.all([workspace.message(first.id,owner,'child','Queued first'),workspace.message(first.id,owner,'child','Queued second')]);const cached=workspace.get(first.id,owner);if(!cached.messages.some(m=>m.text==='Queued first')||!cached.messages.some(m=>m.text==='Queued second'))throw Error('facade acknowledged a lost message');
+   await workspace.update(first.id,owner,s=>{if(workspace.withConversation(s).messages[0].text!=='An original blue moon.')throw Error('callback history lost');s.design.ideas.push({id:'source-idea',text:'Make a moon jump',origin:'child',adopted:true});});
+   window.FG={store:{current:()=>({id:owner}),pendingRewards:()=>[],acknowledgeRewards:()=>{}}};const uninstallSource=NotebookTest.installNotebookRewardSource(async(requested)=>{if(requested!==owner)throw Error('Wrong source');return store;});const rewards=NotebookTest.installRewards();await rewards.refresh();if((await store.pendingRewards()).length)throw Error('indexed reward outbox not acknowledged');const total=(await rewards.summary()).lifetimeGems;await rewards.refresh();if((await rewards.summary()).lifetimeGems!==total||total<=0)throw Error('indexed reward duplicated or lost');
+   same(port.getItem(NotebookTest.STUDIO_KEY),raw,'facade or reward service rewrote legacy source');owner='player2';await expect(()=>workspace.load(first.id,'player1'),'facade profile change accepted');owner='player1';uninstallSource();checks.push('awaited facade mutation queue, callback provenance and active indexed reward source');
+   allowed=false;await expect(()=>store.page(),'revoked page read');await expect(()=>store.update(first.id,s=>{s.draft='forbidden';}),'revoked save');allowed=true;
+   await expect(()=>store.get(first.id,'player2'),'foreign owner accepted');await expect(()=>store.migrateLegacy(raw+' '),'changed source migration accepted');
+   const other=await NotebookTest.IndexedNotebook.open({family:'other-family',profile:'player1'},()=>{});await expect(()=>other.get(first.id),'foreign family read');other.close();
+   const otherChild=await NotebookTest.IndexedNotebook.open({family:scope.family,profile:'player2'},()=>{});await otherChild.migrateLegacy(raw);await expect(()=>otherChild.get(first.id),'foreign child read');otherChild.close();checks.push('family, profile, current grant and source-version isolation');
+   const snapshot=await store.snapshot(),pointer=(await store.records.page('notebook-sessions:'+(await get('notebook-control','head')).value.generation)).find(r=>r.value.id===second.id),manifest=await get('notebook-payloads',pointer.value.payload),chunk=await get('notebook-chunks',manifest.value.chunks[0]);
+   await commit({id:'corrupt-original-fixture',scope,changes:[{collection:'notebook-chunks',id:chunk.id,expectedVersion:chunk.version,value:'CORRUPT'}]},{enqueue:false});
+   await expect(()=>store.get(second.id),'corrupt bytes accepted');await expect(()=>store.snapshot(),'corrupt backup accepted');if(!(await store.get(first.id)).messages.length)throw Error('unrelated session corruption blocked selected read');
+   const visible=await store.page(null,10);if(visible.items.length!==snapshot.sessions.length)throw Error('metadata depended on corrupt payload');checks.push('corrupt/missing original fails closed without full-workspace hydration');
+   uninstall();store.close();return checks;
+  });
+  assert.equal(checks.length,9);console.log(JSON.stringify({browser:process.env.STORAGE_BROWSER??'chromium',checks}));await context.close();
+ }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
+})().catch(error=>{console.error(error);process.exitCode=1;});

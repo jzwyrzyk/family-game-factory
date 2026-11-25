@@ -142,7 +142,7 @@ export function validateNotebook(input: unknown,clone=true): Notebook {
 export class StudioNotebook {
   private cachedRaw:string|null|undefined;
   private cachedNotebook:Notebook|undefined;
-  constructor(private storage: StoragePort,private onRewardSourceSaved?:(owner:string)=>void) { this.read(); }
+  constructor(private storage: StoragePort,private onRewardSourceSaved?:(owner:string)=>void,private sourceEvidence:typeof publishSourceEvidence=publishSourceEvidence) { this.read(); }
   private load(): Notebook {
     const raw=this.storage.getItem(STUDIO_KEY);
     if(raw!==this.cachedRaw||!this.cachedNotebook){
@@ -257,7 +257,7 @@ export class StudioNotebook {
   update(id:string,owner:string,fn:(s:StudioSession)=>void):StudioSession {
     let before:StudioSession|undefined;
     const after=this.write(n=>{const s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');before=copy(conversationContext(n,s));fn(s);s.updated=new Date().toISOString();return conversationContext(n,s);});
-    if(before)publishSourceEvidence({kind:'studio',before,after});
+    if(before)this.sourceEvidence({kind:'studio',before,after});
     return after;
   }
   /** Save reply text, plan/provenance and reward outbox in one atomic key write. */
@@ -304,8 +304,8 @@ export class StudioNotebook {
       delete s.keptExperiments;
       s.updated=new Date().toISOString();return s;
     });
-    if(before)publishSourceEvidence({kind:'studio',before,after:result});
-    publishSourceEvidence({kind:'clear-studio',owner,sessionId:id});
+    if(before)this.sourceEvidence({kind:'studio',before,after:result});
+    this.sourceEvidence({kind:'clear-studio',owner,sessionId:id});
     return result;
   }
   fork(id:string,owner:string,name:string,projectId:string|null,remoteId:string|null,copyRequestId?:string):StudioSession {
