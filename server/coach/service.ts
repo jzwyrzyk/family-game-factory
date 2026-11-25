@@ -16,7 +16,8 @@ export interface CoachConfig {
 }
 export interface CoachReceipt extends PaidReceipt {hash:string;reply?:CoachReply}
 /** Bounded server reply cache: child conversation remains local to the browser. */
-export const COACH_RECEIPT_TTL_MS=15*60_000;
+export {COACH_RECEIPT_TTL_MS} from './receipts';
+import {COACH_RECEIPT_TTL_MS} from './receipts';
 export interface CoachProvider {complete(context:CoachContext,signal:AbortSignal):Promise<{reply:unknown;usedMicroUsd:number}>;readiness?(signal:AbortSignal):Promise<boolean>}
 export function validateCoachContext(input:any):CoachContext {
  if(!input||typeof input!=='object'||Object.keys(input).some(k=>!['message','mode','game','plan','rules','friction','helpLevel','support','conversation','observations','tests','creation'].includes(k))||typeof input.message!=='string'||input.message.length>2000||!['discuss','ideas','explain','reflect'].includes(input.mode)||typeof input.game!=='string'||input.game.length>120)throw Error('INVALID_REQUEST');

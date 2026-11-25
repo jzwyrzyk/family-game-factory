@@ -56,3 +56,18 @@ test('verified consent, current provider evidence and family policy are independ
  const authorized=await d.withFamily(a.id,async(_tx,f)=>f);assert.equal(deletionTarget(authorized,a.id,pending.request!.id),'beta-'+a.id);
  assert.throws(()=>deletionTarget(authorized,b.id,pending.request!.id));await assert.rejects(repo.snapshot());
 });
+
+test('scheduled reconciliation clears expired server coaching replies for an idle suspended family',async()=>{
+ const {reconcilePaidReceipts,COACH_RECEIPT_TTL_MS}=await import('../server/coach/receipts');
+ const {d,enroll,mutate}=await betaFixture(),family=await enroll('idle-retention'),repo=d.repository(family.id);
+ const now=Date.now();
+ await repo.transaction(s=>{
+  s.coachReceipts=[now-COACH_RECEIPT_TTL_MS-5000,now].map((at,i)=>({
+   familyId:family.id,at,id:'fixture-'+i,subject:'designer',hash:'opaque',state:'ready',reserved:0,month:'2026-11',reply:{text:'fixture'} as never
+  }));
+ });
+ await mutate('suspend',family.id);
+ await reconcilePaidReceipts(repo);
+ const receipts=(await repo.snapshot()).coachReceipts!;
+ assert.equal(receipts.length,2);assert.equal(receipts[0].reply,undefined);assert.equal(receipts[1].reply?.text,'fixture');
+});
