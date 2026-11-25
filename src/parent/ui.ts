@@ -1,3 +1,4 @@
+import {gradeLabel} from '../learning/grades';
 import './style.css';
 import { captureParentSnapshot, type ParentSnapshot } from './snapshot';
 import type { ParentEvidence, ParentOpportunity, ParentRange, ParentSkillRow, ParentSubjectId, ParentSubjectReport } from './model';
@@ -286,7 +287,7 @@ export function installParentDashboard() {
   }
   function skillCard(skill: ParentSkillRow) {
     const detail = node('details', 'pd-skill'); detail.dataset.parentSkill = skill.id;
-    const summary = node('summary', 'pd-skill-summary'); const title = node('div'); title.append(node('strong', '', skill.title), node('span', 'pd-fine', skill.grade ? `Grade ${skill.grade} content · ${number(skill.period.records)} records in this period` : `${number(skill.period.records)} records in this period`));
+    const summary = node('summary', 'pd-skill-summary'); const title = node('div'); title.append(node('strong', '', skill.title), node('span', 'pd-fine', skill.grade !== undefined ? `${gradeLabel(skill.grade)} content · ${number(skill.period.records)} records in this period` : `${number(skill.period.records)} records in this period`));
     summary.append(title, node('span', `pd-state pd-state-${skill.state}`, skill.stateLabel)); detail.append(summary);
     const body = node('div', 'pd-skill-detail'); body.append(node('p', '', skill.note));
     const counts = node('div', 'pd-detail-counts');

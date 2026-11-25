@@ -1,3 +1,4 @@
+import {gradeRank, isGrade, previousGrade, withinGrade, isEarlyGrade} from './grades';
 import { SKILLS, getSkill } from './curriculum';
 import { generateItem, evaluateAnswer, legacyFactItem } from './content';
 import type { Grade, LearnerProfile, LearningContext, MathItem, ProgressState, Representation, SelectionPurpose, SkillDefinition } from './types';
@@ -151,7 +152,7 @@ function emptyState(): LearningState {
     totals: { presentations: 0, submissions: 0, completed: 0, independent: 0, assisted: 0, skipped: 0, interrupted: 0, shown: 0 } };
 }
 export function profileGrade(profile: LearnerProfile): Grade {
-  if (typeof profile.grade === 'number' && [1, 2, 3, 4].includes(profile.grade)) return profile.grade;
+  if (isGrade(profile.grade)) return profile.grade;
   // Age, a character choice and game progress never establish school level.
   // An unconfigured or malformed profile starts at the supported entry grade.
   return 1;
@@ -230,7 +231,7 @@ export function evidenceState(summary: EvidenceSummary | undefined, fact = false
 
 export function beginAttempt(profile: LearnerProfile, item: MathItem, context: LearningContext = {}): Attempt {
   const now = stamp(context.now), state = ensureLearning(profile, now);
-  if (!validItem(item) || item.grade > profileGrade(profile)) throw new Error('This skill is outside the selected learning range or its activity is invalid.');
+  if (!validItem(item) || !withinGrade(item.grade, profileGrade(profile))) throw new Error('This skill is outside the selected learning range or its activity is invalid.');
   // A new activity closes unfinished work without losing its submitted errors.
   for (const prior of state.attempts.filter(a => a.outcome === 'open')) finishAttempt(profile, prior.id, 'interrupted', now);
   let id: string;
@@ -263,6 +264,7 @@ function observeError(summary: EvidenceSummary, item: MathItem, raw: string, now
 export function submitAnswer(profile: LearnerProfile, attemptId: string, raw: string, now = Date.now()) {
   now = stamp(now); const state = ensureLearning(profile, now), attempt = currentAttempt(profile, attemptId);
   if (attempt.outcome !== 'open') return { valid: false, correct: attempt.correct, attempt, message: 'This activity is already complete.' };
+  if (!withinGrade(attempt.item.grade, profileGrade(profile))) return {valid:false, correct:false, attempt, message:'This activity exceeds the current grade.'};
   if (attempt.answers.length >= 12) return { valid: false, correct: false, attempt, message: 'Let’s look at a worked example, then try a fresh activity.' };
   const checked = evaluateAnswer(attempt.item, String(raw).slice(0, 160));
   if (!checked.valid) return { ...checked, attempt };
@@ -382,8 +384,8 @@ function rootFocus(profile: LearnerProfile, available: SkillDefinition[]) {
   const matches = available.filter(s => focus === 'times8' || focus === 'mul' ? /multiply/.test(s.id)
     : focus === 'div' ? /divide/.test(s.id) : focus === 'add' ? /add|subtract|make-ten/.test(s.id) : false);
   if (matches.length) {
-    const highest = Math.max(...matches.map(s => s.grade));
-    return matches.filter(s => s.grade === highest);
+    const highest = Math.max(...matches.map(s => gradeRank(s.grade)));
+    return matches.filter(s => gradeRank(s.grade) === highest);
   }
   return available.filter(s => s.grade === profileGrade(profile));
 }
@@ -403,10 +405,10 @@ function selectSkill(candidates: SkillDefinition[], state: LearningState, random
 }
 export function selectItem(profile: LearnerProfile, context: LearningContext = {}): MathItem {
   const now = stamp(context.now), random = context.random || Math.random, state = ensureLearning(profile, now), grade = profileGrade(profile);
-  const available = SKILLS.filter(s => s.grade <= grade);
+  const available = SKILLS.filter(s => withinGrade(s.grade, grade) && (isEarlyGrade(grade) || !isEarlyGrade(s.grade) || profile.skillFocus?.includes(s.id)));
   if (!available.length) throw new Error('No reviewed learning activities are available.');
   const targets = (Array.isArray(profile.factTargets) ? profile.factTargets : [])
-    .map(fact => legacyFactItem(fact)).filter((q): q is MathItem => !!q && q.grade <= grade);
+    .map(fact => legacyFactItem(fact)).filter((q): q is MathItem => !!q && withinGrade(q.grade, grade));
   let focus = rootFocus(profile, available);
   if (targets.length) focus = available.filter(s => targets.some(q => q.skillId === s.id));
   else if (profile.focus === 'adaptive' && !profile.skillFocus?.some(id => available.some(s => s.id === id))) {
@@ -434,7 +436,7 @@ export function selectItem(profile: LearnerProfile, context: LearningContext = {
   if (purpose === 'review') {
     const dueFacts = Object.entries(state.facts).filter(([id, s]) => s.dueAt !== null && s.dueAt <= now && id !== state.recentFacts.at(-1))
       .sort((a, b) => (a[1].dueAt || 0) - (b[1].dueAt || 0));
-    target = dueFacts.map(([id]) => legacyFactItem(id)).find(q => q && q.grade <= grade);
+    target = dueFacts.map(([id]) => legacyFactItem(id)).find(q => q && withinGrade(q.grade, grade));
     const dueSkills = available.filter(s => state.skills[s.id]?.dueAt !== null && (state.skills[s.id]?.dueAt ?? Infinity) <= now);
     candidates = dueSkills.length ? dueSkills : available.filter(s => state.skills[s.id]?.presentations > 0);
     if (!candidates.length && !target) { purpose = 'readiness'; candidates = available.filter(s => s.grade === grade); }
@@ -442,14 +444,14 @@ export function selectItem(profile: LearnerProfile, context: LearningContext = {
   if (purpose === 'confidence') {
     const familiarFacts = Object.entries(state.facts)
       .filter(([id, s]) => id !== state.recentFacts.at(-1) && ['independent', 'remembered-later'].includes(evidenceState(s, true)))
-      .map(([id]) => legacyFactItem(id)).filter((q): q is MathItem => !!q && q.grade <= grade);
+      .map(([id]) => legacyFactItem(id)).filter((q): q is MathItem => !!q && withinGrade(q.grade, grade));
     if (familiarFacts.length) target = familiarFacts[Math.floor(randomUnit(random) * familiarFacts.length)];
     candidates = available.filter(s => ['independent', 'remembered-later'].includes(evidenceState(state.skills[s.id])));
     if (!candidates.length && !target) {
       // With no known-success history, use a supported prerequisite probe and label it honestly.
       const supporting = new Set(focus.flatMap(s => s.prerequisites));
       candidates = available.filter(s => supporting.has(s.id));
-      if (!candidates.length) candidates = available.filter(s => s.grade === Math.max(1, grade - 1));
+      if (!candidates.length) candidates = available.filter(s => s.grade === previousGrade(grade));
       purpose = 'readiness';
     }
   }
@@ -500,7 +502,7 @@ export function selectItem(profile: LearnerProfile, context: LearningContext = {
 
 export function report(profile: LearnerProfile, now = Date.now()): LearningReport {
   now = stamp(now); const state = ensureLearning(profile, now), grade = profileGrade(profile);
-  const skills: SkillReport[] = SKILLS.filter(s => s.grade <= grade).map(skill => {
+  const skills: SkillReport[] = SKILLS.filter(s => withinGrade(s.grade, grade) || state.skills[s.id]).map(skill => {
     const s = state.skills[skill.id], status = evidenceState(s);
     const patterns = (s?.patterns || []).filter(p => p.count >= 2 && p.itemKeys.length >= 2);
     return { id: skill.id, title: skill.title, grade: skill.grade, state: status, label: PROGRESS_LABELS[status],

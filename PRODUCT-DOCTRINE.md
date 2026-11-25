@@ -156,3 +156,7 @@ Routine operations must be automated through GitHub and scoped cloud identities 
 ## Changing this doctrine
 
 Update the affected principle and its linked detailed contract in the same PR as a material behavior change. Record a consequential choice and its source in [a decision record](docs/decisions/README.md). Distinguish an owner decision, a research hypothesis and an implementation observation. Automated maintenance may flag conflicts and stale evidence; it must not silently rewrite product intent or turn a proposal into an accepted decision.
+
+## Pre-K through Grade 4
+
+Parents explicitly select Pre-K, Kindergarten or Grades 1–4. Pre-K and Kindergarten use illustrated, audio-led play and local visual coding. Creating an AI game requires a grown-up handoff and separately authorized family processing. The child's selected grade sets a learning ceiling across subjects and Stretch. Reading access, game difficulty, adult access and provider permissions each retain their own controls.

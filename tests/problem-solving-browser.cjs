@@ -1,3 +1,4 @@
+const {authorizeLearningParent}=require('./learning-parent-fixture.cjs');
 /* Production-dist journeys. Explicit fixtures cover storage faults, checkpoint
  * pacing and a mocked narration transport/playback policy; no live provider. */
 const {chromium}=require('playwright');
@@ -156,6 +157,7 @@ async function narrationJourney(browser,url){
     // Set the older sibling's grade deliberately; fresh profiles now all start
     // at Grade 1. Leaving must still preserve the first learner's unfinished work.
     await pick(1);await parent();await activate('[data-parent-tab="settings"]');
+    await authorizeLearningParent(page);
     await page.selectOption('#parentGrade','3');await activate('#saveParent');
     assert.equal(await page.evaluate(()=>FG.store.current().grade),3);
     await activate('#studioNavProblemSolving');assert.equal(await page.locator('[data-ps-task="robot-stop-g3-4"]').count(),1);assert.equal((await saved()).length,0);

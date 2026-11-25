@@ -306,10 +306,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T00:47:28.656Z",
-      "sourceDigest": "073e73457b64f67b9150838658fc01771bdf34d0b72d420953c03a9abe4ef978",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The new private game-balance error uses the existing saved-game recovery surface. Navigation, child copy and availability for other audiences retain their existing contracts.",
+      "reviewedAt": "2026-11-25T04:07:53.482Z",
+      "sourceDigest": "fc00ce6bf65ce53211226a574dcdbd3f0532d2a8f07757af9f22910934a42a12",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed preview eligibility and parent authorization for grade-changing backups and resets in the foundational grade contract.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -493,10 +493,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "4fdd985c5da76076a57ebca31acd176b4afa822b46bd5b97b17fc2a0d428dce0",
-      "reviewedAt": "2026-11-23T05:43:13.311Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Inspected combined notebook chapter expansion and family backup with Notifications, selected helper evidence and pending request identity. New tests preserve exact native game bytes and reward provenance through restore/fork; earning policy, immutable receipts and explicit Keep authority are unchanged.",
+      "sourceDigest": "f15af69b31bfd284f39b6445eb53eff516a602bef7cac1202eb0aa27655f93e2",
+      "reviewedAt": "2026-11-25T04:07:53.901Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed preview eligibility and parent authorization for grade-changing backups and resets in the foundational grade contract.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -641,10 +641,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-21T20:28:20.947Z",
-      "sourceDigest": "7a29e1ae8b763657ea3002efad103c42cfc42f3d44e1d3c554920a4aa0597fdb",
+      "reviewedAt": "2026-11-25T01:20:39.496Z",
+      "sourceDigest": "ca72d267d454dca146d216ce8d9ab9b7a6f59e3a0ff15b1a6d77cc6caf6973d3",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated Math and Language integration and acceptance for explicit saved grade and learning difficulty, conservative missing values, visible profile setup and assistance-aware read-aloud.",
+      "reviewReason": "Parent verification applies to actual grade changes. Offline learning fixtures explicitly supply a synthetic authorized parent.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:05:30.649Z",
-      "sourceDigest": "645f0ae9add381b7f474b404ac928ef3ce845db3e32b6f34dde1f06ea35e6f41",
+      "reviewedAt": "2026-11-25T01:36:33.949Z",
+      "sourceDigest": "33cbcfd34d59bba078efe2a9328b8655dca33a343d25d2718afaf3aaf92b3fc6",
       "reviewOutcome": "updated",
-      "reviewReason": "Combined PR168’s premium unit and settlement coverage with the editor’s viewport, rendered-control and gesture acceptance. Both keep their existing CI command and release selection contracts.",
+      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1091,13 +1091,6 @@
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed the measured 550-second Mining dependency installation and preserved every visual assertion, viewport, capture and timeout while applying the hosted-verified Chromium-only setup pattern. The 99 CI contracts and workflow lint pass; new-source visual acceptance remains pending.",
           "sourceCommit": "daec8cf53ed0d0cd267943ed03722675e8bafd87"
-        },
-        {
-          "sourceCommit": "6a9532763da4ec986b03df1cbc6d0a4b614810fb",
-          "reviewedAt": "2026-11-25T00:47:29.942Z",
-          "sourceDigest": "9bf8fbce6f1bca385b1684d2895dcac69d78f6212e1d20e24244f3e4b4de14ea",
-          "reviewOutcome": "unchanged",
-          "reviewReason": "Existing premium and unit commands cover concurrent fork edits, actual settlement across revisions, pass-sized art and repair holds, and conservative unknown usage. CI selection and release evidence rules stay in place."
         }
       ]
     },
@@ -1494,10 +1487,10 @@
         "tests/parent-dashboard*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "21cbc0fa874ca9cd7f833db2b5f756cbe41d49c349937372c3d04f5f7015c2e8",
-      "reviewedAt": "2026-11-23T03:35:24.321Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Only the synthetic parent-dashboard fixture date moved from 29 to 28 days before now so the oldest sample remains within the documented inclusive 30-local-calendar-day window at UTC midnight. Parent report source, filter semantics, evidence labels and limitations are unchanged.",
+      "sourceDigest": "a8f550a9ef223282e87d3002facf0e6608bb5f6bcfa27d9058ffd7556cc54990",
+      "reviewedAt": "2026-11-25T01:00:58.822Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the six-grade parent selection, eligibility, reporting, backup guard and backward compatibility against the early learning decision.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-19T17:17:56.552Z",
@@ -1521,10 +1514,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "935acd09f28ffa7ac9ba0d8c7b1c30154fd0834b6ca6266cdfd9b137d9ced184",
-      "reviewedAt": "2026-11-22T18:41:05.064Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the browser Parent helper using the visible My Games exit from a fitted coding scene. Trusted source observations, assistance attribution and parent evidence assertions remain unchanged.",
+      "sourceDigest": "131112bdd156f599674b42b406109871c4a0cd428db58a4a618071f86967fb55",
+      "reviewedAt": "2026-11-25T01:20:39.636Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Parent verification applies to actual grade changes. Offline learning fixtures explicitly supply a synthetic authorized parent.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
