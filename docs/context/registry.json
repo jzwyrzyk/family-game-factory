@@ -678,10 +678,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-24T23:59:22.620Z",
-      "sourceDigest": "936bf31f2f8b83a97f4024dd192823086e275590d934f75c26d33370ebe2deb4",
+      "reviewedAt": "2026-11-25T00:19:20.069Z",
+      "sourceDigest": "29546fd758deda3a8887a8f61f5b7da02fcda6b27505b29bf68d6714dc2fdf3a",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented guardian-only exports, controlled erasure executor, IAP administration, privacy evidence and grant revalidation at preview delivery.",
+      "reviewReason": "Document consent withdrawal settlement inside the per-family transaction and preserve the private inference packaging boundary.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -827,10 +827,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "3052a17ba846065820afce8aab2d958686a5cb790632da770011cf2f61f17bd4",
-      "reviewedAt": "2026-11-24T23:59:23.350Z",
+      "sourceDigest": "5d7f2eb9952e436f6dbd8f4415e06ce9df079e7f32d5b4ef80d42b38d08cf4e6",
+      "reviewedAt": "2026-11-25T00:19:20.180Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented current provider requirements and immediate withdrawal or replacement of consent, verified family export and erasure.",
+      "reviewReason": "Keep consent updates, cancellation and restricted export procedures covered by the owner guide and privacy data-flow review.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
