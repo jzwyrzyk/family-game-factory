@@ -9,6 +9,10 @@
 import type {FunctionalGameContract,FunctionalCheckpoint,GameObservation} from './functional-game-contract';
 import {QUALITY_AXES,QUALITY_FINDINGS,type QualityAxis,type QualityFinding,type QualityStatus} from './game-quality';
 
+export function needsAssetRepair(feedback:string):boolean {
+ return /\b(?:VISUAL_INCOHERENT_ART|VISUAL_PLACEHOLDER_APPEARANCE)\b/.test(feedback);
+}
+
 export type RepairCategory=
   'intent-missing'|'input-unresponsive'|'runtime-failed'|
   'replay-failed'|'syntax-invalid'|'limits-failed'|'test-unverified'|

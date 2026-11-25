@@ -82,7 +82,7 @@ const stylePatterns:Array<[VisualStyle,RegExp]>=[
  ['dimensional',/\b(?:2\.5d|isometric|clay(?:[- ]style)?|diorama|dimensional\s+(?:art|style|look|design)|3d[- ]looking)\b/gi],
  ['realistic',/\b(?:photorealistic|photo[- ]realistic|realistic(?:[- ]art|[- ]look|[- ]style|[- ]visuals)?|lifelike)\b/gi]
 ];
-export function presentationBrief(input:AgentInput):PresentationBrief {
+export function presentationBrief(input:Pick<AgentInput,'baseRevision'|'childIntent'>):PresentationBrief {
  if(typeof input.childIntent!=='string'||!input.childIntent.trim()||input.childIntent.length>4000)throw Error('PRODUCTION_PLAN_INVALID');
  const hits:Array<{style:VisualStyle;quote:string;index:number}>=[];
  for(const [style,pattern]of stylePatterns){
@@ -122,7 +122,7 @@ export function presentationBrief(input:AgentInput):PresentationBrief {
  * allowance to redraw an approved world during an unrelated rules change.
  * Unusual art requests remain in the literal idea and may fail explicitly;
  * this heuristic is not a claim of universal natural-language understanding. */
-export function permitsNewArt(input:AgentInput):boolean {
+export function permitsNewArt(input:Pick<AgentInput,'baseRevision'|'childIntent'>):boolean {
  const game=input.baseRevision.game;
  if(!game||!('assets'in game)||!game.assets||validateAssetPack(game.assets).assets.length===0)return true;
  const brief=presentationBrief(input),savedStyle=validateAssetPack(game.assets).style;
