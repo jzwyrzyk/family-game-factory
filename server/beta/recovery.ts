@@ -3,7 +3,7 @@ import {ContinuityService,DocumentContinuityRepository} from '../storage/continu
 import {RecoveryPoints} from '../storage/recovery-points';
 import {RecoveryScheduler,type BackupScheduleLedger} from '../storage/recovery-scheduler';
 import {readCloudRecovery,BACKUP_DOMAINS} from '../../src/storage/cloud-recovery';
-import {activeFamily,participationNotice,familyOrigin} from './model';
+import {activeFamily,participationNotice,betaNotice,familyOrigin} from './model';
 import type {FamilyDirectory} from './store';
 import type {Documents} from './documents';
 import {GcsPrivateArtifacts} from '../storage/artifacts';
@@ -21,8 +21,8 @@ export function cloudBackupSchedule(d:FamilyDirectory):BackupSchedule {
  * not authorize a snapshot. Every read/write transaction rechecks these grants. */
 export async function authorizeScheduledRecovery(d:FamilyDirectory,tx:Documents,id:string,profile:string){
  const f=await d.family(tx,id),policy=await d.policy(tx);activeFamily(f,policy);const config=d.config.continuity;
- const grant=await tx.get<{version:number;notice:string;participation:string;guardian:string;profiles:string[];domains:string[];revokedAt?:number}>(d.path(id)+'/continuity/authorization');
- if(!cloudBackupSchedule(d).enabled||!config?.enabled||f.request?.kind==='deletion'||!f.profiles?.includes(profile)||!grant||grant.version!==1||grant.notice!==config.notice||grant.participation!==participationNotice||grant.guardian!==f.guardian.id||grant.revokedAt!==undefined||!grant.profiles.includes(profile)||f.profiles.some(owner=>!grant.profiles.includes(owner))||BACKUP_DOMAINS.some(domain=>!config.domains.includes(domain)||!f.storageDomains?.includes(domain)||!grant.domains.includes(domain)))throw Error('BACKUP_SCHEDULE_DENIED');
+ const grant=await tx.get<{version:number;notice:string;participation:string;guardianNotice:string;renewedAt:number;guardian:string;profiles:string[];domains:string[];revokedAt?:number}>(d.path(id)+'/continuity/authorization');
+ if(!cloudBackupSchedule(d).enabled||!config?.enabled||f.request?.kind==='deletion'||!f.profiles?.includes(profile)||!grant||grant.version!==1||grant.notice!==config.notice||grant.participation!==participationNotice||grant.guardianNotice!==betaNotice||grant.renewedAt!==((f.guardian as {participationRenewedAt?:number}).participationRenewedAt??0)||grant.guardian!==f.guardian.id||grant.revokedAt!==undefined||!grant.profiles.includes(profile)||f.profiles.some(owner=>!grant.profiles.includes(owner))||BACKUP_DOMAINS.some(domain=>!config.domains.includes(domain)||!f.storageDomains?.includes(domain)||!grant.domains.includes(domain)))throw Error('BACKUP_SCHEDULE_DENIED');
  return {family:f,grant};
 }
 /** Bounded scanner of already authorized COMPLETE cloud copies. It never reads

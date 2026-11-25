@@ -1,4 +1,4 @@
-import {recoveryHash,validateRecoveryArchive,type RecoveryArchive,type RecoveryScope} from './recovery-vault';
+import {recoveryHash,validateRecoveryArchive,type RecoveryArchive,type RecoveryScope} from './recovery-format';
 import {assertRecordValue,operationFingerprint,type DurableRecord,type RecordOperation,type RecordReceipt} from './record-contract';
 export const BACKUP_DOMAINS=['profiles','games','creative','learning','artwork','conversation','rewards','notifications','backups'] as const;
 export interface CloudRecoveryTransport {
