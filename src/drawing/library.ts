@@ -101,7 +101,10 @@ export async function artDatabase(): Promise<IDBDatabase> {
     const cursor=request.transaction!.objectStore('drawings').openCursor();
     cursor.onsuccess=()=>{if(cursor.result){saveDrawingMetadata(request.transaction!,cursor.result.value);cursor.result.continue();}};
   };
-  const database = await artRequest(request);
+  const database = await new Promise<IDBDatabase>((resolve,reject)=>{
+    let blocked=false;request.onblocked=()=>{blocked=true;reject(Error('Close another open Jems tab, then reopen your artwork. Your original pictures are safe.'));};
+    request.onerror=()=>reject(request.error);request.onsuccess=()=>{if(blocked)request.result.close();else resolve(request.result);};
+  });
   database.onversionchange = () => database.close();
   try {
     if (!migration) migration = migrateLegacy(database).catch(error => { migration = undefined; throw error; });
@@ -142,13 +145,13 @@ export async function registerArtUsage(owner: string, input: Omit<ArtUsage, 'id'
 export async function releaseArtUsage(owner: string, targetId: string, guard?: ArtGuard) {
   assertArtWrite(owner, guard);
   return withArtTransaction(['usage'], 'readwrite', async transaction => {
-    const store = transaction.objectStore('usage'), all = await artRequest(store.getAll()) as ArtUsage[];
+    const store = transaction.objectStore('usage'), all = await ownerArtRecords<ArtUsage>(transaction,'usage',owner);
     assertArtWrite(owner, guard); for (const item of all) if (item.owner === owner && item.targetId === targetId) store.delete(item.id);
   });
 }
 /** Read the source histories as authority. A valid workspace can disprove an
  * obsolete index receipt; unavailable/corrupt source evidence cannot do so. */
-export function deriveArtUsages(owner: string, originals: Drawing[], rigs: SavedRig[], indexed: ArtUsage[]): ArtUsage[] {
+export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'owner'|'sha256'>[], rigs: SavedRig[], indexed: ArtUsage[]): ArtUsage[] {
   const result = new Map<string, ArtUsage>(), known = new Set<ArtUsage['targetKind']>();
   const images = new Map(originals.filter(item => item.owner === owner).map(item => [item.id, item]));
   const versions = new Map(rigs.filter(item => item.owner === owner).map(item => [item.id, item]));
@@ -189,10 +192,10 @@ export function deriveArtUsages(owner: string, originals: Drawing[], rigs: Saved
 }
 export async function artUsages(owner: string, drawingId?: string): Promise<ArtUsage[]> {
   artOwner(owner);
-  return withArtTransaction(['usage', 'drawings', 'rigs'], 'readonly', async transaction => {
-    const indexed = await artRequest(transaction.objectStore('usage').getAll()) as ArtUsage[];
-    const originals = await artRequest(transaction.objectStore('drawings').getAll()) as Drawing[];
-    const rigs = await artRequest(transaction.objectStore('rigs').getAll()) as SavedRig[];
+  return withArtTransaction(['usage', 'drawingMetadata', 'rigs'], 'readonly', async transaction => {
+    const indexed = await ownerArtRecords<ArtUsage>(transaction,'usage',owner);
+    const originals = await ownerArtRecords<DrawingMetadata>(transaction,'drawingMetadata',owner);
+    const rigs = await ownerArtRecords<SavedRig>(transaction,'rigs',owner);
     return deriveArtUsages(owner, originals, rigs, indexed).filter(item => !drawingId || item.drawingId === drawingId);
   });
 }

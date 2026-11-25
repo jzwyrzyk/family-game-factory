@@ -35,6 +35,7 @@ export async function initLiveRemix() {
   let store:NativeWorkspace;
   const owner=()=>String(FG.store.current().id);
   try{store=await NativeWorkspace.open(profileStorage(localStorage),owner);}catch(err){$('liveStatus').textContent=`Could not open your remix workspace: ${(err as Error).message} Your data has not been replaced. Original games still work.`;host.querySelectorAll('button,input,select').forEach(el=>(el as HTMLButtonElement).disabled=true);return;}
+  let projectAfter:string|null=null,historyAfter:string|null=null;
   let active:string|null=null,pending:Extract<Intent,{kind:'supported'}>|null=null, pendingPrompt='';
   let currentPlay:{game:GameId;stateKey:string;config:Mechanics;owner:string}|null=null;
   const coach=new DesignCoach();
@@ -60,17 +61,20 @@ export async function initLiveRemix() {
     for(const m of playableMechanics(p.game,current.config)){const row=document.createElement('tr');[m.label,display(m.key,chosen.config[m.key]),display(m.key,current.config[m.key])].forEach(t=>{const cell=document.createElement('td');cell.textContent=t;row.append(cell)});body.append(row);}
   }
   async function renderCollection(){
-    const box=$('savedRemixes');box.replaceChildren();const projects=await store.list(owner());
-    if(!projects.length)box.textContent='Try Live Remix to save your first playable version.';
-    projects.forEach(p=>{const button=document.createElement('button');button.className='btn secondary';setIconLabel(button,'play',p.name);button.onclick=()=>guarded(async()=>{active=p.id;coach.reset();clearPending();await render();FG.app.page('feedback');});box.append(button);});
+    const box=$('savedRemixes');box.replaceChildren();const page=await store.page(owner());
+    if(!page.items.length)box.textContent='Try Live Remix to save your first playable version.';
+    const append=(projects:typeof page.items)=>projects.forEach(p=>{const button=document.createElement('button');button.className='btn secondary';setIconLabel(button,'play',p.name);button.onclick=()=>guarded(async()=>{active=p.id;coach.reset();clearPending();await render();FG.app.page('feedback');});box.append(button);});
+    append(page.items);let after=page.next;
+    if(after){const more=document.createElement('button');more.id='liveMoreGames';more.className='btn secondary';more.textContent='Show more games';box.append(more);more.onclick=()=>guarded(async()=>{if(!after)return;more.disabled=true;const next=await store.page(owner(),after);more.remove();append(next.items);after=next.next;if(after){more.disabled=false;box.append(more);}});}
   }
   async function render(){
-    const projects=await store.list(owner());if(!projects.some(p=>p.id===active))active=projects.at(-1)?.id||null;
-    $('liveProjects').replaceChildren(...projects.map(p=>option(p.id,p.name)));$<HTMLSelectElement>('liveProjects').value=active||'';$<HTMLSelectElement>('liveProjects').disabled=!projects.length;$('liveEditor').hidden=!active;
+    const page=await store.page(owner()),projects=page.items;projectAfter=page.next;if(active&&!projects.some(p=>p.id===active)){try{projects.push(await store.project(active,owner()));}catch{active=null;}}if(!active)active=projects.at(-1)?.id||null;
+    $('liveProjects').replaceChildren(...projects.map(p=>option(p.id,p.name)),...(projectAfter?[option('__more__','More saved games…')]:[]));$<HTMLSelectElement>('liveProjects').value=active||'';$<HTMLSelectElement>('liveProjects').disabled=!projects.length;$('liveEditor').hidden=!active;
     await renderCollection();if(!active)return;
-    const p=(await project()),r=(await revision()),history=await store.history(p.id,owner());$('liveName').textContent=p.name;$('liveVersion').textContent=`${manifests[p.game].name} · version ${history.findIndex(x=>x.id===r.id)+1} · Saved on this device. Learning settings stay the same.`;
+    const p=(await project()),r=(await revision()),historyPage=await store.historyPage(p.id,owner()),history=historyPage.items;historyAfter=historyPage.next;if(!history.some(item=>item.id===r.id))history.push(r);if(r.parentId&&!history.some(item=>item.id===r.parentId))history.push(await store.revision(p.id,owner(),r.parentId));$('liveName').textContent=p.name;$('liveVersion').textContent=`${manifests[p.game].name} · ${store.indexed?'Saved version':'version '+(history.findIndex(x=>x.id===r.id)+1)} · Saved on this device. Learning settings stay the same.`;
     $('liveMechanics').replaceChildren(...playableMechanics(p.game,r.config).map(m=>{const card=document.createElement('div');card.className='stat';card.textContent=`${m.label}: ${display(m.key,r.config[m.key])}`;return card;}));
     $<HTMLButtonElement>('liveUndo').disabled=!r.parentId;const redo=$<HTMLButtonElement>('liveRedo');if(redo)redo.disabled=!history.some(x=>x.parentId===r.id);$('compareVersion').replaceChildren(...history.map((rev,i)=>option(rev.id,`Version ${i+1}: ${rev.label}`)));$<HTMLSelectElement>('compareVersion').value=r.parentId||r.id;
+    let more=$<HTMLButtonElement>('liveMoreVersions');if(!more){more=document.createElement('button');more.id='liveMoreVersions';more.className='btn secondary';more.textContent='More saved versions';$('compareVersion').after(more);}more.hidden=!historyAfter;more.onclick=()=>guarded(async()=>{if(!historyAfter)return;const next=await store.historyPage(p.id,owner(),historyAfter);for(const revision of next.items)if(!Array.from($<HTMLSelectElement>('compareVersion').options).some(item=>item.value===revision.id))$('compareVersion').append(option(revision.id,revision.label));historyAfter=next.next;more.hidden=!historyAfter;});
     $('liveExamples').replaceChildren(...examples[p.game].map(example=>{const button=document.createElement('button');button.type='button';button.className='text-btn';button.textContent=example;button.onclick=()=>{clearPending();$<HTMLInputElement>('livePrompt').value=example;$('livePrompt').focus()};return button;}));
     $<HTMLInputElement>('livePrompt').placeholder=examples[p.game][0]||'Describe your game idea';await renderComparison();renderCoach();
   }
@@ -81,7 +85,7 @@ export async function initLiveRemix() {
     })});
   }
   $('newLiveGame').onclick=()=>guarded(async()=>{const game=value('liveGame') as GameId;const p=await withBuildCopy('original-'+game,async id=>await store.create(owner(),game,`My ${manifests[game].name}`,defaults(game,FG.store.current().remixes?.[game]||'classic'),id));active=p.id;coach.reset();clearPending();await render();$('liveStatus').textContent='Your starting version is saved. Play it, then try a change!';});
-  $('liveProjects').onchange=()=>guarded(async()=>{active=value('liveProjects');coach.reset();clearPending();await render();});
+  $('liveProjects').onchange=()=>guarded(async()=>{if(value('liveProjects')==='__more__'){const next=await store.page(owner(),projectAfter);$('liveProjects').querySelector('option[value=__more__]')?.remove();for(const project of next.items)if(!Array.from($<HTMLSelectElement>('liveProjects').options).some(item=>item.value===project.id))$('liveProjects').append(option(project.id,project.name));projectAfter=next.next;if(projectAfter)$('liveProjects').append(option('__more__','More saved games…'));$<HTMLSelectElement>('liveProjects').value=active??'';return;}active=value('liveProjects');coach.reset();clearPending();await render();});
   $('liveKeep').onclick=()=>guarded(async()=>{await store.keep((await project()).id,owner());$('liveStatus').textContent='Kept! This version is pinned in your private remix history.';});
   $('livePlay').onclick=()=>guarded(async()=>play((await revision())));
   $('livePromptForm').onsubmit=e=>{e.preventDefault();guarded(async()=>{clearPending();const p=(await project()),r=(await revision()),prompt=value('livePrompt');const mathRequest=interpretLearningRequest(prompt,FG.learning.subject);if(mathRequest){if(mathRequest.kind==='required')$('liveIntent').textContent=mathRequest.message;else{FG.learning.setMode(p.id,mathRequest.mode);$('liveIntent').textContent='Learning format: '+learningFormatLabel(FG.learning.subject,mathRequest.mode)+'. Your learning history stays with you.';}return;}const intent=interpret(p.game,r.config,prompt);pendingPrompt=prompt;
@@ -107,8 +111,8 @@ export async function initLiveRemix() {
     const detail=(event as CustomEvent<{game:GameId;prompt?:string}>).detail;if(!detail||!isGameId(detail.game))return;
     const source=currentPlay?.game===detail.game&&currentPlay.owner===owner()?currentPlay:null;
     FG.app.page('feedback'); // Unmount first so the last ride/build state is flushed.
-    const known=await store.list(owner());const existing=source&&(await store.snapshot()).revisions.find(r=>r.id===source.stateKey&&known.some(p=>p.id===r.projectId));
-    if(existing){active=existing.projectId;await store.checkout(active,owner(),existing.id);}
+    const existing=source?await store.projectForRevision(source.stateKey):null;
+    if(existing){active=existing.id;await store.checkout(active,owner(),source!.stateKey);}
     else{const config=source?.config||defaults(detail.game,FG.store.current().remixes?.[detail.game]||'classic');const p=await withBuildCopy(source?.stateKey||'original-'+detail.game,async id=>await store.create(owner(),detail.game,`My ${manifests[detail.game].name}`,config,id));active=p.id;}
     coach.reset();clearPending();await render();$<HTMLInputElement>('livePrompt').value=detail.prompt||'';
     $('liveStatus').textContent='Your game and build are ready for an experiment. Try a change, compare it, then Keep your favourite.';

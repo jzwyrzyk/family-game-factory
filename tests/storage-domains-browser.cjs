@@ -31,6 +31,10 @@ const {build}=require('esbuild'),{chromium,webkit}=require('playwright');
    const configRows=await store.records.page('native-configs');if(configRows.length!==3)throw Error('unchanged mechanics duplicated');
    if((await store.records.pending()).length!==2)throw Error('native migration or editing enqueued private data');
    const capture=await store.snapshot();if(capture.projects.some(p=>p.owner!=='player1')||capture.revisions.length!==12)throw Error('full capture incomplete');
+   const exactId=crypto.randomUUID(),exact=await store.commit(dragon.id,domainTest.defaults('dragon'),'Preserve runtime identity','',dragon.headId,exactId);if(exact.id!==exactId)throw Error('caller revision id lost');
+   const forkId=crypto.randomUUID(),exactFork=await store.fork(dragon.id,'Exact copy',exact.id,{revisionId:forkId,expectedHeadId:exact.id});if(exactFork.headId!==forkId)throw Error('copy runtime identity lost');
+   await store.restoreSnapshot(capture,'reviewed-restore');if((await store.revision(dragon.id)).id!==dragon.headId)throw Error('reviewed pointer not restored');if(!(await store.snapshot()).revisions.some(r=>r.id===exactId))throw Error('restore deleted newer original');
+   const corrupt=structuredClone(capture);corrupt.revisions.find(r=>r.projectId===source.id).label='Conflicting immutable identity';const protectedHead=(await store.project(source.id)).headId;await expect(()=>store.restoreSnapshot(corrupt,'conflicting-restore'),'immutable content overwritten');if((await store.project(source.id)).headId!==protectedHead)throw Error('failed restore changed pointer');
    await expect(()=>store.migrateLegacy(raw+' '),'changed migration accepted');store.close();checks.push('resumable native authority, bounded reads, config reuse, CAS, Keep/Undo/Fork');
    const other=await domainTest.IndexedNativeStore.open({family:'other-family',profile:'player1'},()=>{});await expect(()=>other.project(source.id),'cross-family game read');other.close();
    // Real original records remain byte-for-byte inline; page only lightweight cards.

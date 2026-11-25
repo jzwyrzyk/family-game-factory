@@ -22,8 +22,19 @@ export class IndexedRecords {
  }
  close(){this.db.close();}
  async commit(operation:RecordOperation,options:{enqueue?:boolean}={}):Promise<RecordReceipt>{
-  const op=structuredClone(operation),fingerprint=await operationFingerprint(op);this.assertAuthorized();
-  if(scopeKey(op.scope)!==scopeKey(this.scope))throw Error('STORAGE_SCOPE_DENIED');
+  const op=structuredClone(operation),fingerprint=await operationFingerprint(op);return this.commitVerified(op,fingerprint,options.enqueue!==false);
+ }
+ /** Explicit bounded local recovery batch. This never populates the remote
+  * outbox and retains every previous version in immutable history. */
+ async restoreLocal(operation:RecordOperation):Promise<RecordReceipt>{
+  const op=structuredClone(operation);this.assertAuthorized();
+  if(!Array.isArray(op.changes)||op.changes.length<1||op.changes.length>5000||new Set(op.changes.map(c=>JSON.stringify([c.collection,c.id]))).size!==op.changes.length||new TextEncoder().encode(JSON.stringify(op)).length>32*1024*1024)throw Error('STORAGE_RECOVERY_CAPACITY');
+  const parts:string[]=[];for(let i=0;i<op.changes.length;i+=50)parts.push(await operationFingerprint({...op,changes:op.changes.slice(i,i+50)}));
+  const fingerprint=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(parts.join(':'))))].map(b=>b.toString(16).padStart(2,'0')).join('');
+  return this.commitVerified(op,fingerprint,false);
+ }
+ private commitVerified(op:RecordOperation,fingerprint:string,enqueue:boolean):Promise<RecordReceipt>{
+  this.assertAuthorized();if(scopeKey(op.scope)!==scopeKey(this.scope))throw Error('STORAGE_SCOPE_DENIED');
   return new Promise((resolve,reject)=>{
    const tx=this.db.transaction(['records','history','receipts','outbox','pending','meta'],'readwrite'),records=tx.objectStore('records'),receipts=tx.objectStore('receipts');
    let result:RecordReceipt,failed:unknown;
@@ -39,9 +50,9 @@ export class IndexedRecords {
        result={operation:op.id,fingerprint,versions:[]};
        for(const change of op.changes){const k=recordKey(this.scope,change.collection,change.id),version=change.expectedVersion+1;
         const record:DurableRecord={id:change.id,collection:change.collection,version,value:change.value,deleted:change.deleted??false};
-        records.put(record,k);if(options.enqueue!==false)tx.objectStore('pending').put(op.id,k);tx.objectStore('history').add(record,JSON.stringify([k,version]));result.versions.push({id:change.id,collection:change.collection,version});
+        records.put(record,k);if(enqueue)tx.objectStore('pending').put(op.id,k);tx.objectStore('history').add(record,JSON.stringify([k,version]));result.versions.push({id:change.id,collection:change.collection,version});
        }
-       receipts.add(result,receiptKey);if(options.enqueue!==false){const sequence=tx.objectStore('meta').get('sequence');sequence.onsuccess=()=>{try{this.assertAuthorized();const next=(sequence.result??0)+1;if(!Number.isSafeInteger(next))throw Error('STORAGE_SEQUENCE_EXHAUSTED');tx.objectStore('meta').put(next,'sequence');tx.objectStore('outbox').add({...op,queueScope:scopeKey(this.scope),queueSequence:next},receiptKey);}catch(e){abort(e);}};}
+       receipts.add(result,receiptKey);if(enqueue){const sequence=tx.objectStore('meta').get('sequence');sequence.onsuccess=()=>{try{this.assertAuthorized();const next=(sequence.result??0)+1;if(!Number.isSafeInteger(next))throw Error('STORAGE_SEQUENCE_EXHAUSTED');tx.objectStore('meta').put(next,'sequence');tx.objectStore('outbox').add({...op,queueScope:scopeKey(this.scope),queueSequence:next},receiptKey);}catch(e){abort(e);}};}
       }catch(e){abort(e);}
      };}
     }catch(e){abort(e);}
@@ -75,6 +86,8 @@ export class IndexedRecords {
    tx.oncomplete=()=>resolve(values);tx.onabort=()=>reject(tx.error);tx.onerror=()=>{};
   });
  }
+ async hasPending(collection:string,id:string):Promise<boolean>{if(!recordId(collection)||!recordId(id))throw Error('STORAGE_RECORD_INVALID');return !!await this.readValue('pending',recordKey(this.scope,collection,id));}
+ async receipt(id:string):Promise<RecordReceipt|null>{if(!recordId(id))throw Error('STORAGE_RECORD_INVALID');return this.readValue('receipts',JSON.stringify([scopeKey(this.scope),id]));}
  async getSyncCursor():Promise<string>{return await this.readValue('meta','cursor:'+scopeKey(this.scope))??'';}
  setSyncCursor(expected:string,next:string):Promise<void>{
   this.assertAuthorized();if(typeof expected!=='string'||typeof next!=='string'||expected.length>1024||next.length>1024)throw Error('STORAGE_CURSOR_INVALID');

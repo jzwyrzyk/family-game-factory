@@ -81,13 +81,13 @@ export async function drawing(owner: string, id: string): Promise<Drawing> {
 export async function saveDrawing(owner: string, name: string, file: Blob, sourceId?: string, guard?: ArtGuard): Promise<Drawing> {
   assertArtWrite(owner, guard); const item = await prepareDrawing(owner, name, file); assertArtWrite(owner, guard);
   return withArtTransaction(['drawings'], 'readwrite', async transaction => {
-    const store = transaction.objectStore('drawings'), all = await artRequest(store.getAll()) as Drawing[];
+    const store = transaction.objectStore('drawings'), metadata=await artRequest(transaction.objectStore('drawingMetadata').getAll()) as DrawingMetadata[];
     if (sourceId) {
-      const source = all.find(original => original.owner === owner && original.id === sourceId);
+      const source = metadata.find(original => original.owner === owner && original.id === sourceId);
       if (!source) throw Error('Original drawing not found in this profile.');
       item.sourceId = sourceId; item.sourceSha256 = source.sha256; item.category = source.category || 'other';
     }
-    checkArtCapacity([...all, item]); assertArtWrite(owner, guard); store.add(item); saveDrawingMetadata(transaction,item); return item;
+    if(metadata.filter(original=>original.owner===owner).length>=ART_LIMITS.drawingsPerOwner||metadata.reduce((bytes,original)=>bytes+original.originalBytes+(original.preview?.byteLength??0),0)+item.bytes.byteLength+(item.preview?.byteLength??0)>ART_LIMITS.storageBytes)throw Error('Your art storage is full. Keep a complete backup before adding more pictures.'); assertArtWrite(owner, guard); store.add(item); saveDrawingMetadata(transaction,item); return item;
   });
 }
 export async function updateDrawing(owner: string, id: string, changes: { name?: string; category?: DrawingCategory; archived?: boolean }, guard?: ArtGuard): Promise<Drawing> {
