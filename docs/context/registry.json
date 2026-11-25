@@ -146,10 +146,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:23:35.324Z",
-      "sourceDigest": "c0af8b5189a1f9c6e2318733cac705263c0bcd768b3ccebf239ee92c3a934914",
+      "reviewedAt": "2026-11-25T23:29:02.401Z",
+      "sourceDigest": "79e9842fb80352579fc9b967a0d1f48db36a41d3414b2df6e6c34f7921646967",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the mobile Powers activity navigation exception and uniform section header geometry.",
+      "reviewReason": "The child doctrine now specifies small-phone starter reach and accessible contrast on secondary pages.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -310,10 +310,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:52.972Z",
-      "sourceDigest": "04f4d94d41c32ff5babd32f33f6ff0207f52588bc497ec26d8ace84847a9eda8",
+      "reviewedAt": "2026-11-25T23:28:28.349Z",
+      "sourceDigest": "f4344e9174fbac6de912f2d6a7ed0fefc46893dbb0acc5ebd3b5ed1312d63395",
       "reviewOutcome": "updated",
-      "reviewReason": "The child interface contract describes shared headers, route announcements and exceptions. The homepage contract specifies the illustrated card hierarchy and mobile reflow.",
+      "reviewReason": "The shared header and phone starter rows are documented in the child interface doctrine. Reviewed Notifications contrast and Powers mobile navigation placement.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -681,10 +681,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:55.205Z",
-      "sourceDigest": "29d09d458b9fd3ad5800a4bf62ffb329f138f7c77a4f2dc74ff385a2d71d6d1f",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The existing artifact and recovery read boundaries validate historical identities. No API endpoints, authorization or credential boundaries change.",
+      "reviewedAt": "2026-11-25T23:28:29.105Z",
+      "sourceDigest": "ca7b341e9de009c700ec5b750b52d88705543bbb56fe2f4833bd1dc2dfd64a33",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented and packaged the shared immutable historical scene metadata for gateway, preview and family gateway consumers.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -891,10 +891,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:23:36.367Z",
-      "sourceDigest": "7d0c9a487cba3caa14464fe2d87ad25ab90ad801aae534c70ab34acab4235048",
+      "reviewedAt": "2026-11-25T23:28:29.508Z",
+      "sourceDigest": "460a8ffcc6b9a4d964bf947a6747c0a3ddce5b44359f365ccf4fa6e864bb50ce",
       "reviewOutcome": "updated",
-      "reviewReason": "Compared section-relative spacing and actual viewport sizes, and checked real route, modal, refresh and keyboard focus in the sandbox and application.",
+      "reviewReason": "The matched-viewport browser suite now verifies both starter actions fit on phones, and archive tests explicitly enumerate the reviewed files.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1135,10 +1135,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T23:20:57.755Z",
-      "sourceDigest": "9dbe059f6509701d8beeac8a58c62ca9be07e6f26213f48eba5f4d72faedc96f",
+      "reviewedAt": "2026-11-25T23:28:30.109Z",
+      "sourceDigest": "697887e258cfc6b4b10fff22b72920b387ef4de706c6503524e73be717535fd8",
       "reviewOutcome": "updated",
-      "reviewReason": "Delivery state identifies the latest merged family and storage base, the overlapping child UI candidate and the existing release gates.",
+      "reviewReason": "Protected image builds track the historical JSON dependency and check the same scoped publication archive; DEV, TEST and production gates are retained.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1662,10 +1662,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "284586f22f0a8ac896315ede781b4ff271071cd4596a368240f6240b5c8f23e1",
-      "reviewedAt": "2026-11-25T23:23:37.875Z",
+      "sourceDigest": "3d1d93cbf5304439f38ed80460b5c3fa6dd4640ad1e4de48df9151ff2941e2f9",
+      "reviewedAt": "2026-11-25T23:28:30.573Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The updated browser journey verifies both free starter choices, preserved equipped progress after reload and the empty-state heading.",
+      "reviewReason": "Both original starter illustrations and selection buttons fit in two compact rows on the phone; the two-form inventory and migration contract still apply.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",

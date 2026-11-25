@@ -83,3 +83,5 @@ timeout. Final browser and combined-source evidence is recorded separately in
 `DELIVERY-STATE.md`.
 
 The active picker uses 44 Base/Grown neutrals. Four older neutral files render only when an existing scene pins them. Both paths use the original image proportions and shared alpha preparation. The generation schema enumerates the active assets. [Saved-game contract](../decisions/2026-11-25-journey-cards-and-starter-pals.md)
+
+The gateway, preview and family gateway packages include the same historical scene metadata as the browser. Their source archive and Docker allowlists include the JSON file explicitly so a restored actor can resolve in a packaged service.
