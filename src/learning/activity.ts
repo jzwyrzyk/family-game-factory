@@ -1,3 +1,4 @@
+import {setIconLabel} from '../brand/icons';
 import {earlyInstruction} from './early/audio';
 import {mountEarlyMath} from './early/render';
 import {isEarlyGrade} from './grades';
@@ -22,6 +23,7 @@ export interface MathActivityOptions {
   onSave(attempt: Attempt): void;
   legacyIds?: boolean;
   challenge?: boolean;
+  onLeave?:()=>void;
 }
 let nextActivity = 0;
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, className?: string, text?: string): HTMLElementTagNameMap[K] {
@@ -58,6 +60,13 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   root.dataset.mode = mode; root.dataset.attemptId = attempt.id; root.dataset.interactionKind = kind;
   root.setAttribute('role','group'); root.setAttribute('aria-labelledby',`${prefix}-question`);
   const title = el('h2',undefined,item.question); title.id = `${prefix}-question`; title.tabIndex = -1;
+  if(early&&options.onLeave){
+    const back=button('Back to Games','early-leave');
+    setIconLabel(back,'arrow','Back to Games','jems-icon--back');
+    back.dataset.action='leave-game';
+    back.addEventListener('click',()=>{if(!disposed&&!done)options.onLeave?.();},{signal:listeners.signal});
+    root.append(back);
+  }
   root.append(title);
   const instruction=early?earlyInstruction(()=>item.question,String(options.profile.id),()=>!disposed&&!done&&!locked,
     mode=>{if(attempt.promptDelivery!=='grown-up')attempt.promptDelivery=mode;save();}):null;

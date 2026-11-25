@@ -440,3 +440,5 @@ After merging Gem Pal expression assets and the learning-surface fixes, the exac
 [PR139 completion](../game-intelligence/premium-benchmark/COMPLETION.md) retains all existing premium suites and adds offline fault injection to the same contract/browser lanes. The Game Intelligence workflow adds a clean unpublished sandbox build and actual-byte/legacy/premium envelope proof. This is separate from the stable Arcade aggregates and from production gVisor/paid-provider acceptance. Source fingerprints and full CI evidence include the added scripts; no existing command is omitted.
 
 The early learner stack uses synthetic profiles, both subject engines and bounded scene traces. Browser prompt delivery and declared adult reading have separate provenance. Keep native gameplay, isolated preview fixtures, rendered viewport inspection, real-device acceptance and educational efficacy as separate receipts.
+
+The [early learner verification guide](early-learning/README.md) covers the five synthetic viewport journeys, the two-subject native matrix and the isolated reviewed game fixture.

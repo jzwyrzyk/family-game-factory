@@ -70,3 +70,7 @@ The [accepted repair decision](../decisions/2026-11-20-learning-readability-and-
 Render the actual candidate, inspect its captures, and retain the exact test/build provenance. Automated browser checks establish the tested states; they do not establish physical-device audio quality, child comprehension or educational effectiveness.
 
 Early learning uses generous illustrated answer targets, spoken prompts, replay and an explicit grown-up reading alternative. First steps presents arrows, actions, an event control and ordered commands. Optional exact values remain in the editor. Compare the stage, palette, sequence and playback controls together on portrait, landscape and short viewports.
+
+## Early learner journeys
+
+Early activities offer pictured answers, audio replay, mute, a declared grown-up reading option and large tap targets. Children can select and undo story tiles without dragging. A printed decoding target stays visible and silent. A tap before instruction delivery leaves the attempt open. Use the shared Spark and owned-Pal art in the creation handoff. In the scene editor, a child can add direction blocks by tapping. On narrow phones Code and Play share the workspace through adjacent controls. Expand or use fullscreen to work with either view.

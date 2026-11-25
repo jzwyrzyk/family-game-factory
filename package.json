@@ -73,6 +73,7 @@
     "test:studio-notifications": "node --import tsx --test tests/studio-notifications.test.ts && node tests/studio-notifications-browser.cjs",
     "test:creation-learner": "node tests/creation-learner-browser.cjs",
     "test:bubble-gum": "node --import tsx --test tests/bubble-gum-rules.test.ts tests/bubble-gum-journey.test.ts && node tests/bubble-gum-builder-browser.cjs",
+    "test:early-preview": "vite build --mode early-preview --outDir test-results/early-build && node --import tsx --test tests/early-grades.test.ts && node --import tsx tests/early-journey.cjs",
     "test:ci": "node --test scripts/ci/*.test.mjs tests/ci-*.test.mjs tests/browser-scenarios.test.cjs"
   },
   "devDependencies": {

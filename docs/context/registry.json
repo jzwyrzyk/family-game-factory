@@ -143,10 +143,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:11:52.744Z",
-      "sourceDigest": "a406cc00d0d419c26e60d03d106cf6db4676876a97cb2b2458e12a8549b5c5b4",
+      "reviewedAt": "2026-11-25T01:44:10.185Z",
+      "sourceDigest": "f83f9913ed630db9b84be9ba27a9c625f8c0580d0299c6cfb640ac7ae0c90ab1",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed grade-based coding presentation, saved scene compatibility and four additional bounded path challenges against the Creation Studio contract and child interface.",
+      "reviewReason": "Verified early-grade host and speech behavior with synthetic family sessions, eight native games, a live isolated fixture and five browser viewports.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -641,10 +641,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:28:45.037Z",
-      "sourceDigest": "ba7dc4c367bbca5eb5553c243ce5e8c549b4cbefb0446959037ff3a216c63aec",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Parent handoff and reporting preserve the new curriculum and graphical scene changes from the preceding review stages. Existing operational procedures and acceptance commands still apply to this change.",
+      "reviewedAt": "2026-11-25T01:44:10.273Z",
+      "sourceDigest": "2b3d3b3a93ab061212d12b4fb725b124efe3d353b584d353cf4de8ca6c5d953d",
+      "reviewOutcome": "updated",
+      "reviewReason": "Verified early-grade host and speech behavior with synthetic family sessions, eight native games, a live isolated fixture and five browser viewports.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -824,10 +824,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "03686c7668d00ce04c830f3d085ffb91c3b991baaa0edc5bfda4bd0cc9d226aa",
-      "reviewedAt": "2026-11-25T01:37:11.629Z",
+      "sourceDigest": "d320ffa0ba7ec6354e5d7da2e22adad9ab88cdf4cf4d6404b3f730795ce37128",
+      "reviewedAt": "2026-11-25T01:44:10.317Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage.",
+      "reviewReason": "Verified early-grade host and speech behavior with synthetic family sessions, eight native games, a live isolated fixture and five browser viewports.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:37:11.719Z",
-      "sourceDigest": "3b2e505a38bb3d68bd7e0ad6d261d29c618ee74e69bbfa59ae63a6052490cef1",
+      "reviewedAt": "2026-11-25T01:44:10.405Z",
+      "sourceDigest": "0d8669ec8044901cf1afc13656ee35e85915be6c38ce116f7eb8c19edee13914",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage.",
+      "reviewReason": "Verified early-grade host and speech behavior with synthetic family sessions, eight native games, a live isolated fixture and five browser viewports.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1126,10 +1126,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-24T21:04:00.637Z",
-      "sourceDigest": "8b90caceaf316bd524c2af26e758dec86f03eb531bf59bf80f662f90d445477e",
+      "reviewedAt": "2026-11-25T01:44:10.486Z",
+      "sourceDigest": "92d416561849d70e3b76ccf4efd3ed453b3820000fc2f9b6f50fcf08ecc757cb",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded source-specific local trials, standalone artifact hashes and downloaded clean hosted image evidence; preserved superseded run scope, current main production records and all external activation gates.",
+      "reviewReason": "Verified early-grade host and speech behavior with synthetic family sessions, eight native games, a live isolated fixture and five browser viewports.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
