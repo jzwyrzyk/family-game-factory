@@ -8,6 +8,6 @@
 @media(max-width:850px){.creation-welcome{grid-template-columns:1fr 1fr}.creation-starts{grid-column:1/-1}.creation-welcome-art{max-height:180px}.creation-intro-workspace{grid-template-columns:1fr}}
 @media(max-width:500px){.creation-welcome{padding:20px;gap:12px}.creation-welcome-copy h2{font-size:24px}.creation-welcome-copy p{font-size:18px}.creation-welcome-art{max-height:160px}.creation-start,#creationTryIdea{padding:14px}.creation-intro-heading{flex-wrap:wrap}.creation-introduction{padding:16px}.creation-shelf-heading{flex-wrap:wrap}}
 
-#page-creation .creation-start>svg:first-child{width:28px;height:28px;flex:0 0 28px}#page-creation .creation-start>svg:last-child{width:22px;height:22px;flex:0 0 22px}#creationTryIdea{flex-wrap:nowrap;justify-content:flex-start}
+#page-creation .creation-start>svg:first-child{box-sizing:content-box;width:28px;height:28px;flex:0 0 28px}#page-creation .creation-start>svg:last-child{width:22px;height:22px;flex:0 0 22px}#creationTryIdea{flex-wrap:nowrap;justify-content:flex-start}
 
 .creation-introduction{color:#0b1e3b}.creation-intro-heading p{color:#52617a}

@@ -46,3 +46,14 @@ No private DEV environment is provisioned by this assignment; repository environ
 ## CI reconciliation
 
 The first candidate standalone run [45677701949](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45677701949) passed stock Chromium file navigation and complete screenshot capture on `d1b68df43efe60a9190a3c150914d259bc8bacb8`. The first Arcade preparation run failed its hard-coded command count because the additional modernization test expanded creative coverage from 63 to 64 commands; the count was corrected with all original commands and failure checks retained. The early-preview test initially used the former direct world entrance and was updated to explicitly skip the optional introduction and choose Make a scene. These earlier runs do not validate subsequent refinements; final receipts belong to the PR head. No CI selection or security gate was narrowed.
+
+## Before / after comparisons
+
+These actual offline app captures compare baseline `af11650` and candidate `85faf70` with synthetic review fixtures. They show the landing-page viewport; the workflow screenshots preserve the complete scrollable production journeys.
+
+- [My Games](compare-home.webp)
+- [My Journey](compare-journey.webp)
+- [Creative Studio](compare-coding.webp)
+- [My Art](compare-art.webp)
+- [Menu](compare-menu.webp)
+- [Conversation / Build](compare-coach-confirm.webp)

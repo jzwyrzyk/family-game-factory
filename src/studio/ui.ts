@@ -1584,9 +1584,10 @@ export async function installStudio(){
  $('studioSend').onclick=()=>act(async()=>{
   if(young()){handOff();return;}
   if(guardMath()||coaching?.busy()||saving)return;
-  const s=current();
-  if(sending.has(s.id)||busy(s)||s.pendingSubmission||unknownJobs.has(s.id)||needsReadyRecovery(s))return;
-  if(s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate&&$<HTMLTextAreaElement>('studioPrompt').value.trim()){
+  const s=current(),creating=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
+  // Existing games retain submit()'s local-edit path while a remote test runs.
+  if(creating&&(sending.has(s.id)||busy(s)||s.pendingSubmission||unknownJobs.has(s.id)||needsReadyRecovery(s)))return;
+  if(creating&&$<HTMLTextAreaElement>('studioPrompt').value.trim()){
    stopSpeech();flushDraft();await coaching?.discuss('discuss');return;
   }
   await submit();

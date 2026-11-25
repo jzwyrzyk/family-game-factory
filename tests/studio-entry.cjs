@@ -29,6 +29,7 @@ exports.completeWelcome=async function completeWelcome(page,character='spark'){
 };
 exports.navigate=async function navigate(page,id){
  const selector=id.startsWith('#')?id:'#'+id;
+ if(await page.locator('#page-studio-library').isVisible())await waitForWelcome(page);
  if(await page.locator('#page-studio.studio-play-mode').isVisible())await page.locator('#studioHome').click();
  if(await page.locator('#page-creation.has-scene').isVisible())await page.locator('#creationHome').click();
  const sections={'#studioNavPals':'pals','#studioNavRewards':'rewards','#studioNavPowers':'powers','#jemsRewardsWidget':'rewards'};

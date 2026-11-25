@@ -307,10 +307,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:46:29.325Z",
-      "sourceDigest": "029822f191136db58bea9ad746dbd7ed71a943c4a3fd01764090130993277725",
+      "reviewedAt": "2026-11-25T18:50:24.900Z",
+      "sourceDigest": "39e133c394162a5115d4ee07a23fb8da4fc9a6138d5694736ff65e71cd56f6b0",
       "reviewOutcome": "updated",
-      "reviewReason": "Final visual pass fixed intro/disclosure/Build contrast, drawing labels, narrow experiment header and canonical Help/creation labels; feature contracts retain shared Art reference.",
+      "reviewReason": "Preserved instant native edits during remote builds by limiting the new completion guard to first creation; canonical routes and recovery remain documented.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -407,10 +407,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "8a107f8ed70d3d53642329e79ed06ecdb2692b2929541ecc0685d567f87a14f7",
-      "reviewedAt": "2026-11-25T18:39:39.531Z",
+      "sourceDigest": "ae52de086415f100bb2d80f14eaefa3b96c370de738ab5dd0efa41a88d80f5d8",
+      "reviewedAt": "2026-11-25T18:50:26.336Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented three Creative Studio entrances, contextual My Art return, real optional intro and existing engine/storage/checking preservation.",
+      "reviewReason": "Verified eight editor layouts and fixed the zoom fixture to wait for the real first-visit entrance; restored readable icon content sizing under the existing box-sizing rule.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -886,10 +886,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:46:30.939Z",
-      "sourceDigest": "20d18130e408d6b98f8a91597ed48f0c7d4b7b28541d6356efe6d29c4669cfed",
+      "reviewedAt": "2026-11-25T18:50:28.685Z",
+      "sourceDigest": "40ba780b707f3cffe453a83b2ce7e6e6a6526ef295a7f66d4c04c4ab9624a41e",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded 63-to-64 creative command expansion without narrowing; maintained exact-once Build, visible route, early-preview and browser zoom checks.",
+      "reviewReason": "Retained native concurrent-edit and full-notebook invariants; adjusted visible navigation and hydration waits, with first failures recorded in candidate evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
