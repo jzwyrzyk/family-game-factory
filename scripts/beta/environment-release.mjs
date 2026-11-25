@@ -20,6 +20,9 @@ export function verifyBuild(build,record,source,image,trigger){
 function verifyRuntime(spec,desired){
  const container=spec?.containers?.[0],approved=desired.containers[0];
  requireState(spec?.serviceAccountName===desired.serviceAccountName&&spec.containers?.length===1&&container&&!container.command?.length&&!container.args?.length,'Runtime identity or command differs.');
+ requireState(spec.containerConcurrency===desired.containerConcurrency&&spec.timeoutSeconds===desired.timeoutSeconds&&
+  JSON.stringify(container.ports)===JSON.stringify(approved.ports)&&container.resources?.limits?.cpu===approved.resources.limits.cpu&&container.resources?.limits?.memory===approved.resources.limits.memory,
+  'Runtime capacity or listener differs.');
  const env=container.env??[];
  requireState(env.length===approved.env.length&&approved.env.every(e=>env.some(row=>row.name===e.name&&row.value===e.value&&!row.valueFrom)),'Runtime environment differs.');
  const volumes=spec.volumes??[],secret=volumes[0]?.secret,target=desired.volumes[0].secret,mounts=container.volumeMounts??[];
@@ -43,6 +46,25 @@ function checkRouting(url,expected){
  const canonical=u=>({default:backendResource(u.defaultService),hosts:u.hostRules.map(h=>[h.pathMatcher,h.hosts.slice().sort()]).sort(),paths:u.pathMatchers.map(p=>[p.name,backendResource(p.defaultService),(p.pathRules??[]).map(r=>[r.paths.slice().sort(),backendResource(r.service)]).sort()]).sort()});
  requireState(JSON.stringify(canonical(url))===JSON.stringify(canonical(expected))&&!url.defaultRouteAction&&!url.defaultUrlRedirect&&url.pathMatchers.every(p=>!p.routeRules?.length&&!p.defaultRouteAction&&!p.defaultUrlRedirect&&(p.pathRules??[]).every(r=>!r.routeAction&&!r.urlRedirect)),'Live host and path routing differs.');
 }
+export function verifyBackend(backend,role,c,io){
+ const name=c.backends[role],resource='projects/'+c.project+'/global/backendServices/'+name;
+ requireState(backend.name===name&&backendResource(backend.selfLink)===resource&&!backend.enableCDN&&
+  backend.protocol==='HTTP'&&backend.loadBalancingScheme==='EXTERNAL_MANAGED','Unexpected backend identity, protocol or caching.');
+ const guarded=role==='management'||role==='household';
+ requireState((backend.iap?.enabled===true)===guarded,'Backend IAP boundary differs.');
+ const targets=backend.backends??[];
+ // Unknown hosts must have no route to any application, even if its handler would reject them.
+ if(role==='deny'){requireState(targets.length===0,'Default deny backend must have no serving targets.');return;}
+ requireState(targets.length===1,'Exactly one reviewed serverless backend target required.');
+ const match=typeof targets[0].group==='string'&&targets[0].group.match(/^(?:https:\/\/(?:www\.googleapis\.com|compute\.googleapis\.com)\/compute\/v1\/)?projects\/([a-z0-9-]+)\/regions\/([a-z0-9-]+)\/networkEndpointGroups\/([a-z0-9-]+)$/);
+ requireState(match&&match[1]===c.project&&match[2]===c.region,'Backend target project or region differs.');
+ const neg=io(['compute','network-endpoint-groups','describe',match[3],'--project',c.project,'--region',c.region]);
+ const serviceRole=role==='management'?'gateway':role==='machine'?'household':role;
+ requireState(neg.name===match[3]&&neg.networkEndpointType==='SERVERLESS'&&
+  neg.region?.endsWith('/projects/'+c.project+'/regions/'+c.region)&&
+  neg.cloudRun?.service===c.services[serviceRole].name&&!neg.cloudRun.urlMask&&!neg.cloudRun.tag&&
+  !neg.appEngine&&!neg.cloudFunction,'Backend does not target the exact reviewed Cloud Run service.');
+}
 export async function environmentRelease(release,controller,options,io=cloud){
  const {descriptor:c,source,builds}=release,plan=hostingPlan(c),env=options.environment,mode=options.mode;
  requireState(['dev','test'].includes(env)&&env===c.environment&&['verify','stage'].includes(mode)&&/^[a-f\d]{40}$/.test(source)&&source===options.source,'Explicit DEV/TEST source and operation required.');
@@ -54,8 +76,7 @@ export async function environmentRelease(release,controller,options,io=cloud){
  }
  checkRouting(io(['compute','url-maps','describe',plan.urlMap.name,...regionless]),plan.urlMap);
  for(const [role,name] of Object.entries(c.backends)){
-  const backend=io(['compute','backend-services','describe',name,...regionless]);requireState(backend.name===name&&!backend.enableCDN,'Unexpected backend or caching.');
-  if(role==='management'||role==='household')requireState(backend.iap?.enabled===true,'Management and owner IAP must be enabled.');
+  verifyBackend(io(['compute','backend-services','describe',name,...regionless]),role,c,io);
  }
  const roles=['preview','gateway','household'],before={},receipt={source,environment:env,mode,services:[]};
  const service=role=>io(['run','services','describe',c.services[role].name,...common]);

@@ -4,7 +4,7 @@ import {mkdtemp,readdir,readFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import vm from 'node:vm';
-import {environmentRelease} from '../scripts/beta/environment-release.mjs';
+import {environmentRelease,verifyBackend} from '../scripts/beta/environment-release.mjs';
 import {hostingPlan} from '../scripts/beta/prepare-hosting.mjs';
 import {BuilderClient} from '../src/builder/client';
 import {identifyBuildRequest} from '../src/builder/submission';
@@ -16,6 +16,25 @@ const cfg={environment:'test',project,projectNumber:'123456789',region:'us-east5
  gatewayImage:ref+'gateway@sha256:'+'a'.repeat(64),previewImage:ref+'preview@sha256:'+'b'.repeat(64),
  services:Object.fromEntries(accounts.map(r=>[r,{name:'jems-test-'+r,identity:r+'@'+project+'.iam.gserviceaccount.com',secret:r+'-settings',version:'3'}])),
  backends:Object.fromEntries(['deny','gateway','management','preview','household','machine'].map(k=>[k,'test-'+k]))};
+const compute='https://www.googleapis.com/compute/v1/projects/'+project;
+function backendFixture(role:string){return {name:cfg.backends[role],selfLink:compute+'/global/backendServices/'+cfg.backends[role],protocol:'HTTP',loadBalancingScheme:'EXTERNAL_MANAGED',iap:{enabled:['management','household'].includes(role)},backends:role==='deny'?[]:[{group:compute+'/regions/'+cfg.region+'/networkEndpointGroups/'+role+'-neg'}]};}
+function negFixture(role:string){return {name:role+'-neg',networkEndpointType:'SERVERLESS',region:compute+'/regions/'+cfg.region,cloudRun:{service:cfg.services[role==='management'?'gateway':role==='machine'?'household':role].name}};}
+test('release verifies exact project, region and service behind every backend before staging',()=>{
+ for(const role of Object.keys(cfg.backends))verifyBackend(backendFixture(role),role,cfg,(args:string[])=>negFixture(args[3].replace(/-neg$/,'')));
+ const role='management',backend=backendFixture(role),neg=negFixture(role);
+ for(const change of [
+  {selfLink:backend.selfLink.replace(project,'other-project')},{enableCDN:true},{protocol:'HTTPS'},
+  {loadBalancingScheme:'EXTERNAL'},{iap:{enabled:false}},{backends:[]},{backends:[...backend.backends,...backend.backends]},
+  {backends:[{group:backend.backends[0].group.replace(project,'other-project')}]},
+  {backends:[{group:backend.backends[0].group.replace(cfg.region,'europe-west1')}]}
+ ])assert.throws(()=>verifyBackend({...backend,...change},role,cfg,()=>neg));
+ for(const change of [{name:'other-neg'},{networkEndpointType:'GCE_VM_IP_PORT'},{region:neg.region.replace(project,'other-project')},
+  {cloudRun:{service:cfg.services.household.name}},{cloudRun:{...neg.cloudRun,urlMask:'<service>.example'}},
+  {cloudRun:{...neg.cloudRun,tag:'old'}},{cloudFunction:{function:'unexpected'}}
+ ])assert.throws(()=>verifyBackend(backend,role,cfg,()=>({...neg,...change})));
+ assert.throws(()=>verifyBackend({...backendFixture('deny'),backends:backend.backends},'deny',cfg,()=>neg));
+ assert.throws(()=>verifyBackend({...backendFixture('machine'),iap:{enabled:true}},'machine',cfg,()=>neg));
+});
 test('DEV/TEST templates require dedicated hosts, identity, numeric secret version and pinned artifacts',()=>{
  const plan=hostingPlan(cfg) as any;
  assert.equal(plan.urlMap.defaultService.endsWith('/test-deny'),true);
@@ -65,7 +84,8 @@ test('protected nonproduction controller verifies build evidence and stages each
     results:{images:[{name:img.split('@')[0]+':approved',digest:wrongImage?'sha256:'+'f'.repeat(64):img.split('@')[1]}]}};
   }
   if(group==='compute url-maps describe')return wrongBackendProject?{...plan.urlMap,defaultService:plan.urlMap.defaultService.replace(cfg.project,'other-isolated-project')}:plan.urlMap;
-  if(group==='compute backend-services describe')return {name:args[3],iap:{enabled:true}};
+  if(group==='compute backend-services describe')return backendFixture(Object.keys(cfg.backends).find(role=>cfg.backends[role]===args[3])!);
+  if(group==='compute network-endpoint-groups describe')return negFixture(args[3].replace(/-neg$/,''));
   if(group==='run services describe'){
    const found=accounts.find(r=>cfg.services[r].name===args[3])!;
    return {...plan[found],status:{traffic:[{revisionName:args[3]+'-prior',percent:100}]}};
