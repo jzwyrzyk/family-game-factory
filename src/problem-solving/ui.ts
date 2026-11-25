@@ -30,7 +30,10 @@ export function installProblemSolvingPractice(host: Host) {
     && active?.episode.id === readingEpisode && phaseNow() === readingPhase);
   const status = (text: string, error = false) => { $('psStatus').textContent = text; $('psStatus').classList.toggle('is-error', error); };
   const isCurrent = () => visible && activeOwner === owner();
-  const act = (fn: () => void) => { try { fn(); } catch (error) { status((error as Error).message, true); } };
+  const act = (fn: () => void|Promise<void>) => {
+    const capturedOwner=owner(),failed=(error:unknown)=>{if(owner()===capturedOwner)status((error as Error).message,true);};
+    try { const result=fn();if(result)void result.catch(failed); } catch(error) { failed(error); }
+  };
   const stopSpeech = () => narrator.cancel();
   function assertCurrent() {
     if (!isCurrent()) throw Error('Open this idea in your own profile.');
