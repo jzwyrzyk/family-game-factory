@@ -1,10 +1,43 @@
 # Storage reliability and continuity — PR166
 
+**Current-main completion continuation, November 25:** the application now combines protected main `0f459f5` with the preserved storage and family-beta/audit source. The [combined acceptance register](../family-beta/COMPLETION.md) records current requirements and dispositions; the [nine-stage runbook](../family-beta/ACTIVATION.md#nine-stage-activation-plan) is the consolidated future cloud plan. The dated PR166 measurements and implementation record below remain historical evidence for their original tree. Final-source implementation/evidence must not be inferred from those old results.
+
+## Actual application measurements on current main
+
+`CHROMIUM_PATH=/usr/bin/chromium node tools/storage-application-benchmark.cjs TARGET OUTPUT.json` runs the built application with only loopback requests. It creates records through the actual `RevisionStore`, `StudioNotebook` and original-drawing store, reloads the real Studio, opens a saved game from its visible card, and measures source operations in real browser storage. The [main baseline JSON](evidence/application-main-0f459f5.json) pins the full source/tree, Chromium version, five samples per size, counters and process metrics. It is distinct from the older isolated 50,000-record adapter benchmark.
+
+| Scenario | Small | Medium | Large |
+| --- | ---: | ---: | ---: |
+| Projects / retained initial revisions | 5 / 5 | 25 / 100 | 50 / 450 |
+| Notebook sessions / messages | 5 / 100 | 25 / 2,500 | 70 / 14,000 |
+| Original PNGs / original bytes | 2 / 336,612 | 5 / 3,146,610 | 8 / 9,260,556 |
+| Derived preview bytes | 336,612 | 684,427 | 1,517,028 |
+| Persisted localStorage bytes after first measured save | 29,004 | 608,121 | 3,315,149 |
+| Reload to application ready, median ms | 918.48 | 766.38 | 1,283.35 |
+| Home library visible, median ms | 134.83 | 145.03 | 314.61 |
+| Saved-game card to open Studio, median ms | 364.65 | 335.97 | 1,018.71 |
+| Source list / saved revision lookup, median ms | 0.4 / <0.1 | 3.6 / 0.1 | 16.6 / 0.1 |
+| Draft save / immutable revision save, median ms | 1.6 / 0.6 | 13.8 / 1.7 | 71.1 / 13.3 |
+| Legacy progress JSON export / restore, median ms | 0.5 / 0.7 | 4.7 / 9.7 | 28.8 / 64.2 |
+| Original-art bundle export / idempotent restore, median ms | 1,227.9 / 716.1 | 882.8 / 786.4 | 2,012.6 / 1,577.5 |
+
+These are main-baseline measurements, not before/after improvement claims. The full combined-candidate run is required after source integration. The legacy progress measurement excludes artwork, rewards and Pals; original artwork is measured separately. The complete recovery handler must be measured separately once integrated so a progress-only JSON operation cannot be presented as a complete family backup. All original PNG hashes are distinct in this fixture; original/preview copies are deliberate and not counted as redundant art revisions.
+
+The browser is desktop emulation on a shared Linux host, with warm HTTP cache and instrumented `JSON`/localStorage operations. The nonmonotonic small/medium startup and artwork samples are retained; CPU scheduling, decoder/cache state and other concurrent tests affect them. The raw report retains median/p95 and every sample rather than hiding slow runs. Each sample adds a retained revision, preserving the final-source caps. Heap and CDP Task/ScriptDuration are observations, not isolated peak memory or physical-device CPU estimates. localStorage counters count cumulative UTF-16 code units read/written, not network bytes or billed database operations. Final comparison uses the same fixture, browser and instrumentation.
+
+### Cost and scaling interpretation
+
+The retained [cost model](evidence/cost-model.json) projects a five-person family's end-of-year-five monthly storage/metadata/object/network run rate of approximately **$0.023 / $0.295 / $2.581** for its low/typical/high assumptions. It includes one sizing allowance for a recovery copy. It excludes Cloud Run, load balancing, NAT/IP/worker compute, provider calls, support, logs, CI, taxes, discounts and free tiers. Rates are historical planning inputs, not newly verified pricing or observed bills; the target region and architecture must be read back before activation. The [environment cost model](../development/COSTS.md) supplies separate infrastructure/worker assumptions and warns about standing NAT/IP charges.
+
+The storage projection cannot be called the total beta cost or a spending ceiling. Content sharing can reduce retained object bytes while increasing hashing, conditional puts, dependency reads and backup verification work. Full-workspace reads, serial reconciliation and a globally contended ledger can dominate latency before raw storage charges are significant. Keep metadata-only reads and bounded concurrent scans separate from the global atomic admission transaction: strict family/global spending enforcement must not be weakened for throughput. No cloud billing savings or production capacity result was observed in this assignment.
+
+## Preserved November 24 implementation record
+
 **November 24, 2026, America/New_York. Branch implementation, not deployed.** Continues PR166 head `1743c9e6560ae9416ec08a23cb660eb06af68351`, based on refreshed main `13260750b7771beb024cc6a94bf823ee5a4e29ff`. Main includes premium #139, environment preparation #155 and the CI work. No competing open storage PR was found. Other open branches include operations/evidence #143/#138/#116/#113/#110/#109/#105, historical environment #106/#45, test #84, optional analytics #83 and research #60/#54/#50/#31/#29. Their work remains untouched. A separate efficiency PR was not visible in that inventory; this work avoids static artwork and CI selection policy.
 
 This package improves real application persistence and prepares additional adapters. **It does not complete the assignment's entire definition of done.** The existing application still has bounded whole-workspace stores, and the new indexed/cloud adapters have no application migration or live synchronization route. Those are remaining repository engineering, not Cloud Shell dependencies. [Inventory](INVENTORY.md), [implementation and activation](ROLLOUT.md), measured [baseline](evidence/baseline.json), [browser evidence](evidence/browser.json) and [cost model](evidence/cost-model.json) distinguish source, fixtures and projections.
 
-## Selected architecture and alternatives
+### Selected architecture and alternatives
 
 Retain the existing hybrid: synchronous local state for the current application, IndexedDB for transactional records and binary artwork, authenticated gateway/Firestore for authoritative remote metadata and private workspace-scoped GCS for immutable payloads; new split blobs also bind the family/Adult audience. Never make an AI prompt proportional to retained history. No new vendor, database service, synchronization framework or public object URL is needed.
 
@@ -18,7 +51,7 @@ Retain the existing hybrid: synchronous local state for the current application,
 | Full cloud replacement | Reject: offline gameplay, latency and unnecessary operations are worse; it does not make local unsynchronized data durable. |
 | Long revision delta chains / cross-family asset pooling / destructive TTL | Reject: fragile reconstruction, isolation changes and unauthorized deletion. Keep complete small definitions with shared immutable payloads. |
 
-## Current architecture
+### Current architecture
 
 ```mermaid
 flowchart LR
@@ -33,7 +66,7 @@ flowchart LR
   CI[GitHub CI] --> Artifacts[Build archives and evidence with configured retention]
 ```
 
-## Proposed future architecture
+### Proposed future architecture
 
 ```mermaid
 flowchart LR
@@ -52,7 +85,7 @@ flowchart LR
 
 The arrows beyond the current host are a target, not a deployed capability. Browser principal callbacks and server `ContinuityPrincipal` are integration contracts, not authentication implementations. The server adapter must only receive a principal produced by the current trusted-device/Adult/family authorization path. It exposes no HTTP route.
 
-## Ranked implementation register
+### Ranked implementation register
 
 | Priority/category | Change | State and benefit | Remaining constraint |
 |---|---|---|---|
@@ -68,7 +101,7 @@ The arrows beyond the current host are a target, not a deployed capability. Brow
 | 6 / C | Automated backups / retention | Reference tracing, versioned history and resumable hash-verified recovery-point manifests; proposed recovery policy and activation plan | Complete backup scheduler/manifest restore UI and owner retention/RPO/RTO decisions |
 | 7 / D | Automatic user-record GC | No delete API or job added | Reconsider only after complete reference roots, retention approval and recovery evidence |
 
-## F06 disposition
+### F06 disposition
 
 - Browser termination between local create/copy writes: integrated rollback before use. Current journal has pending and committed phases; after the committed marker, cleanup failure does not report lost work. All key images are checked before recovery writes. Unknown bytes, corruption or wrong scope stop recovery without erasing data.
 - Profile/construction copies: the staged host cannot directly call the legacy save. Its profile image joins the transaction. Copy learning mode joins it as well. Existing data formats and engine IDs remain unchanged.
@@ -78,7 +111,7 @@ The arrows beyond the current host are a target, not a deployed capability. Brow
 - Backup/restore: existing family undo journal remains authoritative for its stores. It cannot start over a pending project journal. Existing backups and original image bundles retain their separate formats. Coordinated arbitrary-store backups have not been replaced with a new untested protocol.
 - Saved games/art: full definitions, original bytes, rig hashes, Keep/Undo/Fork identities and frozen engines remain. No real Splash or Pass/Dragon family records were accessed; preservation evidence is synthetic and existing regression coverage, not actual-data acceptance.
 
-## Capacity and performance evidence
+### Capacity and performance evidence
 
 `node --import tsx tools/storage-benchmark.ts` reproduces a warm-process comparison with the original PR166 source. It does not measure physical-device startup. `node tests/storage-browser.cjs` uses actual Chromium localStorage, Web Locks, IndexedDB and renderer termination; desktop/tablet/phone are emulated layouts.
 
@@ -96,7 +129,7 @@ The arrows beyond the current host are a target, not a deployed capability. Brow
 
 The 4.31 MB notebook plus even the compact journal can exceed a browser's localStorage budget. A smaller journal reduces amplification; it does **not** close structural capacity. The indexed adapter can store 50,000 independent records without scanning all of them for a page, but the application has not been migrated to it. Multi-year fixture counts model five profiles × five years × 2,000 metadata records; the separate conversation fixture models retained text. They do not substitute for a realistic entire family import with large decoded images and every domain.
 
-## Economics
+### Economics
 
 `node tools/storage-cost-model.mjs` generates low/typical/high assumptions for five people over five years and linear 100/1,000-family sensitivities. It includes assets, revision/conversation metadata, a recovery-copy allowance, database operations, object operations and network allowance. It excludes model inference, compute, logs, CI, tax and support. No spending was activated.
 
