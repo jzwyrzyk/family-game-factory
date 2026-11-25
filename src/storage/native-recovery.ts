@@ -1,0 +1,13 @@
+import {IndexedNativeStore} from './indexed-native';
+import {nativeScope} from './native-workspace';
+import {validateWorkspace,type Workspace} from '../factory/workspace';
+export interface NativeRecoverySnapshot {owner:string;workspace:Workspace}
+export async function captureNativeRecovery(owners:string[],guard:()=>void):Promise<NativeRecoverySnapshot[]>{const snapshots=[];for(const owner of owners){guard();const store=await IndexedNativeStore.open(await nativeScope(owner),guard);try{if(await store.isActive())snapshots.push({owner,workspace:await store.snapshot()});}finally{store.close();}}return snapshots;}
+export function mergeNativeRecovery(legacy:Workspace,snapshots:NativeRecoverySnapshot[]):Workspace {
+ let result=validateWorkspace(legacy);for(const snapshot of snapshots){const fresh=validateWorkspace(snapshot.workspace);if(fresh.projects.some(p=>p.owner!==snapshot.owner))throw Error('Prepared library belongs to another player.');const removed=new Set(result.projects.filter(p=>p.owner===snapshot.owner).map(p=>p.id)),revisions=new Set(result.revisions.filter(r=>removed.has(r.projectId)).map(r=>r.id));result={version:2,projects:[...result.projects.filter(p=>!removed.has(p.id)),...fresh.projects],revisions:[...result.revisions.filter(r=>!removed.has(r.projectId)),...fresh.revisions],plays:[...result.plays.filter(p=>!revisions.has(p.revisionId)),...fresh.plays]};}return validateWorkspace(result);
+}
+/** Existing prepared stores restore atomically; missing ones stay on the legacy
+ * compatible graph until a separately selected migration build is approved. */
+export async function restoreNativeRecovery(snapshots:NativeRecoverySnapshot[],operation:string,guard:()=>void):Promise<void>{for(const [index,snapshot]of snapshots.entries()){guard();const store=await IndexedNativeStore.open(await nativeScope(snapshot.owner),guard);try{if(await store.isActive())await store.restoreSnapshot(snapshot.workspace,operation+'-'+index);}finally{store.close();}}}
+
+export function nativeSnapshotsOf(workspace:Workspace,owners:string[]):NativeRecoverySnapshot[]{return owners.map(owner=>{const projects=workspace.projects.filter(p=>p.owner===owner),ids=new Set(projects.map(p=>p.id)),revisions=workspace.revisions.filter(r=>ids.has(r.projectId)),revisionIds=new Set(revisions.map(r=>r.id));return {owner,workspace:validateWorkspace({version:2,projects,revisions,plays:workspace.plays.filter(p=>revisionIds.has(p.revisionId))})};});}

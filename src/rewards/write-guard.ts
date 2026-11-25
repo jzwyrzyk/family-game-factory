@@ -16,7 +16,7 @@ export function assertRewardSourceLockHeld(): void {
 }
 
 export function assertRewardSourceWritable(): void {
-  if (typeof localStorage !== 'undefined' && localStorage.getItem(adultStorageKey(LOCAL_JOURNAL_KEY)) !== null) throw Error('Saved work needs recovery. Reload Jems before saving again.');
+  if (typeof localStorage !== 'undefined' && (localStorage.getItem(adultStorageKey(LOCAL_JOURNAL_KEY)) !== null||localStorage.getItem(adultStorageKey('jems-complete-restore-pending-v1'))!==null)) throw Error('Saved work needs recovery. Reload Jems before saving again.');
   if (maintenance) throw Error('Jems is restoring saved progress. Wait for the page to finish reloading.');
   if (managed && !writable) throw Error('Jems is open in another tab. Close that tab, then choose Try this tab here.');
 }

@@ -167,7 +167,7 @@ export async function recoverRewardBackupJournal(storage:BackupStorage,store:Rew
   restoreSources(storage,journal.sources);
   writeJournal(storage,{...journal,phase:'rolled-back'});return 'reload';
 }
-export function hasPendingRewardBackup():boolean {try{return localStorage.getItem(adultStorageKey(REWARD_BACKUP_JOURNAL_KEY))!==null;}catch{return true;}}
+export function hasPendingRewardBackup():boolean {try{return localStorage.getItem(adultStorageKey(REWARD_BACKUP_JOURNAL_KEY))!==null||localStorage.getItem(adultStorageKey('jems-complete-restore-pending-v1'))!==null;}catch{return true;}}
 export async function recoverRewardBackup():Promise<void> {
   const outcome=await recoverRewardBackupJournal(localStorage,new RewardsStore(REWARDS_DB_NAME));
   if(outcome==='reload')location.reload();

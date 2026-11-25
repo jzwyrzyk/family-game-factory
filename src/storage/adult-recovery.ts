@@ -1,3 +1,4 @@
+import {recoverCompleteRestore} from './complete-backup';
 import {adultStorageKey,adultWorkspaceId} from '../adult-pilot/storage';
 import {currentAdultSession,adultSessionVersion} from '../adult-pilot/session';
 import {familyFetch} from '../builder/session';
@@ -14,5 +15,6 @@ export async function verifyAdultRecovery(profileId:string):Promise<()=>void>{
 /** Called only after a newly issued server grant, before loading adult stores. */
 export async function recoverAdultBackupAfterUnlock(profileId:string):Promise<void>{
  if(currentAdultSession()?.profileId!==profileId)throw Error('Fresh Private parent access is required for recovery.');const storage=adultRecoveryStorage(profileId),rewards=new RewardsStore(adultStorageKey(REWARDS_DB_NAME,profileId)),pals=new PalsStore(adultStorageKey(PALS_DB_NAME,profileId));
+ await recoverCompleteRestore(profileId);
  const result=await recoverRewardBackupJournal(storage,rewards,pals);if(result==='reload')await recoverRewardBackupJournal(storage,rewards,pals);
 }

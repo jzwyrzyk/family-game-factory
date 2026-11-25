@@ -166,21 +166,22 @@ export const restoreArtBundle = (owner: string, input: unknown, guard?: ArtGuard
 
 /** Full-family recovery runs under the host maintenance lock, never the active
  * child editor. Original image and rig identities remain additive and immutable. */
-export async function restoreFamilyArtBundles(bundles:{owner:string;bundle:ArtBundle}[],allowedOwners:string[],assertAuthorized:()=>void):Promise<void> {
+export async function restoreFamilyArtBundles(bundles:{owner:string;bundle:ArtBundle;activeRigId?:string|null}[],allowedOwners:string[],assertAuthorized:()=>void):Promise<void> {
   assertRewardSourceLockHeld();assertAuthorized();
   if(new Set(allowedOwners).size!==allowedOwners.length||allowedOwners.length<1||allowedOwners.length>6||new Set(bundles.map(x=>x.owner)).size!==bundles.length||bundles.some(x=>!allowedOwners.includes(x.owner)))throw Error('Choose artwork belonging to this recovery point.');
-  const prepared=await Promise.all(bundles.map(async item=>({owner:item.owner,...await validateAndPrepare(item.bundle,item.owner)})));
+  const prepared=await Promise.all(bundles.map(async item=>({owner:item.owner,activeRigId:item.activeRigId,...await validateAndPrepare(item.bundle,item.owner)})));
   assertAuthorized();
-  await withArtTransaction(['drawings','rigs','drafts'],'readwrite',async tx=>{
+  await withArtTransaction(['drawings','rigs','drafts','active'],'readwrite',async tx=>{
     const drawings=await artRequest(tx.objectStore('drawings').getAll()) as Drawing[],rigs=await artRequest(tx.objectStore('rigs').getAll()) as SavedRig[],drafts=await artRequest(tx.objectStore('drafts').getAll()) as DrawingDraft[];
     const images=new Map(drawings.map(x=>[x.id,x])),versions=new Map(rigs.map(x=>[x.id,x])),draftIds=new Set(drafts.map(x=>x.id));
     const addImages:Drawing[]=[],addVersions:SavedRig[]=[],addDrafts:DrawingDraft[]=[];
     for(const source of prepared){
+      if(source.activeRigId!==undefined&&source.activeRigId!==null&&!source.rigs.some(rig=>rig.id===source.activeRigId))throw Error('A selected movement version is unavailable in this recovery point.');
       for(const image of source.originals){const prior=images.get(image.id);if(prior&&!sameImage(prior,image))throw Error('A saved picture conflicts with this recovery point. Your originals were not replaced.');if(!prior){images.set(image.id,image);addImages.push(image);}}
       for(const item of source.rigs){const rig={...item,owner:source.owner},prior=versions.get(rig.id);if(prior&&(prior.owner!==rig.owner||prior.parentId!==rig.parentId||!sameValue(prior.assembly,rig.assembly)))throw Error('A saved movement version conflicts with this recovery point.');if(!prior){versions.set(rig.id,rig);addVersions.push(rig);}}
       for(const item of source.drafts){const draft={...item,owner:source.owner,id:JSON.stringify([source.owner,item.sourceId])};if(!draftIds.has(draft.id)){draftIds.add(draft.id);addDrafts.push(draft);}}
     }
     checkArtCapacity([...drawings,...addImages],[...rigs,...addVersions]);if(new TextEncoder().encode(JSON.stringify([...drafts,...addDrafts])).byteLength>ART_LIMITS.designBytes)throw Error('There is not enough room for the recovered artwork drafts.');
-    assertRewardSourceLockHeld();assertAuthorized();for(const item of addImages){tx.objectStore('drawings').add(item);saveDrawingMetadata(tx,item);}for(const item of addVersions)tx.objectStore('rigs').add(item);for(const item of addDrafts)tx.objectStore('drafts').add(item);
+    assertRewardSourceLockHeld();assertAuthorized();for(const item of addImages){tx.objectStore('drawings').add(item);saveDrawingMetadata(tx,item);}for(const item of addVersions)tx.objectStore('rigs').add(item);for(const item of addDrafts)tx.objectStore('drafts').add(item);for(const source of prepared){if(source.activeRigId===null)tx.objectStore('active').delete(source.owner);else if(source.activeRigId!==undefined)tx.objectStore('active').put({owner:source.owner,id:source.activeRigId});}
   });
 }
