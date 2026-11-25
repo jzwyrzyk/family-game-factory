@@ -1,0 +1,20 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {randomUUID} from 'node:crypto';
+import {betaFixture} from './beta-fixture';
+import {runFamilyCloudRecovery} from '../server/beta/recovery';
+import {familyOrigin,participationNotice} from '../server/beta/model';
+import {ContinuityService,DocumentContinuityRepository} from '../server/storage/continuity';
+import {buildRecoveryArchive} from '../src/storage/recovery-vault';
+import {BACKUP_DOMAINS,uploadCloudRecovery,readCloudRecovery,type CloudRecoveryTransport} from '../src/storage/cloud-recovery';
+import type {BackupScheduleLedger} from '../server/storage/recovery-scheduler';
+function ledger():BackupScheduleLedger{const points=new Map<string,{sources:Record<string,string|null>;completed:boolean}>();return {claim:async(key,make)=>{if(!points.has(key))points.set(key,{...await make(),completed:false});return structuredClone(points.get(key)!);},complete:async key=>{points.get(key)!.completed=true;}};}
+test('actual beta scheduled path snapshots complete authorized cloud originals and stops on withdrawal',async()=>{
+ const fixture=await betaFixture(),{d}=fixture,f=await fixture.enroll('backup'),profile=randomUUID(),scope={family:f.id,profile};const schedule={enabled:true,intervalMs:60000,maxPointsPerRun:1};
+ d.config.continuity={enabled:true,notice:'storage-notice-v1',domains:[...BACKUP_DOMAINS],...{backupSchedule:schedule}};
+ await d.db.run(async tx=>{const family=await d.family(tx,f.id);family.profiles=[profile];family.storageDomains=[...BACKUP_DOMAINS];tx.set(d.path(f.id),family);tx.set(d.path(f.id)+'/continuity/authorization',{version:1,notice:'storage-notice-v1',participation:participationNotice,guardian:family.guardian.id,profiles:[profile],domains:[...BACKUP_DOMAINS]});});
+ const service=new ContinuityService(new DocumentContinuityRepository(d.db,'beta-'+f.id),true);const remote:CloudRecoveryTransport={status:async()=>({version:1,...scope,epoch:'test-epoch',profiles:[profile],guardian:true,domains:[...BACKUP_DOMAINS]}),lookup:id=>service.lookup(scope,scope,id),commit:op=>service.commit(scope,op),read:(collection,id,version)=>service.read(scope,scope,collection,id,version),changes:()=>service.changes(scope,scope)};
+ const archive=await buildRecoveryArchive({origin:familyOrigin(d.config,f.id),audience:'family',owners:[profile]},'Original artwork',{progress:'synthetic profiles',art:'exact original image bytes'});await uploadCloudRecovery(archive,remote);const durable=ledger();const first=await runFamilyCloudRecovery(d,f.id,()=>durable,1);assert.equal(first.copied,1);
+ const feed=await service.page(scope,scope,'recovery-points');const saved=feed.records.find(row=>row.collection==='recovery-points'&&(row.value as any).schema==='jems.recovery-point.v1');assert.ok(saved);assert.deepEqual(await readCloudRecovery(saved.id,archive.manifest.scope,remote),archive);
+ assert.equal((await runFamilyCloudRecovery(d,f.id,()=>durable,61000)).copied,0,'unchanged uploads do not create redundant scheduled originals');
+ await d.db.run(async tx=>{const path=d.path(f.id)+'/continuity/authorization',grant=await tx.get<any>(path);tx.set(path,{...grant,revokedAt:Date.now()});});assert.equal((await runFamilyCloudRecovery(d,f.id,()=>durable,120000)).copied,0);
+});
+test('default-off scheduler never inspects upload data or invokes cloud ledger',async()=>{const {d,enroll}=await betaFixture(),f=await enroll('local-only');assert.deepEqual(await runFamilyCloudRecovery(d,f.id,()=>{throw Error('must not touch storage');}),{copied:0,pending:false});});

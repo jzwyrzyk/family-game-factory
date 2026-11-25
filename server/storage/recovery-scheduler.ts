@@ -26,7 +26,7 @@ export class RecoveryScheduler {
  * snapshots use immutable audience-bound chunks; the Firestore transaction only
  * publishes one winner's manifest and never stores full artwork in a document. */
 export class FirestoreBackupScheduleLedger implements BackupScheduleLedger {
- constructor(private db:import('@google-cloud/firestore').Firestore,private workspace:string,private audience:string,private artifacts:import('./artifacts').PrivateArtifacts){if(!/^[\w-]{1,100}$/.test(workspace)||!audience||audience.length>250)throw Error('BACKUP_LEDGER_SCOPE_INVALID');}
+ constructor(private db:import('@google-cloud/firestore').Firestore,private workspace:string,private audience:string,private artifacts:import('./artifacts').PrivateArtifacts,private authorizeTransaction:(tx:FirebaseFirestore.Transaction)=>Promise<void>=async()=>{}){if(!/^[\w-]{1,100}$/.test(workspace)||!audience||audience.length>250)throw Error('BACKUP_LEDGER_SCOPE_INVALID');}
  private ref(key:string){if(!/^scheduled-[a-f0-9]{48}$/.test(key))throw Error('BACKUP_LEDGER_KEY_INVALID');return this.db.doc(`factoryBackupSchedules/${this.workspace}/points/${createHash('sha256').update(JSON.stringify([this.audience,key])).digest('hex')}`);}
  private async decode(record:any):Promise<{sources:Record<string,string|null>;completed:boolean}>{
   if(record?.schema!=='jems.backup-schedule.v1'||record.audience!==this.audience||!Array.isArray(record.parts)||record.parts.length<1||record.parts.length>32)throw Error('BACKUP_LEDGER_INVALID');
@@ -37,7 +37,7 @@ export class FirestoreBackupScheduleLedger implements BackupScheduleLedger {
  async claim(key:string,make:()=>Promise<{sources:Record<string,string|null>}>){
   const ref=this.ref(key),existing=await ref.get();if(existing.exists)return this.decode(existing.data());const {sources}=await make();if(!sources||Object.keys(sources).length<1||Object.keys(sources).length>32)throw Error('BACKUP_LEDGER_INVALID');
   const parts=[];let total=0;for(const [name,value] of Object.entries(sources).sort(([a],[b])=>a.localeCompare(b))){if(!/^[\w:-]{1,160}$/.test(name)||value!==null&&typeof value!=='string'||(value?.length??0)>16_000_000)throw Error('BACKUP_LEDGER_INVALID');const text=JSON.stringify(value),refs=[];total+=Buffer.byteLength(text);if(total>96*1024*1024)throw Error('BACKUP_LEDGER_CAPACITY');for(let offset=0;offset<text.length;offset+=256000)refs.push(await this.artifacts.put(Buffer.from(JSON.stringify({audience:this.audience,text:text.slice(offset,offset+256000)}))));parts.push({key:name,sha256:createHash('sha256').update(text).digest('hex'),refs});}
-  const proposed={schema:'jems.backup-schedule.v1',audience:this.audience,parts,completed:false};const selected=await this.db.runTransaction(async tx=>{const current=await tx.get(ref);if(current.exists)return current.data();tx.create(ref,proposed);return proposed;});return this.decode(selected);
+  const proposed={schema:'jems.backup-schedule.v1',audience:this.audience,parts,completed:false};const selected=await this.db.runTransaction(async tx=>{await this.authorizeTransaction(tx);const current=await tx.get(ref);if(current.exists)return current.data();tx.create(ref,proposed);return proposed;});return this.decode(selected);
  }
- async complete(key:string){const ref=this.ref(key);await this.db.runTransaction(async tx=>{const current=await tx.get(ref);if(!current.exists||current.data()?.audience!==this.audience)throw Error('BACKUP_LEDGER_MISSING');tx.update(ref,{completed:true});});}
+ async complete(key:string){const ref=this.ref(key);await this.db.runTransaction(async tx=>{await this.authorizeTransaction(tx);const current=await tx.get(ref);if(!current.exists||current.data()?.audience!==this.audience)throw Error('BACKUP_LEDGER_MISSING');tx.update(ref,{completed:true});});}
 }
