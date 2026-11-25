@@ -1,6 +1,6 @@
 import {IndexedRecords} from './indexed-records';
 import type {RecordScope,RecordChange,DurableRecord,RecordReceipt} from './record-contract';
-import {validateWorkspace,type Project,type Revision,type PlayRecord,type Workspace} from '../factory/workspace';
+import {validateWorkspace,migrateWorkspace,type Project,type Revision,type PlayRecord,type Workspace} from '../factory/workspace';
 import {defaults,validateConfig,isGameId} from '../runtime/manifests';
 import type {GameId,Mechanics,PlayOutcome} from '../runtime/types';
 
@@ -220,7 +220,14 @@ export class IndexedNativeStore {
  /** The source hash binds every resumable batch. No live source key is deleted,
   * and the final authority marker is published only after reference readback. */
  async migrateLegacy(raw:string,options:{batchSize?:number;onBatch?:(completed:number,total:number)=>void;beforeActivate?:()=>void}={}):Promise<Migration>{
-  this.assertAuthorized();const input=validateWorkspace(JSON.parse(raw)),sourceHash=await digest(raw),batchSize=options.batchSize??40;
+  this.assertAuthorized();const sourceHash=await digest(raw),parsed=JSON.parse(raw),input=migrateWorkspace(parsed),batchSize=options.batchSize??40;
+  if(parsed?.version===1){
+   // V1 had game identities and exact mechanics, but no revision IDs or dates.
+   // Normalize those missing fields deterministically from the retained source:
+   // interrupted preparation must not manufacture a different root on retry.
+   for(const project of input.projects){const revision=input.revisions.find(r=>r.id===project.headId)!;revision.id='v1-'+await digest(JSON.stringify([sourceHash,project.id]));revision.createdAt='1970-01-01T00:00:00.000Z';project.headId=revision.id;}
+   validateWorkspace(input);
+  }
   if(!Number.isInteger(batchSize)||batchSize<1||batchSize>40)throw Error('Invalid migration batch size.');
   const current=await this.row(CONTROL,'migration'),prior=await this.migration();
   if(prior&&prior.sourceHash!==sourceHash)throw Error('Saved work changed during preparation. Keep its original and start a separately reviewed migration.');
