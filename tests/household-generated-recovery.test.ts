@@ -38,7 +38,7 @@ async function fixture(split=false){
  const route=createHouseholdRecovery(config,db,artifacts,ledgerFor);
  const call=(who:0|1,path:string,body:object={})=>route.request(sessions[who].cookies,sessions[who].proof,path,{profile:sessions[who].session.adultProfileId,...body});
  const mutate=async(fn:(s:any)=>void)=>db.run(async tx=>{const loaded=await readWorkspace(tx,workspace,artifacts);fn(loaded.state);await writeWorkspace(tx,loaded,artifacts,{splitGamePayloads:split});});
- return {db,repo,config,route,artifacts,blobs,sessions,call,mutate,game,originalState,ledgerFor,writes:()=>calls};
+ return {db,repo,config,route,artifacts,blobs,sessions,call,mutate,game,originalState,ledgerFor,frozen,writes:()=>calls};
 }
 async function serve(handler:(req:any,res:any)=>Promise<void>){const server=createServer((req,res)=>void handler(req,res));await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));return {server,url:'http://127.0.0.1:'+(server.address() as any).port};}
 async function close(server:Server){await new Promise<void>(resolve=>server.close(()=>resolve()));}
@@ -139,4 +139,55 @@ test('fresh authorization before each original republish prevents mapped publica
  const route=createHouseholdRecovery(f.config,f.db,artifacts,f.ledgerFor);
  await assert.rejects(route.request(f.sessions[1].cookies,f.sessions[1].proof,'restore',{profile:targetAudience,sourceAudience,pointId:point.pointId,checksum:point.checksum,approved:true,attemptId:'revoke-during-put'}),/ADULT_PILOT_ACCESS_REQUIRED/);
  assert.equal(forced,1);const state=await f.db.run(async tx=>(await readWorkspace(tx,workspace,f.artifacts)).state,true);assert.equal(state.revisions.length,2);assert.deepEqual(state.ledgers,f.originalState.ledgers);
+});
+
+test('HTTP first capture from an approved earlier origin keeps original ownership before reviewed mapped restore',async()=>{
+ const f=await fixture(true),sourceOrigin=appOrigin,targetOrigin='https://new-owner.example';
+ f.config.appOrigin=targetOrigin;f.config.gatewayOrigin=targetOrigin;f.config.householdPrivateHost!.sourceOrigin=sourceOrigin;
+ const mapping={sourceOrigin,sourceAudience,targetAudience};f.config.householdRecovery!.adultMappings=[mapping];
+ await f.mutate(s=>{s.adultPilotSessions.find((g:any)=>g.profileId===sourceAudience).revokedAt=Date.now();});
+ const before=await f.db.run(async tx=>(await readWorkspace(tx,workspace,f.artifacts)).state,true),{server,url}=await serve(f.route.handler);
+ const selection={sourceAudience,sourceOrigin};
+ const post=async(path:string,body:object,proof=f.sessions[1].proof)=>{const response=await fetch(url+'/v1/recovery/generated/'+path,{method:'POST',headers:{Origin:targetOrigin,Cookie:f.sessions[1].cookies,'X-Factory-Adult-Session':proof,'X-Factory-Request':'1','Content-Type':'application/json'},body:JSON.stringify({profile:targetAudience,...body})});return {status:response.status,value:await response.json()};};
+ try{
+  const empty=await post('list',{...selection,after:''});assert.equal(empty.status,200);assert.deepEqual(empty.value.copies,[],'the earlier site never created a recovery point');
+  assert.equal((await post('capture',{sourceAudience,requestId:'first-earlier-copy'})).status,403,'mapped capture must explicitly select its origin');
+  assert.equal((await post('capture',{...selection,sourceOrigin:'https://foreign.example',requestId:'first-earlier-copy'})).status,403);
+  assert.equal((await post('capture',{...selection,requestId:'first-earlier-copy'},'z'.repeat(43))).status,403,'current target tab proof is required');
+  const captured=await post('capture',{...selection,requestId:'first-earlier-copy'});assert.equal(captured.status,200,JSON.stringify(captured.value));assert.equal(captured.value.revisions,1);
+  assert.deepEqual((await post('capture',{...selection,requestId:'first-earlier-copy'})).value,captured.value,'lost-response retry returns the frozen point');
+  assert.equal(f.frozen.size,1);const sources=[...f.frozen.values()][0].sources,archive=JSON.parse(Object.keys(sources).sort().map(key=>sources[key]).join(''));
+  assert.deepEqual(archive.manifest.scope,{origin:sourceOrigin,audience:sourceAudience,owners:[sourceAudience]},'capture keeps source identity rather than relabeling it as the target');
+  assert.deepEqual(await f.db.run(async tx=>(await readWorkspace(tx,workspace,f.artifacts)).state,true),before,'capture changes no revisions, pointers, jobs, grants or accounting');
+  const listed=await post('list',{...selection,after:''});assert.equal(listed.status,200);assert.equal(listed.value.copies.length,1);
+  const preview=await post('preview',{...selection,pointId:captured.value.pointId});assert.equal(preview.status,200);assert.equal(preview.value.playbackOnly,true);
+  const restore={...selection,pointId:captured.value.pointId,checksum:preview.value.checksum,approved:true,attemptId:'reviewed-first-earlier-restore'};
+  const restored=await post('restore',restore);assert.equal(restored.status,200);assert.equal(restored.value.added,1);
+  const after=await f.db.run(async tx=>(await readWorkspace(tx,workspace,f.artifacts)).state,true),mapped=after.revisions.find(r=>r.id===restored.value.revisionMap['source-revision'])!;
+  assert.deepEqual(after.revisions.slice(0,before.revisions.length),before.revisions);assert.deepEqual(mapped.game,f.game);assert.equal(mapped.adultPilotProfileId,targetAudience);assert.equal(mapped.recoveryProvenance!.sourceOrigin,sourceOrigin);assert.equal(mapped.recoveryProvenance!.sourceAudience,sourceAudience);assert.equal(mapped.recoveryProvenance!.playbackOnly,true);
+  for(const field of ['jobs','ledgers','adultPilotSessions','adultPilotPermits','devices'] as const)assert.deepEqual(after[field],before[field]);
+  f.config.householdRecovery!.adultMappings=[];
+  for(const [path,body] of [['capture',{...selection,requestId:'mapping-removed'}],['preview',{...selection,pointId:captured.value.pointId}],['restore',restore]] as const)assert.equal((await post(path,body)).status,403);
+  f.config.householdRecovery!.adultMappings=[mapping];await f.mutate(s=>{s.adultPilotSessions.find((g:any)=>g.profileId===targetAudience).revokedAt=Date.now();});
+  for(const [path,body] of [['capture',{...selection,requestId:'target-revoked'}],['preview',{...selection,pointId:captured.value.pointId}],['restore',restore]] as const)assert.equal((await post(path,body)).status,403);
+ }finally{await close(server);}
+});
+
+for(const withdrawal of ['mapping','session'] as const)test('mapped first capture rechecks '+withdrawal+' after reading originals and before publication',async()=>{
+ const f=await fixture(),sourceOrigin=appOrigin,targetOrigin='https://new-owner.example';
+ f.config.appOrigin=targetOrigin;f.config.gatewayOrigin=targetOrigin;f.config.householdPrivateHost!.sourceOrigin=sourceOrigin;f.config.householdRecovery!.adultMappings=[{sourceOrigin,sourceAudience,targetAudience}];
+ let changed=false,writes=0;
+ const store:AtomicStore={run:(operation,readOnly)=>f.db.run(tx=>operation({...tx,create:(path,value)=>{writes++;tx.create(path,value);},set:(path,value)=>{writes++;tx.set(path,value);}}),readOnly)};
+ const ledgerFor=(audience:string,authorize:(tx:any)=>Promise<void>):BackupScheduleLedger=>{const ledger=f.ledgerFor(audience,authorize);return {...ledger,claim:(key,make)=>ledger.claim(key,async()=>{
+  const frozen=await make();changed=true;
+  if(withdrawal==='mapping')f.config.householdRecovery!.adultMappings=[];
+  else await f.mutate(s=>{s.adultPilotSessions.find((g:any)=>g.profileId===targetAudience).revokedAt=Date.now();});
+  return frozen;
+ })};};
+ const route=createHouseholdRecovery(f.config,store,f.artifacts,ledgerFor),{server,url}=await serve(route.handler);
+ try{
+  const response=await fetch(url+'/v1/recovery/generated/capture',{method:'POST',headers:{Origin:targetOrigin,Cookie:f.sessions[1].cookies,'X-Factory-Adult-Session':f.sessions[1].proof,'X-Factory-Request':'1','Content-Type':'application/json'},body:JSON.stringify({profile:targetAudience,sourceAudience,sourceOrigin,requestId:'withdrawal-before-publication'})});
+  assert.equal(response.status,403);assert.equal(changed,true);assert.equal(writes,0,'withdrawn request publishes no recovery records or workspace changes');
+  const state=await f.db.run(async tx=>(await readWorkspace(tx,workspace,f.artifacts)).state,true);assert.deepEqual(state.revisions,f.originalState.revisions);assert.deepEqual(state.active,f.originalState.active);assert.deepEqual(state.ledgers,f.originalState.ledgers);assert.deepEqual(state.jobs,f.originalState.jobs);
+ }finally{await close(server);}
 });

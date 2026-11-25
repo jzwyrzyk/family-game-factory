@@ -111,15 +111,20 @@ export function createHouseholdRecovery(config:HouseholdRecoveryConfig,store:Ato
    exact(body,['profile','sourceAudience','sourceOrigin','after']);if(typeof body.after!=='string')throw Error('INVALID_REQUEST');
    const page=await service.page(scope,scope,'generated-recovery-index',body.after,4);result={copies:page.records.filter(r=>!r.deleted).map(r=>r.value),next:page.next};
   }else if(path==='capture'){
-   exact(body,['profile','requestId']);if(!recordId(body.requestId)||selected.mapped)throw Error('INVALID_REQUEST');
-   const id='scheduled-'+digest(JSON.stringify([scope,body.requestId])).slice(0,48),ledger=ledgerFor(JSON.stringify([config.familyId,selected.source]),authorize);
+   exact(body,['profile','sourceAudience','sourceOrigin','requestId']);if(!recordId(body.requestId))throw Error('INVALID_REQUEST');
+   // An earlier site may never have exposed this protected endpoint. The
+   // current target Adult can explicitly capture retained originals only under
+   // the exact operator-approved mapping; capture does not remap the source.
+   if(selected.mapped&&(body.sourceAudience!==selected.source||body.sourceOrigin!==selected.sourceOrigin))throw Error('HOUSEHOLD_RECOVERY_MAPPING_REQUIRED');
+   const captureKey=selected.mapped?[scope,selected.sourceOrigin,body.requestId]:[scope,body.requestId];
+   const id='scheduled-'+digest(JSON.stringify(captureKey)).slice(0,48),ledger=ledgerFor(JSON.stringify([config.familyId,selected.source]),authorize);
    const frozen=await ledger.claim(id,async()=>{
     const snapshot=await store.run(async tx=>{await authorize(tx);const {loaded}=await authenticate(tx,cookies,proof),raw=loaded.state;
      const revisions=raw.revisions.filter(r=>r.familyId===config.familyId&&r.adultPilotProfileId===selected.source),ids=new Set(revisions.map(r=>r.id));
      const state=await decodeArtifacts(JSON.stringify({version:1,revisions,jobs:[],active:Object.fromEntries(Object.entries(raw.active).filter(([,id])=>ids.has(id))),ledgers:{},audit:[]}),artifacts);
      return captureGeneratedRecovery(state,config.familyId,selected.source);
     },true);
-    const archive=await buildRecoveryArchive({origin:config.appOrigin,audience:selected.source,owners:[selected.source]},'Saved Adult generated games',{generated:JSON.stringify(snapshot)});return {sources:archiveSources(archive)};
+    const archive=await buildRecoveryArchive({origin:selected.sourceOrigin,audience:selected.source,owners:[selected.source]},'Saved Adult generated games',{generated:JSON.stringify(snapshot)});return {sources:archiveSources(archive)};
    });
    if(!frozen.completed){await new RecoveryPoints(service).prepare(scope,scope,id,frozen.sources);await store.run(authorize,true);await ledger.complete(id);}
    const {archive,snapshot}=await read(id),summary={pointId:id,checksum:archive.manifest.checksum,createdAt:archive.manifest.createdAt,projects:new Set(snapshot.revisions.map(r=>r.projectId)).size,revisions:snapshot.revisions.length,sourceHash:generatedRecoveryHash(snapshot)};
