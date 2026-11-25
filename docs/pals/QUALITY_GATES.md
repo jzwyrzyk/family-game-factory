@@ -63,3 +63,14 @@ Distinguish an artwork defect from an intentional reaction to an error. The foll
 | Thinking or listening | Readable attention without anatomy drift. |
 
 Inspect each output individually. Record exact candidate, checks, unresolved defects, decision, and downstream impact. Fix clear generation defects before presenting artwork for creative review.
+
+
+## Integrated portrait fidelity
+
+Artwork approval and successful image decode do not prove correct integration.
+Inspect starter, owned/locked, equipped, expression and scene surfaces against
+contrasting backgrounds at actual mobile size and in the offline review. Use the
+canonical Pal alpha renderer; preserve enclosed white details and intentional
+ground/props. Verify rendered corner transparency, correct source/form identity,
+loading/failure behavior and card proportions. The November 25 Android Journey
+finding is tracked in [the correction record](../evidence/child-modernization/pal-fidelity/README.md).

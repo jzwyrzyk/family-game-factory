@@ -144,10 +144,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:39:37.209Z",
-      "sourceDigest": "01fe519fcdb1d1a6fa3d016639f4dd3fa923d3679185d89d6005c47087c174c3",
+      "reviewedAt": "2026-11-25T21:27:35.450Z",
+      "sourceDigest": "8dd4f382037bef30cb73b088a6080c731934aa1f97a375052774b7290d67e964",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded owner-approved Art reference, canonical destinations, saved-concept Build and transient intro in doctrine and modernization decision.",
+      "reviewReason": "Architecture records shared presentation-only alpha preparation; original artwork, ownership and product doctrine are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -307,10 +307,10 @@
         "src/speech/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:50:24.900Z",
-      "sourceDigest": "39e133c394162a5115d4ee07a23fb8da4fc9a6138d5694736ff65e71cd56f6b0",
+      "reviewedAt": "2026-11-25T21:27:36.000Z",
+      "sourceDigest": "578812989cb35f853a01486f9f9d3b172f343082ee9897f9faa8111837e6db39",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved instant native edits during remote builds by limiting the new completion guard to first creation; canonical routes and recovery remain documented.",
+      "reviewReason": "Journey fidelity evidence records compact card sizing, four viewport captures and shared portraits; child copy and approved navigation hierarchy remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -407,10 +407,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "ae52de086415f100bb2d80f14eaefa3b96c370de738ab5dd0efa41a88d80f5d8",
-      "reviewedAt": "2026-11-25T18:50:26.336Z",
+      "sourceDigest": "53ccc18b5a8d5c8f3238096846f4e98d71020854935d317db6fed55c4a529bde",
+      "reviewedAt": "2026-11-25T21:27:37.669Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified eight editor layouts and fixed the zoom fixture to wait for the real first-visit entrance; restored readable icon content sizing under the existing box-sizing rule.",
+      "reviewReason": "Shared Pal rendering contract now covers DOM picker and canvas scene, exact-source holes, preparation failure and unchanged saved scene references.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -886,10 +886,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T19:05:16.392Z",
-      "sourceDigest": "ddcaa018da9f1cc43a2385e599d2641a360119c70805058f6becf5edd5e4e741",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the two phone-card test changes against docs/evidence/child-modernization/README.md and navigation contracts: after font layout, center the card and retain the complete-viewport assertion plus new top/bottom hit tests so fixed navigation cannot cover it. Runtime and documented hierarchy unchanged; hosted nearest-edge scrolling differed from local Chromium.",
+      "reviewedAt": "2026-11-25T21:27:38.222Z",
+      "sourceDigest": "290fc9f09ad5147b91e679f072c00797a514caae4cbcc6a617100320d1a32351",
+      "reviewOutcome": "updated",
+      "reviewReason": "New 186-variant pixel audit and app/offline profiles are added to existing Pal and review gates; creative leaf coverage grows to 65 with no narrowed CI.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1129,10 +1129,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T18:39:41.947Z",
-      "sourceDigest": "bc008f03a736dcdb18015a00d589e0df145f7dd4d063608610e08126446d4b69",
+      "reviewedAt": "2026-11-25T21:27:38.863Z",
+      "sourceDigest": "d4059e046951c66e6067ecaa10e4fc9ceac4fff321a75bd86b3d7838ec447621",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded candidate-only implementation, excluded concurrent PR186, no release actions and offline/DEV evidence distinction.",
+      "reviewReason": "Delivery records owner Android defect, baseline source, correction evidence and explicit owner acceptance and merge/deploy hold.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1571,10 +1571,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "07a7e458005e54be81bd5c496f92d72dea05404c419f96d60477a2c012a94ee3",
-      "reviewedAt": "2026-11-25T18:39:43.231Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "README navigation placement changed only; no character references, anatomy, forms, artwork bytes, asset approvals or design methodology changed.",
+      "sourceDigest": "e36c024e71ac0e60b09f52e7f4d500cde1dda6c2944b9461617e0bf7193cd652",
+      "reviewedAt": "2026-11-25T21:27:39.331Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Quality gate now checks composed portrait alpha against contrasting backgrounds; approved art and two-form design are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1654,10 +1654,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3f7067c124698131bf0c26a9d481f87f7db54c79e5c2d93f89093298580ee231",
-      "reviewedAt": "2026-11-25T18:46:32.168Z",
+      "sourceDigest": "29d58775759c9a88295eb501eca578eb381383831a62466b0e6425af13ab47eb",
+      "reviewedAt": "2026-11-25T21:27:40.219Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated Pal tests now open the real Journey entry and Make scene character shelf; collection/ownership/growth assertions remain intact.",
+      "reviewReason": "Pal and expression contracts use canonical shared alpha, exact-source negative-space seeds and existing error recovery without collection/growth/reward changes.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",

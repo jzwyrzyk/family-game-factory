@@ -163,3 +163,14 @@ The v1 saved collection accepts all 24 IDs. Older application builds do not unde
 ### Coding scene presentation
 
 The first-learner coding candidate adds [scene-only Pal compositing](../creation-studio/PAL_SCENE_RENDERING.md) for the 48 approved neutral pictures. It removes cream paper at draw time with a bounded active-scene cache. Catalogue portraits, source bytes, ownership and growth, expression approvals, saved asset IDs and original token compatibility remain unchanged. This is not a replacement art pack or a new approval of character designs.
+
+
+### Shared transparent presentation — November 25 correction
+
+The owner’s Android review found the Journey starter portrait bypassed scene-only
+paper isolation. All Pal portraits now use the [shared rendering contract](../creation-studio/PAL_SCENE_RENDERING.md), including starter/locked/owned cards,
+Base/Grown expressions, host cameos, rewards and Creative Studio choices. Exact
+approved source URLs and art bytes remain unchanged. Preparation failure is
+visible and recoverable, never an opaque-paper success. Journey's column card
+resets the horizontal widget's flex basis so phone whitespace follows content.
+[Audit and acceptance evidence](../evidence/child-modernization/pal-fidelity/README.md).

@@ -2,6 +2,7 @@ import { PAL_CATALOG, palArtworkPath, palDefinition, palLine, type PalId, type P
 import type { PalsView, PalPreferences, OwnedPalView, PalStage } from './model';
 import type { PalArtworkExpression } from './artwork';
 import './pals.css';
+import { applyPalArtworkMask } from './presentation-image';
 
 /** Read-only presentation. Only the trusted coordinator changes ownership or growth. */
 export interface PalsViewState {
@@ -86,7 +87,7 @@ function setPortraitExpression(portrait: HTMLElement, expression: PalArtworkExpr
   portraitRequests.set(portrait, request);
   const clearLoadTimeout = () => { clearTimeout(portraitTimeouts.get(portrait)); portraitTimeouts.delete(portrait); };
   clearLoadTimeout();
-  image.hidden = false; unavailable.hidden = true;
+  image.hidden = false; image.style.visibility = 'hidden'; unavailable.hidden = true;
   portrait.dataset.expression = requested === neutral ? 'neutral' : expression;
   portrait.dataset.state = 'loading';
   const changed = () => portrait.dispatchEvent(new Event('pal-picture-state', { bubbles: true }));
@@ -110,8 +111,9 @@ function setPortraitExpression(portrait: HTMLElement, expression: PalArtworkExpr
     if (portraitRequests.get(portrait) !== request) return;
     void image.decode().then(() => {
       if (portraitRequests.get(portrait) !== request || image.src !== decodedURL) return;
+      applyPalArtworkMask(image, palArtworkPath(id, form, portrait.dataset.expression as PalArtworkExpression));
       clearLoadTimeout();
-      image.hidden = false; unavailable.hidden = true;
+      image.hidden = false; image.style.visibility = 'visible'; unavailable.hidden = true;
       portrait.dataset.state = 'ready'; changed();
     }).catch(() => failed(decodedURL));
   };

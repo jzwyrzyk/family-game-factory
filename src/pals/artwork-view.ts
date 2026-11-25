@@ -1,6 +1,7 @@
 import { createPalArtworkResolver, PAL_ARTWORK_ASSET_VERSION, type PalArtworkAsset } from './artwork';
 import { createPalExpressionController } from './expressions';
 import './artwork-view.css';
+import { applyPalArtworkMask } from './presentation-image';
 
 type Resolver = NonNullable<ReturnType<typeof createPalArtworkResolver>>;
 type Controller = ReturnType<typeof createPalExpressionController>;
@@ -102,6 +103,8 @@ export function createPalArtworkView(options: PalArtworkViewOptions) {
       image.src = new URL(asset.url, document.baseURI).href;
     });
     if (signal.aborted || disposed) throw new DOMException('Portrait request cancelled.', 'AbortError');
+    applyPalArtworkMask(image, asset.url);
+    image.style.maskPosition = 'center bottom';
     prepared.set(asset.url, image);
     // A form contains four approved states. A change of context clears this map.
     while (prepared.size > 4) prepared.delete(prepared.keys().next().value!);

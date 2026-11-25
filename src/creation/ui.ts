@@ -1,3 +1,4 @@
+import { createPalPortrait } from '../pals/ui';
 import {earlySoundMuted} from '../learning/early/audio';
 import {profileGrade} from '../learning/engine';
 import {isEarlyGrade,withinGrade} from '../learning/grades';
@@ -424,6 +425,8 @@ export function installCreationStudio(host: Host) {
         preview.getContext('2d')!.drawImage(resolved.image,(128-w)/2,(128-h)/2,w,h);
         preview.style.cssText='width:100%;height:100%;object-fit:contain';wrap.replaceChildren(preview);
       }).catch(()=>{if(capturedOwner===owner()&&capturedView===viewEpoch&&wrap.isConnected)wrap.textContent='Art unavailable';});
+    }else if (asset?.palId && asset.palForm) {
+      wrap.append(createPalPortrait(asset.palId, asset.palForm === 'mature' ? 2 : 1));
     }else if (asset?.url) {
       const img = node('img'); img.alt = ''; img.decoding = 'async';
       if (asset.palForm) img.onerror = () => { wrap.textContent = 'Picture unavailable'; };

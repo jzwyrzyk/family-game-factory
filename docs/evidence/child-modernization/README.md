@@ -57,3 +57,11 @@ These actual offline app captures compare baseline `af11650` and candidate `ca68
 - [My Art](compare-art.webp)
 - [Menu](compare-menu.webp)
 - [Conversation / Build](compare-coach-confirm.webp)
+
+
+## Mandatory Pal fidelity follow-up
+
+The owner’s physical Android review found visible portrait paper and excessive
+Journey card height. [The correction record](pal-fidelity/README.md) supersedes
+the earlier visual acceptance for those surfaces. It retains baseline evidence,
+the shared-renderer audit and the corrected candidate’s acceptance limits.

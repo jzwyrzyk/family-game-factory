@@ -81,7 +81,9 @@ test('approved scene artwork stays identifiable during loading, retries after re
     constructor() { images.push(this); }
   }
   Object.defineProperty(globalThis, 'Image', { configurable: true, value: TestImage });
-  Object.defineProperty(globalThis, 'document', { configurable: true, value: { baseURI: 'https://example.test/jems/' } });
+  Object.defineProperty(globalThis, 'document', { configurable: true, value: { baseURI: 'https://example.test/jems/', createElement() {
+    const scratch={width:0,height:0,getContext:()=>({drawImage(){},getImageData(){return {data:new Uint8ClampedArray(scratch.width*scratch.height*4)};}})};return scratch;
+  } } });
   const context = new Proxy({
     createLinearGradient: () => ({ addColorStop() {} }), measureText: (text: string) => ({ width: text.length * 8 }),
     fillText: (text: string) => labels.push(text), drawImage: (...args: unknown[]) => draws.push(args),
@@ -289,7 +291,9 @@ function stageImageFixture(t: TestContext) {
     removeAttribute(name: string) { assert.equal(name, 'src'); this.removed++; }
   }
   Object.defineProperty(globalThis, 'Image', { configurable: true, value: TestImage });
-  Object.defineProperty(globalThis, 'document', { configurable: true, value: { baseURI: 'https://example.test/jems/' } });
+  Object.defineProperty(globalThis, 'document', { configurable: true, value: { baseURI: 'https://example.test/jems/', createElement() {
+    const scratch={width:0,height:0,getContext:()=>({drawImage(){},getImageData(){return {data:new Uint8ClampedArray(scratch.width*scratch.height*4)};}})};return scratch;
+  } } });
   const context = new Proxy({
     createLinearGradient: () => ({ addColorStop() {} }), measureText: () => ({ width: 80 }),
     drawImage: (image: unknown) => draws.push(image),

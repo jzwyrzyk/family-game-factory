@@ -593,6 +593,16 @@ async function installReceiptFixture(page) {
     await page.click('#creationAddActor');await page.click('#creationChoosePal');
     assert.equal(await page.locator('#creationActorDialog').isVisible(), true);
     assert.equal(await page.locator('#creationActorDialog [data-creation-asset]').count(), 3);
+    await page.waitForFunction(() => [...document.querySelectorAll('#creationActorDialog .pals-portrait')].every(p => p.dataset.state === 'ready'));
+    const pickerPictures = await page.locator('#creationActorDialog .pals-portrait').evaluateAll(portraits => portraits.map(p => ({
+      mask: getComputedStyle(p.querySelector('img')).maskImage,
+      width: p.getBoundingClientRect().width, parentWidth: p.parentElement.getBoundingClientRect().width,
+      unavailable: !p.querySelector('.pals-picture-unavailable').hidden,
+    })));
+    assert.equal(pickerPictures.length, 3);
+    for (const picture of pickerPictures) { assert.notEqual(picture.mask, 'none'); assert.ok(picture.width <= picture.parentWidth); assert.equal(picture.unavailable, false); }
+    await page.locator('#creationActorDialog').screenshot({ path: path.join(outputs, 'pals-creative-picker-mobile.png') });
+
     assert.deepEqual(await page.locator('#creationActorDialog [data-creation-asset]').evaluateAll(choices => choices.map(choice => choice.dataset.creationAsset).sort()), [
       'pal-luma-mature-core-2026-11-20', 'pal-nook-base-core-2026-11-20', 'pal-wink-base-core-2026-11-20',
     ], 'The picker offers only owned characters in their earned form, with no legacy or unearned form choices');

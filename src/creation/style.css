@@ -132,6 +132,7 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
 .creation-actor { display:flex; align-items:center; gap:8px; min-height:48px; border:2px solid transparent; border-radius:14px; background:#f1f4fa; padding:4px 10px 4px 4px; color:var(--creation-ink); flex:none; }
 .creation-actor[aria-pressed=true] { background:#eae0ff; border-color:#9d77d5; color:#432074; }
 .creation-actor-art { width:52px; height:52px; flex:none; display:grid; place-items:center; border-radius:10px; color:var(--actor-color,#845dc0); font-size:36px; overflow:hidden; }
+.creation-actor-art > .pals-portrait { width:100%; height:100%; }
 .creation-actor-art img { width:100%; height:100%; object-fit:contain; }
 .creation-actor .creation-actor-art { width:36px; height:36px; font-size:30px; }
 .creation-actor>span:last-child { font-weight:750; max-width:150px; overflow-wrap:anywhere; }

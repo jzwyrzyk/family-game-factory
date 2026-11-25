@@ -112,3 +112,10 @@ The component browser fixture uses synthetic selections and host triggers. It do
 Default asset verification checks committed bytes, lossless headers and recorded pixel digests. For a fresh decode against the recorded pixel hashes, run `node scripts/verify-pal-assets.mjs --pixels`. With the approved source kit available, `node scripts/verify-pal-assets.mjs --source-kit "$PAL_SOURCE_KIT"` also compares all original PNGs directly. `PAL_ASSET_PYTHON` can select the Python/Pillow runtime. Detailed source audits stay outside `public/`.
 
 Keep art approval, byte/pixel verification, component behavior, application acceptance, merge and deployment as separate recorded results. The [two-form compatibility decision](../decisions/0013-two-form-pals-and-current-main.md) continues to govern earned progress and saved history.
+
+
+Portrait decode now includes the same [Pal alpha preparation](../creation-studio/PAL_SCENE_RENDERING.md)
+as the scene renderer before a state becomes ready. The exact approved asset,
+same-form neutral fallback, owner/context cancellation and bounded cache remain
+authoritative. Missing/unreadable preparation uses Picture unavailable and the
+existing explicit retry; an opaque original is not shown as a successful fallback.

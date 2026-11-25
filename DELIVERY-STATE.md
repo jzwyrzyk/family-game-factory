@@ -1,5 +1,17 @@
 # jems delivery state
 
+## Pal transparency correction — owner acceptance pending
+
+The owner’s physical Android review of PR188's offline candidate found opaque
+paper in the Journey “Choose your free Pal” card and excessive height. The
+follow-up begins from `40063a13352b90344318a61e4fe86d74e4020433`. Application and
+offline reproduction show the same defects: portraits bypassed the existing
+scene-only alpha preparation, and a vertical card inherited a 240px horizontal
+flex basis. The [correction evidence](docs/evidence/child-modernization/pal-fidelity/README.md)
+records implementation, visual comparison and scoped tests. The PR carries final
+CI/artifact identities. Corrected physical-device acceptance is pending; no merge
+or deployment is authorized by this follow-up.
+
 ## Child experience modernization candidate, November 25, 2026
 
 The owner's comprehensive modernization is implemented on `codex/child-experience-modernization-20261125`, based on current protected main `af11650ea35a29bb0ef9f6b0aa6edd7d8ee84a9e`. Home, canonical navigation, My Journey, Creative Studio and the saved-concept Build flow are updated; My Art remains the visual reference. The [decision](docs/decisions/2026-11-25-child-experience-modernization.md) records data/guard boundaries and the [acceptance record](docs/evidence/child-modernization/README.md) maps workstreams, visual evidence, tests, integration and remaining acceptance.
