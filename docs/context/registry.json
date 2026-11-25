@@ -641,10 +641,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:28:26.927Z",
-      "sourceDigest": "ba7dc4c367bbca5eb5553c243ce5e8c549b4cbefb0446959037ff3a216c63aec",
+      "reviewedAt": "2026-11-25T01:48:35.295Z",
+      "sourceDigest": "0d4d853b038b9b8b627bc1ec5c0a6a792b0a0593de5e850a01f069cc5ce37c8b",
       "reviewOutcome": "updated",
-      "reviewReason": "The shared shell loads responsive learning styles. Reviewed picture sequences record ordered listening evidence with tap controls.",
+      "reviewReason": "Extend reviewed math coverage with subset sorting, numeral to group matching and shape properties. Preserve previous generated items.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -884,10 +884,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T01:36:44.559Z",
-      "sourceDigest": "3d55ece296fced7c97c8467e6fdb8e01d18d4543d8fe9e6ab8d682002090b5ce",
+      "reviewedAt": "2026-11-25T01:48:35.466Z",
+      "sourceDigest": "25ea4bc9eef2d241701f33aa8fced823aa79feeb2a0f7aed799ab53b8e8d8651",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reconciled the refreshed responsive coding layout and the independent Adult Private budget changes with this early learning review stage. Existing operational procedures and acceptance commands still apply to this change.",
+      "reviewReason": "Extend reviewed math coverage with subset sorting, numeral to group matching and shape properties. Preserve previous generated items. Existing operational procedures and acceptance commands still apply to this change.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -13,6 +13,9 @@ function group(n:number,object:string) {
  return node;
 }
 function visual(value:string,object:string){
+ if(value==='small-gem'||value==='large-gem'){
+  const image=picture('gem');image.classList.add('early-'+value);image.alt=value.replace('-',' ');return image;
+ }
  if(hasPicture(value))return picture(value);
  if(value.startsWith('group-'))return group(Number(value.slice(6)),object);
  const node=frame('early-token');
@@ -25,7 +28,8 @@ export function mountEarlyMath(area:HTMLElement,item:MathItem,submit:(value:stri
  const {prompt,object,style,n,b,layout}=item.parameters;
  const scene=frame('early-scene');scene.dataset.layout=String(layout);
  const asset=String(object),target=Number(n),promptText=String(prompt);
- if(prompt==='position'){scene.classList.add('early-column');scene.append(picture('star'),picture('gem'),picture('apple'));}
+ if(style==='sort'){scene.append(visual(promptText.split(' ')[0],asset));}
+ else if(prompt==='position'){scene.classList.add('early-column');scene.append(picture('star'),picture('gem'),picture('apple'));}
  else if(prompt==='category'){for(let i=0;i<Math.max(target,Number(b));i++){if(i<target)scene.append(picture('apple'));if(i<Number(b))scene.append(picture('pear'));}}
  else if(prompt==='teen'){scene.append(group(10,asset),visual('+',asset),group(target-10,asset));}
  else if(prompt==='triangles'){scene.append(visual('◢',asset),visual('◤',asset));}
@@ -37,15 +41,19 @@ export function mountEarlyMath(area:HTMLElement,item:MathItem,submit:(value:stri
  }else if(promptText){for(const token of promptText.split(' '))scene.append(visual(token,asset));}
  if(scene.childElementCount)area.append(scene);
  const grid=document.createElement('div');grid.className='early-choices';area.append(grid);
- if(style==='touch'||style==='build'){
-  const count=style==='touch'?target:Math.max(target,item.grade===-1?5:10);
+ if(style==='touch'||style==='build'||style==='sort'){
+  const board=style==='sort'?promptText.split(' ').slice(1):null;
+  const count=board?board.length:style==='touch'?target:Math.max(target,item.grade===-1?5:10);
   grid.classList.add('early-counter');let selected=0;
   for(let i=0;i<count;i++){
-   const tile=document.createElement('button');tile.type='button';tile.setAttribute('aria-pressed','false');tile.append(picture(asset));
+   const tile=document.createElement('button');tile.type='button';tile.setAttribute('aria-pressed','false');tile.append(board?visual(board[i],asset):picture(asset));
    tile.onclick=()=>{const pressed=tile.getAttribute('aria-pressed')==='true';tile.setAttribute('aria-pressed',String(!pressed));selected+=pressed?-1:1;};grid.append(tile);
   }
   const check=document.createElement('button');check.type='button';check.className='early-check';check.setAttribute('aria-label','Check my group');check.append(createIcon('check'));
-  check.onclick=()=>submit(String(selected));area.append(check);return;
+  check.onclick=()=>{
+   const value=board?Array.from(grid.querySelectorAll('button'),tile=>tile.getAttribute('aria-pressed')==='true'?'1':'0').join(''):String(selected);
+   submit(value);
+  };area.append(check);return;
  }
  for(const choice of item.choices||[]){
   const tile=document.createElement('button');tile.type='button';tile.dataset.value=choice.value;
