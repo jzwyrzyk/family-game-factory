@@ -1,3 +1,4 @@
+import {cloudBackupSchedule,runFamilyCloudRecovery,familyBackupLedger} from './beta/recovery';
 import {reconcileFamilies} from './beta/reconcile';
 import {platformMode,validateBeta,familyOrigin,uuid,type BetaConfig} from './beta/model';
 import {mappedHouseholdRepository,type HouseholdBinding} from './beta/household';
@@ -142,6 +143,7 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
     (config.active&&!beta.workerRoute)||config.sessionKey.length<32||config.previewKey.length<32||config.sessionKey===config.previewKey)throw Error('BETA_CONFIGURATION_REQUIRED');
  const db=new Firestore({projectId:config.projectId});
  const d=new FamilyDirectory(firestoreStore(db),beta,workspace=>new GcsPrivateArtifacts(config.artifactBucket!,workspace),artifactEncoding(config));
+ cloudBackupSchedule(d); // Validate separate, default-off backup configuration.
  const runtimes=new Map<string,ReturnType<typeof createGateway>>();
  const runtime=(id:string)=>{
   if(!uuid(id))throw Error('INVALID_FAMILY');
@@ -182,6 +184,7 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
     const retired=await d.withFamily(id,async(_tx,f)=>f.request?.kind==='deletion'&&['deleting','completed'].includes(f.request.state));
     if(retired)return;
     const target=await runtime(id);await reconcilePaidReceipts(target.repo);await target.coordinator.tick();
+    await runFamilyCloudRecovery(d,id,profile=>familyBackupLedger(db,d,config.artifactBucket!,id,profile));
    });
    res.writeHead(204);res.end();
   }});
