@@ -94,7 +94,7 @@ const { chromium } = require('playwright');
    await art.deleteArtwork(owner, recovered.drawings[0].id);
    owner = 'player1';
    const counts = await art.withArtTransaction(['drawings'], 'readwrite', async tx => {
-    for (let i = 0; i < art.ART_LIMITS.drawingsPerOwner - 2; i++) tx.objectStore('drawings').add({ ...original, id: 'quota-fixture-' + i, name: 'Synthetic quota fixture' });
+    for (let i = 0; i < art.ART_LIMITS.drawingsPerOwner - 2; i++) {const fixture={ ...original, id: 'quota-fixture-' + i, name: 'Synthetic quota fixture' };tx.objectStore('drawings').add(fixture);art.saveDrawingMetadata(tx,fixture);}
    });
    const concurrent = await Promise.allSettled([art.saveDrawing(owner, 'Last slot', file), art.saveDrawing(owner, 'Racing slot', file)]);
    check(concurrent.filter(result => result.status === 'fulfilled').length === 1 && (await art.drawings(owner)).length === art.ART_LIMITS.drawingsPerOwner, 'concurrent image saves cannot exceed transactional quota');

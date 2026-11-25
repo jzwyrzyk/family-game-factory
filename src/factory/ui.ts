@@ -67,7 +67,10 @@ export async function initLiveRemix() {
     append(page.items);let after=page.next;
     if(after){const more=document.createElement('button');more.id='liveMoreGames';more.className='btn secondary';more.textContent='Show more games';box.append(more);more.onclick=()=>guarded(async()=>{if(!after)return;more.disabled=true;const next=await store.page(owner(),after);more.remove();append(next.items);after=next.next;if(after){more.disabled=false;box.append(more);}});}
   }
+  let renderSequence=0;
   async function render(){
+    const sequence=++renderSequence;$('liveEditor').inert=true;$('liveEditor').setAttribute('aria-busy','true');
+    try{
     const page=await store.page(owner()),projects=page.items;projectAfter=page.next;if(active&&!projects.some(p=>p.id===active)){try{projects.push(await store.project(active,owner()));}catch{active=null;}}if(!active)active=projects.at(-1)?.id||null;
     $('liveProjects').replaceChildren(...projects.map(p=>option(p.id,p.name)),...(projectAfter?[option('__more__','More saved games…')]:[]));$<HTMLSelectElement>('liveProjects').value=active||'';$<HTMLSelectElement>('liveProjects').disabled=!projects.length;$('liveEditor').hidden=!active;
     await renderCollection();if(!active)return;
@@ -77,6 +80,7 @@ export async function initLiveRemix() {
     let more=$<HTMLButtonElement>('liveMoreVersions');if(!more){more=document.createElement('button');more.id='liveMoreVersions';more.className='btn secondary';more.textContent='More saved versions';$('compareVersion').after(more);}more.hidden=!historyAfter;more.onclick=()=>guarded(async()=>{if(!historyAfter)return;const next=await store.historyPage(p.id,owner(),historyAfter);for(const revision of next.items)if(!Array.from($<HTMLSelectElement>('compareVersion').options).some(item=>item.value===revision.id))$('compareVersion').append(option(revision.id,revision.label));historyAfter=next.next;more.hidden=!historyAfter;});
     $('liveExamples').replaceChildren(...examples[p.game].map(example=>{const button=document.createElement('button');button.type='button';button.className='text-btn';button.textContent=example;button.onclick=()=>{clearPending();$<HTMLInputElement>('livePrompt').value=example;$('livePrompt').focus()};return button;}));
     $<HTMLInputElement>('livePrompt').placeholder=examples[p.game][0]||'Describe your game idea';await renderComparison();renderCoach();
+    }finally{if(sequence===renderSequence){$('liveEditor').inert=false;$('liveEditor').removeAttribute('aria-busy');}}
   }
   async function play(r:Revision){
     const p=(await project()),capturedOwner=owner();$('playedVersion').hidden=false;$('playedVersion').textContent=`Playing ${p.name}: ${playableMechanics(p.game,r.config).map(m=>`${m.label} ${display(m.key,r.config[m.key])}`).join(' · ')}`;$('returnLive').hidden=false;
