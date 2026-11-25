@@ -2,6 +2,7 @@ import {Firestore} from '@google-cloud/firestore';
 import {Storage} from '@google-cloud/storage';
 import {readFile} from 'node:fs/promises';
 import {uuid,workspaceOf,defaultCapabilities,type Family} from './model';
+import {reconcileGeneratedRestoreOperation} from './backup-operations';
 
 export function deletionTarget(f:Family,id:string,requestId:string){
  if(!uuid(id)||!uuid(requestId)||f.id!==id||f.status!=='revoked'||f.request?.kind!=='deletion'||
@@ -17,6 +18,14 @@ export async function processDeletion(db:Firestore,storage:Storage,config:{envir
  // Admissions read the family state and create this barrier atomically before
  // any external write. Deletion was already fenced by the approved revoked case.
  // An old or failed operation is unresolved, never presumed safe after a timeout.
+ if(apply){
+  // Lost replies may leave a completed restore's barrier. Its atomic receipt
+  // proves completion even after access was revoked. Unknown writes stay held.
+  const operations=await db.collection('factoryBackupSchedules/'+workspace+'/activeOperations').limit(100).get();
+  for(const operation of operations.docs)await db.runTransaction(async native=>{
+   await reconcileGeneratedRestoreOperation({get:async<T>(path:string)=>{const row=await native.get(db.doc(path));return row.exists?row.data() as T:undefined;},delete:path=>{native.delete(db.doc(path));}},family.path,id,workspace,operation.id);
+  });
+ }
  const pending=await db.collection('factoryBackupSchedules/'+workspace+'/activeOperations').limit(1).get();
  if(!apply)return {authorized:true,workspace,apply:false,pendingStorageOperations:!pending.empty};
  if(!pending.empty)throw Error('STORAGE_OPERATIONS_PENDING');

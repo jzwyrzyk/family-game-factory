@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {randomUUID} from 'node:crypto';
+import {createHash,randomUUID} from 'node:crypto';
 import {createServer,request} from 'node:http';
 import type {AddressInfo} from 'node:net';
 import {processDeletion} from '../server/beta/erase';
@@ -23,7 +23,7 @@ function executor(records:Map<string,any>,objects:string[]){
  const doc=(path:string):any=>({path,collection:(name:string)=>query(path+'/'+name),get:async()=>row(path)});
  const db:any={doc,collection:(path:string)=>query(path),recursiveDelete:async(ref:any)=>{if(ref.path===failPath){failPath='';throw Error('SYNTHETIC_INTERRUPTION');}deleted.push(ref.path);for(const path of records.keys())if(path===ref.path||path.startsWith(ref.path+'/'))records.delete(path);},
   batch:()=>{const paths:string[]=[];return {delete:(ref:any)=>paths.push(ref.path),commit:async()=>{for(const path of paths){deleted.push(path);records.delete(path);}}};},
-  runTransaction:async(fn:any)=>fn({get:async(ref:any)=>row(ref.path),set:(ref:any,value:any)=>records.set(ref.path,copy(value))})};
+  runTransaction:async(fn:any)=>fn({get:async(ref:any)=>row(ref.path),set:(ref:any,value:any)=>records.set(ref.path,copy(value)),delete:(ref:any)=>{deleted.push(ref.path);records.delete(ref.path);}})};
  const storage:any={bucket:()=>({getFiles:async({prefix,versions,autoPaginate,maxResults}:any)=>{assert.equal(versions,true);assert.equal(autoPaginate,false);listed.push(prefix);return [objects.filter(path=>path.startsWith(prefix)).slice(0,maxResults).map(name=>({name,metadata:{generation:'7'},delete:async({ifGenerationMatch}:any)=>{assert.equal(ifGenerationMatch,'7');deleted.push(name);objects.splice(objects.indexOf(name),1);}}))];}})};
  return {db,storage,deleted,listed,interrupt:(path:string)=>{failPath=path;}};
 }
@@ -76,6 +76,15 @@ test('approved guardian export includes paged storage consent, schedule and unre
   assert.ok((await call(a.id,{kind:kinds[0],after:'../'})).status>=400);
   assert.ok((await call(a.id,{},cookies,'GET')).status>=400);
  }finally{server.closeAllConnections();await new Promise<void>(ok=>server.close(()=>ok()));}
+});
+
+test('verified erasure reconciles only the exact committed restore receipt after revocation',async()=>{
+ const {d,enroll,mutate}=await betaFixture(),f=await enroll('committed-restore-erasure');await mutate('request-deletion',f.id);const requestId=(await d.withFamily(f.id,async(_tx,f)=>f)).request!.id;await mutate('confirm-deletion',f.id,{requestId,receipt:'synthetic-reviewed-erasure'});
+ const family=await d.withFamily(f.id,async(_tx,f)=>f),pointId='scheduled-'+'a'.repeat(48),checksum='b'.repeat(64),identity=createHash('sha256').update(pointId+':'+checksum).digest('hex'),operation='factoryBackupSchedules/'+family.workspace+'/activeOperations/restore-'+identity,receiptPath=d.path(f.id)+'/generated-restores/'+identity;
+ const records=new Map<string,any>([[d.path(f.id),family],[operation,{schema:'jems.backup-operation.v1',familyId:f.id,profile:'original-profile',purpose:'generated-restore',attempt:'lost-reply',startedAt:1,completion:{pointId,checksum}}],[receiptPath,{pointId,checksum:'c'.repeat(64),added:1,opened:1,retained:0}]]),objects=[`factory/${family.workspace}/original`],x=executor(records,objects),config={environment:d.config.environment,artifactBucket:'synthetic-only'};
+ await assert.rejects(processDeletion(x.db,x.storage,config,f.id,requestId,true),/STORAGE_OPERATIONS_PENDING/);assert.ok(records.has(operation));assert.deepEqual(x.deleted,[]);
+ records.set(receiptPath,{pointId,checksum,added:1,opened:1,retained:0});assert.equal((await processDeletion(x.db,x.storage,config,f.id,requestId,false)).pendingStorageOperations,true,'read-only check cannot settle an operation');assert.ok(records.has(operation));
+ assert.equal((await processDeletion(x.db,x.storage,config,f.id,requestId,true)).apply,true);assert.equal(records.has(operation),false);assert.deepEqual(objects,[]);assert.equal(records.get(d.path(f.id)).request.state,'completed');
 });
 
 test('suspended guardian downloads only its approved privacy case with a separate live-device parent proof',async()=>{
