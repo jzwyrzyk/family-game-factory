@@ -68,8 +68,11 @@ export async function earlyBetaBrowser(tls:ServerOptions,engine:'chromium'|'webk
    const choice=await submitParentPrivacyChoice(d.repository(family.id),{...session,role:'parent'},{noticeVersion:betaNotice,guardianAffirmed:true,providerAcknowledged:true,scopes:{generation:true,conversation:false,remoteSpeech:false}});
    await recordExternalGuardianVerification(d.repository(family.id),{familyId:family.id,choiceId:choice.choiceId,receipt:'synthetic-browser-guidance',verifiedByOwner:true});
    await page.reload();await page.waitForURL('**/acknowledge');await page.getByLabel('Parent passphrase').fill(parent);for(const checkbox of await page.getByRole('checkbox').all())await checkbox.check();await page.getByRole('button',{name:'Enter Jems'}).click();await page.waitForFunction(()=>Boolean((window as any).FG?.studio));
-   await page.evaluate(profileId=>{const FG=(window as any).FG;FG.store.choose(profileId);window.dispatchEvent(new Event('factory-profile'));window.dispatchEvent(new Event('factory-open-parent-connection'));},profiles[0]);
+   // Open Parent in the same task as profile switching: the notebook's async
+   // rebind must not later override the adult's explicit navigation with Home.
+   await page.evaluate(profileId=>{const w=window as any,FG=w.FG;w.parentNavigation=[];window.addEventListener('factory-page',event=>w.parentNavigation.push((event as CustomEvent).detail));FG.store.choose(profileId);window.dispatchEvent(new Event('factory-profile'));window.dispatchEvent(new Event('factory-open-parent-connection'));},profiles[0]);
    await page.locator('#parentGuidanceStart').click();await page.waitForFunction(()=>document.getElementById('parentGuidanceStatus')?.textContent?.includes('Stay together'));
+   const navigation=await page.evaluate(()=>(window as any).parentNavigation as string[]);assert.ok(navigation.includes('parent'));assert.ok(!navigation.slice(navigation.indexOf('parent')+1).includes('home'));assert.equal(await page.locator('#page-parent').isVisible(),true);
    await page.locator('#homeBtn').click();await page.locator('#studioNew').click();await page.locator('#studioPrompt').waitFor({state:'visible'});
    assert.equal(await page.locator('#earlyCreationHandoff[open]').count(),0);assert.equal(await page.locator('#guidedCreationTogether').isVisible(),true);
    await page.screenshot({path:'test-results/family-beta/'+engine+'-beta-parent-guided-creation.png',fullPage:true});

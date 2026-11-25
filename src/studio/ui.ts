@@ -97,7 +97,7 @@ export async function installStudio(){
  let guidanceEpoch=0;
  const creationAction=()=>{const captured=String(FG.store.current().id),generation=guidanceEpoch;return()=>String(FG.store.current().id)===captured&&generation===guidanceEpoch&&!young();};
  const handOff=createEarlyHandoff(async ()=>(await openParent(true)),async ()=>(await home()),()=>creation.open(),()=>pals.state,()=>String(FG.store.current().id));
- let notebook:NotebookWorkspace,notebookOwner=String(FG.store.current().id);
+ let notebook:NotebookWorkspace,notebookOwner=String(FG.store.current().id),notebookReady:Promise<void>=Promise.resolve();
  try{notebook=await NotebookWorkspace.open(profileStorage(localStorage),()=>String(FG.store.current().id),notifyRewardSourceSaved);}catch(error){
   const warning=el('p','notice',String((error as Error).message));$('page-home').prepend(warning);return;
  }
@@ -426,20 +426,27 @@ export async function installStudio(){
  const rewardsWidget=createRewardsWidget({...rewards.state,onOpen:()=>act(openRewards)});
  headerTools.prepend(rewardsWidget.element);
  const rewardToastHost=el('div','jems-rewards-toast-host');rewardToastHost.id='jemsRewardCelebrations';document.body.append(rewardToastHost);
- let rewardToastTimer:ReturnType<typeof setTimeout>|undefined,rewardBatchTimer:ReturnType<typeof setTimeout>|undefined,pendingGrants:RewardGrant[]=[];
+ let rewardToastTimer:ReturnType<typeof setTimeout>|undefined,rewardBatchTimer:ReturnType<typeof setTimeout>|undefined,pendingGrants:RewardGrant[]=[],rewardViewReady:Promise<unknown>=Promise.resolve();
  function clearRewardCelebration(){clearTimeout(rewardToastTimer);clearTimeout(rewardBatchTimer);pendingGrants=[];rewardToastHost.replaceChildren();}
  function celebrationWouldCoverWork(){return playView.active||(route==='studio'&&panel==='talk'&&!page.classList.contains('hidden'));}
  function enterPlayView(){clearRewardCelebration();document.getElementById('jems-delight-host')?.replaceChildren();playView.enter();}
  function renderRewards(){if(notebookOwner!==owner())return;rewardsWidget.update(rewards.state.summary,rewards.state);rewardsPage.update({...rewards.state,journey:rewardJourney()});}
  rewards.subscribe((state,grants)=>{
-  if(notebookOwner===owner()){const selected=notebook;void selected.refreshRewards().then(()=>{if(notebook===selected&&notebookOwner===owner())renderRewards();}).catch(()=>{});}
+  if(notebookOwner===owner()){const selected=notebook;
+   // A recovered maker outbox may come from another writer. Refresh the maker
+   // projection for that milestone, while ordinary rewards read only receipts.
+   const refreshed=grants.some(grant=>grant.kind==='maker.milestone')?selected.refresh():selected.refreshRewards();
+   rewardViewReady=Promise.all([rewardViewReady.catch(()=>{}),refreshed]);
+   void rewardViewReady.then(()=>{if(notebook===selected&&notebookOwner===owner())renderRewards();}).catch(()=>{});
+  }
   renderRewards();
   // Earned totals still update; decorative popups must not cover answers or game controls.
   if(celebrationWouldCoverWork()){clearRewardCelebration();return;}
   if(!grants.length||state.summary.owner!==owner()||document.hidden)return;
   pendingGrants.push(...grants);clearTimeout(rewardBatchTimer);
   const capturedOwner=owner();
-  rewardBatchTimer=setTimeout(()=>{
+  rewardBatchTimer=setTimeout(async()=>{
+   try{await rewardViewReady;}catch{pendingGrants=[];return;}
    if(owner()!==capturedOwner||document.hidden||celebrationWouldCoverWork()){pendingGrants=[];return;}
    const batch=pendingGrants;pendingGrants=[];
    const earned=batch.reduce((total,grant)=>total+grant.amount,0),summary=rewards.state.summary;
@@ -749,8 +756,8 @@ export async function installStudio(){
   setIconLabel(checkIdea,'retry',reconnect?'Reconnect chat':'Check my idea');
   buildGuidance.hidden=!creating||(!buildReason.textContent&&checkIdea.hidden);
  }
- const activeActions=new Set<Promise<void>>();
- function act(action:()=>void|Promise<void>){const actor=owner();try{const result=action(),project=activeId,view=route;const pending=Promise.resolve(result).catch(error=>{if(owner()===actor&&activeId===project&&route===view)status((error as Error).message,true);}).finally(()=>activeActions.delete(pending));activeActions.add(pending);}catch(error){if(owner()===actor)status((error as Error).message,true);}}
+ const activeActions=new Set<Promise<void>>();let actionGeneration=0;
+ function act(action:()=>void|Promise<void>){const actor=owner(),generation=++actionGeneration;try{const result=action();const pending=Promise.resolve(result).catch(error=>{if(owner()===actor&&generation===actionGeneration)status((error as Error).message,true);}).finally(()=>activeActions.delete(pending));activeActions.add(pending);}catch(error){if(owner()===actor&&generation===actionGeneration)status((error as Error).message,true);}}
  async function flushForCapture(){await Promise.all([...activeActions]);await flushDraft();}
  function status(text:string,error=false){const target=route==='studio'?$('studioStatus'):globalStatus;target.textContent=text;target.classList.toggle('is-error',error);target.setAttribute('role',error?'alert':'status');}
  function sameView(s:StudioSession,at=epoch){return at===epoch&&owner()===s.owner&&activeId===s.id&&route==='studio';}
@@ -767,7 +774,7 @@ export async function installStudio(){
  let draftWrites=0;
  function draftPending(){if(draftWrites)return true;if(!activeId)return false;try{return current().draft!==$<HTMLTextAreaElement>('studioPrompt').value;}catch{return true;}}
  async function flushDraft(){
-  clearTimeout(draftTimer);await compoundTail;await notebook.whenIdle();if(!activeId)return;const s=current(),text=$<HTMLTextAreaElement>('studioPrompt').value,at=epoch;draftWrites++;
+  clearTimeout(draftTimer);await notebookReady;await compoundTail.catch(()=>{});await notebook.whenIdle();if(!activeId)return;const s=current(),text=$<HTMLTextAreaElement>('studioPrompt').value,at=epoch;draftWrites++;
   try{await coaching?.flushDrafts();if(s.draft!==text)await notebook.update(s.id,s.owner,x=>{x.draft=text;});if(sameView(s,at)&&$<HTMLTextAreaElement>('studioPrompt').value===text)$('studioDraftStatus').textContent='Saved on this device';}
   catch(error){if(sameView(s,at)){$('studioDraftStatus').textContent='Could not save. Keep this page open.';$('studioStorage').textContent='Could not save — keep this page open';}throw error;}
   finally{draftWrites--;}
@@ -917,7 +924,7 @@ export async function installStudio(){
  function renderLibrary(){const actor=owner();void renderLibraryAsync().catch(error=>{if(owner()===actor&&route==='library')status((error as Error).message,true);});}
  async function renderLibraryAsync(){
   const requested=++libraryRender,capturedOwner=owner();const projects=await games.list(capturedOwner);
-  for(const session of notebook.list(capturedOwner).filter(s=>s.game==='gum'&&s.projectId&&!s.remoteId))await games.revision(session.projectId!,capturedOwner);
+  for(const session of notebook.list(capturedOwner).filter(s=>s.game==='gum'&&s.projectId&&!s.remoteId&&projects.some(project=>project.id===s.projectId)))await games.revision(session.projectId!,capturedOwner);
   if(requested!==libraryRender||owner()!==capturedOwner)return;
   refreshEarlyJourney();
   refreshLearningChoice();
@@ -1019,7 +1026,7 @@ export async function installStudio(){
    (ORIGINAL_GAMES.includes(game)?originalGames:starters).append(b);
   });installQualityCards();updateCreationNote();refreshWelcome();
  }
- async function home(){stopSpeech();(await flushDraft());handoff.close();closeJourneyMap();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));library.classList.remove('hidden');route='library';renderLibrary();setActiveNav('studioNavHome');window.scrollTo(0,0);focusView(welcome.element.hidden?$('studioLibraryTitle'):$('studioWelcomeTitle'));}
+ async function home(){if(document.body.classList.contains('creation-open'))welcomeArt=null;stopSpeech();(await flushDraft());handoff.close();closeJourneyMap();hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('home');document.querySelectorAll('main > .page').forEach(p=>p.classList.add('hidden'));library.classList.remove('hidden');route='library';renderLibrary();setActiveNav('studioNavHome');window.scrollTo(0,0);focusView(welcome.element.hidden?$('studioLibraryTitle'):$('studioWelcomeTitle'));}
  async function homeFromNavigation(){
   // The first invitation has no competing Explore action. After choosing a
   // character, an intentional Home action can still open the ordinary library.
@@ -1206,10 +1213,11 @@ export async function installStudio(){
   if(showing==='candidate'&&s.candidate)await playCandidate();else await playWorking();
  }
  async function showHelp(){
-  const s=current(),at=epoch;if(guardMath())return;const helpIntent=++viewIntent;
+  const s=current();if(guardMath())return;const helpIntent=++viewIntent;
   if(mounted&&FG.runtime.showHelp?.())return;
   if(mounted||iframe){disposeGame(true);showStudio();pausedForTools=true;}
-  (await setTab('game'));render();$('studioHelpPanel').hidden=false;
+  const at=epoch; // Disposing the current player advances the view epoch.
+  (await setTab('game'));render();
   const touch=matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0;
   const native=!remoteViewedId&&s.game!=='new';
   const touchHelp:Record<string,string>={mining:'Hold Left or Right to run into jems. Bring them to the bucket. Run to safety or hold on before the giant shakes; holding spills your bag.',factory:'Find the next gem in the pattern. Tap a bucket, use the glowing machines, then choose paper and send your gift!',moon:'Tap Left or Right to run, and Jump to leap over meteors.',robot:'Tap the arrows to plan a route, then Run to test it.',gum:'Tap a part to add it. Drag to move it. Choose Gum, then another part to stick them together. Choose Test machine to try it.',hill:'Hold the right pedal to drive. Hold the left pedal to brake. You can change your ride in the garage.',buckets:'Tap a bucket to choose it. Watch what happens, then try another round.',dragon:'Use the arrow buttons to move. Tap the jump button to bounce fireballs with your shield.'};
@@ -1222,7 +1230,7 @@ export async function installStudio(){
   $('studioHelpGoal').textContent=stickerConstruction?'Choose three stickers for your invention, then send it flying, swimming or dancing.':physicalConstruction?'Connect everyday pieces with gum. Test your machine, change it, and try again.':oldConstruction?'Build a silly invention with the pieces and gum. Try it and make a change.':native?FG.games[s.game]?.instructions||'Try your game and see what happens.':'Use the instructions and controls shown inside your game. Your saved tests stay in My tests.';
   $('studioHelpControls').textContent=assemblyConstruction?'Choose a real object, then tap the glowing +. Tap the pink gum at a join to stick the pieces together. Wiggle test checks your joins. Launch and see how far your pieces can go. Watch again or change a piece to try a different adventure. Choose Next build when you are ready.':stickerConstruction?'Choose a sticker and tap a bubble on the machine, or drag a sticker onto a bubble. Add three, then tap Make it GO!':physicalConstruction?(touch?touchHelp.gum:'Choose a part from the tray, place it on the canvas, attach parts with gum and test your machine.'):oldConstruction?'Choose a part in your build, then use the move, turn and connect controls shown below it. Try your machine and change it again.':native&&touch?touchHelp[s.game]:native?FG.games[s.game]?.controls||'Use the controls in your game.':'Tap the game first, then use its buttons or keyboard controls.';
   $('studioHelpKeyboard').textContent=assemblyConstruction?'Use Tab and Enter to choose a piece. Enter places it at the focused +. Tab to the pink gum join and press Enter to connect it. Every action also works with a tap.':stickerConstruction?'Press Tab to choose a sticker, Enter to select it, then Tab and Enter to place it on a bubble.':physicalConstruction?'Use Tab to reach parts and tools, Enter to select them, arrow keys to move a chosen part, and R to rotate it.':oldConstruction?'Use Tab and Enter to choose parts and construction controls.':'Use Tab to reach controls and Enter to choose. How a character moves depends on this game.';
-  focusView($('studioHelpTitle'));
+  $('studioHelpPanel').hidden=false;focusView($('studioHelpTitle'));
  }
  async function submit(request?:{prompt:string;displayText?:string;compiledPlan?:boolean}){
   const authorized=creationAction();
@@ -1693,20 +1701,27 @@ export async function installStudio(){
  window.addEventListener('factory-session-restored',()=>{void refreshServiceReadiness();if(activeId&&panel==='talk')void privateSpeech?.refresh();});
  window.addEventListener('factory-profile-before-change',event=>{stopSpeech();if(event.cancelable&&draftPending()){event.preventDefault();act(flushDraft);return;}handoff.close();disposeGame();});
  let profileOpening=0;
- window.addEventListener('factory-profile',()=>{const requested=++profileOpening,capturedOwner=owner(),preserveParent=!$('page-parent').classList.contains('hidden');notebookOwner='';welcomeArt=null;handoff.close();buildAttempts.clear();submittedDrafts.clear();sending.clear();waitProject=null;stopSpeech();hideJourney();
+ window.addEventListener('factory-profile',()=>{const requested=++profileOpening,capturedOwner=owner(),navigationIntent=++actionGeneration,preserveParent=!$('page-parent').classList.contains('hidden');notebookOwner='';welcomeArt=null;handoff.close();buildAttempts.clear();submittedDrafts.clear();sending.clear();waitProject=null;stopSpeech();hideJourney();
   // A hidden Studio DOM must never retain the previous child's transcript.
   // Clearing a browser view does not delete the former child's saved notebook.
   conversationReaders.forEach(reader=>reader.dispose());conversationReaders=[];notificationView?.clear();
   const conversation=$('studioMessages');conversation.replaceChildren();delete conversation.dataset.session;delete conversation.dataset.signature;$('coachProposals').replaceChildren();
   $('coachModeStatus').textContent='';$<HTMLTextAreaElement>('studioPrompt').value='';
   $('studioVoiceStatus').textContent='';
-  coachConnection=remote.mode==='remote'?'checking':'unavailable';builderReadiness=remote.mode==='remote'?'checking':'not-configured';$<HTMLDialogElement>('studioCopyDialog').close();coaching?.reset();clearTimeout(draftTimer);clients.forEach(c=>c.disconnect());clients.clear();unknownJobs.clear();for(const timer of retryTimers.values())clearTimeout(timer);retryTimers.clear();activeId=null;reflecting=false;disposeGame();$('studioLibrary').replaceChildren();notebook.close();void (async()=>{const next=await NotebookWorkspace.open(profileStorage(localStorage),owner,notifyRewardSourceSaved);if(requested!==profileOpening||owner()!==capturedOwner){next.close();return;}notebook=next;notebookOwner=capturedOwner;lastPresentedLevel=notebook.summary().journey.level;updateProfile();if(!preserveParent)await home();else route='other';void refreshServiceReadiness();resumeOutstanding();})().catch(error=>{if(owner()===capturedOwner)status((error as Error).message,true);});});
+  coachConnection=remote.mode==='remote'?'checking':'unavailable';builderReadiness=remote.mode==='remote'?'checking':'not-configured';$<HTMLDialogElement>('studioCopyDialog').close();coaching?.reset();clearTimeout(draftTimer);clients.forEach(c=>c.disconnect());clients.clear();unknownJobs.clear();for(const timer of retryTimers.values())clearTimeout(timer);retryTimers.clear();activeId=null;reflecting=false;disposeGame();$('studioLibrary').replaceChildren();notebook.close();
+  const opening=(async()=>{const next=await NotebookWorkspace.open(profileStorage(localStorage),owner,notifyRewardSourceSaved);if(requested!==profileOpening||owner()!==capturedOwner){next.close();return;}notebook=next;notebookOwner=capturedOwner;lastPresentedLevel=notebook.summary().journey.level;updateProfile();})();notebookReady=opening;
+  void opening.then(async()=>{if(requested!==profileOpening||owner()!==capturedOwner)return;
+   // A later Parent action owns navigation even while this profile's notebook
+   // is still opening. Rebinding its data must not send that adult back home.
+   if(!preserveParent&&navigationIntent===actionGeneration)await home();else if(!$('page-parent').classList.contains('hidden'))route='other';
+   void refreshServiceReadiness();resumeOutstanding();}).catch(error=>{if(owner()===capturedOwner)status((error as Error).message,true);});});
  window.addEventListener('factory-art-updated',event=>{
   if((event as CustomEvent).detail?.owner!==owner())return;
   void readWelcomeArt(true);
  });
  window.addEventListener('beforeunload',event=>{stopSpeech();if(rewardSourceWritable()&&draftPending()){event.preventDefault();event.returnValue='';}});
- window.addEventListener('storage',event=>{if(event.key?.startsWith('family-game-factory')){updateProfile();if(route==='library')act(renderLibrary);else if(route==='journey')act(renderJourney);else if(route==='rewards')act(renderRewards);else if(route==='notifications')act(refreshNotifications);else if(activeId)act(render);else act(refreshNotifications);}});
+ let storageRefresh=0;
+ window.addEventListener('storage',event=>{if(event.key?.startsWith('family-game-factory')){const requested=++storageRefresh,capturedOwner=owner();void (async()=>{await notebookReady;const selected=notebook;await selected.refresh(capturedOwner);if(requested!==storageRefresh||owner()!==capturedOwner||selected!==notebook)return;updateProfile();if(route==='library')renderLibrary();else if(route==='journey')renderJourney();else if(route==='rewards')renderRewards();else if(route==='notifications')refreshNotifications();else if(activeId)render();else refreshNotifications();})().catch(error=>{if(requested===storageRefresh&&owner()===capturedOwner)status((error as Error).message,true);});}});
  coaching=installCoaching({get notebook(){return notebook;},current,owner,message,render,status,config:()=>remote,
   onSavedDesignChange,
   onCoachReply:text=>voice?.reply(text),
@@ -1882,6 +1897,7 @@ export async function installStudio(){
   refreshCreation:()=>creation.refreshPals(),help:()=>{$('studioHelp').click();},
  });
  async function openParent(connection=false){
+  ++viewIntent;
   stopSpeech();(await flushDraft());(await FG.creation?.flush());closeJourneyMap();hideJourney();disposeGame();
   FG.app.page('parent');route='other';setActiveNav(null);
   if(connection)FG.parentDashboard?.openTab('settings');
