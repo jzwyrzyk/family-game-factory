@@ -54,6 +54,7 @@
     "docs/pals/README.md",
     "docs/decisions/0012-pals-from-earned-activity.md",
     "docs/decisions/0013-two-form-pals-and-current-main.md",
+    "docs/decisions/2026-11-25-journey-cards-and-starter-pals.md",
     "docs/pals/art/README.md",
     "docs/decisions/2026-11-19-pal-base-design-adoption.md",
     "docs/decisions/2026-11-19-pal-form-reconciliation.md",
@@ -145,10 +146,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:24:21.985Z",
-      "sourceDigest": "f6c07d9cb139945baa6a14d113dfe66d5477ed0675a93a9ff383d716db34fb46",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Inventory-aware legacy lookup and diagnostic error context preserve child-owned originals, explicit consent, rollback and audience boundaries; no product doctrine change.",
+      "reviewedAt": "2026-11-25T23:23:35.324Z",
+      "sourceDigest": "c0af8b5189a1f9c6e2318733cac705263c0bcd768b3ccebf239ee92c3a934914",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented the mobile Powers activity navigation exception and uniform section header geometry.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -309,10 +310,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T21:23:13.250Z",
-      "sourceDigest": "57ab04a98224db722fd91a4b94eb49cd9c4f03db93f3aca9b56da9ec4238917c",
+      "reviewedAt": "2026-11-25T23:20:52.972Z",
+      "sourceDigest": "04f4d94d41c32ff5babd32f33f6ff0207f52588bc497ec26d8ace84847a9eda8",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented active-only fitted-play observations and original navigation intent across local revision reads; newer Change or Help prevents late mounting while existing owner/session/epoch guards remain.",
+      "reviewReason": "The child interface contract describes shared headers, route announcements and exceptions. The homepage contract specifies the illustrated card hierarchy and mobile reflow.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -409,10 +410,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "cc8e4b6b3a2e729b32f5fd154215f0f2bae944ce52a9f6568222059a4ffa8369",
-      "reviewedAt": "2026-11-25T17:33:43.447Z",
+      "sourceDigest": "fee0252694b94e3f1254485510ef5c6da2cbd6ca19ac18af19c0ec8e8e26b54d",
+      "reviewedAt": "2026-11-25T23:20:54.040Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed scoped prepared-domain capture and restore beyond the old cross-owner aggregate, actual 42-scene recovery and fresh target initialization; per-owner scene validators, authoring semantics, immutable provenance and explicit preparation remain documented.",
+      "reviewReason": "The scene rendering contract distinguishes legacy pinned tokens and neutral bytes from new active actor choices.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -496,10 +497,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "8abff69badaf5e4321ad79c8580fb4c56b04d57761e9be3f7519c642c7562106",
-      "reviewedAt": "2026-11-25T18:50:02.598Z",
+      "sourceDigest": "e44b2afc02a371f2c0a63299a8fb7d062b5048a1f6519daa31c05b5dd2056fad",
+      "reviewedAt": "2026-11-25T23:20:54.641Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Storage rollout records exact no-op restore writes and one native-quota-only lossless Latin-1 retry, including journal and rollback; 25 contracts retain original sources and permanent-quota/wide-text failure behavior, without earning or retention changes.",
+      "reviewReason": "Reviewed grant and Pal acquisition code. Original unlocks never spent lifetime gems, so policy conversion issues no refund or grant.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -680,10 +681,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:24:22.137Z",
-      "sourceDigest": "b8d5f8f52eb9183a29d58846b3f208bffb5b6f9ae00f2093b7491b7e54967b24",
-      "reviewOutcome": "updated",
-      "reviewReason": "Completion records database and migration-stage diagnostics without filtering, deleting or omitting stored originals; inventory absence avoids a needless legacy creation probe.",
+      "reviewedAt": "2026-11-25T23:20:55.205Z",
+      "sourceDigest": "29d09d458b9fd3ad5800a4bf62ffb329f138f7c77a4f2dc74ff385a2d71d6d1f",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The existing artifact and recovery read boundaries validate historical identities. No API endpoints, authorization or credential boundaries change.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -733,10 +734,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T17:33:43.817Z",
-      "sourceDigest": "4f19311d071f73686310b2f9aa095800702709ad0e6c9f6f1eb4773452e11c12",
+      "reviewedAt": "2026-11-25T23:20:55.850Z",
+      "sourceDigest": "3c42ed09d4394afe0c109b5a6fa6d9d87f119c2474a5101fb24cafd81bf20c81",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented trusted original capture and repeated asset repair, immutable source provenance and playback-only mapped copies; admission rejects recovered edit/base/fork lineage before reservation, preserving ordinary and premium limits without importing jobs or accounting.",
+      "reviewReason": "Scene authoring uses active Pal IDs. The ADR and scene rendering contract cover reading saved generated versions through the historical asset resolver.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -765,10 +766,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T16:41:37.451Z",
-      "sourceDigest": "7ac1eb43e2368e8d64ec8e0a351e9b45b481520a245c7df6491c1624282699e9",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed awaited notebook writes, draft/coaching epoch fences, owner-scoped bounded metadata presentation and inactive-family reply expiration; authored transcript preservation and separate consent remain documented.",
+      "reviewedAt": "2026-11-25T23:20:56.441Z",
+      "sourceDigest": "50bb0b9c9ee3b6c2cf7a3d58319542761c1cc7287ec38b7594787b37b1398837",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The integrated UI candidate preserves its saved-concept build surface. These refinements change neither coach admission nor model prompts outside the active asset catalog.",
       "reviewHistory": [
         {
           "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
@@ -890,10 +891,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T21:23:13.837Z",
-      "sourceDigest": "87d114b2a9156651ec4eefb2459822281d69a7e47ccaac6cc2882c257785941f",
+      "reviewedAt": "2026-11-25T23:23:36.367Z",
+      "sourceDigest": "7d0c9a487cba3caa14464fe2d87ad25ab90ad801aae534c70ab34acab4235048",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved 77b failures and exact causal negatives/positives: native request cancellation versus simulated handler aborts, metadata-only empty-host observer ownership, and actual Change in both pending local read gaps; no browser errors or original assertions relaxed.",
+      "reviewReason": "Compared section-relative spacing and actual viewport sizes, and checked real route, modal, refresh and keyboard focus in the sandbox and application.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1134,10 +1135,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T21:23:13.987Z",
-      "sourceDigest": "e59f705db2c5d19717d0d9e28976d7e26fb4af728f1263d6aaeaaf9f68eae1a4",
+      "reviewedAt": "2026-11-25T23:20:57.755Z",
+      "sourceDigest": "9dbe059f6509701d8beeac8a58c62ca9be07e6f26213f48eba5f4d72faedc96f",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded 77b Security failure, independently verified passing workflows, scoped corrections and local evidence; successor exact-head hosted checks still govern review readiness, with release and real-data operations held.",
+      "reviewReason": "Delivery state identifies the latest merged family and storage base, the overlapping child UI candidate and the existing release gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1392,10 +1393,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T17:36:49.815Z",
-      "sourceDigest": "ffcb75ea2b467438035bcf79bf5bcb35abee7594f4127027f5431f504244a43e",
+      "reviewedAt": "2026-11-25T23:20:58.459Z",
+      "sourceDigest": "37c0c3f9ee5432f31d4741e23cb41fe2cc54569af18aec957152e780590aad46",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the added storage helper route, existing family/storage document index and source coverage; preserved the semantic-review requirement, link scope and all existing areas instead of refreshing unrelated records. Reviewed main185 required review runbook/index and broad tools/workflow routing together with storage helper coverage; retained both architectures and all existing semantic checks.",
+      "reviewReason": "Registered the roster and Journey decision with companion contracts and updated the documentation index.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1523,10 +1524,10 @@
         "tests/problem-solving-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "ec5644fcbf01f5b6ef58818d76ce999d96b5938d1769bc1775f0e69ded23233d",
-      "reviewedAt": "2026-11-25T17:33:44.490Z",
+      "sourceDigest": "8347cdd2f3e1722c9a617ea027f04d3425b83aeece5cf316bd3eddcc23199a05",
+      "reviewedAt": "2026-11-25T23:20:59.029Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed async practice action catch and browser-negative fixture: a failed awaited Studio entry now reports only to the same owner; episode schemas, evaluators, evidence meaning, retention, reporting and reward rules are unchanged.",
+      "reviewReason": "The integrated existing experiment shortcut still opens the guarded practice destination. The activity evidence and assessment contract are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1558,6 +1559,7 @@
         "skills/gem-pal-studio/SKILL.md",
         "docs/decisions/2026-11-19-gem-pal-studio.md",
         "docs/decisions/0013-two-form-pals-and-current-main.md",
+        "docs/decisions/2026-11-25-journey-cards-and-starter-pals.md",
         "docs/pals/art/README.md",
         "docs/decisions/2026-11-19-pal-base-design-adoption.md",
         "docs/decisions/2026-11-19-pal-form-reconciliation.md",
@@ -1576,10 +1578,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "e36c024e71ac0e60b09f52e7f4d500cde1dda6c2944b9461617e0bf7193cd652",
-      "reviewedAt": "2026-11-25T21:27:39.331Z",
+      "sourceDigest": "b2c55a9dc03986bb12d1396de7e56859273c25b444b57611e930bc3e6004534c",
+      "reviewedAt": "2026-11-25T23:20:59.505Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Quality gate now checks composed portrait alpha against contrasting backgrounds; approved art and two-form design are unchanged.",
+      "reviewReason": "Character inventory marks Luma and Zippa as historical and records active profile counts. Nook and Navi retain their existing approved Base and Grown artwork.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1615,10 +1617,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "8b3ecf6682dac371e9270e8477be8e589ef1b5a810f91953afcd86b75dd87fff",
-      "reviewedAt": "2026-11-25T18:50:03.037Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Recovery now completes initial art preparation before maintenance and rechecks audience; held-inventory actual-app regression retains original art, cloud lost-ack retry and single immutable root checks. Art readiness also covers exact read-only request cancellation.",
+      "sourceDigest": "467544c05466d8d0c1045244fa942dbfccf7b81e1e04635e8f5ecae1c0b62afc",
+      "reviewedAt": "2026-11-25T23:21:00.320Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "My Creations uses the shared header and retains the My Art action. The drawing library, private assets and editor use the inherited My Art contract.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1645,6 +1647,7 @@
         "docs/decisions/0012-pals-from-earned-activity.md",
         "docs/pals/previews/*.md",
         "docs/decisions/0013-two-form-pals-and-current-main.md",
+        "docs/decisions/2026-11-25-journey-cards-and-starter-pals.md",
         "docs/pals/art/README.md",
         "docs/decisions/2026-11-21-approved-pal-collection.md"
       ],
@@ -1659,10 +1662,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "c6201521fdd75fcc4c8dec29451d86d849ab294dd3fd48d3cc731f3d22399b2a",
-      "reviewedAt": "2026-11-25T16:41:38.788Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The Pals host now awaits the existing Studio entry/save guard; collection policy, deterministic rewards, Base/Grown assets, scene provenance and ownership rules are unchanged.",
+      "sourceDigest": "284586f22f0a8ac896315ede781b4ff271071cd4596a368240f6240b5c8f23e1",
+      "reviewedAt": "2026-11-25T23:23:37.875Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "The updated browser journey verifies both free starter choices, preserved equipped progress after reload and the empty-state heading.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1697,10 +1700,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "18b933d6e8a56f3b05e01944d099956324a5654bc728c3a18d0cc160908e6e86",
-      "reviewedAt": "2026-11-25T18:50:03.148Z",
+      "sourceDigest": "381260b659e8d8ed26b7fdddb3c2182a49d2f8f9cffd808e7d167695f25bfb3a",
+      "reviewedAt": "2026-11-25T23:21:01.748Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Rollout records capture readiness ordering, lossless exact-string and bounded quota retry for legacy recovery, preserved protected rollback and no additional capacity or deletion; benchmark pins and native WebKit evidence limits remain explicit."
+      "reviewReason": "The decision explains scoped policy projection, atomic persistence and replay on explicit restore. Retained IndexedDB authority and unrelated domain records stay intact."
     }
   ]
 }

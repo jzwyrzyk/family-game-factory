@@ -76,7 +76,13 @@ async function screenshotPixel(page,buffer,x,y){return page.evaluate(async({src,
    }
    if(offline){await page.click('#return');await page.selectOption('#scenario','unlocked');await page.waitForTimeout(1500);app=page.frames().find(f=>f.parentFrame()===page.mainFrame());await app.waitForFunction(()=>document.getElementById('page-studio-library')?.getAttribute('aria-busy')==='false');await page.selectOption('#destination','journey');await page.waitForTimeout(400);await page.click('#hide');}
    else{await app.locator('#studioPalsEntry').first().click();const starter=name==='portrait'?'kip':'navi';assert.equal(await app.locator('.pals-starter-grid [data-pals-focus^="starter-"]').count(),2);await app.locator('[data-pals-focus="starter-'+starter+'"]').click();await app.waitForFunction(id=>FG.pals.view()?.activeId===id,starter);await app.locator('.page:not(.hidden) [data-journey-section="overview"]').click();}
-   const before=await app.evaluate(()=>JSON.stringify(FG.pals.view()));results.push(await capture('equipped'));assert.equal(await app.evaluate(()=>JSON.stringify(FG.pals.view())),before,'presentation does not mutate Pal progress');assert.deepEqual(errors,[]);assert.deepEqual(posts,[]);await context.close();console.log('PASS Pal fidelity '+(offline?'offline ':'app ')+name);
+   const before=await app.evaluate(()=>JSON.stringify(FG.pals.view()));results.push(await capture('equipped'));assert.equal(await app.evaluate(()=>JSON.stringify(FG.pals.view())),before,'presentation does not mutate Pal progress');if(!offline && name==='desktop'){
+    await page.reload();await exploreWelcome(page);await page.locator('#studioJourneyTile').click();
+    await page.locator('#studioPalsEntry').click();
+    await page.waitForFunction(()=>document.activeElement.id==='jemsPalsTitle' && getComputedStyle(document.activeElement).outlineStyle==='none');
+    assert.equal(await page.evaluate(()=>JSON.stringify(FG.pals.view())),before,'refresh preserves the equipped starter and progression');
+   }
+   assert.deepEqual(errors,[]);assert.deepEqual(posts,[]);await context.close();console.log('PASS Pal fidelity '+(offline?'offline ':'app ')+name);
   }
   fs.writeFileSync(`${out}/${offline?'offline':'app'}-results.json`,JSON.stringify(results,null,2));console.log('PASS exact Pal variants, transparent pixels, fail-closed presentation and responsive cards');
  }finally{await browser.close();server.close();}

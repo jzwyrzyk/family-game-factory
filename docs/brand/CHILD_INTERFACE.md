@@ -82,3 +82,11 @@ In the graphical editor, Jump and Dance display existing Spark poses with their 
 ## Shared landing-page reference
 
 The existing My Art composition is the owner-approved visual standard for Home, My Journey and Creative Studio: illustrated purpose, readable task cards, one clear primary next action, and progressive details. Preserve its artwork and original composition while repairing undersized text. My Journey groups actual Pals, gems, achievements and powers; Creative Studio separates Make a scene, Rebuild a scene and Try an experiment. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md).
+
+## Secondary page headers and focus
+
+My Journey, My Pals (including Choose your Pal), Gems & achievements, My Powers, My Creations and Notifications use the shared Jems page header. Put the back action first, followed by one left-aligned title and a short description. Place optional owner-scoped progress beside the title on wide screens and beneath the description on phones. Align the section navigation and the content below to the same edge. Use approved illustrations in the activity, collection and reward content.
+
+Move focus to the route heading when a reader needs the new page announced. Keep this ordinary title outside the Tab order and visually quiet during navigation. Give keyboard-operated buttons, links and disclosure controls a visible focus ring. Dialogs return focus to their opener. An active learning question retains its own announcement and intentional focus treatment. On phones, My Powers keeps the existing global navigation above the learning workspace so it cannot cover answers. Its section navigation, back action, title and description use the same spacing as the other Journey pages.
+
+Home and first-visit onboarding lead with an invitation and a maker choice. My Art and Creative Studio use illustrated workspaces; creation conversations, experiments, learning questions and gameplay put the current task first. Grown-ups and guardian screens keep the information hierarchy of their management forms and reports. These experiences retain their own headers. [Shared header implementation](../../src/brand/page-header.ts)

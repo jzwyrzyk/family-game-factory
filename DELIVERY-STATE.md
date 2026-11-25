@@ -1,5 +1,9 @@
 # jems delivery state
 
+## November 25, 2026 — Journey, secondary headers and starter roster candidate
+
+The review branch combines the UI work from #188 at `f813052` with main at `d777f46`, including the merged #186 storage and family changes. This candidate covers Journey shortcuts, secondary navigation focus, the active roster and per-profile compatibility. Private family beta acceptance and release controls continue separately. The [decision and migration contract](docs/decisions/2026-11-25-journey-cards-and-starter-pals.md) describes the accepted scope.
+
 ## November 25, 2026 — family and storage validation follow-up; release held
 
 Head `77b49847a3370ca3bb743906c75b6ba931f09407` remains unqualified after [Security 45699701257](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45699701257) identified a beta test ordering assumption and a real native ResizeObserver warning during the visible empty saved-game loading gap. The other fifteen workflows, including full Arcade 120/120, passed. The follow-up separates actual navigation cancellation from a labelled simulated handler check and stops observing the unfitted host while play is inactive. Causal local negatives and positives are preserved in [the acceptance register](docs/family-beta/COMPLETION.md#validated-application-checkpoint--november-25-2026). The separately reproduced late-open overwrite of Change is corrected by preserving navigation intent across local revision reads. Both actual pending-read gaps retain the exact draft/owner/session, later Play opens the kept revision, and the existing 45-case fitted-play suite passes. Independent review found no blockers; final combined-source hosted checks must pass before #186 is ready. No failure is waived and release remains held.

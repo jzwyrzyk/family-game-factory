@@ -81,3 +81,5 @@ identity/save/Keep compatibility. Playback readiness tests additionally cover
 shared loads, hidden actors, decode failure, scene cancellation and the bounded
 timeout. Final browser and combined-source evidence is recorded separately in
 `DELIVERY-STATE.md`.
+
+The active picker uses 44 Base/Grown neutrals. Four older neutral files render only when an existing scene pins them. Both paths use the original image proportions and shared alpha preparation. The generation schema enumerates the active assets. [Saved-game contract](../decisions/2026-11-25-journey-cards-and-starter-pals.md)

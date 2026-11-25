@@ -8,6 +8,9 @@ exports.checkSecondaryHeaders = async function ({page, app, out, name, width, he
  ];
  let reference;
  const scope = offline ? 'offline' : 'app';
+ // Hiding the sandbox toolbar leaves focus in the outer document. Enter through
+ // the actual application navigation before checking its route announcement.
+ if (offline) await app.locator('#page-jems-journey [data-journey-section="overview"]').click();
  for (const [section, selector] of pages) {
   if (section !== 'journey') {
    const link = app.locator('#page-jems-journey [data-journey-section="' + section + '"]');
@@ -25,10 +28,11 @@ exports.checkSecondaryHeaders = async function ({page, app, out, name, width, he
    const box = node.getBoundingClientRect(), style = getComputedStyle(node);
    const header = node.parentElement, back = header.querySelector('button').getBoundingClientRect();
    const description = header.querySelector('p');
+   const nav = header.previousElementSibling.getBoundingClientRect();
    return {
-    viewport: [innerWidth, innerHeight], x: box.x, y: box.y, font: style.font,
+    viewport: [innerWidth, innerHeight], x: box.x, y: box.y - nav.bottom, font: style.font,
     color: style.color, descriptionFont: getComputedStyle(description).font,
-    left: description.getBoundingClientRect().x, backX: back.x, backY: back.y,
+    left: description.getBoundingClientRect().x, backX: back.x, backY: back.y - nav.bottom,
     backHeight: back.height, outline: style.outlineStyle,
    };
   });
@@ -50,7 +54,9 @@ exports.checkSecondaryHeaders = async function ({page, app, out, name, width, he
   } else {
    await page.keyboard.press('Enter');
    if (section === 'powers') {
-    await app.locator('#studioJourneyTile').click();
+    await app.locator('#page-studio-library').waitFor({state:'visible'});
+    if (offline) await require('./studio-entry.cjs').navigate(app,'#studioNavJourney');
+    else await app.locator('#studioJourneyTile').click();
    }
    await app.waitForFunction(()=>document.activeElement.id === 'jemsJourneyTitle');
   }

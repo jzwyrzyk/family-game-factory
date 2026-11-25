@@ -1,9 +1,9 @@
 {
   "reference_index_id": "jems-gem-pals-character-references",
-  "revision": 5,
-  "date": "2026-11-21",
+  "revision": 6,
+  "date": "2026-11-25",
   "timezone": "America/New_York",
-  "scope": "All 23 original profiles reconciled to approved package 2.9: 46 exact neutral sources and 138 approved expressions, with lossless repository exports. Brio retains two approved neutrals and six expressions in review; all prior asset records remain historical evidence.",
+  "scope": "Historical approvals for package 2.9 and Brio. Use the 22 active profiles for Jems. Luma and Zippa are retired.",
   "growth_form_policy": {
     "decision_date": "2026-11-19",
     "stage_count": 2,
@@ -24,7 +24,7 @@
     "intermediate_visual_stage": null,
     "applies_to": "23 roster entries and 24 individual profiles including Brio; the original core is 22 entries and 23 profiles, with F1 Navi and F2 Mote separate.",
     "progression_threshold": "Existing ADR0013 derives Base at 0–4 adventures and Grown from five; this art reconciliation does not change earning, receipts, ownership or backups.",
-    "runtime_mapping_status": "All 24 profiles have explicit application_mapping entries for the earned collection. The original 23 use core-2026-11-20; Brio uses only his two approved neutrals. Existing inventory aliases and legacy token scene IDs are preserved. Live acceptance is recorded separately.",
+    "runtime_mapping_status": "22 active profiles, including Nook and Navi as free starter choices. Luma and Zippa have compatibility-only mappings for historical saves.",
     "saved_data_policy": "Preserve committed activity receipts, per-Pal adventure counts, ownership, selections and backups. Derive displayed form without resetting history."
   },
   "counts": {
@@ -43,7 +43,8 @@
     "original_core_unresolved_current_forms": 0,
     "brio_approved_neutral_images": 2,
     "brio_expression_candidates_in_review": 6,
-    "scope_note": "Original-core counts refer only to package 2.9. Brio is a separately preserved 24th profile; legacy source boards and superseded review assets are retained without adding active masters."
+    "scope_note": "Original-core counts refer only to package 2.9. Brio is a separately preserved 24th profile; legacy source boards and superseded review assets are retained without adding active masters.",
+    "active_profiles": 22
   },
   "reference_rules": [
     "Keep character identity, visual form, art revision, expression set, animation rig and application binding separate.",
@@ -557,8 +558,6 @@
     "core_2026_11_20_luma_base_celebrate": {
       "asset_id": "core_2026_11_20_luma_base_celebrate",
       "role": "approved_expression_lossless_export",
-      "repository_path": "../../../public/jems-pals/luma/base/celebrate-385db67c5961.webp",
-      "runtime_url": "jems-pals/luma/base/celebrate-385db67c5961.webp",
       "reference_location": "repository_lossless_derivative",
       "mime_type": "image/webp",
       "sha256": "e95ae7f0e213e34f2bf361b0ad95b61718b10a4ce25bda70669e3e616e750043",
@@ -570,13 +569,13 @@
       "source_form_key": "initial",
       "manifest_version": "core-2026-11-20",
       "manifest_path": "../../../public/jems-pals/manifest.json",
-      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest."
+      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest.",
+      "historical_runtime_url": "jems-pals/luma/base/celebrate-385db67c5961.webp",
+      "export_status": "Retired; historical export identity only."
     },
     "core_2026_11_20_luma_base_thinking": {
       "asset_id": "core_2026_11_20_luma_base_thinking",
       "role": "approved_expression_lossless_export",
-      "repository_path": "../../../public/jems-pals/luma/base/thinking-0154deb790db.webp",
-      "runtime_url": "jems-pals/luma/base/thinking-0154deb790db.webp",
       "reference_location": "repository_lossless_derivative",
       "mime_type": "image/webp",
       "sha256": "ca5426f65729158b3534c23a099832911bc53f9a1c7a329e60cbd2b541558d9d",
@@ -588,13 +587,13 @@
       "source_form_key": "initial",
       "manifest_version": "core-2026-11-20",
       "manifest_path": "../../../public/jems-pals/manifest.json",
-      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest."
+      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest.",
+      "historical_runtime_url": "jems-pals/luma/base/thinking-0154deb790db.webp",
+      "export_status": "Retired; historical export identity only."
     },
     "core_2026_11_20_luma_base_encouraging_retry": {
       "asset_id": "core_2026_11_20_luma_base_encouraging_retry",
       "role": "approved_expression_lossless_export",
-      "repository_path": "../../../public/jems-pals/luma/base/encouraging-retry-b51667e217fc.webp",
-      "runtime_url": "jems-pals/luma/base/encouraging-retry-b51667e217fc.webp",
       "reference_location": "repository_lossless_derivative",
       "mime_type": "image/webp",
       "sha256": "acece08d1bd618ee16cb404c5f407ed757d4b73553a89600861fd20885906ad1",
@@ -606,7 +605,9 @@
       "source_form_key": "initial",
       "manifest_version": "core-2026-11-20",
       "manifest_path": "../../../public/jems-pals/manifest.json",
-      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest."
+      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest.",
+      "historical_runtime_url": "jems-pals/luma/base/encouraging-retry-b51667e217fc.webp",
+      "export_status": "Retired; historical export identity only."
     },
     "core_2026_11_20_luma_mature_neutral": {
       "asset_id": "core_2026_11_20_luma_mature_neutral",
@@ -629,8 +630,6 @@
     "core_2026_11_20_luma_mature_celebrate": {
       "asset_id": "core_2026_11_20_luma_mature_celebrate",
       "role": "approved_expression_lossless_export",
-      "repository_path": "../../../public/jems-pals/luma/mature/celebrate-ddcfb1f44e92.webp",
-      "runtime_url": "jems-pals/luma/mature/celebrate-ddcfb1f44e92.webp",
       "reference_location": "repository_lossless_derivative",
       "mime_type": "image/webp",
       "sha256": "1b3057240c5a72d407d129b3b81cb9fa851b13ffdcf317d3654a15a3d1d597be",
@@ -642,13 +641,13 @@
       "source_form_key": "growth",
       "manifest_version": "core-2026-11-20",
       "manifest_path": "../../../public/jems-pals/manifest.json",
-      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest."
+      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest.",
+      "historical_runtime_url": "jems-pals/luma/mature/celebrate-ddcfb1f44e92.webp",
+      "export_status": "Retired; historical export identity only."
     },
     "core_2026_11_20_luma_mature_thinking": {
       "asset_id": "core_2026_11_20_luma_mature_thinking",
       "role": "approved_expression_lossless_export",
-      "repository_path": "../../../public/jems-pals/luma/mature/thinking-5dc612792318.webp",
-      "runtime_url": "jems-pals/luma/mature/thinking-5dc612792318.webp",
       "reference_location": "repository_lossless_derivative",
       "mime_type": "image/webp",
       "sha256": "6403388334ac8aea55c2ed465b1e3b19852aef3a126938a3922b2fb24f7844b9",
@@ -660,13 +659,13 @@
       "source_form_key": "growth",
       "manifest_version": "core-2026-11-20",
       "manifest_path": "../../../public/jems-pals/manifest.json",
-      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest."
+      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest.",
+      "historical_runtime_url": "jems-pals/luma/mature/thinking-5dc612792318.webp",
+      "export_status": "Retired; historical export identity only."
     },
     "core_2026_11_20_luma_mature_encouraging_retry": {
       "asset_id": "core_2026_11_20_luma_mature_encouraging_retry",
       "role": "approved_expression_lossless_export",
-      "repository_path": "../../../public/jems-pals/luma/mature/encouraging-retry-02078a368879.webp",
-      "runtime_url": "jems-pals/luma/mature/encouraging-retry-02078a368879.webp",
       "reference_location": "repository_lossless_derivative",
       "mime_type": "image/webp",
       "sha256": "f2feb75610a5c215186de18e80b13c64c5bf41d2f2f81247e544ceed3c677861",
@@ -678,7 +677,9 @@
       "source_form_key": "growth",
       "manifest_version": "core-2026-11-20",
       "manifest_path": "../../../public/jems-pals/manifest.json",
-      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest."
+      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest.",
+      "historical_runtime_url": "jems-pals/luma/mature/encouraging-retry-02078a368879.webp",
+      "export_status": "Retired; historical export identity only."
     },
     "core_2026_11_20_nook_base_neutral": {
       "asset_id": "core_2026_11_20_nook_base_neutral",
@@ -3581,8 +3582,6 @@
     "core_2026_11_20_zippa_base_celebrate": {
       "asset_id": "core_2026_11_20_zippa_base_celebrate",
       "role": "approved_expression_lossless_export",
-      "repository_path": "../../../public/jems-pals/zippa/base/celebrate-777a587cacec.webp",
-      "runtime_url": "jems-pals/zippa/base/celebrate-777a587cacec.webp",
       "reference_location": "repository_lossless_derivative",
       "mime_type": "image/webp",
       "sha256": "0cef1528dc4a0cc2cab1f6e69ae089c4e129e7285f64064318d1d3ce8dbbb142",
@@ -3594,13 +3593,13 @@
       "source_form_key": "initial",
       "manifest_version": "core-2026-11-20",
       "manifest_path": "../../../public/jems-pals/manifest.json",
-      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest."
+      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest.",
+      "historical_runtime_url": "jems-pals/zippa/base/celebrate-777a587cacec.webp",
+      "export_status": "Retired; historical export identity only."
     },
     "core_2026_11_20_zippa_base_thinking": {
       "asset_id": "core_2026_11_20_zippa_base_thinking",
       "role": "approved_expression_lossless_export",
-      "repository_path": "../../../public/jems-pals/zippa/base/thinking-adb92600ce86.webp",
-      "runtime_url": "jems-pals/zippa/base/thinking-adb92600ce86.webp",
       "reference_location": "repository_lossless_derivative",
       "mime_type": "image/webp",
       "sha256": "9707d2b60944836c46bc0e456f2b6c65989523b288c6e4f3913f6f1ea58a2736",
@@ -3612,13 +3611,13 @@
       "source_form_key": "initial",
       "manifest_version": "core-2026-11-20",
       "manifest_path": "../../../public/jems-pals/manifest.json",
-      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest."
+      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest.",
+      "historical_runtime_url": "jems-pals/zippa/base/thinking-adb92600ce86.webp",
+      "export_status": "Retired; historical export identity only."
     },
     "core_2026_11_20_zippa_base_encouraging_retry": {
       "asset_id": "core_2026_11_20_zippa_base_encouraging_retry",
       "role": "approved_expression_lossless_export",
-      "repository_path": "../../../public/jems-pals/zippa/base/encouraging-retry-dda8c100e77d.webp",
-      "runtime_url": "jems-pals/zippa/base/encouraging-retry-dda8c100e77d.webp",
       "reference_location": "repository_lossless_derivative",
       "mime_type": "image/webp",
       "sha256": "2d118abb3869c6f67d25166c34232d765e98a28031603f95599589c20e057ae6",
@@ -3630,7 +3629,9 @@
       "source_form_key": "initial",
       "manifest_version": "core-2026-11-20",
       "manifest_path": "../../../public/jems-pals/manifest.json",
-      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest."
+      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest.",
+      "historical_runtime_url": "jems-pals/zippa/base/encouraging-retry-dda8c100e77d.webp",
+      "export_status": "Retired; historical export identity only."
     },
     "core_2026_11_20_zippa_mature_neutral": {
       "asset_id": "core_2026_11_20_zippa_mature_neutral",
@@ -3653,8 +3654,6 @@
     "core_2026_11_20_zippa_mature_celebrate": {
       "asset_id": "core_2026_11_20_zippa_mature_celebrate",
       "role": "approved_expression_lossless_export",
-      "repository_path": "../../../public/jems-pals/zippa/mature/celebrate-91c568325e4c.webp",
-      "runtime_url": "jems-pals/zippa/mature/celebrate-91c568325e4c.webp",
       "reference_location": "repository_lossless_derivative",
       "mime_type": "image/webp",
       "sha256": "71aaec5bb3e38e0b4bd2ab947e2f161957f095a25d6b9326ed70a0d4de21631f",
@@ -3666,13 +3665,13 @@
       "source_form_key": "growth",
       "manifest_version": "core-2026-11-20",
       "manifest_path": "../../../public/jems-pals/manifest.json",
-      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest."
+      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest.",
+      "historical_runtime_url": "jems-pals/zippa/mature/celebrate-91c568325e4c.webp",
+      "export_status": "Retired; historical export identity only."
     },
     "core_2026_11_20_zippa_mature_thinking": {
       "asset_id": "core_2026_11_20_zippa_mature_thinking",
       "role": "approved_expression_lossless_export",
-      "repository_path": "../../../public/jems-pals/zippa/mature/thinking-3253323605fa.webp",
-      "runtime_url": "jems-pals/zippa/mature/thinking-3253323605fa.webp",
       "reference_location": "repository_lossless_derivative",
       "mime_type": "image/webp",
       "sha256": "c83cf068561113b5d488b36931b43439a1598aa3801fd6bcaa81c95857b565b1",
@@ -3684,13 +3683,13 @@
       "source_form_key": "growth",
       "manifest_version": "core-2026-11-20",
       "manifest_path": "../../../public/jems-pals/manifest.json",
-      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest."
+      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest.",
+      "historical_runtime_url": "jems-pals/zippa/mature/thinking-3253323605fa.webp",
+      "export_status": "Retired; historical export identity only."
     },
     "core_2026_11_20_zippa_mature_encouraging_retry": {
       "asset_id": "core_2026_11_20_zippa_mature_encouraging_retry",
       "role": "approved_expression_lossless_export",
-      "repository_path": "../../../public/jems-pals/zippa/mature/encouraging-retry-f2a920aa3c48.webp",
-      "runtime_url": "jems-pals/zippa/mature/encouraging-retry-f2a920aa3c48.webp",
       "reference_location": "repository_lossless_derivative",
       "mime_type": "image/webp",
       "sha256": "479db2e20b02b6017e3a24dbd609948890c721b6ecee908ea3665045e7904cf7",
@@ -3702,7 +3701,9 @@
       "source_form_key": "growth",
       "manifest_version": "core-2026-11-20",
       "manifest_path": "../../../public/jems-pals/manifest.json",
-      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest."
+      "verification": "Lossless WebP export; source dimensions, decoded pixels, alpha and background are preserved. Export bytes and source PNG hashes are pinned in the manifest.",
+      "historical_runtime_url": "jems-pals/zippa/mature/encouraging-retry-f2a920aa3c48.webp",
+      "export_status": "Retired; historical export identity only."
     },
     "core_2026_11_20_whorl_base_neutral": {
       "asset_id": "core_2026_11_20_whorl_base_neutral",
@@ -11751,7 +11752,7 @@
     "reconciled_date": "2026-11-20",
     "manifest_version": "core-2026-11-20",
     "manifest_path": "../../../public/jems-pals/manifest.json",
-    "manifest_sha256": "4135c90c543b134395af1b9bba24b98722057d24ee64ba3435025482125a44ca",
+    "manifest_sha256": "5687280e359074dcf5d665ac27822dcefb63478cae8ee393a83d53a22d796e64",
     "source_forms": {
       "initial": "base",
       "growth": "mature"

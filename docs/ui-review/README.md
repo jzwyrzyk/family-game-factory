@@ -56,3 +56,7 @@ The primary download uploads immediately after the build, separately from browse
 ## Child experience candidate, November 25
 
 The modernization candidate includes the consolidated My Journey sections, Make/Rebuild/experiment landing, optional live movement introduction, My Art, the revised Home/menu, and saved-concept Build states. The toolbar labels the represented source as **candidate branch** or **merged main**; downloads use the exact represented SHA. PR builds check out and package the PR head rather than its merge base. The workflow also runs the production-bundle four-viewport modernization journey and uploads complete screenshots under `child-modernization/`. The offline review remains synthetic and separate from DEV deployment or owner acceptance. See the [decision](../decisions/2026-11-25-child-experience-modernization.md) and [acceptance record](../evidence/child-modernization/README.md).
+
+Choose **My Journey** in the destination selector to inspect the three dashboard cards. Check **Empty** for starter selection and **Unlocked** for an equipped companion and earned gems. Follow each card into the corresponding live section, then return through My Journey.
+
+The Journey, Pals, rewards and Powers destinations render the shared production header and cards. Use the empty scenario to review the two starter choices. Compare the same application viewport on each page and use Shift+Tab from the announced heading to check the back action’s visible keyboard focus.
