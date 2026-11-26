@@ -1,5 +1,6 @@
-import { createPageHeader } from '../brand/page-header';
-import { createDashboardCard } from '../brand/dashboard-card';
+import {hostArtworkPath} from '../design-system/artwork';
+import { createCollectionHeader as createPageHeader } from '../design-system/templates/collection';
+import { createDashboardCard } from '../design-system/components/dashboard-card';
 import {hasParentGuidance,installParentGuidance} from '../family-beta/guidance';
 import {isEarlyGrade} from '../learning/grades';
 import {createEarlyHandoff,FAMILY_CREATION_LABEL} from './early-handoff';
@@ -1952,9 +1953,9 @@ export async function installStudio(){
  });
  const destinations=el('nav','jems-destinations');destinations.id='studioDestinations';destinations.setAttribute('aria-label','Your Jems world');
  destinations.append(
-  destinationTile('studioJourneyTile','My Journey','Pals, gems & your powers','./jems-art/spot_first_idea.webp',()=>act(()=>openJourney())),
-  destinationTile('studioArt','My Art','Draw it. Make it yours.','./jems-art/character_spark_wave.webp',()=>act(()=>artStudio.open())),
-  destinationTile('studioScenes','Creative Studio','Make scenes. Try ideas.','./jems-workbench.svg',()=>creation.open())
+  destinationTile('studioJourneyTile','My Journey','Pals, gems & your powers',hostArtworkPath('firstIdea'),()=>act(()=>openJourney())),
+  destinationTile('studioArt','My Art','Draw it. Make it yours.',hostArtworkPath('companionWave'),()=>act(()=>artStudio.open())),
+  destinationTile('studioScenes','Creative Studio','Make scenes. Try ideas.',hostArtworkPath('workbench'),()=>creation.open())
  );
  $('studioContinue').before(destinations);
  const journeySections=installJourneySections({overview:()=>act(()=>openJourney()),pals:()=>palsInterface.open(),rewards:()=>act(openRewards),powers:()=>$('studioNavPowers').click(),scenes:()=>creation.openChallenges(),experiments:()=>practice.open()});

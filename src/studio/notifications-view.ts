@@ -1,4 +1,5 @@
-import { createPageHeader } from '../brand/page-header';
+import {createAction} from '../design-system/components/action';
+import { createCollectionHeader as createPageHeader } from '../design-system/templates/collection';
 import {createIcon, setIconLabel} from '../brand/icons';
 import {createReadAloudControl} from '../speech/read-aloud-control';
 import type {StudioNotification} from './notifications';
@@ -25,7 +26,7 @@ const node = <K extends keyof HTMLElementTagNameMap>(tag: K, className = '', tex
   const element = document.createElement(tag); element.className = className; element.textContent = text; return element;
 };
 const button = (id: string, label: string, icon: Parameters<typeof setIconLabel>[1], className = 'studio-button') => {
-  const element = node('button', className); element.type = 'button'; element.id = id; setIconLabel(element, icon, label); return element;
+  const element = createAction({label, icon, className}); element.id = id; return element;
 };
 
 /** Views of the notebook projection. This component never creates, selects,

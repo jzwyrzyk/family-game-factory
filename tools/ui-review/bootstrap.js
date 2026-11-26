@@ -87,6 +87,7 @@ Object.defineProperty(HTMLIFrameElement.prototype,'src',{...frameSrc,set(value){
  if(/^(https?:|file:)/.test(String(value)))throw Error('External frame disabled in review');return frameSrc.set.call(this,value);
 }});
 window.__reviewNavigate=async action=>{
+ document.getElementById('design-system-gallery')?.remove();
  const FG=window.FG,click=id=>document.getElementById(id)?.click();
  const enterParent=()=>new Promise((resolve,reject)=>{
   const opened=event=>{if(event.detail==='parent'){clearTimeout(timeout);window.removeEventListener('factory-page',opened);resolve();}};
@@ -94,7 +95,8 @@ window.__reviewNavigate=async action=>{
   window.addEventListener('factory-page',opened);click('studioMenuParent');
  });
  FG.learning?.dispose();for(const d of document.querySelectorAll('dialog[open]'))d.close();
- if(action==='home')FG.studio.home();
+ if(action==='design-system'){FG.studio.home();window.__reviewDesignSystem();}
+ else if(action==='home')FG.studio.home();
  else if(action==='create')click('studioNavCreate');
  else if(action==='creations'){FG.studio.home();click('studioSavedIdeas');}
  else if(action==='coding')FG.creation.open();

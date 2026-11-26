@@ -60,3 +60,7 @@ The modernization candidate includes the consolidated My Journey sections, Make/
 Choose **My Journey** in the destination selector to inspect the three dashboard cards. Check **Empty** for starter selection and **Unlocked** for an equipped companion and earned gems. Follow each card into the corresponding live section, then return through My Journey.
 
 The Journey, Pals, rewards and Powers destinations render the shared production header and cards. Use the empty scenario to review the two starter choices. Compare the same application viewport on each page and use Shift+Tab from the announced heading to check the back action’s visible keyboard focus.
+
+## Production design-system gallery
+
+Choose **Design system** under Page or journey state to inspect real production tokens, headers, cards, actions, icons and the collection template. Gallery links open the actual synthetic application journeys. `/tools/design-system/` on the existing Vite server supplies fast component iteration. `design:browser` joins the existing standalone test chain; it checks four viewport sizes, contrast, touch/focus/dialog behavior and a single-token change propagating to six actual page headers. [Guide and limits](../design-system/README.md).

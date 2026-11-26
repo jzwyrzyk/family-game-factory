@@ -84,7 +84,9 @@
     "docs/development/SETUP.md",
     "docs/development/COSTS.md",
     "docs/decisions/2026-11-23-dev-test-prod.md",
-    "docs/ui-review/README.md"
+    "docs/ui-review/README.md",
+    "docs/design-system/README.md",
+    "docs/design-system/INVENTORY.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -1704,6 +1706,28 @@
       "reviewedAt": "2026-11-26T00:23:36.006Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reconciled merged F06 rollback limits with the owner-scoped Pal migration, retained readers and repeat restore contract."
+    },
+    {
+      "id": "design-system",
+      "documents": [
+        "docs/design-system/*.md",
+        "AGENTS.md",
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/ui-review/README.md"
+      ],
+      "sources": [
+        "src/design-system/**",
+        "tools/design-system/**",
+        "scripts/check-design-system.mjs",
+        "scripts/tests/check-design-system.test.mjs",
+        "docs/design-system/**"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "reviewedAt": "2026-11-26T00:00:00.000Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Shared design foundations and actual collection consumers are documented with explicit pending feature integration and acceptance gates."
     }
   ]
 }

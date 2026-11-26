@@ -1,3 +1,4 @@
+import {mountDesignSystemGallery} from '../design-system/gallery';
 import '../../src/style.css';
 import {parentDashboardFixture} from '../../tests/parent-dashboard-fixture';
 import {StudioNotebook} from '../../src/studio/notebook';
@@ -37,6 +38,7 @@ async function boot(){
   await pals.sync('player1',palSnapshotFromRewards(await rewards.export(),'player1'));
  }
  await import('../../src/main');
+ w.__reviewDesignSystem=()=>{ for(const page of document.querySelectorAll('.page'))page.classList.add('hidden'); const gallery=mountDesignSystemGallery(document.querySelector('main')!,route=>w.__reviewNavigate(route)); gallery.page.classList.remove('hidden'); gallery.page.querySelector<HTMLElement>('.jems-page-title')?.focus(); };
  const timer=setInterval(()=>{if(w.FG?.studio&&w.FG?.creation){clearInterval(timer);parent.postMessage({type:'review-ready'},'*');}},40);
 }
 void boot();

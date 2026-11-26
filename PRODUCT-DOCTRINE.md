@@ -170,3 +170,7 @@ Update the affected principle and its linked detailed contract in the same PR as
 Parents explicitly select Pre-K, Kindergarten or Grades 1–4. Pre-K and Kindergarten use illustrated, audio-led play and local visual coding. Creating an AI game requires a grown-up handoff and separately authorized family processing. The child's selected grade sets a learning ceiling across subjects and Stretch. Reading access, game difficulty, adult access and provider permissions each retain their own controls.
 
 Secondary collection and progress pages use the left-aligned Choose your Pal header pattern. Preserve the route announcement and visible keyboard cues on actions. Keep contextual shortcuts within the shared My Journey destination. [Child interface standards](docs/brand/CHILD_INTERFACE.md#secondary-page-headers-and-focus)
+
+## Reusable host design
+
+The owner’s November 25 design-system assignment establishes **Design once. Approve once. Reuse everywhere.** Consolidate the current owner-directed Jems identity through shared foundations, presentation components and actual page templates. The host is consistent while games and original child artwork retain their distinct identities. Presentation never acquires authorization, persistence, spending, assessment or reward authority. The [design-system guide](docs/design-system/README.md) and [migration inventory](docs/design-system/INVENTORY.md) distinguish implemented reuse from remaining work and owner acceptance.

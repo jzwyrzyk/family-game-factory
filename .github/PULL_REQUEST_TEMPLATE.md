@@ -50,3 +50,5 @@
 - Follow-up issue(s), if needed:
 
 <!-- Before reporting a merge, release, activation or rollback, update DELIVERY-STATE.md with the exact evidence and observation time. Never commit credentials, child content or private consent records. -->
+
+<!-- Host UI: identify the existing feature owner, archetype and reused design-system components/tokens. Explain legitimate specialist exceptions, run design:check/design:test and relevant rendered checks, and report actual pages migrated. Library/gallery existence alone is not migration completion. See docs/design-system/README.md. -->
