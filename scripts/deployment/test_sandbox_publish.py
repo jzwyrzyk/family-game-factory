@@ -7,7 +7,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT/'.github/workflows/sandbox-publish.yml'
-PUBLIC_SOURCE = 'b472c224f7e8ef8ab0986ce6f755728d7cc63d46'
+PUBLIC_SOURCE = '68b92cd7cfcc3b77c7dd5724920573192b31cfd3'
 
 class ManualSandboxPublisherTests(unittest.TestCase):
     def source(self):
@@ -43,7 +43,9 @@ class ManualSandboxPublisherTests(unittest.TestCase):
             'Stage only committed, reviewed sandbox inputs',
             'Build and validate sandbox before any publication',
             'Exercise current envelope protocol in isolated no-network container',
+            'Verify premium packaged bytes and desktop and touch captures',
             'Publish to GHCR after protocol validation',
+            'Retain digest-bound publication and package receipts',
         ]
         indexes=[text.index(label) for label in stages]
         self.assertEqual(indexes,sorted(indexes))
@@ -54,6 +56,30 @@ class ManualSandboxPublisherTests(unittest.TestCase):
         self.assertIn('source-$REVIEWED_SANDBOX_SHA-run-$GITHUB_RUN_ID-attempt-$GITHUB_RUN_ATTEMPT',text)
         self.assertIn('PUBLISHED_SANDBOX_IMAGE=$ref',text)
         self.assertIn('NOT YET PRODUCTION-ACCEPTED',text)
+
+    def test_published_digest_is_bound_to_image_that_passed_both_protocols(self):
+        text=self.source()
+        ordered=['docker tag jems-sandbox:prepublish jems-premium-sandbox:ci',
+                 'node --import tsx tools/premium-sandbox-check.ts',
+                 'docker push "$tag"', 'docker pull "$ref"',
+                 '.imageId == $id and .source == $source', 'PUBLISHED_SANDBOX_IMAGE=$ref']
+        offsets=[text.index(step) for step in ordered]
+        self.assertEqual(offsets,sorted(offsets))
+        self.assertIn('github.ref_protected',text)
+        self.assertIn('if-no-files-found: error',text)
+
+    def test_attestation_job_only_signs_verified_manifest_after_publication(self):
+        publisher, attestation = self.source().split('\n  attest-reviewed-sandbox:')
+        self.assertNotIn('id-token: write', publisher)
+        self.assertNotIn('attestations: write', publisher)
+        self.assertLess(publisher.index('.imageId == $id and .source == $source'),
+                        publisher.index('echo "digest=$digest" >> "$GITHUB_OUTPUT"'))
+        self.assertIn('needs: publish-reviewed-sandbox', attestation)
+        self.assertIn('subject-digest: ${{ needs.publish-reviewed-sandbox.outputs.digest }}', attestation)
+        self.assertIn('subject-name: ghcr.io/jzwyrzyk/family-game-factory-sandbox', attestation)
+        self.assertNotIn('packages: write', attestation)
+        self.assertNotIn('actions/checkout', attestation)
+        self.assertNotIn('run:', attestation)
 
     def test_fixture_loader_from_real_typescript_package(self):
         # Regression for run 44837433067: named ESM import of a TS fixture

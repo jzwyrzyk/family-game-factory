@@ -8,12 +8,14 @@ concurrency:
   group: jems-reviewed-sandbox-publish
   cancel-in-progress: false
 env:
-  REVIEWED_SANDBOX_SHA: b472c224f7e8ef8ab0986ce6f755728d7cc63d46
+  REVIEWED_SANDBOX_SHA: 68b92cd7cfcc3b77c7dd5724920573192b31cfd3
   SANDBOX_IMAGE: ghcr.io/jzwyrzyk/family-game-factory-sandbox
 jobs:
   publish-reviewed-sandbox:
-    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main'
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected
     runs-on: ubuntu-24.04
+    outputs:
+      digest: ${{ steps.publish.outputs.digest }}
     timeout-minutes: 35
     permissions:
       contents: read
@@ -146,7 +148,12 @@ jobs:
             }
             console.log("SANDBOX_ENVELOPE_WIRE_CONTRACT_PASSED");
           '
+      - name: Verify premium packaged bytes and desktop and touch captures
+        run: |
+          docker tag jems-sandbox:prepublish jems-premium-sandbox:ci
+          node --import tsx tools/premium-sandbox-check.ts
       - name: Publish to GHCR after protocol validation
+        id: publish
         shell: bash
         env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -162,6 +169,14 @@ jobs:
           ref="$SANDBOX_IMAGE@$digest"
           docker pull "$ref" >/dev/null
           test "$(docker image inspect "$ref" --format '{{index .Config.Labels "org.opencontainers.image.revision"}}')" = "$REVIEWED_SANDBOX_SHA"
+          published_id="$(docker image inspect "$ref" --format '{{.Id}}')"
+          jq -e --arg id "$published_id" --arg source "$REVIEWED_SANDBOX_SHA" \
+            '.imageId == $id and .source == $source' test-results/premium-sandbox/build-receipt.json
+          jq -n --arg image "$ref" --arg id "$published_id" --arg source "$REVIEWED_SANDBOX_SHA" \
+            --arg run "$GITHUB_RUN_ID" --arg attempt "$GITHUB_RUN_ATTEMPT" \
+            '{image:$image,imageId:$id,source:$source,run:$run,attempt:$attempt}' \
+            > test-results/premium-sandbox/publication.json
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
           echo "PUBLISHED_SANDBOX_IMAGE=$ref"
           {
             echo '## Reviewed Jems sandbox publication'
@@ -172,3 +187,28 @@ jobs:
             echo 'No private worker tag, WIF trust, Cloud Run setting, paid AI approval or website changed.'
           } >> "$GITHUB_STEP_SUMMARY"
           docker logout ghcr.io >/dev/null
+      - name: Retain digest-bound publication and package receipts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: sandbox-publication-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            test-results/premium-sandbox/publication.json
+            test-results/premium-sandbox/build-receipt.json
+          if-no-files-found: error
+          retention-days: 30
+
+  attest-reviewed-sandbox:
+    needs: publish-reviewed-sandbox
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      attestations: write
+      id-token: write
+    steps:
+      - name: Attest the verified immutable GHCR manifest
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a
+        with:
+          subject-name: ghcr.io/jzwyrzyk/family-game-factory-sandbox
+          subject-digest: ${{ needs.publish-reviewed-sandbox.outputs.digest }}
