@@ -711,10 +711,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:34:53.387Z",
-      "sourceDigest": "4de058388fa8c3e15a8ffd3b85b17a280db9cd7466bbda8f5864d99c8d17dbda",
+      "reviewedAt": "2026-11-26T23:41:08.401Z",
+      "sourceDigest": "793230bdbffd37f58c95745b89a9171471d017e76dc9f1f32ce4bd7ef28204bd",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented TEST financial admission and content-free settlement and source-matched household asset handling.",
+      "reviewReason": "Reviewed dedicated TEST Cloud Run identities, Secret Manager versions, database selection, isolation, verified build provenance and worker transport.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -770,10 +770,10 @@
         "tools/game-art-review/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:31:05.691Z",
-      "sourceDigest": "bbc14bf55c40022eb6d37c0b3d2a278ca446f04f4837a91148eb92aafcc86424",
+      "reviewedAt": "2026-11-26T23:41:08.495Z",
+      "sourceDigest": "bb7f23f50ceb5ead3f44523c8e0266a313917955fb63daeb432b3d7261a2a33b",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed linked domain documentation for this candidate and its tested private-art boundary.",
+      "reviewReason": "Reviewed TEST fixture and separately funded workflow admission, private worker callbacks, signed sandbox selection and preserved cumulative reservations.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -802,10 +802,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:56.441Z",
-      "sourceDigest": "50bb0b9c9ee3b6c2cf7a3d58319542761c1cc7287ec38b7594787b37b1398837",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The integrated UI candidate preserves its saved-concept build surface. These refinements change neither coach admission nor model prompts outside the active asset catalog.",
+      "reviewedAt": "2026-11-26T23:41:08.626Z",
+      "sourceDigest": "dcaad40e69756a9963d89c8736d769bf76c77b1102885851b2bdf5fd0aa9ffc9",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the TEST-only synthetic Coach scenario, private identity-token boundary, expiring funded model access and the default unpaid route.",
       "reviewHistory": [
         {
           "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
@@ -866,10 +866,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "254e5bc24519e6d068053d488e6e6483060cfde1884a725987ff7ed7f6109c48",
-      "reviewedAt": "2026-11-25T17:33:43.991Z",
+      "sourceDigest": "42bb41aa28afe027b83dc046d34b7c7c8879ccdfbd050033fca60d23d33314af",
+      "reviewedAt": "2026-11-26T23:41:08.693Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled fresh source-to-target Adult mapping and grant, original-audience retained-source capture, durable reviewed attempts, stale workspace UI clearing and playback-only remote copies; no credentials, jobs, spending or private authority transfer.",
+      "reviewReason": "Reviewed private IAP subject binding, synthetic device sessions, administrator separation and rejection of unauthorized household spending or recovery.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -929,10 +929,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:27:49.971Z",
-      "sourceDigest": "bef2e2bca16efaa6179ab9dba09960b8ee77a7ba997fab724b32f5904b8a969b",
+      "reviewedAt": "2026-11-26T23:41:08.796Z",
+      "sourceDigest": "09853e37d55a29063cf906552b1ef6fa7538769c4f1de06f64f0cf70a0ff2318",
       "reviewOutcome": "updated",
-      "reviewReason": "The protected release suite now covers actual fixture archives, failed checks, stale owner reviews, staged traffic, unhealthy canaries, immutable image copies and retained website recovery.",
+      "reviewReason": "Verified retained Arcade definitions, deployed TEST proof producers, independent fixture and funded checks, and fail-closed production release evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1175,10 +1175,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T23:27:50.209Z",
-      "sourceDigest": "8c9014d2a3aae01af26942df7af66026b1deeedd2e4444d76cbf289ba59ae157",
+      "reviewedAt": "2026-11-26T23:41:08.988Z",
+      "sourceDigest": "57655345e45398966bdb843a2fe31ca47d19ec286787fe2b80085d61443eb08f",
       "reviewOutcome": "updated",
-      "reviewReason": "The coordinated production runbook specifies the authenticated manifest decision, TEST-first registry promotion, compatibility ordering, public website readback and approved reverse recovery.",
+      "reviewReason": "Reviewed protected DEV policy compatibility, separate infrastructure ownership, exact approval chronology, image transport, website delivery and ordered rollback.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1755,10 +1755,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fd13e01d23d4398e1a1ff78632fe1662399c9981965d7cc2003b863e500cc6e0",
-      "reviewedAt": "2026-11-26T07:32:37.407Z",
+      "sourceDigest": "fe45a4e157b029f47352dcf88663fa34956d5de7cae67a3f19b3aac8dd0c5b37",
+      "reviewedAt": "2026-11-26T23:41:09.154Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Existing private and native storage authorities retain the exact artwork and scene revisions while scratchpaper stays transient.",
+      "reviewReason": "Reviewed named TEST database and bucket binding, verified original backup checksums, scoped synthetic restoration and persistent financial ledger integrity.",
       "reviewHistory": []
     },
     {
