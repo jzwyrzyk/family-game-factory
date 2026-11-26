@@ -12,7 +12,7 @@ if (file) file.onchange = async () => {
     const image = file.files?.[0];
     if (!image || image.type !== 'image/png' || image.size > 5 * 1024 * 1024) throw Error('Choose a reviewed PNG up to 5 MB.');
     const bytes = await image.arrayBuffer();
-    checkReviewedPng(bytes);
+    await checkReviewedPng(bytes);
     if (!guard()) throw Error('The explorer changed. Open the image again.');
     const headers = {'Content-Type':'application/json','X-Factory-Request':'1'};
     const unlock = await fetch('/v1/devices/unlock', {method:'POST', headers, body:JSON.stringify({parentPassphrase:pass.value})});
