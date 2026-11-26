@@ -3,7 +3,6 @@ export interface MathModelOptions {
   submit(value: string): void;
   isLocked(): boolean;
   signal: AbortSignal;
-  objectAsset?: string;
 }
 export function node<K extends keyof HTMLElementTagNameMap>(tag: K, className: string, content?: string) {
   const element = document.createElement(tag);
@@ -105,9 +104,15 @@ export function moves(panel: HTMLElement, move: (from: string,to: string)=>void)
       if(event.pointerId!==id)return;
       source.onpointerup=null;
       if(Math.hypot(event.clientX-x,event.clientY-y)<8)return;
+      // Pointer capture sends the synthesized click to the source even after an
+      // invalid drop. Keep a rejected move from becoming a tap-to-remove.
+      const suppress=(click:MouseEvent)=>{
+        if(click.detail>0){click.preventDefault();click.stopImmediatePropagation();}
+      };
+      source.addEventListener('click',suppress,{capture:true,once:true});
+      source.addEventListener('pointerdown',()=>source.removeEventListener('click',suppress,true),{once:true});
       const destination=document.elementFromPoint(event.clientX,event.clientY)?.closest<HTMLElement>('[data-place-at]');
       if(!destination || !panel.contains(destination))return;
-      // Replacing the board here also removes the source's pending click target.
       move(source.dataset.piece!,destination.dataset.placeAt!);
     };
     source.onpointercancel=()=>{source.onpointerup=null;};

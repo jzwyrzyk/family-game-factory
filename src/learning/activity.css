@@ -19,7 +19,7 @@
 .math-answer-form,.math-help-actions,.math-mode-tabs { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; }
 .math-mode-tabs:not([hidden]) { margin-bottom: 14px; }
 #page-lab .learning-workspace .math-answer-form label, .learning-workspace .math-answer-form label { color: var(--workspace-ink); width: 100%; text-align: center; font-size: 18px; font-weight: 700; }
-.math-answer-form .math-answer-input { width: min(11ch,100%); min-height: var(--workspace-target); border: 2px solid var(--workspace-edge); border-radius: 12px; padding: 8px; color: #0b1e3b; font-size: 24px; text-align: center; }
+.learning-workspace .workspace-work .math-answer-form .math-answer-input { width: min(11ch,100%); min-height: var(--workspace-target); border: 2px solid var(--workspace-edge); border-radius: 12px; padding: 8px; color: #0b1e3b; font-size: 24px; text-align: center; }
 .math-built-number { display: block; text-align: center; font-weight: 800; font-size: 28px; color: #422379; }
 .math-help-actions { margin-top: 12px; }
 .math-save-warning,.language-save-warning { padding: 12px; background: #fff1ce; color: #58390b; border-radius: 12px; }

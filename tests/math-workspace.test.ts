@@ -89,6 +89,9 @@ test('frame edits, moves, zero, undo and submit are distinct actions',async()=>{
     await page.mouse.down();await page.mouse.move(to.x+to.width/2,to.y+to.height/2,{steps:6});await page.mouse.up();
     assert.equal(await page.locator('[data-place-at="11"]').getAttribute('aria-pressed'),'true');
     await button(page,'Undo').click();assert.equal(await page.locator('[data-place-at="0"]').getAttribute('aria-pressed'),'true');
+    await page.mouse.move(from.x+from.width/2,from.y+from.height/2);
+    await page.mouse.down();await page.mouse.move(2,2,{steps:5});await page.mouse.up();
+    assert.equal(await page.locator('[data-place-at="0"]').getAttribute('aria-pressed'),'true','a rejected drop leaves the counter in place');
     await button(page,'Move a counter').click();await page.locator('[data-place-at="0"]').click();await page.locator('[data-place-at="8"]').click();
     assert.equal(await page.locator('[data-place-at="8"]').getAttribute('aria-pressed'),'true');
     await check.click();assert.deepEqual(await raw(page),['1']);

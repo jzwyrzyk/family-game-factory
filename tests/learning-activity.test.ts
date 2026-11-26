@@ -240,3 +240,18 @@ test('Math question and help share explicit read-aloud without reading the answe
     assert.equal(await page.locator('[data-action=read-aloud]').count(),0);
   }finally{await page.close();}
 });
+
+test('given counters retain a visible painted area inside the composed ten-frame',async()=>{
+  const item=generateItem('g1-make-ten',{random:()=>.41}),page=await mount(item,'both');
+  try{
+    const counters=await page.locator('.model-counter.given').evaluateAll(nodes=>nodes.map(node=>{
+      const bounds=node.getBoundingClientRect();
+      return {width:bounds.width,height:bounds.height,image:getComputedStyle(node).backgroundImage};
+    }));
+    assert.equal(counters.length,item.parameters.a);
+    for(const counter of counters){
+      assert.ok(counter.width>=24&&counter.height>=24,'the gem occupies the frame cell');
+      assert.match(counter.image,/learning-counters/);
+    }
+  }finally{await page.close();}
+});

@@ -645,10 +645,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:51:04.169Z",
-      "sourceDigest": "7afa55e5ad7906daf47b4affb89509659b8c20706d711196478986f2b42fbfec",
+      "reviewedAt": "2026-11-26T01:52:09.804Z",
+      "sourceDigest": "1f17499ea7d2259dcdaf7f57f535ee9a0b7a65bc37d772a2a0f6c4dd004b09cb",
       "reviewOutcome": "updated",
-      "reviewReason": "The shared place-value model also covers fallback number construction. The Math integration contract records how visual models and original answers share evidence.",
+      "reviewReason": "Verified editable models use original item semantics, successful saves clear prior warnings, and abandoned counter drags preserve the child’s construction.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -891,10 +891,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:50:07.515Z",
-      "sourceDigest": "321faff4b11c1c7749b9f0d2c5890f01b4334521b583f32fb5c74630d94c9269",
+      "reviewedAt": "2026-11-26T01:52:09.934Z",
+      "sourceDigest": "a1b90b416f634e1267b36c2eaf22bbb2ab8b495cf0b5e2290b5fd1f3043dbe1c",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The same learning UI shard now verifies the geometry, bounded constructors, equivalent numeric responses, pointer input and diagram accessibility.",
+      "reviewReason": "Real-browser regressions exercise visible counter bounds, rejected drops and the same tracked attempts through the established learning UI command.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

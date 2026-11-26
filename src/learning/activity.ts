@@ -113,7 +113,7 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   target.replaceChildren(root);
 
   function save() {
-    try { const result=options.onSave(attempt) as unknown; if(result===false)saveWarning.hidden=false; }
+    try { const result=options.onSave(attempt) as unknown; saveWarning.hidden=result!==false; }
     catch { saveWarning.hidden=false; }
   }
   save();
