@@ -1,3 +1,4 @@
+import {planMathModel, mountMathModel} from './workspace/math';
 import {createNumericKeypad, createScratchpad} from './workspace/support';
 import {createLearningWorkspace} from './workspace/shell';
 import {earlyInstruction} from './early/audio';
@@ -5,7 +6,7 @@ import {mountEarlyMath} from './early/render';
 import {isEarlyGrade} from './grades';
 import { profileGrade, beginAttempt, finishAttempt, selectItem, submitAnswer, useHint, type Attempt } from './engine';
 import type { LearnerProfile, LearningContext, LearningMode, MathItem } from './types';
-import { interactionKind, quantityPlaces, renderMathVisual } from './visuals';
+import { interactionKind, renderMathVisual } from './visuals';
 import {createReadAloudControl} from '../speech/read-aloud-control';
 
 export interface MathActivityResult {
@@ -36,8 +37,6 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, className?: string, t
 function button(text: string, className?: string): HTMLButtonElement {
   const node = el('button', className, text); node.type = 'button'; return node;
 }
-const placeName = (place: number) => ({1000000:'millions',100000:'hundred thousands',10000:'ten thousands',1000:'thousands',100:'hundreds',10:'tens',1:'ones',.1:'tenths',.01:'hundredths'} as Record<number,string>)[place] || String(place);
-
 /**
  * One host-owned learning opportunity. Both input paths submit the same item and
  * attempt, so changing representation cannot create duplicate learning credit.
@@ -48,9 +47,16 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   const mode = options.mode || options.context?.mode || 'checkpoint';
   const initial = options.item || selectItem(options.profile, options.context);
   const kind = interactionKind(initial);
+  const availableModel = planMathModel(initial);
+  // A checkpoint keeps its authored representation. A symbolic checkpoint can
+  // offer a model after a recorded hint, without relabeling symbolic evidence.
+  const quantityFallback = mode !== 'checkpoint' && !isEarlyGrade(initial.grade) && kind==='quantity'
+    ? {kind:'blocks', role:'answer'} as const : undefined;
+  const plan = mode !== 'checkpoint' || initial.representation==='visual' ? availableModel ?? quantityFallback : undefined;
+  const constructsAnswer = plan?.role === 'answer';
   // A quantity/fraction construction is an actual mathematical representation,
   // not evidence of unaided symbolic recall. Choice tiles retain the item form.
-  const item: MathItem = mode !== 'checkpoint' && (kind === 'quantity' || kind === 'fraction')
+  const item: MathItem = !isEarlyGrade(initial.grade) && mode !== 'checkpoint' && plan
     ? {...initial, id: `${initial.id}:constructed`, representation: 'visual'} : initial;
   const attempt = beginAttempt(options.profile, item, {...options.context, mode});
   let disposed = false, done = false, locked = false, errors = 0, hintDepth = 0;
@@ -70,11 +76,17 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     canRead: () => !disposed && !done && !locked,
   });
   shell.header.append(questionReading.element);
-  if(item.visual)shell.stimulus.append(renderMathVisual(item.visual));
+  if(item.visual && plan?.kind !== 'chart' && plan?.kind !== 'shapes') {
+    if(item.skillId==='g3-fraction-number' && item.visual.kind==='number-line') {
+      shell.stimulus.append(renderMathVisual({...item.visual,jumps:[]},{divisions:Number(item.parameters.d)}));
+    } else {
+      shell.stimulus.append(renderMathVisual(item.visual));
+    }
+  }
 
   const tabs = el('div','math-mode-tabs'); tabs.setAttribute('role','group'); tabs.setAttribute('aria-label','How would you like to answer?');
   const typeTab=button('Write an answer'),buildTab=button(kind==='choice'?'Choose a tile':'Build an answer');
-  tabs.append(typeTab,buildTab); tabs.hidden=mode!=='both'||kind==='answer'||kind==='choice';
+  tabs.append(typeTab,buildTab); tabs.hidden=!constructsAnswer || !(mode==='both'||(mode==='checkpoint'&&plan));
   shell.work.append(tabs);
   const answerArea=el('div','math-answer-area'),interactionArea=el('div','math-interaction-area');
   shell.work.append(interactionArea,answerArea);
@@ -101,7 +113,7 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   target.replaceChildren(root);
 
   function save() {
-    try { const result=options.onSave(attempt) as unknown; if(result===false)saveWarning.hidden=false; }
+    try { const result=options.onSave(attempt) as unknown; saveWarning.hidden=result!==false; }
     catch { saveWarning.hidden=false; }
   }
   save();
@@ -160,6 +172,9 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     const hint=item.hints[hintDepth++];useHint(options.profile,attempt.id,hintDepth);save();
     shell.setHelpState(false);presentHelp(`Hint ${hintDepth} of ${item.hints.length}`,hint.text);
     if(hint.visual)hintPanel.append(renderMathVisual(hint.visual));
+    if(availableModel && !plan && hintDepth===2 && !options.challenge) {
+      mountMathModel(hintPanel,item,availableModel,{submit,isLocked:()=>disposed||done||locked,signal:listeners.signal});
+    }
     hintPanel.append(helpActions,hintReading.element);
     hintButton.textContent=hintDepth<item.hints.length?'Another hint':'Show how to finish';
     if(requested){helpAnnouncement.textContent='';focusAndReveal(hintTitle,'start');}
@@ -207,39 +222,25 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   if(!early && !options.challenge) shell.tools.append(createScratchpad(listeners.signal));
   on(form,'submit',event=>{event.preventDefault();submit(input.value);});answerArea.append(form);
 
-  if(kind==='quantity') {
-    const mission=el('section','math-interaction');mission.append(el('h3',undefined,'Build the amount'),el('p',undefined,'Change the place-value blocks to make your answer.'));
-    const places=quantityPlaces(item),digits=places.map(()=>0),controls=el('div','math-quantity-controls'),picture=el('div'),total=el('output','math-built-number','0');
-    total.setAttribute('aria-live','polite');total.setAttribute('aria-label','Amount you built');
-    const outputs:HTMLOutputElement[]=[],plusButtons:HTMLButtonElement[]=[],minusButtons:HTMLButtonElement[]=[];
-    const value=()=>Number(digits.reduce((sum,digit,i)=>sum+digit*places[i],0).toFixed(2));
-    function redraw(){const amount=value();total.textContent=amount.toLocaleString('en-US',{maximumFractionDigits:2});mission.dataset.value=String(amount);outputs.forEach((out,i)=>{out.textContent=String(digits[i]);minusButtons[i].disabled=locked||digits[i]===0;plusButtons[i].disabled=locked||digits[i]===9;});picture.replaceChildren(renderMathVisual({kind:'place-value',value:amount}));}
-    places.forEach((place,i)=>{
-      const column=el('div','math-place'),name=el('span',undefined,placeName(place)),plus=button('+'),minus=button('−'),count=el('output',undefined,'0');
-      plus.setAttribute('aria-label',`Add one ${placeName(place)} block`);minus.setAttribute('aria-label',`Remove one ${placeName(place)} block`);plus.dataset.place=String(place);minus.dataset.place=String(place);plus.dataset.delta='1';minus.dataset.delta='-1';
-      on(plus,'click',()=>{if(locked||digits[i]>=9)return;digits[i]++;redraw();});on(minus,'click',()=>{if(locked||digits[i]<=0)return;digits[i]--;redraw();});
-      column.append(name,plus,count,minus);controls.append(column);outputs.push(count);plusButtons.push(plus);minusButtons.push(minus);
-    });
-    const check=button('Use this amount','math-primary');check.dataset.action='check-interaction';on(check,'click',()=>submit(String(value())));
-    mission.append(controls,total,picture,check);interactionArea.append(mission);redraw();
-  } else if(kind==='fraction') {
-    const mission=el('section','math-interaction');mission.append(el('h3',undefined,'Build a fraction'),el('p',undefined,'Choose equal parts, then shade the amount you mean.'));
-    let numerator=0,denominator=2;const controls=el('div','math-fraction-controls'),picture=el('div'),total=el('output','math-built-number','0/2');
-    total.setAttribute('aria-label','Fraction you built');total.setAttribute('aria-live','polite');
-    const outputs:HTMLOutputElement[]=[];const refresh=()=>{outputs[0].textContent=String(numerator);outputs[1].textContent=String(denominator);total.textContent=`${numerator}/${denominator}`;mission.dataset.value=`${numerator}/${denominator}`;picture.replaceChildren(renderMathVisual({kind:'fraction',numerator,denominator}));};
-    ['Shaded parts','Equal parts per whole'].forEach((name,i)=>{const part=el('div','math-fraction-part'),label=el('label',undefined,name),minus=button('−'),out=el('output',undefined,i?'2':'0'),plus=button('+');
-      minus.setAttribute('aria-label',`Decrease ${name.toLowerCase()}`);plus.setAttribute('aria-label',`Increase ${name.toLowerCase()}`);
-      for(const [control,delta] of [[minus,-1],[plus,1]] as const){control.dataset.fractionPart=i?'denominator':'numerator';control.dataset.delta=String(delta);on(control,'click',()=>{if(locked)return;if(i)denominator=Math.max(1,Math.min(12,denominator+delta));else numerator=Math.max(0,Math.min(96,numerator+delta));refresh();});}
-      part.append(label,minus,out,plus);controls.append(part);outputs.push(out);
-    });
-    const check=button('Use this fraction','math-primary');check.dataset.action='check-interaction';on(check,'click',()=>submit(`${numerator}/${denominator}`));
-    mission.append(controls,total,picture,check);interactionArea.append(mission);refresh();
+  if(plan) {
+    mountMathModel(interactionArea,item,plan,{submit,isLocked:()=>locked||disposed||done,signal:listeners.signal});
   }
-  function setPath(interactive:boolean){const usable=kind==='quantity'||kind==='fraction';interactionArea.hidden=!interactive||!usable;answerArea.hidden=interactive&&usable;typeTab.setAttribute('aria-pressed',String(!interactive));buildTab.setAttribute('aria-pressed',String(interactive));}
+  function setPath(interactive:boolean) {
+    interactionArea.hidden=!interactive || !plan;
+    answerArea.hidden=interactive && constructsAnswer;
+    // A frame with given counters and an empty fraction line already present
+    // their stimulus in the model. Keep the given visible on the written path.
+    shell.stimulus.hidden=interactive && (
+      (plan?.kind==='frames' && item.parameters.operation==='missing-addend')
+      || (plan?.kind==='numberLine' && item.skillId==='g3-fraction-number')
+    );
+    typeTab.setAttribute('aria-pressed',String(!interactive));
+    buildTab.setAttribute('aria-pressed',String(interactive));
+  }
   on(typeTab,'click',()=>{setPath(false);returnToAnswer();});on(buildTab,'click',()=>{setPath(true);returnToAnswer();});
   // Showing the model first makes visual-form evidence truthful in both mode,
   // even when the child later chooses the written response for the same item.
-  setPath(mode!=='checkpoint');
+  setPath(mode!=='checkpoint'||plan?.role==='explore');
   // A question is the entry point, including on touch devices. Focusing a text
   // input here would open the software keyboard before the child can read it.
   focusQuestion();

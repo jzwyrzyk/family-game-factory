@@ -1,5 +1,6 @@
 @import './workspace/shell.css';
 @import './workspace/support.css';
+@import './workspace/math.css';
 
 .learning-preview-cover {
   position: absolute; inset: 0; z-index: 35; display: flex; align-items: flex-start;
@@ -15,18 +16,19 @@
 .math-visual figcaption { color: #34425c; line-height: 1.5; font-size: 18px; }
 .math-choice-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(130px,100%),1fr)); gap: 10px; width: 100%; }
 .math-choice-grid button { min-height: var(--workspace-target); font-size: 22px; }
-.math-answer-form,.math-help-actions,.math-mode-tabs,.math-quantity-controls,.math-fraction-controls { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; }
+.math-answer-form,.math-help-actions,.math-mode-tabs { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; }
 .math-mode-tabs:not([hidden]) { margin-bottom: 14px; }
-.math-answer-form label { width: 100%; text-align: center; font-size: 18px; font-weight: 700; }
-.math-answer-form .math-answer-input { width: min(11ch,100%); min-height: var(--workspace-target); border: 2px solid var(--workspace-edge); border-radius: 12px; padding: 8px; color: #0b1e3b; font-size: 24px; text-align: center; }
-.math-interaction { text-align: center; }
-.math-interaction h3 { margin: 0; color: #0b1e3b; font-size: 22px; }
+#page-lab .learning-workspace .math-answer-form label, .learning-workspace .math-answer-form label { color: var(--workspace-ink); width: 100%; text-align: center; font-size: 18px; font-weight: 700; }
+.learning-workspace .workspace-work .math-answer-form .math-answer-input { width: min(11ch,100%); min-height: var(--workspace-target); border: 2px solid var(--workspace-edge); border-radius: 12px; padding: 8px; color: #0b1e3b; font-size: 24px; text-align: center; }
 .math-built-number { display: block; text-align: center; font-weight: 800; font-size: 28px; color: #422379; }
-.math-place,.math-fraction-part { display: grid; gap: 4px; justify-items: center; padding: 6px; border-radius: 12px; background: var(--workspace-tint); }
-.math-place span,.math-fraction-part label { font-size: 18px; }
-.math-help-actions,.math-interaction .math-primary { margin-top: 12px; }
+.math-help-actions { margin-top: 12px; }
 .math-save-warning,.language-save-warning { padding: 12px; background: #fff1ce; color: #58390b; border-radius: 12px; }
 .math-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 .math-answer-form > .learning-keypad { width: 100%; text-align: center; }
 .math-answer-form .learning-keypad-keys { margin-inline: auto; }
+.math-activity .math-visual svg { max-height: clamp(170px,28vh,285px); }
+.math-activity[data-band="early"] .math-answer-form { flex-direction: column; gap: 16px; }
+.math-activity[data-band="early"] .early-counter button { min-width: var(--workspace-target); min-height: var(--workspace-target); }
+.math-activity[data-band="early"] .early-choices { gap: clamp(8px, 1.5vw, 16px); }
+.math-activity[data-band="early"] .early-check { background: var(--workspace-action); color: #fff; border-color: var(--workspace-action); }

@@ -103,3 +103,10 @@
 #page-lab .two-column:has(.learning-workspace) { grid-template-columns: minmax(0,1fr); }
 #page-lab .panel:has(#lab-question .learning-workspace) { min-width: 0; padding: clamp(6px,1.5vw,16px); }
 #lab-question .learning-workspace { margin-inline: auto; }
+.learning-workspace .workspace-heading { position: relative; padding-inline-start: 16px; }
+.workspace-heading::before { content: ''; position: absolute; inset-inline-start: 0; height: min(64%,36px); width: 6px; border-radius: 8px; background: var(--workspace-accent); }
+.learning-workspace[data-band="early"] .workspace-pal { width: clamp(64px,15vw,120px); }
+@media (min-width: 330px) and (max-width: 530px) {
+  .workspace-header .jems-read-aloud { flex: 1 1 auto; justify-content: end; }
+  .workspace-header:has(.jems-reading-notice:not(:empty)) .jems-read-aloud { justify-content: start; }
+}

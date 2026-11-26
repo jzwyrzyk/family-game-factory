@@ -126,14 +126,15 @@ test('three errors provide a worked example and a supportive way back to play',a
 });
 
 test('interaction mode constructs a quantity without pre-filling the answer',async()=>{
-  const page=await mount(multiply(),'interaction');try{
+  const item=generateItem('g2-hundreds',{random:()=>0});
+  const page=await mount(item,'interaction');try{
     assert.equal(await page.locator('.math-built-number').textContent(),'0');
     assert.equal(await page.locator('#math-answer').isVisible(),false);
-    for(let i=0;i<5;i++)await page.locator('button[data-place="10"][data-delta="1"]').click();
-    for(let i=0;i<6;i++)await page.locator('button[data-place="1"][data-delta="1"]').click();
-    assert.equal(await page.locator('.math-built-number').textContent(),'56');
+    await page.locator('button[data-place="100"][data-delta="1"]').click();
+    await page.locator('button[data-place="10"][data-delta="1"]').click();
+    assert.equal(await page.locator('.math-built-number').textContent(),String(item.answer));
     await page.locator('[data-action=check-interaction]').click();await page.waitForFunction(()=>(window as any).results.length===1);
-    const e=await evidence(page);assert.equal(e.results[0].independent,true);assert.equal(e.profile.learning.attempts[0].item.representation,'visual');assert.equal(e.profile.learning.attempts[0].answers[0].normalized,'56/1');
+    const e=await evidence(page);assert.equal(e.results[0].independent,true);assert.equal(e.profile.learning.attempts[0].item.representation,'visual');assert.equal(e.profile.learning.attempts[0].answers[0].normalized,item.answer+'/1');
   }finally{await page.close();}
 });
 
@@ -237,5 +238,20 @@ test('Math question and help share explicit read-aloud without reading the answe
     assert.equal((await evidence(page)).profile.learning.attempts[0].hintLevel,1);
     await page.evaluate(()=>(window as any).activity.dispose());
     assert.equal(await page.locator('[data-action=read-aloud]').count(),0);
+  }finally{await page.close();}
+});
+
+test('given counters retain a visible painted area inside the composed ten-frame',async()=>{
+  const item=generateItem('g1-make-ten',{random:()=>.41}),page=await mount(item,'both');
+  try{
+    const counters=await page.locator('.model-counter.given').evaluateAll(nodes=>nodes.map(node=>{
+      const bounds=node.getBoundingClientRect();
+      return {width:bounds.width,height:bounds.height,image:getComputedStyle(node).backgroundImage};
+    }));
+    assert.equal(counters.length,item.parameters.a);
+    for(const counter of counters){
+      assert.ok(counter.width>=24&&counter.height>=24,'the gem occupies the frame cell');
+      assert.match(counter.image,/learning-counters/);
+    }
   }finally{await page.close();}
 });

@@ -645,10 +645,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:47:03.820Z",
-      "sourceDigest": "937d42c456c7e0d6e76e8ba0a5c14c5c72caa1a61b63eaa53b1e3726019b18c0",
+      "reviewedAt": "2026-11-26T01:52:09.804Z",
+      "sourceDigest": "1f17499ea7d2259dcdaf7f57f535ee9a0b7a65bc37d772a2a0f6c4dd004b09cb",
       "reviewOutcome": "updated",
-      "reviewReason": "Math preserves the active response and centers it on explicit return from hints. The integration contract documents the shared question and working tools.",
+      "reviewReason": "Verified editable models use original item semantics, successful saves clear prior warnings, and abandoned counter drags preserve the child’s construction.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -891,10 +891,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:59:09.198Z",
-      "sourceDigest": "7f6f06866628a978a1e86606837685ee3943e8c88a8ef4dc69be61296f51fa1b",
+      "reviewedAt": "2026-11-26T02:01:21.683Z",
+      "sourceDigest": "1338f8a0de6233a839f80db086c9487f181a31de005c580bb561ad9de958a093",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The My Powers brand journey now checks approved Ink and measured contrast on the light learning surface. The original game journey uses the visible checkpoint exit, verifies persisted interrupted evidence and its unused-budget refund, and still exercises the ordinary game exit. Host navigation, receipts and CI assignments are unchanged.",
+      "reviewReason": "Reviewed the foundation's composed light-surface contrast and persisted unused-checkpoint exit tests together with Math's counter bounds, rejected drops, geometric models and tracked construction submissions. The same learning UI and browser commands retain their assigned CI scope.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1135,10 +1135,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T01:45:23.244Z",
-      "sourceDigest": "89d01be4965b0dd852a8ab6cf2f75824fcfd09bbc248e5908a42bc10eaf1c3dd",
+      "reviewedAt": "2026-11-26T01:50:07.685Z",
+      "sourceDigest": "407ba629bd4f34955f20a5e6c69735d1a2b95e1cf6510accae9f3f1d6c53b927",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The feature branch adds local Math presentation and browser fixtures. It changes no release manifest, operational environment, worker version or production authorization.",
+      "reviewReason": "Adding deterministic local Math model and geometry tests to the existing learning command changes neither deployment routing nor the approved release source.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
