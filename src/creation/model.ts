@@ -22,7 +22,7 @@ export type CreationBlock = BlockBase & (
   | {type: 'dance'; durationMs: number}
   | {type: 'jump'; height: number; durationMs: number}
   | {type: 'show' | 'hide'}
-  | {type: 'repeat'; count: number; actions: CreationBlock[]}
+  | {type: 'repeat'; count: number; actions: CreationBlock[]; pathName?: string}
   | {type: 'if'; condition: SceneCondition; then: CreationBlock[]; else?: CreationBlock[]}
   | {type: 'set'; variable: string; value: number}
   | {type: 'change'; variable: string; amount: number}
@@ -139,7 +139,7 @@ export function validateCreationProject(input: unknown): CreationProject {
     list(raw, CREATION_LIMITS.blocks, 'blocks');
     for (const value of raw) {
       if (++blockCount > CREATION_LIMITS.blocks) fail('This project has too many blocks.');
-      const b = record(value, ['id','origin','type','x','y','dx','dy','durationMs','text','height','count','actions','condition','then','else','variable','value','amount','name'], 'block');
+      const b = record(value, ['id','origin','type','x','y','dx','dy','durationMs','text','height','count','actions','condition','then','else','variable','value','amount','name','pathName'], 'block');
       id(b.id, 'block ID');
       if (blockIds.has(b.id)) fail('Block IDs must be unique throughout a project.');
       blockIds.add(b.id);
@@ -161,7 +161,7 @@ export function validateCreationProject(input: unknown): CreationProject {
         case 'say': fields(['text','durationMs']); text(b.text, 160, 'speech', true); duration(); break;
         case 'jump': fields(['height','durationMs']); number(b.height, 0, 300, 'jump height'); duration(); break;
         case 'show': case 'hide': fields([]); break;
-        case 'repeat': fields(['count','actions']); number(b.count, 0, CREATION_LIMITS.repeat, 'repeat count', true); blocks(b.actions, depth + 1); break;
+        case 'repeat': fields(['count','actions','pathName']); if (b.pathName !== undefined) text(b.pathName, 40, 'path name'); number(b.count, 0, CREATION_LIMITS.repeat, 'repeat count', true); blocks(b.actions, depth + 1); break;
         case 'if': fields(['condition','then','else']); condition(b.condition); blocks(b.then, depth + 1); if (b.else !== undefined) blocks(b.else, depth + 1); break;
         case 'set': fields(['variable','value']); variable(b.variable); number(b.value, -1000000, 1000000, 'variable value'); break;
         case 'change': fields(['variable','amount']); variable(b.variable); number(b.amount, -1000000, 1000000, 'variable change'); break;

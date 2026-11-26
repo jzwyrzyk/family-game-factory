@@ -413,10 +413,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fee0252694b94e3f1254485510ef5c6da2cbd6ca19ac18af19c0ec8e8e26b54d",
-      "reviewedAt": "2026-11-25T23:20:54.040Z",
+      "sourceDigest": "71dcf4ff42672f3ca738503e1893f28f1c18a67d21da1ce6e2cac9cb3d0791f7",
+      "reviewedAt": "2026-11-26T03:15:30.846Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The scene rendering contract distinguishes legacy pinned tokens and neutral bytes from new active actor choices.",
+      "reviewReason": "The first-steps Step shortcut is confined to the selected private actor under reduced motion. The drawn path guide specifies that scope, exact Keep reuse and scene-owned timing.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -894,10 +894,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:21:39.478Z",
-      "sourceDigest": "44eae5990229b9407abb742383425bdaad8aad4c5eed99859b6d29f4183d5a3c",
+      "reviewedAt": "2026-11-26T03:22:17.224Z",
+      "sourceDigest": "23b8872f023de77daba93e5f52f3b9a5c5505afa62592f54f0c97dc888bcebec",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Count the new editable-crayon browser regression in the existing creative shard. Exact command membership, complete coverage and failure-closed receipt checks still use the same policy.",
+      "reviewReason": "The A and C browser journeys add two creative leaf commands to the previous 65. Exact expansion has 67 creative and 43 browser leaves; every existing shard, negative missing/duplicate check and evidence rule still applies.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1138,10 +1138,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:07:06.155Z",
-      "sourceDigest": "0f06813f92e2b9a100767df63ef687efd9e63be61f4792c3852b63f9572bb2b8",
+      "reviewedAt": "2026-11-26T03:08:55.290Z",
+      "sourceDigest": "407481a3b75669bdaeafbb738f58e1d82d582963d41ecba68eb2cd85da8fc5de",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The package change registers one local artwork regression in its existing gate. Deployment identity, traffic, provider and family activation contracts remain as recorded.",
+      "reviewReason": "The package changes extend the existing creation test commands. Deployment controls, release audiences and service or worker configuration retain the documented contracts.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1705,10 +1705,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "381260b659e8d8ed26b7fdddb3c2182a49d2f8f9cffd808e7d167695f25bfb3a",
-      "reviewedAt": "2026-11-26T00:23:36.006Z",
+      "sourceDigest": "3b669cf847b1ba4c4642c8130894505a04e7b12f3707b8ffd273b74370ed92df",
+      "reviewedAt": "2026-11-26T03:08:54.218Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled merged F06 rollback limits with the owner-scoped Pal migration, retained readers and repeat restore contract."
+      "reviewReason": "Architecture records reads of the active owner’s kept scene revision in both original and indexed scene storage. Copying motion writes a new group of block IDs through existing autosave, keep and backup."
     }
   ]
 }

@@ -1,5 +1,8 @@
 # Jems current architecture
 
+The local [drawn path editor](docs/creation-studio/DRAWN_PATHS.md) records movement as named groups of bounded relative moves on private-art actors. Scene revisions own timing and positions. A cross-scene copy reads the active owner’s explicitly kept revision and writes new block IDs into the destination scene.
+
+
 The November 26 application integration combines family beta and F06 storage from #186 with the child experience from #188 and #190. The [environment contract](docs/development/DEV-TEST-PROD.md) governs DEV, TEST and household promotion. Production still serves the earlier household release. The [delivery register](DELIVERY-STATE.md) distinguishes source validation, hosted acceptance and activation for this release.
 
 **Private family beta and F06 on protected main, November 25.** Application #186 integrated the opt-in family tenancy and storage paths. Existing household deployments use the household route. Prepared workspaces preserve their recoverable originals. Native private copies use per-owner authorization and explicit conflict handling. Other domains use reviewed recovery. The protected worker still runs the earlier pinned public source. Private dispatch checks both its immutable execution tag and the current private main commit against the same approved SHA. An advance of worker main would stop admission under the current pin. [Integration and continuity record](docs/family-beta/COMPLETION.md#protected-main-integration)
