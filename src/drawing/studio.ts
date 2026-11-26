@@ -5,7 +5,9 @@ import {exportArtBundle,importArtBundle,restoreArtBundle} from './transfer';
 import {openDrawingLab} from './lab';
 import {editMotionPath} from './motion-editor';
 import {drawOnTablet} from './paint';
-import {readSketch} from './sketch';
+import {hasCrayonSource} from './crayon-source';
+import {editLegacyCrayons} from './legacy-crayon-editor';
+import {readSketch,verifySketchPixels} from './sketch';
 import {editPicture} from './picture';
 import {createIcon,iconMarkup,setIconLabel,type IconName} from '../brand/icons';
 import {assertRewardSourceWritable} from '../rewards/write-guard';
@@ -93,7 +95,15 @@ export function installArtStudio(host:Host){
     for(const [i,rig]of versions.entries()){const count=rig.assembly.pieces.length,option=node('option','',rig.assembly.motion ? `Version ${rig.assembly.revision} · animation path` : `${versions.length-i} · ${rig.assembly.kind} · ${count} ${count===1?'part':'parts'}`);option.value=rig.id;choice.append(option);}if(versions.length)choice.value=versions[0].id;versionLabel.append(choice);pane.append(versionLabel);
     const actions=node('div','art-detail-actions');
     const sketch=item.mime==='image/png'?readSketch(item.bytes):null;
-    if(sketch)actions.append(button('Keep drawing','edit',()=>drawOnTablet(captured,saved=>showKeptDrawing(saved,captured,run),()=>current(captured,run),{item,sketch})));
+    if(sketch || (item.mime==='image/png' && hasCrayonSource(item.bytes)))actions.append(button('Keep drawing','edit',async()=>{
+      const active=()=>current(captured,run) && selected===id && !pane.hidden;
+      const saved=(result:Drawing)=>showKeptDrawing(result,captured,run);
+      if(!active())return;
+      if(sketch){
+        await verifySketchPixels(item.bytes,sketch);
+        if(active())await drawOnTablet(captured,saved,()=>current(captured,run),{item,sketch});
+      }else await editLegacyCrayons(captured,item,saved,active);
+    }));
     const editMovement=async(rigId?:string)=>{const editor=await openDrawingLab(captured,item,savedId=>host.openCar(savedId,()=>current(captured,run)),{...(rigId?{rigId}:{}),isCurrent:()=>current(captured,run),onSaved:async()=>{if(current(captured,run)&&await refresh()){status('Movement saved. Choose where it goes next.');notify(captured);}}});editor?.addEventListener('close',()=>{if(current(captured,run))void refresh();},{once:true});};
     const openEditor=button(versions.length?'Edit movement':'Make it move','play',()=>editMovement(choice.value||undefined),true);openEditor.id='artEditMovement';
     const path=button('Draw a path','edit',()=>editMotionPath(captured,item,choice.value||undefined,()=>current(captured,run),async saved=>{
