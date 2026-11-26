@@ -59,3 +59,5 @@ New development uses 2D sprites, layered environments and compatible physics. Ar
 | E | Game host owns explicit adapters and trust checks. Security and release owners independently qualify any future change to general delivery. | A named playable example, preserved game behavior, an isolated generated realm, and confirmation of disabled production delivery. |
 
 For each change record its PR and dependencies, exact head, reproducible tests, screenshots and motion capture where relevant. Record what passed locally, hosted checks and private preview identity, TEST acceptance, production state and external family activation separately. Use synthetic work in public artifacts. Existing parent reports, learning evidence, reward receipts, earned Pals and prior histories retain their own authorities. [Delivery governance](../development/DEV-TEST-PROD.md)
+
+Four versioned Creative Studio worlds pair painted plates with aligned middle and foreground layers and transparent props. Keep the versioned files and catalogue IDs used by saved scenes. [Artwork manifest and review status](../creation-studio/WORLD_ART.md)

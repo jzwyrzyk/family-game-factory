@@ -42,12 +42,64 @@ const {exploreWelcome,navigate}=require('./studio-entry.cjs');
     await navigate(page,'#studioNavScenes');
     await page.locator('#creationFreeMode').click();
     await page.locator('[data-creation-starter="dragon"]').click();
-    const initial=await page.evaluate(()=>FG.creation.scene());
     const options=page.locator('#creationSceneOptions');
     const settings=async()=>{
       if(!await options.isVisible())await page.locator('#creationCharacterTools').click();
       if(!await options.evaluate(el=>el.open))await options.locator(':scope > summary').click();
     };
+    fs.mkdirSync('test-results',{recursive:true});
+    for (const key of ['forest','cloud','workshop','moon']) {
+      await settings();
+      const pin = 'world-'+key+'-v1';
+      await page.locator('#creationBackground').selectOption(pin);
+      await page.waitForFunction(pin => FG.creation.scene().world.assetId === pin, pin);
+      await page.locator('#creationSettingsDone').click();
+      await page.locator('#creationRun').click();
+      await page.waitForFunction(()=>FG.creation.snapshot().status==='completed');
+      // Compare the rendered canvas with the independently composed registered
+      // images at positions away from the child-editable actors and text.
+      const fraction = await page.evaluate(async key => {
+        const stage=document.querySelector('#creationCanvas'), {width,height}=stage;
+        const expected=document.createElement('canvas');expected.width=width;expected.height=height;
+        const ctx=expected.getContext('2d');
+        for(const layer of ['background','middle','foreground']){
+          const img=new Image();img.src='./art/creative-worlds/v1/'+key+'-'+layer+'.webp';await img.decode();
+          const scale=Math.max(width/img.width,height/img.height),w=img.width*scale,h=img.height*scale;
+          ctx.drawImage(img,(width-w)/2,(height-h)/2,w,h);
+        }
+        const a=stage.getContext('2d').getImageData(0,0,width,height).data,b=ctx.getImageData(0,0,width,height).data;
+        let same=0,total=0;
+        for(let i=0;i<a.length;i+=4*23){
+          if(Math.max(Math.abs(a[i]-b[i]),Math.abs(a[i+1]-b[i+1]),Math.abs(a[i+2]-b[i+2]))<3) same++;
+          total++;
+        }
+        return same/total;
+      },key);
+      assert.ok(fraction>.80, key+' matched '+fraction+' of independently composed stage samples');
+      await page.locator('#creationCanvas').screenshot({path:'test-results/creative-painted-'+key+'.png'});
+    }
+    await page.locator('#creationAddActor').click();
+    await page.locator('[data-creation-asset="world-prop-rover-v1"]').click();
+    await page.waitForFunction(()=>FG.creation.scene().actors.some(a=>a.assetId==='world-prop-rover-v1'));
+    await page.locator('#creationKeep').click();
+    const paintedScene=await page.evaluate(()=>FG.creation.scene());
+    await page.reload();
+    await navigate(page,'#studioNavScenes');
+    await page.locator('[data-scene="'+paintedScene.id+'"]').click();
+    assert.deepEqual((await page.evaluate(()=>FG.creation.scene())).world,paintedScene.world);
+    assert.equal((await page.evaluate(()=>FG.creation.scene())).actors.at(-1).assetId,'world-prop-rover-v1');
+    await page.setViewportSize({width:390,height:844});
+    await page.locator('#creationPlayView').click();
+    await page.locator('#creationRun').click();
+    await page.waitForFunction(()=>FG.creation.snapshot().status==='completed');
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+    await page.screenshot({path:'test-results/creative-painted-moon-phone.png'});
+    await page.setViewportSize({width:1366,height:900});
+    // Resume the existing private world journey on its own starting project.
+    await page.locator('#creationBack').click();
+    await page.locator('#creationFreeMode').click();
+    await page.locator('[data-creation-starter="dragon"]').click();
+    const initial=await page.evaluate(()=>FG.creation.scene());
     await settings();
     await page.locator('#creationBackground').selectOption({label:'Waterfall islands'});
     await page.waitForFunction(()=>FG.creation.scene()?.world?.assetId.startsWith('world-islands'));

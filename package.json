@@ -55,7 +55,7 @@
     "test:rewards-browser": "node tests/rewards-ui-browser.cjs && node tests/rewards-browser.cjs",
     "test:problem-solving": "node --import tsx --test tests/problem-solving-evidence.test.ts tests/problem-solving-storage.test.ts tests/problem-solving-practice.test.ts tests/problem-solving-adapters.test.ts",
     "test:problem-solving-browser": "node tests/problem-solving-browser.cjs",
-    "test:art": "node --import tsx --test tests/drawing-engine.test.ts tests/drawing-bindings.test.ts tests/creation-private-art.test.ts",
+    "test:art": "node --import tsx --test tests/drawing-engine.test.ts tests/drawing-bindings.test.ts tests/creation-private-art.test.ts tests/creative-world-art.test.ts",
     "test:art-browser": "node tests/art-entry-readiness.cjs && node tests/art-storage-browser.cjs && node tests/art-studio-browser.cjs && node tests/picture-tools-browser.cjs && node tests/drawing-engine-browser.cjs && node tests/creation-private-art-browser.cjs && node tests/sketch-recovery.cjs && node tests/crayon-revision-browser.cjs && node tests/drawing-workspace-browser.cjs && node tests/creative-motion-browser.cjs && node tests/creation-worlds-browser.cjs",
     "test:first-creation": "node --import tsx --test tests/studio-guidance.test.ts && node tests/first-creation-journey.cjs",
     "test:pals": "node --import tsx --test tests/pals.test.ts tests/pals-service.test.ts tests/pals-controller.test.ts tests/pals-backup.test.ts tests/pals-creation.test.ts tests/pal-scene-image.test.ts && npm run test:pals-expressions && npm run test:pals-assets",

@@ -10,9 +10,11 @@ export function worldSettings(host:HTMLElement, dialog:HTMLDialogElement, action
   choose(world:SceneWorld | undefined, background?:CreationProject['background'], current?:()=>boolean):Promise<boolean>;
 }) {
   host.innerHTML = `<label>World <select id="creationBackground"></select></label>
+    <img id="creationWorldPreview" width="112" height="63" alt="" hidden>
     <button type="button" id="creationWorldFromArt" class="creation-button">Use my artwork</button>
     <label id="creationWorldFramingLabel">Picture size <select id="creationWorldFraming"><option value="fit">Show whole picture</option><option value="fill">Fill the stage</option></select></label>`;
   const select = host.querySelector<HTMLSelectElement>('#creationBackground')!;
+  const preview = host.querySelector<HTMLImageElement>('#creationWorldPreview')!;
   const frame = host.querySelector<HTMLSelectElement>('#creationWorldFraming')!;
   const frameLabel = frame.closest('label')!;
   for (const world of SCENE_WORLDS) select.add(new Option(world.label,world.id));
@@ -74,7 +76,12 @@ export function worldSettings(host:HTMLElement, dialog:HTMLDialogElement, action
     render(project:CreationProject){
       scene=project;
       const world=project.world;
-      const own=world && !SCENE_WORLDS.some(item=>item.id===world.assetId);
+      const bundled = SCENE_WORLDS.find(item => item.id === world?.assetId);
+      const own = world && !bundled;
+      preview.hidden = !bundled?.preview;
+      if (bundled?.preview) {
+        if (preview.getAttribute('src') !== bundled.preview) preview.src = bundled.preview;
+      } else preview.removeAttribute('src');
       if(own) select.append(privateOption); else privateOption.remove();
       select.value=own?'private':world?.assetId??project.background;
       frameLabel.hidden=!world;

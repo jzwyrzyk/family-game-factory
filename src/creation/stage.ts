@@ -4,9 +4,18 @@ import { creationAsset, drawCreationVector, parsePrivateArtId, type CreationAsse
 import type { PrivateArtResolver } from './private-art';
 import { preparePalSceneImage } from './pal-scene-image';
 
-function worldArt(project: CreationProject): CreationAsset | undefined {
-  const world = SCENE_WORLDS.find(item => item.id === project.world?.assetId);
-  return world && {...world, kind:'image'};
+// Layer IDs live only in the renderer. The scene keeps one immutable world pin.
+const worldImages = new Map(SCENE_WORLDS.map(world => {
+  const picture = (id: string, url: string): CreationAsset => ({id, url, label:world.label, kind:'image'});
+  return [world.id, {
+    plate: picture(world.id, world.url),
+    middle: world.middle && picture(world.id + ':middle', world.middle),
+    foreground: world.foreground && picture(world.id + ':front', world.foreground),
+  }];
+}));
+
+function worldArt(project: CreationProject) {
+  return project.world && worldImages.get(project.world.assetId);
 }
 
 export const CREATION_ART_LOAD_TIMEOUT_MS = 8_000;
@@ -46,7 +55,11 @@ export class CreationStage {
     const assets = [...new Set(project.actors.map(actor => actor.assetId))]
       .map(id => creationAsset(id)).filter((asset): asset is CreationAsset => !!asset?.url);
     const world = worldArt(project);
-    if (world) assets.push(world);
+    if (world) {
+      assets.push(world.plate);
+      if (world.middle) assets.push(world.middle);
+      if (world.foreground) assets.push(world.foreground);
+    }
     await Promise.all(assets.map(asset => this.loadImage(asset).ready));
     assertCurrent();
   }
@@ -76,7 +89,8 @@ export class CreationStage {
       if (!active() || settled) return;
       const message = `${asset.label}'s picture could not load${timedOut ? ' in time' : ''}. Reopen this scene to try again.`;
       entry.failed = true; this.failedArt.add(asset.id); settle(Error(message));
-      if (this.scene && sceneAssetSlots(this.scene).some(slot => slot.assetId === asset.id)) this.artError?.(message);
+      if (this.scene && (sceneAssetSlots(this.scene).some(slot => slot.assetId === asset.id)
+        || Object.values(worldArt(this.scene) ?? {}).includes(asset))) this.artError?.(message);
       repaint();
     };
     const finish = () => {
@@ -102,6 +116,9 @@ export class CreationStage {
     // Approved portraits are large. Retain only this scene's pinned pictures,
     // not every Pal/form visited across the whole collection.
     const assets = new Set(sceneAssetSlots(scene).map(slot => slot.assetId));
+    const world = worldArt(scene);
+    if (world?.middle) assets.add(world.middle.id);
+    if (world?.foreground) assets.add(world.foreground.id);
     for (const [id, entry] of this.images) if (!assets.has(id)) { entry.cancel(); this.images.delete(id); this.failedArt.delete(id); }
     if (this.canvas.width !== scene.width) this.canvas.width = scene.width;
     if (this.canvas.height !== scene.height) this.canvas.height = scene.height;
@@ -109,6 +126,10 @@ export class CreationStage {
     c.clearRect(0, 0, w, h);
     this.background(scene);
     for (const actor of snapshot.actors) if (actor.visible) this.actor(actor, actor.id === selected);
+    if (world?.foreground) {
+      const layer = this.loadImage(world.foreground);
+      if (layer.loaded) this.paintWorldImage(scene, layer.image);
+    }
     for (const actor of snapshot.actors) if (actor.visible && actor.speech) this.bubble(actor);
     let badgeX = 12;
     for (const [name, value] of Object.entries(snapshot.variables).slice(0, 6)) {
@@ -147,18 +168,25 @@ export class CreationStage {
     });
     return undefined;
   }
+  private paintWorldImage(scene: CreationProject, image: HTMLImageElement | HTMLCanvasElement) {
+    const scale = (scene.world!.framing === 'fit' ? Math.min : Math.max)(scene.width / image.width, scene.height / image.height);
+    const width = image.width * scale, height = image.height * scale;
+    this.context.drawImage(image, (scene.width - width) / 2, (scene.height - height) / 2, width, height);
+  }
   private background(scene: CreationProject) {
     if (scene.world) {
-      const context = this.context, {assetId, framing} = scene.world;
+      const context = this.context, {assetId} = scene.world;
       const bundled = worldArt(scene);
-      const entry = bundled && this.loadImage(bundled);
+      const entry = bundled && this.loadImage(bundled.plate);
       const image = bundled ? (entry?.loaded ? entry.image : undefined) : this.privatePicture(assetId)?.image;
       context.fillStyle = '#f7f4ee';
       context.fillRect(0, 0, scene.width, scene.height);
       if (image) {
-        const scale = (framing === 'fit' ? Math.min : Math.max)(scene.width / image.width, scene.height / image.height);
-        const width = image.width * scale, height = image.height * scale;
-        context.drawImage(image, (scene.width-width)/2, (scene.height-height)/2, width, height);
+        this.paintWorldImage(scene, image);
+        if (bundled?.middle) {
+          const layer = this.loadImage(bundled.middle);
+          if (layer.loaded) this.paintWorldImage(scene, layer.image);
+        }
       } else {
         context.font = '600 18px system-ui'; context.fillStyle = '#37304a';
         context.textAlign = 'center'; context.textBaseline = 'middle';

@@ -7,7 +7,7 @@ import {profileGrade} from '../learning/engine';
 import {isEarlyGrade,withinGrade} from '../learning/grades';
 import { SceneEngine, type SceneSnapshot } from './engine';
 import { starterWorld, validateCreationProject, type CreationProject, type CreationBlock } from './model';
-import { CREATION_ASSETS, createStarterProject, createProjectFromStudio, creationAsset, validateEditableProject, parsePrivateArtId } from './projects';
+import { CREATION_ASSETS, propsForWorld, createStarterProject, createProjectFromStudio, creationAsset, validateEditableProject, parsePrivateArtId } from './projects';
 import { CreationStore, CREATION_KEY, validateCreationWorkspace, type CreationEntry } from './storage';
 import {CreationWorkspace,prepareIndexedCreation} from '../storage/creation-workspace';
 import { challengesForGrade, getCreationChallenge, createChallengeStarter, createChallengeTarget, evaluateChallenge, predictActor, firstMovement, movementChoices, type MovementChoice } from './challenges';
@@ -1078,7 +1078,7 @@ export function installCreationStudio(host: Host) {
   function renderActorChoices(palsOnly = false) {
     const box = $('creationActorChoices'), ids = ownedPals(); box.replaceChildren();
     $('creationActorDialogTitle').textContent = palsOnly ? 'Which Pal is joining?' : 'Who’s joining your scene?';
-    for (const asset of CREATION_ASSETS) {
+    for (const asset of [...propsForWorld(scene?.world?.assetId), ...CREATION_ASSETS]) {
       if (asset.palId ? challengeId || !ids.includes(asset.palId) || asset.id !== palSceneAssetId(asset.palId, ownedPalForm(asset.palId)) : palsOnly) continue;
       const b = node('button', 'creation-character-choice'); b.type = 'button'; b.dataset.creationAsset = asset.id;
       b.append(art(asset.id), node('strong', '', asset.label));
