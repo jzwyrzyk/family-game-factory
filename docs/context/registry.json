@@ -918,8 +918,8 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:31:06.292Z",
-      "sourceDigest": "c8514ccbc7eb85507b68be63425d08990cd895805275917bed1b3f4f4c291b70",
+      "reviewedAt": "2026-11-26T06:37:40.676Z",
+      "sourceDigest": "a01ffcd3749bf14726e6e9c282d7523846ef70f6d3e1ded6ef89d89115b94d15",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed integrated CI leaves and source assertions for original admissions, game binding, movement and recovery.",
       "reviewHistory": [
