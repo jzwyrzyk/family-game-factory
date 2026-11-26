@@ -48,6 +48,8 @@ def assemble(api, spec, pages):
         job = "integrated-test-" + scope
         run_and_jobs(api, run, TEST, source, [job])
         observed, raw_hash = receipt(api, metadata(api, run, f"{job}-{run}-1", source))
+        if scope == "uat":
+            record["supplyChain"].setdefault("sandboxSourceSha", observed["sandboxSourceSha"])
         fields = ["sourceSha", "releaseIdentitySha256", "journeys", "target", "providerMode"]
         if scope == "live":
             fields += ["authorizationSha256", "limitMicrousd", "spendMicrousd"]

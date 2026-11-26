@@ -5,6 +5,9 @@ from datetime import datetime, timezone
 import hashlib
 import io
 import json
+import os
+import subprocess
+import importlib.util
 from pathlib import Path
 import sys
 import tempfile
@@ -146,7 +149,12 @@ class ProductionTests(unittest.TestCase):
         self.config = dict.fromkeys(gate.ORDER, "f" * 64)
         m = manifest()
         files = [{"path": "index.html", "sha256": "9" * 64, "bytes": 23}]
-        api.run(1, gate.TEST, SOURCE, ["integrated-test-frontend"])
+        api.run(
+            1,
+            gate.TEST,
+            SOURCE,
+            ["integrated-test-serving", "integrated-test-frontend", "integrated-test-final-observation"],
+        )
         front = {
             "environment": "test",
             "scope": "iap-household-served-files",
@@ -166,15 +174,35 @@ class ProductionTests(unittest.TestCase):
         for w in m["worker"].values():
             w["sandboxImage"] = "ghcr.io/jzwyrzyk/family-game-factory-sandbox@sha256:" + "d" * 64
         self.images = {k: f"{gate.TEST_REGISTRY}/{k}@" + v.split("@")[1] for k, v in m["backends"].items()}
+        self.lanes = {"fixture": "e" * 64, "live": "d" * 64}
+        m["configuration"]["testSha256"] = gate.digest(self.lanes)
         for n, scope in ((2, "uat"), (3, "live")):
             job = "integrated-test-" + scope
-            api.run(n, gate.TEST, SOURCE, [job, "integrated-test-final-observation"])
+            api.run(
+                n, gate.TEST, SOURCE, ["integrated-test-serving", job, "integrated-test-final-observation"]
+            )
             observed = {
                 **m["evidence"][scope],
                 "releaseIdentitySha256": gate.manifest.release_identity_sha256(m),
                 "testBackends": self.images,
                 "testConfigurationSha256": m["configuration"]["testSha256"],
                 "testWorker": m["worker"]["test"],
+                "observedConfigurationSha256": self.lanes["fixture" if scope == "uat" else "live"],
+                "targetSha256": "8" * 64,
+                "sandboxSourceSha": "d" * 40,
+                "sandboxSignerSha": SIGNER,
+                "testWorkerRepositoryId": "12345",
+                "repairAttempts": 1,
+                "settlementSha256": "a" * 64,
+                "workerExecution": [
+                    {
+                        "runId": str(100 + i),
+                        "artifactId": str(200 + i),
+                        "archiveSha256": str(i) * 64,
+                        "executionSha256": str(i) * 64,
+                    }
+                    for i in (1, 2)
+                ],
                 "recovery": dict.fromkeys(
                     ("captureSha256", "resetSha256", "restoreSha256", "replayedRevisionSha256"), "9" * 64
                 ),
@@ -248,6 +276,171 @@ class ProductionTests(unittest.TestCase):
             dest = Path(tmp) / "artifact.tar"
             gate.validate_pages(self.api, self.new_pages, POLICY, destination=dest)
             self.assertEqual(dest.read_bytes(), b"archived site " + SOURCE.encode())
+
+    def test_actual_frontend_and_test_lane_producers_seal_through_the_production_controller(self):
+        # On the combined candidate these are sibling files. An isolated controller
+        # checkout can explicitly select the reviewed UAT worktree for this offline test.
+        producer = Path(os.environ.get("JEMS_TEST_PRODUCER_ROOT", ROOT)) / "scripts/environments"
+
+        def load(name):
+            spec = importlib.util.spec_from_file_location(name, producer / (name + ".py"))
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            return module
+
+        workers = self.record["manifest"]["worker"]
+        source = self.record["manifest"]["sourceSha"]
+        target = {
+            "source": source,
+            "project": "jems-jzw-nonprod",
+            "region": "us-east5",
+            "projectNumber": "123456789",
+            "hub": "hub.test.example",
+            "household": "house.test.example",
+            "preview": "play.test.example",
+            "familyId": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+            "profile": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+            "oauthClient": "1234-test.apps.googleusercontent.com",
+            "signerSha": SIGNER,
+            "sandboxSourceSha": "d" * 40,
+            "workerRepositoryId": "12345",
+            "images": {**self.images, "household": self.images["gateway"]},
+            "services": {
+                role: "jems-test-" + role for role in ("gateway", "preview", "household", "coach")
+            },
+        }
+        observer = load("test_target")
+        observed = {}
+        for lane in ("fixture", "live"):
+
+            def describe(kind, name):
+                if kind == "services":
+                    return {
+                        "metadata": {},
+                        "status": {"traffic": [{"revisionName": name + "-" + lane, "percent": 100}]},
+                    }
+                service = name.removesuffix("-" + lane)
+                image = target["images"][service.removeprefix("jems-test-")]
+                return {
+                    "metadata": {
+                        "name": name,
+                        "namespace": target["projectNumber"],
+                        "labels": {"serving.knative.dev/service": service},
+                    },
+                    "spec": {"containers": [{"image": image}]},
+                    "status": {"conditions": [{"type": "Ready", "status": "True"}], "imageDigest": image},
+                }
+
+            observed[lane] = observer.serving(target, describe)
+        pins = {k: v["testConfigurationSha256"] for k, v in observed.items()}
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            for name, contents in (
+                ("index.html", '<html lang="en"><head></head></html>'),
+                ("entry/owner-session.js", "session"),
+                ("assets/index-abc.js", "fixture"),
+                ("jems-pals/manifest.json", "{}"),
+            ):
+                file = directory / name
+                file.parent.mkdir(parents=True, exist_ok=True)
+                file.write_text(contents)
+            js = """
+const fs=require('node:fs/promises'), path=require('node:path');
+const {fingerprint,servedIndex}=require(process.argv[1]);
+const root=process.argv[2];
+fingerprint(root,process.argv[3],async url => {
+    if(url==='/'||url==='/index.html') return Buffer.from(servedIndex(await fs.readFile(path.join(root,'index.html'),'utf8')));
+    return fs.readFile(path.join(root,url==='/owner-session.js'?'entry/owner-session.js':url.slice(1)));
+}).then(r=>process.stdout.write(JSON.stringify(r))).catch(e=>{console.error(e);process.exitCode=1});
+"""
+            data = subprocess.check_output(
+                ["node", "-e", js, str(producer / "test-frontend.cjs"), tmp, source], timeout=20
+            )
+            self.api.artifacts[1] = []
+            frontend = self.api.artifact(1, "integrated-test-frontend-1-1", "frontend.json", data)
+            clean = {
+                **self.record["manifest"],
+                "evidence": dict.fromkeys(("uat", "live", "ci")),
+                "frontend": {
+                    "artifactId": str(frontend["id"]),
+                    "sha256": json.loads(data)["frontendSha256"],
+                },
+                "configuration": {
+                    **self.record["manifest"]["configuration"],
+                    "testSha256": gate.digest(pins),
+                },
+            }
+            self.spec["manifest"] = clean
+            spec_env = {
+                **os.environ,
+                "GITHUB_SHA": source,
+                "FAMILY_SOURCE": source,
+                "RUNNER_TEMP": tmp,
+                "TEST_TARGET": json.dumps(target),
+                "TEST_CONFIGURATION_PINS": json.dumps(pins),
+                "TEST_MANIFEST": json.dumps(clean),
+            }
+            proofs = {}
+            for lane, run, name in (("fixture", 2, "uat"), ("live", 3, "live")):
+                (directory / "test-serving.json").write_bytes(gate.manifest.canonical(observed[lane]))
+                subprocess.run(
+                    [sys.executable, str(producer / "test_target.py"), "bind"],
+                    check=True,
+                    timeout=10,
+                    env={**spec_env, "FAMILY_OPERATION": "uat" if lane == "fixture" else "live-uat"},
+                )
+                bound = json.loads((directory / "test-bound.json").read_text())
+                received, _ = gate.receipt(self.api, self.api.artifacts[run][0])
+                fields = (
+                    ("journeys", "providerMode", "workerExecution", "recovery")
+                    if lane == "fixture"
+                    else (
+                        "journeys",
+                        "providerMode",
+                        "spendMicrousd",
+                        "limitMicrousd",
+                        "authorizationSha256",
+                        "repairAttempts",
+                        "settlementSha256",
+                    )
+                )
+                proof = {
+                    **{k: v for k, v in bound.items() if k != "frontend"},
+                    **{k: received[k] for k in fields},
+                    "target": "deployed-test",
+                }
+                if lane == "fixture":
+                    provisional = {
+                        **proof,
+                        "testConfigurationSha256": pins["fixture"],
+                        "target": "deployed-test-fixture-qualification",
+                        "frontendIdentity": bound["frontend"],
+                    }
+                    with patch.dict(sys.modules, {"test_target": observer}):
+                        proof = load("test_fixture_reuse").retained(provisional, bound)
+                proofs[name] = proof
+
+            def seal():
+                for run, name in ((2, "uat"), (3, "live")):
+                    self.api.artifacts[run] = []
+                    self.api.artifact(run, f"integrated-test-{name}-{run}-1", "receipt.json", proofs[name])
+                return assemble(self.api, self.spec, self.new_pages)
+
+            sealed = seal()
+            self.assertEqual(sealed["manifest"]["configuration"]["testSha256"], gate.digest(pins))
+            self.assertEqual(workers["test"], proofs["uat"]["testWorker"])
+            for scope, key, val in (
+                ("uat", "observedConfigurationSha256", pins["live"]),
+                ("live", "targetSha256", "0" * 64),
+                ("uat", "testWorkerRepositoryId", "1458899834"),
+                ("uat", "sandboxSignerSha", "0" * 40),
+                ("uat", "workerExecution", proofs["uat"]["workerExecution"][:1]),
+                ("live", "repairAttempts", 0),
+            ):
+                with self.subTest(scope=scope, key=key), patch.dict(
+                    proofs[scope], {key: val}
+                ), self.assertRaises(ValueError):
+                    seal()
 
     def test_no_transcribed_source_worker_evidence_or_failed_checks(self):
         for edit in (
@@ -426,6 +619,49 @@ class ProductionTests(unittest.TestCase):
                 SOURCE, "household", "9", reader=lambda _: {"sourceSha": SIGNER}, pause=lambda _: None
             )
 
+    def test_bootstrap_reads_each_file_and_cannot_substitute_for_forward_qualification(self):
+        retained = gate.retained_pages
+        historic = {
+            "deployments?environment=github-pages&per_page=1": [
+                {"id": retained.DEPLOYMENT, "sha": retained.SIGNER, "environment": "github-pages"}
+            ],
+            f"deployments/{retained.DEPLOYMENT}/statuses?per_page=1": [
+                {
+                    "state": "success",
+                    "environment_url": retained.SITE,
+                    "log_url": f"https://github.com/{retained.REPO}/actions/runs/{retained.RUN}/job/138518380833",
+                }
+            ],
+            f"actions/runs/{retained.RUN}": {
+                "head_sha": retained.SIGNER,
+                "path": gate.PAGES,
+                "run_attempt": 2,
+                "conclusion": "success",
+                "head_branch": "main",
+                "repository": REPO,
+                "head_repository": REPO,
+                "event": "workflow_dispatch",
+            },
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            files = {
+                "jems-release.json": json.dumps({"sourceSha": retained.SOURCE}).encode(),
+                "asset.js": b"original asset",
+            }
+            for k, v in files.items():
+                (folder / k).write_bytes(v)
+            inventory = retained.inventory(folder, historic.__getitem__, lambda name, _size: files[name])
+            page = {**self.new_pages, "sourceSha": retained.SOURCE, "retainedInventorySha256": inventory}
+            gate.pages_ref(page, recovery=True)
+            with self.assertRaises(ERROR):
+                gate.pages_ref(page)
+            with patch.dict(files, {"asset.js": b"modified"}), self.assertRaises(ValueError):
+                retained.inventory(folder, historic.__getitem__, lambda name, _size: files[name])
+            historic["deployments?environment=github-pages&per_page=1"][0]["sha"] = SOURCE
+            with self.assertRaises(ValueError):
+                retained.inventory(folder, historic.__getitem__, lambda name, _size: files[name])
+
     def test_registry_copy_requires_full_provenance_and_identical_raw_digest(self):
         chain = self.record["supplyChain"]
         build = {
@@ -458,6 +694,45 @@ class ProductionTests(unittest.TestCase):
             with patch.dict(self.raw_images, coach=b"wrong"), self.assertRaises(ERROR):
                 mirror_images.copy_images(self.record, reader, lambda *a, **kw: None, target, lambda: None)
 
+    def test_production_private_checkout_and_environment_pins_are_observed(self):
+        worker = self.record["manifest"]["worker"]["production"]
+        body = b"repo: public-app\nref: " + SOURCE.encode() + b"\n"
+        template = {"factory-private.yml": (1, sha(body.replace(SOURCE.encode(), b"APPLICATION")))}
+
+        def read(repo, path):
+            self.assertEqual(repo, gate.WORKERS)
+            if path.startswith("/contents/"):
+                return {
+                    "type": "file",
+                    "path": ".github/workflows/factory-private.yml",
+                    "encoding": "base64",
+                    "size": len(body),
+                    "sha": hashlib.sha1(b"blob " + str(len(body)).encode() + b"\0" + body).hexdigest(),
+                    "content": gate.base64.b64encode(body).decode(),
+                }
+            if path.startswith("/actions/"):
+                key = path.rsplit("/", 1)[-1]
+                return {
+                    "name": key,
+                    "value": worker["sandboxImage" if key == "FACTORY_SANDBOX_IMAGE" else "sourceSha"],
+                }
+            return {"variables": [], "total_count": 0}
+
+        gate.production_worker_binding(worker, SOURCE, read, template)
+        with self.assertRaises(ERROR):
+            gate.production_worker_binding(worker, SIGNER, read, template)
+
+        def shadow(repo, path):
+            if "/environments/factory-sandbox/" in path:
+                return {
+                    "total_count": 1,
+                    "variables": [{"name": "FACTORY_SANDBOX_IMAGE", "value": "other"}],
+                }
+            return read(repo, path)
+
+        with self.assertRaises(ERROR):
+            gate.production_worker_binding(worker, SOURCE, shadow, template)
+
     def test_private_tag_change_or_replaced_repository_rejects(self):
         def read(repo, path):
             is_test = repo == gate.TEST_WORKERS
@@ -477,7 +752,9 @@ class ProductionTests(unittest.TestCase):
             }
 
         call = []
-        gate.runtime_supply(self.record, read, lambda a, **kw: call.append(a))
+        with patch.object(gate, "production_worker_binding") as binding:
+            gate.runtime_supply(self.record, read, lambda a, **kw: call.append(a))
+            binding.assert_called_once_with(self.record["manifest"]["worker"]["production"], SOURCE, read)
         self.assertIn("--deny-self-hosted-runners", call[0])
 
         def moved(repo, path):

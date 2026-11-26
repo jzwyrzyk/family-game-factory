@@ -29,6 +29,14 @@ def main():
         "archiveSha256": item["digest"].removeprefix("sha256:"),
         "policySha256": hashlib.sha256((ROOT / "ops/pages-delivery.json").read_bytes()).hexdigest(),
     }
+    if env["PREPARATION"] == "prepare-retained":
+        from retained_pages import SOURCE
+
+        require(
+            source == SOURCE and len(env["RETAINED_INVENTORY"]) == 64,
+            "Missing verified household inventory",
+        )
+        result["retainedInventorySha256"] = env["RETAINED_INVENTORY"]
     (Path(env["RUNNER_TEMP"]) / "receipt.json").write_text(json.dumps(result, sort_keys=True) + "\n")
 
 

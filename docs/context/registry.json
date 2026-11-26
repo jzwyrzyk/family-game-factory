@@ -929,10 +929,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:27:49.971Z",
-      "sourceDigest": "bef2e2bca16efaa6179ab9dba09960b8ee77a7ba997fab724b32f5904b8a969b",
+      "reviewedAt": "2026-11-26T23:42:56.150Z",
+      "sourceDigest": "8d4f62d303c15ea361fcd64ece9828430ebab7ba7b3cbcde43fb73182363ba94",
       "reviewOutcome": "updated",
-      "reviewReason": "The protected release suite now covers actual fixture archives, failed checks, stale owner reviews, staged traffic, unhealthy canaries, immutable image copies and retained website recovery.",
+      "reviewReason": "Cross-producer fixtures now exercise the authentic TEST frontend fingerprint, runtime observation, finalized fixture reuse and funded configuration intake through production approval.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1174,10 +1174,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T23:27:50.209Z",
-      "sourceDigest": "8c9014d2a3aae01af26942df7af66026b1deeedd2e4444d76cbf289ba59ae157",
+      "reviewedAt": "2026-11-26T23:42:56.401Z",
+      "sourceDigest": "e3b2dbd53fa01a98b8933f38a0d7bd6b210a76fae58ae2fa2127a4c534d96519",
       "reviewOutcome": "updated",
-      "reviewReason": "The coordinated production runbook specifies the authenticated manifest decision, TEST-first registry promotion, compatibility ordering, public website readback and approved reverse recovery.",
+      "reviewReason": "First-cutover recovery now verifies each historical household byte and the approved deployment while promotion independently checks both TEST lane configurations and private worker workflow identities.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

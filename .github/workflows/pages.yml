@@ -7,7 +7,7 @@ on:
       delivery:
         description: Prepare a read-only package or publish the exact approved archive
         type: choice
-        options: [prepare, publish, rollback]
+        options: [prepare, prepare-retained, publish, rollback]
         default: prepare
       observation_run:
         description: Fresh protected three-service observation for publication or recovery
@@ -28,13 +28,19 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: ${{ inputs.delivery == 'prepare' && format('jems-pages-prepare-{0}', github.run_id) || 'jems-cloud-run-production' }}
+  group: ${{ startsWith(inputs.delivery, 'prepare') && format('jems-pages-prepare-{0}', github.run_id) || 'jems-cloud-run-production' }}
   cancel-in-progress: false
 jobs:
   build:
-    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && inputs.delivery == 'prepare'
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && (inputs.delivery == 'prepare' || (inputs.delivery == 'prepare-retained' && inputs.source_sha == 'aa56b60abe152e750f9f0b5e8949bdb44be53196'))
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      actions: read
+      deployments: read
+    outputs:
+      retained: ${{ steps.inventory.outputs.retained }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -113,13 +119,24 @@ jobs:
           Path('dist/jems-release.json').write_text(json.dumps({'sourceSha': source}) + '\n')
           print('PAGES_BUILD_SOURCE_VERIFIED=' + source)
           PY
+      - name: Verify deployment provenance and all served files of the first recovery archive
+        id: inventory
+        if: inputs.delivery == 'prepare-retained'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVIEWED_SOURCE_SHA: ${{ inputs.source_sha }}
+          DELIVERY_MODE: ${{ steps.delivery.outputs.mode }}
+        run: |
+          set -euo pipefail
+          git show "$GITHUB_SHA:scripts/environments/retained_pages.py" > "$RUNNER_TEMP/retained-pages.py"
+          python3 "$RUNNER_TEMP/retained-pages.py"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
           retention-days: 30
   regressions:
     name: regression (${{ matrix.shard }})
-    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && inputs.delivery == 'prepare'
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && (inputs.delivery == 'prepare' || (inputs.delivery == 'prepare-retained' && inputs.source_sha == 'aa56b60abe152e750f9f0b5e8949bdb44be53196'))
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     strategy:
@@ -133,6 +150,7 @@ jobs:
           persist-credentials: false
       - name: Verify immutable merged regression source and stage reviewed helper
         env:
+          PREPARATION: ${{ inputs.delivery }}
           REVIEWED_SOURCE_SHA: ${{ inputs.source_sha }}
           FACTORY_PUBLIC_GATEWAY: ${{ inputs.gateway_origin }}
           FACTORY_PUBLIC_PREVIEW: ${{ inputs.preview_origin }}
@@ -143,9 +161,16 @@ jobs:
           git merge-base --is-ancestor "$REVIEWED_SOURCE_SHA" "$GITHUB_SHA"
           test "$FACTORY_PUBLIC_GATEWAY" = "https://factory-gateway-ola734esta-ul.a.run.app"
           test "$FACTORY_PUBLIC_PREVIEW" = "https://factory-preview-ola734esta-ul.a.run.app"
+          # Forward selection always uses protected current policy. The one
+          # finite recovery preparation replays that household's original eight full suites.
           # Tooling belongs to the reviewed dispatch commit; the application may
           # be any explicitly selected, reviewed ancestor of that commit.
           git show "$GITHUB_SHA:scripts/deployment/regressions.py" > "$RUNNER_TEMP/jems-regressions.py"
+          if [[ "$PREPARATION" == prepare-retained ]]; then
+            test "$REVIEWED_SOURCE_SHA" = aa56b60abe152e750f9f0b5e8949bdb44be53196
+            git show cc3da7ef0cdd371f628f9bc51d32d6296f575f8e:scripts/deployment/regressions.py > "$RUNNER_TEMP/jems-regressions.py"
+            echo "b1f6f36385b08195318c264427e5e51038b020284ba5cb1c477a90c14474c231  $RUNNER_TEMP/jems-regressions.py" | sha256sum -c -
+          fi
           git checkout --detach "$REVIEWED_SOURCE_SHA"
           test "$(git rev-parse HEAD)" = "$REVIEWED_SOURCE_SHA"
           python3 "$RUNNER_TEMP/jems-regressions.py" --source . --check
@@ -183,6 +208,8 @@ jobs:
       - env:
           GH_TOKEN: ${{ github.token }}
           REVIEWED_SOURCE_SHA: ${{ inputs.source_sha }}
+          RETAINED_INVENTORY: ${{ needs.build.outputs.retained }}
+          PREPARATION: ${{ inputs.delivery }}
         run: python3 scripts/environments/pages_receipt.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
