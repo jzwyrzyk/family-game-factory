@@ -17,7 +17,7 @@ export function coachHandler(service:CoachService,config:{appOrigin:string;sessi
    if(req.method==='OPTIONS'){res.setHeader('Access-Control-Allow-Headers','Content-Type,X-Factory-Adult-Session,X-Factory-Request');res.setHeader('Access-Control-Allow-Methods','GET,POST');res.writeHead(204);res.end();return;}
    const session=await verifyBrowserSession(repo,req.headers.cookie,config.sessionKey,Date.now(),req.headers['x-factory-adult-session']);
    const path=new URL(req.url!,'http://internal').pathname;
-   if(path==='/v1/coach/status'&&req.method==='GET'){const available=await service.ready(session);return send(200,{available,mode:available?'model':'unavailable'});}
+   if(path==='/v1/coach/status'&&req.method==='GET'){const available=await service.ready(session);return send(200,{available,mode:available?service.mode():'unavailable'});}
    if(path==='/v1/coach/erase'&&req.method==='POST'){
     if(req.headers['x-factory-request']!=='1'||!req.headers['content-type']?.startsWith('application/json'))throw Error('FORBIDDEN');
     const input=await readJsonBody(req,1024,{invalidJsonError:'INVALID_REQUEST'});

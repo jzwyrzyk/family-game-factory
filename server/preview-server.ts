@@ -28,6 +28,8 @@ async function main(){
  if(process.env.FACTORY_BOOTSTRAP==='true'){startBootstrap();return;}
  if(!process.env.FACTORY_PRIVATE_CONFIG)throw Error('PRIVATE_PREVIEW_CONFIG_REQUIRED');
  const raw=JSON.parse(await readFile(process.env.FACTORY_PRIVATE_CONFIG,'utf8'));
+ if(process.env.K_SERVICE==='jems-test-preview'&&(raw.environment!=='test'||raw.projectId!=='jems-jzw-nonprod'||
+   raw.artifactBucket!=='jems-jzw-nonprod-jems-test-artifacts'||raw.platformMode!=='PRIVATE_FAMILY_BETA'))throw Error('TEST_PREVIEW_ISOLATION_REQUIRED');
  if(platformMode(raw.platformMode)==='PRIVATE_FAMILY_BETA'){
   if(Object.keys(raw).some(k=>!['platformMode','environment','hubOrigin','previewOrigin','previewKey','projectId','artifactBucket','householdViewer'].includes(k))||!raw.projectId||!raw.artifactBucket)throw Error('PREVIEW_CONFIGURATION_REQUIRED');
   const store=firestoreStore(new Firestore({projectId:raw.projectId})),artifacts=(w:string)=>new GcsPrivateArtifacts(raw.artifactBucket,w);

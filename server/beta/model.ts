@@ -33,6 +33,7 @@ export interface Policy {version:1;invitations:boolean;participation:boolean;sto
 export const closedPolicy=():Policy=>({version:1,invitations:false,participation:false,stop:true,monthlyLimit:0});
 export interface ProviderEvidence {notice:string;expiresAt:number;provider:'openai'|'google-cloud';privacyDigest:string;safetyDigest:string;scope:RemoteScope;zdrApproved?:boolean}
 export interface BetaConfig {
+ testReset?:{familyId:string;subject:string};
  environment:string;hubOrigin:string;earlyLearningPreview?:boolean;parentGuidedCreation?:boolean;workerRoute?:'beta-dev'|'beta-test'|'beta-prod';administrator:{audience:string;subject:string;verifier:Pick<FamilyParentAuth,'salt'|'digest'>};
  ownerActivation:string;operatorContact:string;providerEvidence:ProviderEvidence[];
  continuity?:{enabled:boolean;notice:string;domains:StorageDomain[];generatedRecovery?:boolean;backupSchedule?:{enabled:boolean;intervalMs:number;maxPointsPerRun:number}};
@@ -45,6 +46,7 @@ export function validateBeta(config:BetaConfig|undefined,householdWorkspace:stri
   householdWorkspace.startsWith('beta-')||!/^\/projects\/\d+\/global\/backendServices\/\d+$/.test(config.administrator?.audience)||
   !/^[\w:.@-]{1,200}$/.test(config.administrator?.subject)||!/^([a-f0-9]{32})$/.test(config.administrator?.verifier?.salt)||
   !/^[a-f0-9]{64}$/.test(config.administrator?.verifier?.digest)||!Array.isArray(config.providerEvidence))throw Error('BETA_CONFIGURATION_REQUIRED');
+ if(config.testReset&&(config.environment!=='test'||!uuid(config.testReset.familyId)||typeof config.testReset.subject!=='string'||!/^([\w:.@-]{1,200})$/.test(config.testReset.subject)||config.testReset.subject===config.administrator.subject))throw Error('TEST_RESET_IDENTITY_REQUIRED');
  for(const e of config.providerEvidence)if(!remoteScopes.includes(e.scope)||e.notice!==betaNotice||
   e.provider!==(e.scope==='remoteSpeech'?'google-cloud':'openai')||!Number.isSafeInteger(e.expiresAt)||
   !/^[a-f0-9]{64}$/.test(e.privacyDigest)||!/^[a-f0-9]{64}$/.test(e.safetyDigest)||
@@ -65,11 +67,12 @@ export function workspaceOf(family:Family){
  if(!uuid(family.id)||family.workspace!=='beta-'+family.id)throw Error('FAMILY_MAPPING_REJECTED');
  return family.workspace;
 }
-export function remoteAllowed(family:Family,policy:Policy,evidence:ProviderEvidence[],scope:RemoteScope,now:number){
+export function remoteAllowed(family:Family,policy:Policy,evidence:ProviderEvidence[],scope:RemoteScope,now:number,synthetic?:{familyId:string;expiresAt:number}){
  return policy.participation===true&&policy.stop===false&&family.status==='active'&&!family.paused&&
   family.guardian.participationVersion===participationNotice&&family.guardian.noticeVersion===betaNotice&&!!family.guardian.receiptDigest&&
   family.capabilities[scope]===true&&(scope!=='generation'||!family.generationPaused)&&
-  evidence.some(e=>e.scope===scope&&e.expiresAt>now&&e.notice===betaNotice);
+  (evidence.some(e=>e.scope===scope&&e.expiresAt>now&&e.notice===betaNotice)||
+   scope!=='remoteSpeech'&&synthetic?.familyId===family.id&&synthetic.expiresAt>now);
 }
 export function verifiedGuardian(family:Family,policy:Policy){
  if(!policy.participation||family.status!=='active'||!family.guardian.verifiedAt||!family.guardian.receiptDigest||family.request?.kind==='deletion')throw Error('FAMILY_ACCESS_PAUSED');
