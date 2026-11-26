@@ -3,13 +3,16 @@ import {lstat,readFile,mkdir,realpath,writeFile} from 'node:fs/promises';
 import {join,resolve} from 'node:path';
 import {createHash,createPrivateKey,randomBytes,randomUUID} from 'node:crypto';
 import {pathToFileURL} from 'node:url';
-import {newParentAuth} from '../../server/trusted-devices.ts';
-import {storageDomains} from '../../src/storage/sync-contract.ts';
-import {validateBeta} from '../../server/beta/model.ts';
-import {familyPreview} from '../../server/beta/preview.ts';
-import {ownerPreview} from '../../server/beta/owner-preview.ts';
-import {protectedHousehold} from '../../server/beta/owner-host.ts';
-import {testExecution,testWorkerRepository} from '../../server/actions/test-execution.ts';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);
+require('tsx/cjs');
+const {newParentAuth}=require('../../server/trusted-devices.ts');
+const {storageDomains}=require('../../src/storage/sync-contract.ts');
+const {validateBeta}=require('../../server/beta/model.ts');
+const {familyPreview}=require('../../server/beta/preview.ts');
+const {ownerPreview}=require('../../server/beta/owner-preview.ts');
+const {protectedHousehold}=require('../../server/beta/owner-host.ts');
+const {testExecution,testWorkerRepository}=require('../../server/actions/test-execution.ts');
 
 function need(ok){if(!ok)throw Error('Invalid isolated TEST settings');}
 async function privateFile(path){

@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {generateKeyPairSync}=require('node:crypto');
 test('TEST settings preserve private keys across renders and bind the application, worker, named database, preview and administrator scopes',async()=>{
- require('tsx/cjs');const {initialInputs,render}=await import('tsx/esm/api').then(({tsImport})=>tsImport('../../scripts/beta/prepare-test-settings.mjs',__filename));
+ const {initialInputs,render}=await import('../../scripts/beta/prepare-test-settings.mjs');
  const source='a'.repeat(40),worker='b'.repeat(40),project='jems-jzw-nonprod',number='1092405124984';
  const usere='https://jems-test-coach-'+number+'.us-east5.run.app';
  const key=generateKeyPairSync('rsa',{modulusLength:2048}).privateKey.export({type:'pkcs8',format:'pem'});
