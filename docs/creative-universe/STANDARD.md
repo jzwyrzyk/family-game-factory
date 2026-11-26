@@ -20,7 +20,7 @@ Let the child explicitly crop, turn, scale, flip, remove paper or edit a compone
 | How is it used here? | The scene owns each placement, actor program, backdrop and decoration. A game owns the explicit obstacle, collectible or vehicle contract. Naming a rock never assigns a collider, gravity or points. |
 | What if I change it later? | Archive preserves historical uses. A new picture or motion is a separate version. Updating a use requires explicit selection and a new scene or game revision. A missing version offers recovery. |
 
-The existing private drawings database, scene workspace, generated companion and native saved-game authorities own their respective records. Extend their existing storage, reference remapping, backup, capacity and deletion checks. Concurrent saves and restores must preserve profile isolation and immutable history. Any incompatible new field needs a forward and rollback reader plan before release. A cached catalog and a thumbnail can be rebuilt.
+The existing private drawings database, scene workspace, generated companion and native saved-game authorities own their respective records. Extend their existing storage, reference remapping, backup, capacity and deletion checks. Concurrent saves and restores must preserve profile isolation and immutable history. Any incompatible new field needs a forward and rollback reader plan before release. A cached catalog and a thumbnail can be rebuilt. Read drafts, revisions and retained projects before erasure. An empty usage index cannot establish that deletion is safe. Inspect derivative ancestry and rig dependencies under the existing writer lock.
 
 ## Drawing, movement and continuation
 
@@ -38,7 +38,7 @@ New development uses 2D sprites, layered environments and compatible physics. Ar
 
 1. The trusted host checks the active owner, exact chosen image or design, digest, consent and intended game use. Read only that version. Stop if the owner changes or the digest fails.
 2. Generated content may request only reviewed bounded gameplay operations. Keep image records, owner IDs, unrestricted URLs, storage handles, bytes and host credentials out of generated code. Prefer a trusted renderer that composites a selected sprite after receiving validated positions.
-3. Keep private art out of model calls, build payloads, gameplay-review captures, logs and worker artifacts. An offline review build can qualify a named adapter with synthetic marks. A generated companion customized in the trusted editor and an executable generated game are separate destinations.
+3. Keep private art out of model calls, build payloads, gameplay-review captures, logs and worker artifacts. An offline review build can qualify a named adapter with synthetic marks. Scope any future grant to one game revision, slot and session. Bound its lifetime and revoke it on a profile or consent change. A generated companion customized in the trusted editor and an executable generated game are separate destinations.
 4. General asset delivery stays closed until independent security review, isolation and revocation tests, exact-source hosted qualification and release approval. Exact reviewed-family PNG admission remains subject to the adult, operator, device and family gates. [Family privacy](../family-beta/PRIVACY.md) · [Premium pilot](../game-intelligence/premium-benchmark/ARTWORK-PILOT.md)
 
 ## Ownership and release evidence

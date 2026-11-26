@@ -16,10 +16,10 @@ The [standalone UI review](ui-review/README.md) packages the real UI for offline
 
 ## Canonical references
 
-[Creative Asset & World Design Standard](creative-universe/STANDARD.md) governs permanent originals, versioned movement, illustrated worlds, contextual use, retrieval and secure 2D game delivery.
 
 | Reference | Question it answers | Update when |
 | --- | --- | --- |
+| [Creative Asset & World Design Standard](creative-universe/STANDARD.md) | How does one child-owned artwork retain identity, versions, movement and roles across activities? | Creative storage, picker, worlds, games or destination support changes |
 | [Agent entry point](../AGENTS.md) | What should an assistant read and preserve before answering or developing? | Working method or context-loading rules change |
 | [Product doctrine](../PRODUCT-DOCTRINE.md) | Why are we building jems, and what must remain true? | An accepted product principle or tradeoff changes |
 | [Current architecture](../ARCHITECTURE-CURRENT.md) | What is implemented, where does it live, and how do boundaries interact? | Components, APIs, storage, trust or version contracts change |
