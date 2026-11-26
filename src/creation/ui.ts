@@ -312,7 +312,9 @@ export function installCreationStudio(host: Host) {
     if (!scene || !engine) return;
     const snapshot = engine.snapshot();
     const editing = !targetMode && !recording && !cleanPreview && snapshot.status === 'idle';
-    stage.render(targetMode && challengeId ? createChallengeTarget(challengeId) : scene, snapshot, editing ? selectedActor : '', editing && !challengeId);
+    const display = targetMode && challengeId ? createChallengeTarget(challengeId) : scene;
+    $('creationCanvas').parentElement!.classList.toggle('illustrated-stage', !!display.world || display.background.startsWith('world-'));
+    stage.render(display, snapshot, editing ? selectedActor : '', editing && !challengeId);
     $('creationClock').textContent = (snapshot.timeMs / 1000).toFixed(1) + ' s';
     $('creationRunStatus').textContent = snapshot.status === 'limit' ? snapshot.reason || 'Try fewer repeats.' : snapshot.status === 'running' ? 'Follow your blocks' : snapshot.status === 'paused' ? 'Paused' : snapshot.status === 'completed' ? 'Try a change, or tap a character' : 'Ready to try';
     const words = [...snapshot.actors.filter(actor => actor.visible && actor.speech).map(actor => `${actor.name}: ${actor.speech}`),

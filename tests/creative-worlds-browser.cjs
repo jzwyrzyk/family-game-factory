@@ -42,6 +42,7 @@ const {start}=require('./browser-server.cjs');
     await page.waitForFunction(()=>window.keptWorldView().backdrop==='world-forest-v1');
     // Wait for the illustration to reach the actual stage canvas.
     async function illustrated(){
+      assert.equal(await page.locator('.creation-canvas-wrap').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(41, 41, 67)', 'Illustrated stages retain their dark letterbox matte.');
       await page.waitForFunction(()=>{
         const c=document.querySelector('#creationCanvas'),pixels=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
         const colors=new Set();for(let i=0;i<pixels.length;i+=104)colors.add(pixels[i]*65536+pixels[i+1]*256+pixels[i+2]);

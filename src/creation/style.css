@@ -99,6 +99,7 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
 .creation-stage-heading>span { background:#ffffffee; color:#253957; border-radius:10px; padding:6px 10px; font-weight:750; }
 #creationClock { display:none; }#page-creation[data-tools=full] #creationClock { display:block; }
 #creationFullscreen { margin-left:auto; pointer-events:auto; background:#fffffff0; color:#253957; box-shadow:0 2px 6px #172b4d14; }
+.creation-canvas-wrap.illustrated-stage { background:#292943; }
 .creation-canvas-wrap { position:relative; flex:1; min-height:0; min-width:0; display:grid; place-items:center; overflow:hidden; background:#eeeaf4; }
 #creationCanvas { display:block; max-width:100%; max-height:100%; border-radius:12px; touch-action:none; }
 .creation-playbar { flex:none; display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:8px 14px; background:#ffffff; border-top:1px solid #dbe4ee; }

@@ -320,8 +320,8 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:56:55.066Z",
-      "sourceDigest": "20ec473b391cb7464e59a747cd01e43b349721247ff4df1613bddef1c234b759",
+      "reviewedAt": "2026-11-26T06:07:05.481Z",
+      "sourceDigest": "86d7e16f1c8f6062f4ac8a7b458d97760ff2b9add6fbd601d5d87624db7e3a21",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed whole-picture, arrow and articulated editing via the established child-facing surfaces.",
       "reviewHistory": [
@@ -424,8 +424,8 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "761718168ce5f3c7917cf8a670c071439a8f37ce715f65cf479442d02d18fdf0",
-      "reviewedAt": "2026-11-26T06:03:02.046Z",
+      "sourceDigest": "c26142a1a82c72e9c76143ad111ae45903be09fac991485d227c59a70893d27d",
+      "reviewedAt": "2026-11-26T06:07:06.267Z",
       "reviewOutcome": "updated",
       "reviewReason": "Verified world edition readers, placement behavior and scoped authored movement blocks against CAD and storage documentation.",
       "reviewHistory": [
@@ -912,8 +912,8 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:03:02.734Z",
-      "sourceDigest": "85a80a37635b8b150977328387dd9a980ea3003115ec0e8657509264875126e9",
+      "reviewedAt": "2026-11-26T06:07:06.724Z",
+      "sourceDigest": "1cb67d2ea2f7d78dda24b7d0658fbf0b7effea83a00dcd7058c4170120b4f62d",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed integrated CI leaves and source assertions for original admissions, game binding, movement and recovery.",
       "reviewHistory": [

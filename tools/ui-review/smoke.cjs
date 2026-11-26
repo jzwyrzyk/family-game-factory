@@ -40,6 +40,6 @@ await page.selectOption('#experience','adult');await app().waitForFunction(()=>F
  await page.locator('[data-close="findingsDialog"]').click();await page.click('#hide');assert(await page.locator('#toolbar').isHidden());assert(await page.locator('#return').isVisible());await page.click('#return');
  const broken=await app().locator('img').evaluateAll(es=>es.filter(e=>e.offsetWidth&&e.complete&&!e.naturalWidth).map(e=>e.src));assert.deepEqual(broken,[]);
  assert.deepEqual(network,[],'No external network requests');assert.deepEqual(errors,[],'No browser exceptions');
- const report={artifact,mode:harness?'in-memory transport harness; file:// unverified locally':'file://, no server',pages:visited,viewports:process.env.UI_REVIEW_FOCUS?0:4,overflows,errors,network};fs.writeFileSync('test-results/ui-review/results.json',JSON.stringify(report,null,2));console.log('PASS UI review',JSON.stringify(report));
+ const report={artifact,mode:input.url.startsWith('file:')?'file://, no server':'Single standalone file served on loopback',pages:visited,viewports:process.env.UI_REVIEW_FOCUS?0:4,overflows,errors,network};fs.writeFileSync('test-results/ui-review/results.json',JSON.stringify(report,null,2));console.log('PASS UI review',JSON.stringify(report));
  }catch(e){console.log('BROWSER ERRORS',errors);await page.screenshot({path:'test-results/ui-review/failure.png'});throw e;}finally{await browser.close();await input.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
