@@ -13,6 +13,8 @@ from pathlib import Path
 import re
 import sys
 
+import build_request_broker as publication
+
 from admin_api import Http, Plan, SetupError, command, require
 from bootstrap_diagnostics import BootstrapError, gcloud as run
 
@@ -39,7 +41,9 @@ APIS = {'iam.googleapis.com', 'iamcredentials.googleapis.com', 'sts.googleapis.c
 FILES = ['ops/request-broker/main.py', 'ops/request-broker/requirements.txt',
          'ops/request-diagnostics-provider.cel', '.github/workflows/jems-production-diagnostics.yml',
          'ops/request-evidence.schema.json', 'scripts/ops/bootstrap_request_diagnostics.py',
-         'scripts/ops/admin_api.py', 'scripts/ops/bootstrap_diagnostics.py']
+         'scripts/ops/admin_api.py', 'scripts/ops/bootstrap_diagnostics.py',
+         'scripts/ops/build_request_broker.py', 'scripts/deployment/build.py',
+         'ops/request-broker/Dockerfile', 'ops/request-broker/requirements.lock']
 SPEC = importlib.util.spec_from_file_location('diagnostic_broker', ROOT / FILES[0])
 broker = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(broker)
@@ -58,9 +62,8 @@ def source(sha):
 
 
 def config(image):
-    require(re.fullmatch(re.escape(f'{REGION}-docker.pkg.dev/{PROJECT}/jems-release-images/') +
-                         r'[a-z0-9][a-z0-9/_-]*@sha256:[0-9a-f]{64}', image or ''),
-            'An approved digest in the existing release registry is required')
+    require(re.fullmatch(re.escape(publication.IMAGE) + r'@sha256:[0-9a-f]{64}', image or ''),
+            'An approved request-broker digest in factory-services is required')
     return {'image': image, 'service': SERVICE, 'runtime': BROKER, 'bucket_location': 'global',
             'min_instances': 0, 'max_instances': 1, 'concurrency': 1, 'timeout_seconds': 60,
             'memory': '256Mi', 'cpu': '1', 'authentication': 'required',
@@ -265,6 +268,7 @@ def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--source-sha', required=True)
     p.add_argument('--image', required=True)
+    p.add_argument('--build-id', help='Required for live check/apply; source provenance reverified from Cloud Build')
     modes = p.add_mutually_exclusive_group()
     modes.add_argument('--check', action='store_true')
     modes.add_argument('--apply', action='store_true')
@@ -274,6 +278,11 @@ def main(argv=None):
         spec = proposed(args.image, args.source_sha, source(args.source_sha))
         if not args.check and not args.apply:
             print(json.dumps(spec, indent=2)); return 0
+        require(args.build_id, 'Source-bound Cloud Build ID required for live inventory/apply')
+        receipt = publication.qualify(args.build_id, args.source_sha,
+                                      hashlib.sha256(publication.archive(args.source_sha)).hexdigest())
+        require(receipt['image'] == args.image, 'Build receipt image differs')
+        spec['verified_build'] = receipt
         token = command(['gcloud', 'auth', 'print-access-token', '--quiet'])
         logging = Http('https://logging.googleapis.com', token)
         plan = preflight(spec, logging=logging)
@@ -286,7 +295,7 @@ def main(argv=None):
         else:
             print(json.dumps({'plan': plan.describe(), 'approve_plan_sha256': plan.review_code()}, indent=2))
         return 0
-    except (SetupError, BootstrapError, OSError, ValueError, TypeError, KeyError) as error:
+    except (SetupError, BootstrapError, OSError, ValueError, TypeError, KeyError, RuntimeError) as error:
         # Never print upstream bodies, arbitrary metadata or local file contents.
         print(json.dumps({'status': 'STOPPED', 'reason': str(error) if isinstance(error, SetupError)
                           else 'Source or response validation failed', 'recovery': 'Preserve partial state; rerun --check'}))

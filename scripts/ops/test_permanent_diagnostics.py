@@ -11,7 +11,7 @@ import request_evidence as evidence
 import triage_request_evidence as triage
 from test_request_evidence import SCOPE, NOW, complete, entry
 
-IMAGE = f'us-east5-docker.pkg.dev/{setup.PROJECT}/jems-release-images/request-broker@sha256:' + 'a' * 64
+IMAGE = f'us-east5-docker.pkg.dev/{setup.PROJECT}/factory-services/request-broker@sha256:' + 'a' * 64
 
 
 class BootstrapTests(unittest.TestCase):

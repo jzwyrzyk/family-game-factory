@@ -891,10 +891,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:23:11.824Z",
-      "sourceDigest": "5f7b1ef674e2b84dd647d329848d15cf1839bc2b621d5472752fe3445bcdc3d3",
+      "reviewedAt": "2026-11-26T06:02:38.180Z",
+      "sourceDigest": "7fd5e767bd4834c731d23a4eaf502e0800826123e415c7aa489076150ada7cf3",
       "reviewOutcome": "updated",
-      "reviewReason": "Delivery state records the failed hosted Pal reload and the visible onboarding path. The exact same regression commands, assertions, rendering code and timeouts remain in force, with two new pre-navigation persistence assertions.",
+      "reviewReason": "Validated broker provenance, bounded GitHub dispatch/retrieval with connector archive fallback, rejection of wrong sources/digests/layouts, and create-only nonproduction plans; real failed PR153 artifact remains explicitly unavailable.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1135,10 +1135,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T05:40:16.097Z",
-      "sourceDigest": "fb5367cf9071c2792911dbb469c84cd5d9e3cf680b4d8efdca5b1e61c61a7f44",
+      "reviewedAt": "2026-11-26T06:02:38.574Z",
+      "sourceDigest": "f9f57c43b1caccb057cf5386f8413b13587e345fa83f3ddd2e5dda13c729c955",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed canonical preflight failure reporting alongside documented managed identity and inventory blockers; failed live attempts now remain explicitly NOT_READY.",
+      "reviewReason": "Recorded successful source-bound GitHub metadata observation and actual failed-artifact retrieval, plus independent blocked direct SDK and unapplied provisioning lanes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1393,10 +1393,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:18:13.578Z",
-      "sourceDigest": "b19c31c5abbbf9b825ffae612d738bdcd36a74d8c2884c2f0cd4886d2667dca1",
+      "reviewedAt": "2026-11-26T06:01:12.047Z",
+      "sourceDigest": "b62d3245c56ee2a764f7730d3cd80e14b6c5a6ef4e89daad24b1124c3983bc64",
       "reviewOutcome": "updated",
-      "reviewReason": "Added the standard reviewed-source managed SDK preflight to AGENTS and the canonical assistant guide, distinguishing stale checkouts and unavailable attachments from permission denial without altering product or release authority.",
+      "reviewReason": "Updated canonical entry points to stop denied SDK endpoint retries and keep independent GitHub/nonproduction setup unblocked, with ledger and executable handoff links.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

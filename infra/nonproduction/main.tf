@@ -32,6 +32,19 @@ variable "enable_federation" {
   default = false
 }
 
+variable "billing_account" {
+  type = string
+  validation {
+    condition     = can(regex("^[A-F0-9]{6}-[A-F0-9]{6}-[A-F0-9]{6}$", var.billing_account))
+    error_message = "Supply the verified existing billing account ID."
+  }
+}
+
+variable "enable_registry_cleanup" {
+  type    = bool
+  default = false
+}
+
 provider "google" {
   project = var.project_id
   region  = var.region
@@ -67,7 +80,7 @@ locals {
   APIs = toset([
     "run.googleapis.com", "artifactregistry.googleapis.com", "iam.googleapis.com",
     "iamcredentials.googleapis.com", "sts.googleapis.com", "iap.googleapis.com",
-    "cloudresourcemanager.googleapis.com"
+    "cloudresourcemanager.googleapis.com", "billingbudgets.googleapis.com"
   ])
 }
 
@@ -80,9 +93,28 @@ resource "google_project_service" "api" {
 
 resource "google_service_account" "runtime" {
   account_id   = "jems-static-runtime"
-  display_name = "Jems static DEV TEST runtime: no application roles"
+  display_name = "Jems DEV static runtime: no application roles"
   description  = local.marker
   depends_on   = [google_project_service.api]
+}
+
+resource "google_service_account" "test_runtime" {
+  account_id   = "jems-test-runtime"
+  display_name = "Jems TEST static runtime: no application roles"
+  description  = local.marker
+  depends_on   = [google_project_service.api]
+}
+
+resource "google_service_account_iam_member" "test_runtime_act_as" {
+  service_account_id = google_service_account.test_runtime.name
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${google_service_account.deploy.email}"
+}
+
+resource "google_service_account_iam_member" "test_runtime_inspect" {
+  service_account_id = google_service_account.test_runtime.name
+  role               = google_project_iam_custom_role.runtime_inspect.name
+  member             = "serviceAccount:${google_service_account.deploy.email}"
 }
 
 resource "google_service_account" "deploy" {
@@ -117,7 +149,7 @@ resource "google_artifact_registry_repository" "static" {
   # Runtime references always use immutable digests. Only obsolete CI versions
   # can expire; mutable keep-test-current/previous retention tags protect the
   # two recovery versions without changing either immutable artifact identity.
-  cleanup_policy_dry_run = false
+  cleanup_policy_dry_run = !var.enable_registry_cleanup
   cleanup_policies {
     id     = "delete-old-ci"
     action = "DELETE"
@@ -238,13 +270,44 @@ resource "google_service_account_iam_member" "uat_federation" {
 
 output "configuration_identifiers" {
   value = {
-    projectId             = var.project_id
-    projectNumber         = tostring(data.google_project.nonproduction.number)
-    region                = var.region
-    registry              = "${var.region}-docker.pkg.dev/${var.project_id}/jems-environments"
-    runtimeServiceAccount = google_service_account.runtime.email
-    deployServiceAccount  = google_service_account.deploy.email
-    uatServiceAccount     = google_service_account.uat.email
-    wifProvider           = google_iam_workload_identity_pool_provider.github.name
+    projectId                 = var.project_id
+    projectNumber             = tostring(data.google_project.nonproduction.number)
+    region                    = var.region
+    registry                  = "${var.region}-docker.pkg.dev/${var.project_id}/jems-environments"
+    runtimeServiceAccount     = google_service_account.runtime.email
+    testRuntimeServiceAccount = google_service_account.test_runtime.email
+    deployServiceAccount      = google_service_account.deploy.email
+    uatServiceAccount         = google_service_account.uat.email
+    wifProvider               = google_iam_workload_identity_pool_provider.github.name
   }
+}
+
+# Notification only: never disable billing or production as a budget response.
+resource "google_billing_budget" "nonproduction" {
+  billing_account = var.billing_account
+  display_name    = "Jems nonproduction monthly USD 15"
+  budget_filter {
+    projects               = ["projects/${data.google_project.nonproduction.number}"]
+    calendar_period        = "MONTH"
+    credit_types_treatment = "INCLUDE_ALL_CREDITS"
+  }
+  amount {
+    specified_amount {
+      currency_code = "USD"
+      units         = "15"
+    }
+  }
+  threshold_rules {
+    threshold_percent = 0.5
+    spend_basis       = "CURRENT_SPEND"
+  }
+  threshold_rules {
+    threshold_percent = 0.8
+    spend_basis       = "CURRENT_SPEND"
+  }
+  threshold_rules {
+    threshold_percent = 1.0
+    spend_basis       = "FORECASTED_SPEND"
+  }
+  depends_on = [google_project_service.api]
 }

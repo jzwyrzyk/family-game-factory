@@ -1,5 +1,16 @@
 # Jems current architecture
 
+The November 26 operations candidate preserves blocked direct SDK identity checks
+while independently preparing GitHub and nonproduction access. Broker deployment
+now requires provider-verified source archive/build/image provenance through the
+existing publication lane. The initial nonproduction Terraform baseline uses distinct
+DEV and TEST static runtime accounts and a project-only $15 notification budget;
+federation and registry deletion remain disabled. GitHub setup/dispatch/retrieval
+and saved Terraform plans are guarded by fixed scope and exact review hashes.
+[Executable setup](docs/operations/PERMANENT_CLOUD_SETUP.md) distinguishes preparation,
+live GitHub metadata qualification and pending broker/full TEST acceptance.
+
+
 The November 26 application integration combines family beta and F06 storage from #186 with the child experience from #188 and #190. The [environment contract](docs/development/DEV-TEST-PROD.md) governs DEV, TEST and household promotion. Production still serves the earlier household release. The [delivery register](DELIVERY-STATE.md) distinguishes source validation, hosted acceptance and activation for this release.
 
 **Private family beta and F06 on protected main, November 25.** Application #186 integrated the opt-in family tenancy and storage paths. Existing household deployments use the household route. Prepared workspaces preserve their recoverable originals. Native private copies use per-owner authorization and explicit conflict handling. Other domains use reviewed recovery. The protected worker still runs the earlier pinned public source. Private dispatch checks both its immutable execution tag and the current private main commit against the same approved SHA. An advance of worker main would stop admission under the current pin. [Integration and continuity record](docs/family-beta/COMPLETION.md#protected-main-integration)

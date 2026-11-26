@@ -1,5 +1,19 @@
 # Nonproduction setup and privilege review
 
+**November 26 executable update:** use [the consolidated handoff](../../docs/operations/PERMANENT_CLOUD_SETUP.md)
+and `scripts/ops/setup_nonproduction.py` for the owner's selected `jems-jzw-nonprod`
+project in `us-east5`. Initial source-bound plans are create-only, saved privately,
+and require an approved hash. The owner requested an exact plan before execution.
+The baseline adds a second zero-role static runtime `jems-test-runtime` distinct
+from DEV `jems-static-runtime`, and a project-filtered $15 monthly notification
+budget using the verified existing billing account. Federation stays disabled and
+registry cleanup defaults to **dry-run** until a separately reviewed activation.
+`enable_registry_cleanup=true` activates the retention policy described below;
+it is not enabled by initial setup. One-time Cloud Shell is authorized; subsequent
+routine operations remain in the existing controller. IAP owner details remain
+private. No project creation, billing link or complete TEST backend is implicit.
+
+
 This is an **unapplied setup proposal** for the static DEV and TEST delivery
 lane. It is not evidence of a live project, authenticated preview, full TEST
 backend, provider acceptance or production release. `ops/environments.json`
@@ -35,7 +49,7 @@ The deployer necessarily creates and deletes services and manages their IAP
 policies inside this isolated project. This is broader than the existing
 production account's permissions on three existing services, and is the new
 privileged scope requiring review. It cannot modify project IAM, create keys,
-grant itself roles, assume runtime identities other than the static account, or
+grant itself roles, assume runtime identities other than the two static accounts, or
 access production through any binding in this plan. Do not bind production
 accounts or move unrelated resources into this project.
 

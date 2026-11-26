@@ -1,5 +1,13 @@
 # Autonomous operational investigation
 
+The `github_operations.py --run-id` path now retrieves and verifies the exact
+workflow/repository/main source/attempt/scope, artifact SHA256 and bounded single-file
+report before invoking this classifier. Dispatch is fixed to the existing diagnostic
+workflow and protected main; it never retries uncertain submissions. The live GitHub
+metadata observation in run 45764873156 succeeded, but PR153 request evidence and
+recent 401 attribution remain unqualified. See [executable setup](PERMANENT_CLOUD_SETUP.md).
+
+
 Use the existing Actions workflows, sanitized PR153 request evidence, immutable
 release/deployment receipts and exact-source test artifacts. Routine investigation
 and source fixes are authorized; release, privilege expansion, funded requests and

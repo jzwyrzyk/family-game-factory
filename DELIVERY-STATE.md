@@ -1,5 +1,63 @@
 # jems delivery state
 
+## November 26, 2026 — operational priority realignment and live GitHub observation
+
+The PR #222 candidate incorporates independent managed-auth correction
+`34fd728919e79e90b63f00933d87a265d6d0ac86` (including `a449cfa`). Its regressions and
+fail-closed boundaries are preserved. Direct SDK authoritative identity qualification
+remains **incomplete**; no denied identity endpoint was retried. It no longer gates
+GitHub or nonproduction preparation. Earlier separate-task success below is historical
+finite evidence, not current direct SDK live acceptance.
+
+**Independent live GitHub qualification:** [run 45764873156](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764873156),
+at frozen source `bc602f1ede502f398308ad56f973c4bf7997ff08`, completed the existing
+`observe=true` path at `2026-11-26T05:57:44.342294Z`. The observer verified
+`jems-cloud-run-release@family-game-factory-jzw.iam.gserviceaccount.com` and reported
+`READ_ONLY_RELEASE_OBSERVATION_COMPLETE`, zero mutations. Gateway
+`factory-gateway-r-eaf5effa06d031818f52`, private Coach
+`factory-coach-private-r-890188092e3f4396dab0`, and Preview `factory-preview-00006-5lk`
+were Ready/reconciled, with matching serving configurations and intended revisions
+at 100% traffic. The plan and transition jobs were skipped. This is authenticated
+GitHub metadata acceptance, not broker log coverage, direct SDK acceptance, paid
+request replay or user-visible product acceptance. Managed connection credentials
+and internal diagnostic receipts were not published.
+
+Authenticated GitHub inventory found the diagnostics environment unrestricted and
+both nonproduction environments absent. Six exact main-only settings changes are
+prepared; none applied. Repository OIDC remains unchanged. Actions dispatch works
+through this task's existing connection; variables reads returned 403 and were not
+interpreted as absence. CLI log retrieval was unavailable; the supported GitHub
+connector retrieved the observer's sanitized source-bound result.
+
+Authenticated retrieval also requalified the existing failed PR153 artifact
+`14888098788` from run `45323244621` using the supported connector fallback, its
+GitHub SHA256 `99c5e7ee3b96fd025182e807f9c412c7c94a5c48364c4e7239ca906ed19e55bd`,
+source `2c4751611cbd40ef04a85432845cd260528f5a56`, attempt 1 and exact scope.
+The new classifier correctly returned `UNAVAILABLE/IDENTITY_UNAVAILABLE`, unknown
+counts and no rollback. This establishes authenticated retrieval/validation of a
+failure artifact, not successful broker execution. The artifact payload stays private.
+
+New executable source adds broker build/source/archive/digest verification through
+the existing builder and registry, mandatory build proof before broker apply, guarded
+GitHub setup/dispatch/artifact validation and automated 401 triage, plus a checksum
+verified consolidated Cloud Shell launcher. The nonproduction saved-plan helper
+binds source/project/billing, rejects destructive or replacement initial plans,
+rechecks drift and preserves private durable state. Terraform separates DEV and TEST
+static runtime accounts, keeps federation disabled and cleanup in dry-run, and adds
+project-only $15 monthly alerts. The owner's target is `jems-jzw-nonprod`, `us-east5`,
+with their specified Google account for IAP and live AI disabled. No personal email
+or billing identity needs public publication.
+
+Local validation: **285 operations tests**, **113 environment tests**, and Terraform
+validation passed. No Cloud Build, broker provisioning, project creation, billing
+change, nonproduction apply, new IAM grant or application deployment occurred.
+Project global availability/billing and exact administrator cloud inventory remain
+unverified. Broker live acceptance and full TEST backend/worker provisioning remain
+pending their own prerequisites and approvals; the static baseline is not full TEST.
+The [executable handoff](docs/operations/PERMANENT_CLOUD_SETUP.md) records exact
+resources, costs, security effects and commands. Preparation awaits the owner's
+requested concrete provisioning approval; nothing is merged or activated by it.
+
 ## November 26, 2026 — permanent cloud diagnostics preparation; Coach success evidence
 
 Operations-only preparation against frozen main `bc602f1ede502f398308ad56f973c4bf7997ff08`.

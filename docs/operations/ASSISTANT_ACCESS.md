@@ -1,5 +1,15 @@
 # Direct Jems diagnostic access
 
+**November 26 priority update:** direct managed SDK authoritative identity qualification
+remains incomplete after correction `34fd728919e79e90b63f00933d87a265d6d0ac86`. Do not
+repeat explicitly denied identity endpoint attempts or weaken identity checks. Use
+source-only preflight for this feature until the supported connection capability
+changes. Independently qualify GitHub diagnostics and nonproduction setup using the
+[executable handoff](PERMANENT_CLOUD_SETUP.md); direct SDK access is not their gate.
+The existing GitHub release observation succeeded in run
+[45764873156](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764873156).
+
+
 ## Canonical SDK preflight — November 26, 2026
 
 The owner reports successful **separate-task** managed SDK verification under actual

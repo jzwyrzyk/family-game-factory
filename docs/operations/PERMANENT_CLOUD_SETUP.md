@@ -1,184 +1,190 @@
-# Permanent cloud operations: consolidated setup and evidence
+# Permanent cloud operations: executable setup
 
-Assessment: November 26, 2026, America/New_York. Application base is frozen
-`bc602f1ede502f398308ad56f973c4bf7997ff08`. This operations-only candidate does not
-merge, promote, alter frozen source pins, enable recurring work or approve spending.
-It reuses PR153, the existing managed Codex identity and existing environment and
-release controllers. [Delivery state](../../DELIVERY-STATE.md) is the acceptance ledger.
+November 26, 2026 (America/New_York). PR #222 incorporates managed-auth correction
+`34fd728919e79e90b63f00933d87a265d6d0ac86`. Direct managed SDK effective-account
+qualification remains **incomplete** because supported identity endpoints are
+unavailable. Do not retry explicitly denied endpoints, copy credentials, alter the
+managed proxy or broaden IAM. That limitation does not gate the independent lanes
+below. Frozen application source `bc602f1ede502f398308ad56f973c4bf7997ff08`, release
+identities and production services are unchanged.
 
-## Verified state and explicit gaps
+## One verified launcher
 
-- GitHub confirms [PR153](https://github.com/jzwyrzyk/family-game-factory/pull/153)
-  merged as `2c4751611cbd40ef04a85432845cd260528f5a56`. Its dedicated broker,
-  exact provider condition, manual/default-off scheduled workflow and closed report
-  schema remain unchanged. [Attempt 1 of run 45323244621](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45323244621)
-  failed. The PR receipt records `invalid_target` before a broker query.
-- Owner-supplied inventory confirms the GitHub diagnostic provider/pool, broker and
-  dedicated accounts are missing. That is consistent with the failure; a failed STS
-  exchange alone does not distinguish absent, disabled or deleted resources.
-- Owner-supplied inventory reports the existing Codex pool/provider ACTIVE, the
-  diagnostic account present, `global/_Default` as the retained destination, Gateway
-  `factory-gateway-r-eaf5effa06d031818f52`, Coach
-  `factory-coach-private-r-890188092e3f4396dab0` and Preview `factory-preview-00006-5lk`
-  latest ready. These were not independently reread from GCP in this task.
-- This managed task has enforced Google/GitHub network access, but no outbound
-  identity, secret binding or `OIC_MANIFEST_PATH`. Google Cloud SDK 594.0.1 was
-  installed in the task's work directory. Both existing diagnostic commands then
-  returned `IDENTITY_NOT_CONFIGURED`; installing the CLI did not restore identity.
-  The available environment change API cannot attach OIDC. The owner subsequently verified the existing connection in another task under
-  actual alias `GCP`; use that connection and the canonical SDK client; do not recreate its pool or grant
-  broader roles. [Connection procedure](ASSISTANT_ACCESS.md).
-- The owner reports separate-task SDK identity, metadata and finite negative-permission
-  verification succeeded under alias `GCP`; all services Ready/reconciled at 100%.
-  This task independently retried SDK access but still has no attached manifest.
-- No actual administrator inventory diff or production request-evidence artifact
-  has been accepted in this task. The missing attachment,
-  administrator preflight, approved broker image and coverage review remain blockers.
+Use an existing administrator Cloud Shell session with `gcloud`, `gh`, Python 3 and
+Terraform >=1.6,<2. Credentials stay in their supported tools; no keys are created.
+The reviewed handoff supplies the full `OPS_SHA` for this candidate. Download once:
 
-## Owner setup sequence
+```sh
+curl -fsSL "https://raw.githubusercontent.com/jzwyrzyk/family-game-factory/$OPS_SHA/scripts/ops/handoffs/operations-bootstrap.sh" -o /tmp/jems-operations.sh
+printf '%s  %s\n' 81adb6cdf38379f60b184e68b5daf1758a8c929f7c68d53e93b149dbafed9572 /tmp/jems-operations.sh | sha256sum -c -
+bash /tmp/jems-operations.sh "$OPS_SHA" github --check
+bash /tmp/jems-operations.sh "$OPS_SHA" broker-build --check
+bash /tmp/jems-operations.sh "$OPS_SHA" nonprod --inventory
+```
 
-One cloud command can apply the reviewed resource diff after its read-only check.
-Initial account attachment, GitHub environment settings and an approved immutable
-broker image are explicit prerequisites. There is no honest ready-to-run apply
-command until those values and the actual inventory hash exist.
+These three checks make no cloud or GitHub changes. The launcher fetches exactly
+the selected commit into a temporary clean checkout and accepts only four named
+operations. Keep inventories, billing IDs, Terraform plans/state and operational
+receipts private, outside the checkout. No direct Codex credential is a prerequisite.
+The older request-only launcher remains available; the consolidated launcher is
+preferred. A checksum verifies the downloaded launcher against the reviewed handoff;
+it does not itself approve the source SHA or a provisioning plan.
 
-1. Reuse the existing Codex identity attachment, actual alias `GCP`. Run the canonical
-   `diagnostic_preflight.py --expected-source FULL_REVIEWED_SHA --identity-alias GCP
-   --live --verify-permissions` with the task virtual environment. It runs SDK
-   self-check, full metadata reads and same-token permission probes without gcloud
-   or cache writes. See [SDK/source preflight](ASSISTANT_ACCESS.md).
-   The probe covers service read/write/delete/IAM, project administration/data/log
-   permissions, named secrets and impersonation/key creation. It does not read secret
-   payloads. Verify the named secret resources actually exist using the operator
-   inventory; an empty permission response for a nonexistent resource proves nothing.
-   A finite check is not a universal privilege-ceiling proof.
-2. Review a broker image built from the exact `ops/request-broker/main.py` and pinned
-   requirements at the selected source, running Functions Framework with entry point
-   `request_evidence`. Use the existing authorized publication/build infrastructure
-   and a digest in `us-east5-docker.pkg.dev/family-game-factory-jzw/jems-release-images/`.
-   Retain build ID, exact source archive/file hashes, builder identity, base/dependency
-   provenance and resulting digest. A registry digest proves immutability, not which
-   source it contains. **No image has been built or approved by this task.** The
-   bootstrap deliberately does not create a parallel build account, bucket, registry,
-   implicit source-build pipeline or API activation. Any missing build prerequisite
-   needs its own exact diff under the existing publication method.
-3. Pin this operations candidate's full reviewed commit. From a clean checkout run:
+## Exact changes requiring approval
 
-   ```sh
-   python3 scripts/ops/bootstrap_request_diagnostics.py --source-sha "$REVIEWED_SHA" --image "$BROKER_IMAGE"
-   python3 scripts/ops/bootstrap_request_diagnostics.py --source-sha "$REVIEWED_SHA" --image "$BROKER_IMAGE" --check
-   ```
+| Lane | Proposed change | Cost and security effect |
+| --- | --- | --- |
+| GitHub | Set selected-branch policies and add only branch `main` on `jems-production-diagnostics`, `jems-nonproduction`, `jems-nonproduction-uat`: six REST changes in the observed inventory | No new credential, OIDC template, release setting, schedule or application change. Restricts diagnostic environment; creates the two missing nonproduction environments. |
+| Broker publication | One <=600-second Cloud Build using existing `factory-service-builder`, source bucket `family-game-factory-jzw-service-builds-us-east5`, repository `factory-services`, image `request-broker` | No new builder, bucket, registry or IAM. One build plus image/source/log storage; at an illustrative $0.006/minute, <=$0.06 compute before allowances. Verify actual account/SKU pricing; this is not a quote. |
+| PR153 broker infrastructure | Dedicated `jems-github-diagnostics/github-main` pool/provider; `jems-github-log-reader` and `jems-request-broker` keyless accounts; `jemsRequestViewReader` custom role; `global/_Default/views/jems-production-requests`; `jems-request-evidence` Cloud Run service; three exact resource bindings | Caller can impersonate only its account and invoke only broker; broker gets `logging.views.get/access` on only the filtered view. No project log role or secret/data/deploy grants. Min 0, max 1, concurrency 1, 256 MiB, 1 vCPU, 60s. Indicative $1–5/month for sparse manual reads, separate from nonproduction budget; not an approved cap. |
+| Nonproduction project | Reserve `jems-jzw-nonprod` only after availability review; link the verified existing billing account | No production data/credential copy. No silent adoption of a hidden or colliding project. Account/parent authority remains an administrator prerequisite. |
+| Nonproduction Terraform | 28 expected create instances for an empty project: eight API enables, four keyless SAs, four runtime account bindings, one registry and writer binding, two custom roles and controller binding, IAP service identity and agent binding, disabled pool/provider and two exact federation bindings, one project-filtered $15 monthly budget | Existing architecture; DEV `jems-static-runtime` and TEST `jems-test-runtime` are distinct and have zero application roles. Deployer acts as those two only; UAT has no project role. Federation disabled, registry deletion dry-run, no application deployment, data service, secret, NAT, VM or AI. Initial plans reject updates/replacement/deletion. |
 
-   The first is offline. The second uses the owner's existing administrator session,
-   reads project/API/account/key/policy/pool/provider/view/bucket/service/image state,
-   and prints the additive diff plus `approve_plan_sha256`. Raw policies and metadata
-   stay in memory; only hashes and the proposed fixed grants are emitted. The token
-   is never printed. Keep this output in the private operational record.
-4. Review that exact diff, image provenance, narrow grants and cost. Only after the
-   owner approves, add `--apply --approve-plan-sha256 HASH`. The bootstrap repeats
-   preflight and rejects changed inventory. It verifies resulting configuration.
-   Completion is **CONFIGURED_NOT_ACCEPTED**, until the following acceptance work.
-5. Reuse/create only the `jems-production-diagnostics` GitHub environment with exactly
-   the main branch allowed. Verify main protection and actual OIDC subject format.
-   Keep `JEMS_DIAGNOSTICS_HOURLY_ENABLED` absent/false; do not enable debugging.
-   These GitHub settings are separate from the Cloud Shell bootstrap, and no settings
-   write or recurring enablement was performed here.
-6. Run `python3 scripts/ops/audit_request_diagnostics.py` as the existing operator.
-   It checks resource existence and Policy Troubleshooter's **overall** result for
-   explicit allow/deny tuples, including inherited policy evaluation. Unknown,
-   missing, API-disabled or inaccessible results fail acceptance. It adds no API or
-   grant. Retain the dated report privately. Review ancestor visibility, unsupported
-   permission/resource combinations, conditional inputs and the legacy diagnostics
-   view separately. Actual caller invocation and broker reads remain required. Verify anonymous GET to
-   the exact broker URL returns 401/403 with no body capture; a 200 fails private
-   invocation acceptance. Review ancestor public grants as well as local policy.
-7. Follow the existing [coverage and privacy procedure](PRODUCTION_DIAGNOSTICS_SETUP.md)
-   to establish a finite, settled coverage interval, independent request-count
-   comparison, retention and effective IAM. Install its dated attestation through a
-   separately reviewed broker revision. The bootstrap sets only bucket location;
-   it **never manufactures coverage timestamps**. Its later preflight stops on the
-   changed environment, preserving the separately reviewed receipt.
-8. Manually dispatch the existing protected-main workflow for an already observed,
-   free request interval. Verify source/run/attempt, artifact digest, one regular
-   `report.json`, strict schema, exact scope, observed rows and completeness. Then
-   pass it to `triage_request_evidence.py`. Do not replay a paid application request.
-   An initial broker without a receipt may validate private invocation but supplies
-   no usable request rows. Publish only the allowlisted report and scoped conclusions.
+Actual resource existence can reduce creates or reveal conflicts. The scripts bind
+approval to freshly read inventory/source or a saved Terraform plan; no GCP apply
+hash is available until the authenticated administrator checks complete. Failed,
+inaccessible and absent resources are distinct states, never evidence of denial.
+Review effective ancestor/group/resource policies before activation.
 
-The optional [Cloud Shell launcher](../../scripts/ops/handoffs/request-diagnostics-bootstrap.sh)
-checks out an exact commit in a temporary directory and runs the same bootstrap.
-Download it from the reviewed immutable raw GitHub URL, verify its SHA-256 **before
-execution**, and pass the reviewed source, image and plan hash. Do not use a mutable
-main URL or pipe an unchecked download into a shell. Launcher SHA-256: `816e9abac3527695e9b4b07903738472a9855ba40ef3ac9f4d2027ee98cb62a2`. Its checksum is included in the
-candidate handoff; a changed helper requires a new checksum and review.
+## Broker build, provisioning and request evidence
 
-## Exact intended resource changes
+The publisher stages exactly four committed broker files. The Python base is pinned
+by digest; every CPython 3.12 Linux x86_64 dependency wheel is version/hash pinned.
+It reuses the existing Cloud Build preflight and compares the returned builder,
+executable steps/options, source archive SHA256 from provider provenance, resolved
+source generation and registry digest. This is source-bound provider evidence, not
+an independently signed SLSA attestation. The Docker builder follows the existing
+lane's image; record its provider-reported builder digest in the private build
+record. No actual broker build has been accepted yet.
 
-| Resource | Additive setup; conflicting resources stop |
-| --- | --- |
-| `jems-github-diagnostics/github-main` | Dedicated keyless pool/provider, exact existing CEL, issuer/audience/mapping; no wildcard subject |
-| `jems-github-log-reader` | No project roles or user-managed keys; exact WIF subject may impersonate it |
-| `jems-request-broker` | No project roles or user-managed keys; runtime of only the new broker |
-| `jemsRequestViewReader` | Exactly `logging.views.get` and `logging.views.access` |
-| `global/_Default/views/jems-production-requests` | PR153 exact three-service regional platform-request filter; custom role bound to broker only |
-| `jems-request-evidence` | Reviewed digest, broker runtime, required IAM authentication, min 0/max 1, concurrency 1, 60 s timeout, 1 CPU/256 MiB; exact caller Invoker grant |
+After approving the printed build plan:
 
-The caller never gets log access. The view selects whole entries and is **not** a
-redaction layer: the trusted broker alone projects and sanitizes the output. No sink,
-raw log copy, retention extension, Codex grant, shared field-restriction change,
-application deployment/traffic change, secret/data read or paid request is included.
+```sh
+bash /tmp/jems-operations.sh "$OPS_SHA" broker-build --submit --approve-plan-sha256 "$BUILD_PLAN_HASH"
+# Use the returned existing build ID; do not repeat --submit after timeout.
+bash /tmp/jems-operations.sh "$OPS_SHA" broker-build --build-id "$BUILD_ID"
+bash /tmp/jems-operations.sh "$OPS_SHA" broker-setup --image "$BROKER_IMAGE" --build-id "$BUILD_ID" --check
+# Only after reviewing that exact additive infrastructure plan:
+bash /tmp/jems-operations.sh "$OPS_SHA" broker-setup --image "$BROKER_IMAGE" --build-id "$BUILD_ID" --apply --approve-plan-sha256 "$BROKER_PLAN_HASH"
+```
 
-## Partial failure, disablement and cost
+`BROKER_IMAGE` is the verified `factory-services/request-broker@sha256:...` result.
+Check/apply independently reverify Cloud Build provenance. They never accept a tag,
+external image, mutable source or arbitrary build recipe. Setup ends
+**CONFIGURED_NOT_ACCEPTED**. It does not install fabricated log coverage or enable
+hourly execution. Preserve the [PR153 privacy/coverage procedure](PRODUCTION_DIAGNOSTICS_SETUP.md):
+finite settled interval, independent request-count/retention comparison, exact IAM
+audit (`audit_request_diagnostics.py`), anonymous denial, effective caller/broker
+checks, and a separately reviewed dated coverage revision before complete evidence.
+Keep existing exact CEL until signed claims qualify it; a mismatch is a blocker,
+not permission to widen claims or change repository OIDC and disrupt release trust.
 
-After any failure preserve the private output, run a new read-only `--check`, inspect
-remaining actions and approve its new hash. Existing exact marked resources and
-bindings are reused; conflicting names, keys, grants, trust, images or runtime settings
-stop. There is no automatic rollback, deletion, privilege widening or rebuild. A
-newly deployed but reconciling service must be inspected before a fresh check.
+After the six GitHub changes are approved, apply with:
 
-Emergency stop after authorization: leave the scheduling variable false, disable
-only `github-main` in `jems-github-diagnostics`, and remove the caller's Invoker binding
-from only `jems-request-evidence`. This stops new federation/invocations without
-changing application services; issued tokens can remain valid until expiry, so the
-Invoker removal is needed as well. Re-read policies and verify denial. Do not remove
-the existing Codex pool or production worker/release trust. Full removal is a separate
-reviewed plan: broker service, its exact view binding/view, caller WIF binding,
-provider/pool and dedicated accounts/role after checking references. Image cleanup
-uses the existing registry retention process; never delete shared logs or buckets.
+```sh
+bash /tmp/jems-operations.sh "$OPS_SHA" github --apply --approve-plan-sha256 "$GITHUB_PLAN_HASH"
+```
 
-Planning assumption: at most 100 manual queries/month, each <=60 s, one vCPU and
-256 MiB, no minimum instances. This bounds planned request execution at about 6,000
-vCPU-seconds and 1,500 GiB-seconds/month, before retries/overhead. Illustrative list
-rates of $0.000024/vCPU-second and $0.0000025/GiB-second give about **$0.15/month**
-compute, before free-tier allocation. This is an estimate, not a current regional
-quote. Allow **$1–5/month** provisionally for small manual use plus artifact/platform
-log storage; image build, registry storage, network and GitHub Actions/artifacts are
-additional and must be priced from actual project usage. This document authorizes
-no spend. Max instances is not a spending cap. Hourly work remains off; 720 monthly
-queries at the same upper duration would be 43,200 vCPU-seconds before overhead.
-Validate actual regional billing rates and set the approved alert/allowance first.
+`github_operations.py` provides bounded diagnostic dispatch and retrieval. Prepare
+an `inputs.json` containing only `service`, `revision` (empty for service-wide),
+`start_utc`, `end_utc` for a settled interval of at most one hour. After broker
+qualification, dispatch once from the current protected main:
 
-## Subsequent provisioning against frozen main
+```sh
+bash /tmp/jems-operations.sh "$OPS_SHA" github --dispatch --expected-main "$MAIN_SHA" --inputs "$PWD/inputs.json" --dispatch-receipt "$PWD/dispatch-once.json"
+gh run list --repo jzwyrzyk/family-game-factory --workflow jems-production-diagnostics.yml --event workflow_dispatch --limit 5
+bash /tmp/jems-operations.sh "$OPS_SHA" github --run-id "$RUN_ID" --expected-main "$MAIN_SHA" --inputs "$PWD/inputs.json"
+```
 
-| Area | Existing controller and next gate |
-| --- | --- |
-| DEV/TEST | `ops/environments.json` still has `enabled:false`, unset project/identities/IAP. Use `scripts/environments/` and the separate-project/IAP plan, with the existing $15/month planning context; verify actual account, billing and browser audience. #191 directory correction is independent. No production diagnostic role can provision DEV. |
-| Storage recovery | Preserve #186/F06, mixed-version recovery and original bytes. Use `docs/storage/ROLLOUT.md`, synthetic copies and exact rollback-reader compatibility. Private configuration, worker/WIF/runner settings and live recovery remain unread in this task. |
-| Sandbox publication | Reconcile #169 to frozen `bc602f1…`, exact public package inputs, signed digest and existing sandbox publication workflow. Do not move its source pin or publish during this work. |
-| Worker rotation | Private #22 combines #19–21; protected worker baseline in main's ledger is `dddf53dbc76796be19782c1bb5bbb99b86e99909`. Requalify public pin, runner/WIF and compatibility together; verify live private state before rotation. Source acceptance does not authorize trust/pin rotation. |
-| Premium generation | Keep disabled. The recorded $3.912 initial reservation/$5 lineage ceiling is a planning envelope, not current entitlement/pricing or a paid trial receipt. Use the existing private worker, isolated TEST, model/rate verification, explicit funded trial and recovery gates. |
+Retrieval requires the exact workflow/repository/main/source/attempt/scope, GitHub
+artifact digest, a single bounded `report.json`, and strict PR153 schema. It returns
+sanitized triage. When the managed CLI cannot follow GitHub's archive redirect, use
+the supported GitHub connector download and add `--artifact-zip /private/path.zip`;
+the same provider digest, source, attempt and scope checks still apply. This path
+was actually qualified with the failed PR153 artifact from run `45323244621` and
+correctly returned `UNAVAILABLE/IDENTITY_UNAVAILABLE`, never successful acceptance.
+A failed auth report remains unavailable; a successful workflow
+alone is not complete request evidence. Recent 401s remain a separate investigation;
+never replay a paid POST or infer rollback from them. No private report is committed.
 
-Current parallel learning #218, creative #220 and CI #219 remain separate. No feature
-branch is merged into this operations candidate. The [triage runbook](AUTONOMOUS_TRIAGE.md)
-records the available investigation loop and current authentication evidence limits.
+Use the attached managed GitHub connection if it permits dispatch. Otherwise a
+repository-selected GitHub App needs Actions:write and Contents:read for routine
+dispatch/retrieval; initial environment setup separately needs Administration:write.
+GitHub Actions:write is **repository-wide**, not per-workflow. The client allowlist
+is a software guard, not an IAM boundary. Do not create a broad PAT or persist an
+App key here. Manual owner dispatch is the fallback if that capability is unavailable.
 
-## Candidate validation
+## Nonproduction project, budget and IAP
 
-Local operations suite: 263/263 passed, including 24 added SDK/preflight/bootstrap/
-policy/triage cases. Focused Node 22 authentication suite: 29/29 passed. Actual pinned
-Google Auth 2.43.0 and Requests 2.32.5 initialize a synthetic external-account session
-without network or writes. Shell syntax, whitespace and documentation checks pass.
-These are offline/fixture and source checks. Independent live SDK preflight in this
-task stops at the missing managed attachment. The owner's separate-task SDK success
-is recorded distinctly. The original diagnostic reader, production workflows,
-provider condition, broker source/schema and release intent remain byte-identical.
+Approved preparation target: `jems-jzw-nonprod`, `us-east5`, $15/month infrastructure,
+live AI off. The named owner IAP principal stays in the private configuration until
+review; no personal email needs publication in this public repository.
+
+`nonprod --inventory` verifies the production project's existing billing account is
+open and, for an existing nonproduction project, checks its number, lifecycle and
+billing attachment. It prints exact project-create/link argument arrays if the ID
+is not visible. **Not visible does not prove globally available.** Use Cloud Console's
+New project ID check before the approved create command; Google atomically reserves
+the ID at creation and rejects collision. There is no reservation from this read-only
+check. An inaccessible project, uncertain create or billing mismatch stops recovery;
+never blindly retry or adopt an unknown project.
+
+After reviewing/approving and executing those two exact project commands, run:
+
+```sh
+mkdir -p "$HOME/work/jems-nonprod-state"
+chmod 700 "$HOME/work/jems-nonprod-state"
+bash /tmp/jems-operations.sh "$OPS_SHA" nonprod --plan --state-dir "$HOME/work/jems-nonprod-state"
+# Review the private reviewed.json and saved plan; then approve its printed hash.
+bash /tmp/jems-operations.sh "$OPS_SHA" nonprod --apply --state-dir "$HOME/work/jems-nonprod-state" --approve-plan-sha256 "$NONPROD_PLAN_HASH"
+```
+
+State is durable/private, never in a temporary checkout or committed. Provider
+versions/hashes use the existing lockfile. Apply rechecks project/billing/source,
+saved-plan hash and a fresh cloud plan; it records an exclusive started marker to
+prevent blind replays after uncertain/partial execution. An initial conflict or
+partial apply needs explicit state review; do not delete state/marker to force a
+retry. Migrate state to an approved private backend before multiple operators use it.
+
+The $15 budget emits default billing-recipient notifications at 50%, 80% actual and
+100% forecast, filtered to this project. Verify the owner receives billing alerts;
+IAP access alone does not make them a billing recipient. Budgets do not cap charges.
+The static estimate is $2–5 minimal / $6–15 moderate use, with no standing Run
+instances; storage/network can exceed it. DEV/TEST share this **nonproduction-only**
+aggregate budget and trusted control plane, but distinct runtime identities/origins,
+no shared server data or provider credentials. They do not inherit production
+spending admission. Independent hard dollar limits for each lane are not implemented.
+
+One-time Console step: select this project, configure the OAuth consent/client for
+direct Cloud Run IAP if required (especially a project outside an organization).
+Use the approved owner Google account as the sole initial adult IAP user. Record
+only the OAuth client ID as `iapAudience`; never copy its secret into source/chat.
+Reuse direct IAP, no load balancer. The controller grants owner and dedicated UAT
+access on each exact service; reject anonymous and other-user access in real browsers.
+
+After baseline apply, `configuration-identifiers.json` gives both runtime identities,
+controller/UAT accounts, numeric project and provider. Prepare a separate reviewed
+`ops/environments.json` change with these values, `iapAudience`, exact owner allowlist,
+initial `maxPreviews:2`, min 0/max 1 and TTL72h. Keep the current file disabled until
+signed claim, permission and IAP tests qualify it. Enable federation/registry cleanup
+only through a separately reviewed Terraform update; the initial helper deliberately
+rejects updates. The existing trusted environment controller then owns routine
+preview, permanent static TEST, cleanup and UAT operations; no routine Cloud Shell.
+
+The static TEST website is **not a complete TEST backend**. Permanent TEST still
+requires its own gateway, untrusted generated-game origin, coach, Firestore, artifact
+bucket, worker identities/network and reset controls, with production identifiers and
+data forbidden. DEV remains disconnected synthetic local data. These additional
+billable resources are excluded from this $15 baseline apply: the actual worker/network
+choice and full TEST cost must be reviewed before provisioning. Existing
+[DEV → TEST → PROD](../development/DEV-TEST-PROD.md) architecture remains authoritative;
+do not install NAT/VMs or share the production default database under the static budget.
+
+## Observed qualification
+
+The attached GitHub connection reads workflow/environment metadata and accepted an
+explicit read-only `observe=true` dispatch on frozen main. Its source excludes the
+plan/transition jobs in that mode. See [delivery ledger](../../DELIVERY-STATE.md) for
+run outcome. Request-broker live evidence, administrator cloud inventory, project
+availability/billing, actual broker image build, nonproduction apply and IAP acceptance
+remain separately unverified. No denied managed identity endpoint was retried.
