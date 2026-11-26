@@ -64,7 +64,7 @@ async function collect() {
         check(first.logicalId === original.id && first.category === category && first.semanticIdentity === semantic, name + ' has a stable categorized identity');
 
         const world = a.createStarterProject('blank', name + ' stage');
-        world.world = {backdrop: category === 'world' ? first.assetId : 'world:jem-gardens:v1',fit:'contain',
+        world.world = {backdrop: category === 'world' ? first.assetId : index === 0 ? 'world-forest-v1' : 'world:jem-gardens:v1',fit:'contain',
           decorations:category === 'world' ? [] : [{id:'own-piece',assetId:first.assetId,name,x:26,y:58,size:25,plane:'front'}]};
         const setting = store.create(owner,world);
         await rejected(() => a.deleteArtwork(owner, original.id), /still uses|prepared game|saved version/i, name + ' retained original cannot be erased');
@@ -82,13 +82,33 @@ async function collect() {
         const movement = a.runScene(episode,{durationMs:1000});
         check(movement.actors[0].x === episode.actors[0].x + 22 && movement.actors[0].y === episode.actors[0].y + 9, name + ' follows its authored path');
 
+        let animatedRockId;
+        if (index === 0) {
+          const animated = a.createArtAdventure(first, 'scene');
+          animated.title = 'My Rock jumps when tapped';
+          animated.actors[0].role = 'character';
+          const animatedRock = store.create(owner, animated);
+          store.keep(animatedRock.id, owner);
+          animatedRockId = animatedRock.id;
+          check(animated.actors[0].assetId === first.assetId && animated.programs.some(p => p.trigger.type === 'tap' && p.actions.some(b => b.type === 'jump')),
+            'My Rock is a separately animated actor on the identical selected revision');
+          check(world.world.backdrop === 'world-forest-v1' && world.world.decorations[0].assetId === first.assetId &&
+            episode.actors[0].role === 'obstacle' && hunt.actors[0].role === 'collectible',
+            'My Rock is Forest scenery, a moving obstacle and a three-tap collectible in independent activities');
+          await a.registerArtUsage(owner,{targetKind:'scene',targetId:animatedRock.id,drawingId:original.id});
+        }
         const uses = await a.artUsages(owner,original.id);
+        if (animatedRockId) check(uses.some(use=>use.targetId===animatedRockId && use.usedAt && use.contexts.includes('animation')),
+          'a confirmed animated use retains the actual picker recency receipt');
         check([originalScene.id,game.id,setting.id].every(id=>uses.some(use=>use.targetId===id)),name + ' usage inventory includes its game, world and animation');
         strokes.push({color:a.crayons[4],size:16,points:[{x:320,y:220},{x:365,y:240}]});
         const version = await a.saveDrawing(owner,name,await encode(),original.id);
         const second = (await a.listCreativeAssetChoices(owner)).find(item=>item.drawingId === version.id);
         check(second.logicalId === first.logicalId && second.assetId !== first.assetId && version.sourceSha256 === original.sha256, name + ' new revision retains original lineage');
         const pinned = store.load(originalScene.id,owner);
+        if (animatedRockId) check(store.load(animatedRockId,owner).scene.actors[0].assetId===first.assetId &&
+          a.privateArtReferences(store.load(setting.id,owner).scene).includes(first.assetId),
+          'editing My Rock preserves its existing forest, collectible, obstacle and independent animated actor');
         check(pinned.scene.actors[0].assetId === first.assetId && store.load(game.id,owner).scene.actors[0].assetId === first.assetId, name + ' saved game and animation stay pinned');
         pinned.scene.actors[0].assetId = second.assetId;
         store.save(originalScene.id,owner,pinned.scene,originalScene.headId);
@@ -99,7 +119,7 @@ async function collect() {
         const pixels = sprite.getContext('2d').getImageData(0,0,sprite.width,sprite.height).data;
         check(pixels[3] === 0 && pixels.some((channel,i)=>i%4===3 && channel===255), name + ' preserves its transparent shape on reuse');
         records.push({id:original.id,sha256:original.sha256,exact:btoa(String.fromCharCode(...new Uint8Array(await file.arrayBuffer()))),semantic,
-          category,pin:first.assetId,newPin:second.assetId,scene:originalScene.id,game:game.id,world:setting.id});
+          animatedRockId,category,pin:first.assetId,newPin:second.assetId,scene:originalScene.id,game:game.id,world:setting.id});
       }
       FG.store.choose(other);
       check(!(await a.listCreativeAssetChoices(other)).length, 'second profile sees its own empty collection');
@@ -155,6 +175,9 @@ async function collect() {
         if (scene.actors[0].assetId!==item.newPin || store.keptRevision(item.scene,owner).scene.actors[0].assetId!==item.pin ||
             game.actors[0].assetId!==item.pin || !a.privateArtReferences(setting).includes(item.pin) ||
             a.reusablePaths(scene)[0]?.name!=='Along the trail') throw Error('Restored use differs: '+item.semantic);
+        if (item.animatedRockId && (store.load(item.animatedRockId,owner).scene.actors[0].assetId!==item.pin ||
+            setting.world.backdrop!=='world-forest-v1' || game.actors[0].role!=='collectible' ||
+            scene.actors[0].role!=='obstacle')) throw Error('Replacing the obstacle must preserve the Forest, collectible and separately animated original');
         reports.push(item.semantic+' restores exact bytes, archived original, kept/head scene, game, world and named path on fresh device');
       }
       return reports;

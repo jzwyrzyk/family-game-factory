@@ -22,10 +22,17 @@ export async function listPickerChoices(owner:string,current:()=>boolean):Promis
   const [choices,uses]=await Promise.all([listCreativeAssetChoices(owner,valid),artUsages(owner)]);
   if(!valid())throw Error('Reopen your own artwork.');
   const motions=new Map(uses.filter(u=>u.contexts?.includes('animation')).map(u=>[u.rigId ?? u.drawingId,u.title ?? 'a saved scene']));
+  const lastUse=new Map<string,string>();
+  for (const use of uses) {
+    const key=use.rigId ?? use.drawingId;
+    if (use.usedAt && use.usedAt > (lastUse.get(key) ?? '')) lastUse.set(key,use.usedAt);
+  }
   return choices.map(choice=>{
-    const item={...choice,animatedIn:motions.get(choice.rigId ?? choice.drawingId)};
+    const key=choice.rigId ?? choice.drawingId;
+    const usedAt=lastUse.get(key) ?? '';
+    const item={...choice,recentAt:usedAt>choice.savedAt?usedAt:choice.savedAt,animatedIn:motions.get(key)};
     privateOwners.set(item,owner);return item;
-  }).sort((a,b)=>b.savedAt.localeCompare(a.savedAt)||a.assetId.localeCompare(b.assetId));
+  }).sort((a,b)=>b.recentAt.localeCompare(a.recentAt)||a.assetId.localeCompare(b.assetId));
 }
 const categoryNames = {character: 'My characters', prop: 'My things', vehicle: 'My vehicles', world: 'My worlds'} as const;
 function element<K extends keyof HTMLElementTagNameMap>(tag: K, text?: string) {

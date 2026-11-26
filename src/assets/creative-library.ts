@@ -75,8 +75,13 @@ export async function listCreativeAssetChoices(owner: string, current: () => boo
   const revisions=new Map<string,number>();
   for(const image of [...images].sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id))){
     const root=originalFor(image,byId);
-    revisions.set(root.id,(revisions.get(root.id)??0)+1);
-    indexes.set(image.id,revisions.get(root.id)!);
+    if (image.id === root.id) {
+      indexes.set(image.id,1);
+    } else {
+      const number=(revisions.get(root.id) ?? 1)+1;
+      revisions.set(root.id,number);
+      indexes.set(image.id,number);
+    }
   }
   rigs.sort((a, b) => b.savedAt.localeCompare(a.savedAt) || b.id.localeCompare(a.id));
   images.sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id));

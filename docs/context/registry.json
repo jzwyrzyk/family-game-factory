@@ -320,8 +320,8 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:30:03.657Z",
-      "sourceDigest": "f2d3e30cb01b286ac4dd748abb7135f23cd44ba391b7e541e1176c8938965849",
+      "reviewedAt": "2026-11-26T05:35:52.833Z",
+      "sourceDigest": "23cfb4309dbcaadb2bdf002bf65aeff701310a862e5da7717afc69a281490ef0",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed whole-picture, arrow and articulated editing via the established child-facing surfaces.",
       "reviewHistory": [
@@ -424,8 +424,8 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "781fb407fb8630ec1acf4ee3919d712d0ac08d74445c5f2546d42fc1c00cf11f",
-      "reviewedAt": "2026-11-26T05:30:04.375Z",
+      "sourceDigest": "ef15e4789b6586f55d40880e79edef31a071f70cb8faa8eb0575f1fca74edc2a",
+      "reviewedAt": "2026-11-26T05:35:53.612Z",
       "reviewOutcome": "updated",
       "reviewReason": "Verified world edition readers, placement behavior and scoped authored movement blocks against CAD and storage documentation.",
       "reviewHistory": [
@@ -912,8 +912,8 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:30:04.773Z",
-      "sourceDigest": "b4d4d19ba33ddf794124b35c6449ee6090565671bb66128b235d134729795c3b",
+      "reviewedAt": "2026-11-26T05:35:53.935Z",
+      "sourceDigest": "d0fbae87a05cb7b9136bd714964dfb9b54a86bf387655c5750b5b402d9dd6d59",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed integrated CI leaves and source assertions for original admissions, game binding, movement and recovery.",
       "reviewHistory": [
@@ -1653,8 +1653,8 @@
         "tests/game-art/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "095ababb71e3cca5a4e9930b3a2b421b6f117ad91f16eaeea5b6d1aae6e2daf1",
-      "reviewedAt": "2026-11-26T05:30:05.189Z",
+      "sourceDigest": "491438a704f41438d5b1d39be0e32a8d4ec8ad46d7989e0ca9186aed023f76c4",
+      "reviewedAt": "2026-11-26T05:35:54.373Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed supported editors, legacy data readers and exact PNG admission.",
       "reviewHistory": [
@@ -1698,8 +1698,8 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "824b451b76e5608d6f40b2a270900a9c76b28a82fe2bb38f35302d45e324fc65",
-      "reviewedAt": "2026-11-26T05:30:05.691Z",
+      "sourceDigest": "093f37cf80e6440ca3d779cc7654691f29754ce950b3e116d1acc68616f26e52",
+      "reviewedAt": "2026-11-26T05:35:54.855Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed linked domain documentation for this candidate and its tested private-art boundary.",
       "reviewHistory": [

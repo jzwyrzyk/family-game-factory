@@ -221,7 +221,15 @@ export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'own
       }
     }
   }
-  for (const item of indexed) if (item.owner === owner && !known.has(item.targetKind)) result.set(item.id, item);
+  for (const item of indexed) {
+    if (item.owner !== owner) continue;
+    const confirmed = result.get(item.id);
+    if (confirmed) {
+      if (typeof item.usedAt === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(item.usedAt) && Number.isFinite(Date.parse(item.usedAt))) {
+        confirmed.usedAt = item.usedAt;
+      }
+    } else if (!known.has(item.targetKind)) result.set(item.id, item);
+  }
   return [...result.values()];
 }
 export async function artUsages(owner: string, drawingId?: string): Promise<ArtUsage[]> {

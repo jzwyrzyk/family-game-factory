@@ -392,6 +392,10 @@ async function installReceiptFixture(page) {
     await selectedNav(page, 'studioNavScenes');
     const original = await scene(page), projectId = original.id;
     assert.equal(original.title, "Navi's playground");
+    assert.equal(original.world?.assetId ?? original.background, 'world-forest-v1');
+    await page.waitForFunction(() => ['background','middle','foreground'].every(layer =>
+      performance.getEntriesByType('resource').some(entry =>
+        new URL(entry.name, location.href).pathname.endsWith('/art/creative-worlds/v1/forest-' + layer + '.webp'))));
     assert.equal(original.actors[0].assetId, 'pal-navi-base-core-2026-11-20');
     const tapProgram = original.programs.find(program => program.trigger.type === 'tap');
     assert.deepEqual(tapProgram.actions.map(action => action.type), ['jump', 'dance', 'say']);

@@ -16,7 +16,7 @@ import {earlySoundMuted} from '../learning/early/audio';
 import {profileGrade} from '../learning/engine';
 import {isEarlyGrade,withinGrade} from '../learning/grades';
 import { SceneEngine, type SceneSnapshot } from './engine';
-import { starterWorld, validateCreationProject, type CreationProject, type CreationBlock } from './model';
+import { validateCreationProject, type CreationProject, type CreationBlock } from './model';
 import { CREATION_ASSETS, propsForWorld, createStarterProject, createProjectFromStudio, creationAsset, validateEditableProject, parsePrivateArtId } from './projects';
 import { CreationStore, CREATION_KEY, validateCreationWorkspace, type CreationEntry } from './storage';
 import {CreationWorkspace,prepareIndexedCreation} from '../storage/creation-workspace';
@@ -409,7 +409,6 @@ export function installCreationStudio(host: Host) {
     // replaced with an apparently successful new empty collection.
     const collection = await store();
     const project = createPalPlayground(palId, ownedPalForm(palId));
-    project.world = starterWorld('terrace');
     if (!await enter()) return false;
     const saved = await collection.create(owner(), project); await loadScene(saved.id);
     // Show the child's editable tap script immediately; Play and Keep are still
