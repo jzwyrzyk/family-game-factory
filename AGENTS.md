@@ -33,7 +33,8 @@ For a new diagnostic/development session, use the canonical SDK/source preflight
 [Assistant access](docs/operations/ASSISTANT_ACCESS.md#canonical-sdk-preflight--november-26-2026).
 Direct managed identity qualification is currently blocked and is not a prerequisite
 for the independent GitHub operations or nonproduction setup lanes. Use source-only
-preflight while that blocker persists; do not retry denied authentication endpoints.
+preflight (`diagnostic_preflight.py --expected-source FULL_REVIEWED_SHA --source-only`)
+while that blocker persists; do not retry denied authentication endpoints.
 Select the actual managed GCP alias (`GCP` in the verified connection), verify the
 reviewed checkout and effective account, and keep unavailable access distinct from
 permission denial. Never copy credentials, make managed directories writable or use

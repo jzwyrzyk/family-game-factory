@@ -33,9 +33,14 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--identity-alias', default='GCP')
     p.add_argument('--expected-source', required=True)
-    p.add_argument('--live', action='store_true')
+    modes = p.add_mutually_exclusive_group()
+    modes.add_argument('--live', action='store_true')
+    modes.add_argument('--source-only', action='store_true',
+                       help='Verify checkout/tool availability without selecting any identity or credential')
     p.add_argument('--verify-permissions', action='store_true')
     args = p.parse_args()
+    if args.source_only and args.verify_permissions:
+        p.error('--source-only cannot verify cloud permissions')
     result = {'status': 'NOT_READY', 'mutations': 0, 'live_checked': False}
     try:
         sha = git('rev-parse', 'HEAD')
@@ -45,6 +50,10 @@ def main():
             raise diagnose.DiagnosticError('SOURCE_DIRTY: Use a clean isolated checkout for acceptance.')
         hashes = {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest() for name in REQUIRED}
         result.update(source_sha=sha, source_files=hashes)
+        if args.source_only:
+            result.update(status='SOURCE_VERIFIED_IDENTITY_UNCHECKED', identity_verified=False)
+            print(json.dumps(result, indent=2))
+            return 0
         env = managed.identity_environment(args.identity_alias)
         diagnose_sdk.credential_info(env['GOOGLE_APPLICATION_CREDENTIALS'])
         result.update(identity_alias=env['JEMS_DIAGNOSTIC_IDENTITY_ALIAS'], status='CONFIGURED_NOT_VERIFIED')

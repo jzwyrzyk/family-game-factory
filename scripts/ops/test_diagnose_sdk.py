@@ -232,5 +232,19 @@ class PreflightTests(unittest.TestCase):
             live.assert_not_called()
             self.assertEqual(json.loads(out.getvalue())['status'], 'CONFIGURED_NOT_VERIFIED')
 
+    def test_source_only_preflight_never_selects_identity_or_claims_readiness(self):
+        with patch.object(preflight, 'git', side_effect=['a' * 40, '']), \
+             patch.object(preflight.managed, 'identity_environment') as select, \
+             patch.object(preflight.diagnose_sdk, 'report') as live, \
+             patch.object(sys, 'argv', ['preflight', '--expected-source', 'a' * 40, '--source-only']), \
+             contextlib.redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(preflight.main(), 0)
+            select.assert_not_called()
+            live.assert_not_called()
+            result = json.loads(out.getvalue())
+            self.assertEqual(result['status'], 'SOURCE_VERIFIED_IDENTITY_UNCHECKED')
+            self.assertFalse(result['identity_verified'])
+            self.assertFalse(result['live_checked'])
+
 
 if __name__ == '__main__': unittest.main()

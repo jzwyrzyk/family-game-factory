@@ -1135,10 +1135,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T06:02:38.574Z",
-      "sourceDigest": "f9f57c43b1caccb057cf5386f8413b13587e345fa83f3ddd2e5dda13c729c955",
+      "reviewedAt": "2026-11-26T06:03:33.792Z",
+      "sourceDigest": "da03fed6403e1c49c7154dfad5b0c1e4230afd30db0100ca247f04b4062ef6ad",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded successful source-bound GitHub metadata observation and actual failed-artifact retrieval, plus independent blocked direct SDK and unapplied provisioning lanes.",
+      "reviewReason": "Added explicit source-only preflight that never selects credentials or claims identity qualification, preserving independent GitHub and nonproduction progress.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1393,10 +1393,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:01:12.047Z",
-      "sourceDigest": "b62d3245c56ee2a764f7730d3cd80e14b6c5a6ef4e89daad24b1124c3983bc64",
+      "reviewedAt": "2026-11-26T06:03:34.186Z",
+      "sourceDigest": "f900c6bf88a433172deb7a293539fda30774ad24fa4228f3cad9756e353694a0",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated canonical entry points to stop denied SDK endpoint retries and keep independent GitHub/nonproduction setup unblocked, with ledger and executable handoff links.",
+      "reviewReason": "Canonical session instruction names source-only preflight and keeps direct managed identity blocked without holding other operations.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

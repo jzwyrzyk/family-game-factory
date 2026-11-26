@@ -3,7 +3,7 @@
 **November 26 priority update:** direct managed SDK authoritative identity qualification
 remains incomplete after correction `34fd728919e79e90b63f00933d87a265d6d0ac86`. Do not
 repeat explicitly denied identity endpoint attempts or weaken identity checks. Use
-source-only preflight for this feature until the supported connection capability
+`diagnostic_preflight.py --expected-source FULL_REVIEWED_SHA --source-only` for source-only preflight until the supported connection capability
 changes. Independently qualify GitHub diagnostics and nonproduction setup using the
 [executable handoff](PERMANENT_CLOUD_SETUP.md); direct SDK access is not their gate.
 The existing GitHub release observation succeeded in run
