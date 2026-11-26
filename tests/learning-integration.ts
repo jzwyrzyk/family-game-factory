@@ -303,7 +303,7 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
       await frame.locator('body').evaluate((_el,packet)=>parent.postMessage(packet,'*'),{type:'factory-preview',channel,artifactId,event:'math-checkpoint',roundId:3,checkpointId:2});
       await page.waitForSelector('.learning-preview-cover .math-activity');
     }
-    const abandoned=await page.evaluate(()=>FG.learning.activeAttemptId);
+    const abandoned=await page.evaluate(()=>window.FG.learning.activeAttemptId);
     const roundsBeforeExit=await page.evaluate(()=>(window as any).previewRounds.length);
     await activity(page).locator('[data-action="leave-game"]').click();
     assert.equal(await page.locator('#math-fixture-frame').count(),0);
