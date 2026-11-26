@@ -1,6 +1,6 @@
 # Draw a path
 
-A child can open a picture or saved cutout in Creative Studio, select that actor, and choose **Draw a path**. Trace on the pad, tap destinations, or use the four direction buttons. The picture follows the end of the path on the pad. Undo step removes the most recent point. Give the path a name and choose its speed, then add it to the actor’s selected script. Play runs the sequence, including existing actions before it. In reduced-motion mode the first-steps play bar also exposes Step for deliberate 100 ms advances. The composer has no automatic playback.
+A child can open a picture or saved cutout in Creative Studio, select that actor, and choose **Draw a path**. Trace on the pad, tap destinations, or use the four direction buttons. The picture follows the end of the path on the pad. Undo step removes the most recent point. Give the path a name and choose its speed, then add it to the actor’s selected script. Play runs the sequence, including existing actions before it. With a private-art actor selected in reduced-motion mode, the first-steps play bar also exposes Step for deliberate 100 ms advances. The composer has no automatic playback.
 
 ## Persistence and reuse
 
