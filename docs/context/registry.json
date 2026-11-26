@@ -929,10 +929,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T22:35:32.999Z",
-      "sourceDigest": "62a93630c83508e452c3c6bc433b38f0fcab5a826f922457d5ee660d5c025ba2",
+      "reviewedAt": "2026-11-26T23:18:20.883Z",
+      "sourceDigest": "a9417ff8079445e9fa10950229371b0814d441665507f967f406c41056bbe024",
       "reviewOutcome": "updated",
-      "reviewReason": "The standalone review guide records the full-size notebook pointer journey and the navigation budget used to open the exact download.",
+      "reviewReason": "Reviewed the held-source full Arcade, immutable root and conflict-resolution checks together with the independent end-to-end DEV evidence stream.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1174,10 +1174,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T22:35:33.293Z",
-      "sourceDigest": "c33452d055868eeec7b810391f107d1aaab7ed0e6f0c90934aa70720734d4e85",
+      "reviewedAt": "2026-11-26T23:18:21.439Z",
+      "sourceDigest": "533348a6d8c3a27bca96e4e54e819f3f9abde405313e74e3198b36dd34c4b565",
       "reviewOutcome": "updated",
-      "reviewReason": "The delivery record now directs owners to the combined draft and current household revision observation while preserving each historic receipt.",
+      "reviewReason": "Reconciled the operational review record and environment controller with the consolidated application while retaining both subject-specific full-CI requirements.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
