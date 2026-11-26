@@ -27,6 +27,7 @@ The shared header, cards, secondary navigation and collection layout serve Journ
    gcloud auth application-default login
    gcloud auth application-default print-access-token >/dev/null
    umask 077
+   export JEMS_OPERATIONS_RECEIPT_DIR="$HOME/work/jems-operations-recovery"
    recovery_dir=$(mktemp -d)
    cd "$recovery_dir"
    curl -fsSLo nonproduction-recovery.sh https://raw.githubusercontent.com/jzwyrzyk/family-game-factory/a76c2324a5aa35eb9eee6601c2ac128c8808711b/scripts/ops/handoffs/nonproduction-recovery.sh
