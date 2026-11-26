@@ -2,6 +2,7 @@ import {assertRewardSourceLockHeld,setRewardSourceMaintenance} from '../rewards/
 /** Private immutable image bytes. Metadata and visibility can change; the image cannot. */
 import { ART_LIMITS, artOwner, artRequest, assertArtWrite, checkArtCapacity, deriveArtUsages, withArtTransaction, saveDrawingMetadata, ownerArtRecords, type DrawingMetadata, type ArtGuard, type ArtUsage } from '../drawing/library';
 import type { SavedRig } from '../drawing/store';
+import {creativeOriginal, matchesArtSearch, validSemanticIdentity} from './creative-identity';
 import { adultStorageKey } from '../adult-pilot/storage';
 
 export type DrawingCategory = 'character' | 'vehicle' | 'prop' | 'world' | 'other';
@@ -9,7 +10,7 @@ export const DRAWING_CATEGORIES: readonly DrawingCategory[] = ['character', 'veh
 export interface Drawing {
   id: string; owner: string; name: string; mime: 'image/png' | 'image/jpeg'; bytes: ArrayBuffer; sha256: string; createdAt: string;
   sourceId?: string; sourceSha256?: string; preview?: ArrayBuffer;
-  category?: DrawingCategory; archived?: boolean; updatedAt?: string;
+  category?: DrawingCategory; semanticIdentity?: string; archived?: boolean; updatedAt?: string;
 }
 export const drawingHash = async (bytes: ArrayBuffer) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), byte => byte.toString(16).padStart(2, '0')).join('');
 
@@ -87,19 +88,39 @@ export async function saveDrawing(owner: string, name: string, file: Blob, sourc
       const source = metadata.find(original => original.owner === owner && original.id === sourceId);
       if (!source) throw Error('Original drawing not found in this profile.');
       item.sourceId = sourceId; item.sourceSha256 = source.sha256; item.category = source.category || 'other';
+      if (source.semanticIdentity) item.semanticIdentity = source.semanticIdentity;
     }
     if(metadata.filter(original=>original.owner===owner).length>=ART_LIMITS.drawingsPerOwner||metadata.reduce((bytes,original)=>bytes+original.originalBytes+(original.preview?.byteLength??0),0)+item.bytes.byteLength+(item.preview?.byteLength??0)>ART_LIMITS.storageBytes)throw Error('Your art storage is full. Keep a complete backup before adding more pictures.'); assertArtWrite(owner, guard); store.add(item); saveDrawingMetadata(transaction,item); return item;
   });
 }
-export async function updateDrawing(owner: string, id: string, changes: { name?: string; category?: DrawingCategory; archived?: boolean }, guard?: ArtGuard): Promise<Drawing> {
+export async function updateDrawing(owner: string, id: string, changes: { name?: string; category?: DrawingCategory; semanticIdentity?:string; archived?: boolean }, guard?: ArtGuard): Promise<Drawing> {
   assertArtWrite(owner, guard);
-  if (!changes || Object.keys(changes).some(key => !['name', 'category', 'archived'].includes(key)) ||
+  if (!changes || Object.keys(changes).some(key => !['name', 'category', 'semanticIdentity', 'archived'].includes(key)) ||
     changes.name !== undefined && (typeof changes.name !== 'string' || !changes.name.trim() || changes.name.trim().length > 60) ||
+    changes.semanticIdentity !== undefined && !validSemanticIdentity(changes.semanticIdentity) ||
     changes.category !== undefined && !DRAWING_CATEGORIES.includes(changes.category) || changes.archived !== undefined && typeof changes.archived !== 'boolean') throw Error('Choose a short name and an available art category.');
   return withArtTransaction(['drawings'], 'readwrite', async transaction => {
     const store = transaction.objectStore('drawings'), item = await artRequest(store.get(id)) as Drawing | undefined;
     if (!item || item.owner !== owner) throw Error('Choose artwork from this profile.');
     const updated = { ...item, ...changes, ...(changes.name !== undefined ? { name: changes.name.trim() } : {}), updatedAt: new Date().toISOString() };
+    // A child can describe the same object from any saved picture. Change
+    // only the description on related records in this same-owner transaction.
+    if (changes.semanticIdentity !== undefined) {
+      updated.semanticIdentity = changes.semanticIdentity.trim();
+      if ((item.semanticIdentity || '') !== updated.semanticIdentity) {
+        const rows = await ownerArtRecords<DrawingMetadata>(transaction, 'drawingMetadata', owner);
+        const images = new Map(rows.map(row => [row.id, row]));
+        const root = creativeOriginal(images.get(id)!, images);
+        for (const row of rows) {
+          if (row.id === id || creativeOriginal(row, images).id !== root.id) continue;
+          const sibling: Drawing = await artRequest(store.get(row.id));
+          sibling.semanticIdentity = updated.semanticIdentity;
+          sibling.updatedAt = updated.updatedAt;
+          store.put(sibling);
+          saveDrawingMetadata(transaction, sibling);
+        }
+      }
+    }
     assertArtWrite(owner, guard); store.put(updated); saveDrawingMetadata(transaction,updated); return updated;
   });
 }
@@ -186,7 +207,7 @@ export async function drawingPage(owner:string,query:DrawingPageQuery={}):Promis
   const store=transaction.objectStore('drawingMetadata'),total=await artRequest(store.index('owner').count(IDBKeyRange.only(owner)));
   const range=IDBKeyRange.bound([owner,'',''],[owner,...(query.after??['\uffff','\uffff'])],false,!!query.after);
   const items:DrawingMetadata[]=[],search=(query.search??'').trim().toLowerCase();
-  await new Promise<void>((resolve,reject)=>{const request=store.index('ownerCreated').openCursor(range,'prev');request.onerror=()=>reject(request.error);request.onsuccess=()=>{const cursor=request.result;if(!cursor||items.length>limit){resolve();return;}const item=cursor.value as DrawingMetadata;if((query.archived===undefined||Boolean(item.archived)===query.archived)&&(!query.category||(item.category??'other')===query.category)&&(!search||item.name.toLowerCase().includes(search)))items.push(item);cursor.continue();};});
+  await new Promise<void>((resolve,reject)=>{const request=store.index('ownerCreated').openCursor(range,'prev');request.onerror=()=>reject(request.error);request.onsuccess=()=>{const cursor=request.result;if(!cursor||items.length>limit){resolve();return;}const item=cursor.value as DrawingMetadata;if((query.archived===undefined||Boolean(item.archived)===query.archived)&&(!query.category||(item.category??'other')===query.category)&&(matchesArtSearch(item,search)))items.push(item);cursor.continue();};});
   const hasMore=items.length>limit;if(hasMore)items.pop();const last=items.at(-1);return {items,next:hasMore&&last?[last.createdAt,last.id]:null,total};
  });
 }

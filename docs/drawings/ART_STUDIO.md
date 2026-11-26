@@ -1,5 +1,17 @@
 # Art Studio: draw it, develop it, reuse it
 
+## Connected creative asset picker
+
+My Art accepts an optional **What is it?** description. A child can enter “rock” or an invented word, leave the field empty, and change it later. The shelf and picker search the description and artwork names. Updating the description from any picture updates the related pictures in one owner-scoped transaction. Pinned image bytes and movement versions retain their original hashes.
+
+The trusted picker joins private picture metadata with saved movement versions in the existing local art database. A picture's oldest verified ancestor supplies its stable logical identity. Each picker result identifies the exact selected picture and optional saved movement. Parent IDs and fingerprints preserve the path back to the original. Portable copies remap those links into the importing profile. Restore uses the existing exact-ID and content checks. No database upgrade or rewriting of legacy pictures is required.
+
+Creative Studio can insert the original, an edited picture, or any retained cutout version. Search and collection filters work with touch or a keyboard. Archive hides a picture and its cutouts from new selections. An earlier scene still resolves the exact version it used. **Choose another version** in a private actor’s scene settings offers its related pictures and cuts while preserving the actor’s blocks and position. In scene settings the child can assign an optional role to their private actor. “Decoration”, “obstacle” and “collectible” describe its part in that scene. Blocks and the host's explicit mechanics control what it does.
+
+Downloading a scene with artwork includes its placed pictures, selected movement versions and their required ancestors. Unfinished drafts and unrelated movement versions stay on the device. Downloading the whole My Art library still includes those drafts and versions for recovery.
+
+[Shared catalog](../../src/assets/creative-catalog.ts) · [Picker](../../src/assets/creative-picker.ts) · [Portable art](../../src/drawing/transfer.ts)
+
 ## My Art navigation and preserved visual reference — November 25, 2026
 
 **My Art** is the canonical destination in Home and Menu → Make. The original **You drew it. Now let’s play.** heading, gem illustration, gradient panel, Upload a drawing / Take a photo / Draw here arrangement and collection remain the visual reference. Readability is improved without replacing the composition or assets. Optional picture controls in a game/scene open the same library and offer an owner-bound return to that activity. Scene links use **Creative Studio**. Original pixels, derivatives, exact references, camera/upload and private storage contracts below are unchanged. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
@@ -41,6 +53,16 @@ The source [gold standard](GOLD_STANDARD.md) still requires visible artwork fide
 | Learning, rewards and parent reports | Native games and scene playback retain their existing trusted learning gates. Uploads, drawing edits and saves introduce no new learning score or reward category. Existing scene challenge results keep their original provenance and assistance rules. |
 
 Changing a library picture's metadata or saving a later rig does not rewrite earlier game or scene references. A new use is explicit. The legacy `activeRig` pointer remains a picker convenience, never the authority for a saved Studio game.
+
+## Keep drawing on a saved picture
+
+**Draw here** starts with white paper. Children can choose a crayon, change its size, erase a mark, or select a clear background for a sprite. Undo restores marks removed by the eraser or Start over. Touch, mouse and keyboard work on the same canvas. **Keep my drawing** saves the picture on the active player's shelf. **Keep drawing** reopens its strokes. **Keep new version** pins the result to the selected parent picture and hash. The earlier picture and adventures remain recoverable.
+
+Each new crayon PNG contains its finished raster plus a versioned private ancillary `jeMS` chunk holding the editable source. Both travel in the exact bytes already covered by the artwork hash, byte quota, export, restore and parent backup. The chunk records the paper choice, palette indices, brush widths and bounded coordinates on the 900 × 560 canvas. The limits are 160 strokes and 4,096 points per stroke. The PNG contains no profile or family identifier. Treat the entire file, including strokes covered by the eraser, as private artwork. **Download visible picture** renders a separate transparent-capable PNG containing the final pixels. **Download editable original** returns the exact file with its crayon and eraser steps.
+
+On reopen the host checks the chunk checksum, bounds and decoded pixels against a local rendering of the stroke source. New saves use the v1 format from [#199](https://github.com/jzwyrzyk/family-game-factory/pull/199), with 1/64-pixel coordinates. If that replay differs, the reader checks the earlier 1/32-pixel candidate against the same saved pixels. The two candidate writers used the same version marker. When an erased image matches both interpretations, the reader uses the #199 coordinates and preserves the source bytes. A mismatch leaves the original available on the shelf. Re-encoding a PNG in another app can remove its source. Older raster-only drawings, photos and flattened picture-tool derivatives retain the existing picture and movement tools. Pending strokes live in the open editor until the child keeps or discards them. Learning-workspace scratch paper has a separate, temporary lifetime.
+
+The offline phone and desktop journey uses a synthetic drawing, reopens saved strokes after reload, erases and restores real alpha, saves a pinned version, and opens its downloaded library in a fresh browser. [Phone capture](evidence/editable-drawing-phone.png) · [Desktop capture](evidence/editable-drawing-desktop.png) · [Browser regression](../../tests/art-entry-readiness.cjs)
 
 ## Storage and lifecycle
 

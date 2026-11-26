@@ -1,3 +1,5 @@
+import {createHash} from 'node:crypto';
+import {twoColorPNG} from './generated-art-fixtures';
 import {operatorBrowser} from './beta-operator-browser';
 import {earlyBetaBrowser} from './beta-early-browser';
 import {browserIsolation} from './beta-browser-isolation';
@@ -57,7 +59,10 @@ async function entryBrowser(browser:Browser,engine:string,tls:ServerOptions,out:
      await p.locator('[name=passphrase]').fill(parent);await p.getByRole('checkbox').check();await p.getByRole('button',{name:'Pair this device'}).click();await p.locator('#paired output').waitFor();
      const pair=await p.locator('#paired output').innerText();await mutate('verify',family.id,{pairingCode:pair,receipt:'synthetic-browser-'+engine+'-'+phase});
     }
-    await mutate('policy',family.id,{capabilities:defaultCapabilities(),monthlyCents:0,paused:true,generationPaused:true});
+    const reviewed = twoColorPNG();
+    const digest = createHash('sha256').update(reviewed).digest('hex');
+    await mutate('approve-art',family.id,{digest});
+    await mutate('policy',family.id,{capabilities:{...defaultCapabilities(),artwork:true},monthlyCents:0,paused:true,generationPaused:true});
     await p.goto(local+'/grown-ups');await p.getByLabel('Parent passphrase').fill(parent);await p.getByRole('button',{name:'Unlock family controls'}).click();
     await p.getByRole('button',{name:'Add an explorer'}).click();await p.getByText(/explorer profiles\./).waitFor();
     const publicBeforePlay=p.url();assert.equal(publicBeforePlay,local+'/grown-ups');
@@ -66,6 +71,62 @@ async function entryBrowser(browser:Browser,engine:string,tls:ServerOptions,out:
     await p.getByRole('button',{name:'Enter Jems'}).click();await p.waitForURL('**/play/');
     await p.waitForFunction(()=>Boolean((window as any).FG?.store?.current()?.id));await p.locator('#studioLibraryTitle, #studioWelcomeTitle').first().waitFor({state:'attached'});
     assert.equal(await p.evaluate(async()=>(await navigator.serviceWorker.getRegistrations()).length),0);
+    const artwork = p.locator('#betaReviewedArt'), pass = p.locator('#reviewedArtPassphrase');
+    await p.waitForFunction(() => typeof document.querySelector<HTMLInputElement>('#betaReviewedArt')?.onchange === 'function');
+    const reviews:unknown[]=[];
+    p.on('request', request => { if(request.url() === local+'/entry/review-art') reviews.push(request.postDataJSON()); });
+    await pass.fill(parent);
+    await artwork.setInputFiles({name:'private-fixture-name.png',mimeType:'image/png',buffer:Buffer.concat([reviewed,Buffer.from('metadata')])});
+    await p.getByText('Ask a grown-up for a reviewed RGB or RGBA PNG saved without extra file information.').waitFor();
+    assert.deepEqual(reviews,[]);
+    // Interrupt the real intake before unlock and during the unlock response.
+    // Both must leave a subsequent profile's status and library untouched.
+    for (const phase of ['before-unlock','during-unlock'] as const) {
+      const requests=await p.evaluate(async({phase,bytes,passphrase})=>{
+        const input=document.querySelector<HTMLInputElement>('#betaReviewedArt')!;
+        const status=document.getElementById('familyExitStatus')!;
+        const events:string[]=[];
+        const transfer=new DataTransfer();
+        transfer.items.add(new File([Uint8Array.from(bytes)],'private-fixture-name.png',{type:'image/png'}));
+        input.files=transfer.files;
+        document.querySelector<HTMLInputElement>('#reviewedArtPassphrase')!.value=passphrase;
+        const realFetch=window.fetch;
+        let started!:()=>void,release!:()=>void;
+        const unlockStarted=new Promise<void>(resolve=>{started=resolve;});
+        const hold=new Promise<void>(resolve=>{release=resolve;});
+        window.fetch=async(...args)=>{
+          const path=String(args[0]);
+          if(path==='/v1/devices/unlock') {
+            events.push(path); const result=await realFetch(...args);
+            started(); await hold; return result;
+          }
+          if(path==='/entry/review-art')events.push(path);
+          return realFetch(...args);
+        };
+        try {
+          const settled=input.onchange!(new Event('change'));
+          if(phase==='during-unlock')await unlockStarted;
+          window.dispatchEvent(new Event('factory-profile'));
+          status.textContent='Next explorer';
+          release(); await settled;
+          return {events,status:status.textContent};
+        } finally {release();window.fetch=realFetch;}
+      },{phase,bytes:Array.from(reviewed),passphrase:parent});
+      assert.deepEqual(requests,{events:phase==='during-unlock'?['/v1/devices/unlock']:[],status:'Next explorer'});
+    }
+    await pass.fill(parent);
+    await artwork.setInputFiles({name:'private-fixture-name.png',mimeType:'image/png',buffer:reviewed});
+    await p.getByText('Your reviewed drawing is ready.').waitFor();
+    assert.deepEqual(reviews,[{digest}]);
+    const retained = await p.evaluate(async()=>{
+      const db=await new Promise<IDBDatabase>((resolve,reject)=>{const r=indexedDB.open('family-private-drawings-v1');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
+      try{
+        const rows=await new Promise<any[]>((resolve,reject)=>{const r=db.transaction('drawings').objectStore('drawings').getAll();r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
+        return rows.map(row=>({bytes:Array.from(new Uint8Array(row.bytes)),name:row.name,hash:row.sha256,activeOwner:row.owner===(window as any).FG.store.current().id}));
+      }finally{db.close();}
+    });
+    assert.deepEqual(retained,[{bytes:Array.from(reviewed),name:'Reviewed workshop artwork',hash:digest,activeOwner:true}]);
+
     // Hold the real login status response. End play is not ready for a Back
     // action while that intermediate document can still redirect elsewhere.
     let releaseLogin!:()=>void;loginStatusGate=new Promise<void>(resolve=>{releaseLogin=resolve;});

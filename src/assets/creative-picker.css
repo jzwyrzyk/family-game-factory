@@ -1,0 +1,14 @@
+.creative-picker-dialog { box-sizing:border-box; width:min(46rem,calc(100vw - 1.5rem)); max-height:90dvh; overflow:auto; padding:1.25rem; border:2px solid #b2a4ce; border-radius:1.25rem; background:#fffaf1; color:#2f2545; }
+.creative-picker-dialog::backdrop { background:rgb(31 20 54 / .65); }
+.creative-picker-dialog h2 { display:inline-block; max-width:75%; margin:0 0 1rem; color:#2f2545; }
+.creative-picker-dialog > button { float:right; min-height:48px; border-radius:.75rem; padding:0 .8rem; }
+.creative-picker { display:block; color:#342947; }
+.creative-picker-controls, .creative-picker-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,9rem),1fr)); gap:.65rem; }
+.creative-picker-controls label { display:grid; gap:.2rem; font-size:18px; color:#342947; font-weight:700; }
+.creative-picker-controls input, .creative-picker-controls select, .creative-picker-dialog > button { min-height:48px; min-width:0; max-width:100%; font:inherit; font-size:18px; color:#342947; background:white; border:1px solid #8c809b; border-radius:.65rem; }
+.creative-picker-controls input, .creative-picker-controls select { width:100%; padding:0 .55rem; box-sizing:border-box; }
+.creative-picker-grid { margin-top:.8rem; }
+.creative-picker-grid button { background:#fff; color:#322644; border:1px solid #ab9aba; border-radius:1rem; display:grid; align-content:start; justify-items:center; gap:.25rem; padding:.65rem; min-height:48px; font:inherit; font-size:18px; overflow-wrap:anywhere; }
+.creative-picker-grid img, .creative-picker-grid canvas { width:100%; height:5rem; object-fit:contain; }
+.creative-picker-grid button:focus-visible, .creative-picker-dialog button:focus-visible { outline:3px solid #5449a3; outline-offset:2px; }
+.creative-picker [role=status]:empty { display:none; }

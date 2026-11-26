@@ -1,5 +1,10 @@
 # jems delivery state
 
+## Connected Creative Universe — private drawing and picker review
+
+My Art retains the authored stroke source in the exact kept PNG and opens it after a pixel-verified replay. The picker resolves versions for the active profile, accepts imaginative semantic names, and keeps contextual role on the scene actor. Scene-only exports include the selected version and its sources. The optional family workshop intake preserves the exact admitted metadata-free reviewed image. Earlier beta images retain their stored pixels. This source depends on the shared creative standard and catalogue in #196 and #200. The proposed #199 crayon version was compared for round-trip compatibility. #198 overlaps the reviewed intake. Do not apply overlapping writers as independent migrations. Local browser evidence is in the [My Art contract](docs/drawings/ART_STUDIO.md); external family activation awaits the existing family release process.
+
+
 ## Connected Creative Universe artwork candidate — November 26
 
 Protected main was verified at `bc602f1ede502f398308ad56f973c4bf7997ff08`. The first review unit contains four original Jems world plates, eight transparent scene layers, four picker previews and 32 individual prop images. The catalogue and [provenance manifest](docs/creation-studio/world-art-manifest.json) pin the collection. Owner visual review and hosted qualification remain pending. The existing household Pages release reported embedded source `aa56b60abe152e750f9f0b5e8949bdb44be53196` during development.

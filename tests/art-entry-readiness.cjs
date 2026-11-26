@@ -19,7 +19,7 @@ const inView=(page,selector)=>page.locator(selector).evaluate(node=>{
 async function artRecords(page){
  return page.evaluate(async()=>{
   const db=await new Promise((resolve,reject)=>{const request=indexedDB.open('family-private-drawings-v1');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
-  try{return await new Promise((resolve,reject)=>{const request=db.transaction('drawings').objectStore('drawings').getAll();request.onsuccess=()=>resolve(request.result.map(({id,owner,name,sha256})=>({id,owner,name,sha256})));request.onerror=()=>reject(request.error);});}
+  try{return await new Promise((resolve,reject)=>{const request=db.transaction('drawings').objectStore('drawings').getAll();request.onsuccess=()=>resolve(request.result.map(({id,owner,name,sha256,sourceId,sourceSha256})=>({id,owner,name,sha256,sourceId,sourceSha256})));request.onerror=()=>reject(request.error);});}
   finally{db.close();}
  });
 }
@@ -156,6 +156,121 @@ async function rejectedConfig(browser,base){
   await page.locator('#page-art-studio').waitFor({state:'visible'});
   await page.waitForFunction(()=>document.querySelectorAll('.art-card').length===2);
   assert.deepEqual(await artRecords(page),originals,'both originals survive a reload with remote configuration unavailable');
+  const dot=originals.find(record=>record.name==='My offline dot');
+  await page.locator('#artSearch').fill('offline dot');
+  await page.waitForFunction(()=>document.querySelectorAll('.art-card').length===1);
+  await page.locator('[data-art-id="'+dot.id+'"]').click();
+  const reopen=page.getByRole('button',{name:'Keep drawing',exact:true});
+  await reopen.click();
+  const canvas=drawing.locator('[data-paper]');
+  const pixel=()=>canvas.evaluate(c=>[...c.getContext('2d').getImageData(450,280,1,1).data]);
+  assert.deepEqual(await pixel(),[32,43,57,255],'saved strokes reproduce the original dot');
+  await drawing.locator('[data-undo]').click();
+  assert.deepEqual(await pixel(),[255,255,255,255],'a mark from before reload can be undone');
+  await drawing.locator('[data-redo]').click();
+  await drawing.getByLabel('Clear background').check();
+  await drawing.getByRole('button',{name:'Eraser',exact:true}).click();
+  await canvas.press('Enter');
+  await drawing.locator('[data-title]').focus();
+  assert.equal((await pixel())[3],0,'the eraser clears actual alpha');
+  await drawing.locator('[data-undo]').click();
+  assert.deepEqual(await pixel(),[32,43,57,255],'undoing an eraser recovers the exact mark');
+  await drawing.getByRole('button',{name:'Use Teal crayon'}).click();
+  // Synthetic rocket traced on the real canvas with the ordinary pointer controls.
+  const trace=async points=>{
+    await canvas.scrollIntoViewIfNeeded();
+    const box=await canvas.boundingBox();
+    for(const [i,[x,y]] of points.entries()){
+      await page.mouse.move(box.x+x*box.width,box.y+y*box.height,{steps:i?3:1});
+      if(!i)await page.mouse.down();
+    }
+    await page.mouse.up();
+  };
+  await trace([[.40,.65],[.405,.52],[.45,.36],[.51,.24],[.57,.17],[.62,.16],[.64,.25],[.63,.37],[.60,.49],[.51,.65],[.46,.70],[.40,.65]]);
+  await trace([[.41,.49],[.34,.53],[.29,.68],[.40,.63]]);
+  await trace([[.48,.68],[.48,.78],[.54,.76],[.59,.60],[.55,.57]]);
+  await drawing.getByRole('button',{name:'Use Berry crayon'}).click();
+  await trace([[.51,.39],[.53,.36],[.56,.36],[.57,.40],[.56,.44],[.53,.45],[.51,.42],[.51,.39]]);
+  await drawing.getByRole('button',{name:'Use Sunshine crayon'}).click();
+  await trace([[.39,.66],[.34,.73],[.38,.71],[.32,.83],[.42,.74],[.42,.78],[.46,.71]]);
+  await drawing.locator('[data-title]').fill('My rocket');
+  await canvas.scrollIntoViewIfNeeded();
+  assert.ok(await inView(page,'dialog.drawing-paint [data-save]'),'the phone Keep action remains visible while drawing');
+  await page.screenshot({path:path.join(output,'editable-drawing-phone.png')});
+  await page.setViewportSize({width:1280,height:900});
+  await page.screenshot({path:path.join(output,'editable-drawing-desktop.png')});
+  await drawing.getByRole('button',{name:'Keep new version'}).click();
+  await drawing.waitFor({state:'detached'});
+  await page.waitForFunction(()=>document.getElementById('artDetailTitle')?.textContent==='My rocket');
+  assert.equal(await page.locator('#artSearch').inputValue(),'','keeping under a new name reveals the new version');
+  const revision=(await artRecords(page)).find(record=>record.name==='My rocket');
+  assert.equal(revision.sourceId,dot.id);
+  assert.equal(revision.sourceSha256,dot.sha256);
+  assert.deepEqual((await artRecords(page)).find(record=>record.id===dot.id),dot);
+  await page.locator('.art-detail-tools summary').click();
+  const visibleDownload=page.waitForEvent('download');
+  await page.getByRole('button',{name:'Download visible picture',exact:true}).click();
+  const visible=fs.readFileSync(await (await visibleDownload).path());
+  const pngChunks=[];
+  for(let pos=8;pos+12<=visible.length;pos+=12+visible.readUInt32BE(pos))pngChunks.push(visible.toString('ascii',pos+4,pos+8));
+  assert.ok(pngChunks.includes('IEND')&&!pngChunks.includes('jeMS'),'the visible PNG contains no editable stroke chunk');
+  // Download the ordinary art backup, then import into a fresh offline browser.
+  await page.locator('.art-library-more summary').click();
+  const download=page.waitForEvent('download');await page.locator('#artExport').click();
+  const backup=fs.readFileSync(await (await download).path());
+  const keptPng=JSON.parse(backup).drawings.find(record=>record.id===revision.id).data;
+  assert.ok(await page.evaluate(async images=>{
+    const hashes=await Promise.all(images.map(async image=>{
+      const bytes=Uint8Array.from(atob(image),c=>c.charCodeAt(0));
+      const bitmap=await createImageBitmap(new Blob([bytes],{type:'image/png'}));
+      try{
+        const c=document.createElement('canvas');
+        c.width=bitmap.width;c.height=bitmap.height;
+        const g=c.getContext('2d');g.drawImage(bitmap,0,0);
+        return [...new Uint8Array(await crypto.subtle.digest('SHA-256',g.getImageData(0,0,c.width,c.height).data))].join(',');
+      }finally{bitmap.close();}
+    }));
+    return hashes[0]===hashes[1];
+  },[keptPng,visible.toString('base64')]),'visible-only download has the exact decoded artwork');
+  const restored=await prepare(browser);
+  try{
+    await restored.page.route('**/factory-config.json',route=>route.abort('failed'));
+    await restored.page.goto(base+'?art=1');await ready(restored.page);
+    await restored.page.locator('#artImport').setInputFiles({name:'art.json',mimeType:'application/json',buffer:backup});
+    await restored.page.waitForFunction(()=>document.getElementById('artStatus')?.textContent.includes('pictures added'));
+    const records=await artRecords(restored.page),copy=records.find(record=>record.name==='My rocket');
+    assert.ok(copy&&copy.id!==revision.id&&copy.sha256===revision.sha256,'portable copy preserves all original PNG bytes');
+    await restored.page.locator('[data-art-id="'+copy.id+'"]').click();
+    await restored.page.getByRole('button',{name:'Keep drawing',exact:true}).click();
+    const restoredEditor=restored.page.locator('dialog.drawing-paint');
+    await restoredEditor.waitFor({state:'visible'});
+    assert.equal(await restoredEditor.getByLabel('Clear background').isChecked(),true);
+    assert.equal(await restoredEditor.getByRole('button',{name:'Undo',exact:true}).isEnabled(),true);
+    await restoredEditor.locator('[data-exit]').click();
+    // jeMS v1 dot chunks from #199 and the independent 1/32-pixel writer.
+    // Both describe the same teal dot in their respective coordinate units.
+    const raster=Buffer.from(await restored.page.evaluate(()=>{
+      const c=document.createElement('canvas');c.width=900;c.height=560;
+      const g=c.getContext('2d');g.fillStyle='#268e8c';g.beginPath();g.arc(680,350,4,0,Math.PI*2);g.fill();
+      return c.toDataURL().split(',')[1];
+    }),'base64');
+    for(const [i,chunk] of ['AAAADGplTVMBAQABAwgAAaoAV4DlNw2J','AAAADGplTVMBAQABAwgAAVUAK8DOZHwS'].entries()){
+      const buffer=Buffer.concat([raster.subarray(0,-12),Buffer.from(chunk,'base64'),raster.subarray(-12)]);
+      const name='Earlier crayon '+i;
+      await restored.page.locator('#artUpload').setInputFiles({name:name+'.png',buffer,mimeType:'image/png'});
+      await restored.page.waitForFunction(n=>document.getElementById('artDetailTitle')?.textContent===n,name);
+      await restored.page.getByRole('button',{name:'Keep drawing',exact:true}).click();
+      await restoredEditor.waitFor({state:'visible'});
+      const dot=restoredEditor.locator('[data-paper]');
+      const color=()=>dot.evaluate(c=>[...c.getContext('2d').getImageData(680,350,1,1).data]);
+      assert.deepEqual(await color(),[38,142,140,255]);
+      await restoredEditor.locator('[data-undo]').click();
+      assert.equal((await color())[3],0,'undo operates on the verified earlier writer geometry');
+      await restoredEditor.locator('[data-redo]').click();
+      await restoredEditor.locator('[data-exit]').click();
+    }
+    assert.deepEqual(restored.posts,[]);assert.deepEqual(restored.errors,[]);
+  }finally{await restored.context.close();}
   assert.deepEqual(posts,[],'offline drawing and upload never post private images');
   assert.deepEqual(errors,[],'failed remote configuration does not cause a local-art exception');
   console.log('PASS Art entry with rejected configuration: phone upload, keyboard drawing, post-dialog focus and durable private library');

@@ -1,3 +1,4 @@
+import {creativeOriginal} from '../src/assets/creative-identity';
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {createStarterProject,parsePrivateArtId,privateArtId,validateEditableProject,validateGeneratedCreationManifest} from '../src/creation/projects';
@@ -89,4 +90,34 @@ test('private art does not grant profile access, challenge credit, or an interpr
   assert.equal(engine.snapshot().actors[0].assetId,image);
   const invalid=sceneWith();(invalid.actors[0] as any).url='https://example.invalid/private.png';
   assert.throws(()=>store.create('player1',invalid),/Unknown field/);
+});
+
+test('asset identity follows the verified original across derived pictures and forks',()=>{
+  const root={id:'rock',owner:'p1',sha256:'a'};
+  const crop={id:'crop',owner:'p1',sha256:'b',sourceId:'rock',sourceSha256:'a'};
+  const flip={id:'flip',owner:'p1',sha256:'c',sourceId:'crop',sourceSha256:'b'};
+  const rows=[root,crop,flip],byId=new Map(rows.map(row=>[row.id,row]));
+  assert.equal(creativeOriginal(flip,byId),root);
+  assert.throws(()=>creativeOriginal({...flip,owner:'p2'},byId),/original art/);
+  const wrongHash={...flip,sourceSha256:'changed'};
+  assert.throws(()=>creativeOriginal(wrongHash,byId),/original art/);
+  const cycle={...crop,sourceId:'crop',sourceSha256:'b'};
+  assert.throws(()=>creativeOriginal(cycle,new Map([[cycle.id,cycle]])),/original art/);
+});
+
+test('a contextual role is private scene data with no automatic movement or collisions',()=>{
+  const scene=sceneWith(),store=new CreationStore(new MemoryStorage());
+  const before=structuredClone(scene),base=store.create('owner',before);
+  scene.actors[0].creativeRole='obstacle';
+  store.save(base.id,'owner',scene,base.headId);
+  assert.equal(store.load(base.id,'owner').scene.actors[0].creativeRole,'obstacle');
+  assert.equal(store.history(base.id,'owner').find(row=>row.id===base.headId)?.scene.actors[0].creativeRole,undefined);
+  assert.deepEqual(scene.programs,before.programs);
+  assert.equal(scene.actors[0].assetId,before.actors[0].assetId);
+  const run=(project:typeof scene)=>{
+    const engine=new SceneEngine(project);engine.start();engine.step(400);return engine.snapshot();
+  };
+  const poses=(project:typeof scene)=>run(project).actors.map(actor=>[actor.id,actor.x,actor.y,actor.visible]);
+  assert.deepEqual(poses(scene),poses(before));
+  assert.throws(()=>validateEditableProject({...scene,actors:[{...scene.actors[0],creativeRole:'not-a-role'}]}),/role/);
 });

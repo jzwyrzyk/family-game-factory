@@ -151,10 +151,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:38:12.735Z",
-      "sourceDigest": "6925af7797920346bfc5542e781245e8f039124dca019a6962d867f334a2a400",
-      "reviewOutcome": "updated",
-      "reviewReason": "The first-creation contract now records single admission for repeated taps without changing saved-idea ownership or readiness rules.",
+      "reviewedAt": "2026-11-26T03:17:07.447Z",
+      "sourceDigest": "47bf407644b7d904717ac5ca8561ccad1997b2b18968fa4dff84e1d560e88ff2",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The accepted authentic artwork doctrine covers the resulting drawing and revision behavior, including optional descriptive metadata and explicit version selection.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -315,10 +315,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:12:00.058Z",
-      "sourceDigest": "ba3d8d381cc13596fc5c1f4ea0f721398f46956285bff57bbb074bb55a7fe07c",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Four newly illustrated product environments have separate origin and version records. The accepted standard already covers child authorship and immutable uses.",
+      "reviewedAt": "2026-11-26T03:17:07.808Z",
+      "sourceDigest": "e6de5fab14c4670bdcadd9543b9d10bd52b95ec290868f29ed1c75a22effcbf8",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed actor and backdrop selection, immutable drawing replay, scene history and owner changes against the source. The architecture describes these trusted host paths.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -418,10 +418,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "a8bb53d3aa90d9c1e7af9d7752cc1ee6727276a145a0ab9a399c5f9a10909404",
-      "reviewedAt": "2026-11-26T03:12:02.230Z",
+      "sourceDigest": "e6b1a879e4958dcc192967f9a2e7df650bf8cb6c37be775381bd7980ac5b9dfa",
+      "reviewedAt": "2026-11-26T03:17:09.148Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the four original environments and their layer, prop and preview files in the creative world artwork manifest.",
+      "reviewReason": "Documented world rendering, asset selection and scene ownership in the Creative Studio and architecture records with pinned references, failed loads and retained histories.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -899,10 +899,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:12:02.488Z",
-      "sourceDigest": "83c23ae7f11c5e9a126b91d2cd247e3751ec0f01e85def1206f1090964231b99",
+      "reviewedAt": "2026-11-26T03:17:40.335Z",
+      "sourceDigest": "60e912b478eeb8793cd5aec0c13ce70a9a8b2cd1411e5e3f77171ee26b703bef",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the manifest checks for content identity, scale and mapped files in the delivery entry for this source candidate.",
+      "reviewReason": "The delivery entry identifies local drawing, scene and synthetic game evidence along with physical-device, provider and hosted qualification limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1143,10 +1143,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:12:03.342Z",
-      "sourceDigest": "d6691c0e7097678f19c4b2277e4782b32634074014cb41f4b11b9bc94c906b82",
+      "reviewedAt": "2026-11-26T03:17:09.521Z",
+      "sourceDigest": "908e4c2a9d81ce045a93685fcf3ade3ea7f9bf1c8140c5f7a026292a4f9c1df9",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the consulted protected baseline and current household embedded release independently of local art readiness.",
+      "reviewReason": "Recorded source dependencies, private worktree qualification and current household release separately. No change to production traffic or provider activation was made.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1626,10 +1626,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "b0021e16fa3a1ec1088b8ed9d923b951798654608b6d7ef72522c4c9bf76512e",
-      "reviewedAt": "2026-11-26T03:05:50.127Z",
+      "sourceDigest": "7b4bd147eaf571e0b0f833d0497def45cd187be3cfcad15afeb50ebac6f97094",
+      "reviewedAt": "2026-11-26T03:17:09.909Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Routed the shared identity, original-byte, pinning, ownership and lifecycle standard into Art Studio review.",
+      "reviewReason": "Updated the My Art contract for editable source bytes, recovery, selection and retained version behavior. Stale owner and version failures preserve the current drawing.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",

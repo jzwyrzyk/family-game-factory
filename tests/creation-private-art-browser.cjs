@@ -49,6 +49,12 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     const rig=(await records(page,'rigs','player1'))[0];assert.ok(rig);
     await page.locator('.drawing-lab [data-close]').click();
     await page.waitForSelector('.drawing-lab',{state:'detached'});
+    await page.evaluate(id=>FG.artStudio.open(id),source.id);
+    await page.getByLabel('What is it?').fill('Moon rock');
+    await page.getByLabel('Artwork collection',{exact:true}).selectOption('prop');
+    await page.getByRole('button',{name:'Save details',exact:true}).click();
+    await page.waitForFunction(()=>document.querySelector('#artStatus').textContent==='Artwork details saved.');
+    assert.equal((await records(page,'drawings','player1'))[0].sha256,source.sha256);
     const firstId=await page.evaluate(selection=>FG.creation.openArt(selection),{drawingId:source.id,rigId:rig.id});
     await page.locator('#creationWorkspace').waitFor({state:'visible'});
     await page.waitForFunction(()=>document.querySelector('#creationActors canvas'));
@@ -69,17 +75,49 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     // A second scene reuses the same immutable version through the visible picker.
     await page.locator('#creationBack').click();await page.locator('#creationFreeMode').click();await page.locator('[data-creation-starter="blank"]').click();
     await page.locator('#creationAddActor').click();
+    const picker=page.locator('#creationPrivateActorChoices');
+    await picker.locator('[data-private-art]').first().waitFor();
+    await picker.getByLabel('Find my art').fill('missing');
+    assert.equal(await picker.locator('[data-private-art]').count(),0);
+    await picker.getByLabel('Find my art').fill('moon rock');
+    await picker.getByLabel('Collection').selectOption('world');
+    assert.equal(await picker.locator('[data-private-art]').count(),0);
+    await picker.getByLabel('Collection').selectOption('');
+    assert.equal(await picker.locator('[data-private-art]').count(),2);
+    await page.locator('#creationActorDialog').screenshot({path:'test-results/creative-picker-'+device+'.png'});
+    if(device==='desktop'){
+      await page.setViewportSize({width:390,height:844});
+      assert.ok(await page.locator('#creationActorDialog').evaluate(dialog=>dialog.scrollWidth<=dialog.clientWidth+1));
+      assert.ok(await picker.getByLabel('Collection').evaluate(field=>field.getBoundingClientRect().height>=44));
+      await page.locator('#creationActorDialog').screenshot({path:'test-results/creative-picker-phone.png'});
+      await page.setViewportSize(viewport);
+    }
     await page.locator('#creationPrivateActorChoices [data-private-art]').filter({hasText:'Latest saved cutout design'}).click();
     await page.waitForFunction(()=>FG.creation.scene()?.actors.length===2);
     const second=await page.evaluate(()=>FG.creation.scene());
     assert.equal(second.actors[1].assetId,first.actors[0].assetId);assert.notEqual(second.id,firstId);
+    await page.locator('#creationFullMode').click();
+    await page.locator('#creationSceneOptions > summary').click();
+    await page.getByLabel('Role in this scene').selectOption('collectible');
+    await page.waitForFunction(()=>FG.creation.scene().actors[1].creativeRole==='collectible');
+    const change=page.getByRole('button',{name:'Choose another version',exact:true});
+    await change.click();
+    await page.locator('.creative-picker-dialog [data-private-art]').filter({hasText:'Original artwork'}).click();
+    await page.waitForFunction(()=>FG.creation.scene().actors[1].assetId.startsWith('art:image:'));
+    assert.deepEqual((await page.evaluate(()=>FG.creation.scene())).programs,second.programs);
+    await change.click();
+    await page.locator('.creative-picker-dialog [data-private-art]').filter({hasText:'Latest saved cutout design'}).click();
+    await page.waitForFunction(id=>FG.creation.scene().actors[1].assetId===id,first.actors[0].assetId);
+    assert.equal((await page.evaluate(()=>FG.creation.scene())).actors[1].creativeRole,'collectible');
+    await page.locator('#creationSceneOptions > summary').click();
+    await page.locator('#creationSimpleMode').click();
     await page.locator('[data-add-block="say"]').click();await page.locator('#creationKeep').click();
     const retained=await page.evaluate(id=>FG.creation.export().revisions.filter(revision=>revision.projectId===id),firstId);
     assert.equal(retained[0].scene.actors.length,1);assert.equal(retained[0].scene.actors[0].assetId,first.actors[0].assetId);
     if(!await page.locator('#creationMore').evaluate(element=>element.open))await page.locator('#creationMore summary').click();
     const downloaded=page.waitForEvent('download');await page.locator('#creationDownload').click();
     const file=await downloaded,path=await file.path(),bundle=JSON.parse(fs.readFileSync(path,'utf8'));
-    assert.equal(bundle.schema,'jems.scene-art.v1');assert.equal(bundle.art.drawings[0].sha256,source.sha256);
+    assert.equal(bundle.art.drawings[0].semanticIdentity,'Moon rock');assert.equal(bundle.schema,'jems.scene-art.v1');assert.equal(bundle.art.drawings[0].sha256,source.sha256);
     assert.equal(bundle.art.rigs[0].id,rig.id);assert.equal(Object.hasOwn(bundle.art.drawings[0],'owner'),false);
     assert.equal(bundle.scene.actors[1].assetId,first.actors[0].assetId);
 
@@ -108,7 +146,7 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     await profile(page,1);await pacing(page);
     await navigate(page,'#studioNavScenes');await page.locator('#creationFreeMode').click();await page.locator('[data-creation-starter="blank"]').click();
     await page.locator('#creationAddActor').click();
-    await page.waitForFunction(()=>document.getElementById('creationActorArtStatus').textContent.includes('Add one'));
+    await page.waitForFunction(()=>document.querySelector('#creationPrivateActorChoices [role=status]')?.textContent.includes('Add a drawing'));
     assert.equal(await page.locator('#creationPrivateActorChoices button').count(),0);await page.locator('#creationCloseActor').click();
     await page.locator('#creationBack').click();
     const broken=structuredClone(bundle);broken.scene.actors[1].assetId=broken.scene.actors[1].assetId.slice(0,-1)+(broken.scene.actors[1].assetId.endsWith('0')?'1':'0');

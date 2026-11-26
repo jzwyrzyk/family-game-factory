@@ -29,7 +29,10 @@ export type CreationBlock = BlockBase & (
   | {type: 'emit'; name: string}
 );
 export type SceneTrigger = {type: 'start' | 'tap'} | {type: 'event'; name: string};
+export const CREATIVE_ROLES = ['character','decoration','scenery','obstacle','collectible'] as const;
+export type CreativeRole = typeof CREATIVE_ROLES[number];
 export interface SceneActor {
+  creativeRole?: CreativeRole;
   id: string; name: string; assetId: string; x: number; y: number;
   size?: number; visible?: boolean;
 }
@@ -97,7 +100,7 @@ export function validateCreationProject(input: unknown): CreationProject {
   if (!p.actors.length) fail('Add at least one character.');
   const actorIds = new Set<string>();
   for (const raw of p.actors) {
-    const a = record(raw, ['id','name','assetId','x','y','size','visible'], 'character');
+    const a = record(raw, ['id','name','assetId','x','y','size','visible','creativeRole'], 'character');
     id(a.id, 'character ID');
     if(!isCreationId(a.assetId)&&!parsePrivateArtId(a.assetId))fail('Invalid asset reference.');
     text(a.name, 60, 'character name');
@@ -105,6 +108,7 @@ export function validateCreationProject(input: unknown): CreationProject {
     actorIds.add(a.id);
     number(a.x, 0, p.width, 'character x'); number(a.y, 0, p.height, 'character y');
     if (a.size !== undefined) number(a.size, 16, 240, 'character size');
+    if (a.creativeRole !== undefined && !CREATIVE_ROLES.includes(a.creativeRole as CreativeRole)) fail('Choose a supported role for this scene.');
     if (a.visible !== undefined && typeof a.visible !== 'boolean') fail('Invalid character visibility.');
   }
   if (!p.variables || typeof p.variables !== 'object' || Array.isArray(p.variables)
