@@ -44,7 +44,7 @@ class GitHubTests(unittest.TestCase):
         return run, artifact, raw
 
     def test_verified_failure_retrieved_without_false_acceptance(self):
-        api = Mock(side_effect=self.fixture())
+        api = Mock(side_effect=[*self.fixture(), self.jobs()])
         result = github.retrieve('123', 'a' * 40, {**SCOPE, 'revision': SCOPE['revision'] or ''}, api)
         self.assertFalse(result['live_acceptance'])
         self.assertEqual(result['triage']['reason'], 'IDENTITY_UNAVAILABLE')
@@ -52,11 +52,48 @@ class GitHubTests(unittest.TestCase):
 
     def test_connector_download_still_verified_without_raw_download(self):
         run, artifacts, raw = self.fixture()
-        api = Mock(side_effect=[run, artifacts])
+        api = Mock(side_effect=[run, artifacts, self.jobs()])
         result = github.retrieve('123', 'a' * 40, {**SCOPE, 'revision': SCOPE['revision'] or ''},
                                  api, downloaded_zip=raw)
         self.assertFalse(result['live_acceptance'])
-        self.assertEqual(api.call_count, 2)
+        self.assertEqual(api.call_count, 3)
+
+    def jobs(self):
+        return {'total_count': 1, 'jobs': [{'name': 'evidence', 'run_id': 123,
+                'head_sha': 'a' * 40, 'status': 'completed', 'conclusion': 'success',
+                'steps': [{'name': name, 'status': 'completed', 'conclusion': 'success'}
+                          for name in github.ACCEPTANCE_STEPS]}]}
+
+    def test_complete_report_requires_successful_exact_attempt_job_and_steps(self):
+        run, artifacts, old_raw = self.fixture()
+        run['conclusion'] = 'success'
+        report = evidence.initial_report(SCOPE, {'GITHUB_RUN_ID': '123', 'GITHUB_RUN_ATTEMPT': '1',
+                                                'GITHUB_SHA': 'a' * 40}, NOW)
+        report.update(evidence.verified_result(complete([entry()]), SCOPE, NOW))
+        output = io.BytesIO()
+        with zipfile.ZipFile(output, 'w') as archive: archive.writestr('report.json', json.dumps(report))
+        raw = output.getvalue()
+        artifacts['artifacts'][0]['digest'] = 'sha256:' + hashlib.sha256(raw).hexdigest()
+        for fault in ('none', 'job_failed', 'step_skipped', 'step_missing', 'step_duplicate'):
+            jobs = self.jobs()
+            job = jobs['jobs'][0]
+            if fault == 'job_failed': job['conclusion'] = 'failure'
+            if fault == 'step_skipped': job['steps'][2]['conclusion'] = 'skipped'
+            if fault == 'step_missing': job['steps'].pop()
+            if fault == 'step_duplicate': job['steps'].append(job['steps'][0])
+            api = Mock(side_effect=[run, artifacts, jobs])
+            result = github.retrieve('123', 'a' * 40, {**SCOPE, 'revision': SCOPE['revision'] or ''},
+                                     api, downloaded_zip=raw)
+            self.assertEqual(result['live_acceptance'], fault == 'none')
+            self.assertIn('/attempts/1/jobs', api.call_args_list[-1].args[1])
+
+    def test_job_with_wrong_run_or_source_is_rejected(self):
+        run, artifacts, raw = self.fixture()
+        for key, value in [('run_id', 124), ('head_sha', 'b' * 40), ('name', 'other')]:
+            jobs = self.jobs(); jobs['jobs'][0][key] = value
+            with self.assertRaises(SetupError):
+                github.retrieve('123', 'a' * 40, {**SCOPE, 'revision': SCOPE['revision'] or ''},
+                                Mock(side_effect=[run, artifacts, jobs]), downloaded_zip=raw)
 
     def test_artifact_path_and_report_source_rejected_even_with_valid_archive_digest(self):
         for bad_name in ('../report.json', 'report.json'):

@@ -1,5 +1,34 @@
 # Production HTTP request evidence
 
+## November 26 live acceptance attempt
+
+The assistant dispatched and retrieved [run 45869033203, attempt 1](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45869033203)
+on protected main `652bf9e312fc0776e37b7ef7893835e0fd8136d4` without owner-relayed
+commands. Source verification and ID-token acquisition passed. The private broker
+returned `UNAVAILABLE / COVERAGE_UNVERIFIED` at `2026-11-26T17:35:52Z`, with no rows,
+unknown counts and `permissions_verified: false`. Initial coverage settings were
+not accepted; actual view reads and finite IAM/coverage acceptance remain pending.
+This proves the workflow reached the broker, not that request diagnostics passed.
+The retained artifact `15142360710` was downloaded through the GitHub connector and
+verified against SHA-256 `6b46985b95af3e71218e5a53e8fa567073c528549fd34e06394f966337bccf19`.
+
+The requested Gateway interval was `2026-11-24T14:40:00Z` through
+`2026-11-24T14:55:00Z`, with an empty revision. GitHub substituted the workflow's
+historical nonempty default, so the actual report selected
+`factory-gateway-r-eaf5effa06d031818f52`. Retrieval rejected that scope mismatch.
+The prepared correction makes the workflow revision default empty. Until that
+correction reaches main, supply an explicit reviewed revision; do not describe an
+empty-input dispatch as service-wide. The correction has offline regression evidence
+only and has not been dispatched on main. No request was replayed, schedule enabled,
+permission changed or production service redeployed during this acceptance attempt.
+
+`github_operations.py --run-id` now verifies the sole completed `evidence` job from
+the exact run attempt as well as artifact provenance and digest. Acceptance requires
+successful source, authentication, read and retention steps, a successful job/run
+and a `COMPLETE` validated report. Failure artifacts remain useful diagnostics.
+The GitHub CLI could dispatch and read metadata here; its artifact download failed,
+so the existing connector ZIP fallback avoided an owner download.
+
 November 26 continuation: [consolidated Cloud Shell setup and verified blockers](PERMANENT_CLOUD_SETUP.md), [autonomous triage and 401 investigation](AUTONOMOUS_TRIAGE.md). Earlier receipts below retain their original scope.
 
 Use this reader to answer which Cloud Run revision handled an HTTP request and what status it returned. Read the observation interval alongside the canary or promotion receipt. This repository is public. Only the six approved request fields and bounded operational metadata belong in its reports. The summary remains visible for the workflow run's retention period, which can exceed the artifact's seven days.

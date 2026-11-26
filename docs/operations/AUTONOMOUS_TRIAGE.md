@@ -2,10 +2,16 @@
 
 The `github_operations.py --run-id` path now retrieves and verifies the exact
 workflow/repository/main source/attempt/scope, artifact SHA256 and bounded single-file
-report before invoking this classifier. Dispatch is fixed to the existing diagnostic
+report and exact-attempt job/required steps before invoking this classifier. Dispatch is fixed to the existing diagnostic
 workflow and protected main; it never retries uncertain submissions. The live GitHub
 metadata observation in run 45764873156 succeeded, but PR153 request evidence and
-recent 401 attribution remain unqualified. See [executable setup](PERMANENT_CLOUD_SETUP.md).
+recent 401 attribution remain unqualified. [Run 45869033203](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45869033203)
+subsequently established protected-main ID-token acquisition and a private broker
+response, but returned `UNAVAILABLE/COVERAGE_UNVERIFIED` before reading the view.
+Its empty revision input also exposed the nonempty workflow-default substitution;
+the requested service-wide scope was rejected at retrieval. See the
+[acceptance record and prepared correction](PRODUCTION_DIAGNOSTICS.md#november-26-live-acceptance-attempt).
+There is no verified zero-request or zero-error conclusion.
 
 
 Use the existing Actions workflows, sanitized PR153 request evidence, immutable
@@ -47,12 +53,15 @@ current blockers are in [the consolidated plan](PERMANENT_CLOUD_SETUP.md).
    their exact-artifact acceptance gates. Record live verification separately.
 
 This loop is ready as source/runbook, but unattended production investigation is
-not accepted end to end. The owner reports separate-task SDK identity/metadata and
-finite permission checks succeeded under alias `GCP`; this task still lacks its
-attachment and the GitHub broker evidence remains unavailable. The
-current connector can retrieve Actions evidence; workflow dispatch/settings require
-a suitably authorized existing client or the manual Actions page. Do not add a broad
-personal token merely to bypass that capability gap.
+not accepted end to end. The managed SDK identity's authoritative verification
+remains blocked as described in [assistant access](ASSISTANT_ACCESS.md). GitHub
+dispatch, environment readback, job inspection and connector artifact retrieval now
+have direct assistant execution evidence. All three reviewed GitHub environments
+restrict deployment to exact main; no environment setup action remained in the
+November 26 readback. Use this route for routine evidence instead of asking the owner
+to relay commands or download artifacts. The broker's initial finite IAM audit and
+dated source-coverage attestation still need existing authorized operator evidence;
+do not manufacture a receipt, widen access or enable recurrence to bypass that gate.
 
 ## Recent Gateway 401 investigation
 

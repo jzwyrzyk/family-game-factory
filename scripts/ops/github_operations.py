@@ -26,6 +26,13 @@ PREFIX = 'repos/' + REPO + '/'
 WORKFLOW = 'jems-production-diagnostics.yml'
 ENVIRONMENTS = ('jems-production-diagnostics', 'jems-nonproduction', 'jems-nonproduction-uat')
 POLICY = {'protected_branches': False, 'custom_branch_policies': True}
+ACCEPTANCE_STEPS = (
+    'Validate diagnostic scope',
+    'Verify current main before requesting a Google credential',
+    'Obtain an ID token for the private diagnostics broker',
+    'Read sanitized request evidence',
+    'Retain the sanitized report',
+)
 
 
 def api(method, path, data=None, binary=False):
@@ -126,9 +133,24 @@ def retrieve(run_id, expected_sha, inputs, reader=api, downloaded_zip=None):
     require(report.get('workflow') == {'run_id': run_id, 'attempt': attempt, 'workflow_source_sha': expected_sha}
             and report.get('scope') == scope, 'Report source/run/scope differs')
     classified = triage(report)
+    # Inspect this exact attempt, never the mutable latest-attempt jobs endpoint.
+    jobs = reader('GET', PREFIX + 'actions/runs/' + run_id + '/attempts/' + attempt + '/jobs?per_page=100')
+    require(isinstance(jobs, dict) and jobs.get('total_count') == 1 and
+            isinstance(jobs.get('jobs'), list) and len(jobs['jobs']) == 1,
+            'Unique diagnostic job required')
+    job = jobs['jobs'][0]
+    require(job.get('name') == 'evidence' and job.get('status') == 'completed' and
+            str(job.get('run_id')) == run_id and job.get('head_sha') == expected_sha,
+            'Diagnostic job provenance differs or incomplete')
+    steps = job.get('steps', [])
+    required = {name: [s for s in steps if s.get('name') == name] for name in ACCEPTANCE_STEPS}
+    successful_steps = all(len(matches) == 1 and matches[0].get('status') == 'completed' and
+                           matches[0].get('conclusion') == 'success' for matches in required.values())
+    job_verified = job.get('conclusion') == 'success' and successful_steps
     return {'run_id': run_id, 'source_sha': expected_sha, 'artifact_sha256': artifact['digest'],
             'workflow_conclusion': run.get('conclusion'), 'triage': classified,
-            'live_acceptance': run.get('conclusion') == 'success' and classified['status'] == 'COMPLETE'}
+            'job_verified': job_verified,
+            'live_acceptance': run.get('conclusion') == 'success' and job_verified and classified['status'] == 'COMPLETE'}
 
 
 def main(argv=None):
