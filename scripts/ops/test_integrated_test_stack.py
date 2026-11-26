@@ -109,3 +109,16 @@ class SavedPlanTests(unittest.TestCase):
             self.assertEqual(cli.call_count, 1)
             with self.assertRaises(op.Stop):
                 op.initialize(home, 'b' * 40, files)
+
+    def test_paid_close_removes_only_specific_private_trial_access(self):
+        for address, (role, service) in op.TRIAL_GRANTS.items():
+            old = {'project':op.PROJECT,'role':role,'member':'serviceAccount:jems-test-' +
+                   service + '@' + op.PROJECT + '.iam.gserviceaccount.com',
+                   'name':'jems-test-coach','secret_id':'jems-test-coach-key'}
+            plan = {'resource_changes':[{'address':address,'mode':'managed','change':{
+                'actions':['delete'],'before':old,'after':None}}]}
+            with self.assertRaises(op.Stop): op.review(plan)
+            self.assertEqual(op.review(plan, True)[0]['actions'], ['delete'])
+            old['role'] = 'roles/owner'
+            with self.assertRaises(op.Stop): op.review(plan, True)
+        with self.assertRaises(op.Stop): op.review(program(['delete']), True)
