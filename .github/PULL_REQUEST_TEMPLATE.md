@@ -8,6 +8,8 @@
 
 ## Evidence
 
+<!-- For creative asset and world changes, list affected workstreams and shared-module owners. Bind each applicable assertion to an exact source, synthetic screenshot or playback capture, integrity/restore test and negative owner or generated-game boundary test. Identify prior-reader rollback compatibility and unresolved independent release gates. -->
+
 | Claim / acceptance criterion | Check or observation | Exact SHA / run / artifact | Result and limits |
 | --- | --- | --- | --- |
 | | | | |

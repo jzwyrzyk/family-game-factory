@@ -16,6 +16,8 @@ The [standalone UI review](ui-review/README.md) packages the real UI for offline
 
 ## Canonical references
 
+[Creative Asset & World Design Standard](creative-universe/STANDARD.md) governs permanent originals, versioned movement, illustrated worlds, contextual use, retrieval and secure 2D game delivery.
+
 | Reference | Question it answers | Update when |
 | --- | --- | --- |
 | [Agent entry point](../AGENTS.md) | What should an assistant read and preserve before answering or developing? | Working method or context-loading rules change |
