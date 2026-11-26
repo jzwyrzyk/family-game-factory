@@ -55,7 +55,9 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     ? {kind:'blocks', role:'answer'} as const : undefined;
   const plan = mode !== 'checkpoint' || initial.representation==='visual' ? availableModel ?? quantityFallback : undefined;
   const constructsAnswer = plan?.role === 'answer';
-  const explorationWithBlocks = plan?.role === 'explore' && kind === 'quantity' && !isEarlyGrade(initial.grade) && mode !== 'checkpoint' && !options.challenge;
+  const optionalBlocks = !!plan && plan.kind !== 'blocks' && kind === 'quantity'
+    && !isEarlyGrade(initial.grade) && mode !== 'checkpoint' && !options.challenge;
+  const explorationWithBlocks = optionalBlocks && plan.role === 'explore';
   // A quantity/fraction construction is an actual mathematical representation,
   // not evidence of unaided symbolic recall. Choice tiles retain the item form.
   const item: MathItem = !isEarlyGrade(initial.grade) && mode !== 'checkpoint' && plan
@@ -88,13 +90,16 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
 
   const tabs = el('div','math-mode-tabs'); tabs.setAttribute('role','group'); tabs.setAttribute('aria-label','How would you like to answer?');
   const typeTab=button('Write an answer'),buildTab=button(kind==='choice'?'Choose a tile':'Build an answer');
-  tabs.append(typeTab,buildTab); tabs.hidden=!explorationWithBlocks && (!constructsAnswer || !(mode==='both'||(mode==='checkpoint'&&plan)));
+  const alternativeBlocks = button('Build with base-ten blocks');
+  tabs.append(typeTab,buildTab);
+  if (optionalBlocks && constructsAnswer) tabs.append(alternativeBlocks);
+  tabs.hidden=!optionalBlocks && (!constructsAnswer || !(mode==='both'||(mode==='checkpoint'&&plan)));
   shell.work.append(tabs);
   const answerArea=el('div','math-answer-area'),interactionArea=el('div','math-interaction-area');
   const blockAnswer = el('div','math-block-answer');
   blockAnswer.hidden = true;
   shell.work.append(interactionArea,answerArea);
-  if (explorationWithBlocks) shell.work.append(blockAnswer);
+  if (optionalBlocks) shell.work.append(blockAnswer);
   feedback.id=options.legacyIds?'math-feedback':`${prefix}-feedback`;
   const support=el('div','math-support-actions'),hintButton=button('Give me a hint'),showButton=button('Show me how');
   hintButton.dataset.action='hint';showButton.dataset.action='show-solution';
@@ -230,27 +235,24 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   if(plan) {
     mountMathModel(interactionArea,item,plan,{submit,isLocked:()=>locked||disposed||done,signal:listeners.signal});
   }
-  function setPath(interactive:boolean) {
-    if (explorationWithBlocks) {
-      interactionArea.hidden = false;
-      answerArea.hidden = interactive;
-      blockAnswer.hidden = !interactive;
-      if (interactive && !blockAnswer.childElementCount) {
-        mountMathModel(blockAnswer,item,{kind:'blocks',role:'answer'},{submit,isLocked:()=>locked||disposed||done,signal:listeners.signal});
-      }
-    } else {
-      interactionArea.hidden=!interactive || !plan;
-      answerArea.hidden=interactive && constructsAnswer;
+  function setPath(interactive:boolean, useBlocks = explorationWithBlocks && interactive) {
+    interactionArea.hidden = explorationWithBlocks ? false : !interactive || !plan || useBlocks;
+    answerArea.hidden = useBlocks || interactive && constructsAnswer;
+    blockAnswer.hidden = !useBlocks;
+    if (useBlocks && !blockAnswer.childElementCount) {
+      mountMathModel(blockAnswer,item,{kind:'blocks',role:'answer'},{submit,isLocked:()=>locked||disposed||done,signal:listeners.signal});
     }
+    alternativeBlocks.setAttribute('aria-pressed', String(useBlocks));
     // A frame with given counters and an empty fraction line already present
     // their stimulus in the model. Keep the given visible on the written path.
-    shell.stimulus.hidden=interactive && (
+    shell.stimulus.hidden=interactive && !useBlocks && (
       (plan?.kind==='frames' && item.parameters.operation==='missing-addend')
       || (plan?.kind==='numberLine' && item.skillId==='g3-fraction-number')
     );
     typeTab.setAttribute('aria-pressed',String(!interactive));
-    buildTab.setAttribute('aria-pressed',String(interactive));
+    buildTab.setAttribute('aria-pressed',String(interactive && (!useBlocks || explorationWithBlocks)));
   }
+  on(alternativeBlocks,'click',()=>{setPath(true,true);returnToAnswer();});
   on(typeTab,'click',()=>{setPath(false);returnToAnswer();});on(buildTab,'click',()=>{setPath(true);returnToAnswer();});
   // Showing the model first makes visual-form evidence truthful in both mode,
   // even when the child later chooses the written response for the same item.
