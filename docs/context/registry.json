@@ -1144,8 +1144,8 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:23:59.912Z",
-      "sourceDigest": "e658d1c450cdb7c1eea8e0d2aefe2bcae60c1ce9ec4076447ce7161023939b27",
+      "reviewedAt": "2026-11-26T03:25:18.487Z",
+      "sourceDigest": "6d9a0966438f55ba668e86cbf4319cbc1d2f0bd15a518b82bd9f03b74160b2d3",
       "reviewOutcome": "updated",
       "reviewReason": "Recorded source dependencies, private worktree qualification and current household release separately. No change to production traffic or provider activation was made.",
       "reviewHistory": [
