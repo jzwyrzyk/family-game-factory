@@ -1,5 +1,8 @@
 # Consolidated candidate for owner review
 
+The operational successor preserves the application named below. Its protected DEV qualification, named TEST Firestore and four services, private worker execution, and authenticated promotion have dedicated procedures. The earlier activation assessment on this page describes the original owner-review source. [DEV policy](../development/REVIEWED-DEV-SOURCE.md) · [Isolated TEST activation](INTEGRATED_TEST_STACK.md) · [Production promotion](EXACT-MANIFEST-RELEASE.md)
+
+
 The existing [draft #223](https://github.com/jzwyrzyk/family-game-factory/pull/223) carries the proposed application. The release manifest accompanying its standalone HTML binds the final commit, Git tree, review-file digest and qualification results. A reviewed source, a hosted build, an accepted TEST deployment and a household rollout each have separate receipts.
 
 | Selected input | Commit | Disposition |

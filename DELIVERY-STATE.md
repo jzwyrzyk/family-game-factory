@@ -1,5 +1,9 @@
 # Jems delivery state
 
+## November 26 operational release candidate
+
+The owner-review application remains PR #223 at `b1169673050a8be83ed5ba69a27b04c23a87903f`. Its retained artwork, Arcade and learning fidelity evidence belongs to that source. The operational candidate adds protected DEV qualification, isolated integrated TEST and authenticated release control. Hosted Arcade run 45909288018 also exercised the exact owner-review head. Terraform and controller rehearsals use private synthetic fixtures. The signed production publication, live cloud acceptance, owner review and funded generation each require their own receipts. [DEV policy integration](docs/development/REVIEWED-DEV-SOURCE.md) · [TEST setup](docs/operations/INTEGRATED_TEST_STACK.md) · [Manifest approval and promotion](docs/operations/EXACT-MANIFEST-RELEASE.md)
+
 ## November 26 consolidated release preparation
 
 Use the [consolidated candidate handoff](docs/operations/CONSOLIDATED-CANDIDATE.md) and [active draft #223](https://github.com/jzwyrzyk/family-game-factory/pull/223) for the proposed integration. The individual workstream records below retain their original source and evidence. The protected engineering base includes #219. The household Pages marker remains aa56b60a. [Read-only revision observation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45904862225)
