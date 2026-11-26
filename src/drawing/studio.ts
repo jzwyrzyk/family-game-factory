@@ -3,6 +3,7 @@ import {artUsages,ART_LIMITS,type DrawingMetadata} from './library';
 import {listRigs,loadDrawingDraft,type SavedRig} from './store';
 import {exportArtBundle,importArtBundle,restoreArtBundle} from './transfer';
 import {openDrawingLab} from './lab';
+import {editMotionPath} from './motion-editor';
 import {drawOnTablet} from './paint';
 import {readSketch} from './sketch';
 import {editPicture} from './picture';
@@ -38,7 +39,7 @@ export function installArtStudio(host:Host){
     if(pane.hidden||!title)return;
     // Drawing and picture tools call onSaved before closing their modal. Let
     // that close finish before moving focus into the newly selected artwork.
-    const editor=document.querySelector<HTMLDialogElement>('dialog.art-picture[open],dialog.drawing-paint[open]');
+    const editor=document.querySelector<HTMLDialogElement>('dialog.art-picture[open],dialog.drawing-paint[open],dialog.motion-path[open]');
     if(editor){editor.addEventListener('close',()=>queueMicrotask(()=>focusSelectedArtwork(artId,capturedOwner,capturedEpoch)),{once:true});return;}
     if(innerWidth<850)pane.scrollIntoView({behavior:'auto',block:'start'});
     title.focus({preventScroll:true});
@@ -60,7 +61,7 @@ export function installArtStudio(host:Host){
   }
   function renderGrid(){
     release();const grid=$('artGrid');grid.replaceChildren();const query=$<HTMLInputElement>('artSearch').value.trim().toLowerCase();
-    const found=items.filter(item=>Boolean(item.archived)===archive&&(category==='all'||(item.category??'other')===category)&&(!query||item.name.toLowerCase().includes(query)));
+    const found=items.filter(item=>Boolean(item.archived)===archive&&(category==='all'||(item.category??'other')===category)&&(!query||item.name.toLowerCase().includes(query)||(item.semanticIdentity??'').toLowerCase().includes(query)));
     $('artCount').textContent=String(total);
     $('artEmpty').hidden=found.length>0;
     $('artEmpty').querySelector('h3')!.textContent=archive?'Your archived art':items.length?'No art matches yet.':'Your ideas belong here.';
@@ -89,7 +90,7 @@ export function installArtStudio(host:Host){
     const metadataSave=button('Save details','check',async()=>{await updateDrawing(captured,id,{name:name.value,category:kind.value as DrawingCategory,semanticIdentity:subject.value.trim()},()=>current(captured,run));if(!current(captured,run)||!await refresh())return;status('Artwork details saved.');notify(captured);});metadata.append(label,subjectLabel,kindLabel,metadataSave);metadata.onsubmit=e=>{e.preventDefault();metadataSave.click();};pane.append(metadata);
     const versions=rigs.filter(r=>r.assembly.sourceId===id),versionLabel=node('label','art-version-label','Movement version'),choice=node('select');choice.id='artVersion';choice.setAttribute('aria-label','Movement version');
     const original=node('option','','Original picture');original.value='';choice.append(original);
-    for(const [i,rig]of versions.entries()){const count=rig.assembly.pieces.length,option=node('option','',`${versions.length-i} · ${rig.assembly.kind} · ${count} ${count===1?'part':'parts'}`);option.value=rig.id;choice.append(option);}if(versions.length)choice.value=versions[0].id;versionLabel.append(choice);pane.append(versionLabel);
+    for(const [i,rig]of versions.entries()){const count=rig.assembly.pieces.length,option=node('option','',rig.assembly.motion ? `Version ${rig.assembly.revision} · animation path` : `${versions.length-i} · ${rig.assembly.kind} · ${count} ${count===1?'part':'parts'}`);option.value=rig.id;choice.append(option);}if(versions.length)choice.value=versions[0].id;versionLabel.append(choice);pane.append(versionLabel);
     const actions=node('div','art-detail-actions');
     const sketch=item.mime==='image/png'?readSketch(item.bytes):null;
     if(sketch)actions.append(button('Keep drawing','edit',()=>drawOnTablet(captured,async saved=>{
@@ -100,9 +101,14 @@ export function installArtStudio(host:Host){
     },()=>current(captured,run),{item,sketch})));
     const editMovement=async(rigId?:string)=>{const editor=await openDrawingLab(captured,item,savedId=>host.openCar(savedId,()=>current(captured,run)),{...(rigId?{rigId}:{}),isCurrent:()=>current(captured,run),onSaved:async()=>{if(current(captured,run)&&await refresh()){status('Movement saved. Choose where it goes next.');notify(captured);}}});editor?.addEventListener('close',()=>{if(current(captured,run))void refresh();},{once:true});};
     const openEditor=button(versions.length?'Edit movement':'Make it move','play',()=>editMovement(choice.value||undefined),true);openEditor.id='artEditMovement';
+    const path=button('Draw a path','edit',()=>editMotionPath(captured,item,choice.value||undefined,()=>current(captured,run),async saved=>{
+      if(!await refresh())throw Error('Reopen My Art to find your saved path.');
+      const version=$<HTMLSelectElement>('artVersion');version.value=saved.id;version.dispatchEvent(new Event('change'));
+      status('Path saved. Choose Use in Creative Studio to play it.');notify(captured);focusSelectedArtwork(item.id,captured,run);
+    }));path.id='artDrawPath';
     const scene=button('Use in Creative Studio','grid',async()=>{await host.openScene({drawingId:item.id,...(choice.value?{rigId:choice.value}:{})});});scene.id='artUseScene';
     const car=button('Make a Rally game','arrow',async()=>{const at=epoch;await host.openCar(choice.value,()=>current(captured,at));});car.id='artUseRally';
-    const updateCar=()=>{car.hidden=!versions.some(r=>r.id===choice.value&&r.assembly.kind==='car');};choice.onchange=updateCar;updateCar();actions.append(openEditor,scene,car);pane.append(actions);
+    const updateCar=()=>{car.hidden=!versions.some(r=>r.id===choice.value&&r.assembly.kind==='car');};choice.onchange=updateCar;updateCar();actions.append(openEditor,path,scene,car);pane.append(actions);
     const hint=node('p','art-small','This choice is copied into the new game or scene. Earlier adventures keep their chosen version.');pane.append(hint);
     const tools=node('details','art-detail-tools'),summary=node('summary','','Picture & storage tools');tools.append(summary);
     tools.append(button('Trim, turn & clean up','edit',async()=>{await editPicture(captured,item,async result=>{if(!current(captured,run))return;selected=result.id;if(!await refresh())return;status('New picture saved. Your original is still in My art.');notify(captured);focusSelectedArtwork(result.id,captured,run);},()=>current(captured,run));}));

@@ -17,6 +17,7 @@ import { publishSourceEvidence } from '../problem-solving/signals';
 import { createIcon, iconMarkup, setIconLabel, type IconName } from '../brand/icons';
 import {rewardSourceWritable} from '../rewards/write-guard';
 import { createGuideCard, type GuideHost } from '../studio/guide-card';
+import {applyArtMotion} from '../drawing/motion';
 import {PrivateArtResolver,artChoice,listArtChoices,privateArtReferences,exportSceneArt,importSceneArt,type ArtSelection,type ResolvedPrivateArt} from './private-art';
 import {ART_LIMITS,registerArtUsage,releaseArtUsage} from '../drawing/library';
 import { addPalToProject, createPalPlayground, isCreationPalId, type CreationPalId } from '../pals/creation';
@@ -1018,6 +1019,7 @@ export function installCreationStudio(host: Host) {
                 return;
               }
               const actor={id:uid(),assetId:item.assetId,name:item.label,x:Math.round(project.width / 2),y:Math.round(project.height * .65),size:140,visible:true};project.actors.push(actor);
+              if (resolved.motion) applyArtMotion(project, actor, resolved.motion);
               const program={id:uid(),actorId:actor.id,trigger:{type:'tap' as const},actions:[]};project.programs.push(program);
               selectedActor=actor.id;selectedProgram=project.programs.find(p=>p.actorId===actor.id&&p.trigger.type==='start')?.id??program.id;insert=null;
             });
@@ -1105,17 +1107,19 @@ export function installCreationStudio(host: Host) {
       const capturedOwner=owner(),capturedView=viewEpoch,current=()=>capturedOwner===owner()&&capturedView===viewEpoch&&visible&&!FG.learning.active;
       status('Getting your art ready for a new scene…');
       try{
-        const choice=await artChoice(capturedOwner,selection,current);await privateArt.load(choice.assetId);if(!current())return;
+        const choice=await artChoice(capturedOwner,selection,current);const resolved=await privateArt.load(choice.assetId);if(!current())return;
         const project=createStarterProject('blank',(choice.label+' adventure').slice(0,60)),actorId=uid();
         project.actors=[{id:actorId,name:choice.label,assetId:choice.assetId,x:400,y:280,size:180}];
-        project.programs=[
+        project.programs=[];
+        if(resolved.motion)applyArtMotion(project,project.actors[0],resolved.motion);
+        else project.programs.push(
           {id:uid(),actorId,trigger:{type:'start'},actions:[{id:uid(),type:'jump',height:60,durationMs:800,origin:'starter'}]},
           {id:uid(),actorId,trigger:{type:'tap'},actions:[{id:uid(),type:'jump',height:80,durationMs:650,origin:'starter'}]},
-        ];
+        );
         project.provenance={createdBy:'child',sourceKind:'art',sourceProjectId:choice.drawingId,sourceRevisionId:choice.rigId||parsePrivateArtId(choice.assetId)!.sha256};
         const bindings=await prepareSceneArt(project,current);if(!current())return;
         const saved=await (await store()).create(capturedOwner,project);indexSceneArt(saved.id,capturedOwner,bindings);await loadScene(saved.id);
-        status('Your art is ready. Try the starter hop, then change the blocks to make it yours. This scene uses the saved artwork as one character.');
+        status(resolved.motion?'Your path is ready. Press Play or change a move.':'Your art is ready. Try the starter hop, then change the blocks to make it yours. This scene uses the saved artwork as one character.');
         return saved.id;
       }catch(error){if(current())status((error as Error).message,true);}
     },

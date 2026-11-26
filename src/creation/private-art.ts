@@ -10,7 +10,7 @@ import {exportArtBundle,validateArtBundle,importArtBundle,type ArtBundle} from '
 
 export interface ArtSelection {drawingId:string;rigId?:string}
 export interface ArtChoice extends ArtSelection {assetId:string;label:string;detail:string}
-export interface ResolvedPrivateArt extends ArtChoice {image:HTMLCanvasElement}
+export interface ResolvedPrivateArt extends ArtChoice {image:HTMLCanvasElement;motion?:import('../drawing/motion').DrawingMotion}
 const stale=()=>Error('The player or page changed. Reopen your artwork in your own profile.');
 const hex=(bytes:ArrayBuffer)=>Array.from(new Uint8Array(bytes),byte=>byte.toString(16).padStart(2,'0')).join('');
 /** Union cutout masks without repeatedly blending the original's translucent
@@ -116,7 +116,7 @@ export async function resolvePrivateArt(owner:string,assetId:string,current:()=>
     const original=document.createElement('canvas');original.width=Math.max(1,Math.round(bitmap.width*scale));original.height=Math.max(1,Math.round(bitmap.height*scale));
     original.getContext('2d')!.drawImage(bitmap,0,0,original.width,original.height);
     let image=original;
-    if(rig){
+    if(rig && rig.assembly.motion?.sprite!=='original'){
       image=document.createElement('canvas');image.width=original.width;image.height=original.height;
       const context=image.getContext('2d')!,sourcePixels=original.getContext('2d')!.getImageData(0,0,original.width,original.height);
       const mask=document.createElement('canvas');mask.width=original.width;mask.height=original.height;
@@ -129,7 +129,7 @@ export async function resolvePrivateArt(owner:string,assetId:string,current:()=>
       }
       const output=context.createImageData(image.width,image.height);if(pixels)output.data.set(pixels);context.putImageData(output,0,0);
     }
-    return {assetId,drawingId:source.id,...(rig?{rigId:rig.id}:{}),label:source.name,detail:rig?'Saved cutout design':'Original artwork',image};
+    return {assetId,drawingId:source.id,...(rig?{rigId:rig.id,motion:rig.assembly.motion}:{}),label:source.name,detail:rig?.assembly.motion?'Animation path':rig?'Saved cutout design':'Original artwork',image};
   }finally{bitmap.close();}
 }
 

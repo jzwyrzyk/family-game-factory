@@ -1,3 +1,4 @@
+import {validateMotion, type DrawingMotion} from './motion';
 import {validateDrawingRig, type DrawingRig, type Material} from '../quality/parts';
 
 /** Normalized 0–1 rectangles refer to the unmodified original image. */
@@ -19,7 +20,7 @@ export interface DrawingPiece {
 }
 export interface DrawingAssembly {
   schemaVersion:1; sourceId:string; sourceSha256:string; kind:DrawingKind;
-  pieces:DrawingPiece[]; notes:string; revision:number;
+  pieces:DrawingPiece[]; notes:string; revision:number; motion?:DrawingMotion;
 }
 const isNumber=(v:unknown)=>typeof v==='number'&&Number.isFinite(v);
 const ident=(v:unknown)=>typeof v==='string'&&/^[a-z][a-z0-9_-]{0,39}$/.test(v);
@@ -34,12 +35,13 @@ export function validRegion(v:unknown):Region {
 }
 export function validateAssembly(value:unknown):DrawingAssembly {
   const a=value as DrawingAssembly;
-  if(!a||typeof a!=='object'||!allowed(a,['schemaVersion','sourceId','sourceSha256','kind','pieces','notes','revision'])||
+  if(!a||typeof a!=='object'||!allowed(a,['schemaVersion','sourceId','sourceSha256','kind','pieces','notes','revision','motion'])||
     a.schemaVersion!==1||typeof a.sourceId!=='string'||a.sourceId.length>100||!a.sourceId||
     !/^[a-f0-9]{64}$/.test(a.sourceSha256)||!['car','character','machine','scene'].includes(a.kind)||
     !Array.isArray(a.pieces)||a.pieces.length<1||a.pieces.length>24||
     typeof a.notes!=='string'||a.notes.length>300||!Number.isInteger(a.revision)||a.revision<1||a.revision>10000)
     throw Error('Unsupported drawing design.');
+  if(a.motion!==undefined)validateMotion(a.motion);
   const ids=new Set<string>();
   for(const p of a.pieces){
     if(!p||typeof p!=='object'||!allowed(p,['id','name','role','region','parentId','physical','pivot','maskStrokes'])||

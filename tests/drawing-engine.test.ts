@@ -218,3 +218,16 @@ test('Other child-created objects instantiate actual independent bodies and join
   assert.ok(after.parts.every(p=>Number.isFinite(p.angle)));
  }finally{world.dispose();}
 });
+
+test('animation paths round-trip inside bounded immutable movement assemblies', () => {
+  const motion = {points:[{x:0,y:1},{x:.5,y:.25},{x:1,y:0}], stepMs:600, sprite:'original'};
+  const valid=validateAssembly({...sample,motion});
+  assert.deepEqual(valid.motion,motion);
+  valid.motion!.points[0].x=.4;
+  assert.equal(motion.points[0].x,0);
+  for (const invalid of [{...motion,points:[{x:0,y:0}]}, {...motion,points:Array(17).fill({x:0,y:0})},
+    {...motion,points:[{x:NaN,y:0},{x:1,y:1}]}, {...motion,points:[{x:1.1,y:0},{x:1,y:1}]},
+    {...motion,url:'private'}, {...motion,stepMs:-1}, {...motion,sprite:'remote'}]) {
+    assert.throws(()=>validateAssembly({...sample,motion:invalid}));
+  }
+});
