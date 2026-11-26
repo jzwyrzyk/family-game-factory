@@ -61,7 +61,7 @@ An **updated** review for an impacted area must have an applicable document chan
 
 Read the current sections of the three root references, inspect related open PRs and diff the last verified source against current main. Use the dated [delivery](../history/2026-11-26/DELIVERY-STATE.md), [architecture](../history/2026-11-26/ARCHITECTURE-CURRENT.md) and [doctrine](../history/2026-11-26/PRODUCT-DOCTRINE.md) records for historical questions. Keep new dated receipts in the relevant evidence record and link them from current state. Maintain old heading routes when archiving.
 
-Add a regression to its applicable npm test chain and shard. Run `npm run test:ci`. The independent frozen argv inventory in `scripts/ci/retained-coverage.json` protects the historical groups against coordinated deletion. Additions are discovered from npm and verified against the assigned commands. Review command identities, fixture prerequisites and cross-group duplication. Local editing checks never issue hosted receipts.
+Add a regression to its applicable npm test chain and shard. Run `npm run test:ci`. The independent frozen argv inventory in `scripts/ci/retained-coverage.json` protects the historical groups against coordinated deletion. Additions are discovered from npm and verified against the assigned commands. Hosted CI also reads the independently committed PR base or preceding main commit so regressions added after the freeze remain protected on later changes. Review command identities, fixture prerequisites and cross-group duplication. Local editing checks never issue hosted receipts.
 
 ## 3. Automatic repository checks
 

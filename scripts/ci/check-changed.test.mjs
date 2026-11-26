@@ -18,7 +18,7 @@ test('editing includes committed, staged, deleted, renamed and untracked paths',
   git('mv', 'before', 'after'); git('commit', '-qm', 'move');
   write('one', 'staged'); git('add', 'one'); write('one', 'old');
   rmSync(join(cwd, 'gone')); write('new file', 'untracked');
-  assert.deepEqual(changedFiles(base, cwd), ['after', 'before', 'gone', 'new file', 'one']);
+  assert.deepEqual(changedFiles(base, cwd).paths, ['after', 'before', 'gone', 'new file', 'one']);
 });
 
 test('requested domains add coverage and cannot hide shared changes', () => {
@@ -28,5 +28,7 @@ test('requested domains add coverage and cannot hide shared changes', () => {
   assert.ok(selectChecks(['src/main.ts'], ['coding']).full);
   assert.ok(selectChecks(['src/language/activity.css'], [], () => false).full);
   assert.ok(selectChecks(['server/trusted-devices.ts'], ['english']).commands.includes('test:sandbox'));
+  assert.deepEqual(selectChecks(['docs/context/registry.json'], [], () => true).commands, ['docs:check']);
+  assert.ok(selectChecks(['docs/context/registry.json'], [], () => false).full);
   assert.throws(() => selectChecks([], ['invented']));
 });

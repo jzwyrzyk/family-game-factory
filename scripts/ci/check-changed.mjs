@@ -1,8 +1,9 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, lstatSync, readFileSync } from 'node:fs';
-import { parseArgs } from 'node:util';
+import { isDeepStrictEqual, parseArgs } from 'node:util';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
+import { normalizedReviewRegistry } from './classify-impact.mjs';
 
 // These are editing loops. Each includes the consumer journey for its fixtures.
 // Shared persistence, host composition, security and unrecognized files escalate.
@@ -16,7 +17,7 @@ const domains = {
   coach: ['test:coach'],
   generated: ['test:intent-playtest', 'test:generated-art'],
   storage: ['test:storage-browser'],
-  security: ['test:ops', 'test:deployment', 'test:unit'],
+  security: ['test:sandbox'],
 };
 const routes = [
   [/^src\/studio\/(?:navigation|modernization)\.css$/, 'navigation'],
@@ -43,7 +44,11 @@ export function sameDependencies(path, ancestor) {
   if (!existsSync(path) || !lstatSync(path).isFile()) return false;
   try {
     const before = execFileSync('git', ['show', ancestor + ':' + path], {encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore']});
-    return JSON.stringify(dependencies(before)) === JSON.stringify(dependencies(readFileSync(path, 'utf8')));
+    const after = readFileSync(path, 'utf8');
+    if (path === 'docs/context/registry.json') {
+      return isDeepStrictEqual(normalizedReviewRegistry(JSON.parse(before)), normalizedReviewRegistry(JSON.parse(after)));
+    }
+    return isDeepStrictEqual(dependencies(before), dependencies(after));
   } catch { return false; }
 }
 const broad = ['test:ci', 'test:docs', 'test', 'docs:check'];
@@ -56,15 +61,16 @@ export function changedFiles(base, cwd = process.cwd()) {
     git('diff', '--no-renames', '--name-only', '-z', '--'),
     git('ls-files', '--others', '--exclude-standard', '-z'),
   ];
-  return [...new Set(files.flatMap(list => list.split('\0').filter(Boolean)))].sort();
+  return {ancestor, paths: [...new Set(files.flatMap(list => list.split('\0').filter(Boolean)))].sort()};
 }
-export function selectChecks(paths, requested = [], safeLeaf = existsSync) {
+export function selectChecks(paths, requested = [], safeLeaf = () => false) {
   const selected = new Set(requested);
   for (const domain of selected) if (!Object.hasOwn(domains, domain)) throw Error('Unknown --domain. Choose ' + Object.keys(domains).join(', '));
   const reasons = [];
   const units = new Set();
   let docs = false, full = false;
   for (const file of paths) {
+    if (file === 'docs/context/registry.json' && safeLeaf(file)) { docs = true; continue; }
     if (/^(?:[^/]+\.md|docs\/.*\.md)$/.test(file)) { docs = true; continue; }
     const target = routes.find(([pattern]) => pattern.test(file))?.[1];
     const suite = testFiles.get(file);
@@ -82,25 +88,24 @@ export function selectChecks(paths, requested = [], safeLeaf = existsSync) {
     ...units, ...(docs ? ['docs:check'] : []), ...(selected.size ? ['build'] : []),
     ...[...selected].flatMap(domain => domains[domain]),
   ];
-  if (full && selected.has('security')) commands.push('test:sandbox');
+  if (full && selected.has('security')) commands.push(...domains.security);
   return {full, reasons, commands: [...new Set(commands)]};
 }
 function main() {
   const {values} = parseArgs({options: {base: {type: 'string', default: 'origin/main'},
     domain: {type: 'string', multiple: true}, plan: {type: 'boolean'}}});
   if (process.env.GITHUB_ACTIONS === 'true') throw Error('Use the hosted qualification workflow. check:changed is for editing.');
-  let files;
-  try { files = changedFiles(values.base); }
+  let comparison;
+  try { comparison = changedFiles(values.base); }
   catch {
     console.error('Cannot compare the merge base and working tree. Selecting broad local regression.');
-    files = ['(unavailable Git comparison)'];
+    comparison = {paths: ['(unavailable Git comparison)']};
   }
   const safeLeaf = file => {
-    const ancestor = execFileSync('git', ['merge-base', '--', values.base, 'HEAD'], {encoding: 'utf8'}).trim();
     if (file.endsWith('.webp')) return existsSync(file) && lstatSync(file).isFile();
-    return sameDependencies(file, ancestor);
+    return sameDependencies(file, comparison.ancestor);
   };
-  const plan = selectChecks(files, values.domain, safeLeaf);
+  const plan = selectChecks(comparison.paths, values.domain, safeLeaf);
   console.log('Local editing feedback only. Hosted integration and release evidence are separate.');
   for (const reason of plan.reasons.slice(0, 15)) console.log('  ' + reason);
   if (plan.reasons.length > 15) console.log('  … ' + (plan.reasons.length - 15) + ' additional paths');

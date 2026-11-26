@@ -149,7 +149,8 @@ jobs:
           path: |
             test-results/
             !test-results/storage-preview/**
-          retention-days: ${{ github.ref == 'refs/heads/main' && 30 || 7 }}
+          # Zero uses GitHub's repository default, as the original visual upload did.
+          retention-days: ${{ (github.event_name == 'pull_request' && matrix.shard == 'factory') && '0' || github.ref == 'refs/heads/main' && 30 || 7 }}
           compression-level: 0
           if-no-files-found: warn
   image-isolation:

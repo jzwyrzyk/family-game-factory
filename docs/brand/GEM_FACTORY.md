@@ -137,8 +137,7 @@ next-pattern acceptance, the one-jem flight lock, wrong-route recovery,
 keyboard/touch input, pointer cancellation, both pause paths, required learning,
 profile isolation and scene coverage. Exercise all three paper previews even
 though a default day now ships only two gifts. Captures go to
-`test-results/gem-factory/`; the visual-review workflow retains them as
-`gem-factory-gameplay`.
+`test-results/gem-factory/`; PRs retain them in the Arcade factory shard’s `arcade-evidence-<run>-<attempt>-factory` archive at the repository-default retention. A manual full visual review retains them as `gem-factory-gameplay`.
 
 The new acceptance cases are deliberate out-of-zone cuts, paused recovery,
 successful retry, preservation of an already packed gift and its coins/paper,

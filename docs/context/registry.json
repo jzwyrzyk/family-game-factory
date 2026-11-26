@@ -151,10 +151,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:38:12.735Z",
-      "sourceDigest": "6925af7797920346bfc5542e781245e8f039124dca019a6962d867f334a2a400",
-      "reviewOutcome": "updated",
-      "reviewReason": "The first-creation contract now records single admission for repeated taps without changing saved-idea ownership or readiness rules.",
+      "reviewedAt": "2026-11-26T04:43:54.338Z",
+      "sourceDigest": "07fc21610f861620f19ab0faadd68800d67ab76ad7f79566f164df2cf5d3d037",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The Gem Factory guide now points reviewers to the Arcade capture archive for PRs. The game's pattern, cutter, physics, learning, accessibility and acceptance requirements retain their reviewed behavior.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -897,10 +897,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:36:23.364Z",
-      "sourceDigest": "07bc305375730f9cda5b545e4a4e8906eadc35b1af32a501054b487bc2956885",
+      "reviewedAt": "2026-11-26T04:43:31.122Z",
+      "sourceDigest": "caf68c9ddb086bef4f410c055fc8b85a0d2c5dbb5b35f08310f831ac761aa441",
       "reviewOutcome": "updated",
-      "reviewReason": "Compared the frozen npm command identities, hosted per-command timings, fixture ordering, local-only selection and visual screenshot consumers. The execution inventory records the retained evidence and release limits.",
+      "reviewReason": "Added predecessor-source inventory checks for future regressions, tested coordinated removal and verified all frozen hosted command receipts independently. Measured the local navigation loop and shadow reader.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T04:36:23.751Z",
-      "sourceDigest": "0738bb7e8cd26e21626752feda5454bebe857721c61ba33440705e8e10a005ae",
+      "reviewedAt": "2026-11-26T04:43:31.531Z",
+      "sourceDigest": "fc45a616c21770ab57cdf96ab12dd864fc36a524cfca9997e52d420c231e2620",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified the six protected contexts and unchanged frozen release source. Documented PR-scoped cancellation, visual evidence ownership, current environment blockers and the separate release regression partition.",
+      "reviewReason": "Preserved repository-default retention of the transferred factory captures and corrected the manual reviewer change link. Linked current delivery to the exact engineering PR and its protected push evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1400,10 +1400,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:36:24.145Z",
-      "sourceDigest": "d2cec1aa74d216e82cb4b0ec5a555a477c48225fd8098ab455130adab36262ec",
+      "reviewedAt": "2026-11-26T04:43:54.709Z",
+      "sourceDigest": "6a82d9e760b2acf553296077219283a0611744977077ef029b48a4dadba0fce0",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed indexed historical source records, compatibility headings, local link targets, compact session entry points and branch handoffs. Documentation diagnostics now reuse the existing digest pass.",
+      "reviewReason": "The maintenance instructions now explain comparison with the preceding independently committed source so future additions remain protected without manual count maintenance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
