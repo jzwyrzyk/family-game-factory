@@ -893,10 +893,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:15:16.208Z",
-      "sourceDigest": "a241bbdff38fbcba3de9e1213b2dcdbdb7ee487eb80b7e5aaa43e3ba16570b24",
+      "reviewedAt": "2026-11-26T05:17:04.754Z",
+      "sourceDigest": "9857b12d761d94fb24ba1f43b1eda6e8c1119525efbfdb6c8b0df618d7b45c63",
       "reviewOutcome": "updated",
-      "reviewReason": "The shared source guard now rejects residual feature copies of destination styles, and gallery screenshots use one-to-one review scale. Existing contrast, target, keyboard, no-network and propagation assertions remain intact.",
+      "reviewReason": "Extended standalone exact-source verification to production gallery and review tooling and reject untracked build inputs; dirty source was rejected before asset preparation. Existing visual and functional gates are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1137,10 +1137,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T05:09:20.863Z",
+      "reviewedAt": "2026-11-26T05:17:04.900Z",
       "sourceDigest": "2a47776af2742cf7a9343419690f4a73f24a85f1f747bb22eecf8b9a6d06d6d2",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded this implementation as a non-deploying foundation increment on the frozen source; Learning, Creative and Phase 2 retain independent gates and no production or worker pin changed.",
+      "reviewReason": "Review build identity now covers gallery and harness implementation in addition to application source and artwork. No deployment, provider or frozen release pin was altered.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1724,10 +1724,10 @@
         "docs/design-system/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "d2931807ef5bee3fc3d562c935e35c56899796e190f3ae24ed16e5d00f2ce0c5",
-      "reviewedAt": "2026-11-26T05:15:16.098Z",
+      "sourceDigest": "d3f02dfa9720ae3b2315c14a7340db2b84ee1252b587f96b26bd9bb4da3671c2",
+      "reviewedAt": "2026-11-26T05:17:05.044Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Added a regression contract against residual destination selectors in Studio and captured review iframe evidence at its actual CSS size. Source-bound evidence retains its original represented SHA and explicit remaining integration gates."
+      "reviewReason": "Recorded distinct original capture and final follow-up source identities, canonical destination ownership, and stricter gallery packaging provenance; no owner acceptance or full migration completion is inferred."
     }
   ]
 }

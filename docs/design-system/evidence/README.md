@@ -9,7 +9,7 @@ This evidence qualifies the first independently reviewable increment in [PR #221
 - [Interactive standalone HTML download](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45759863217/artifacts/15089306609). Extract and open `jems-ui-review.html`, then choose **Design system** under Page or journey state. Artifact identity: SHA-256 `265092858a34bedea9454d800984430a40ea1cd2826d08389eb3fdac8fea6b16`; retention expires December 10, 2026. Download availability is separate from passing hosted tests.
 - [Exact-source hosted standalone workflow](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45759863217). Hosted checks and independent review were still in progress when this receipt was written. Consult the run and PR for the current outcome.
 
-The later documentation/evidence commit does not change the application or review source. The artifact deliberately labels its represented full SHA; it is not relabelled as another commit.
+This receipt preserves the bdaf717 checkpoint. Follow-up `f96d5ea957da43847ea4bbf9a064786cc1bd4b1b` removes identical residual destination phone/reduced-motion rules from Studio, removes a duplicate navigation focus selector from destination CSS, strengthens the duplicate guard and captures the review iframe at 1:1 scale. The canonical shared rules remain unchanged. That follow-up receives its own exact-head artifact and focused validation; the bdaf717 download is never relabelled as another commit. Independent review of bdaf717 completed with no major findings; follow-up review and hosted qualification remain separate.
 
 ## Actual product comparisons
 
@@ -61,3 +61,5 @@ Passed locally: combined production build; all 122 Phase 2 CI contracts; 34 Math
 The live collection specimen uses the production template and cards with no page-specific stylesheet. Six existing pages receive header changes through one implementation. Five foundation blocks are consolidated and 216 exact existing color declarations use semantic roles. New focused checks reuse the existing standalone workflow instead of creating another full capture pipeline. No developer-hours or hosted CI speedup was measured.
 
 Only the collection archetype is extracted. The other seven archetypes, broader inputs/feedback/specialist-control consolidation, full existing-page migration, feature-owner acceptance, independent review, hosted exact-source checks and applicable owner/device/DEV/TEST gates remain open. No feature PR was merged, no production deployment occurred, and frozen release pins remain unchanged.
+
+The follow-up also extends the standalone exact-source guard to review/gallery implementation files and rejects untracked source inputs. This changes packaging verification, not application behavior. The final PR/run receipt records the later full SHA separately from the preserved bdaf717 captures.

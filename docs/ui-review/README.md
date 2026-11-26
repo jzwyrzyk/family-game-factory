@@ -64,3 +64,5 @@ The Journey, Pals, rewards and Powers destinations render the shared production 
 ## Production design-system gallery
 
 Choose **Design system** under Page or journey state to inspect real production tokens, headers, cards, actions, icons and the collection template. Gallery links open the actual synthetic application journeys. `/tools/design-system/` on the existing Vite server supplies fast component iteration. `design:browser` joins the existing standalone test chain; it checks four viewport sizes, contrast, touch/focus/dialog behavior and a single-token change propagating to six actual page headers. [Guide and limits](../design-system/README.md).
+
+The exact-source build guard now includes `tools/ui-review` and `tools/design-system` alongside application source and assets, and rejects untracked files in those source paths. A locally edited gallery cannot be labelled with an unrelated clean commit SHA. Documentation/evidence outside those build inputs retains its own commit identity.

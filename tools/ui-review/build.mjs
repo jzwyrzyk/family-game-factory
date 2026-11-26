@@ -5,7 +5,11 @@ import {execFileSync} from 'node:child_process';
 const root=process.cwd(),out=path.resolve(process.env.UI_REVIEW_OUT||'dist-review');
 await fs.mkdir(out,{recursive:true});
 const sha=process.env.UI_REVIEW_BASE_SHA||execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
-execFileSync('git',['diff','--exit-code',sha,'--','src','public','index.html','tests/parent-dashboard-fixture.ts'],{stdio:'pipe'});
+const sourcePaths=['src','public','index.html','tests/parent-dashboard-fixture.ts','tools/ui-review','tools/design-system'];
+// The represented SHA includes gallery/review implementation as well as product UI.
+execFileSync('git',['diff','--exit-code',sha,'--',...sourcePaths],{stdio:'pipe'});
+const untracked=execFileSync('git',['ls-files','--others','--exclude-standard','--',...sourcePaths],{encoding:'utf8'}).trim();
+if(untracked)throw new Error('Review source contains untracked files: '+untracked);
 const manifest=JSON.parse(await fs.readFile('tools/ui-review/coverage.json','utf8'));
 manifest.excludedPRs=JSON.parse(await fs.readFile('tools/ui-review/excluded-prs.json','utf8'));
 const files=await fs.readdir('public',{recursive:true});
