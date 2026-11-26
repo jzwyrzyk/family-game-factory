@@ -10,6 +10,7 @@ test('trusted game IDs resolve local counter artwork and unknown IDs share one f
   for (const id of ['mining','factory','gum','dragon','moon']) {
     const theme = learningTheme(id);
     assert.equal(theme.id,id);
+    assert.equal(Object.isFrozen(theme),true);
     assert.match(theme.counter,/^(learning-counters|early-pictures)\/[a-z_]+\.webp$/);
     assert.ok(existsSync('public/'+theme.counter));
   }

@@ -402,11 +402,12 @@ const complexScene={
         const attempt=await page.evaluate(()=>FG.learning.activeAttemptId);
         await reach(page.locator('#creationLearning [data-action="read-aloud"]'));
         if(compact) {
-          await tap(page.locator('#creationCodeView'));
+          assert.equal(await page.locator('#creationLearning').evaluate(dialog=>dialog.matches(':modal')),true);
+          await page.keyboard.press('Escape');
           assert.equal(await page.locator('#creationPlayView').getAttribute('aria-pressed'),'true');
         }
         assert.deepEqual(await scene(),beforeLearning);
-        await tap(page.locator('#creationHome'));
+        await tap(page.locator('#creationLearning [data-action="leave-game"]'));
         assert.equal(await page.evaluate(id=>FG.store.current().learning.attempts.find(a=>a.id===id)?.outcome,attempt),'interrupted');
         assert.equal(await page.locator('#page-creation').isVisible(),false,'exit remains usable');
         const navigation=page.locator('#studioNavScenes');

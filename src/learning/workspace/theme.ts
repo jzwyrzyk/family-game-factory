@@ -9,13 +9,14 @@ interface LearningTheme {
 
 // Only the host's game ID selects a local asset. Project titles, generated
 // messages, assessment content and filenames from games never enter this map.
-const fallback: LearningTheme = { id: 'jems', counter: 'learning-counters/gem_blue.webp', noun: 'gem' };
-const themes = new Map<string, LearningTheme>([
-  ['mining', { id: 'mining', counter: 'learning-counters/gem_gold.webp', noun: 'gem' }],
-  ['factory', { id: 'factory', counter: 'learning-counters/gem_mint.webp', noun: 'gem' }],
-  ['gum', { id: 'gum', counter: 'early-pictures/cube.webp', noun: 'block' }],
-  ['dragon', { id: 'dragon', counter: 'early-pictures/flower.webp', noun: 'flower' }],
-  ['moon', { id: 'moon', counter: 'early-pictures/star.webp', noun: 'star' }],
+const theme = (id: string, counter: string, noun: string): LearningTheme => Object.freeze({id, counter, noun});
+const fallback = theme('jems', 'learning-counters/gem_blue.webp', 'gem');
+const themes = new Map([
+  ['mining', theme('mining', 'learning-counters/gem_gold.webp', 'gem')],
+  ['factory', theme('factory', 'learning-counters/gem_mint.webp', 'gem')],
+  ['gum', theme('gum', 'early-pictures/cube.webp', 'block')],
+  ['dragon', theme('dragon', 'early-pictures/flower.webp', 'flower')],
+  ['moon', theme('moon', 'early-pictures/star.webp', 'star')],
 ]);
 
 export function learningTheme(gameId?: string): LearningTheme {

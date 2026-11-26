@@ -98,7 +98,7 @@ export function installCreationStudio(host: Host) {
       </div>
       <div class="creation-workspace-grid">
         <div id="creationStagePane" class="creation-stage-column">
-          <section class="creation-stage-card" aria-label="Scene preview"><div class="creation-stage-heading"><span id="creationPreviewLabel">Your stage</span><span id="creationClock">0.0 s</span><button id="creationFullscreen" class="creation-button creation-quiet" aria-pressed="false">${iconMarkup('grid')} Full screen</button></div><div class="creation-canvas-wrap"><canvas id="creationCanvas" width="800" height="450" tabindex="0" aria-label="Your scene. Select a character to edit it. Use the character buttons to trigger taps." role="img"></canvas><div id="creationLearning" class="creation-learning" hidden></div><div id="creationTargetBadge" class="creation-target-badge" hidden>Watching the goal</div><section id="creationFeedback" class="creation-feedback" tabindex="-1" aria-live="polite" hidden></section></div><div id="creationSceneWords" class="creation-scene-words" aria-live="polite" hidden></div><div class="creation-playbar"><button id="creationRun" class="creation-button creation-play">${iconMarkup('play')} Play</button><button id="creationPause" class="creation-button" disabled>${iconMarkup('pause')} Pause</button><button id="creationReset" class="creation-button" aria-label="Reset scene to its beginning">${iconMarkup('retry')} Reset</button><span id="creationTapSlot"></span><button id="creationStep" class="creation-button" aria-label="Advance the scene by one tenth of a second">${iconMarkup('chevron')} Step</button><span id="creationRunStatus">Ready to try</span></div></section>
+          <section class="creation-stage-card" aria-label="Scene preview"><div class="creation-stage-heading"><span id="creationPreviewLabel">Your stage</span><span id="creationClock">0.0 s</span><button id="creationFullscreen" class="creation-button creation-quiet" aria-pressed="false">${iconMarkup('grid')} Full screen</button></div><div class="creation-canvas-wrap"><canvas id="creationCanvas" width="800" height="450" tabindex="0" aria-label="Your scene. Select a character to edit it. Use the character buttons to trigger taps." role="img"></canvas><div id="creationTargetBadge" class="creation-target-badge" hidden>Watching the goal</div><section id="creationFeedback" class="creation-feedback" tabindex="-1" aria-live="polite" hidden></section></div><div id="creationSceneWords" class="creation-scene-words" aria-live="polite" hidden></div><div class="creation-playbar"><button id="creationRun" class="creation-button creation-play">${iconMarkup('play')} Play</button><button id="creationPause" class="creation-button" disabled>${iconMarkup('pause')} Pause</button><button id="creationReset" class="creation-button" aria-label="Reset scene to its beginning">${iconMarkup('retry')} Reset</button><span id="creationTapSlot"></span><button id="creationStep" class="creation-button" aria-label="Advance the scene by one tenth of a second">${iconMarkup('chevron')} Step</button><span id="creationRunStatus">Ready to try</span></div></section>
         </div>
         <section id="creationCodePane" class="creation-code-card" aria-label="Scene blocks">
           <aside class="creation-palette" aria-label="Add a block"><h3>Add an action</h3><div id="creationPalette"></div></aside>
@@ -113,10 +113,13 @@ export function installCreationStudio(host: Host) {
       </div>
       <section id="creationVersions" class="creation-versions" hidden><div class="creation-shelf-heading"><h2>Saved versions</h2><button id="creationCloseHistory" class="creation-button">${iconMarkup('close')} Close</button></div><div id="creationVersionList"></div></section>
     </div>
+    <dialog id="creationLearning" class="creation-learning" aria-label="Learning activity"></dialog>
     <input id="creationImport" type="file" accept="application/json,.json" hidden>
     <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">${iconMarkup('close')}</button></div><div id="creationPalSlot"></div><section><div class="creation-shelf-heading"><h3>My art</h3><button id="creationOpenArtStudio" class="creation-button">${iconMarkup('edit')} My Art</button></div><p id="creationActorArtStatus" role="status"></p><div id="creationPrivateActorChoices" class="creation-actor-choices"></div></section><h3>Characters & things</h3><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
   document.querySelector('main')!.append(page);
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => page.querySelector<T>('#' + id)!;
+  const learningDialog = $<HTMLDialogElement>('creationLearning');
+  learningDialog.addEventListener('cancel', event => event.preventDefault());
   const introduction=createStudioIntroduction(host.guidance,()=>shelf('landing'));
   $('creationShelf').before(introduction.element);
   const privateArt=new PrivateArtResolver(owner);
@@ -248,10 +251,25 @@ export function installCreationStudio(host: Host) {
   async function learningThen(action: () => void|Promise<void>) {
     if (locked() || !isCurrent()) return;
     if (recoveryPending) { status(recoveryMessage, true); return; }
-    const target = $('creationLearning'), beforeOwner = sceneOwner, beforeId = entryId;
-    const done = () => { target.hidden = true; if (isCurrent() && beforeOwner === owner() && beforeId === entryId) void act(action); };
-    const asked = FG.learning.checkpoint(target, { gameId: 'creation', projectId: entryId, versionId: revisionId }, done, { onLeave: () => host.home() });
-    if (asked) { stop(); setWorkspaceView('play'); target.hidden = false; } else await action();
+    const beforeOwner = sceneOwner, beforeId = entryId;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const done = () => {
+      learningDialog.close();
+      if (!isCurrent() || beforeOwner !== owner() || beforeId !== entryId) return;
+      const focusTarget = previous && page.contains(previous) && previous.getClientRects().length && !previous.matches(':disabled')
+        ? previous : $('creationCanvas');
+      focusTarget.focus({preventScroll: true});
+      void act(action);
+    };
+    const asked = FG.learning.checkpoint(learningDialog, { gameId: 'creation', projectId: entryId, versionId: revisionId }, done, {
+      onLeave: () => act(async () => { await saveVersion(); host.home(); }),
+    });
+    if (asked) {
+      stop();
+      setWorkspaceView('play');
+      learningDialog.showModal();
+      FG.learning.focus();
+    } else await action();
   }
   async function run(record = false) {
     assertEditing(); setWorkspaceView('play'); $('creationFeedback').hidden = true; await saveVersion();
@@ -862,7 +880,7 @@ export function installCreationStudio(host: Host) {
     if (!visible) return; stop(); clearInterval(checkpointTimer); visible = false; viewEpoch++;
     stopReading(); setExpandedView(false); page.classList.remove('has-scene'); document.body.classList.remove('creation-editing'); fullTools = false; expandedBlockId = '';
     privateArt.clear();stage.clear();
-    $<HTMLDialogElement>('creationActorDialog').close(); $('creationLearning').hidden = true;
+    $<HTMLDialogElement>('creationActorDialog').close(); learningDialog.close();
   }
   $('creationHome').onclick = async () => await act(async () => { await saveVersion(); host.home(); });
   $('creationBack').onclick = async () => await act(async () => await shelf());
@@ -1021,7 +1039,14 @@ export function installCreationStudio(host: Host) {
   canvas.onpointerdown = async event => {
     if (!isCurrent() || locked() || targetMode) return; const point = stage.point(event), id = stage.hit(point.x, point.y); if (!id) return;
     if (recoveryPending) { status(recoveryMessage, true); return; }
-    if (engine?.snapshot().status === 'running' || engine?.snapshot().status === 'completed') { await act(() => learningThen(() => { engine!.resume(); engine!.tap(id); animate(); })); return; }
+    if (engine?.snapshot().status === 'running' || engine?.snapshot().status === 'completed') {
+      // Default pointer focus runs after this handler and could steal focus
+      // back from a checkpoint that opened in response to this very tap.
+      event.preventDefault();
+      canvas.focus({preventScroll: true});
+      await act(() => learningThen(() => { engine!.resume(); engine!.tap(id); animate(); }));
+      return;
+    }
     selectedActor = id; selectedProgram = scene!.programs.find(p => p.actorId === id)?.id || ''; insert = null; renderEditor(); paint();
     if (!challengeId) { drag = { id, ...point, moved: false }; canvas.setPointerCapture(event.pointerId); }
   };
@@ -1052,7 +1077,10 @@ export function installCreationStudio(host: Host) {
   });
   window.addEventListener('beforeunload', event => { if (visible&&pendingActions&&rewardSourceWritable()){event.preventDefault();event.returnValue='';} });
   window.addEventListener('pagehide', () => stop());
-  window.addEventListener('factory-learning-active', event => { if (visible && (event as CustomEvent).detail) { stop(); } });
+  window.addEventListener('factory-learning-active', event => {
+    if ((event as CustomEvent).detail) { if (visible) stop(); }
+    else if (learningDialog.open) learningDialog.close();
+  });
   document.addEventListener('visibilitychange', () => { if (document.hidden && visible) { stop(); paint(); } });
   const api = {
     open, openChallenges, close:leave,

@@ -15,7 +15,7 @@ import {createReadAloudControl} from '../speech/read-aloud-control';
 
 export interface LanguageActivityOptions {
   profile:LanguageProfile;context?:LanguageContext;item?:LanguageItem;mode?:LearningMode;
-  onComplete(result:LanguageResult):void;onSave(attempt:LanguageAttempt):void;onLeave?:()=>void;legacyIds?:boolean;
+  onComplete(result:LanguageResult):void;onSave(attempt:LanguageAttempt):void;onLeave?:()=>void;leaveLabel?:string;legacyIds?:boolean;
 }
 let sequence=0;
 const make=<K extends keyof HTMLElementTagNameMap>(tag:K,cls?:string,text?:string):HTMLElementTagNameMap[K]=>{
@@ -34,7 +34,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
   const interaction= literacyInteraction(item);
   const titleText = interaction === 'punctuation' ? 'Which mark ends this sentence?' : item.question;
   const shell=createLearningWorkspace({subject:'language',grade:profileGrade(options.profile),title:titleText,id:prefix+'-title',
-    owner:String(options.profile.id??''),gameId:options.context?.gameId,onLeave:options.onLeave,signal:listeners.signal});
+    owner:String(options.profile.id??''),gameId:options.context?.gameId,leaveLabel:options.leaveLabel,onLeave:options.onLeave,signal:listeners.signal});
   const {root,title,work,feedback,helpPanel:hintPanel}=shell;
   root.dataset.skillId=item.skillId;root.dataset.kind=item.kind;root.dataset.interaction=interaction;
   root.dataset.mode=mode;root.dataset.attemptId=attempt.id;
