@@ -2,7 +2,7 @@
 
 **Scope:** the style-aware production and acceptance path implemented on this branch for real generated games. This extends the earlier [Game Intelligence work](README.md); it does not replace its independent authored behavioral probes, authorization, learning host or execution isolation. Source implementation is not deployment or provider activation. See [delivery state](../../DELIVERY-STATE.md) for dated release evidence.
 
-**Decision:** [ADR0006](../decisions/0006-style-diverse-playable-quality.md), following the owner's request to carry the craft of Gem Factory into generated games without making every game look or play alike. Child art uploads and a new art-library workflow remain later work.
+**Decision:** [ADR0006](../decisions/0006-style-diverse-playable-quality.md), following the owner's request to carry the craft of Gem Factory into generated games without making every game look or play alike. The [private artwork slot contract](CREATIVE-ART-SLOTS.md) covers the separate local qualification of original drawings. Private originals and captures containing them remain outside provider review.
 
 ## The quality target
 

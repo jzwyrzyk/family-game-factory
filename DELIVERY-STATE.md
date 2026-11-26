@@ -1,5 +1,9 @@
 # jems delivery state
 
+## November 26, 2026 — local game-art qualification
+
+The dependent review build adds a playable, synthetic Gem Hunt to the trusted scene editor on localhost. The original drawing moves according to bounded positions from an isolated archived generated-module worker. The host retains its pixels. A regular frontend build has no executable Gem Hunt path. The generic delivery proposals in #202 and #206 need independent security review and hosted qualification. [Game-slot contract and reproduction](docs/game-intelligence/CREATIVE-ART-SLOTS.md)
+
 ## November 26, 2026 — draw-to-animation candidate
 
 The application candidate builds on the converged input head `4be7c6dd70b588cfbd288cc8d7a68fe94d9ae37c`. #198 reconciles #196 and #197. #207 combines the #199 editable PNG, #200 layered art, #201 editable coded paths and #204 exact-family-PNG validation. The pointer utility also matches the learning bridge in #203, while #192–195 keep ownership of learning scratchpads. #202 is a parallel isolated game-slot qualification. #205 supplies a separate reviewer baseline. Production and family enrollment remain under their existing release controls.

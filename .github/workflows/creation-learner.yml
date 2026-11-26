@@ -10,6 +10,8 @@ on:
       - 'tests/animation-editor-browser.cjs'
       - 'tests/creative-world-browser.cjs'
       - 'tests/drawing-animation.test.ts'
+      - 'tools/creative-art-review/**'
+      - 'tests/creative-art-game-browser.cjs'
       - 'tests/creation-learner*'
       - 'tests/pal-scene-image.test.ts'
       - 'src/pals/creation.ts'
@@ -51,6 +53,10 @@ jobs:
           node tests/animation-editor-browser.cjs
           node tests/creative-world-browser.cjs
           node scripts/connected-universe-browser.cjs
+      - name: Local-only generated module with a host-rendered synthetic sprite
+        run: |
+          npx --no-install vite build --mode creative-art-review --outDir test-results/creative-art-review
+          node tests/creative-art-game-browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

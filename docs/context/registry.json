@@ -421,10 +421,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "03a005be73a8505ffb7934c69fb7c58ec9b7774522c21c0da92998362e0f0178",
-      "reviewedAt": "2026-11-26T03:19:45.541Z",
+      "sourceDigest": "3b8febc5ec315743b7285b8e1b4b78d11aa2ff6b8f23cd7b79758c0909e99346",
+      "reviewedAt": "2026-11-26T03:22:16.915Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The scene contract records deterministic saved-motion playback, immutable illustrated worlds, custom backdrops and reusable kept scenery.",
+      "reviewReason": "Architecture records a localhost-only host-rendered game entry over the same owner-checked private sprite resolver.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -745,10 +745,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:55.850Z",
-      "sourceDigest": "3c42ed09d4394afe0c109b5a6fa6d9d87f119c2474a5101fb24cafd81bf20c81",
+      "reviewedAt": "2026-11-26T03:22:17.039Z",
+      "sourceDigest": "06ea1cfffc2016285163697abf332e57e44caac7908bc4d5ee74acb21c46864b",
       "reviewOutcome": "updated",
-      "reviewReason": "Scene authoring uses active Pal IDs. The ADR and scene rendering contract cover reading saved generated versions through the historical asset resolver.",
+      "reviewReason": "Generation and planning contracts enforce 2D authentic art rules while preserving the existing premium and editable-companion request budgets.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -903,10 +903,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:19:45.769Z",
-      "sourceDigest": "025f2c2d0135dce7ffb82e4f5c1587428ab50e8391c08f4eb04746cd70a0c946",
+      "reviewedAt": "2026-11-26T03:22:17.187Z",
+      "sourceDigest": "b53d848969e1789c2258c5c9b7c91a114975dc39faae3dd7ea3d7194ae96420c",
       "reviewOutcome": "updated",
-      "reviewReason": "Delivery records link actual seven-drawing fidelity, recovery, profile isolation and touch journeys with rendered screenshots and playback evidence.",
+      "reviewReason": "The game-slot contract and delivery record document the original-pixel gameplay capture, isolated worker, replay and learning interruption tests.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1147,10 +1147,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:19:46.043Z",
-      "sourceDigest": "c27fd7a61f45f8956fb0366ad2d4cb50190eb425e3f46cf977b10ef23437dda7",
+      "reviewedAt": "2026-11-26T03:22:17.353Z",
+      "sourceDigest": "865d4601078d2b5e3cd39c9e72bcdc48028ad2dd6239d27e7d638c1a3e8d9eac",
       "reviewOutcome": "updated",
-      "reviewReason": "The candidate links the reviewed prerequisite heads and adds reproducible connected movement and world tests to the existing coding review workflow.",
+      "reviewReason": "Coding review builds and plays the offline-only synthetic example; general generated-game asset delivery remains independently gated.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
