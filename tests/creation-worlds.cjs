@@ -77,6 +77,7 @@ async function buildMixedWorld(page) {
   const twin = (await scene(page)).actors.at(-1);
   assert.notEqual(twin.id,original.id);
   for (const action of ['Move right','Bigger','Turn']) await placement.getByRole('button',{name:action}).click();
+  await page.locator('.creation-layer-tools > summary').click();
   await page.getByLabel('Picture layer').selectOption('front');
   await page.waitForFunction(id => FG.creation.scene().actors.find(a => a.id === id)?.layer === 'front',twin.id);
   const placed = (await scene(page)).actors.find(a => a.id === twin.id);

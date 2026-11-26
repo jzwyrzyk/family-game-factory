@@ -1,6 +1,21 @@
 import { ILLUSTRATED_WORLDS, WORLD_PROPS } from './illustrated-art';
 import type { CreationProject, SceneActor } from './model';
 
+// Paint order is independent of interpreter order, including simultaneous programs.
+export function orderedPlacements<T extends SceneActor>(actors:T[]):T[] {
+  if (!actors.some(actor => actor.stackOrder !== undefined)) return actors;
+  return actors.map((actor,index) => ({actor, rank:actor.stackOrder ?? index}))
+    .sort((a,b) => a.rank - b.rank).map(item => item.actor);
+}
+
+export function stackPlacement(project:CreationProject, selected:SceneActor, top:boolean) {
+  const peers = orderedPlacements(project.actors).filter(actor =>
+    actor.id !== selected.id && (actor.layer ?? 'middle') === (selected.layer ?? 'middle'));
+  if (top) peers.push(selected);
+  else peers.unshift(selected);
+  peers.forEach((actor,index) => { actor.stackOrder = index; });
+}
+
 export function worldTiles(open: (id: string) => void) {
   const tiles = document.createElement('div');
   tiles.id = 'creationWorldTiles';

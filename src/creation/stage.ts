@@ -1,4 +1,5 @@
 import { ILLUSTRATED_WORLDS } from './illustrated-art';
+import { orderedPlacements } from './world-tools';
 import type { CreationProject, SceneLayer } from './model';
 import type { ActorSnapshot, SceneSnapshot } from './engine';
 import { creationAsset, drawCreationVector, parsePrivateArtId, type CreationAsset } from './projects';
@@ -126,8 +127,9 @@ export class CreationStage {
     } else if (scene.background === 'blank') {
       c.fillStyle = '#fff'; c.fillRect(0, 0, w, h);
     } else this.background(scene);
+    const placements = orderedPlacements(snapshot.actors);
     const drawActors = (layer: SceneLayer) => {
-      for (const actor of snapshot.actors) {
+      for (const actor of placements) {
         if (actor.visible && (actor.layer ?? 'middle') === layer) this.actor(actor, actor.id === selected);
       }
     };
@@ -148,7 +150,7 @@ export class CreationStage {
     }
   }
   hit(x: number, y: number): string | null {
-    const actors = this.snapshot?.actors ?? [];
+    const actors = orderedPlacements(this.snapshot?.actors ?? []);
     for (const layer of ['front', 'middle', 'back']) {
       for (let i = actors.length - 1; i >= 0; i--) {
         const actor = actors[i];

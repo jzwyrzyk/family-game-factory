@@ -224,6 +224,11 @@
       "action": "coding-challenge"
     },
     {
+      "id": "world-builder",
+      "label": "Build in the Enchanted Gem Forest",
+      "action": "world-builder"
+    },
+    {
       "id": "art-draw",
       "label": "Art Studio: drawing canvas",
       "action": "art-draw"
