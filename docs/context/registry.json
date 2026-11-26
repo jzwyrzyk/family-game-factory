@@ -76,6 +76,7 @@
     "docs/decisions/2026-11-21-profile-play-and-reading.md",
     "docs/bubble-gum-builders/README.md",
     "docs/decisions/2026-11-22-bubble-gum-assembly.md",
+    "docs/game-intelligence/PRIVATE-SPRITE-QUALIFICATION.md",
     "docs/game-intelligence/PREMIUM-BUILDER.md",
     "docs/game-intelligence/premium-benchmark/README.md",
     "docs/decisions/2026-11-23-premium-builder.md",
@@ -84,7 +85,12 @@
     "docs/development/SETUP.md",
     "docs/development/COSTS.md",
     "docs/decisions/2026-11-23-dev-test-prod.md",
-    "docs/ui-review/README.md"
+    "docs/ui-review/README.md",
+    "docs/creative-universe/STANDARD.md",
+    "docs/decisions/2026-11-26-connected-creative-universe.md",
+    "docs/creation-studio/WORLD_ART.md",
+    "docs/creation-studio/world-art-manifest.json",
+    "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -125,7 +131,8 @@
     "docs/development/*.md",
     "infra/nonproduction/*.md",
     "docs/development/evidence/*.md",
-    "docs/storage/*.md"
+    "docs/storage/*.md",
+    "docs/creative-universe/*.md"
   ],
   "areas": [
     {
@@ -146,10 +153,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:38:12.735Z",
-      "sourceDigest": "6925af7797920346bfc5542e781245e8f039124dca019a6962d867f334a2a400",
+      "reviewedAt": "2026-11-26T03:19:38.821Z",
+      "sourceDigest": "ff9c02d667b54ac95443882ff6269ecf8d27444f45635284e0f055eacb1974d2",
       "reviewOutcome": "updated",
-      "reviewReason": "The first-creation contract now records single admission for repeated taps without changing saved-idea ownership or readiness rules.",
+      "reviewReason": "Converged both concurrent art standards on exact originals, explicit 2D game roles, world editions and permanent private artwork boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -310,10 +317,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:37:55.191Z",
-      "sourceDigest": "9fc46a601c3012b0fd13afe7231ff32b111837e443a734f47bfa672e1a5056ce",
+      "reviewedAt": "2026-11-26T03:19:38.980Z",
+      "sourceDigest": "879a3ff172bd4e85db495b78e71238eeec47198589ed524ec6caa7e1d090ac0e",
       "reviewOutcome": "updated",
-      "reviewReason": "The first-creation contract records the per-idea Build gesture guard across async storage and review. Shared headings and navigation still use the guarded host routes.",
+      "reviewReason": "Reviewed the compatible drawing and scene changes with family reviewed uploads, active-profile checks and retained game entrances.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -402,18 +409,23 @@
         "docs/creation-studio/*.md",
         "docs/decisions/0007-creation-and-rebuild-practice.md",
         "docs/rewards/*.md",
-        "docs/pals/*.md"
+        "docs/pals/*.md",
+        "docs/creative-universe/STANDARD.md",
+        "docs/decisions/2026-11-26-connected-creative-universe.md"
       ],
       "sources": [
         "src/creation/**",
         "server/agent/creation-schema.ts",
-        "tests/creation-*"
+        "tests/creation-*",
+        "public/art/creative-worlds/**",
+        "docs/creation-studio/world-art-manifest.json",
+        "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fee0252694b94e3f1254485510ef5c6da2cbd6ca19ac18af19c0ec8e8e26b54d",
-      "reviewedAt": "2026-11-25T23:20:54.040Z",
+      "sourceDigest": "d122a456a3e7cc1cfdcf951c51bbf1113eebdb7d6df92a9daf9b20a755f44dca",
+      "reviewedAt": "2026-11-26T03:19:39.415Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The scene rendering contract distinguishes legacy pinned tokens and neutral bytes from new active actor choices.",
+      "reviewReason": "Reviewed layered catalogue IDs and immutable named motion alongside the reduced-motion learner fix and isolated slot experiment.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -729,15 +741,16 @@
         "server/sandbox/**",
         "server/testing/**",
         "docs/game-intelligence/*.md",
+        "tools/qualification/private-art-slot.ts",
         "tools/premium-*",
         "docs/game-intelligence/premium-benchmark/*.md",
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:55.850Z",
-      "sourceDigest": "3c42ed09d4394afe0c109b5a6fa6d9d87f119c2474a5101fb24cafd81bf20c81",
+      "reviewedAt": "2026-11-26T03:11:28.263Z",
+      "sourceDigest": "2f438d9162a56e683be1166296809e9b6336fa2cb68e68a5fb80bc5014c22144",
       "reviewOutcome": "updated",
-      "reviewReason": "Scene authoring uses active Pal IDs. The ADR and scene rendering contract cover reading saved generated versions through the historical asset resolver.",
+      "reviewReason": "Documented exact slot, digest and profile checks in an offline compositor receiving only captured v2 frame commands. Production preview, worker and paid operations remain outside the experiment.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -888,13 +901,14 @@
         "scripts/verify-brand-assets.mjs",
         "scripts/tests/verify-pal-assets.test.mjs",
         "scripts/ci/**",
-        "scripts/environments/ci_evidence.py"
+        "scripts/environments/ci_evidence.py",
+        "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:23:11.824Z",
-      "sourceDigest": "5f7b1ef674e2b84dd647d329848d15cf1839bc2b621d5472752fe3445bcdc3d3",
+      "reviewedAt": "2026-11-26T03:26:10.642Z",
+      "sourceDigest": "72ed819537605ed580b3b4c7c83e2e6a7ee54e174072500f7ab223f5b5e20bad",
       "reviewOutcome": "updated",
-      "reviewReason": "Delivery state records the failed hosted Pal reload and the visible onboarding path. The exact same regression commands, assertions, rendering code and timeouts remain in force, with two new pre-navigation persistence assertions.",
+      "reviewReason": "Verified the combined drawing, movement and selected-slot suites. The exact manifest has 67 creative and 44 browser commands, with all prior required tests retained.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1135,10 +1149,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T01:23:12.305Z",
-      "sourceDigest": "3a5ab9bfd335677e581d5e32600605a1c3cf253d9a45b9e0e271b77ea454684f",
+      "reviewedAt": "2026-11-26T03:19:39.720Z",
+      "sourceDigest": "f09c3c5942a4451ad6855d65ebb0faee1d49592053532089444ceced98594253",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the passing protected-main suite and the subsequent failed documentation-candidate Pal shard with its retained evidence and correction.",
+      "reviewReason": "Combined existing CI registrations and reviewed separate development and deployment gates for all contributing branches.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1393,10 +1407,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:58.459Z",
-      "sourceDigest": "37c0c3f9ee5432f31d4741e23cb41fe2cc54569af18aec957152e780590aad46",
+      "reviewedAt": "2026-11-26T03:19:39.872Z",
+      "sourceDigest": "c5073a8ae7f6bf43501e0346eb88845923859037348e2b1ae0437341f441d5ae",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the roster and Journey decision with companion contracts and updated the documentation index.",
+      "reviewReason": "Reconciled linked documentation paths and both concurrent sets of registry routes, including the illustrated art manifest.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1606,7 +1620,11 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/drawings/*.md",
         "docs/creation-studio/*.md",
-        "docs/decisions/2026-11-19-private-art-studio.md"
+        "docs/decisions/2026-11-19-private-art-studio.md",
+        "docs/creative-universe/STANDARD.md",
+        "docs/decisions/2026-11-26-connected-creative-universe.md",
+        "docs/creative-universe/*.md",
+        "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md"
       ],
       "sources": [
         "src/drawing/**",
@@ -1614,13 +1632,14 @@
         "tests/art-*",
         "tests/drawing-*",
         "tests/creation-private-art*",
-        "tests/picture-tools-browser.cjs"
+        "tests/picture-tools-browser.cjs",
+        "tests/crayon-revision-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "467544c05466d8d0c1045244fa942dbfccf7b81e1e04635e8f5ecae1c0b62afc",
-      "reviewedAt": "2026-11-25T23:21:00.320Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "My Creations uses the shared header and retains the My Art action. The drawing library, private assets and editor use the inherited My Art contract.",
+      "sourceDigest": "180a66e42bea5c5f7982bd316476525280fbdb0897b7867dff392942737ac4a6",
+      "reviewedAt": "2026-11-26T03:19:40.028Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed lossless embedded source, original-byte ingestion and the private asset catalogue contract across the converged branches.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1700,10 +1719,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "381260b659e8d8ed26b7fdddb3c2182a49d2f8f9cffd808e7d167695f25bfb3a",
-      "reviewedAt": "2026-11-26T00:23:36.006Z",
+      "sourceDigest": "3b669cf847b1ba4c4642c8130894505a04e7b12f3707b8ffd273b74370ed92df",
+      "reviewedAt": "2026-11-26T03:08:54.218Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled merged F06 rollback limits with the owner-scoped Pal migration, retained readers and repeat restore contract."
+      "reviewReason": "Architecture records reads of the active owner’s kept scene revision in both original and indexed scene storage. Copying motion writes a new group of block IDs through existing autosave, keep and backup."
     }
   ]
 }

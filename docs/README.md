@@ -16,8 +16,10 @@ The [standalone UI review](ui-review/README.md) packages the real UI for offline
 
 ## Canonical references
 
+
 | Reference | Question it answers | Update when |
 | --- | --- | --- |
+| [Creative Asset & World Design Standard](creative-universe/STANDARD.md) | How does one child-owned artwork retain identity, versions, movement and roles across activities? | Creative storage, picker, worlds, games or destination support changes |
 | [Agent entry point](../AGENTS.md) | What should an assistant read and preserve before answering or developing? | Working method or context-loading rules change |
 | [Product doctrine](../PRODUCT-DOCTRINE.md) | Why are we building jems, and what must remain true? | An accepted product principle or tradeoff changes |
 | [Current architecture](../ARCHITECTURE-CURRENT.md) | What is implemented, where does it live, and how do boundaries interact? | Components, APIs, storage, trust or version contracts change |
@@ -47,7 +49,7 @@ The [standalone UI review](ui-review/README.md) packages the real UI for offline
 | Jem Factory pattern matching and machine play | [Factory contract](brand/GEM_FACTORY.md), [clearer play decision](decisions/2026-11-22-factory-play-clarity.md) | `src/games/gem-factory*`, `src/runtime/manifests.ts`, `tests/gem-factory*`; physical routing, forgiving cut recovery, two-cycle pattern progression and preserved finishing choices |
 | Game archetypes and creative differentiation (research only) | [Archetype engine charter](archetypes/README.md), [Game Intelligence](game-intelligence/README.md) | `src/archetypes/`, `tests/archetype*`; 22 archetype records, 77 proposed mechanics, 88 design-only play patterns and headless prototypes; no production composition engine |
 | Optional build-wait game | [Mind Your Jems design and validation](mind-your-jems/README.md), [recovery checkpoint](mind-your-jems/RECOVERY-CHECKPOINT.md) | `src/games/mind-your-jems*`, `public/art/mind-your-jems/`, `public/fonts/fredoka/`, `tests/mind-your-jems*` |
-| Generated-game quality, intent and repair | [Game Intelligence](game-intelligence/README.md), [presentation quality](game-intelligence/PRESENTATION-QUALITY.md), [cross-vertical standard](game-intelligence/cross-vertical-standard.md), [merge handoff](game-intelligence/merge-handoff.md) | `server/quality/`, `server/actions/`, `server/sandbox/`; distinct visual styles, captured play, separate review and bounded repair |
+| Generated-game quality, intent and repair | [Offline private sprite slot qualification](game-intelligence/PRIVATE-SPRITE-QUALIFICATION.md), [Game Intelligence](game-intelligence/README.md), [presentation quality](game-intelligence/PRESENTATION-QUALITY.md), [cross-vertical standard](game-intelligence/cross-vertical-standard.md), [merge handoff](game-intelligence/merge-handoff.md) | `server/quality/`, `server/actions/`, `server/sandbox/`; distinct visual styles, captured play, separate review and bounded repair |
 | Math | [Math overview](adaptive-math/README.md), [curriculum](adaptive-math/curriculum.md), [integration](adaptive-math/integration.md), [acceptance](adaptive-math/acceptance.md) | `src/learning/`, host integration and learning tests |
 | Language Arts | [Language overview](adaptive-language/README.md), [curriculum](adaptive-language/curriculum.md), [integration](adaptive-language/integration.md), [acceptance](adaptive-language/acceptance.md) | `src/language/`, language integration tests |
 | Background problem solving and optional reasoning practice | [Formative feature contract](problem-solving/README.md), [standards and assessment comparisons](problem-solving/BENCHMARKS.md), [implementation and acceptance](problem-solving/IMPLEMENTATION.md), [accepted decision](decisions/0011-formative-problem-solving-evidence.md) | `src/problem-solving/`, trusted-host source adapters and `tests/problem-solving-*`; separate context from structured observations and from PR54 independent research |
