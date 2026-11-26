@@ -62,12 +62,9 @@ body.studio-review .studio-play-mode #studioRemoteHost { height: 100%; min-heigh
 body.studio-review .studio-play-mode #game-mount { overflow: auto; overscroll-behavior: contain; }
 body.studio-review .studio-play-mode #studioRemoteHost iframe { width: 100% !important; height: 100% !important; min-height: 0; max-height: 100%; }
 body.studio-review .studio-play-mode :is(.stage-overlay, .learning-preview-cover) { overflow-y: auto; overscroll-behavior: contain; align-items: safe center; }
-body.studio-review .studio-play-mode .learning-modal-card { max-height: 100%; overflow: auto; }
-/* The legacy Language host uses a viewport-fixed overlay. Inside the fitted
-   player its stacking context would put that overlay beneath the site header.
-   Use the real game boundary instead, including its own readable scroll card. */
-body.studio-review .studio-play-mode .stage-overlay:has(.language-activity) {
+body.studio-review .studio-play-mode .stage-overlay:has(.learning-workspace) {
   position: absolute; inset: 0; width: auto; height: auto; z-index: 20;
+  align-items: flex-start;
 }
 
 /* Canvas favorites reserve room for their real touch controls. No transform

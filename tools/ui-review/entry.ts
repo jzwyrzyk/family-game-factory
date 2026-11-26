@@ -1,4 +1,5 @@
 import '../../src/style.css';
+import {openLearningSample} from './learning';
 import {parentDashboardFixture} from '../../tests/parent-dashboard-fixture';
 import {StudioNotebook} from '../../src/studio/notebook';
 import {CREATION_KEY} from '../../src/creation/storage';
@@ -11,6 +12,7 @@ import {PAL_CATALOG} from '../../src/pals/catalog';
 import {palSnapshotFromRewards} from '../../src/pals/service';
 import {PROBLEM_SOLVING_KEY} from '../../src/problem-solving/model';
 const w=window as any,config=w.__reviewConfig;
+w.__openLearningSample=openLearningSample;
 const fixture=parentDashboardFixture(Date.now());
 const empty=['first-time','empty'].includes(config.scenario);
 if(!localStorage.getItem('family-game-factory-state-v1')){

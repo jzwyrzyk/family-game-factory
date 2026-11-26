@@ -20,7 +20,7 @@ The shared narrator cancels pending voice discovery, availability checks, synthe
 | Creation Studio | Persistent reading toolbar for current directions, scene challenge, visible hint or scene-check feedback; a control remains available inside the character picker |
 | Grown-ups | Explicit Jems voice preview with displayed natural/device mode; separate preview and selection of an eligible installed device backup voice |
 
-Math question narration supplies access to the wording without computing or revealing an answer and does not add a mathematical hint. English passage/question playback retains the existing listening-support evidence rule: evidence is recorded at actual playback, not at button tap, request submission or successful audio download. Narrating an already revealed hint does not remove the hint’s assistance history. Creator directions do not award learning credit.
+Math question narration supplies access to the wording without computing or revealing an answer and does not add a mathematical hint. English has a neutral direction reader and an explicit Read with me path for assessed material. Record listening support for the latter at actual playback. Early device-only prompt delivery follows the existing completion and grown-up fallback rules. Narrating an already revealed hint does not remove the hint’s assistance history. Creator directions do not award learning credit.
 
 ## Voice policy and limits
 

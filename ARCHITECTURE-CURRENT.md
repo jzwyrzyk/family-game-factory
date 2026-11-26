@@ -2,6 +2,13 @@
 
 The browser owns play, local creation and the learning host. The family gateway owns authorization and durable job admission. A separate preview origin runs generated content. The private worker and private coach have independent credentials, consent and spending boundaries. The family beta adds per-family workspaces and isolated origins. [Family architecture](docs/family-beta/ARCHITECTURE.md) · [Deployment and acceptance](DELIVERY-STATE.md)
 
+
+## Unified Learning Workspace
+
+The trusted Math and English activity entry points present a common light workspace. The active profile supplies its age band. The authored item supplies its stimulus, answer contract and subject-specific interactions. Host adapters handle admission, saves, interruption, profile scope, pause and continuation. A child can change tools or revise an answer within the same attempt. Dark game-result surfaces retain their own styles. [Learning workspace standard](docs/learning/LEARNING_WORKSPACE_STANDARD.md) · [Child interface](docs/brand/CHILD_INTERFACE.md)
+
+[The workspace shell](src/learning/workspace/shell.ts) accepts the subject, captured owner, profile grade, trusted game identity, leave action and lifetime signal. The host owns its navigation boundary. [Math model routing](src/learning/workspace/math.ts) distinguishes answer construction from exploration. [English interaction routing](src/language/reading-workspace.ts) binds passages, tiles and local writing to the declared content pack. The host injects the equipped Pal portrait through the [theme registry](src/learning/workspace/theme.ts). Games receive the existing pause/continue protocol. Workspace gestures, scratch marks and portrait reactions have no storage or reward writer.
+
 ## Component and source map
 
 | Component | Responsibility and source of truth |

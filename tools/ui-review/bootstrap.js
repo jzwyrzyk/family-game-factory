@@ -94,7 +94,11 @@ window.__reviewNavigate=async action=>{
   window.addEventListener('factory-page',opened);click('studioMenuParent');
  });
  FG.learning?.dispose();for(const d of document.querySelectorAll('dialog[open]'))d.close();
- if(action==='home')FG.studio.home();
+ if(action.startsWith('learn:')){
+  const sample=host.learningSamples.find(sample=>sample.action===action);
+  if(!sample)throw Error('Unknown review sample');
+  window.__openLearningSample(sample,host.learningTheme,host.config.grade);
+ }else if(action==='home')FG.studio.home();
  else if(action==='create')click('studioNavCreate');
  else if(action==='creations'){FG.studio.home();click('studioSavedIdeas');}
  else if(action==='coding')FG.creation.open();

@@ -47,7 +47,7 @@ Use `--jems-child-label` and `--jems-child-body` from [the shared brand layer](.
 
 Light activities use dark ink; dark activities and game results use appropriate light ink. Set the foreground and background together. Do not apply a dark card's heading or form rules to every descendant of a host container. Native learning mounts use `learning-modal-card`, separate from dark result `modal-card` styling. Language edit and creative labels own their dark ink even inside an older panel. Save failures have an explicit readable warning background and foreground. Selected answers and used letter tiles remain instructional content: do not fade their text when the control becomes disabled.
 
-Inspect actual composed screens. An isolated component can pass while a more specific outer selector turns its heading white. Test native Studio games, the legacy game shell, My Powers and generated-preview covers, including visible error and help states. Keep dark Math and result-card checks so a light-surface repair cannot reverse that defect elsewhere.
+Inspect actual composed screens. An isolated component can pass while a more specific outer selector turns its heading white. Test native Studio games, the legacy game shell, My Powers and generated-preview covers, including visible error and help states. Verify the light Math and English workspace and the separate dark game-result surface, including transitions between them. Grade-specific target sizes, model labels and interaction states follow the [learning workspace standard](../learning/LEARNING_WORKSPACE_STANDARD.md).
 
 ## Friendly optional narration
 

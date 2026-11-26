@@ -109,21 +109,9 @@ h1,h2,h3,.brand,.studio-card-name,.studio-make-copy strong,.studio-library-headi
 .game-card .card-foot{color:#6736C6}
 .game-stage{border-color:#CFCFF0}
 .favorite-game{color:#EAF2FF}
-.math-activity {
- --math-ink:#FFFFFF;--math-muted:#D6E2FA;--math-panel:#182B60;--math-edge:#6283C9;
- --math-accent:#FFC24D;
- background:linear-gradient(148deg,#223872,#0B1E3B);
- border-color:#506CB3;box-shadow:0 15px 35px #0B1E3B31;
-}
-.math-activity button.math-primary{background:#FFC24D;color:#0B1E3B;border-color:#FFC24D}
-.math-activity .math-answer-input{background:#081942;color:#fff}
-.math-activity .math-eyebrow{color:#22D3A6}
-.language-activity{border-color:#CBC5ED}
-.language-activity button:focus-visible,.math-activity button:focus-visible,
 .studio-review button:focus-visible,.studio-review input:focus-visible,.studio-review textarea:focus-visible{
  outline:3px solid #7136C9;outline-offset:3px;
 }
-.math-activity button:focus-visible{outline-color:#FFC24D}
 body.studio-review > .factory-update-notice{background:#F9F7FF;color:#26375B;border-color:#D5D9EA}
 footer,.studio-review footer{border-color:#E2E4F0;color:#62718F}
 @media(max-width:650px){
@@ -296,13 +284,6 @@ input:focus-visible,select:focus-visible,textarea:focus-visible {
   border:1px solid var(--jems-input);border-radius:var(--jems-radius-sm);
   color:#0B1E3B;background:#FFF;
 }
-.studio-review .math-activity{border-radius:18px}
-.studio-review .math-activity button.math-primary {
-  background:var(--jems-gold);color:var(--jems-ink);border-color:#E2AF00;
-}
-.studio-review .language-activity{border-color:#C9B8ED;box-shadow:0 7px 22px #7136C914}
-.studio-review .language-activity :is(button,input,textarea):focus-visible,
-.studio-review .math-activity :is(button,input):focus-visible {outline-offset:3px}
 .studio-review .studio-mobile-tabs{border-color:#DAD3F0}
 .studio-review .studio-mobile-tabs button[aria-pressed="true"]{
   color:#5628A9;background:#E6D8FF
@@ -370,18 +351,6 @@ body:not(.studio-review) .page .panel { color:var(--jems-ink); }
 #page-lab #skill-report .learning-progress-card small {color:#556684;}
 #page-parent .panel .learning-state,
 #page-lab #skill-report .learning-state{color:#0B7159;}
-
-/* Dark Math activity is a self-contained high-contrast reading surface.
-   Avoid inheriting the dark Ink headline color used on white cards. */
-body.studio-review .math-activity,
-body.studio-review .math-activity h2,
-body.studio-review .math-activity .math-prompt,
-body:not(.studio-review) .math-activity h2 {color:#FFFFFF;}
-body.studio-review .math-activity h3,
-body:not(.studio-review) .math-activity h3 {color:#A8ECDD;}
-body.studio-review .math-activity .math-hint h3 {color:#8CE7D1;}
-body.studio-review .math-activity .math-visual figcaption {color:#D3DEF1;}
-body.studio-review .math-activity .math-activity-label {color:#E9F2FF;}
 
 /* The optional old Arcade is now light like Studio, not a partly dark relic. */
 body:not(.studio-review) .profile-bar {

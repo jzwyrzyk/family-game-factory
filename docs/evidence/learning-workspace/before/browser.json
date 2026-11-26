@@ -1,0 +1,72 @@
+{
+  "source": "bc602f1ede502f398308ad56f973c4bf7997ff08",
+  "browser": "156.0.8078.79",
+  "samples": 7,
+  "checks": [
+    {
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "name": "build-a-word",
+      "left": 31,
+      "right": 359,
+      "scroll": 390
+    },
+    {
+      "device": "tablet-portrait",
+      "width": 768,
+      "height": 1024,
+      "name": "pk-touch",
+      "left": 74,
+      "right": 694,
+      "scroll": 768
+    },
+    {
+      "device": "tablet-landscape",
+      "width": 1024,
+      "height": 768,
+      "name": "g1-make-ten",
+      "left": 55,
+      "right": 475,
+      "scroll": 1024
+    },
+    {
+      "device": "desktop",
+      "width": 1366,
+      "height": 768,
+      "name": "select-supporting-evidence",
+      "left": 123,
+      "right": 646,
+      "scroll": 1366
+    },
+    {
+      "device": "small-phone",
+      "width": 320,
+      "height": 667,
+      "name": "g2-hundreds",
+      "left": 31,
+      "right": 289,
+      "scroll": 320
+    },
+    {
+      "device": "short-landscape",
+      "width": 844,
+      "height": 390,
+      "name": "sequence-a-picture-story",
+      "left": 45,
+      "right": 385,
+      "scroll": 844
+    },
+    {
+      "device": "wide",
+      "width": 1600,
+      "height": 1000,
+      "name": "g4-add-fraction",
+      "left": 240,
+      "right": 763,
+      "scroll": 1600
+    }
+  ],
+  "network": [],
+  "failures": []
+}

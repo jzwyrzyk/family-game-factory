@@ -42,6 +42,9 @@ test('all original Arcade leaf commands occur exactly once in their original req
       all.add(command);
     }
   }
+  const creation = expandCommands(manifest.shards['creation-art'].commands, pkg.scripts);
+  assert.ok(creation.some(([runner, script]) => runner === 'node' && script === 'tests/creation-learning-workspace.cjs'),
+    'the Creation Studio shard exercises fullscreen learning and game return');
   for (const mutation of [m => m.shards.mining.commands.pop(), m => m.shards.factory.commands.push('node tests/mind-your-jems-browser.cjs')]) {
     const changed = structuredClone(manifest); mutation(changed);
     assert.throws(() => verifyCoverage(changed, pkg), /CI_COVERAGE_MISMATCH/);

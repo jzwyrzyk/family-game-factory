@@ -4,6 +4,8 @@ The review build packages the selected Jems source into one downloadable `jems-u
 
 The toolbar selects an experience, supported learning grade, effective iframe viewport, page/journey state and synthetic scenario. Fit display scales the live frame; the frame's CSS viewport still matches the selected dimensions and uses the product's responsive rules. Choose 100% to inspect physical text size, or hide the toolbar. Flag concerns after clicking an affected control, edit/delete findings, mark pages reviewed, and export Markdown or JSON. Findings use a separate browser-local key with an in-memory fallback. Export before closing if persistence is unavailable.
 
+The **Math workspace**, **English workspace**, and **Learning feedback and recovery** groups open deterministic curriculum samples through My Powers. The grade and game-context controls let reviewers compare presentations. Choose **Populated** to include an owned starter Pal. [Learning gallery walkthrough, screenshots and browser receipts](../evidence/learning-workspace/README.md)
+
 ## Regenerate
 
 From a clean checkout with Node 24+, Python 3 and Pillow:
@@ -62,3 +64,7 @@ The modernization candidate includes the consolidated My Journey sections, Make/
 Choose **My Journey** in the destination selector to inspect the three dashboard cards. Check **Empty** for starter selection and **Unlocked** for an equipped companion and earned gems. Follow each card into the corresponding live section, then return through My Journey.
 
 The Journey, Pals, rewards and Powers destinations render the shared production header and cards. Use the empty scenario to review the two starter choices. Compare the same application viewport on each page and use Shift+Tab from the announced heading to check the back action’s visible keyboard focus.
+
+The learning review CI download embeds exact artwork bytes. Its application journeys open the single downloaded file directly in the hosted browser. The gallery uses a loopback server that streams only that same file so a fresh browser context can exercise native zoom and fullscreen. The managed-browser option uses the same single-file server. The shell decodes original assets with native base64 decoding where available, with a byte-for-byte typed-array fallback.
+
+The offline Pal capture shares the full review’s single-file input helper. The hosted browser opens the downloaded file directly. When a managed browser needs the loopback option, the same file streams from the temporary local address and the capture checks each of its four viewports.
