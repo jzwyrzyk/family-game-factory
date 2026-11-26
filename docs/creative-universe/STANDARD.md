@@ -28,6 +28,8 @@ A child can go from saving or importing a drawing to seeing it move, choose the 
 
 Offer manual parts, masks and placement corrections when a guess misses. Show initial simple actions, reveal advanced geometry on request and keep the original available throughout. A saved design can return to My Art, enter Creative Studio or enter a specifically compatible game. Preserve the selected profile, version, world and existing save/learning guards on these transitions.
 
+Give the canvas and its palette priority on the drawing surface. Preserve a failed Keep for retry and honor pointer cancellation on mouse, pen and touch. Reopening a flattened picture must never invent editable marks.
+
 For young children, begin with visible movement choices and a single playback action. Use the current Jems label sizes, focus order, contrast and touch targets. Provide keyboard alternatives to path and part placement. A cancelled pointer must discard the unfinished gesture. Pause, reduced motion, profile change and dismissal must stop unsolicited playback. Use the existing grade and parent supervision policies. Scratchpad marks from Math or English remain transient unless a future, separately designed explicit Keep journey is accepted. [Child interface](../brand/CHILD_INTERFACE.md)
 
 ## Worlds and 2D mechanics

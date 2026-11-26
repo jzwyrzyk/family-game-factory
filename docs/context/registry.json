@@ -86,7 +86,8 @@
     "docs/decisions/2026-11-23-dev-test-prod.md",
     "docs/ui-review/README.md",
     "docs/creative-universe/STANDARD.md",
-    "docs/decisions/2026-11-26-connected-creative-universe.md"
+    "docs/decisions/2026-11-26-connected-creative-universe.md",
+    "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -1615,7 +1616,9 @@
         "docs/creation-studio/*.md",
         "docs/decisions/2026-11-19-private-art-studio.md",
         "docs/creative-universe/STANDARD.md",
-        "docs/decisions/2026-11-26-connected-creative-universe.md"
+        "docs/decisions/2026-11-26-connected-creative-universe.md",
+        "docs/creative-universe/*.md",
+        "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md"
       ],
       "sources": [
         "src/drawing/**",
