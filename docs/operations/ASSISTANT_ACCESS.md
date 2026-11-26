@@ -1,5 +1,105 @@
 # Direct Jems diagnostic access
 
+**November 26 priority update:** direct managed SDK authoritative identity qualification
+remains incomplete after correction `34fd728919e79e90b63f00933d87a265d6d0ac86`. Do not
+repeat explicitly denied identity endpoint attempts or weaken identity checks. Use
+`diagnostic_preflight.py --expected-source FULL_REVIEWED_SHA --source-only` for source-only preflight until the supported connection capability
+changes. Independently qualify GitHub diagnostics and nonproduction setup using the
+[executable handoff](PERMANENT_CLOUD_SETUP.md); direct SDK access is not their gate.
+The existing GitHub release observation succeeded in run
+[45764873156](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764873156).
+
+
+## Canonical SDK preflight — November 26, 2026
+
+The owner reports successful **separate-task** managed SDK verification under actual
+alias **`GCP`**, effective account
+`jems-codex-diagnostics@family-game-factory-jzw.iam.gserviceaccount.com`. Self-check
+and full three-service reads exited 0; all services were Ready/reconciled and serving
+intended revisions at 100%. Positive metadata and negative deployment, IAM, secret,
+destructive and impersonation checks passed across the tested resources. Exact probe
+resource list, source SHA and sanitized receipt were not supplied here; this is
+owner-reported finite acceptance, not a universal privilege audit or this task's run.
+
+The corrective candidate supports only the installed managed HTTPS proxy profile:
+exact federation audience, diagnostic impersonation account, proxy port/routes,
+GCP subject selector, JSON subject format and identity guard-header name. It reads
+credentials in place and preserves proxy and CA settings. Authentication and API
+redirects are rejected. Owner ADC, executable/file subject sources, arbitrary
+endpoints and plaintext proxy routes are not accepted.
+
+Effective identity uses Google's documented access-token inspection endpoint
+`https://oauth2.googleapis.com/tokeninfo`, with the same in-memory token, followed
+by matching the provider subject to the diagnostic account's IAM `uniqueId`.
+See [service-account token interpretation](https://cloud.google.com/docs/authentication/token-types#access-tokens).
+The shared finite verifier accepts that verified identity and does not repeat userinfo.
+Token changes fail the audit. No token or token fingerprint is emitted.
+
+**Live blocker observed in the attached corrective task:** the installed managed
+helper documents opaque identity handles: the trusted proxy owns the Google token.
+Gateway metadata GET succeeds, but userinfo returns HTTP 403
+`identity_unsupported_request`. Tokeninfo with the managed handle returns HTTP 403
+`identity_handle_denied`; a form POST returned HTTP 400 Invalid Value. Neither
+configured impersonation nor successful metadata access proves effective identity.
+The candidate therefore fails closed until the approved managed provider supports
+authoritative introspection. Do not export real tokens, widen IAM or bypass the proxy.
+IAM account metadata must also be readable for the unique-ID comparison; no new grant
+is implied. The installed `/run/codex-environment/outbound-identity/gcp/cloud_sql.py`
+and Cloud Environment networking instructions informed the exact supported routing.
+
+Finite permission evidence now requires resource GET inventory before permission
+POSTs. It covers three services, project-level write/data/log permissions, four
+production secret references, and diagnostic/release/runtime accounts. The expected
+absent `jems-request-broker` is reported separately and never counted as denied.
+A 404 can conceal access and is qualified accordingly; 403, unsupported inventory,
+and unexpected grants leave acceptance incomplete. These checks read no secret
+versions, application records or logs. Metadata inventory access is not silently
+granted when unavailable.
+
+Install dependencies **outside the source/managed credential directory**, for example
+in a task-owned `work/diagnostic-venv`, using
+`scripts/ops/diagnostic-requirements.txt`. Preserve proxy, CA and managed auth guards.
+Then run from a clean pinned checkout:
+
+```sh
+/path/to/work/diagnostic-venv/bin/python scripts/ops/diagnostic_preflight.py --expected-source FULL_REVIEWED_SHA --identity-alias GCP --live --verify-permissions
+```
+
+The preflight verifies HEAD, cleanliness and hashes of required tools, then executes
+both self-check and full diagnostics. Without `--live`, it verifies configuration
+only and reports `CONFIGURED_NOT_VERIFIED`. Individual SDK commands support
+`--self-check` and `--verify-permissions`. The finite checks include service
+read/update/delete/IAM, project admin/data/log operations, named secret access/delete,
+and account impersonation/key/IAM operations. Verify named resource existence in the
+operator inventory; an empty testIamPermissions response for a nonexistent resource
+cannot prove denied access. API errors, unavailable identity and unexpected permissions
+fail acceptance. Service/revision metadata reads supply actual positive-read evidence.
+
+**Checkout discrepancy:** this task began at `a5f1f41cad0c8881cbb05ca97d0d1364cf5878f4`,
+where `scripts/ops/diagnose.py` does not exist. Fetching main obtained
+`bc602f1ede502f398308ad56f973c4bf7997ff08`, which includes the legacy reader. The new
+SDK tools are in the isolated operations candidate until reviewed integration. Future
+Codex tasks must fetch/pin the reviewed operations source, or the later main containing
+it, and verify the tool paths before diagnosing IAM. Do not use a stale environment
+snapshot as proof that merged tooling is absent. Do not silently advance frozen
+application/worker pins while refreshing an isolated diagnostic checkout.
+
+**Current-task reproduction limit:** after the separate success was reported, this
+task's environment still reported `outbound_identities:[]` at spec revision 1 with no
+manifest. Both real SDK commands returned `IDENTITY_NOT_CONFIGURED`. Synthetic SDK
+regressions pass; independent live reproduction remains blocked in this environment.
+A clean-source preflight retry and its exact source/receipt must accompany the next
+attached task. The existing connection is not recreated or widened. The environment
+change API offered here has no OIDC-attachment or reusable-image publication control.
+SDK support removes the reported gcloud PATH/read-only token-cache dependency; a
+published environment still needs the existing connection and reviewed source.
+
+The CLI instructions below are historical and remain an explicit fallback. Do not
+make a managed credential directory writable or copy it to work around a gcloud cache
+error. Alias `jems-diagnostics` in those earlier examples is not this verified alias.
+
+November 26 continuation: [consolidated Cloud Shell setup and verified blockers](PERMANENT_CLOUD_SETUP.md), [autonomous triage and 401 investigation](AUTONOMOUS_TRIAGE.md). Earlier receipts below retain their original scope.
+
 ## Production HTTP request evidence through GitHub
 
 Use the [production diagnostics guide](PRODUCTION_DIAGNOSTICS.md) for the separate protected-main workflow, scoped source, report interpretation and ChatGPT retrieval procedure. It uses GitHub Actions federation to a private request-metadata broker. Its browser-based setup is independent of the managed Codex identity and Cloud Shell. See the [delivery ledger](../../DELIVERY-STATE.md) for the last verified state.

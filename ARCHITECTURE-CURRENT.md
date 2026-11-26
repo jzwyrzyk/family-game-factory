@@ -20,6 +20,26 @@ Workstream E adds owner-notebook game-art plans and immutable local review tests
 
 The owner-scoped drawing, rig, native game and scene authorities implement separate parts of the [creative asset standard](docs/creative-universe/STANDARD.md). A family workshop's reviewed import verifies format, digest approval and the active profile before persisting the exact permitted PNG. Metadata-bearing files require another eligible file and exact operator review. Previously stored workshop reconstructions remain the recoverable copies available for those imports. The private game worker has no library access.
 
+The nonproduction partial-recovery operator preserves the original evidence and
+plans against a private successor state. It accepts only the two remaining
+provider/budget creations or exact no-op imports, with all 25 existing instances
+unchanged. The IAP controller retains per-service invocation grants. Source
+implementation and actual cloud acceptance remain separate.
+[Recovery contract](docs/operations/NONPRODUCTION_RECOVERY.md)
+
+## Operational access and recovery
+
+The PR #222 source candidate keeps direct managed identity qualification fail-closed
+while independent GitHub diagnostics and nonproduction setup advance. Broker setup
+requires source/archive/build/image provenance and accepts only Cloud Build's exact
+image-list mirror. Static DEV/TEST use distinct zero-role runtime accounts; the
+baseline leaves federation disabled and the $15 project budget is notification-only.
+Source-only preflight does not select credentials. Historical cleanup requires
+remote recoverability, unchanged file hashes and explicit deletion approval; unique
+records/Git/Terraform are preserved. Handoffs use sparse temporary source and private
+minimal recovery journals. [Setup](docs/operations/PERMANENT_CLOUD_SETUP.md) ·
+[Recovery](docs/operations/OPERATIONS_RECOVERY.md).
+
 ## Component and source map
 
 | Component | Responsibility and source of truth |

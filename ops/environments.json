@@ -5,6 +5,7 @@
   "projectNumber": null,
   "region": "us-east5",
   "runtimeServiceAccount": null,
+  "testRuntimeServiceAccount": null,
   "deployServiceAccount": null,
   "uatServiceAccount": null,
   "wifProvider": null,
