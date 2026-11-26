@@ -681,10 +681,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:28:29.105Z",
+      "reviewedAt": "2026-11-26T00:23:35.574Z",
       "sourceDigest": "ca7b341e9de009c700ec5b750b52d88705543bbb56fe2f4833bd1dc2dfd64a33",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented and packaged the shared immutable historical scene metadata for gateway, preview and family gateway consumers.",
+      "reviewReason": "Verified the protected worker main and tag, scoped production observation, and preserved the historical scene JSON package for all three readers.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -1135,10 +1135,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T23:28:30.109Z",
-      "sourceDigest": "697887e258cfc6b4b10fff22b72920b387ef4de706c6503524e73be717535fd8",
+      "reviewedAt": "2026-11-26T00:23:36.401Z",
+      "sourceDigest": "9cd989c6d501a60f5e94b6610ebde260ec37b062dfcfe003182ec76001d6eb3e",
       "reviewOutcome": "updated",
-      "reviewReason": "Protected image builds track the historical JSON dependency and check the same scoped publication archive; DEV, TEST and production gates are retained.",
+      "reviewReason": "Recorded the protected documentation merge, worker holds, integrated UI review, current serving observation, environment access and legacy PR dispositions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1701,9 +1701,9 @@
       ],
       "reviewAfterDays": 30,
       "sourceDigest": "381260b659e8d8ed26b7fdddb3c2182a49d2f8f9cffd808e7d167695f25bfb3a",
-      "reviewedAt": "2026-11-25T23:21:01.748Z",
+      "reviewedAt": "2026-11-26T00:23:36.006Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The decision explains scoped policy projection, atomic persistence and replay on explicit restore. Retained IndexedDB authority and unrelated domain records stay intact."
+      "reviewReason": "Reconciled merged F06 rollback limits with the owner-scoped Pal migration, retained readers and repeat restore contract."
     }
   ]
 }
