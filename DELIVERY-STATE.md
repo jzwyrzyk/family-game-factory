@@ -24,8 +24,10 @@ including registry verification of image digest `4373d65a…19659c3e`; the exact
 build and full digest are in the linked ledger. All eight candidate workflows passed
 on attempt 1 (30 checks succeeded, one intentional skip) at `7867b4e…`. No build
 was resubmitted. The subsequent read-only broker inventory stopped with a generic
-validation error before producing a plan. The corrective tool now reports sanitized
-stages/provider codes; its actual cloud blocker remains unverified. Guarded cleanup, quarantine restoration and durable handoff journals
+validation error before producing a plan. Instrumented readback identified Cloud Run's
+unstructured “Cannot find service” response. The correction requires an authoritative
+HTTP 404 for that exact broker before proposing creation; live confirmation remains
+pending. Guarded cleanup, quarantine restoration and durable handoff journals
 are implemented; no historical files or Terraform state were deleted. No resource
 apply, deployment or paid request occurred in this follow-up.
 

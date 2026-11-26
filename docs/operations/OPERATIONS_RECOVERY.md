@@ -47,17 +47,23 @@ older build. Changing an image's source label to a newer tool SHA is forbidden.
 
 ## Next broker inventory (read-only)
 
-The initial inventory invocation at `7867b4e…` stopped with a generic validation
-error; it produced no plan or approval hash. The next read uses corrective tooling
-`9e598d7aa7d7929601b7ba40270ca396348f69f4`. The original build/image identities and
-launcher checksum remain unchanged.
+The first inventory at `7867b4e…` hid the failed read. Instrumented source
+`9e598d7…` identified `BROKER_SERVICE` / `CANNOT_FIND_SERVICE_MESSAGE` with no
+structured provider status. Its completed reads found the dedicated accounts,
+role, pool and view not yet provisioned. No plan was emitted.
 
-The corrective error output includes `stage`, `code`, allowlisted `provider_codes`,
-`cli_category` and completed read statuses. `READ_OK` records a completed read only;
-`NOT_PROVISIONED` identifies explicit absence, never verified permission denial.
-CLI message hints are diagnostic only and cannot authorize resource creation.
-Raw errors, token values and provider bodies remain suppressed. No new plan exists
-until the complete check succeeds.
+The correction confirms absence with one fixed Cloud Run v2 GET only for that
+exact CLI failure with no structured provider error. It reuses the administrator
+token in memory with TLS verification and no redirects. Only HTTP 404 permits a
+creation proposal. Every success/denial/redirect/transport failure stops; response
+bodies are never read. The plan hash binds the explicit REST-404 absence basis.
+Use the corrective immutable SHA from the reviewed handoff for this next read;
+retain the same verified image, original build/source and launcher checksum.
+
+The error output includes `stage`, `code`, allowlisted `provider_codes`,
+`cli_category`, bounded `http_status` and completed read statuses. `READ_OK` means
+a completed read only; `NOT_PROVISIONED` is absence, never verified denial.
+No plan exists until the complete inventory succeeds.
 
 Read-only diagnostic inventory command:
 

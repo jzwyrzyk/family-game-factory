@@ -13,6 +13,8 @@ from pathlib import Path
 import re
 import sys
 import subprocess
+import urllib.error
+import urllib.request
 
 import build_request_broker as publication
 
@@ -89,6 +91,37 @@ def run(*args, missing_ok=False):
     return value
 
 
+class ServiceAbsenceError(SetupError):
+    def __init__(self, code, http_status=None):
+        self.code = code
+        self.http_status = http_status
+        super().__init__(code)
+
+
+class ServiceAbsenceProbe(Http):
+    """Confirm only the exact broker's absence; never parse or expose a response body."""
+    path = f'v2/projects/{PROJECT}/locations/{REGION}/services/{SERVICE}'
+
+    def __init__(self, token):
+        super().__init__('https://run.googleapis.com', token)
+
+    def confirm(self):
+        request = urllib.request.Request(self.origin + '/' + self.path,
+                                         headers=self.headers, method='GET')
+        try:
+            # Inherit TLS verification and NoRedirect from the shared HTTP client.
+            with self.opener.open(request, timeout=25) as response:
+                # Even a 200 null/malformed body is not evidence of absence.
+                raise ServiceAbsenceError('BROKER_SERVICE_REST_NOT_ABSENT', response.status)
+        except urllib.error.HTTPError as error:
+            error.close()
+            if error.code == 404:
+                return None
+            raise ServiceAbsenceError('BROKER_SERVICE_ABSENCE_HTTP_FAILED', error.code) from None
+        except (urllib.error.URLError, TimeoutError, OSError):
+            raise ServiceAbsenceError('BROKER_SERVICE_ABSENCE_TRANSPORT_FAILED') from None
+
+
 class BrokerValidationError(SetupError):
     def __init__(self, code):
         self.code = code
@@ -144,6 +177,8 @@ def failure(error, progress):
     provider_codes = []
     if isinstance(error, (BrokerValidationError, publication.BuildVerificationError)):
         code = error.code
+    elif isinstance(error, ServiceAbsenceError):
+        code = error.code
     elif isinstance(error, ProviderReadError):
         allowed = {'GCLOUD_TIMEOUT', 'GCLOUD_UNAVAILABLE', 'GCLOUD_COMMAND_FAILED',
                    'GCLOUD_RESPONSE_INVALID', 'GCLOUD_JSON_INVALID', 'BOOTSTRAP_FAILED'}
@@ -169,6 +204,8 @@ def failure(error, progress):
             'cli_category': error.cli_category if isinstance(error, ProviderReadError) and
                 error.cli_category in {'UNRECOGNIZED_ARGUMENTS', 'INVALID_COMMAND_CHOICE',
                                        'CANNOT_FIND_SERVICE_MESSAGE'} else None,
+            'http_status': error.http_status if isinstance(error, ServiceAbsenceError) and
+                type(error.http_status) is int and 100 <= error.http_status <= 599 else None,
             'completed_reads': progress.reads,
             'resubmit': False, 'recovery': 'Preserve partial state; rerun --check'}
 
@@ -227,19 +264,31 @@ def grants(policy, allowed, label):
     return found
 
 
-def preflight(spec, cloud=None, logging=None, progress=None):
+def preflight(spec, cloud=None, logging=None, progress=None, service_absence=None):
     """Complete read-only inventory before constructing any executable mutation."""
     reader, inventory = cloud or run, []
     progress = progress or Progress()
     def cloud(*args, **kwargs):
         stage, shape = read_stage(args)
-        value = progress.call(stage, reader, *args, **kwargs)
+        absence_proof = {}
+        try:
+            value = progress.call(stage, reader, *args, **kwargs)
+        except ProviderReadError as error:
+            if not (stage == 'BROKER_SERVICE' and kwargs.get('missing_ok') and
+                    args == ('run', 'services', 'describe', SERVICE, '--region=' + REGION) and
+                    error.code == 'GCLOUD_COMMAND_FAILED' and not error.provider_codes and
+                    error.cli_category == 'CANNOT_FIND_SERVICE_MESSAGE'):
+                raise
+            require(service_absence is not None, 'BROKER_SERVICE_ABSENCE_CLIENT_REQUIRED')
+            value = progress.call('BROKER_SERVICE_ABSENCE_CHECK', service_absence.confirm)
+            require(value is None, 'BROKER_SERVICE_ABSENCE_RESPONSE_INVALID')
+            absence_proof = {'absence_confirmation': 'CLOUD_RUN_HTTP_404'}
         require((value is None and kwargs.get('missing_ok')) or isinstance(value, shape),
                 'INVENTORY_RESPONSE_SHAPE_INVALID')
         if isinstance(value, list):
             require(all(isinstance(item, dict) for item in value), 'INVENTORY_RESPONSE_SHAPE_INVALID')
-        progress.reads.append({'stage': stage, 'status': 'NOT_PROVISIONED' if value is None else 'READ_OK'})
-        inventory.append({"read": list(args), "sha256": digest(value)})
+        progress.reads.append({'stage': stage, 'status': 'NOT_PROVISIONED' if value is None else 'READ_OK', **absence_proof})
+        inventory.append({"read": list(args), "sha256": digest(value), **absence_proof})
         return value
     exact(cloud('projects', 'describe', PROJECT),
           {'projectId': PROJECT, 'projectNumber': NUMBER, 'lifecycleState': 'ACTIVE'}, 'project')
@@ -424,10 +473,11 @@ def main(argv=None):
         spec['verified_build'] = receipt
         token = progress.call('ADMIN_ACCESS_TOKEN', command, ['gcloud', 'auth', 'print-access-token', '--quiet'])
         logging = Http('https://logging.googleapis.com', token)
-        plan = preflight(spec, logging=logging, progress=progress)
+        service_absence = ServiceAbsenceProbe(token)
+        plan = preflight(spec, logging=logging, progress=progress, service_absence=service_absence)
         if args.apply:
             progress.call('APPLY_PLAN', plan.execute, args.approve_plan_sha256)
-            remaining = preflight(spec, logging=logging, progress=progress)
+            remaining = preflight(spec, logging=logging, progress=progress, service_absence=service_absence)
             require(not remaining.actions, 'PARTIAL_SETUP_REMAINS')
             print(json.dumps({'status': 'CONFIGURED_NOT_ACCEPTED', 'effective_iam': 'unverified',
                               'request_evidence': 'unverified', 'recurring_execution': False}))

@@ -1,5 +1,31 @@
 # Permanent cloud operations delivery ledger
 
+## November 26, 2026 — actual inventory blocker identified
+
+The administrator reran the instrumented check at `9e598d7…`. It stopped at
+`BROKER_SERVICE` with `GCLOUD_COMMAND_FAILED`, no structured provider codes and
+`CANNOT_FIND_SERVICE_MESSAGE`. Project metadata, enabled APIs, project IAM, image
+metadata and the log bucket were read. The two dedicated accounts, view role,
+federation pool and log view were explicitly `NOT_PROVISIONED`. The service's CLI
+message is not authoritative absence proof, so no plan/hash was emitted and no
+resource was created. This identifies the previous generic failure as a Cloud Run
+CLI absence-reporting compatibility issue, not a failed build/provenance predicate.
+
+The correction uses one fixed Cloud Run v2 GET for the exact project/region/broker
+only after that exact CLI failure without any structured denial/error code. It
+uses the existing administrator token in memory, verified TLS and no redirects.
+Only HTTP 404 confirms absence. HTTP 200 (including null/malformed bodies), denial,
+redirects, transport and other HTTP errors stop without a plan. Response bodies
+are never read or emitted. The approval evidence records this explicit 404 basis;
+all existing source, provenance, IAM, service and approval gates remain enforced.
+No new cloud permission, endpoint bypass or service deployment is introduced.
+
+**315 operations tests passed**, including exact endpoint/same-token checks,
+HTTP 404 planning, 200/redirect/denial/transient-error refusal and redaction.
+Administrator REST confirmation and the actual additive plan remain pending.
+The original verified image and saved nonproduction Terraform plan are unchanged.
+
+
 ## November 26, 2026 — broker inventory stopped before a plan
 
 The administrator ran `broker-setup --check` from tooling `7867b4e…` against the

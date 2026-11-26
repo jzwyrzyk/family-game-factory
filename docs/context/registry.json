@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T15:20:43.207Z",
-      "sourceDigest": "f429f9753f7060311955b981eb5cb6f5812ac1fc12ff08a9f320c6619aa65a80",
+      "reviewedAt": "2026-11-26T15:28:51.222Z",
+      "sourceDigest": "0ca35beb0116aec5a70b1da3495863c5e117f6885e99e353ccb904e318188619",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the administrator inventory stop without inventing a failed predicate; documented fixed stage/provider diagnostics, strict absence handling and preservation of frozen activation, original image and Terraform bytes.",
+      "reviewReason": "Recorded administrator evidence isolating Cloud Run's unstructured absence message; documented exact-service HTTP-404 confirmation with in-memory token, TLS/no-redirect controls, fail-closed alternatives and preserved image/Terraform approvals.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -35,6 +35,83 @@ class BootstrapTests(unittest.TestCase):
                 returncode=1, stdout='', stderr='NOT_FOUND private-token-marker')):
             self.assertIsNone(setup.run('iam', 'service-accounts', 'describe', setup.BROKER, missing_ok=True))
 
+    def missing_service_cloud(self, *args, **kwargs):
+        if args[:3] == ('run', 'services', 'describe'):
+            raise setup.ProviderReadError('private-token-marker', cli_category='CANNOT_FIND_SERVICE_MESSAGE')
+        return self.cloud(*args, **kwargs)
+
+    def test_service_cli_absence_requires_exact_rest_404_with_same_token(self):
+        import io
+        opener = Mock()
+        def open_request(request, timeout):
+            self.assertEqual(request.full_url, 'https://run.googleapis.com/v2/projects/' + setup.PROJECT +
+                             '/locations/us-east5/services/jems-request-evidence')
+            self.assertEqual(request.get_method(), 'GET')
+            self.assertEqual(request.headers['Authorization'], 'Bearer private-token-marker')
+            self.assertIsNone(request.data)
+            raise setup.urllib.error.HTTPError(request.full_url, 404, 'private-token-marker', {}, io.BytesIO(b'private-token-marker'))
+        opener.open.side_effect = open_request
+        with patch.object(setup.urllib.request, 'build_opener', return_value=opener):
+            code, report, _, _ = self.invoke_inventory(self.missing_service_cloud)
+        self.assertEqual(code, 0)
+        self.assertEqual(len(report['plan']['actions']), 10)
+        opener.open.assert_called_once()
+        progress = setup.Progress()
+        probe = Mock()
+        probe.confirm.return_value = None
+        plan = setup.preflight(self.spec(), cloud=self.missing_service_cloud, service_absence=probe, progress=progress)
+        record = next(r for r in progress.reads if r['stage'] == 'BROKER_SERVICE')
+        self.assertEqual(record['absence_confirmation'], 'CLOUD_RUN_HTTP_404')
+        self.assertEqual(record['status'], 'NOT_PROVISIONED')
+        original = setup.preflight(self.spec(), cloud=self.cloud)
+        self.assertNotEqual(plan.review_code(), original.review_code())
+
+    def test_absence_http_denial_redirect_and_transient_errors_never_plan(self):
+        import io
+        for status in (301, 302, 307, 401, 403, 429, 500, 503):
+            opener = Mock()
+            opener.open.side_effect = setup.urllib.error.HTTPError(
+                'https://run.googleapis.com/private-token-marker', status, 'private-token-marker', {}, io.BytesIO())
+            with self.subTest(status=status), patch.object(setup.urllib.request, 'build_opener', return_value=opener):
+                code, report, _, _ = self.invoke_inventory(self.missing_service_cloud)
+            self.assertEqual(code, 2)
+            self.assertEqual(report['stage'], 'BROKER_SERVICE_ABSENCE_CHECK')
+            self.assertEqual(report['code'], 'BROKER_SERVICE_ABSENCE_HTTP_FAILED')
+            self.assertEqual(report['http_status'], status)
+            self.assertNotIn('plan', report)
+            self.assertNotIn('approve_plan_sha256', report)
+
+    def test_absence_success_and_transport_failure_are_not_absence(self):
+        from unittest.mock import MagicMock
+        opener = Mock()
+        response = MagicMock()
+        response.status = 200
+        response.read.return_value = b'null'
+        response.__enter__.return_value = response
+        opener.open.return_value = response
+        with patch.object(setup.urllib.request, 'build_opener', return_value=opener):
+            code, report, _, _ = self.invoke_inventory(self.missing_service_cloud)
+        self.assertEqual((code, report['code'], report['http_status']), (2, 'BROKER_SERVICE_REST_NOT_ABSENT', 200))
+        response.read.assert_not_called()
+        opener.open.side_effect = setup.urllib.error.URLError('private-token-marker')
+        with patch.object(setup.urllib.request, 'build_opener', return_value=opener):
+            code, report, _, _ = self.invoke_inventory(self.missing_service_cloud)
+        self.assertEqual(report['code'], 'BROKER_SERVICE_ABSENCE_TRANSPORT_FAILED')
+        self.assertNotIn('plan', report)
+
+    def test_absence_confirmation_is_not_an_auth_failure_fallback(self):
+        probe = Mock()
+        def cloud(*args, **kwargs):
+            if args[:3] == ('run', 'services', 'describe'):
+                raise setup.ProviderReadError('private-token-marker', provider_codes=['PERMISSION_DENIED'],
+                                              cli_category='CANNOT_FIND_SERVICE_MESSAGE')
+            return self.cloud(*args, **kwargs)
+        with self.assertRaises(setup.ProviderReadError):
+            setup.preflight(self.spec(), cloud=cloud, service_absence=probe)
+        probe.confirm.assert_not_called()
+        actual = setup.ServiceAbsenceProbe('private-token-marker')
+        self.assertTrue(any(type(handler).__name__ == 'NoRedirect' for handler in actual.opener.handlers))
+
     def test_cli_absence_hint_does_not_authorize_creation(self):
         from types import SimpleNamespace
         for text, category in [('Cannot find service [private-token-marker]', 'CANNOT_FIND_SERVICE_MESSAGE'),
