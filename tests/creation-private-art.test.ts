@@ -110,3 +110,19 @@ test('picker derives a stable owner-scoped identity from immutable, hash-checked
   await assert.rejects(creativeAssetChoices('owner',[{...crop,sourceSha256:'c'.repeat(64)},picture],[]),/original/);
   await assert.rejects(creativeAssetChoices('owner',[{...crop,sourceId:crop.id,sourceSha256:crop.sha256}],[]),/original/);
 });
+
+test('private draft role aliases preserve context without assigning mechanics',()=>{
+  for(const [alias,role] of [['character','character'],['scenery','environment'],['decoration','decoration'],['obstacle','obstacle'],['collectible','collectible']]){
+    const raw=createStarterProject('blank');
+    const actor = raw.actors[0] as typeof raw.actors[number] & {creativeRole:string};
+    actor.creativeRole=alias;
+    const migrated=validateEditableProject(raw);
+    assert.equal(migrated.actors[0].role,role);
+    assert.equal('creativeRole' in migrated.actors[0],false);
+    assert.equal('role' in actor,false);
+    assert.deepEqual(migrated.programs,raw.programs);
+    assert.throws(()=>validateGeneratedCreationManifest(raw),/Unknown field/);
+    assert.deepEqual(validateEditableProject({...raw,actors:[{...actor,role}]}).actors,migrated.actors);
+    assert.throws(()=>validateEditableProject({...raw,actors:[{...actor,role:'player'}]}),/conflicting roles/);
+  }
+});

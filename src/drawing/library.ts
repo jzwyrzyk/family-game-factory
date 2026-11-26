@@ -264,7 +264,7 @@ export function ownerArtRecords<T>(transaction:IDBTransaction,store:ArtStoreName
  artOwner(owner);return artRequest(transaction.objectStore(store).index('owner').getAll(IDBKeyRange.only(owner)));
 }
 
-export function originalPictureId(picture: DrawingMetadata, images: ReadonlyMap<string, DrawingMetadata>): string {
+export function originalPictureId(picture: Pick<Drawing,'id'|'owner'|'sha256'|'sourceId'|'sourceSha256'>, images: ReadonlyMap<string, DrawingMetadata>): string {
   let root = picture;
   const visited = new Set([picture.id]);
   while (root.sourceId) {

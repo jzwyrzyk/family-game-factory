@@ -1,9 +1,9 @@
 import {assertRewardSourceLockHeld} from '../rewards/write-guard';
 /** Portable private art: validate all bytes and references before one additive transaction. */
-import { type Drawing, DRAWING_CATEGORIES, validArtSemantic, prepareDrawing } from '../assets/private-drawings';
+import { type Drawing, DRAWING_CATEGORIES, canonicalArtSemantic, validArtSemantic, prepareDrawing } from '../assets/private-drawings';
 import { type SavedRig, type DrawingDraft } from './store';
 import { validateAssembly, type DrawingAssembly } from './model';
-import { ART_LIMITS, artOwner, artRequest, saveDrawingMetadata, assertArtWrite, checkArtCapacity, withArtTransaction, type ArtGuard } from './library';
+import { ART_LIMITS, artOwner, artRequest, saveDrawingMetadata, ownerArtRecords, assertArtWrite, checkArtCapacity, withArtTransaction, type ArtGuard } from './library';
 
 export type PortableDrawing = Omit<Drawing, 'owner' | 'bytes' | 'preview'> & { data: string };
 export type PortableRig = Omit<SavedRig, 'owner'>;
@@ -58,10 +58,10 @@ function validateLinks(drawings: Drawing[], rigs: PortableRig[], drafts: Portabl
 async function validateAndPrepare(input: unknown, owner: string) {
   const bundle = parse(input), originals: Drawing[] = [], ids = new Set<string>();
   for (const item of bundle.drawings) {
-    if (!object(item, ['id', 'name', 'mime', 'sha256', 'createdAt', 'sourceId', 'sourceSha256', 'category', 'semantic', 'archived', 'updatedAt', 'data']) || !identifier(item.id) || ids.has(item.id) || typeof item.name !== 'string' || !item.name.trim() || item.name.length > 60 || !['image/png', 'image/jpeg'].includes(item.mime) || !hash(item.sha256) || !date(item.createdAt) || item.sourceId !== undefined && !identifier(item.sourceId) || item.sourceSha256 !== undefined && !hash(item.sourceSha256) || item.category !== undefined && !DRAWING_CATEGORIES.includes(item.category) || item.semantic !== undefined && !validArtSemantic(item.semantic) || item.archived !== undefined && typeof item.archived !== 'boolean' || item.updatedAt !== undefined && !date(item.updatedAt)) fail();
+    if (!object(item, ['id', 'name', 'mime', 'sha256', 'createdAt', 'sourceId', 'sourceSha256', 'category', 'semantic', 'semanticIdentity', 'archived', 'updatedAt', 'data']) || !identifier(item.id) || ids.has(item.id) || typeof item.name !== 'string' || !item.name.trim() || item.name.length > 60 || !['image/png', 'image/jpeg'].includes(item.mime) || !hash(item.sha256) || !date(item.createdAt) || item.sourceId !== undefined && !identifier(item.sourceId) || item.sourceSha256 !== undefined && !hash(item.sourceSha256) || item.category !== undefined && !DRAWING_CATEGORIES.includes(item.category) || item.semantic !== undefined && !validArtSemantic(item.semantic) || item.archived !== undefined && typeof item.archived !== 'boolean' || item.updatedAt !== undefined && !date(item.updatedAt)) fail();
     ids.add(item.id); const prepared = await prepareDrawing(owner, item.name, new Blob([decode(item.data)], { type: item.mime }));
     if (prepared.sha256 !== item.sha256) throw Error('An image in this backup does not match its saved fingerprint. Nothing was imported.');
-    const { data: _data, ...metadata } = item; originals.push({ ...prepared, ...metadata });
+    const { data: _data, ...metadata } = canonicalArtSemantic(item); originals.push({ ...prepared, ...metadata });
   }
   const rigs: PortableRig[] = []; ids.clear();
   for (const item of bundle.rigs) {
@@ -75,24 +75,25 @@ async function validateAndPrepare(input: unknown, owner: string) {
   }
   validateLinks(originals, rigs, drafts); checkArtCapacity(originals, rigs.map(item => ({ ...item, owner })));
   if (new TextEncoder().encode(JSON.stringify(drafts)).byteLength > ART_LIMITS.designBytes) fail();
-  return { bundle: { ...bundle, rigs, ...(bundle.drafts ? { drafts } : {}) }, originals, rigs, drafts };
+  return { bundle: { ...bundle, drawings:bundle.drawings.map(canonicalArtSemantic), rigs, ...(bundle.drafts ? { drafts } : {}) }, originals, rigs, drafts };
 }
 /** Full byte/schema preflight, with no persistent writes. */
 export async function validateArtBundle(input: unknown): Promise<ArtBundle> { return (await validateAndPrepare(input, 'import-validation')).bundle; }
 
-export async function exportArtBundle(owner: string, selection?: { drawingIds?: string[]; rigIds?: string[] }): Promise<ArtBundle> {
+export async function exportArtBundle(owner: string, selection?: { drawingIds?: string[]; rigIds?: string[]; includeAssociatedDesigns?:boolean }): Promise<ArtBundle> {
   artOwner(owner);
   const snapshot = await withArtTransaction(['drawings', 'rigs', 'drafts'], 'readonly', async transaction => {
-    const originals = (await artRequest(transaction.objectStore('drawings').getAll()) as Drawing[]).filter(item => item.owner === owner);
-    const rigs = (await artRequest(transaction.objectStore('rigs').getAll()) as SavedRig[]).filter(item => item.owner === owner);
-    const drafts = (await artRequest(transaction.objectStore('drafts').getAll()) as DrawingDraft[]).filter(item => item.owner === owner);
+    const originals = (await ownerArtRecords<Drawing>(transaction,'drawings',owner)).map(canonicalArtSemantic);
+    const rigs = await ownerArtRecords<SavedRig>(transaction,'rigs',owner);
+    const drafts = selection?.includeAssociatedDesigns === false ? [] : await ownerArtRecords<DrawingDraft>(transaction,'drafts',owner);
     return { originals, rigs, drafts };
   });
   const selectedOriginals = new Set(selection ? selection.drawingIds || [] : snapshot.originals.map(item => item.id));
   const selectedRigs = new Set(selection ? selection.rigIds || [] : snapshot.rigs.map(item => item.id));
   if ([...selectedOriginals].some(id => !snapshot.originals.some(item => item.id === id)) || [...selectedRigs].some(id => !snapshot.rigs.some(item => item.id === id))) throw Error('Choose artwork or movement versions from this profile.');
-  for (const rig of snapshot.rigs) if (selectedOriginals.has(rig.assembly.sourceId)) selectedRigs.add(rig.id);
-  for (const draft of snapshot.drafts) if (selectedOriginals.has(draft.sourceId) && draft.parentId) selectedRigs.add(draft.parentId);
+  if (selection?.includeAssociatedDesigns !== false) {
+    for (const rig of snapshot.rigs) if (selectedOriginals.has(rig.assembly.sourceId)) selectedRigs.add(rig.id);
+  }
   let changed = true;
   while (changed) {
     const before = selectedRigs.size + selectedOriginals.size;

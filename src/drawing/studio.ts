@@ -11,7 +11,7 @@ import type {PalsView} from '../pals/model';
 import {openDrawingLab} from './lab';
 import {drawOnTablet} from './paint';
 import {hasCrayonSource} from './crayon-source';
-import {editPicture} from './picture';
+import {editPicture,visiblePicturePng} from './picture';
 import {createIcon,iconMarkup,setIconLabel,type IconName} from '../brand/icons';
 import {assertRewardSourceWritable} from '../rewards/write-guard';
 import './studio.css';
@@ -108,6 +108,10 @@ export function installArtStudio(host:Host){
     if(item.mime==='image/png'&&hasCrayonSource(item.bytes))actions.append(button('Keep drawing','edit',()=>openPaper(captured,run,item)));
     const tools=node('details','art-detail-tools'),summary=node('summary','','Picture & storage tools');tools.append(summary);
     tools.append(button('Trim, turn & clean up','edit',async()=>{await editPicture(captured,item,async result=>{if(!current(captured,run))return;selected=result.id;if(!await refresh())return;status('New picture saved. Your original is still in My art.');notify(captured);focusSelectedArtwork(result.id,captured,run);},()=>current(captured,run));}));
+    tools.append(button('Download visible picture','download',async()=>{
+      const visiblePng=await visiblePicturePng(item);
+      if(current(captured,run)&&selected===id)download(visiblePng,'my-picture.png');
+    }));
     tools.append(button('Download original picture','download',async()=>{
       const original=await originalDrawing(captured,id);
       if(await drawingHash(original.bytes)!==original.sha256)throw Error('Restore your original picture from a backup.');

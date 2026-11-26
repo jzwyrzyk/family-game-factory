@@ -49,6 +49,17 @@ const { chromium } = require('playwright');
    check((await art.drawingPage(owner,{search:'rover'})).items[0].id===original.id,'optional child meaning is searchable');
    await rejects(()=>art.updateDrawing(owner, original.id, {semantic:'x'.repeat(61)}),'overlong artwork meaning is rejected');
    const bundle = await art.exportArtBundle(owner);
+   const aliasBundle = structuredClone(bundle);
+   aliasBundle.drawings[0].semanticIdentity=aliasBundle.drawings[0].semantic;
+   delete aliasBundle.drawings[0].semantic;
+   const canonical = await art.validateArtBundle(aliasBundle);
+   check(canonical.drawings[0].semantic==='moon rover' && !Object.hasOwn(canonical.drawings[0],'semanticIdentity'),'draft meaning spelling canonicalizes on read');
+   aliasBundle.drawings[0].semantic='a different idea';
+   await rejects(()=>art.importArtBundle(owner,aliasBundle),'ambiguous dual artwork meanings reject before writing');
+   const sceneSubset = await art.exportArtBundle(owner,{drawingIds:[original.id],rigIds:[first.id],includeAssociatedDesigns:false});
+   check(sceneSubset.rigs.length===1 && sceneSubset.rigs[0].id===first.id && !sceneSubset.drafts,'selected scene closure omits newer sibling rigs and unfinished drafts');
+   const ancestry = await art.exportArtBundle(owner,{rigIds:[second.id],includeAssociatedDesigns:false});
+   check(ancestry.rigs.length===2 && ancestry.drawings.length===1 && !ancestry.drafts,'selected rig export includes its immutable parent chain and source image');
    check(bundle.drawings[0].semantic==='moon rover','portable library retains artwork meaning');
    check(!JSON.stringify(bundle).includes('player1') && bundle.drawings.length === 1 && bundle.rigs.length === 2, 'portable bundle includes exact originals and all versions without source owner');
    await art.updateDrawing(owner, original.id, { name:'A newer local name' });
@@ -120,6 +131,10 @@ const { chromium } = require('playwright');
    check((await art.artUsages(owner, stale.id)).length === 0, 'valid source workspace disproves obsolete scene index rows');
    await art.deleteArtwork(owner,stale.id); localStorage.removeItem('family-game-factory-creation-v1');
    const source = await art.saveDrawing(owner, 'Source with derivative', file), derivative = await art.saveDrawing(owner, 'Separate crop', file, source.id);
+   await art.updateDrawing(owner,derivative.id,{semantic:'moon gem'});
+   const parentAfter = await art.drawing(owner,source.id), childAfter = await art.drawing(owner,derivative.id);
+   check(parentAfter.semantic==='moon gem' && childAfter.semantic==='moon gem' && parentAfter.name===source.name && childAfter.name===derivative.name &&
+    parentAfter.sha256===source.sha256 && childAfter.sha256===derivative.sha256,'semantic edits on a derivative update only family labels and retain exact revisions and names');
    const picturePin='art:image:'+derivative.id+':'+derivative.sha256;
    const adventure={title:'Pebble parade',actors:[{id:'pebble',assetId:picturePin,role:'collectible'}],
     programs:[{actorId:'pebble',actions:[{type:'repeat',actions:[{type:'move'}]}]}],

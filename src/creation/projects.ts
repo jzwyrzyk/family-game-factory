@@ -80,7 +80,7 @@ export function privateArtId(reference:PrivateArtReference):string {
 /** Local persistence allows opaque private references; remote model output is
  * deliberately restricted to the bundled catalogue by its own entry point. */
 export function validateEditableProject(input: unknown,options:{allowPrivateArt?:boolean}={}): CreationProject {
-  const project=validateCreationProject(input);
+  const project=validateCreationProject(input,options.allowPrivateArt!==false);
   if(options.allowPrivateArt === false && sceneAssetIds(project).some(id => parsePrivateArtId(id))) throw Error('Private artwork belongs in your own saved scenes.');
   if(project.actors.some(actor=>!creationAsset(actor.assetId)&&!(options.allowPrivateArt!==false&&parsePrivateArtId(actor.assetId)))) {
     throw Error('This scene uses artwork that is not available in this version of jems. Your saved work was not replaced.');

@@ -30,7 +30,7 @@ export type CreationBlock = BlockBase & (
   | {type: 'emit'; name: string}
 );
 export type SceneTrigger = {type: 'start' | 'tap'} | {type: 'event'; name: string};
-export const SCENE_ROLES = ['player', 'npc', 'vehicle', 'collectible', 'obstacle', 'decoration', 'environment', 'background'] as const;
+export const SCENE_ROLES = ['character', 'player', 'npc', 'vehicle', 'collectible', 'obstacle', 'decoration', 'environment', 'background'] as const;
 export type SceneRole = typeof SCENE_ROLES[number];
 export interface SceneActor {
   /** Context for this appearance. Programs remain the authority for behavior. */
@@ -113,7 +113,7 @@ const origins = ['child', 'starter', 'assisted'];
 const operators = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte'];
 
 /** Strictly validates before cloning: unsupported executable/asset payloads are never retained. */
-export function validateCreationProject(input: unknown): CreationProject {
+export function validateCreationProject(input: unknown, acceptDraftRoles = false): CreationProject {
   const p = record(input, ['schema','id','title','width','height','background','world','actors','programs','variables','provenance'], 'project');
   if (p.schema !== CREATION_SCHEMA) fail('Unsupported saved project version.');
   id(p.id, 'project ID'); text(p.title, 80, 'project title');
@@ -141,11 +141,19 @@ export function validateCreationProject(input: unknown): CreationProject {
   list(p.actors, CREATION_LIMITS.actors, 'characters');
   if (!p.actors.length) fail('Add at least one character.');
   const actorIds = new Set<string>();
+  const roles = new Map<string,SceneRole>();
   for (const raw of p.actors) {
-    const a = record(raw, ['id','name','assetId','x','y','size','visible','role'], 'character');
+    const a = record(raw, ['id','name','assetId','x','y','size','visible','role',...(acceptDraftRoles ? ['creativeRole'] : [])], 'character');
     id(a.id, 'character ID');
     if(!isCreationId(a.assetId)&&!parsePrivateArtId(a.assetId))fail('Invalid asset reference.');
     text(a.name, 60, 'character name');
+    if (a.creativeRole !== undefined) {
+      const alias = a.creativeRole;
+      if (alias !== 'character' && alias !== 'scenery' && alias !== 'decoration' && alias !== 'collectible' && alias !== 'obstacle') fail('Choose an available role.');
+      const role = alias === 'scenery' ? 'environment' : alias as SceneRole;
+      if (a.role !== undefined && a.role !== role) fail('This actor has conflicting roles.');
+      roles.set(a.id,role);
+    }
     if (a.role !== undefined && !SCENE_ROLES.includes(a.role as SceneRole)) fail('Choose an available role.');
     if (actorIds.has(a.id)) fail('Character IDs must be unique.');
     actorIds.add(a.id);
@@ -240,5 +248,10 @@ export function validateCreationProject(input: unknown): CreationProject {
     if (source.sourceKind !== undefined && !['curated','generated','creation','art'].includes(source.sourceKind as string)) fail('Invalid source kind.');
     for (const field of ['sourceProjectId','sourceRevisionId','sourceSessionId','sourceGameId']) if (source[field] !== undefined) id(source[field], 'source reference');
   }
-  return JSON.parse(JSON.stringify(input)) as CreationProject;
+  const project = JSON.parse(JSON.stringify(input)) as CreationProject;
+  for (const actor of project.actors) {
+    const mapped = roles.get(actor.id);
+    if (mapped) { actor.role = mapped; delete (actor as SceneActor & {creativeRole?:string}).creativeRole; }
+  }
+  return project;
 }

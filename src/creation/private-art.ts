@@ -50,7 +50,7 @@ export interface SceneArtBundle {schema:'jems.scene-art.v1';scene:CreationProjec
 export async function exportSceneArt(owner:string,input:CreationProject,current:()=>boolean=()=>true):Promise<SceneArtBundle> {
   const scene=validateEditableProject(input),refs=privateArtReferences(scene).map(id=>parsePrivateArtId(id)!);
   if(!current())throw stale();
-  const art=await exportArtBundle(owner,{drawingIds:refs.filter(ref=>ref.kind==='image').map(ref=>ref.id),rigIds:refs.filter(ref=>ref.kind==='rig').map(ref=>ref.id)});
+  const art=await exportArtBundle(owner,{includeAssociatedDesigns:false,drawingIds:refs.filter(ref=>ref.kind==='image').map(ref=>ref.id),rigIds:refs.filter(ref=>ref.kind==='rig').map(ref=>ref.id)});
   if(!current())throw stale();
   return validateSceneArtBundle({schema:'jems.scene-art.v1',scene,art});
 }

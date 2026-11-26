@@ -1,7 +1,7 @@
 import { deriveArtUsages, preparedUsageSources, originalPictureId, ownerArtRecords, type ArtUsage, withArtTransaction, type DrawingMetadata } from './library';
 import { validateAssembly, type DrawingAssembly } from './model';
 import type { SavedRig } from './store';
-import type { DrawingCategory } from '../assets/private-drawings';
+import { canonicalArtSemantic, type DrawingCategory } from '../assets/private-drawings';
 import { CREATION_ASSETS, privateArtId } from '../creation/projects';
 
 export interface CreativeAssetChoice {
@@ -48,7 +48,7 @@ export async function assemblyHash(input: DrawingAssembly): Promise<string> {
 /** Older edited pictures already carry immutable parent IDs and fingerprints.
  * Resolve them without rewriting either a picture or a saved adventure. */
 export async function creativeAssetChoices(owner: string, pictures: DrawingMetadata[], rigs: SavedRig[]): Promise<CreativeAssetChoice[]> {
-  const sources = new Map(pictures.filter(picture => picture.owner === owner).map(picture => [picture.id, picture]));
+  const sources = new Map(pictures.filter(picture => picture.owner === owner).map(canonicalArtSemantic).map(picture => [picture.id, picture]));
   const groups = new Map<string, DrawingMetadata[]>();
   for (const picture of sources.values()) {
     const creativeId = originalPictureId(picture,sources);
@@ -132,6 +132,7 @@ export interface CreativePickerOptions {
   catalogueCompatibility?: (item: CatalogueChoice) => string | undefined;
   onChooseCatalogue?: (item: CatalogueChoice) => void;
   roleLabel?: string;
+  relatedCreativeId?: string;
 }
 
 function thumbnail(item: CreativeAssetChoice, urls: Set<string>) {
@@ -172,7 +173,7 @@ export function mountCreativeAssetPicker(container: HTMLElement, choices: readon
   const search = element('input'), group = element('select');
   search.type = 'search'; search.placeholder = 'Find my art'; search.setAttribute('aria-label', 'Find artwork'); search.maxLength = 60;
   group.setAttribute('aria-label', 'Art collection');
-  const names = {recent:'Recent art', ...categoryNames, motion:'Moving creations', versions:'Saved versions',
+  const names = {recent:'Recent art', ...(options.relatedCreativeId ? {family:'Versions of this picture'} : {}), ...categoryNames, motion:'Moving creations', versions:'Saved versions',
     ...(options.catalogue ? {pal:'My Pals', jems:'Jems artwork'} : {})};
   for (const [id, title] of Object.entries(names)) group.add(new Option(title, id));
   tools.append(search, group);
@@ -207,6 +208,7 @@ export function mountCreativeAssetPicker(container: HTMLElement, choices: readon
       return;
     }
     const items = choices.filter(item => {
+      if (collection === 'family' && item.creativeId !== options.relatedCreativeId) return false;
       if (collection === 'motion' && !item.rigId && !item.animatedIn || collection === 'versions' && !item.rigId && item.revisionNumber === 1) return false;
       if (collection in categoryNames && item.category !== collection && !(collection === 'prop' && item.category === 'other')) return false;
       return !query || [item.label, item.semantic, item.detail, item.identity.name, item.identity.semantic].some(text => text.toLowerCase().includes(query));

@@ -58,6 +58,10 @@ async function main() {
         await page.getByLabel('Role here').selectOption('decoration');
         await page.waitForFunction(()=>FG.creation.scene()?.actors[0].role==='decoration');
         await page.locator('#creationChangePicture').click();
+        const familyFilter=page.locator('#creationPrivateActorChoices select');
+        await familyFilter.selectOption('family');
+        assert.equal(await page.locator('#creationPrivateActorChoices [data-private-art]').filter({hasText:'Green stone'}).count(),0);
+        await familyFilter.selectOption('recent');
         const other=page.locator('#creationPrivateActorChoices [data-private-art]').filter({hasText:'Green stone'}).first();
         const greenPin=await other.getAttribute('data-private-art');await other.click();
         await page.waitForFunction(pin=>FG.creation.scene()?.actors[0].assetId===pin,greenPin);

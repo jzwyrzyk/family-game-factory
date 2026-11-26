@@ -56,7 +56,7 @@ export function validateCreationWorkspace(value:unknown):CreationWorkspace {
   for(const r of data.revisions){
     if(!object(r,['id','projectId','parentId','sourceRevisionId','createdAt','label','scene'])||!ident(r.id)||revisions.has(r.id)||!projects.has(r.projectId)||!(r.parentId===null||ident(r.parentId))||r.sourceRevisionId!==undefined&&!ident(r.sourceRevisionId)||!date(r.createdAt)||!text(r.label,120))invalid();
     const scene=validateEditableProject(r.scene);if(scene.id!==r.projectId)invalid();
-    revisions.set(r.id,r);
+    revisions.set(r.id,{...r,scene});
   }
   for(const p of data.projects){
     const head=revisions.get(p.headId);if(!head||head.projectId!==p.id||head.scene.title!==p.title)invalid();
@@ -69,10 +69,10 @@ export function validateCreationWorkspace(value:unknown):CreationWorkspace {
     const source=r.sourceRevisionId?revisions.get(r.sourceRevisionId):undefined;
     if(source&&projects.get(source.projectId)?.owner!==projects.get(r.projectId)?.owner)invalid();
   }
-  const drafts=new Set<string>();
+  const drafts=new Map<string,CreationProject>();
   for(const d of data.drafts){
     if(!object(d,['projectId','baseRevisionId','scene','updatedAt'])||!projects.has(d.projectId)||drafts.has(d.projectId)||revisions.get(d.baseRevisionId)?.projectId!==d.projectId||!date(d.updatedAt))invalid();
-    const scene=validateEditableProject(d.scene);if(scene.id!==d.projectId)invalid();drafts.add(d.projectId);
+    const scene=validateEditableProject(d.scene);if(scene.id!==d.projectId)invalid();drafts.set(d.projectId,scene);
   }
   const attempts=new Set<string>();
   for(const a of data.attempts){
@@ -85,7 +85,7 @@ export function validateCreationWorkspace(value:unknown):CreationWorkspace {
     const facts=validateRewardOutbox(data.rewardOutbox);
     if(facts.some(fact=>fact.kind!=='scene.challenge'||!data.projects.some(p=>p.owner===fact.owner)))invalid();
   }
-  checkSize(data);return clone(data);
+  checkSize(data);return clone({...data,revisions:[...revisions.values()],drafts:data.drafts.map(draft=>({...draft,scene:drafts.get(draft.projectId)!}))});
 }
 
 export class CreationStore {

@@ -102,6 +102,20 @@ async function main() {
       assert.equal(require('node:crypto').createHash('sha256').update(bytes).digest('hex'),expected);
     }
 
+    const visibleDownload=page.waitForEvent('download');
+    await page.getByRole('button',{name:'Download visible picture',exact:true}).click();
+    const visible=fs.readFileSync(await (await visibleDownload).path()), originalVersion=Buffer.from(revision.bytes);
+    assert.equal(visible.includes(Buffer.from('jeMS')),false);
+    const visibleMatches=await page.evaluate(async ([a,b])=>{
+      async function pixels(base64){
+        const blob=new Blob([Uint8Array.from(atob(base64),c=>c.charCodeAt(0))],{type:'image/png'});
+        const bitmap=await createImageBitmap(blob),canvas=document.createElement('canvas');
+        canvas.width=bitmap.width;canvas.height=bitmap.height;canvas.getContext('2d').drawImage(bitmap,0,0);
+        bitmap.close();return canvas.toDataURL();
+      }
+      return await pixels(a)===await pixels(b);
+    },[visible.toString('base64'),originalVersion.toString('base64')]);
+    assert.equal(visibleMatches,true,'visible-only export preserves the selected version’s displayed pixels');
     // Transfer both images through the real downloadable library. Restore into
     // a clean browser profile to prove recovery independently of the first DB.
     await page.locator('.art-library-more summary').click();

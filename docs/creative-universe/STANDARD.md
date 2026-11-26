@@ -93,3 +93,5 @@ This matrix describes the candidate source. **Supported** means the trusted acti
 | Export and recovery | Exact original bytes, derivative lineage and explicit references | Art libraries and scene-with-art transfers carry their referenced assemblies and programs | Bundled IDs resolve through the compatible application edition | Portable imports remap owner-local IDs. Complete recovery preserves identity within the supported namespace |
 
 Picker entry points limit the choices to the active destination. A decorative object has no implied physics. A scene actor can carry a player, nonplayer, vehicle, collectible, obstacle, decoration, environment-object or background role while retaining the same program. Only explicit rules give it behavior. A collectible in a picture hunt is counted by the hunt's tap program. [Game-specific bindings](../game-intelligence/CREATIVE-ASSET-BINDINGS.md) · [Offline qualification](../game-intelligence/PRIVATE-SPRITE-QUALIFICATION.md)
+
+[Acceptance journeys, screenshots and offline review](EVIDENCE.md)
