@@ -76,6 +76,7 @@
     "docs/decisions/2026-11-21-profile-play-and-reading.md",
     "docs/bubble-gum-builders/README.md",
     "docs/decisions/2026-11-22-bubble-gum-assembly.md",
+    "docs/game-intelligence/PRIVATE-SPRITE-QUALIFICATION.md",
     "docs/game-intelligence/PREMIUM-BUILDER.md",
     "docs/game-intelligence/premium-benchmark/README.md",
     "docs/decisions/2026-11-23-premium-builder.md",
@@ -732,15 +733,16 @@
         "server/sandbox/**",
         "server/testing/**",
         "docs/game-intelligence/*.md",
+        "tools/qualification/private-art-slot.ts",
         "tools/premium-*",
         "docs/game-intelligence/premium-benchmark/*.md",
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:55.850Z",
-      "sourceDigest": "3c42ed09d4394afe0c109b5a6fa6d9d87f119c2474a5101fb24cafd81bf20c81",
+      "reviewedAt": "2026-11-26T03:11:28.263Z",
+      "sourceDigest": "2f438d9162a56e683be1166296809e9b6336fa2cb68e68a5fb80bc5014c22144",
       "reviewOutcome": "updated",
-      "reviewReason": "Scene authoring uses active Pal IDs. The ADR and scene rendering contract cover reading saved generated versions through the historical asset resolver.",
+      "reviewReason": "Documented exact slot, digest and profile checks in an offline compositor receiving only captured v2 frame commands. Production preview, worker and paid operations remain outside the experiment.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -894,10 +896,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:23:11.824Z",
-      "sourceDigest": "5f7b1ef674e2b84dd647d329848d15cf1839bc2b621d5472752fe3445bcdc3d3",
+      "reviewedAt": "2026-11-26T03:22:12.097Z",
+      "sourceDigest": "f1089dfb42949aae5bf2a17222a7ddc3abc8ada77cc5b37db7853a21b218484f",
       "reviewOutcome": "updated",
-      "reviewReason": "Delivery state records the failed hosted Pal reload and the visible onboarding path. The exact same regression commands, assertions, rendering code and timeouts remain in force, with two new pre-navigation persistence assertions.",
+      "reviewReason": "The synthetic sprite fixture adds one executable browser leaf, raising its verified count to 44. The current evidence guide and PR inventory identify the command and the retained full-suite policy.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1138,10 +1140,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T01:23:12.305Z",
-      "sourceDigest": "3a5ab9bfd335677e581d5e32600605a1c3cf253d9a45b9e0e271b77ea454684f",
-      "reviewOutcome": "updated",
-      "reviewReason": "Recorded the passing protected-main suite and the subsequent failed documentation-candidate Pal shard with its retained evidence and correction.",
+      "reviewedAt": "2026-11-26T03:11:32.489Z",
+      "sourceDigest": "793d6e866130ac01e32634111bc85996ec9b10c3f48d7437620df271cad5bbf6",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Only a local qualification command and its evidence changed. There is no application route, service, release workflow or environment activation in this branch.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1396,10 +1398,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:05:50.558Z",
-      "sourceDigest": "3519bd3b6a3b81b4fcd3a4628c1b50c54065abb8da7b3fca64a3097169ec380a",
+      "reviewedAt": "2026-11-26T03:11:58.404Z",
+      "sourceDigest": "4352b43b5f05ed18db64d490ebdd766ac27aa8c4977c62611d31cd56dfdd9ab8",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the shared standard and decision and updated the PR template and maintenance ownership.",
+      "reviewReason": "Registered the private slot qualification contract and mapped its offline compositor to the generation area. Other document routing remains intact.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
