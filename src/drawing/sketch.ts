@@ -12,14 +12,14 @@ export type SketchStroke = { ink: number; size: number; points: SketchPoint[] };
 export type Sketch = { transparent: boolean; strokes: SketchStroke[] };
 export const eraserInk = crayons.length;
 
-const precision = 32;
+const precision = 64;
 const signature = [137, 80, 78, 71, 13, 10, 26, 10];
 const sketchChunk = 0x6a654d53; // jeMS: ancillary, private, unsafe to copy after image edits
 const endChunk = 0x49454e44;
 const maxPayload = 4 + maxStrokes * (4 + 4 * maxStrokePoints);
 
 function locate(bytes: Uint8Array) {
-  if (bytes.length < 57 || !signature.every((v, i) => bytes[i] === v)) return null;
+  if (bytes.length < 57 || bytes.length > 5 * 1024 * 1024 || !signature.every((v, i) => bytes[i] === v)) return null;
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   if (view.getUint32(12) !== 0x49484452 || view.getUint32(16) !== sketchWidth || view.getUint32(20) !== sketchHeight) return null;
   let source = -1;
@@ -41,7 +41,7 @@ export function hasSketchSource(buffer: ArrayBuffer): boolean {
   return !!location && location.source !== -1;
 }
 
-export function readSketch(buffer: ArrayBuffer): Sketch | null {
+export function readSketch(buffer: ArrayBuffer, coordinateScale: 32 | 64 = precision): Sketch | null {
   const bytes = new Uint8Array(buffer), source = locate(bytes)?.source;
   if (source === undefined || source < 0) return null;
   const view = new DataView(buffer), end = source + 8 + view.getUint32(source);
@@ -59,7 +59,7 @@ export function readSketch(buffer: ArrayBuffer): Sketch | null {
     if (ink > eraserInk || size < 3 || size > 24 || !length || length > maxStrokePoints || pos + length * 4 > end) return null;
     const points: SketchPoint[] = [];
     for (let j = 0; j < length; j++) {
-      const x = view.getUint16(pos) / precision, y = view.getUint16(pos + 2) / precision;
+      const x = view.getUint16(pos) / coordinateScale, y = view.getUint16(pos + 2) / coordinateScale;
       if (x > sketchWidth || y > sketchHeight) return null;
       points.push({ x, y });
       pos += 4;

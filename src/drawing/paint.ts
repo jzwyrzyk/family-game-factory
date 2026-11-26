@@ -31,7 +31,7 @@ export async function drawOnTablet(owner: string, onSaved: (drawing: Drawing) =>
   if (!checkOwner() || (source && source.owner !== owner)) throw Error('Choose the player who owns this drawing.');
   if (!isCurrent()) throw Error('Open a drawing from your Art Studio.');
   assertRewardSourceWritable();
-  const original: Sketch | null = source ? readSketch(source.bytes) : { strokes: [], transparent: false };
+  let original: Sketch | null = source ? readSketch(source.bytes) : { strokes: [], transparent: false };
   if (!original) throw Error('The crayon steps could not be opened. Your saved picture is still on the shelf.');
   const returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   const originPage = document.querySelector<HTMLElement>('.page:not(.hidden)')?.id.replace(/^page-/, '');
@@ -65,7 +65,8 @@ export async function drawOnTablet(owner: string, onSaved: (drawing: Drawing) =>
   let state = original;
   // Share immutable strokes between undo states; the last saved strokes can
   // be undone individually, including after a browser reload or bundle restore.
-  const history: Sketch[] = state.strokes.map((_, i) => ({transparent: state.transparent, strokes: state.strokes.slice(0, i)}));
+  const priorStrokes = (page: Sketch): Sketch[] => page.strokes.map((_, i) => ({transparent: page.transparent, strokes: page.strokes.slice(0, i)}));
+  const history = priorStrokes(state);
   const future: Sketch[] = [];
   let ink = 0, active: SketchStroke | null = null, pointer: number | null = null;
   let cursor = sketchPoint(sketchWidth / 2, sketchHeight / 2), keyboardCursor = false;
@@ -259,9 +260,20 @@ export async function drawOnTablet(owner: string, onSaved: (drawing: Drawing) =>
       const sample = reference.getContext('2d')!;
       sample.drawImage(bitmap, 0, 0);
       const pixels = sample.getImageData(0, 0, sketchWidth, sketchHeight).data;
-      const rendered = ctx.getImageData(0, 0, sketchWidth, sketchHeight).data;
-      if (!pixels.every((value, i) => value === rendered[i])) {
-        throw Error('These crayon steps look different from your saved picture on this device. Your original is still on the shelf.');
+      const matches = () => {
+        const rendered = ctx.getImageData(0, 0, sketchWidth, sketchHeight).data;
+        return pixels.every((value, i) => value === rendered[i]);
+      };
+      if (!matches()) {
+        // An independent pre-release writer used the same chunk version with
+        // 1/32-pixel units. Admit that interpretation only after exact replay.
+        const early = readSketch(source.bytes, 32);
+        if (early) {
+          state = original = early;
+          history.splice(0, history.length, ...priorStrokes(early));
+          rebuild();
+        }
+        if (!early || !matches()) throw Error('These crayon steps look different from your saved picture on this device. Your original is still on the shelf.');
       }
     } finally { bitmap.close(); }
   }
