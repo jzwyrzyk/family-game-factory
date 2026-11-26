@@ -2,7 +2,7 @@
 
 ## Editable drawing workspace
 
-**Draw here** opens a private drawing page. New narrow portrait screens get a 560 × 800 page. Other new pages use 900 × 560. Reopening preserves the selected page’s dimensions. Children can draw immediately, choose an optional Character, Thing or World invitation, or keep Anything. Choosing an invitation sets the initial collection on the same save as the picture. The optional subject field in My Art accepts a child's own description, including an invented word.
+**Draw here** opens a private drawing page. New portrait phone and tablet screens up to 1024 CSS pixels wide get a 560 × 800 page. The phone keeps quick colors beside the paper and opens the full supplies tray on request. Other new pages use 900 × 560. Reopening preserves the selected page’s dimensions. Children can draw immediately, choose an optional Character, Thing or World invitation, or keep Anything. Choosing an invitation sets the initial collection on the same save as the picture. The optional subject field in My Art accepts a child's own description, including an invented word.
 
 The first tray for Pre-K and kindergarten has a crayon, eraser, circle and a Jems stamp. Grades 1–2 also see the pencil, brush and expanded tools. The palette has 18 named colors and a custom color picker. Grades 3–4 start with page options expanded. More tools, colors and page options are reachable at every grade. The artist can draw with a pointer, pen or keyboard, fill a connected region, place shapes and labeled Jems stamps, select and move marks, resize them, change paper transparency and undo edits. Focus on paper hides the supplies. Show tools brings them back. Stamps use the approved blue, mint and gold gem artwork.
 

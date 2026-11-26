@@ -162,3 +162,12 @@
   .drawing-paint.dp-focus .dp-desk>.dp-basic-tools{display:none}
   .drawing-paint:not(.dp-focus) .dp-desk [data-paper]{max-height:47dvh}
 }
+
+@media(max-width:600px) and (orientation:portrait){
+  .dp-desk>.dp-basic-tools{flex-wrap:wrap;overflow:visible}
+  .dp-desk>[data-colors]{gap:5px;margin-block:1px 6px}
+  .dp-desk>[data-colors]>button:nth-child(n+7):not([aria-pressed=true]){display:none}
+  .drawing-paint.dp-focus .dp-desk>[data-colors]{display:none}
+  .drawing-paint.dp-pocket-open .dp-desk{display:none}
+  .drawing-paint.dp-pocket-open .dp-tools{position:static;max-height:none;overflow:visible;overscroll-behavior:auto;box-shadow:none}
+}

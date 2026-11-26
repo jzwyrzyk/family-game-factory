@@ -136,6 +136,7 @@ export function installArtStudio(host:Host){
     options.setAttribute('aria-label','Your saved drawing');
     const move=$<HTMLButtonElement>('artDrawPath'), scene=$<HTMLButtonElement>('artUseScene');
     setIconLabel(move,'play','Make it move');
+    setIconLabel($('artEditMovement'),'settings','Edit parts and joints');
     setIconLabel(scene,'grid','Make a scene');
     const game=node('details','art-kept-game'), summary=node('summary','','Make a game with it');
     game.append(summary,node('p','','Give your picture wheels to drive it in Rally.'),button('Build a Rally car','edit',()=>{

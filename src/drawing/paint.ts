@@ -92,7 +92,7 @@ export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Prom
     }
   }
   if(!openingCurrent() || hasEditor())return;
-  if(!initial && matchMedia('(max-width: 600px) and (orientation: portrait)').matches){
+  if(!initial && matchMedia('(max-width: 1024px) and (orientation: portrait)').matches){
     initial={version:1,transparent:false,marks:[],orientation:'portrait'};
   }
   const dialog = document.createElement('dialog');
@@ -306,9 +306,13 @@ export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Prom
   const mobile=matchMedia('(max-width:600px) and (orientation:portrait)');
   const basicTools=find<HTMLElement>('[aria-label="Drawing tools"]');
   basicTools.classList.add('dp-basic-tools');
+  const quickColors=find<HTMLElement>('[data-colors]');
   function placeBasicTools(){
-    if(mobile.matches && !dialog.classList.contains('dp-pocket-open'))canvas.before(basicTools);
-    else find('.dp-tools h3').after(basicTools);
+    if(mobile.matches && !dialog.classList.contains('dp-pocket-open')){
+      canvas.before(basicTools,quickColors);
+    } else {
+      find('.dp-tools h3').after(basicTools,quickColors);
+    }
   }
   mobile.addEventListener('change',placeBasicTools);placeBasicTools();
   const tray=find<HTMLButtonElement>('[data-tray]');
