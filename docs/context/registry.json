@@ -903,10 +903,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:36:37.746Z",
-      "sourceDigest": "96d797c4f8bd3a847bcef41eb2b53d2e1024659fb377d3d627f08634c3b15db3",
+      "reviewedAt": "2026-11-26T03:43:22.238Z",
+      "sourceDigest": "9755f1f29e52dbb4a755627954365061622a186d2d360a90cc80daccdd6c7ce0",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The CI inventory explicitly checks the already-registered creative test leaves and the existing checkpoint journey checks the Math heading against the documented 4.5:1 minimum. Test commands, production gates and scope stay as documented.",
+      "reviewReason": "The offline smoke test checks the existing build against all 48 independent world-manifest hashes, decodes the three Moon Adventure stage layers offline and preserves private-route, quota and Pal canaries. The shipped caching and release contracts already describe these boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
