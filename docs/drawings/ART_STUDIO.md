@@ -1,5 +1,9 @@
 # Art Studio: draw it, develop it, reuse it
 
+## My Art navigation and preserved visual reference — November 25, 2026
+
+**My Art** is the canonical destination in Home and Menu → Make. The original **You drew it. Now let’s play.** heading, gem illustration, gradient panel, Upload a drawing / Take a photo / Draw here arrangement and collection remain the visual reference. Readability is improved without replacing the composition or assets. Optional picture controls in a game/scene open the same library and offer an owner-bound return to that activity. Scene links use **Creative Studio**. Original pixels, derivatives, exact references, camera/upload and private storage contracts below are unchanged. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
+
 **Source scope:** Art Studio from merged [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23), November 19, 2026 (America/New_York). This contract describes source behavior, not production deployment. The accepted direction is recorded in [the Art Studio decision](../decisions/2026-11-19-private-art-studio.md). [Delivery state](../../DELIVERY-STATE.md) records its merge receipt and keeps the subsequent first-creation integration acceptance separate.
 
 ## The experience

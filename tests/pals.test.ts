@@ -31,11 +31,11 @@ function fixture() {
   const store = new PalsStore(PALS_DB_NAME, persistence, () => clock);
   return { persistence, store, clock: (offset: number) => { clock = instant + offset; } };
 }
-const owned = (view: Awaited<ReturnType<PalsStore['view']>>, id: PalId = 'glim') => view.owned.find(pal => pal.id === id)!;
+const owned = (view: Awaited<ReturnType<PalsStore['view']>>, id: PalId = 'navi') => view.owned.find(pal => pal.id === id)!;
 
 test('approved roster has real two-form portraits, stable legacy identities and bounded reactions', () => {
-  assert.equal(PAL_CATALOG.length, 24);
-  assert.deepEqual(PAL_CATALOG.filter(pal => pal.starter).map(pal => [pal.id, pal.name]), [['glim', 'Luma'], ['kip', 'Nook']]);
+  assert.equal(PAL_CATALOG.length, 22);
+  assert.deepEqual(PAL_CATALOG.filter(pal => pal.starter).map(pal => [pal.id, pal.name]), [['kip', 'Nook'], ['navi', 'Navi']]);
   assert.equal(palDefinition('riff').name, 'Wink');
   assert.equal(new Set(PAL_CATALOG.map(pal => pal.artwork.characterKey)).size, PAL_CATALOG.length);
   for (const pal of PAL_CATALOG) {
@@ -62,17 +62,17 @@ test('approved roster has real two-form portraits, stable legacy identities and 
 test('free starter persists without gems and the other starter is a deterministic collectible', async () => {
   const { store, persistence } = fixture();
   assert.equal((await store.view(owner)).starterId, null);
-  const first = await store.chooseStarter(owner, 'glim', snapshot());
-  assert.equal(first.profile.activeId, 'glim'); assert.equal(first.profile.owned.length, 1);
+  const first = await store.chooseStarter(owner, 'navi', snapshot());
+  assert.equal(first.profile.activeId, 'navi'); assert.equal(first.profile.owned.length, 1);
   assert.deepEqual(first.profile.availableIds, []);
   assert.equal(owned(await new PalsStore(PALS_DB_NAME, persistence).view(owner)).source, 'starter');
   await assert.rejects(store.chooseStarter(owner, 'kip', snapshot()), /already chose/);
   await assert.rejects(store.collect(owner, 'kip', snapshot([], 49)), /lifetime gems/);
-  await assert.rejects(store.chooseStarter('child-two', 'riff', snapshot([], 0, 'child-two')), /Luma or Nook/);
+  await assert.rejects(store.chooseStarter('child-two', 'riff', snapshot([], 0, 'child-two')), /Nook or Navi/);
   const ready = await store.sync(owner, snapshot([], 50));
   assert.deepEqual(ready.newlyAvailable, ['kip']);
   const second = await store.collect(owner, 'kip', snapshot([], 50));
-  assert.equal(second.profile.owned.length, 2); assert.equal(second.profile.activeId, 'glim');
+  assert.equal(second.profile.owned.length, 2); assert.equal(second.profile.activeId, 'navi');
   assert.deepEqual((await store.sync(owner, snapshot([], 150))).newlyAvailable, ['riff']);
   await store.collect(owner, 'riff', snapshot([], 150));
   assert.equal((await store.collect(owner, 'riff', snapshot([], 150))).profile.owned.length, 3);
@@ -82,15 +82,15 @@ test('free starter persists without gems and the other starter is a deterministi
 
 test('the complete roster can be earned, equipped, grown and restored without spending gems', async () => {
   const { store, clock } = fixture();
-  await store.chooseStarter(owner, 'glim', snapshot());
+  await store.chooseStarter(owner, 'navi', snapshot());
   const lifetimeGems = Math.max(...PAL_CATALOG.map(pal => pal.unlockGems));
   const funded = snapshot([], lifetimeGems);
   await store.sync(owner, funded);
-  for (const pal of PAL_CATALOG.filter(pal => pal.id !== 'glim')) {
+  for (const pal of PAL_CATALOG.filter(pal => pal.id !== 'navi')) {
     await store.collect(owner, pal.id, funded);
   }
   assert.equal((await store.view(owner)).owned.length, PAL_CATALOG.length);
-  assert.equal((await store.view(owner)).activeId, 'glim', 'welcoming a Pal does not equip it');
+  assert.equal((await store.view(owner)).activeId, 'navi', 'welcoming a Pal does not equip it');
   clock(500);
   await store.equip(owner, 'navi', funded);
   const receipts = Array.from({ length: 5 }, (_, i) => activity(`navi-adventure-${i}`, 'scene.challenge', 600 + i));
@@ -110,14 +110,14 @@ test('the complete roster can be earned, equipped, grown and restored without sp
 });
 
 test('learning adventures group five receipts, while one coding or making receipt is one adventure', async () => {
-  const { store } = fixture(); await store.chooseStarter(owner, 'glim', snapshot());
+  const { store } = fixture(); await store.chooseStarter(owner, 'navi', snapshot());
   const learning = Array.from({ length: 24 }, (_, i) => activity(`math-${i}`, 'math.completed', i + 100));
   let view = (await store.sync(owner, snapshot(learning, 48))).profile;
   assert.equal(owned(view).adventures, 4); assert.equal(owned(view).stage, 1);
   assert.equal(owned(view).practiceToNextAdventure, 1); assert.equal(owned(view).adventuresToNext, 1);
   learning.push(activity('writing-25', 'language.explored', 200));
   let result = await store.sync(owner, snapshot(learning, 50));
-  assert.deepEqual(result.growth, [{ palId: 'glim', from: 1, to: 2 }]);
+  assert.deepEqual(result.growth, [{ palId: 'navi', from: 1, to: 2 }]);
   assert.equal(owned(result.profile).stageName, 'Grown');
   assert.equal(owned(result.profile).form, 'mature');
   const creation = Array.from({ length: 10 }, (_, i) => activity(`create-${i}`, i % 2 ? 'scene.challenge' : 'game.developed', i + 300));
@@ -130,11 +130,11 @@ test('learning adventures group five receipts, while one coding or making receip
 test('older receipt-only profiles keep earned growth through reload and backup without a new celebration', async () => {
   for (const adventures of [0, 4, 5, 14, 15, 25]) {
     const { store, persistence } = fixture();
-    await store.chooseStarter(owner, 'glim', snapshot());
+    await store.chooseStarter(owner, 'navi', snapshot());
     const receipts = snapshot(Array.from({ length: adventures }, (_, index) => activity(`old-${index}`, 'scene.challenge', index + 100)), 150);
     await store.sync(owner, receipts);
     const saved = await store.export();
-    assert.equal(saved.data.profiles[0].policyVersion, 1);
+    assert.equal(saved.data.profiles[0].policyVersion, 2);
     assert.equal(Object.hasOwn(saved.data.profiles[0], 'stage'), false);
     const reloaded = new PalsStore(PALS_DB_NAME, persistence);
     const projected = await reloaded.sync(owner, receipts);
@@ -166,7 +166,7 @@ test('duplicate projection, retry, reload and removed source detail cannot multi
 test('old receipts including unusual future timestamps are baselined before choosing a starter', async () => {
   const { store } = fixture();
   const old = snapshot([activity('old-game', 'game.developed', -1000), activity('old-clock', 'scene.challenge', 100_000)], 150);
-  const chosen = await store.chooseStarter(owner, 'glim', old);
+  const chosen = await store.chooseStarter(owner, 'navi', old);
   assert.equal(owned(chosen.profile).adventures, 0); assert.deepEqual(chosen.profile.availableIds, ['kip', 'riff']);
   const delayedOld = activity('late-old', 'scene.challenge', -1);
   const next = await store.sync(owner, snapshot([...old.activities, delayedOld, activity('new', 'scene.challenge')], 158));
@@ -175,10 +175,10 @@ test('old receipts including unusual future timestamps are baselined before choo
 });
 
 test('delayed work belongs to the Pal active at its occurrence, including after re-equipping', async () => {
-  const { store, clock } = fixture(); await store.chooseStarter(owner, 'glim', snapshot());
+  const { store, clock } = fixture(); await store.chooseStarter(owner, 'navi', snapshot());
   clock(10); await store.collect(owner, 'kip', snapshot([], 50));
   clock(200); await store.equip(owner, 'kip', snapshot([], 50));
-  clock(400); await store.equip(owner, 'glim', snapshot([], 50));
+  clock(400); await store.equip(owner, 'navi', snapshot([], 50));
   const pending = snapshot([
     activity('first', 'game.developed', 100), activity('second', 'scene.challenge', 300), activity('third', 'scene.challenge', 500),
   ], 100);
@@ -190,7 +190,7 @@ test('delayed work belongs to the Pal active at its occurrence, including after 
 });
 
 test('learning remainder stays with its own Pal when the active companion changes', async () => {
-  const { store, clock } = fixture(); await store.chooseStarter(owner, 'glim', snapshot());
+  const { store, clock } = fixture(); await store.chooseStarter(owner, 'navi', snapshot());
   const first = [activity('a', 'math.completed', 10), activity('b', 'language.completed', 11), activity('c', 'language.explored', 12)];
   clock(20); await store.collect(owner, 'kip', snapshot(first, 50));
   clock(30); await store.equip(owner, 'kip', snapshot(first, 50));
@@ -198,13 +198,13 @@ test('learning remainder stays with its own Pal when the active companion change
   let view = (await store.sync(owner, snapshot([...first, ...kip], 60))).profile;
   assert.equal(owned(view).adventures, 0); assert.equal(owned(view).practiceToNextAdventure, 2);
   assert.equal(owned(view, 'kip').adventures, 1);
-  clock(60); await store.equip(owner, 'glim', snapshot([...first, ...kip], 60));
+  clock(60); await store.equip(owner, 'navi', snapshot([...first, ...kip], 60));
   view = (await store.sync(owner, snapshot([...first, ...kip, activity('d', 'math.completed', 70), activity('e', 'math.completed', 71)], 64))).profile;
   assert.equal(owned(view).adventures, 1);
 });
 
 test('source timestamps cannot be changed behind an existing receipt identity', async () => {
-  const { store } = fixture(); await store.chooseStarter(owner, 'glim', snapshot());
+  const { store } = fixture(); await store.chooseStarter(owner, 'navi', snapshot());
   const saved = activity('same', 'scene.challenge', 100); await store.sync(owner, snapshot([saved]));
   const before = await store.export();
   await assert.rejects(store.sync(owner, snapshot([{ ...saved, occurredAt: time(200) }])), /changed identity/);
@@ -213,7 +213,7 @@ test('source timestamps cannot be changed behind an existing receipt identity', 
 });
 
 test('profile switching, foreign snapshots and adult namespaces cannot cross ownership', async () => {
-  const { store, persistence } = fixture(); await store.chooseStarter(owner, 'glim', snapshot());
+  const { store, persistence } = fixture(); await store.chooseStarter(owner, 'navi', snapshot());
   const other = 'child-two'; await store.chooseStarter(other, 'kip', snapshot([], 0, other));
   await store.sync(owner, snapshot([activity('game', 'game.developed')], 25));
   assert.equal(owned(await store.view(other), 'kip').adventures, 0);
@@ -223,14 +223,14 @@ test('profile switching, foreign snapshots and adult namespaces cannot cross own
   await adult.chooseStarter(adultId, 'kip', snapshot([], 0, adultId));
   await assert.rejects(adult.view(owner), /different player/);
   await assert.rejects(store.view(adultId), /different player/);
-  assert.equal((await store.view(owner)).activeId, 'glim');
+  assert.equal((await store.view(owner)).activeId, 'navi');
 });
 
 test('failed writes show no false starter, collection, growth, preference or selection', async () => {
   const { store, persistence, clock } = fixture(); persistence.fail = true;
-  await assert.rejects(store.chooseStarter(owner, 'glim', snapshot()), /quota/);
+  await assert.rejects(store.chooseStarter(owner, 'navi', snapshot()), /quota/);
   assert.equal((await store.view(owner)).starterId, null);
-  persistence.fail = false; await store.chooseStarter(owner, 'glim', snapshot());
+  persistence.fail = false; await store.chooseStarter(owner, 'navi', snapshot());
   const before = await store.export(); persistence.fail = true;
   await assert.rejects(store.collect(owner, 'kip', snapshot([], 150)), /quota/);
   await assert.rejects(store.sync(owner, snapshot([activity('game', 'game.developed')], 150)), /quota/);
@@ -238,14 +238,14 @@ test('failed writes show no false starter, collection, growth, preference or sel
   assert.deepEqual(await store.export(), before);
   persistence.fail = false; clock(10); await store.collect(owner, 'kip', snapshot([], 50));
   persistence.fail = true; clock(20); await assert.rejects(store.equip(owner, 'kip', snapshot([], 50)), /quota/);
-  assert.equal((await store.view(owner)).activeId, 'glim');
+  assert.equal((await store.view(owner)).activeId, 'navi');
   persistence.fail = false; await store.sync(owner, snapshot([activity('game', 'game.developed')], 150));
   assert.equal(owned(await store.view(owner)).adventures, 1);
 });
 
 test('concurrent stores serialize receipt assignments and starter choice', async () => {
   const { store, persistence } = fixture(); const second = new PalsStore(PALS_DB_NAME, persistence, () => instant);
-  const starters = await Promise.allSettled([store.chooseStarter(owner, 'glim', snapshot()), second.chooseStarter(owner, 'kip', snapshot())]);
+  const starters = await Promise.allSettled([store.chooseStarter(owner, 'navi', snapshot()), second.chooseStarter(owner, 'kip', snapshot())]);
   assert.equal(starters.filter(result => result.status === 'fulfilled').length, 1);
   const receipts = snapshot([activity('one', 'scene.challenge')], 50);
   await Promise.all([store.sync(owner, receipts), second.sync(owner, receipts), store.sync(owner, receipts)]);
@@ -254,7 +254,7 @@ test('concurrent stores serialize receipt assignments and starter choice', async
 });
 
 test('hidden or quiet companions keep the same progress and can return without penalties', async () => {
-  const { store } = fixture(); await store.chooseStarter(owner, 'glim', snapshot());
+  const { store } = fixture(); await store.chooseStarter(owner, 'navi', snapshot());
   await store.setPreferences(owner, { showCompanion: false, encouragement: false });
   await store.sync(owner, snapshot([activity('game', 'game.developed')], 25));
   assert.equal(owned(await store.view(owner)).adventures, 1);
@@ -265,7 +265,7 @@ test('hidden or quiet companions keep the same progress and can return without p
 });
 
 test('backup replacement retains ownership, growth and settings without award replay', async () => {
-  const { store } = fixture(); await store.chooseStarter(owner, 'glim', snapshot());
+  const { store } = fixture(); await store.chooseStarter(owner, 'navi', snapshot());
   const completed = snapshot([activity('game', 'game.developed')], 50);
   await store.sync(owner, completed); await store.collect(owner, 'kip', completed);
   await store.setPreferences(owner, { encouragement: false });
@@ -296,7 +296,7 @@ test('corrupt and future data remain recoverable and failed maintenance can rest
 });
 
 test('schema rejects duplicate identities, unknown state and malformed unlock or selection records', async () => {
-  const { store } = fixture(); await store.chooseStarter(owner, 'glim', snapshot());
+  const { store } = fixture(); await store.chooseStarter(owner, 'navi', snapshot());
   const workspace = (await store.export()).data;
   const cases: Array<(value: any) => void> = [
     value => value.profiles.push(copyPals(value.profiles[0])),
@@ -318,11 +318,51 @@ test('schema rejects duplicate identities, unknown state and malformed unlock or
 });
 
 test('profile erasure removes only that player’s companions and preferences', async () => {
-  const { store } = fixture(); await store.chooseStarter(owner, 'glim', snapshot());
+  const { store } = fixture(); await store.chooseStarter(owner, 'navi', snapshot());
   await store.chooseStarter('child-two', 'kip', snapshot([], 0, 'child-two'));
   await store.sync(owner, snapshot([activity('game', 'game.developed')], 150));
   await store.removeOwner(owner);
   assert.equal((await store.view(owner)).starterId, null);
   assert.equal((await store.view('child-two')).activeId, 'kip');
   assert.equal((await store.export()).data.profiles.length, 1);
+});
+
+test('v1 retirement preserves earned adventures, selection windows and previously owned starters once', async () => {
+  const { store, persistence } = fixture();
+  const times = [0, 10, 20, 30].map(offset => new Date(instant + offset).toISOString());
+  const historical = {
+    owner, policyVersion: 1, starterId: 'glim', activeId: 'zippa',
+    preferences: { showCompanion: false, encouragement: true },
+    owned: ['glim', 'navi', 'kip', 'zippa'].map((id, i) => ({ id, joinedAt: times[i], source: i ? 'gems' : 'starter' })),
+    selections: ['glim', 'navi', 'kip', 'zippa'].map((palId, i) => ({ palId, from: times[i] })),
+    unlockedIds: ['glim', 'kip', 'riff', 'navi', 'zippa'],
+    assignments: Array.from({ length: 5 }, (_, i) => ({ ...activity('old-' + i, 'scene.challenge', 40 + i), palId: 'zippa' })),
+  };
+  const sibling = { ...historical, owner: 'sibling', starterId: 'kip', activeId: 'glim',
+    owned: [{id:'kip', source:'starter', joinedAt:times[0]}, {id:'glim', source:'gems', joinedAt:times[1]}],
+    selections: [{palId:'kip', from:times[0]}, {palId:'glim', from:times[1]}], assignments:[] };
+  const raw = { schema: 'jems.pals.workspace.v1', profiles: [historical, sibling] };
+  persistence.values.set(PALS_DB_NAME, structuredClone(raw));
+  await Promise.all([store.sync(owner, snapshot()), store.sync(owner, snapshot())]);
+  const first = await store.export(), [profile, other] = first.data.profiles;
+  assert.deepEqual(profile.owned.map(pal => [pal.id, pal.source, pal.joinedAt]), [
+    ['navi','starter',times[0]], ['kip','gems',times[2]]]);
+  assert.deepEqual(profile.selections.map(s => s.from), times);
+  assert.deepEqual(profile.assignments, historical.assignments.map(a => ({...a, palId:'kip'})));
+  assert.equal(profile.activeId, 'kip');
+  assert.equal(owned(await store.view(owner), 'kip').form, 'mature');
+  assert.equal(other.activeId, 'navi');
+  assert.deepEqual(other.assignments, []);
+  assert.deepEqual(profile.preferences, historical.preferences);
+  assert.deepEqual(profile.unlockedIds, ['navi','kip','riff']);
+  assert.equal(profile.policyVersion, 2);
+  assert.deepEqual([...persistence.values.keys()], [PALS_DB_NAME], 'no reward ledger writes or grants');
+  await store.restore({ ...first, data: raw }, { mode:'replace', allowedOwners:[owner,'sibling'] });
+  assert.deepEqual(await store.export(), first);
+  for (const id of ['glim','luma','zippa']) {
+    assert.throws(() => palDefinition(id));
+    await assert.rejects(store.chooseStarter(owner, id as PalId, snapshot()));
+    await assert.rejects(store.collect(owner, id as PalId, snapshot()));
+    await assert.rejects(store.equip(owner, id as PalId, snapshot()));
+  }
 });

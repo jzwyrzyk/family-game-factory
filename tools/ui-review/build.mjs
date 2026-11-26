@@ -26,9 +26,10 @@ const js=result.outputFiles.find(x=>x.path.endsWith('.js')).text,css=result.outp
 let html=await fs.readFile('index.html','utf8');
 html=html.replace(/<script[^>]*src=[^>]+><\/script>/g,'').replace(/<link[^>]+>/g,'');
 manifest.assetPackaging=exact?'Exact original bytes':'Gem Pal images: same artwork, maximum 768px WebP quality 90; other assets exact';
-const payload={sha,builtAt:new Date().toISOString(),manifest,assets,html,css,js,bootstrap:await fs.readFile('tools/ui-review/bootstrap.js','utf8')};
+const sourceKind=process.env.UI_REVIEW_SOURCE_KIND || (execFileSync('git',['branch','--show-current'],{encoding:'utf8'}).trim()==='main'?'merged main':'candidate branch');
+const payload={sha,sourceKind,builtAt:new Date().toISOString(),manifest,assets,html,css,js,bootstrap:await fs.readFile('tools/ui-review/bootstrap.js','utf8')};
 const esc=s=>JSON.stringify(s).replaceAll('<','\\u003c');
 const shell=await fs.readFile('tools/ui-review/shell.html','utf8');
 await fs.writeFile(path.join(out,'jems-ui-review.html'),shell.replace('/*__PAYLOAD__*/',()=>`const PAYLOAD=${esc(payload)};`));
-await fs.writeFile(path.join(out,'coverage.json'),JSON.stringify({...manifest,sha,assets:Object.keys(assets).length},null,2));
+await fs.writeFile(path.join(out,'coverage.json'),JSON.stringify({...manifest,sha,sourceKind,assets:Object.keys(assets).length},null,2));
 console.log(`Built ${path.join(out,'jems-ui-review.html')} (${Object.keys(assets).length} embedded assets), baseline ${sha}`);

@@ -100,7 +100,8 @@ const replies={
     assert.equal(await page.locator('#studioSend').isEnabled(),true,'the child can build after a grounded contextual review');
     assert.equal(requests.length,0,'even a ready review cannot submit a build');
     await page.fill('#studioPrompt','I have a different ending in mind.');
-    assert.equal(await page.locator('#studioSend').isDisabled(),true,'unsent changes must be discussed before building');
+    assert.equal(await page.locator('#studioSend').isEnabled(),true,'Build can send an unsent correction through the coach');
+    assert.equal(requests.length,0,'the earlier review cannot automatically authorize the correction');
     await page.fill('#studioPrompt','');
     assert.equal(await page.locator('#studioSend').isVisible(),true);
     await page.click('#studioSend');

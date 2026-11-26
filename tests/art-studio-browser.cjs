@@ -50,7 +50,7 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   assert.equal(await page.evaluate(()=>FG.creation.export().projects.length),0);
   await page.locator('#artHome').click();await waitForWelcome(page);
   assert.equal(await page.locator('#studioWelcome').isVisible(),false,'an art-only creator returns Home without the first-creation welcome');
-  assert.equal(await page.locator('#studioArtShortcut').isVisible(),true,'the creator can return to saved artwork without Explore');
+  assert.equal(await page.locator('#studioArt').isVisible(),true,'the creator can return to saved artwork without Explore');
   await page.goto(base);await ready(page);await waitForWelcome(page);
   assert.equal(await page.locator('#studioWelcome').isVisible(),false,'default entry recognizes existing private artwork');
   await page.reload();await ready(page);await waitForWelcome(page);
@@ -58,7 +58,7 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   assert.equal((await count(page)).length,1,'the original artwork remains available');
   assert.deepEqual(await page.evaluate(()=>FG.studio.exportNotebook()),artOnlyNotebook,'art presence changes no projects, making evidence or guidance preferences');
   assert.equal(await page.evaluate(()=>FG.creation.export().projects.length),0);
-  await page.locator('#studioArtShortcut').click();await page.locator('[data-art-id="'+before.id+'"]').click();
+  await page.locator('#studioArt').click();await page.locator('[data-art-id="'+before.id+'"]').click();
   await page.locator('#artEditMovement').click();await page.locator('dialog.drawing-lab').waitFor({state:'visible'});
   // Suggestions are editable guesses. Prepare this known synthetic drawing
   // through the same visible outline controls available to the maker.
@@ -94,7 +94,7 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   const ride=await page.evaluate(()=>window.FG.runtime.snapshot().state);assert.ok(ride.drawingRigId,'Rally uses immutable selected art');
   const originalBinding=await page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')).revisions.find(r=>r.drawingRigId)?.drawingRigId);assert.equal(originalBinding,ride.drawingRigId);
   await page.screenshot({path:path.join(output,'rally-with-my-art.png'),fullPage:true});
-  await navigate(page,'#studioNavHome');await page.locator('#studioArtShortcut').click();
+  await navigate(page,'#studioNavHome');await page.locator('#studioArt').click();
   await page.locator('[data-art-id]').first().click();await page.locator('.art-detail-tools summary').click();await page.getByRole('button',{name:'Trim, turn & clean up',exact:true}).click();
   await page.locator('.art-picture').waitFor({state:'visible'});await page.locator('[data-edge="left"]').fill('10');await page.locator('[data-edge="left"]').dispatchEvent('change');
   await page.locator('[data-turn]').click();await page.locator('.art-picture [data-name]').fill('Jellybean close-up');
@@ -113,7 +113,7 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   await page.locator('#artUseScene').click();await page.locator('#creationWorkspace').waitFor({state:'visible'});assert.ok((await page.locator('#creationTitle').inputValue()).includes('Mochi'),'drawing starts its own editable scene');
   assert.ok(await page.evaluate(()=>window.FG.creation.scene().actors[0].assetId.startsWith('art:rig:')),'the scene uses the selected saved character cutout');
   await page.waitForFunction(()=>document.querySelector('#creationActors canvas'));await page.screenshot({path:path.join(output,'my-art-in-create-and-code.png'),fullPage:true});
-  await navigate(page,'#studioNavHome');await page.locator('#studioArtShortcut').click();await page.locator('[data-category="all"]').click();
+  await navigate(page,'#studioNavHome');await page.locator('#studioArt').click();await page.locator('[data-category="all"]').click();
   await page.locator('.art-library-more summary').click();const download=page.waitForEvent('download');await page.locator('#artExport').click();const artifact=await download;assert.equal(artifact.suggestedFilename(),'my-jems-art.json');const artBundle=JSON.parse(fs.readFileSync(await artifact.path(),'utf8'));assert.equal(artBundle.drawings.length,4);assert.ok(artBundle.rigs.length>=1);
   await page.locator('.art-library-more summary').click();
   await page.setViewportSize({width:390,height:844});await noOverflow(page,'390px library');const closeIcon=await page.getByRole('button',{name:'Close artwork details'}).locator('svg').boundingBox();assert.ok(closeIcon.width>=16&&closeIcon.height>=16,'icon-only close remains visible');await page.screenshot({path:path.join(output,'art-library-phone.png'),fullPage:true});
@@ -121,7 +121,7 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   await page.locator('#artUpload').setInputFiles({name:'fake.png',mimeType:'image/png',buffer:Buffer.from('<svg onload="alert(1)"></svg>')});await page.waitForFunction(()=>document.getElementById('artStatus').classList.contains('is-error'));assert.equal((await count(page)).length,4);
   await page.setViewportSize({width:1360,height:950});await page.locator('#artHome').click();const menu=page.locator('#studioProfileMenu');if(!await menu.evaluate(e=>e.open))await menu.locator('summary').click();await page.locator('#profile-choices .profile-choice').nth(1).click();await waitForWelcome(page);
   assert.equal(await page.locator('#studioWelcome').isVisible(),true,'another player’s saved artwork does not dismiss this fresh sibling’s welcome');
-  await exploreWelcome(page);await page.locator('#studioArtShortcut').click();await page.locator('#artEmpty').waitFor({state:'visible'});assert.equal(await page.locator('.art-card').count(),0,'another player cannot see prior art');
+  await exploreWelcome(page);await page.locator('#studioArt').click();await page.locator('#artEmpty').waitFor({state:'visible'});assert.equal(await page.locator('.art-card').count(),0,'another player cannot see prior art');
   assert.deepEqual(posts,[],'private artwork makes no POST or model request');assert.deepEqual(errors,[],'no browser exceptions');
   console.log('PASS Art Studio: default navigation, upload, private shelf, truthful refresh failure, metadata/filter, recovered movement draft, notebook quota retry, optional usage-index failure, saved physical ride, picture transform/original preservation, cross-scene use, art export, mobile reflow, invalid image and profile isolation');
  }catch(error){if(page)await page.screenshot({path:path.join(output,'failure.png'),fullPage:true}).catch(()=>{});throw error;}

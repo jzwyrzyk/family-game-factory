@@ -55,7 +55,7 @@ async function incoming(owner=OWNER){
   const {storage,rewards,pals}=stores(),workspace=new RevisionStore(storage),notebook=new StudioNotebook(storage),creation=new CreationStore(storage),problemSolving=new ProblemSolvingStore(storage);
   const project=workspace.create(owner,'buckets','Saved game');notebook.create(owner,'buckets','Saved game',project.id);
   notebook.dismissWelcome(owner);notebook.dismissGuideTip(owner,'idea');
-  await pals.chooseStarter(owner,'glim',{owner,lifetimeGems:0,activities:[]});
+  await pals.chooseStarter(owner,'navi',{owner,lifetimeGems:0,activities:[]});
   await pals.setPreferences(owner,{encouragement:false});
   const scene=creation.create(owner,createChallengeStarter('robot-route'),{challengeId:'robot-route'});
   creation.recordAttempt(scene.id,owner,scene.headId,{challengeId:'robot-route',passed:true,hintUsed:true});
@@ -254,7 +254,7 @@ test('successful replacement commits all five sources and the ledger without pro
   assert.deepEqual(JSON.parse(storage.getItem(CREATION_KEY)!),plan.creation);
   assert.deepEqual(JSON.parse(storage.getItem(PROBLEM_SOLVING_KEY)!),plan.problemSolving);
   assert.deepEqual(await pals.export(),plan.pals);
-  assert.equal((await pals.view(OWNER)).activeId,'glim');
+  assert.equal((await pals.view(OWNER)).activeId,'navi');
   assert.equal((await pals.view(OWNER)).preferences.encouragement,false);
   assert.equal((await rewards.summary(OWNER)).lifetimeGems,2,'the pending coding receipt is not silently projected during restore');
   assert.equal((await rewards.summary(OWNER)).practiceCount,1,'reasoning episodes and drafts do not mint rewards or practice bonuses');

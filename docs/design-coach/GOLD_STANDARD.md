@@ -1,5 +1,9 @@
 # Family Game Factory — Child-owned design coaching
 
+## One concept, separate completion action — November 25, 2026
+
+Build sits outside the conversation input form. HTML composer validity cannot block a ready saved concept. Send and reviewed Speak still feed the same conversation; empty-composer Build compiles eligible accumulated decisions. If a child has added unsent text after a ready review, Build sends it exactly once through the same coach and stops for the updated clarification/recap. The child chooses Build again after readiness is established. No stale review, draft loss, automatic build, changed provider model or new spending authority is permitted. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
+
 **Status: owner-approved product standard.** This standard applies to initial game creation, play, reflection, experiments, revision, save/fork and release. It is not an optional educational layer. Existing game mechanics remain in scope for later repairs, not silently changed by this UI work.
 
 ## Governing principle

@@ -1,6 +1,6 @@
 import {ownerPreviewGrant} from '../beta/owner-preview';
 import {isGeneratedGame} from '../agent/generated';
-import {validateGeneratedCreationManifest} from '../../src/creation/projects';
+import {validateSavedCreationManifest} from '../../src/creation/projects';
 import {renderGenerated} from '../sandbox/preview.cjs';
 import type { IncomingMessage,ServerResponse } from 'node:http';
 import { createHmac,timingSafeEqual } from 'node:crypto';
@@ -44,7 +44,7 @@ export function apiHandler(service:JobService,config:HttpConfig,repo?:Repository
    if(creationMatch&&request.method==='GET'){
     // Reuses the exact family/device/adult audience checks for the saved revision.
     const r=await service.revision(session,creationMatch[1]);
-    const manifest=isGeneratedGame(r.game)&&r.game.creationManifest?validateGeneratedCreationManifest(r.game.creationManifest):null;
+    const manifest=isGeneratedGame(r.game)&&r.game.creationManifest?validateSavedCreationManifest(r.game.creationManifest):null;
     return json(response,200,{revisionId:r.id,projectId:r.projectId,manifest});
    }
    if(path==='/v1/creations'&&request.method==='GET')return json(response,200,(await service.list(session)).map(r=>({...r,game:isGeneratedGame(r.game)?{kind:r.game.kind,title:r.game.title,instructions:r.game.instructions,controls:r.game.controls}:r.game})));

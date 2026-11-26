@@ -31,7 +31,7 @@ All six grade values are available through the `early-preview` compile mode. The
 
 ## Inventory and maintenance
 
-`coverage.json` contains 16 discovered page containers, 30 selectable intermediate states, 11 journey families and 9 scenario choices at the initial baseline. Counts describe available review entrances; they are not proof of every possible combination or human acceptance. Retained legacy screens are explicitly labelled. `review:coverage` scans source page IDs and fails for new unlisted pages. New journeys and conditional dialogs still need human source review. Update the manifest, fixtures and tests together when main changes.
+`coverage.json` contains 16 discovered page containers, 32 selectable intermediate states, 14 journey families and 9 scenario choices at the initial baseline. Counts describe available review entrances; they are not proof of every possible combination or human acceptance. Retained legacy screens are explicitly labelled. `review:coverage` scans source page IDs and fails for new unlisted pages. New journeys and conditional dialogs still need human source review. Update the manifest, fixtures and tests together when main changes.
 
 `excluded-prs.json` preserves significant open work checked on November 25, 2026 against the initial `0f459f5` baseline. It is not a live PR-status service or a list of source excluded from a later candidate. Family-beta server welcome, account recovery and administrator routes are outside this standalone frontend harness even when their source is present; their separate beta acceptance remains required. Existing trusted-device and adult-session controls remain available.
 
@@ -43,7 +43,7 @@ Scenario scope is explicit: first-time/empty clear records, populated adds sampl
 
 A managed local browser can prohibit `file://` by administrator policy. `UI_REVIEW_INLINE_HARNESS=1 npm run review:test` is an explicit development fallback that fulfills one loopback navigation from memory (no server). That result is only DOM/interaction evidence, not proof that file navigation succeeded. GitHub Actions runs the actual `file://` check on stock Chromium and uploads the HTML, manifest and test evidence without deployment credentials.
 
-The workflow is additive, read-only, and independent of production releases. It runs on relevant main changes and sandbox-tool PRs. Review findings never upload automatically. Real-device, Edge-specific, speech/audio, accessibility and owner acceptance remain separate evidence. The HTML's coverage dialog is the authoritative per-artifact list of known deviations.
+The workflow is additive, read-only, and independent of production releases. It runs on relevant main changes and application/sandbox-tool PRs. Review findings never upload automatically. Real-device, Edge-specific, speech/audio, accessibility and owner acceptance remain separate evidence. The HTML's coverage dialog is the authoritative per-artifact list of known deviations.
 
 The artifact workflow pins Ubuntu 24.04 because the repository’s Playwright 1.56.1 cannot install on Ubuntu 26.04. Initial workflow attempts encountered this runner incompatibility before building. The corrected job builds the HTML before browser setup, so a browser-install failure still leaves a downloadable artifact with explicitly incomplete validation.
 
@@ -52,3 +52,11 @@ Additional integration checks add a Jump block and run the real scene engine, up
 Review navigation waits for the real Parent page event before selecting a tab or submitting the synthetic unlock form. The application still saves pending work asynchronously and rejects a form submission from the previous view; the harness does not bypass that guard.
 
 The primary download uploads immediately after the build, separately from browser evidence. Download availability does not by itself imply passing tests: check the run’s test step or the acceptance notes. Screenshot names use portable characters for Windows extraction.
+
+## Child experience candidate, November 25
+
+The modernization candidate includes the consolidated My Journey sections, Make/Rebuild/experiment landing, optional live movement introduction, My Art, the revised Home/menu, and saved-concept Build states. The toolbar labels the represented source as **candidate branch** or **merged main**; downloads use the exact represented SHA. PR builds check out and package the PR head rather than its merge base. The workflow also runs the production-bundle four-viewport modernization journey and uploads complete screenshots under `child-modernization/`. The offline review remains synthetic and separate from DEV deployment or owner acceptance. See the [decision](../decisions/2026-11-25-child-experience-modernization.md) and [acceptance record](../evidence/child-modernization/README.md).
+
+Choose **My Journey** in the destination selector to inspect the three dashboard cards. Check **Empty** for starter selection and **Unlocked** for an equipped companion and earned gems. Follow each card into the corresponding live section, then return through My Journey.
+
+The Journey, Pals, rewards and Powers destinations render the shared production header and cards. Use the empty scenario to review the two starter choices. Compare the same application viewport on each page and use Shift+Tab from the announced heading to check the back action’s visible keyboard focus.

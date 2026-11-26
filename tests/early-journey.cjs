@@ -277,6 +277,8 @@ async function run(){
     await page.click('#studioNew');await page.locator('#earlyCreationHandoff[open]').waitFor();
     if(name==='phone')await capture(page,'phone-handoff');
     await page.locator('#earlyCreationHandoff').getByRole('button',{name:'Create a scene'}).click();
+    if(await page.locator('#creationIntroduction').isVisible())await page.click('#creationIntroSkip');
+    await page.click('#creationFreeMode');
     await page.click('[data-creation-starter="blank"]');
     await page.locator('[data-move-direction="right"]').click();
     assert.ok(await page.evaluate(()=>FG.creation.scene().programs.some(p=>p.actions.some(a=>a.type==='move'))));

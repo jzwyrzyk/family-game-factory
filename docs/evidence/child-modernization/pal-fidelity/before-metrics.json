@@ -1,0 +1,122 @@
+[
+  {
+    "mode": "app",
+    "name": "desktop",
+    "metrics": {
+      "width": 379.328125,
+      "height": 274,
+      "flexBasis": "240px",
+      "flexDirection": "column",
+      "src": "http://127.0.0.1:44009/arcade/jems-pals/luma/base/neutral-93fde3101e62.webp",
+      "natural": [
+        1425,
+        795
+      ]
+    }
+  },
+  {
+    "mode": "offline",
+    "name": "desktop",
+    "metrics": {
+      "width": 379.328125,
+      "height": 274,
+      "flexBasis": "240px",
+      "flexDirection": "column",
+      "src": "blob:http://localhost:43199/0866d754-b1b8-444c-98ee-551708dcbbdf",
+      "natural": [
+        768,
+        428
+      ]
+    }
+  },
+  {
+    "mode": "app",
+    "name": "landscape",
+    "metrics": {
+      "width": 362.671875,
+      "height": 274,
+      "flexBasis": "240px",
+      "flexDirection": "column",
+      "src": "http://127.0.0.1:44009/arcade/jems-pals/luma/base/neutral-93fde3101e62.webp",
+      "natural": [
+        1425,
+        795
+      ]
+    }
+  },
+  {
+    "mode": "offline",
+    "name": "landscape",
+    "metrics": {
+      "width": 362.671875,
+      "height": 274,
+      "flexBasis": "240px",
+      "flexDirection": "column",
+      "src": "blob:http://localhost:43199/c1eddbf1-7aba-4e59-a017-154a0a095872",
+      "natural": [
+        768,
+        428
+      ]
+    }
+  },
+  {
+    "mode": "app",
+    "name": "portrait",
+    "metrics": {
+      "width": 383,
+      "height": 274,
+      "flexBasis": "240px",
+      "flexDirection": "column",
+      "src": "http://127.0.0.1:44009/arcade/jems-pals/luma/base/neutral-93fde3101e62.webp",
+      "natural": [
+        1425,
+        795
+      ]
+    }
+  },
+  {
+    "mode": "offline",
+    "name": "portrait",
+    "metrics": {
+      "width": 383,
+      "height": 274,
+      "flexBasis": "240px",
+      "flexDirection": "column",
+      "src": "blob:http://localhost:43199/9181fc67-68bc-4c5d-8d33-f69ca5473d97",
+      "natural": [
+        768,
+        428
+      ]
+    }
+  },
+  {
+    "mode": "app",
+    "name": "phone",
+    "metrics": {
+      "width": 366,
+      "height": 274,
+      "flexBasis": "240px",
+      "flexDirection": "column",
+      "src": "http://127.0.0.1:44009/arcade/jems-pals/luma/base/neutral-93fde3101e62.webp",
+      "natural": [
+        1425,
+        795
+      ]
+    }
+  },
+  {
+    "mode": "offline",
+    "name": "phone",
+    "metrics": {
+      "width": 366,
+      "height": 274,
+      "flexBasis": "240px",
+      "flexDirection": "column",
+      "src": "blob:http://localhost:43199/6ca6c773-5af1-4b82-9438-80205e5e6f37",
+      "natural": [
+        768,
+        428
+      ]
+    }
+  }
+]

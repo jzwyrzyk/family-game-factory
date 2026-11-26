@@ -1,5 +1,9 @@
 # Jems — the illustrated making journey
 
+## Consolidated My Journey — November 25, 2026
+
+My Journey is the personal world: the original selected maker and actual rank lead the overview, with section entrances for Pals, Gems & achievements and My Powers. Rank artwork and next actions remain authoritative; future rank details are available under **Explore maker ranks**. The Home tile replaces the former hero text link and disconnected rank banner. Navigation grants no gems, ranks or learning evidence. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
+
 This is the detailed feature contract for [PR #57](https://github.com/jzwyrzyk/family-game-factory/pull/57). [ADR 0008](../decisions/0008-cosmetic-making-journey.md) records the decision and threshold limits; [current architecture](../../ARCHITECTURE-CURRENT.md) maps implementation, and [delivery state](../../DELIVERY-STATE.md) owns branch, CI and operational evidence.
 
 **Current visual refinement:** the owner-approved [library v1.2](LIBRARY_V1_2.md) uses the chosen maker's exact original outfit frame as primary rank art across this page, rank cards and earned popups. The [visual decision](../decisions/0009-approved-brand-library-v1-2.md) replaces framed medal presentation without changing any evidence rule below.

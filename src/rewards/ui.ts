@@ -1,3 +1,5 @@
+import { createPageHeader } from '../brand/page-header';
+import { createDashboardCard } from '../brand/dashboard-card';
 import { createJourneyGem, createJourneyRankThumbnail, type JourneyState } from '../brand/journey';
 import { GEM_MILESTONE_START, REWARD_AMOUNTS, type RewardGrant, type RewardsSummary } from './model';
 import { createGuideCard, type GuideHost } from '../studio/guide-card';
@@ -58,15 +60,14 @@ export function createRewardsPage(options: RewardsPageOptions) {
   element.hidden = true;
   element.setAttribute('aria-labelledby', 'jemsRewardsTitle');
 
-  const toolbar = node('div', 'jems-rewards-toolbar');
-  const back = button('jems-rewards-back', '← My jems', options.onBack);
+  const back = button('jems-rewards-back', '← My Journey', options.onBack);
   back.id = 'jemsRewardsBack';
-  const heading = node('h1', '', 'My rewards');
+  const heading = node('h1', '', 'Gems & achievements');
   heading.id = 'jemsRewardsTitle';
-  heading.tabIndex = -1;
-  const journeyLink = button('jems-rewards-secondary', 'My journey', options.onOpenJourney);
-  journeyLink.id = 'jemsRewardsJourney';
-  toolbar.append(back, heading, journeyLink);
+  const toolbar = createPageHeader(element, {
+    title: heading, description: node('p', '', 'See your gems and the milestones you’ve reached.'),
+    back, backLabel: 'My Journey',
+  });
 
   const status = node('div', 'jems-rewards-status');
   status.setAttribute('role', 'status');
@@ -80,7 +81,6 @@ export function createRewardsPage(options: RewardsPageOptions) {
 
   const hero = node('div', 'jems-rewards-hero');
   const copy = node('div', 'jems-rewards-hero-copy');
-  const eyebrow = node('p', 'jems-rewards-eyebrow', 'Create. Solve. Build. Play. Grow.');
   const totalRow = node('div', 'jems-rewards-total-row');
   totalRow.append(image('jems-mark.svg', 'jems-rewards-mark'));
   const totalCopy = node('div');
@@ -105,10 +105,10 @@ export function createRewardsPage(options: RewardsPageOptions) {
   const play = button('jems-rewards-primary', 'Play & practice', options.onPlay);
   play.id = 'jemsRewardsPlay';
   play.append(node('span', 'jems-rewards-arrow', '→'));
-  const create = button('jems-rewards-secondary', 'Make a game', options.onCreate);
+  const create = button('jems-rewards-secondary', 'Invent a game', options.onCreate);
   create.id = 'jemsRewardsCreate';
   actions.append(play, create);
-  copy.append(eyebrow, totalRow, encouragement, next, actions);
+  copy.append(totalRow, encouragement, next, actions);
 
   const maker = node('div', 'jems-rewards-maker');
   const makerArt = node('div', 'jems-rewards-maker-art');
@@ -297,15 +297,12 @@ export type RewardsWidgetOptions = {
 
 /** One compact entry point. Reading it never grants or replays a reward. */
 export function createRewardsWidget(options: RewardsWidgetOptions) {
-  const element = button('jems-rewards-widget', '', options.onOpen);
+  const { element, artwork, detail } = createDashboardCard('My Gems', '', options.onOpen);
   element.id = 'jemsRewardsWidget';
-  const gem = createJourneyGem(1);
-  const count = node('strong');
-  const label = node('span', 'jems-rewards-widget-label', 'Gems');
-  element.append(gem, count, label);
+  artwork.append(createJourneyGem(1));
   const update = (summary: RewardsSummary, status: { loading?: boolean; error?: string } = {}) => {
-    count.textContent = status.loading ? '…' : status.error ? '—' : number(summary.lifetimeGems);
-    element.setAttribute('aria-label', status.loading ? 'My rewards, loading gems' : status.error ? 'My rewards, gems unavailable' : `My rewards, ${number(summary.lifetimeGems)} gems earned`);
+    detail.textContent = status.loading ? 'Counting gems…' : status.error ? 'Gems unavailable'
+      : `${number(summary.lifetimeGems)} ${summary.lifetimeGems === 1 ? 'gem' : 'gems'}`;
     element.setAttribute('aria-busy', String(!!status.loading));
     element.dataset.owner = summary.owner;
   };

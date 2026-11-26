@@ -18,7 +18,7 @@ if(!localStorage.getItem('family-game-factory-state-v1')){
  localStorage.setItem('family-game-factory-state-v1',JSON.stringify(fixture.state));
  if(!empty){localStorage.setItem(CREATION_KEY,JSON.stringify(fixture.creation));localStorage.setItem(PROBLEM_SOLVING_KEY,JSON.stringify(fixture.problemSolving));}
  const book=new StudioNotebook(localStorage);
- if(config.scenario!=='first-time')book.setAvatar('player1','spark');
+ if(config.scenario!=='first-time'){book.setAvatar('player1','spark');book.dismissGuideTip('player1','studio-intro');}
  if(['populated','long-content','unlocked'].includes(config.scenario)){
   const games=new RevisionStore(localStorage);
   const count=config.scenario==='long-content'?16:3;

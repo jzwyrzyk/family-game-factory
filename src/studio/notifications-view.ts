@@ -1,3 +1,4 @@
+import { createPageHeader } from '../brand/page-header';
 import {createIcon, setIconLabel} from '../brand/icons';
 import {createReadAloudControl} from '../speech/read-aloud-control';
 import type {StudioNotification} from './notifications';
@@ -32,14 +33,12 @@ const button = (id: string, label: string, icon: Parameters<typeof setIconLabel>
 export function createStudioNotificationsView(options: NotificationsViewOptions) {
   const page = node('section', 'page hidden studio-notifications'); page.id = 'studioNotifications';
   page.setAttribute('aria-labelledby', 'studioNotificationsTitle');
-  const heading = node('div', 'studio-notifications-heading');
   const back = button('studioNotificationsBack', 'My Games', 'arrow');
   back.querySelector('.jems-icon')?.classList.add('jems-icon--back'); back.onclick = options.onBack;
   const title = node('h1', '', 'Notifications'); title.id = 'studioNotificationsTitle'; title.tabIndex = -1;
-  heading.append(back, title);
   const introduction = node('p', 'studio-notifications-intro', 'Games to try and ideas to finish.');
   const list = node('div', 'studio-notifications-list'); list.id = 'studioNotificationsList';
-  page.append(heading, introduction, list);
+  page.append(createPageHeader(page, { title, description: introduction, back, backLabel: 'My Games' }), list);
   type CachedRow = { signature: string; row: HTMLElement; reader: ReturnType<typeof createReadAloudControl> };
   let rows = new Map<string, CachedRow>();
   let pageSignature = '', homeSignature = '';

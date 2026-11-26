@@ -3,7 +3,7 @@ import { PAL_COLLECTION_ARTWORK } from './catalog-artwork.generated';
 export type PalArtworkSlug = typeof PAL_COLLECTION_ARTWORK[number]['slug'];
 /** Existing inventory IDs are compatibility aliases, not displayed identities.
  * Keeping them preserves owned Pals, receipt assignments and selection history. */
-export type PalId = 'glim' | 'kip' | 'riff' | Exclude<PalArtworkSlug, 'luma' | 'nook' | 'wink'>;
+export type PalId = 'kip' | 'riff' | Exclude<PalArtworkSlug, 'nook' | 'wink'>;
 export type PalForm = 'base' | 'mature';
 export type PalExpression = 'neutral' | 'celebrate' | 'thinking' | 'encouraging_retry';
 type PalExpressionImages = Readonly<Partial<Record<PalExpression, string>> & { neutral: string }>;
@@ -23,9 +23,8 @@ export interface PalDefinition {
   assetId: string; artPath: string; color: string; artwork: Readonly<PalArtworkBinding>;
 }
 
-export const PAL_LEGACY_IDENTITIES = Object.freeze({ glim: 'luma', kip: 'nook', riff: 'wink' } as const);
+export const PAL_LEGACY_IDENTITIES = Object.freeze({ kip: 'nook', riff: 'wink' } as const);
 const COPY: Readonly<Record<PalArtworkSlug, { family: string; tagline: string; description: string; personality: string; color: string }>> = {
-  luma: { family: 'Explorer', tagline: 'Let’s light the way!', description: 'A curious friend with a bright crystal on its back.', personality: 'Curious, warm and easily amazed.', color: '#2E6BFF' },
   nook: { family: 'Gardener', tagline: 'Small ideas can grow!', description: 'A gentle friend with a cozy little gem garden.', personality: 'Patient, caring and quietly inventive.', color: '#C47A20' },
   wink: { family: 'Storyteller', tagline: 'A little flash of fun!', description: 'A playful friend with a tail full of shining signals.', personality: 'Expressive, cheerful and fond of silly surprises.', color: '#CC3859' },
   mizzle: { family: 'Gardener', tagline: 'One little drop!', description: 'A gentle gardener who makes the most of tiny drops.', personality: 'Thoughtful and quietly cheerful.', color: '#359BB0' },
@@ -46,13 +45,11 @@ const COPY: Readonly<Record<PalArtworkSlug, { family: string; tagline: string; d
   chimi: { family: 'Musician', tagline: 'That note was a surprise!', description: 'A musical friend with a tuneful back-gem comb.', personality: 'Inventive, cheerful and forgiving.', color: '#B98457' },
   pleeko: { family: 'Helper', tagline: 'A little step can help!', description: 'A small friend whose back unfolds into helpful steps.', personality: 'Helpful, eager and determined.', color: '#78997C' },
   talli: { family: 'Measurer', tagline: 'How far? Let’s find out!', description: 'A thoughtful friend with a flat measuring tail.', personality: 'Curious, patient and precise.', color: '#A38462' },
-  zippa: { family: 'Maker', tagline: 'Ready, steady, click!', description: 'A cheerful friend who joins edges with gem teeth.', personality: 'Focused, inventive and proud of a neat finish.', color: '#7A96B4' },
   whorl: { family: 'Balancer', tagline: 'Let’s settle that wobble!', description: 'A thoughtful friend with an enthusiastically spinning gem.', personality: 'Calm, helpful and quietly playful.', color: '#8B7BB5' },
   brio: { family: 'Musician', tagline: 'A little rhythm in every step!', description: 'A cheerful rhythm maker with amber sounding plates.', personality: 'Musical, energetic and fond of getting the beat just right.', color: '#B27640' },
 };
 
 function collectionId(slug: PalArtworkSlug): PalId {
-  if (slug === 'luma') return 'glim';
   if (slug === 'nook') return 'kip';
   if (slug === 'wink') return 'riff';
   return slug;
@@ -60,20 +57,21 @@ function collectionId(slug: PalArtworkSlug): PalId {
 function sceneId(slug: PalArtworkSlug, form: PalForm, version: string): string {
   return `pal-${slug}-${form}-${version}`;
 }
-const artworkOrder = [
-  ...['luma', 'nook', 'wink'].map(slug => PAL_COLLECTION_ARTWORK.find(record => record.slug === slug)!),
-  ...PAL_COLLECTION_ARTWORK.filter(record => !['luma', 'nook', 'wink'].includes(record.slug)),
-];
-/** November 21 implementation policy: preserve the first two 50-gem options and
- * the existing third 150-gem unlock; later approved Pals begin at 200 and advance
- * by 50 lifetime gems. These cosmetic thresholds make no ability claim. */
-export const PAL_CATALOG: readonly Readonly<PalDefinition>[] = Object.freeze(artworkOrder.map((source, index) => {
+// Keep each earned threshold independent of display order and roster size.
+const unlockGems: Readonly<Record<PalArtworkSlug, number>> = {
+  navi: 50, nook: 50, wink: 150, mizzle: 200, tumble: 250, mote: 350, sivo: 400,
+  furl: 450, tessit: 500, flick: 550, clasp: 600, skiff: 650, peep: 700, weft: 750,
+  cache: 800, brim: 850, poff: 900, chimi: 950, pleeko: 1000, talli: 1050,
+  whorl: 1150, brio: 1200,
+};
+const artworkOrder = [...PAL_COLLECTION_ARTWORK].sort((a, b) => unlockGems[a.slug] - unlockGems[b.slug]);
+export const PAL_CATALOG: readonly Readonly<PalDefinition>[] = Object.freeze(artworkOrder.map(source => {
   const expressions = Object.freeze({ base: Object.freeze({ ...source.forms.base }), mature: Object.freeze({ ...source.forms.mature }) });
   const artwork: Readonly<PalArtworkBinding> = Object.freeze({ status: 'approved', speciesId: source.speciesId,
     characterKey: source.characterKey, slug: source.slug, assetVersion: source.assetVersion,
     forms: Object.freeze({ base: source.forms.base.neutral, mature: source.forms.mature.neutral }), expressions });
   return Object.freeze({ id: collectionId(source.slug), name: source.name, ...COPY[source.slug],
-    starter: index < 2, unlockGems: index < 2 ? 50 : index === 2 ? 150 : 200 + (index - 3) * 50,
+    starter: source.slug === 'nook' || source.slug === 'navi', unlockGems: unlockGems[source.slug],
     artwork, artPath: artwork.forms.base, assetId: sceneId(source.slug, 'base', source.assetVersion) });
 }));
 export function isPalId(value: unknown): value is PalId {
@@ -98,17 +96,7 @@ export function palSceneAssetId(id: PalId | string, form: PalForm = 'base'): str
   return sceneId(artwork.slug, form, artwork.assetVersion);
 }
 
-const LINES: Readonly<Record<'glim' | 'kip' | 'riff', Readonly<Record<PalLineKind, readonly string[]>>>> = {
-  glim: {
-    welcome: ['Adventure detector: switched on. Sandwich detector: still in testing.', 'What shall we discover? I brought my imaginary map.'],
-    practice: ['Another discovery! My imaginary notebook is getting very sparkly.', 'Aha! Filing that under “things we tried.”'],
-    making: ['That idea has legs. Are we giving it roller skates?', 'An experiment! Excellent. I have put on my thinking eyebrows.'],
-    coding: ['The instructions worked! Even the ones without a snack break.', 'A little plan, a little test, a rather excellent adventure.'],
-    growth: ['New sparkle unlocked. Same delightfully curious me.', 'More adventures, more sparkle. Still no pockets.'],
-    play: ['I wonder what is over there. Probably not a biscuit. Let’s check.', 'A small light. Enormous curiosity.'],
-    rest: ['Our adventure will be right here when you’re ready.', 'Good stopping spot. Map folded. Mostly.'],
-    retry: ['That gave us a clue. What shall we try next?', 'Unexpected result! My map has become more interesting.'],
-  },
+const LINES: Readonly<Record<'kip' | 'riff', Readonly<Record<PalLineKind, readonly string[]>>>> = {
   kip: {
     welcome: ['A little room for a new idea.', 'Let’s grow an idea. Tiny watering can: ready.'],
     practice: ['Another step done! Deploying one tiny celebration wiggle.', 'I would give that a high five, but I am still counting my fingers.'],
@@ -145,8 +133,8 @@ const SHARED_LINES: Readonly<Record<PalLineKind, readonly string[]>> = {
 /** Scripted, deterministic and bounded. No model or emotional-pressure copy. */
 export function palLine(id: PalId, kind: PalLineKind, seed: string | number = 0): string {
   const definition = palDefinition(id);
-  const legacy = definition.id === 'glim' || definition.id === 'kip' || definition.id === 'riff';
-  const lines = legacy ? LINES[definition.id as 'glim' | 'kip' | 'riff'][kind]
+  const legacy = definition.id === 'kip' || definition.id === 'riff';
+  const lines = legacy ? LINES[definition.id as 'kip' | 'riff'][kind]
     : kind === 'play' ? [definition.tagline, ...SHARED_LINES.play] : SHARED_LINES[kind];
   if (!lines) throw Error('Choose an available Pal reaction.');
   let index = typeof seed === 'number' && Number.isFinite(seed) ? Math.abs(Math.floor(seed)) : 0;

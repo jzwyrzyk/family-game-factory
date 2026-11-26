@@ -1,0 +1,30 @@
+[
+  {
+    "id": "pal-luma-base-core-2026-11-20",
+    "label": "Luma",
+    "form": "base",
+    "url": "jems-pals/luma/base/neutral-93fde3101e62.webp",
+    "sha256": "026baf8d05490dfd7a8b48219747da0f01973b65ea88f2cb64c85e519a2596fd"
+  },
+  {
+    "id": "pal-luma-mature-core-2026-11-20",
+    "label": "Luma",
+    "form": "mature",
+    "url": "jems-pals/luma/mature/neutral-6b3ffa07f571.webp",
+    "sha256": "9af252d28372d4f8c96ce26f85142b21c469693c98579a7ca983e10578cbfee3"
+  },
+  {
+    "id": "pal-zippa-base-core-2026-11-20",
+    "label": "Zippa",
+    "form": "base",
+    "url": "jems-pals/zippa/base/neutral-b0f8aca344a3.webp",
+    "sha256": "4965c2e453ba970440aef8fb9b4845a57677f490ffbd39d07a60fb5d92eca5f9"
+  },
+  {
+    "id": "pal-zippa-mature-core-2026-11-20",
+    "label": "Zippa",
+    "form": "mature",
+    "url": "jems-pals/zippa/mature/neutral-df295181dbce.webp",
+    "sha256": "3f92f90b5614faf105b762c2f1e8cdbe58ac3cfb9f893e4eef2483212a8db48c"
+  }
+]
