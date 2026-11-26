@@ -15,7 +15,13 @@ const {standaloneInput}=require('./standalone-input.cjs');
     await page.waitForFunction(()=>document.querySelector('#loading').hidden);
     await page.selectOption('#destination','creative:notebook-flight');
     const app=page.frameLocator('iframe').first();
-    await app.getByRole('button',{name:'Try art in a sample game'}).click();
+    const tryGame=app.getByRole('button',{name:'Try art in a sample game'});
+    await tryGame.waitFor({timeout:15000}).catch(async error=>{
+      console.log('Notebook entry',await page.locator('#status').textContent(),errors);
+      console.log(await app.locator('body').evaluate(()=>({page:document.querySelector('.page:not(.hidden)')?.id,plan:document.querySelector('#studioArtPlan')?.textContent, sessions:window.FG?.studio?.exportNotebook().sessions.map(s=>({game:s.game,art:s.gameArt?.pins.length}))})));
+      throw error;
+    });
+    await tryGame.click();
     const flight=app.frameLocator('.game-art-review iframe');
     const field=flight.locator('#game[data-assets-ready=true]');
     await field.waitFor();

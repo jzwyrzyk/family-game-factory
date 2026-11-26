@@ -99,7 +99,7 @@ async function openNotebookGame(owner:string) {
     book.update(session.id,owner,s=>{s.gameArt=plan;});
     id=session.id;localStorage.setItem(key,id);
   }
-  await (window as any).FG.studio.openGame(id);
+  await (window as any).FG.studio.open(id);
 }
 export async function creativeDestination(action:string){
   const fg=(window as any).FG;
