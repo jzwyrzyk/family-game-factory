@@ -2,7 +2,7 @@
 
 ## Customizable worlds — Workstream F candidate
 
-Application and acceptance source `ba0475c3e476cf8d920583c0f2e8512bf41a6db6` extends the illustrated Studio integration at `1969df66038d5d1e9b77534f3d08d5d0c01b3380`. The child can mix collections, place personal art, give a single placement code, play, keep and reuse the exact saved world. The [acceptance record](docs/creation-studio/evidence/world-composition/README.md) includes browser captures, export checks, storage compatibility and outstanding release gates. This is draft source for review. Hosted DEV/TEST qualification, owner review of the new world collection, physical devices, production promotion and external family activation are outstanding.
+Application and acceptance source `7c31f717712a23001c0d95ed9ed88fa3e4ade3a3` extends the illustrated Studio integration at `1969df66038d5d1e9b77534f3d08d5d0c01b3380`. The child can mix collections, place personal art, give a single placement code, play, keep and reuse the exact saved world. The [acceptance record](docs/creation-studio/evidence/world-composition/README.md) includes browser captures, export checks, storage compatibility and outstanding release gates. This is draft source for review. Hosted DEV/TEST qualification, owner review of the new world collection, physical devices, production promotion and external family activation are outstanding.
 
 ## Connected Creative Universe — integrated source and local evidence
 

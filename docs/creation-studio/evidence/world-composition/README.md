@@ -1,6 +1,6 @@
 # World composition acceptance
 
-The running Studio and the standalone review use application source `ba0475c3e476cf8d920583c0f2e8512bf41a6db6`. Choose **Build in the Enchanted Gem Forest** in the standalone review’s destination menu. Choose **Character → Jems objects** to bring a rocket into the forest. Use **Scene settings** to select a placement’s size, turn, position and layer. Play hides editor decorations. **Keep** saves the revision. **Use this world** on its card starts a new scene from that kept version.
+The running Studio and the standalone review use application source `7c31f717712a23001c0d95ed9ed88fa3e4ade3a3`. Choose **Build in the Enchanted Gem Forest** in the standalone review’s destination menu. Choose **Character → Jems objects** to bring a rocket into the forest. Use **Scene settings** to select a placement’s size, turn, position and layer. Play hides editor decorations. **Keep** saves the revision. **Use this world** on its card starts a new scene from that kept version.
 
 | Evidence | What to look for |
 | --- | --- |
