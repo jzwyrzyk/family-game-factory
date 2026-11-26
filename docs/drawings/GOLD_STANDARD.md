@@ -1,5 +1,7 @@
 # Drawing-to-Playable Engine — Gold Standard
 
+The [Creative Asset & World Design Standard](CREATIVE_ASSET_AND_WORLD_STANDARD.md) governs permanent fidelity, source bytes, authoring and cross-activity reuse in new development.
+
 **Current integration:** the refreshed PR23 [Art Studio contract](ART_STUDIO.md) supersedes the earlier branch UI/storage limits below where specified. It adds the dedicated branded library, crop/turn/flip tools, recoverable drafts and Undo/Redo, immutable per-game bindings, private local scene artwork, and art/scene portability. The physical and recognition principles remain unchanged.
 
 **North star:** A child draws something, explains what it should do, and can immediately see *their actual artwork* doing it in a physically meaningful game. The software removes implementation difficulty, not authorship. A missed detection must be easy to correct without asking an adult or redrawing the object.
