@@ -161,9 +161,11 @@ def main(argv=None):
     p.add_argument('--source-sha', required=True); p.add_argument('--home-dir', type=Path, required=True)
     p.add_argument('--receipt-dir', type=Path, required=True); p.add_argument('--nonprod-state-dir', type=Path)
     p.add_argument('--broker-image'); p.add_argument('--broker-build-id'); p.add_argument('--broker-build-source-sha')
+    p.add_argument('--skip-broker-inventory', action='store_true')
     a = p.parse_args(argv)
     supplied = (a.broker_image, a.broker_build_id, a.broker_build_source_sha)
     broker.require(all(supplied) or not any(supplied), 'COMPLETE_REPLACEMENT_BUILD_REFERENCE_REQUIRED')
+    broker.require(not a.skip_broker_inventory or not any(supplied), 'SKIPPED_INVENTORY_CANNOT_BIND_IMAGE')
     broker.source(a.source_sha)
     home = cleanup.safe_path(a.home_dir); folder = cleanup.private_dir(a.receipt_dir, home)
     report = {'status': 'READ_ONLY_RECOVERY_REPORT_NOT_ACTIVATION', 'source_sha': a.source_sha, 'cloud_mutations': 0, 'deletions': 0, 'archive_uploads': 0}
@@ -174,21 +176,24 @@ def main(argv=None):
         report['provider_audit'] = audit_failure(error)
     try: report['local_provider_evidence'] = local_cli_evidence(home, folder)
     except Exception: report['local_provider_evidence'] = {'status': 'LOCAL_EVIDENCE_UNAVAILABLE'}
-    with contextlib.redirect_stdout(io.StringIO()) as captured:
-        code = broker.main(['--source-sha', a.source_sha, '--image', a.broker_image or IMAGE,
-                            '--build-id', a.broker_build_id or BUILD,
-                            '--build-source-sha', a.broker_build_source_sha or BUILD_SOURCE, '--check'])
-    inventory = json.loads(captured.getvalue())
-    if code == 0:
-        plan = inventory['plan']; capacity.write_json(folder / ('broker-remaining-' + cleanup.digest(plan) + '.json'), plan)
-        report['broker'] = {'status': 'REMAINING_ACTIONS_REVIEW_ONLY', 'actions': plan['actions'],
-            'remaining_actions_sha256': inventory['approve_plan_sha256'],
-            'existing_resources_checked': True, 'apply_blocker': 'FRESH_EXACT_PLAN_APPROVAL_AND_PROVIDER_FILTER_ACCEPTANCE_REQUIRED',
-            'image': a.broker_image or IMAGE, 'build_source_sha': a.broker_build_source_sha or BUILD_SOURCE}
+    if a.skip_broker_inventory:
+        report['broker'] = {'status': 'NOT_CHECKED_BUILD_UNQUALIFIED', 'existing_resources_checked': False}
     else:
-        report['broker'] = inventory
-        if inventory.get('code') == 'BUILD_SOURCE_BROKER_FILES_DIFFER':
-            report['broker']['next_action'] = 'REVIEW_NEW_FILTER_SOURCE_AND_BUILD_PLAN; DO_NOT_RESUBMIT_HISTORICAL_BUILD'
+        with contextlib.redirect_stdout(io.StringIO()) as captured:
+            code = broker.main(['--source-sha', a.source_sha, '--image', a.broker_image or IMAGE,
+                                '--build-id', a.broker_build_id or BUILD,
+                                '--build-source-sha', a.broker_build_source_sha or BUILD_SOURCE, '--check'])
+        inventory = json.loads(captured.getvalue())
+        if code == 0:
+            plan = inventory['plan']; capacity.write_json(folder / ('broker-remaining-' + cleanup.digest(plan) + '.json'), plan)
+            report['broker'] = {'status': 'REMAINING_ACTIONS_REVIEW_ONLY', 'actions': plan['actions'],
+                'remaining_actions_sha256': inventory['approve_plan_sha256'],
+                'existing_resources_checked': True, 'apply_blocker': 'FRESH_EXACT_PLAN_APPROVAL_AND_PROVIDER_FILTER_ACCEPTANCE_REQUIRED',
+                'image': a.broker_image or IMAGE, 'build_source_sha': a.broker_build_source_sha or BUILD_SOURCE}
+        else:
+            report['broker'] = inventory
+            if inventory.get('code') == 'BUILD_SOURCE_BROKER_FILES_DIFFER':
+                report['broker']['next_action'] = 'REVIEW_NEW_FILTER_SOURCE_AND_BUILD_PLAN; DO_NOT_RESUBMIT_HISTORICAL_BUILD'
     try:
         with contextlib.redirect_stdout(io.StringIO()) as captured:
             cleanup.main(['--home-dir', str(home), '--receipt-dir', str(folder / 'source-cleanup')])

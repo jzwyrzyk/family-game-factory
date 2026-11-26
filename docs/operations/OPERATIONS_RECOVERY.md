@@ -13,30 +13,40 @@ This is build approval only. Its archive SHA-256 is
 The continuation tooling may have a newer SHA; **do not change the approved build
 source or hash to the tooling SHA**.
 
-After downloading/checksumming the current launcher from the reviewed handoff:
+The approved submission has been consumed: build
+`a345988d-2c4b-48ab-97d8-06636abb500d` reached `SUCCESS`, but source qualification
+stopped at `SOURCE_ARCHIVE_HASH_MISMATCH`. Every other reported build predicate
+passed. Registry qualification and live acceptance remain incomplete. **Do not
+submit another build or reuse the historical image to bypass this failure.**
+
+After downloading/checksumming the current launcher from the reviewed handoff,
+inspect only the existing generation-pinned source object:
 
 ```sh
-bash "$p" "$r" broker-continue \
+bash "$p" "$r" broker-build \
+  --build-id a345988d-2c4b-48ab-97d8-06636abb500d \
   --build-source-sha 476c2b9793060d30623b16130daeb5e9776640ff \
-  --approve-plan-sha256 c26aff114c7d689671fee7860dcf4f82832dc390eb2556351d76205f3d045d0f \
-  --home-dir "$HOME" --receipt-dir "$HOME/work/jems-recovery-review"
+  --diagnose --inspect-source
 ```
 
-This inventories build prerequisites, verifies the approved plan, records an
-exclusive durable intent, and submits at most once. It polls only the recorded
-build ID for up to 15 minutes and verifies source/build/archive/registry provenance
-on success. The final read-only recovery inventory prepares remaining broker
-operations, new source/capacity dry runs and original DEV/TEST plan integrity.
-Build failure/pending state does not prevent those independent recovery reads.
-It never applies broker infrastructure, changes IAM, deletes or archives files,
-runs Terraform, merges code, replays paid requests or broadens logging access.
+The diagnostic requires all other build predicates to pass. It reads the exact
+resolved source generation, checks its compressed SHA-256 against provider
+provenance, and compares decompressed TAR bytes and the four exact file members
+with approved source. It downloads only into bounded memory, refuses redirects,
+and prints fixed fields without credentials, object paths or archive contents.
+It grants no qualification and makes no cloud changes. The request includes
+`Accept-Encoding: gzip` to avoid ordinary [Storage decompressive transcoding](https://cloud.google.com/storage/docs/transcoding);
+a stored-byte hash mismatch still remains visible, including unusual encoding cases.
+Different gzip representation is a hypothesis until this comparison succeeds.
 
-Rerunning with an intact recorded submission resumes reads of that exact build;
-it cannot submit another. An intent without a verified returned ID is uncertain
-and stops submission. Preserve it, find the existing build ID through authorized
-Cloud Build evidence, and use `--build-id EXACT_EXISTING_ID` instead of the approval
-flag for read-only continuation. Never delete an intent to retry. All private
-journals and receipts remain in Cloud Shell; return only the sanitized final JSON.
+The continuation now exposes allowlisted child failure codes, records the failed
+stage/build status, and qualifies through current tooling while retaining the
+approved build source. An unqualified build skips broker inventory rather than
+silently checking the obsolete image; independent cleanup/capacity and saved
+DEV/TEST plan reads continue. Preserve submission intent and private receipts.
+A future continuation must use this existing `--build-id`, never a new submission.
+No infrastructure apply, IAM change, deletion, archival or Terraform apply is
+included in this diagnostic handoff.
 
 ## Confirmed nesting-depth failure and corrected source
 

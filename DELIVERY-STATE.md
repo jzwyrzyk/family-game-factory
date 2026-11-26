@@ -24,16 +24,18 @@ recovery read at `057daa4` verified all six existing resources/bindings and left
 four actions. Audit evidence at `2628bd3` now identifies a filter nesting-depth limit of 1. The
 corrected flat expression retains every restriction but requires a separately
 approved new image build; the historical image and plan must not be reused with it.
-The owner approved one build from `476c2b9`; a guarded continuation is prepared,
-with no actual submission/deployment receipt yet.
+The one approved build from `476c2b9` reached `SUCCESS`; qualification stopped at
+`SOURCE_ARCHIVE_HASH_MISMATCH` with every other reported build predicate passing.
+A generation-pinned archive inspection is prepared; no resubmission, registry
+qualification, deployment or live acceptance is claimed.
 View-IAM POST and Cloud Run metadata corrections retain narrow permissions.
 
-Expanded cleanup at `2628bd3` found 893,938,345 source bytes but no exact-pack
-deduplication savings. An additional registered recovery-named worktree can now be
-inventoried; the 2 GiB target remains unproven. Locks and unique contents stay
+Expanded cleanup at `5d98d67` found 1,192,248,614 source bytes across five eligible
+repositories, including the registered recovery-named worktree, but no exact-pack
+deduplication savings; the 2 GiB target remains unproven. Locks and unique contents stay
 protected; private off-disk archival needs separate approval.
 No historical deletion or archival has been performed. DEV/TEST's original saved
-28-resource plan passed integrity readback again at `2628bd3`, remains independent and
+28-resource plan passed integrity readback again at `5d98d67`, remains independent and
 must not be regenerated for these tools.
 
 [Exact ledger and prior Coach HTTP 200 evidence](docs/operations/PERMANENT_CLOUD_LEDGER.md) ·

@@ -21,6 +21,15 @@ import recover_checkout_space as capacity
 ROOT = Path(__file__).resolve().parents[2]
 LAUNCHER = ROOT / 'scripts/ops/handoffs/operations-bootstrap.sh'
 UUID = r'[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}'
+# Only codes defined by the reviewed publisher may cross the child-process boundary.
+PUBLIC_BUILD_CODES = frozenset(broker.publication.predicates({}, '0' * 40, '0' * 64)) | frozenset({
+    'SOURCE_SHA_INVALID', 'SOURCE_HEAD_MISMATCH', 'SOURCE_CHECKOUT_DIRTY',
+    'BUILD_RESPONSE_SHAPE_INVALID', 'BUILD_ID_INVALID', 'BUILD_METADATA_READ_FAILED',
+    'BUILD_RESOURCE_IDENTITY_MISMATCH', 'REGISTRY_METADATA_READ_FAILED', 'REGISTRY_DIGEST_MISMATCH',
+    'BUILD_SOURCE_REQUIRES_EXISTING_BUILD', 'DIAGNOSTIC_REQUIRES_EXISTING_BUILD',
+    'BUILD_PLAN_APPROVAL_MISMATCH', 'BUILD_SUBMISSION_UNCERTAIN_NO_RETRY',
+    'BUILD_TOOL_UNAVAILABLE_OR_UNCERTAIN', 'SOURCE_INSPECTION_REQUIRES_DIAGNOSTIC',
+    'SOURCE_INSPECTION_PREREQUISITES_FAILED'})
 
 
 class Stop(RuntimeError):
@@ -35,7 +44,18 @@ def invoke(source, lane, args, home):
     try:
         result = subprocess.run(['bash', str(LAUNCHER), source, lane, *args], cwd=home,
             capture_output=True, text=True, timeout=1200)
-        require(result.returncode == 0 and len(result.stdout) <= 4_000_000, 'CHILD_OPERATION_FAILED_OR_UNCERTAIN')
+        require(len(result.stdout) <= 4_000_000 and len(result.stderr) <= 4_000_000,
+                'CHILD_OPERATION_FAILED_OR_UNCERTAIN')
+        if result.returncode:
+            for line in (result.stdout + '\n' + result.stderr).splitlines()[-64:]:
+                try: failure = json.loads(line)
+                except ValueError: continue
+                if (lane == 'broker-build' and isinstance(failure, dict) and
+                    set(failure) == {'status', 'code', 'resubmit'} and failure['status'] == 'STOPPED' and
+                    failure['resubmit'] is False and isinstance(failure['code'], str) and
+                    failure['code'] in PUBLIC_BUILD_CODES):
+                    raise Stop(failure['code'])
+            raise Stop('CHILD_OPERATION_FAILED_OR_UNCERTAIN')
         value = json.loads(result.stdout)
         require(isinstance(value, dict), 'CHILD_RESPONSE_INVALID')
         return value
@@ -87,11 +107,13 @@ def continuation(tool_source, build_source, approval, home, folder, build_id=Non
                 build_id = rows[1]['build_id']
                 report['resumed_recorded_build'] = True
         if not build_id:
+            report['stage'] = 'BUILD_PREREQUISITES'
             plan = call(build_source, 'broker-build', ['--check'], home)
             require(plan.get('inventory') == 'CHECKED' and plan.get('approve_plan_sha256') == approval and
                     plan.get('plan', {}).get('source_sha') == build_source, 'BUILD_PLAN_APPROVAL_MISMATCH')
             append(journal, {'event': 'SUBMISSION_INTENT', 'source_sha': build_source, 'plan_sha256': approval}, 'x')
             report['build_submission_attempted'] = True
+            report['stage'] = 'BUILD_SUBMISSION'
             result = call(build_source, 'broker-build', ['--submit', '--approve-plan-sha256', approval], home)
             require(result.get('status') == 'SUBMITTED_NOT_VERIFIED' and result.get('source_sha') == build_source and
                     bool(re.fullmatch(UUID, result.get('build_id', ''))), 'SUBMISSION_UNCERTAIN_NO_RETRY')
@@ -99,8 +121,10 @@ def continuation(tool_source, build_source, approval, home, folder, build_id=Non
             append(journal, {'event': 'BUILD_SUBMITTED', 'source_sha': build_source, 'build_id': build_id})
         report['build_id'] = build_id
         deadline = now() + 900
+        report['stage'] = 'BUILD_STATUS'
         while True:
             value = status(build_id)
+            report['build_status'] = value
             if value == 'SUCCESS': break
             if value not in ('QUEUED', 'PENDING', 'WORKING'):
                 report.update(status='BUILD_NOT_SUCCESS', build_status=value); break
@@ -108,7 +132,9 @@ def continuation(tool_source, build_source, approval, home, folder, build_id=Non
                 report.update(status='BUILD_PENDING_RESUME_BY_BUILD_ID', build_status=value); break
             sleep(20)
         if value == 'SUCCESS':
-            receipt = call(build_source, 'broker-build', ['--build-id', build_id], home)
+            report['stage'] = 'BUILD_QUALIFICATION'
+            receipt = call(tool_source, 'broker-build', ['--build-id', build_id,
+                           '--build-source-sha', build_source], home)
             require(receipt.get('status') == 'BUILD_VERIFIED_NOT_DEPLOYED' and
                     receipt.get('source_sha') == build_source and receipt.get('build_id') == build_id,
                     'QUALIFICATION_RECEIPT_MISMATCH')
@@ -124,6 +150,7 @@ def continuation(tool_source, build_source, approval, home, folder, build_id=Non
     if qualified:
         args += ['--broker-image', qualified['image'], '--broker-build-id', build_id,
                  '--broker-build-source-sha', build_source]
+    else: args += ['--skip-broker-inventory']
     try: report['recovery'] = call(tool_source, 'recovery', args, home)
     except Exception: report['recovery'] = {'status': 'READ_ONLY_RECOVERY_UNAVAILABLE'}
     return report

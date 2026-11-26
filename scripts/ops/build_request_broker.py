@@ -187,9 +187,11 @@ def main(argv=None):
     p.add_argument('--approve-plan-sha256')
     p.add_argument('--build-source-sha', help='Original immutable build source; allowed only with --build-id')
     p.add_argument('--diagnose', action='store_true', help='Read existing build and report all fixed verification predicates')
+    p.add_argument('--inspect-source', action='store_true', help='With --diagnose, compare only the generation-pinned source archive in memory; never qualify')
     a = p.parse_args(argv)
     require(not a.build_source_sha or a.build_id, 'BUILD_SOURCE_REQUIRES_EXISTING_BUILD')
     require(not a.diagnose or a.build_id, 'DIAGNOSTIC_REQUIRES_EXISTING_BUILD')
+    require(not a.inspect_source or a.diagnose, 'SOURCE_INSPECTION_REQUIRES_DIAGNOSTIC')
     build_source = a.build_source_sha or a.source_sha
     data = source_archive(a.source_sha, build_source)
     archive_hash = hashlib.sha256(data).hexdigest()
@@ -201,7 +203,12 @@ def main(argv=None):
             require(re.fullmatch('[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}', a.build_id), 'BUILD_ID_INVALID')
             build = cloud_read('BUILD_METADATA_READ_FAILED', 'builds', 'describe', a.build_id, '--region', REGION)
             require(build.get('id') == a.build_id and build.get('projectId') == PROJECT, 'BUILD_RESOURCE_IDENTITY_MISMATCH')
-            print(json.dumps({'build_id': a.build_id, **diagnostic(build, build_source, archive_hash)}, indent=2)); return
+            result = {'build_id': a.build_id, **diagnostic(build, build_source, archive_hash)}
+            if a.inspect_source:
+                require(set(result['failed_predicates']) <= {'SOURCE_ARCHIVE_HASH_MISMATCH'}, 'SOURCE_INSPECTION_PREREQUISITES_FAILED')
+                import inspect_broker_source
+                result['source_inspection'] = inspect_broker_source.inspect(build, data, BUCKET)
+            print(json.dumps(result, indent=2)); return
         print(json.dumps(qualify(a.build_id, build_source, archive_hash), indent=2)); return
     if a.check or a.submit:
         publication.preflight(REGION, BUCKET)

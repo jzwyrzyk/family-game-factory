@@ -1,5 +1,37 @@
 # Permanent cloud operations delivery ledger
 
+## November 26, 2026 — replacement build succeeded; archive qualification blocked
+
+Administrator continuation at `5d98d675510645de26601fcb7b805c0e0f44bfca`
+submitted the one approved build. The direct diagnostic for
+`a345988d-2c4b-48ab-97d8-06636abb500d` reports `SUCCESS` and exactly one failed
+predicate: `SOURCE_ARCHIVE_HASH_MISMATCH`. Expected archive SHA-256 remains
+`2f450c0d49fb975326dd0c78c93b8edc20fb36fb4d832a7a73da677b1ffdf4f2`, bound to
+approved source `476c2b9793060d30623b16130daeb5e9776640ff`. All other reported
+build predicates passed; registry qualification and live acceptance are unverified.
+The one-build approval is consumed. No resubmission or deployment is authorized.
+
+A bounded, generation-pinned source inspection is prepared to compare provider
+hash, stored gzip, exact TAR bytes and exact known members without extraction,
+credential persistence or cloud mutation. It does not relax the existing verifier.
+The continuation now preserves fixed failure codes and uses current qualification
+tooling with the original approved build source. Failed qualification no longer
+causes independent recovery to inventory the obsolete default image.
+
+Validation: **357 operations tests passed**, including source-inspection bounds,
+identity/path/generation checks, gzip differences, changed content, redaction,
+fixed child-error propagation and independent recovery. Broker runtime files remain
+identical to the approved build source.
+
+The same administrator run reports 1,192,248,614 source-cleanup bytes across five
+eligible repositories, two blocked repositories, and zero exact-pack deduplication
+savings. Git objects and dependency archive candidates are not verified reclaimable
+space; do not sum alternative plans. The 2 GiB target remains unverified. No
+historical deletion or archival was executed or approved. The original DEV/TEST
+plan passed integrity verification again, with no Terraform invocation or state
+change. Private manifests and recovery receipts remain in Cloud Shell.
+
+
 ## November 26, 2026 — replacement build approved; guarded continuation prepared
 
 The owner explicitly approved one corrected broker build from

@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T16:51:53.847Z",
-      "sourceDigest": "b8ee022749293a2aef1a01c663c5d31ae9bcee324906f0ae618dd64cf93f9aea",
+      "reviewedAt": "2026-11-26T17:08:54.597Z",
+      "sourceDigest": "36dd564789bd2dbb6ff238e5f6092f2c3321f33072763a592ecb6dc206810ef5",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed single approved-build continuation with durable submission intent, fixed approved source/hash, read-only resume/provenance qualification and independent recovery plans; documented owner build-only approval and new launcher checksum without changing broker runtime or Terraform inputs.",
+      "reviewReason": "Recorded successful approved submission with archive hash qualification blocked, read-only generation-pinned source comparison, specific continuation failure codes and independent recovery evidence; broker runtime and saved Terraform plan remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

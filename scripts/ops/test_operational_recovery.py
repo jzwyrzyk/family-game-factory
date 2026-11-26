@@ -11,6 +11,23 @@ import bootstrap_request_diagnostics as setup
 
 
 class RecoveryTests(unittest.TestCase):
+    def test_unqualified_build_skips_inventory_but_keeps_independent_reads(self):
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp)
+            with patch.object(recovery.broker, 'source'), patch.object(recovery.broker, 'main') as inventory, \
+                 patch.object(recovery, 'audit_evidence', side_effect=RuntimeError()), \
+                 patch.object(recovery, 'local_cli_evidence', return_value={}), \
+                 patch.object(recovery.cleanup, 'main', side_effect=lambda _: print('{}')) as cleanup, \
+                 patch.object(recovery.capacity, 'main', side_effect=lambda _: print('{}')) as capacity, \
+                 patch.object(recovery, 'saved_nonprod', return_value={'status': 'SAVED_PLAN_INTEGRITY_VERIFIED'}) as nonprod, \
+                 contextlib.redirect_stdout(io.StringIO()) as output:
+                recovery.main(['--source-sha', 'b' * 40, '--home-dir', str(home),
+                               '--receipt-dir', str(home / 'receipts'), '--skip-broker-inventory'])
+            result = json.loads(output.getvalue())
+            inventory.assert_not_called(); cleanup.assert_called_once(); capacity.assert_called_once(); nonprod.assert_called_once()
+            self.assertFalse(result['broker']['existing_resources_checked'])
+            self.assertEqual(result['nonproduction']['status'], 'SAVED_PLAN_INTEGRITY_VERIFIED')
+
     def test_partial_replacement_build_tuple_fails_before_source_or_cloud_reads(self):
         for args in (['--broker-image', 'anything'], ['--broker-build-id', 'anything'],
                      ['--broker-build-source-sha', 'a' * 40]):

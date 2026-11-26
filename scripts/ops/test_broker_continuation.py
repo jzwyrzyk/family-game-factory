@@ -2,7 +2,8 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
+from types import SimpleNamespace
 
 import continue_broker_activation as follow
 
@@ -24,7 +25,8 @@ class ContinuationTests(unittest.TestCase):
 
     def child(self, source, lane, args, home):
         if lane == 'recovery': return {'status': 'READ_ONLY_RECOVERY_REPORT_NOT_ACTIVATION'}
-        self.assertEqual(source, SOURCE)
+        self.assertEqual(source, TOOL if '--build-id' in args else SOURCE)
+        if '--build-id' in args: self.assertEqual(args[args.index('--build-source-sha') + 1], SOURCE)
         if args == ['--check']: return {'inventory': 'CHECKED', 'approve_plan_sha256': APPROVAL, 'plan': {'source_sha': SOURCE}}
         if '--submit' in args: return {'status': 'SUBMITTED_NOT_VERIFIED', 'source_sha': SOURCE, 'build_id': BUILD}
         if '--build-id' in args: return {'status': 'BUILD_VERIFIED_NOT_DEPLOYED', 'source_sha': SOURCE, 'build_id': BUILD, 'image': IMAGE}
@@ -110,6 +112,36 @@ class ContinuationTests(unittest.TestCase):
         report = self.run_flow(build_id=BUILD)
         self.assertNotIn('PRIVATE-GCLOUD-OUTPUT', json.dumps(report))
         self.assertEqual(self.status.call_count, 1)
+        self.assertEqual(self.submissions(), [])
+
+    def test_structured_publisher_failure_survives_wrapper_but_arbitrary_output_does_not(self):
+        for channel in ('stdout', 'stderr'):
+            result = SimpleNamespace(returncode=2, stdout='', stderr='')
+            setattr(result, channel, 'private noise\n' + json.dumps({'status': 'STOPPED',
+                    'code': 'SOURCE_ARCHIVE_HASH_MISMATCH', 'resubmit': False}) + '\nprivate receipt path\n')
+            with patch.object(follow.subprocess, 'run', return_value=result):
+                with self.assertRaisesRegex(follow.Stop, '^SOURCE_ARCHIVE_HASH_MISMATCH$'):
+                    follow.invoke(TOOL, 'broker-build', ['--build-id', BUILD], self.home)
+        for value in ({'status': 'STOPPED', 'code': 'PRIVATE_TOKEN', 'resubmit': False},
+                      {'status': 'STOPPED', 'code': 'REGISTRY_DIGEST_MISMATCH', 'resubmit': False, 'payload': 'PRIVATE'}):
+            with patch.object(follow.subprocess, 'run', return_value=SimpleNamespace(returncode=2, stdout=json.dumps(value), stderr='PRIVATE')):
+                with self.assertRaisesRegex(follow.Stop, '^CHILD_OPERATION_FAILED_OR_UNCERTAIN$'):
+                    follow.invoke(TOOL, 'broker-build', ['--build-id', BUILD], self.home)
+
+    def test_qualification_failure_retains_success_status_and_current_verifier_source(self):
+        original = self.child
+        def child(*args):
+            if '--build-id' in args[2]:
+                self.assertEqual(args[0], TOOL)
+                self.assertIn(SOURCE, args[2])
+                raise follow.Stop('SOURCE_ARCHIVE_HASH_MISMATCH')
+            return original(*args)
+        self.call.side_effect = child
+        report = self.run_flow(build_id=BUILD)
+        self.assertEqual(report['code'], 'SOURCE_ARCHIVE_HASH_MISMATCH')
+        self.assertEqual(report['stage'], 'BUILD_QUALIFICATION')
+        self.assertEqual(report['build_status'], 'SUCCESS')
+        self.assertIn('--skip-broker-inventory', self.call.call_args.args[2])
         self.assertEqual(self.submissions(), [])
 
 
