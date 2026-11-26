@@ -891,10 +891,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:45:22.890Z",
-      "sourceDigest": "8dff7c9676a45c1e4dd0da30e459973c0e01855b8c3cb5d1598a085d0c167156",
+      "reviewedAt": "2026-11-26T01:59:09.198Z",
+      "sourceDigest": "7f6f06866628a978a1e86606837685ee3943e8c88a8ef4dc69be61296f51fa1b",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The learning UI suite includes pointer and input regression cases under the same existing command and shard. The CI and release evidence requirements still apply.",
+      "reviewReason": "The My Powers brand journey now checks approved Ink and measured contrast on the light learning surface. The original game journey uses the visible checkpoint exit, verifies persisted interrupted evidence and its unused-budget refund, and still exercises the ordinary game exit. Host navigation, receipts and CI assignments are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
