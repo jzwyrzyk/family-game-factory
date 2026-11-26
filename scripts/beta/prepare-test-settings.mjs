@@ -77,7 +77,14 @@ export function render(source,b,incoming,now=Date.now()){
    expiresAt:expires,authorizationSha256:trial.authorizationSha256}});
   Object.assign(env,{JEMS_TEST_FUNDED_HOUSEHOLD:'true',JEMS_TEST_TRIAL_AUTHORIZATION_SHA256:trial.authorizationSha256,JEMS_TEST_TRIAL_EXPIRES_AT:trial.expiresAt});
  }else need(!household.approval?.enabled&&!household.premiumApproval&&!household.testExecution&&!household.workerRepository);
- testExecution(household,{...env,K_SERVICE:'jems-test-household'});
+ const householdEnv={...env,K_SERVICE:'jems-test-household'};
+ testExecution(household,householdEnv);
+ if(funded){
+  const {trialAuthorization}=require('../../server/beta/test-trial.ts');
+  const authorized=trialAuthorization(household,now,householdEnv);
+  need(authorized.hash===trial.authorizationSha256&&authorized.t.limitMicrousd===trial.limitMicrousd);
+ }
+
  protectedHousehold(household,'unused',()=>{});
  const viewer={appOrigin:house,workspace:household.workspace,familyId:household.familyId,previewKey:household.previewKey};
  const preview={platformMode:'PRIVATE_FAMILY_BETA',environment:'test',hubOrigin:hub,previewOrigin:play,previewKey:gateway.previewKey,

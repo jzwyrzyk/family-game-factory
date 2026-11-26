@@ -77,7 +77,21 @@ for role in gateway household preview; do
 done
 ```
 
-Capture the numeric secret versions and all three exact image digests in `release` in a copy of the foundation inputs, advance to `services`, plan and approve. Only then advance to `edge` and explicitly approve the HTTPS routing resources. Verify exact hosts, wildcard DNS authorization, certificate status, default-domain denial, no CDN caching, separate IAP assertion audiences, secret mounts and serving digests. Verify the management, household, family and preview boundaries through actual requests. Wait for real DNS/TLS readiness; a successful Terraform apply does not establish it.
+Capture the numeric secret versions and all three exact image digests in `release` in a copy of the foundation inputs, advance to `services`, plan and approve. Generate the private service input from the foundation input and the recorded output. Keep the files and numeric versions for rollback.
+
+```bash
+jq --slurpfile b "$private_inputs/service-images.json" \
+  --arg gw "$(basename "$(cat "$private_inputs/gateway-version")")" \
+  --arg hh "$(basename "$(cat "$private_inputs/household-version")")" \
+  --arg pv "$(basename "$(cat "$private_inputs/preview-version")")" \
+  '.stage="services"|.release={images:$b[0].images,versions:{gateway:$gw,household:$hh,preview:$pv}}' \
+  "$private_inputs/foundation.tfvars.json" > "$private_inputs/services.tfvars.json"
+stage_plan "$private_inputs/services.tfvars.json"
+approved_apply
+jq '.stage="edge"' "$private_inputs/services.tfvars.json" > "$private_inputs/edge.tfvars.json"
+```
+
+Then advance to `edge` and explicitly approve the HTTPS routing resources. Verify exact hosts, wildcard DNS authorization, certificate status, default-domain denial, no CDN caching, separate IAP assertion audiences, secret mounts and serving digests. Verify the management, household, family and preview boundaries through actual requests. Wait for real DNS/TLS readiness; a successful Terraform apply does not establish it.
 
 Before enabling TEST worker federation, verify its real protected branch/tag, repository ID, runner group access, signer policy, no-identity VM, bounded TTL and stop/cleanup controls. Review and apply the exact `edge` plan with `enable_worker_federation=true`. Produce the protected family release record after the services or edge readback. This metadata carries no private configuration values.
 
