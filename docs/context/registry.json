@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T05:28:44.476Z",
-      "sourceDigest": "2a3f91df028a7a8f3038f80e187a1c4b9ade3c706824ffdfd0e1b9b320b27e98",
+      "reviewedAt": "2026-11-26T13:47:32.000Z",
+      "sourceDigest": "2ed24f789b5e58d2d232af88b3d0658e62b7b17b6f2c857e11dc422c4308bd73",
       "reviewOutcome": "updated",
-      "reviewReason": "Linked the concurrent review-only Creative Universe integration and retained separate Learning, engineering and frozen application sources.",
+      "reviewReason": "Reviewed #219 protected-main Arcade jobs, read-only Cloud Run metadata receipt, exact frozen sandbox and private worker workflow pins, joined #223 rehearsal contracts and owner-reported Cloud Shell setup. Updated delivery gates without claiming live settings or release approval. Exact integrated-tree fingerprint independently printed by documentation job 139952725686; unrelated review records preserved.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1377,6 +1377,13 @@
           "reviewOutcome": "updated",
           "reviewReason": "Reconciled daec8cf Mining setup adjustment and both parent review histories with the unchanged second-stage release-evidence policy. Guide and ledger retain the exact 559-second Arcade pass, successful Bubble Gum setup improvement and GitHub-confirmed Mining timeout, separating all prior-source results from pending follow-up validation. Existing 228-operation results cover unchanged operations code; no release transition, authority, approval or activation changed.",
           "sourceCommit": "2b170306c4ce5596742c72c69819399dcf4022a1"
+        },
+        {
+          "sourceCommit": "652bf9e312fc0776e37b7ef7893835e0fd8136d4",
+          "reviewedAt": "2026-11-26T05:28:44.476Z",
+          "sourceDigest": "2a3f91df028a7a8f3038f80e187a1c4b9ade3c706824ffdfd0e1b9b320b27e98",
+          "reviewOutcome": "updated",
+          "reviewReason": "Linked the concurrent review-only Creative Universe integration and retained separate Learning, engineering and frozen application sources."
         }
       ]
     },
