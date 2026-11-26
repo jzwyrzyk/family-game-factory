@@ -1,5 +1,10 @@
 # Jems current architecture
 
+## Owner-scoped creative assets
+
+My Art owns exact raster bytes, including the bounded editable source of native crayon drawings. Its logical catalogue uses existing original IDs, derivative parents, movement assemblies and content hashes. Studio scene actors retain individual version pins and optional contextual roles. Mixed use of Jems-supplied art and private pictures is resolved inside the trusted host. Scene-only portability selects the required closure while the full library backup includes the owner's drafts. Optional family intake restricts admissible reviewed PNGs to preserve both exact bytes and its metadata-minimization contract. [My Art](docs/drawings/ART_STUDIO.md) · [Creative Asset & World Design Standard](docs/creative-universe/STANDARD.md)
+
+
 The November 26 application integration combines family beta and F06 storage from #186 with the child experience from #188 and #190. The [environment contract](docs/development/DEV-TEST-PROD.md) governs DEV, TEST and household promotion. Production still serves the earlier household release. The [delivery register](DELIVERY-STATE.md) distinguishes source validation, hosted acceptance and activation for this release.
 
 **Private family beta and F06 on protected main, November 25.** Application #186 integrated the opt-in family tenancy and storage paths. Existing household deployments use the household route. Prepared workspaces preserve their recoverable originals. Native private copies use per-owner authorization and explicit conflict handling. Other domains use reviewed recovery. The protected worker still runs the earlier pinned public source. Private dispatch checks both its immutable execution tag and the current private main commit against the same approved SHA. An advance of worker main would stop admission under the current pin. [Integration and continuity record](docs/family-beta/COMPLETION.md#protected-main-integration)
