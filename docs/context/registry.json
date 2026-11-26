@@ -929,10 +929,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T22:35:32.999Z",
-      "sourceDigest": "62a93630c83508e452c3c6bc433b38f0fcab5a826f922457d5ee660d5c025ba2",
+      "reviewedAt": "2026-11-26T23:27:49.971Z",
+      "sourceDigest": "bef2e2bca16efaa6179ab9dba09960b8ee77a7ba997fab724b32f5904b8a969b",
       "reviewOutcome": "updated",
-      "reviewReason": "The standalone review guide records the full-size notebook pointer journey and the navigation budget used to open the exact download.",
+      "reviewReason": "The protected release suite now covers actual fixture archives, failed checks, stale owner reviews, staged traffic, unhealthy canaries, immutable image copies and retained website recovery.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1174,10 +1174,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T22:35:33.293Z",
-      "sourceDigest": "c33452d055868eeec7b810391f107d1aaab7ed0e6f0c90934aa70720734d4e85",
+      "reviewedAt": "2026-11-26T23:27:50.209Z",
+      "sourceDigest": "8c9014d2a3aae01af26942df7af66026b1deeedd2e4444d76cbf289ba59ae157",
       "reviewOutcome": "updated",
-      "reviewReason": "The delivery record now directs owners to the combined draft and current household revision observation while preserving each historic receipt.",
+      "reviewReason": "The coordinated production runbook specifies the authenticated manifest decision, TEST-first registry promotion, compatibility ordering, public website readback and approved reverse recovery.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

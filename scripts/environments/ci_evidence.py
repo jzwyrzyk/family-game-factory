@@ -199,6 +199,13 @@ def verify_full_ci(api, source, kind, pr_number=None, now=None):
                 and current_pr.get('base', {}).get('ref') == 'main' and current_pr['base'].get('sha') == main
                 and same_repo(current_pr['base'].get('repo')), 'CI_PR_SOURCE_CHANGED')
         tested = sha(current_pr.get('merge_commit_sha'))
+    elif kind == 'release':
+        require(pr_number is None, 'CI_RELEASE_SOURCE_INVALID')
+        comparison = api.request(f'{PREFIX}/compare/{source}...{main}')
+        require(comparison.get('status') in ('ahead', 'identical')
+                and comparison.get('merge_base_commit', {}).get('sha') == source,
+                'CI_RELEASE_SOURCE_NOT_MERGED')
+        tested = source
     else:
         require(kind == 'test' and pr_number is None and source == main, 'CI_TEST_NOT_CURRENT_MAIN')
         tested = source
@@ -216,7 +223,7 @@ def verify_full_ci(api, source, kind, pr_number=None, now=None):
     require(run.get('head_sha') == source and run.get('path') == WORKFLOW and same_repo(run.get('repository'))
             and same_repo(run.get('head_repository')) and run.get('run_attempt') == 1
             and run.get('status') == 'completed' and run.get('conclusion') == 'success', 'CI_FULL_RUN_NOT_SUCCESSFUL')
-    if kind == 'test':
+    if kind != 'dev':
         require(run.get('head_branch') == 'main', 'CI_FULL_RUN_NOT_MAIN')
     else:
         matches = [p for p in run.get('pull_requests', []) if p.get('number') == pr_number

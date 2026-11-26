@@ -14,7 +14,9 @@ class PagesReleaseRegressionGates(unittest.TestCase):
     def setUp(self):
         self.workflow = (ROOT / ".github/workflows/pages.yml").read_text()
         self.build, remainder = self.workflow.split("  regressions:\n", 1)
-        self.regressions, self.deploy = remainder.split("  deploy:\n", 1)
+        self.regressions, tail = remainder.split("  prepare-receipt:\n", 1)
+        self.preparation, tail = tail.split("  approved-archive:\n", 1)
+        self.archive, self.deploy = tail.split("  deploy:\n", 1)
 
     def test_retired_public_site_cannot_republish_a_historical_application(self):
         spec = importlib.util.spec_from_file_location("pages_policy", ROOT / "scripts/beta/pages-policy.py")
@@ -34,9 +36,10 @@ class PagesReleaseRegressionGates(unittest.TestCase):
         self.assertEqual(matrix, list(r.SHARDS))
         self.assertIn("fail-fast: false", self.regressions)
         self.assertNotIn("continue-on-error", self.workflow)
-        self.assertIn("needs: [build, regressions]", self.deploy)
-        self.assertIn("needs.build.result == 'success'", self.deploy)
-        self.assertIn("needs.regressions.result == 'success'", self.deploy)
+        self.assertIn("needs: [build, regressions]", self.preparation)
+        self.assertIn("needs: approved-archive", self.deploy)
+        self.assertIn("needs.build.result == 'success'", self.preparation)
+        self.assertIn("needs.regressions.result == 'success'", self.preparation)
 
     def test_build_and_regressions_are_bound_to_same_reviewed_merged_source(self):
         for job in (self.build, self.regressions):
@@ -54,9 +57,16 @@ class PagesReleaseRegressionGates(unittest.TestCase):
         self.assertIn("workflow_dispatch:", self.build)
         self.assertNotIn("push:", self.build)
         self.assertIn("contents: read", self.build)
-        for job in (self.build, self.regressions):
+        for job in (self.build, self.regressions, self.preparation):
             for authority in ("secrets.", "id-token: write", "pages: write", "environment:", "gcloud "):
                 self.assertNotIn(authority, job)
+        self.assertIn("environment: jems-production-evidence", self.archive)
+        for job in (self.archive, self.deploy):
+            self.assertEqual(re.findall(r"secrets\.([A-Z_]+)",job), ["JEMS_WORKER_REFS_READ_TOKEN"])
+            self.assertNotIn("google-github-actions/auth", job)
+            self.assertNotIn("gcloud ", job)
+        self.assertNotIn("id-token: write", self.archive)
+        self.assertNotIn("pages: write", self.archive)
         self.assertIn("pages: write", self.deploy)
         self.assertIn("name: github-pages", self.deploy)
 
