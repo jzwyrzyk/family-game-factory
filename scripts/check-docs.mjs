@@ -173,7 +173,7 @@ export function check(root, { base, head, now = new Date() } = {}) {
     if (area.id === POLICY_AREA && changedPolicy) changedSources.push(REGISTRY);
     const changedDocuments = result.changedPaths.filter(path => area.documents.some(pattern => matches(path, pattern)));
     if (changedSources.length && area.reviewOutcome === 'updated' && !changedDocuments.length) result.errors.push(`${area.id}: review says updated, but no routed document changed in this PR/range. Update the relevant document or record an honest unchanged review with a specific reason.`);
-    result.areas.push({ id: area.id, current, sourceFiles: sources.length, reviewedAt: area.reviewedAt, reviewOutcome: area.reviewOutcome, changedSources, changedDocuments });
+    result.areas.push({ id: area.id, digest, current, sourceFiles: sources.length, reviewedAt: area.reviewedAt, reviewOutcome: area.reviewOutcome, changedSources, changedDocuments });
   }
   return result;
 }
@@ -233,6 +233,9 @@ function main() {
     }
     if (args.command !== 'check') throw new Error('Use check or refresh <area>.');
     const result = check(root, { ...eventRange(), ...(args.base ? { base: args.base } : {}), ...(args.head ? { head: args.head } : {}) });
+    if (process.env.DOC_PRINT_DIGESTS === 'true') {
+      for (const area of result.areas) console.log('DOC_SOURCE_DIGEST', area.id, area.digest);
+    }
     const report = markdownReport(result);
     console.log(report);
     if (args.report) { mkdirSync(dirname(resolve(args.report)), { recursive: true }); writeFileSync(resolve(args.report), report); }

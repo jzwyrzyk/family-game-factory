@@ -9,8 +9,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: studio-quality-review-${{ github.ref }}
-  cancel-in-progress: true
+  group: studio-quality-review-${{ github.event_name }}-${{ github.event_name == 'push' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 jobs:
   studio-quality:

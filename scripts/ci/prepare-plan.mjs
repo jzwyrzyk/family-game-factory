@@ -120,7 +120,7 @@ export function preparePlan(env = process.env) {
   }
   if (plan.head !== head || plan.requiredShards.some(id => !manifest.shards[id])) throw new Error('CI_CLASSIFIER_MANIFEST_MISMATCH');
   if (plan.mode !== 'full' && (authority !== 'trusted-base' || plan.trustedPolicy !== true)) throw new Error('CI_UNTRUSTED_NARROWING');
-  const priority = ['mining', 'browser-generated', 'studio-core', 'browser-storage', 'factory', 'physical', 'child-coach', 'creation-art', 'learning-math', 'browser-core', 'pals-rewards', 'learning-language', 'notifications'];
+  const priority = ['browser-quality', 'browser-generated', 'mining', 'creation-art', 'browser-storage', 'studio-core', 'browser-core', 'factory', 'physical', 'child-coach', 'pals-rewards', 'learning-math', 'learning-language', 'notifications'];
   plan.requiredShards.sort((a, b) => priority.indexOf(a) - priority.indexOf(b));
   const planBytes = JSON.stringify(plan, null, 2) + '\n';
   fs.writeFileSync('ci-plan.json', planBytes);

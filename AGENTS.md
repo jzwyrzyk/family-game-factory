@@ -7,6 +7,7 @@ This is the entry point for people and coding assistants working in this reposit
 At the start of a new task, after a handoff, or after losing conversation context:
 
 1. Read [PRODUCT-DOCTRINE.md](PRODUCT-DOCTRINE.md) for intent and non-negotiables, [ARCHITECTURE-CURRENT.md](ARCHITECTURE-CURRENT.md) for implemented boundaries, and [DELIVERY-STATE.md](DELIVERY-STATE.md) for dated evidence and active work.
+   Stop at the first `<details>` in each root reference. Its remaining sections route old inbound links into the dated archive. For a shell read use `sed '/^<details>/,$d' FILE`. Use the feature table in the index to load only the relevant contract.
 2. Use [docs/README.md](docs/README.md) to read the feature contracts and [decision records](docs/decisions/README.md) relevant to this task. Read the actual code and tests before changing behavior. Do not load every historical assignment as current instructions.
 3. Verify the current branch, working tree, base/main SHA, related open PRs and dependencies. Work from an isolated branch; preserve concurrent work. For a continued task, inspect what changed since the last verified SHA instead of restarting the entire audit.
 4. Establish the requested outcome, applicable invariants, integration points and acceptance evidence. A user-approved plan or release scope is not evidence that its implementation or deployment succeeded.
@@ -55,6 +56,12 @@ The [doctrine](PRODUCT-DOCTRINE.md) and feature contracts provide the detail. In
 - Keep browser/gateway/preview free of model secrets. The private generation worker and separately approved private coach have different credential boundaries. Preserve trusted-device checks, transactional spending admission and no automatic replay of uncertain paid POSTs.
 - Prefer the simplest game form that preserves the requested actions and consequences. Passing compilation or rendering a themed scene does not establish playable intent fidelity.
 - Preserve approved jems assets and touch/mouse/keyboard usability. Real device, visual, gameplay and learning evidence have separate limits.
+
+## Editing and integration
+
+Run `npm run check:changed` while editing. It includes committed branch changes, staged and unstaged edits, and untracked files relative to the merge base with `origin/main`. Use `-- --plan` to inspect the selection or `-- --domain coding` to add a journey. Inspect the actual UI on affected devices or viewports and iterate locally. A candidate checkpoint earns a hosted prospective-merge run and owner-review packet. Recheck the integrated tree against the current base and all required contexts. Release retains its exact-source, artifact, configuration and acceptance gates.
+
+Inspect related open PRs before branching. Record the shared contract, its single implementation owner, the dependency SHA and the selected integration PR in the PR description. Keep independent work in separate branches. When two alternatives implement the same foundation, reconcile their diffs in one selected route and preserve unique work from each. Link earlier receipts with their exact source and scope. Recompute proof when an input changes. Existing branches should merge current main into a checkpoint branch, resolve CI and registry changes alongside their feature changes, run focused checks, then qualify the resulting prospective merge.
 
 ## Make the change and its references agree
 

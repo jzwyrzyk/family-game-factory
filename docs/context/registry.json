@@ -84,7 +84,10 @@
     "docs/development/SETUP.md",
     "docs/development/COSTS.md",
     "docs/decisions/2026-11-23-dev-test-prod.md",
-    "docs/ui-review/README.md"
+    "docs/ui-review/README.md",
+    "docs/history/2026-11-26/PRODUCT-DOCTRINE.md",
+    "docs/history/2026-11-26/ARCHITECTURE-CURRENT.md",
+    "docs/history/2026-11-26/DELIVERY-STATE.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -125,7 +128,9 @@
     "docs/development/*.md",
     "infra/nonproduction/*.md",
     "docs/development/evidence/*.md",
-    "docs/storage/*.md"
+    "docs/storage/*.md",
+    "docs/history/2026-11-26/*.md",
+    "docs/evidence/DEVELOPMENT-VELOCITY.md"
   ],
   "areas": [
     {
@@ -146,10 +151,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:38:12.735Z",
-      "sourceDigest": "6925af7797920346bfc5542e781245e8f039124dca019a6962d867f334a2a400",
-      "reviewOutcome": "updated",
-      "reviewReason": "The first-creation contract now records single admission for repeated taps without changing saved-idea ownership or readiness rules.",
+      "reviewedAt": "2026-11-26T04:43:54.338Z",
+      "sourceDigest": "07fc21610f861620f19ab0faadd68800d67ab76ad7f79566f164df2cf5d3d037",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The Gem Factory guide now points reviewers to the Arcade capture archive for PRs. The game's pattern, cutter, physics, learning, accessibility and acceptance requirements retain their reviewed behavior.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -880,7 +885,8 @@
         "docs/game-intelligence/premium-benchmark/*.md",
         "docs/development/*.md",
         "infra/nonproduction/*.md",
-        "docs/ui-review/*.md"
+        "docs/ui-review/*.md",
+        "docs/evidence/DEVELOPMENT-VELOCITY.md"
       ],
       "sources": [
         "tests/**",
@@ -891,10 +897,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:02:38.180Z",
-      "sourceDigest": "7fd5e767bd4834c731d23a4eaf502e0800826123e415c7aa489076150ada7cf3",
+      "reviewedAt": "2026-11-26T14:31:03.619Z",
+      "sourceDigest": "3b1256549f4071a722f02e48bf000b1c847d59c3b8a966dfb505464e49fab3c9",
       "reviewOutcome": "updated",
-      "reviewReason": "Validated broker provenance, bounded GitHub dispatch/retrieval with connector archive fallback, rejection of wrong sources/digests/layouts, and create-only nonproduction plans; real failed PR153 artifact remains explicitly unavailable.",
+      "reviewReason": "Reconciled operations recovery coverage with current CI foundation; reviewed targeted build, cleanup, handoff and environment regression boundaries without changing application behavior.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1114,7 +1120,8 @@
         "docs/development/*.md",
         "infra/nonproduction/*.md",
         "docs/evidence/README.md",
-        "docs/ui-review/*.md"
+        "docs/ui-review/*.md",
+        "docs/evidence/DEVELOPMENT-VELOCITY.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -1135,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T14:29:43.476Z",
-      "sourceDigest": "23d0a6cf7180e9a60cf9ab5b82d33feca776b38f1ed867a3c738aaf4de1028ac",
+      "reviewedAt": "2026-11-26T14:31:04.046Z",
+      "sourceDigest": "188fc008c27993c2414d5236e22947db12450942668f076aee0f9f25522a4d96",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded exact provider artifacts.images mirror diagnosis and narrowly compatible verification; reviewed recoverability-based deletion, quarantine recovery, durable sanitized journals, sparse cleanup and original Terraform plan independence.",
+      "reviewReason": "Merged current engineering main while preserving original Terraform plan/source; retained operations chronology in dedicated ledger and current activation facts in concise root delivery map.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1393,10 +1400,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:03:34.186Z",
-      "sourceDigest": "f900c6bf88a433172deb7a293539fda30774ad24fa4228f3cad9756e353694a0",
+      "reviewedAt": "2026-11-26T14:31:04.437Z",
+      "sourceDigest": "eb1f5269f5149f20cbbebc15949c22b4dfd9a20a71dd969f0ede9957eab47162",
       "reviewOutcome": "updated",
-      "reviewReason": "Canonical session instruction names source-only preflight and keeps direct managed identity blocked without holding other operations.",
+      "reviewReason": "Preserved new concise canonical-reference/archive routing and source-only diagnostic instructions; operations history remains linked rather than restoring long root documents.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1662,10 +1669,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "ada2accbff6a1c4c26061297e83a2ab48bdb799664d38749f63d7cf76e56d403",
-      "reviewedAt": "2026-11-26T01:23:10.842Z",
+      "sourceDigest": "08d6c2637ec033c45775d4d86c087d3767314bff224eae63cee81a079beeb84f",
+      "reviewedAt": "2026-11-26T05:28:44.940Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The reload regression verifies the retained owner, active Navi and timestamp before and after the visible maker welcome. Starter rules, menu behavior and approved artwork are unchanged.",
+      "reviewReason": "The browser test selects and measures live rendered labels in one browser task. Required selectors, all-match 4.5 contrast threshold, approved art, interaction and persistence assertions are preserved.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",

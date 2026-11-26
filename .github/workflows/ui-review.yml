@@ -9,8 +9,8 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: ui-review-${{ github.ref }}
-  cancel-in-progress: true
+  group: ui-review-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   offline-review:
     runs-on: ubuntu-24.04
@@ -34,8 +34,9 @@ jobs:
         run: echo "UI_REVIEW_BASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - run: npm run review:build
         env:
-          UI_REVIEW_SOURCE_KIND: ${{ github.event_name == 'pull_request' && 'candidate branch' || 'merged main' }}
+          UI_REVIEW_SOURCE_KIND: ${{ github.event_name == 'pull_request' && 'candidate branch' || github.ref == 'refs/heads/main' && 'merged main' || 'candidate branch' }}
       - name: Upload the standalone download
+        id: download
         uses: actions/upload-artifact@v4
         with:
           name: jems-ui-review-${{ env.UI_REVIEW_BASE_SHA }}
@@ -43,6 +44,20 @@ jobs:
           retention-days: 14
           if-no-files-found: error
           compression-level: 6
+      - name: Open the interactive review while browser qualification runs
+        env:
+          ARTIFACT_URL: ${{ steps.download.outputs.artifact-url }}
+          CHANGE_URL: ${{ github.event.pull_request.html_url || github.event.compare || format('{0}/{1}/commit/{2}', github.server_url, github.repository, github.sha) }}
+        run: |
+          echo "::notice title=Offline review available for $UI_REVIEW_BASE_SHA::$ARTIFACT_URL"
+          {
+            echo '### Available for interactive review'
+            echo
+            echo "[Download the HTML]($ARTIFACT_URL) · [Inspect the changes]($CHANGE_URL)"
+            echo
+            echo "Represented source: $UI_REVIEW_BASE_SHA. The offline build and upload completed."
+            echo 'Open jems-ui-review.html with synthetic data. Browser journeys and hosted checks are pending at upload. Visible changes still require owner acceptance and the applicable private DEV and TEST gates.'
+          } >> "$GITHUB_STEP_SUMMARY"
       - run: npx playwright install --with-deps chromium
       - run: npm run review:test
       - name: Capture complete candidate journeys

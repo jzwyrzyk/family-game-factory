@@ -59,14 +59,18 @@ async function selectedNav(page, id) {
   assert.deepEqual(selected, [id], 'Only the current destination is marked active in navigation');
 }
 async function readablePalText(page, selector) {
-  const readings = await page.locator(selector).evaluateAll(elements => elements.map(element => {
+  // Pal refresh replaces its content. Select and measure the current elements in
+  // one browser task so a render cannot detach them between the two operations.
+  const readings = await page.evaluate(selector => Array.from(document.querySelectorAll(selector), element => {
     const color = getComputedStyle(element).color;
-    const channels = color.match(/[\d.]+/g).slice(0, 3).map(Number).map(value => {
+    const values = color.match(/[\d.]+/g);
+    if (!values || values.length < 3) throw Error(`Cannot measure Pal text color "${color}" for ${selector}`);
+    const channels = values.slice(0, 3).map(Number).map(value => {
       const channel = value / 255; return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
     });
     const luminance = channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
     return { text: element.textContent, color, contrastAgainstWhite: 1.05 / (luminance + 0.05) };
-  }));
+  }), selector);
   assert.ok(readings.length && readings.every(reading => reading.contrastAgainstWhite >= 4.5), `Pal text stays readable inside the production shell: ${JSON.stringify(readings)}`);
 }
 function installPalImageHistory({ urls }) {
