@@ -218,3 +218,21 @@ test('Other child-created objects instantiate actual independent bodies and join
   assert.ok(after.parts.every(p=>Number.isFinite(p.angle)));
  }finally{world.dispose();}
 });
+
+test('child animation paths interpolate, preserve original rig versions and compile to relative scene steps', async () => {
+  const { validateMotion, sampleMotion, placeDrawingMotion } = await import('../src/drawing/motion');
+  const motion = { stepMs: 700, stops: [{ x: 0, y: 0 }, { x: 1, y: .5 }] };
+  const actor = { x: 0, y: 0, size: 100 }, stage = { width: 800, height: 450 };
+  let count = 0;
+  const steps = placeDrawingMotion(motion, actor, stage, () => 'step-' + ++count);
+  assert.deepEqual(actor, { x: 400, y: 225, size: 100 });
+  assert.deepEqual(steps, [
+    { id: 'step-1', type: 'move', dx: -350, dy: -175, origin: 'child', durationMs: 700 },
+    { id: 'step-2', type: 'move', dx: 700, dy: 175, origin: 'child', durationMs: 700 },
+  ]);
+  assert.deepEqual(sampleMotion(motion, 350), { x: .25, y: .25 });
+  assert.deepEqual(sampleMotion(motion, Infinity), motion.stops[1]);
+  for (const stops of [[], Array(13).fill({x: 1, y: 1}), [{x: -1, y: 0}], [{x: 1, y: NaN}], [null], [{x: .4, y: .2, url: 'bad'}]])
+    assert.throws(() => validateMotion({ stepMs: 700, stops }));
+  assert.throws(() => validateMotion({ ...motion, stepMs: Infinity }));
+});

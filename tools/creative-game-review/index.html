@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Workshop drawing · Jems local review</title>
+<link rel="stylesheet" href="/review.css">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3ede5;color:#302747;font:18px/1.45 system-ui}
+main{width:min(100% - 24px,860px);margin:3vh auto}h1{font-size:clamp(26px,5vw,42px);line-height:1.08;margin:.3em 0}
+p{margin:8px 0}canvas{display:block;width:100%;height:auto;border-radius:15px;background:#302747}
+header,.controls{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+button{padding:10px 18px;background:#463165;color:white;border:0;border-radius:12px;font:700 18px system-ui;min-height:46px}button:disabled{opacity:.55}.controls{justify-content:center;margin:10px 0}
+</style></head><body><main>
+<header><div><p>Jems · Synthetic game review</p><h1>Workshop drawing</h1></div><button id="choose" disabled>Choose drawing</button></header>
+<p id="status" role="status">Opening the practice library…</p><canvas id="stage" width="720" height="400" tabindex="0" aria-label="Drawing in the workshop"></canvas>
+<div class="controls"><button data-move="left" disabled>← Move left</button><button data-move="right" disabled>Move right →</button></div>
+</main><script src="/review.js" defer></script></body></html>

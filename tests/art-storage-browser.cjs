@@ -4,7 +4,14 @@ const http = require('node:http');
 const { build } = require('esbuild');
 const { chromium } = require('playwright');
 (async () => {
- const bundled = await build({ stdin: { contents: `export * from './src/assets/private-drawings'; export * from './src/drawing/store'; export * from './src/drawing/library'; export * from './src/drawing/transfer'; export * from './src/rewards/write-guard';`, resolveDir: process.cwd() }, bundle: true, write: false, format: 'iife', globalName: 'art', platform: 'browser' });
+ const bundled = await build({ stdin: { contents: `export * from './src/assets/private-drawings'; export * from './src/drawing/store'; export * from './src/drawing/library'; export * from './src/drawing/transfer'; export * from './src/rewards/write-guard';
+   export {saveSketchPng, readSketch} from './src/drawing/sketch';
+   export {creativeAssetChoices} from './src/assets/creative-catalog';
+   export {createStarterProject, validateGeneratedCreationManifest} from './src/creation/projects';
+   export {placeBackdrop} from './src/creation/world-tools';
+   export {CreationStore} from './src/creation/storage';
+   export {placeDrawingMotion} from './src/drawing/motion';
+   export {exportSceneArt, importSceneArt, resolvePrivateArt} from './src/creation/private-art';`, resolveDir: process.cwd() }, bundle: true, write: false, format: 'iife', globalName: 'art', platform: 'browser' });
  const server = http.createServer((req, res) => { res.setHeader('Content-Type', req.url === '/test.js' ? 'text/javascript' : 'text/html'); res.end(req.url === '/test.js' ? bundled.outputFiles[0].text : '<!doctype html><html><body><script src="/test.js"></script></body></html>'); }).listen(0, '127.0.0.1');
  await new Promise(resolve => server.listening ? resolve() : server.once('listening', resolve));
  let browser;
@@ -118,6 +125,61 @@ const { chromium } = require('playwright');
    await rejects(() => art.deleteArtwork(owner, source.id), 'original cannot be erased while a derivative depends on it');
    await art.deleteArtwork(owner, derivative.id); await art.deleteArtwork(owner, source.id);
    check((await art.drawings(owner)).length === 0, 'unused derivative then original can be explicitly erased');
+   // One explicitly kept picture is a backdrop and an animated prop in the
+   // same scene. Later picture/rig revisions and unkept edits stay private.
+   canvas.width = 900; canvas.height = 560;
+   ctx.fillStyle = '#202b39'; ctx.fillRect(49, 49, 3, 3);
+   const sketch = {transparent: true, strokes: [{ink: 0, size: 3, points: [{x: 50, y: 50}]}]};
+   const raster = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+   const originalFile = await art.saveSketchPng(raster, sketch);
+   const kept = await art.saveDrawing(owner, 'My moon rock', originalFile);
+   const childVersion = await art.saveDrawing(owner, 'Cutout', raster, kept.id);
+   await art.updateDrawing(owner, kept.id, {semanticIdentity: 'Rock'});
+   const movement = {stops: [{x: .15, y: .6}, {x: .8, y: .25}], stepMs: 700};
+   const movingRock = {...assembly, sourceId: childVersion.id, sourceSha256: childVersion.sha256, motion: movement};
+   const pin = await art.saveRig(owner, movingRock);
+   const picks = await art.creativeAssetChoices(owner, () => true);
+   const picture = picks.find(choice => choice.drawingId === childVersion.id && !choice.rigId);
+   const version = picks.find(choice => choice.rigId === pin.id);
+   check([picture, version].every(choice => choice.identityId === kept.id && choice.semanticIdentity === 'Rock'),
+     'picture and animation share the stable original identity');
+   const scene = art.createStarterProject('blank', 'My rock adventure');
+   scene.background = 'world-moon-v1';
+   const actor = scene.actors[0];
+   actor.assetId = version.assetId;
+   scene.programs[0].actions = art.placeDrawingMotion(movement, actor, scene, () => crypto.randomUUID());
+   art.placeBackdrop(scene, picture);
+   const scenes = new art.CreationStore(localStorage, () => owner);
+   const entry = scenes.create(owner, scene);
+   scenes.keep(entry.id, owner, entry.headId);
+   const laterMotion = {...movingRock, revision: 2, motion: {stops: [{x: 1, y: 1}], stepMs: 350}};
+   await art.saveRig(owner, laterMotion, pin.id);
+   await art.saveDrawingDraft(owner, {...laterMotion, notes: 'Private unfinished design'});
+   await art.saveDrawing(owner, 'Later image revision', raster, childVersion.id);
+   await art.updateDrawing(owner, childVersion.id, {archived: true});
+   const retained = scenes.load(entry.id, owner);
+   check(retained.project.keptId === entry.headId && retained.scene.background === 'world-moon-v1' &&
+     retained.scene.actors[0].assetId === version.assetId && retained.scene.actors[1].layer === 'backdrop' &&
+     retained.scene.actors[1].assetId === picture.assetId,
+     'kept world, backdrop and animation survive archive and later revisions');
+   check((await art.artUsages(owner, childVersion.id)).some(use => use.targetId === entry.id),
+     'stored world history protects the archived background and animation');
+   await rejects(() => art.validateGeneratedCreationManifest(retained.scene), 'generated manifest rejects local private pins');
+   const portable = await art.exportSceneArt(owner, retained.scene);
+   check(portable.art.drawings.length === 2 && portable.art.rigs.length === 1 && portable.art.rigs[0].id === pin.id &&
+     !portable.art.drafts?.length, 'portable scene includes exact selected art and its ancestry without newer designs or drafts');
+   owner = 'new-explorer';
+   check(!(await art.creativeAssetChoices(owner, () => true)).length, 'another explorer starts with a separate catalog');
+   await rejects(() => art.resolvePrivateArt(owner, picture.assetId), 'foreign background pixels remain private');
+   const copied = await art.importSceneArt(owner, portable);
+   const copiedImages = await art.drawings(owner);
+   const copiedRoot = copiedImages.find(image => !image.sourceId);
+   const copiedArt = await art.resolvePrivateArt(owner, copied.actors[0].assetId);
+   check(copiedRoot.id !== kept.id && copiedRoot.sha256 === await art.drawingHash(await originalFile.arrayBuffer()) &&
+     JSON.stringify(art.readSketch(copiedRoot.bytes)) === JSON.stringify(sketch) &&
+     copied.actors[1].layer === 'backdrop' && copied.actors[1].assetId !== picture.assetId &&
+     JSON.stringify(copiedArt.motion) === JSON.stringify(movement),
+     'explicit import remaps backdrop and animation pins while preserving original bytes, editable marks and movement');
    return report;
   });
   assert.deepEqual(errors, []); assert.deepEqual(posts, []);

@@ -65,8 +65,8 @@ export async function creativeAssetChoices(owner:string, current:()=>boolean, re
       const sha256 = await assemblyHash(rig.assembly);
       check();
       const version = versions.length - index;
-      const detail = index === 0 ? 'Latest saved cutout design' : 'Saved cutout design';
-      choices.push({...picture, rigId:rig.id, rigKind:rig.assembly.kind, detail:detail+' · '+version,
+      const detail = rig.assembly.motion ? 'Saved animation' : index === 0 ? 'Latest saved cutout design' : 'Saved cutout design';
+      choices.push({...picture, rigId:rig.id, rigKind:rig.assembly.motion ? undefined : rig.assembly.kind, detail:detail+' · '+version,
         assetId:privateArtId({kind:'rig',id:rig.id,sha256})});
     }
   }

@@ -1,3 +1,5 @@
+import { ILLUSTRATED_WORLDS } from './illustrated-art';
+
 /** The local, serializable Creation Lab language. It contains data, never source code. */
 export const CREATION_SCHEMA = 'jems.creation.v1' as const;
 export const CREATION_TICK_MS = 10;
@@ -8,7 +10,8 @@ export const CREATION_LIMITS = {
 } as const;
 
 export type CreationOrigin = 'child' | 'starter' | 'assisted';
-export type SceneBackground = 'meadow' | 'night' | 'workshop' | 'sky';
+export type SceneBackground = 'meadow' | 'night' | 'workshop' | 'sky' | typeof ILLUSTRATED_WORLDS[number]['id'];
+export type SceneLayer = 'backdrop' | 'back' | 'middle' | 'front';
 export type ComparisonOperator = 'eq' | 'neq' | 'lt' | 'lte' | 'gt' | 'gte';
 export type SceneCondition =
   | {type: 'variable'; variable: string; operator: ComparisonOperator; value: number}
@@ -34,7 +37,7 @@ export type CreativeRole = typeof CREATIVE_ROLES[number];
 export interface SceneActor {
   creativeRole?: CreativeRole;
   id: string; name: string; assetId: string; x: number; y: number;
-  size?: number; visible?: boolean;
+  size?: number; visible?: boolean; layer?: SceneLayer;
 }
 export interface SceneProgram {
   id: string; actorId: string; trigger: SceneTrigger; actions: CreationBlock[];
@@ -48,6 +51,7 @@ export interface CreationProvenance {
 export interface CreationProject {
   schema: typeof CREATION_SCHEMA;
   id: string; title: string; width: number; height: number; background: SceneBackground;
+  worldLayers?: { middle: boolean; foreground: boolean };
   actors: SceneActor[]; programs: SceneProgram[]; variables: Record<string, number>;
   provenance?: CreationProvenance;
 }
@@ -91,16 +95,20 @@ const operators = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte'];
 
 /** Strictly validates before cloning: unsupported executable/asset payloads are never retained. */
 export function validateCreationProject(input: unknown): CreationProject {
-  const p = record(input, ['schema','id','title','width','height','background','actors','programs','variables','provenance'], 'project');
+  const p = record(input, ['schema','id','title','width','height','background','worldLayers','actors','programs','variables','provenance'], 'project');
   if (p.schema !== CREATION_SCHEMA) fail('Unsupported saved project version.');
   id(p.id, 'project ID'); text(p.title, 80, 'project title');
   number(p.width, 200, 1600, 'stage width', true); number(p.height, 160, 1200, 'stage height', true);
-  if (!['meadow','night','workshop','sky'].includes(p.background as string)) fail('Choose a supported background.');
+  if (!['meadow','night','workshop','sky'].includes(p.background as string) && !ILLUSTRATED_WORLDS.some(world => world.id === p.background)) fail('Choose a supported background.');
+  if (p.worldLayers !== undefined) {
+    const layers = record(p.worldLayers, ['middle','foreground'], 'world layers');
+    if (typeof layers.middle !== 'boolean' || typeof layers.foreground !== 'boolean') fail('Choose visible world layers.');
+  }
   list(p.actors, CREATION_LIMITS.actors, 'characters');
   if (!p.actors.length) fail('Add at least one character.');
   const actorIds = new Set<string>();
   for (const raw of p.actors) {
-    const a = record(raw, ['id','name','assetId','x','y','size','visible','creativeRole'], 'character');
+    const a = record(raw, ['id','name','assetId','x','y','size','visible','layer','creativeRole'], 'character');
     id(a.id, 'character ID');
     if(!isCreationId(a.assetId)&&!parsePrivateArtId(a.assetId))fail('Invalid asset reference.');
     text(a.name, 60, 'character name');
@@ -108,9 +116,12 @@ export function validateCreationProject(input: unknown): CreationProject {
     actorIds.add(a.id);
     number(a.x, 0, p.width, 'character x'); number(a.y, 0, p.height, 'character y');
     if (a.size !== undefined) number(a.size, 16, 240, 'character size');
+    if (a.layer !== undefined && !['backdrop','back','middle','front'].includes(a.layer as string)) fail('Choose a supported scene layer.');
+    if (a.layer === 'backdrop' && parsePrivateArtId(a.assetId)?.kind !== 'image') fail('Choose an original drawing for your backdrop.');
     if (a.creativeRole !== undefined && !CREATIVE_ROLES.includes(a.creativeRole as CreativeRole)) fail('Choose a supported role for this scene.');
     if (a.visible !== undefined && typeof a.visible !== 'boolean') fail('Invalid character visibility.');
   }
+  if (p.actors.filter(raw => (raw as SceneActor).layer === 'backdrop').length > 1) fail('Choose one drawing for your backdrop.');
   if (!p.variables || typeof p.variables !== 'object' || Array.isArray(p.variables)
     || ![Object.prototype, null].includes(Object.getPrototypeOf(p.variables))) fail('Invalid variables.');
   const variables = p.variables as Record<string, unknown>;

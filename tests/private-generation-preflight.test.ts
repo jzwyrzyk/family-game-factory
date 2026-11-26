@@ -87,6 +87,10 @@ test('O4: explicit unsupported true 3D, conflicting requirements, and uninspecte
  const adapter=new OpenAIResponsesAgent(approval,()=>{keyReads++;return 'synthetic-unit-provider-key-not-a-secret';},
   (async()=>{networkCalls++;return fixtureResponse(stickerLaunchFixture);}) as typeof fetch);
  await assert.rejects(adapter.generate(input('Make a true 3D space game where I fly in depth.')),/GAME_FORM_UNSUPPORTED/);
+ await assert.rejects(adapter.generate(input('Turn my drawing into a 3D mesh that I can rotate.')),/GAME_FORM_UNSUPPORTED/);
+ const layered = privateGenerationPreflight(input('Move my drawn rock across a 2D forest with parallax and shadows.'));
+ assert.equal(layered.brief.form.rendering,'2d-canvas');
+ assert.equal(privateGenerationPreflight(input('Tap a flat drawing of a 3D model.')).brief.form.rendering,'2d-canvas');
  await assert.rejects(adapter.generate(input('Make a rocket with no physics, but simulate gravity and momentum.')),/GAME_FORM_REVIEW_REQUIRED/);
  await assert.rejects(adapter.generate(input('Make it faster.',{id:'saved-but-uninspected'})),/GAME_FORM_BASE_UNVERIFIED/);
  assert.equal(keyReads,0);assert.equal(networkCalls,0);

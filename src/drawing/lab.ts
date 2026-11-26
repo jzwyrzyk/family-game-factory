@@ -9,15 +9,16 @@ import {createCarArtwork,drawCarBody,drawCarWheel,type CarArtwork} from './rally
 import {createFixedClock} from '../quality/clock';
 import {iconMarkup} from '../brand/icons';
 import {assertRewardSourceWritable,rewardSourceWritable} from '../rewards/write-guard';
+import { createMotionEditor } from './motion-editor';
 import './style.css';
 const roles:Role[]=['body','wheel','wing','limb','propeller','decoration','platform','obstacle','collectible'];
-const kindNames:Record<DrawingKind,string>={car:'Car or vehicle',character:'Character or creature',machine:'Invention or machine',scene:'World or level'};
 const clamp=(n:number,lo:number,hi:number)=>Math.max(lo,Math.min(hi,n));
 const q=<T extends HTMLElement>(root:HTMLElement,selector:string)=>root.querySelector(selector)! as T;
 const button=(label:string,action:()=>void)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',action);return b;};
 
 export interface DrawingLabOptions {
  rigId?:string;
+ animate?:boolean;
  isCurrent?:()=>boolean;
  onSaved?:(rig:SavedRig)=>void|Promise<void>;
 }
@@ -47,8 +48,8 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
  working.innerHTML=`<div class="dl-shell"><header class="dl-header"><div><span class="dl-kicker">ART STUDIO · BRING IT TO LIFE</span><h2>Make my drawing move!</h2><p>The original stays safe. You decide what each part does.</p></div><button type="button" data-close aria-label="Close drawing designer">${iconMarkup('close')} Close</button></header>
   <div class="dl-steps" aria-label="Making steps"><span><b>1</b> Choose pieces</span><span><b>2</b> Try movement</span><span><b>3</b> Save & reuse</span><span data-draft-status role="status"></span></div>
   <div class="dl-main"><section class="dl-stage"><canvas class="dl-canvas" tabindex="0" aria-label="Drawing editor. Tap a highlighted part, drag to move it, or drag its corner to resize."></canvas>
-  <div class="dl-stage-actions"><button type="button" data-mode="edit" aria-pressed="true">${iconMarkup('edit')} Edit pieces</button><button type="button" data-mode="play">${iconMarkup('play')} Try it!</button><button type="button" data-cutouts>${iconMarkup('grid')} Check cutouts</button><button type="button" data-retry hidden>${iconMarkup('retry')} Try again</button><button type="button" data-go hidden>Hold to move →</button><button type="button" data-jump hidden>Hold to jump ↑</button></div><p class="dl-canvas-help">Drag a piece or its corner. With a keyboard: arrows move, Shift + arrows resize.</p><div data-cutout-preview class="dl-cutout-preview" aria-label="Separated drawing pieces" hidden></div></section>
-  <aside class="dl-tools"><label>What did you draw?<select data-kind><option value="car">Car or vehicle</option><option value="character">Character or creature</option><option value="machine">Invention or machine</option><option value="scene">World or level</option></select></label>
+  <div class="dl-stage-actions"><button type="button" data-mode="edit" aria-pressed="true">${iconMarkup('edit')} Edit pieces</button><button type="button" data-mode="play">${iconMarkup('play')} Try it!</button><button type="button" data-animation>Draw a path</button><button type="button" data-cutouts>${iconMarkup('grid')} Check cutouts</button><button type="button" data-retry hidden>${iconMarkup('retry')} Try again</button><button type="button" data-go hidden>Hold to move →</button><button type="button" data-jump hidden>Hold to jump ↑</button></div><p class="dl-canvas-help">Drag a piece or its corner. With a keyboard: arrows move, Shift + arrows resize.</p><div data-cutout-preview class="dl-cutout-preview" aria-label="Separated drawing pieces" hidden></div></section>
+  <aside class="dl-tools"><label>What did you draw?<select data-kind><option value="picture">Whole picture</option><option value="car">Car or vehicle</option><option value="character">Character or creature</option><option value="machine">Invention or machine</option><option value="scene">World or level</option></select></label>
   <p data-explanation class="dl-note" aria-live="polite"></p><div data-piece-list class="dl-piece-list" role="group" aria-label="Pieces in this drawing"></div>
   <div class="dl-edit-tools"><div class="dl-edit-row"><button type="button" data-add>${iconMarkup('add')} Add a piece</button><button type="button" data-delete>${iconMarkup('trash')} Remove</button></div>
   <label>What is this part?<input data-piece-name maxlength="50" placeholder="Name this part"></label>
@@ -69,12 +70,12 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
  shapeInput=q<HTMLSelectElement>(working,'[data-shape]'),parentInput=q<HTMLSelectElement>(working,'[data-parent]');
  const historyInput=q<HTMLSelectElement>(working,'[data-history]');
  for(const role of roles){const o=document.createElement('option');o.value=role;o.textContent=role.charAt(0).toUpperCase()+role.slice(1);roleInput.append(o);}
- const initialKind:DrawingKind=source.category==='character'?'character':source.category==='world'?'scene':source.category==='prop'?'machine':'car';
+ const initialKind:DrawingKind=options.animate?'picture':source.category==='character'?'character':source.category==='world'?'scene':source.category==='prop'?'machine':'car';
  let kind:DrawingKind=initialKind,assembly!:DrawingAssembly,selected='',mode:'edit'|'play'='edit',disposed=false,leaving=false;
  const onProfile=()=>{if(!stillOwner()){ownerCurrent=false;working.close();}};
  const onPage=(event:Event)=>{
   if(currentPage()&&(!originPage||(event as CustomEvent).detail===originPage))return;
-  leaving=true;stopPlay();
+  leaving=true;stopPlay();motionEditor.stop();
   // Finish only edits already made by this owner. A route change cannot create
   // a new version or let a delayed load reopen this editor over another page.
   void flushDraft().then(()=>{if(!disposed)working.close();}).catch(error=>{
@@ -101,6 +102,31 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
  const alive=()=>!disposed&&ownerCurrent&&!leaving&&stillOwner()&&currentPage();
  const draftAlive=()=>!disposed&&ownerCurrent&&stillOwner()&&(currentPage()||leaving);
  const canEdit=()=>{if(!alive())return false;if(saving){message('Finishing your save…');return false;}if(!rewardSourceWritable()){message('Saving is paused. Return to the active Jems tab to continue.');return false;}return true;};
+ const motionEditor=createMotionEditor(sourceCanvas,source.name,{
+  read:()=>assembly?.motion,canEdit,
+  change:motion=>{
+   const before=structuredClone(assembly);
+   if(motion)assembly.motion=motion;else delete assembly.motion;
+   remember(before);refresh();
+  },
+  save:()=>q<HTMLButtonElement>(working,'[data-save]').click(),
+  close:()=>showAnimation(false),
+ });
+ const main=q<HTMLElement>(working,'.dl-main');
+ main.after(motionEditor.panel);
+ function showAnimation(open:boolean){
+  stopPlay();mode='edit';working.classList.toggle('is-path-editor',open);main.hidden=open;motionEditor.panel.hidden=!open;
+  q<HTMLElement>(working,'.dl-steps').hidden=open;
+  q<HTMLElement>(working,'.dl-header h2').textContent=open?'Animate my picture':'Make my drawing move!';
+  q<HTMLElement>(working,'.dl-header p').hidden=open;
+  q<HTMLElement>(working,'.dl-kicker').hidden=open;
+  q<HTMLElement>(working,'.dl-footer span:last-child').hidden=open;
+  if(!open)motionEditor.stop();
+  refresh();
+  const target=open?motionEditor.panel.querySelector<HTMLButtonElement>('button'):q<HTMLButtonElement>(working,'[data-animation]');
+  target?.focus({preventScroll:true});
+ }
+ q<HTMLButtonElement>(working,'[data-animation]').onclick=()=>showAnimation(true);
  const draftStatus=q<HTMLElement>(working,'[data-draft-status]');
  function queueDraft(){
   dirty=true;const sequence=++draftSequence,copy=validateAssembly(assembly),parent=history?.id??null;
@@ -130,8 +156,10 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
  }
  function proposals(next:DrawingKind){
   const before=assembly?structuredClone(assembly):null;
-  const p=suggestParts(originalForeground(),next);
-  assembly={schemaVersion:1,sourceId:source.id,sourceSha256:source.sha256,kind:next,pieces:p.pieces,notes:before?.notes??'',revision:before?.revision??1};
+  const wholePicture:DrawingPiece={id:'picture',name:'My picture',role:'decoration',physical:false,parentId:null,
+   region:{x:0,y:0,w:1,h:1,shape:'rect'}};
+  const p=next==='picture'?{pieces:[wholePicture],explanation:'Draw a path for your whole picture.'}:suggestParts(originalForeground(),next);
+  assembly={schemaVersion:1,sourceId:source.id,sourceSha256:source.sha256,kind:next,pieces:p.pieces,notes:before?.notes??'',revision:before?.revision??1,...(before?.motion?{motion:before.motion}:{})};
   kind=next;
   notice.textContent=p.explanation+' You can change any piece.';
   selected=assembly.pieces[0].id;pendingNew=false;pendingPivot=false;brushMode=null;layerCache.clear();lastStored=null;
@@ -151,6 +179,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
  }
  function getSelected(){return assembly.pieces.find(p=>p.id===selected);}
  function updatePanel(){
+  q<HTMLButtonElement>(working,'[data-close]').disabled=saving;
   const locked=saving||!rewardSourceWritable();
   partsPanel.replaceChildren();
   for(const p of assembly.pieces){
@@ -169,7 +198,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
   q<HTMLButtonElement>(working,'[data-redo]').disabled=!redo.length||mode==='play'||locked;
   q<HTMLButtonElement>(working,'[data-add]').disabled=assembly.pieces.length>=24||mode==='play'||locked;
   q<HTMLButtonElement>(working,'[data-save]').disabled=locked||!!drag||(!dirty&&!!lastStored);
-  q<HTMLButtonElement>(working,'[data-use]').disabled=locked||!lastStored||kind!=='car'||!onPlayCar;
+  q<HTMLButtonElement>(working,'[data-use]').disabled=locked||!!lastStored?.assembly.motion||!lastStored||kind!=='car'||!onPlayCar;
   q<HTMLButtonElement>(working,'[data-use]').hidden=!onPlayCar;
   q<HTMLSelectElement>(working,'[data-kind]').disabled=locked;
   historyInput.disabled=locked;
@@ -289,7 +318,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
   }
   if(!carScene&&!otherScene){ctx.fillStyle='#243b48';ctx.fillText('Preparing your moving drawing…',20,30);}
  }
- function refresh(){if(disposed)return;updatePanel();mode==='edit'?drawEdit():drawPlay();renderCutoutPreview();}
+ function refresh(){if(disposed)return;updatePanel();if(!motionEditor.panel.hidden){motionEditor.refresh(saving||!rewardSourceWritable(),!!lastStored&&!dirty);return;}mode==='edit'?drawEdit():drawPlay();renderCutoutPreview();}
  function stopPlay(){
   clockHolder.clock?.dispose();clockHolder.clock=undefined;car?.dispose();other?.dispose();
   car=null;other=null;carArtwork=null;carScene=null;otherScene=null;go=false;jump=false;
@@ -408,7 +437,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
  working.addEventListener('click',event=>{const target=event.target as HTMLElement;if(target.closest('button')&&!target.closest('[data-close]')&&!canEdit()){event.preventDefault();event.stopImmediatePropagation();}},true);
  working.addEventListener('change',event=>{if(!canEdit()){event.preventDefault();event.stopImmediatePropagation();refresh();}},true);
  working.addEventListener('close',()=>{
-  disposed=true;stopPlay();window.removeEventListener('factory-profile',onProfile);window.removeEventListener('factory-page',onPage);imageRect={x:0,y:0,w:1,h:1};working.remove();
+  disposed=true;stopPlay();motionEditor.stop();window.removeEventListener('factory-profile',onProfile);window.removeEventListener('factory-page',onPage);imageRect={x:0,y:0,w:1,h:1};working.remove();
   if(stillOwner()&&currentPage()&&!leaving&&returnFocus?.isConnected)returnFocus.focus({preventScroll:true});
  });
  q<HTMLSelectElement>(working,'[data-kind]').addEventListener('change',e=>{
@@ -479,7 +508,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
   renderCutoutPreview();
  });
  q<HTMLButtonElement>(working,'[data-mode="edit"]').addEventListener('click',()=>setMode('edit'));
- q<HTMLButtonElement>(working,'[data-mode="play"]').addEventListener('click',()=>setMode('play'));
+ q<HTMLButtonElement>(working,'[data-mode="play"]').addEventListener('click',()=>assembly.kind==='picture'?showAnimation(true):setMode('play'));
  q<HTMLButtonElement>(working,'[data-retry]').addEventListener('click',()=>setMode('play'));
  const goButton=q<HTMLButtonElement>(working,'[data-go]'),jumpButton=q<HTMLButtonElement>(working,'[data-jump]');
  for(const [b,key] of [[goButton,'go'],[jumpButton,'jump']] as const){
@@ -496,7 +525,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
  working.addEventListener('keydown',e=>{
   const target=e.target as HTMLElement;
   if(mode==='edit'&&(e.ctrlKey||e.metaKey)&&e.code==='KeyZ'&&!target.closest('input,textarea')){e.preventDefault();restoreUndo(e.shiftKey?'redo':'undo');return;}
-  if(target.closest('input,select,textarea,button'))return;
+  if(!motionEditor.panel.hidden||target.closest('input,select,textarea,button'))return;
   if(!canEdit())return;
   if(mode==='edit'&&e.code==='Enter'&&pendingNew){
    e.preventDefault();const before=structuredClone(assembly),id='piece_'+crypto.randomUUID().slice(0,8);
@@ -519,7 +548,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
  },{signal:abort.signal});
  window.addEventListener('blur',()=>{go=jump=false;},{signal:abort.signal});
  document.addEventListener('visibilitychange',()=>{if(document.hidden)go=jump=false;},{signal:abort.signal});
- const observer=new ResizeObserver(()=>{if(!disposed&&assembly){mode==='edit'?drawEdit():drawPlay();}});
+ const observer=new ResizeObserver(()=>{if(!disposed&&assembly&&!main.hidden){mode==='edit'?drawEdit():drawPlay();}});
  observer.observe(canvas);working.addEventListener('close',()=>observer.disconnect(),{once:true});
  let historyLoad=0;
  const versions=async()=>{
@@ -544,7 +573,8 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
   if(!canEdit())return;saving=true;updatePanel();
   try{
    await flushDraft();if(!alive())return;assertRewardSourceWritable();
-   validateAssembly(assembly);assemblyRig(assembly,sourceAspect);if(kind==='car')vehicleGeometry(assembly,sourceAspect);
+   validateAssembly(assembly);
+   if(!assembly.motion){assemblyRig(assembly,sourceAspect);if(kind==='car')vehicleGeometry(assembly,sourceAspect);}
    const before=lastStored;
    if(assembly.revision>=10000)throw Error('This drawing has reached its version limit. Export it before starting a new drawing.');
    const copy={...assembly,revision:history?Math.max(assembly.revision,history.assembly.revision)+1:assembly.revision};
@@ -565,20 +595,21 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
   }catch(e){message((e as Error).message);}finally{saving=false;if(alive())refresh();}
  });
  try{
-  proposals(kind);
   const all=await versions(),draft=options.rigId?null:await loadDrawingDraft(owner,source.id);
-  const saved=options.rigId?await rigById(owner,options.rigId):all[0];
+  const saved=options.rigId?await rigById(owner,options.rigId):options.animate?undefined:all[0];
   if(!alive())throw Error('The active player changed.');
   if(saved&&(saved.assembly.sourceId!==source.id||saved.assembly.sourceSha256!==source.sha256))throw Error('This version belongs to a different drawing.');
   if(draft){
    assembly=validateAssembly(draft.assembly);history=draft.parentId?all.find(entry=>entry.id===draft.parentId)??null:null;
    notice.textContent='Your saved pieces are here. Choose what to change, then try the movement.';
    dirty=true;draftStatus.textContent='Recovered draft';message('Your draft is back. Continue editing, or save a version to reuse.');
-  }else if(saved){assembly=saved.assembly;history=saved;lastStored=saved;draftStatus.textContent='Version '+saved.assembly.revision;notice.textContent='Your saved pieces are here. Change anything to make a new version.';}
+  }else if(saved){assembly=saved.assembly;history=saved;lastStored=saved;draftStatus.textContent='Version '+saved.assembly.revision;notice.textContent='Your saved pieces are here. Change anything to make a new version.';}else proposals(kind);
   kind=assembly.kind;selected=assembly.pieces[0].id;q<HTMLSelectElement>(working,'[data-kind]').value=kind;
   historyInput.value=lastStored?.id??'';layerCache.clear();refresh();
-  working.showModal();canvas.focus({preventScroll:true});return working;
+  working.showModal();
+  if(options.animate||assembly.motion)showAnimation(true);else canvas.focus({preventScroll:true});
+  return working;
  }catch(error){
-  disposed=true;stopPlay();abort.abort();observer.disconnect();window.removeEventListener('factory-profile',onProfile);window.removeEventListener('factory-page',onPage);working.remove();throw error;
+  disposed=true;stopPlay();motionEditor.stop();abort.abort();observer.disconnect();window.removeEventListener('factory-profile',onProfile);window.removeEventListener('factory-page',onPage);working.remove();throw error;
  }
 }
