@@ -645,10 +645,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:46:41.685Z",
-      "sourceDigest": "5db27b832aa54145a98fa7e2f3287b4219c86660b4b6944ba1a1aecbf926e1a0",
+      "reviewedAt": "2026-11-26T01:47:03.820Z",
+      "sourceDigest": "937d42c456c7e0d6e76e8ba0a5c14c5c72caa1a61b63eaa53b1e3726019b18c0",
       "reviewOutcome": "updated",
-      "reviewReason": "Math focuses and reveals the question heading before input while the new integration contract describes session-only working tools.",
+      "reviewReason": "Math preserves the active response and centers it on explicit return from hints. The integration contract documents the shared question and working tools.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",

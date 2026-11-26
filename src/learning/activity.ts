@@ -124,7 +124,7 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   function returnToAnswer() {
     const area=answerArea.hidden?interactionArea:answerArea;
     const control=area.querySelector<HTMLElement>('input:not([hidden]),button:not(:disabled)');
-    if(control)focusAndReveal(control);else focusQuestion();
+    if(control)focusAndReveal(control,'center');else focusQuestion();
   }
   function presentHelp(heading:string,text:string) {
     stopReading();hintPanel.hidden=false;hintTitle.textContent=heading;hintText.textContent=text;
