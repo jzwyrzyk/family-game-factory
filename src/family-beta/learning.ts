@@ -1,5 +1,8 @@
 import {mountMathActivity} from '../learning/activity';
 import {mountLanguageActivity} from '../language/activity';
+import '../brand/icons.css';
+import '../learning/early/style.css';
+import '../speech/read-aloud.css';
 import '../learning/activity.css';
 import '../language/activity.css';
 export function open(root:HTMLElement,home:()=>void){
