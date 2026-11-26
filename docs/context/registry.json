@@ -423,10 +423,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "7e8051ee5c569f1c475241fd1f7c1455f6c0f4e7333cf4c72fe2bd6c3672ebff",
-      "reviewedAt": "2026-11-26T03:25:09.736Z",
+      "sourceDigest": "cd9653f54e491ad2f89304c996ddfbfb90db107ee393272b3357181681dfa736",
+      "reviewedAt": "2026-11-26T03:29:09.502Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The four versioned worlds, scene layers, gallery preview, original-image backdrop slot and portability now run in the existing stage and preserve the converged path editor. Feature and architecture contracts include actual browser evidence.",
+      "reviewReason": "The reduced-motion portrait toolbar preserves the fixed scene and visible Step control at 768x1024. The rendered evidence index includes the corrected layout and build digests.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
