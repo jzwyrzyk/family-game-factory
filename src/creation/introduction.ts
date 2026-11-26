@@ -1,6 +1,6 @@
 import {SceneEngine} from './engine';
 import {CreationStage} from './stage';
-import {createStarterProject} from './projects';
+import {createIllustratedStarter} from './projects';
 import type {CreationBlock} from './model';
 import type {GuideHost} from '../studio/guide-card';
 import {iconMarkup} from '../brand/icons';
@@ -10,7 +10,7 @@ export function createStudioIntroduction(guidance:GuideHost|undefined,leave:()=>
  const element=document.createElement('section');element.id='creationIntroduction';element.className='creation-introduction';element.hidden=true;
  element.innerHTML=`<div class="creation-intro-heading"><div><h2 tabindex="-1">Can you reach the gem?</h2><p>Choose arrows. Press Play. See what happens.</p></div><button id="creationIntroSkip" class="creation-button">Skip for now</button></div><div class="creation-intro-workspace"><canvas width="800" height="450" aria-label="A dragon to the left of a gem"></canvas><div><div class="creation-intro-arrows" role="group" aria-label="Add a movement">${[['left','←'],['right','→'],['up','↑'],['down','↓']].map(([direction,arrow])=>`<button class="creation-button" data-intro-move="${direction}" aria-label="Move ${direction}">${arrow}</button>`).join('')}</div><ol id="creationIntroSequence" aria-label="Your instructions"></ol><div class="creation-intro-actions"><button id="creationIntroPlay" class="creation-button creation-primary">${iconMarkup('play')} Play</button><button id="creationIntroUndo" class="creation-button">${iconMarkup('undo')} Undo</button></div><p id="creationIntroResult" role="status"></p><button id="creationIntroDone" class="creation-button">Explore Creative Studio ${iconMarkup('arrow')}</button></div></div>`;
  const canvas=element.querySelector('canvas')!,stage=new CreationStage(canvas);
- const project=createStarterProject('blank','My first instructions');
+ const project=createIllustratedStarter('dragon');
  project.actors=[{id:'explorer',name:'Dragon',assetId:'dragon',x:200,y:225,size:110},{id:'goal',name:'Gem',assetId:'gem',x:500,y:225,size:65}];
  project.programs=[{id:'first-steps',actorId:'explorer',trigger:{type:'start'},actions:[]}];
  let engine=new SceneEngine(project),frame=0,prior=0,running=false,epoch=0;

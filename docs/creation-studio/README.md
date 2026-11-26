@@ -1,5 +1,16 @@
 # Creation Studio: make scenes and rebuild behavior
 
+## Illustrated worlds and personal backdrops
+
+**Make a scene** opens four illustrated world tiles. Enchanted Gem Forest, Inventor’s Workshop, Cloud Kingdom and Moon Adventure each have three registered image layers. Their small previews show the composition. Entering a tile creates an editable scene with a selectable object from that world. The existing character starters, Pal playgrounds and new rebuild exercises use these worlds too. The four classic background IDs keep their original renderer when an older project is opened.
+
+In **Scene settings**, choose a world, add one of its objects, or turn the middle and front scenery on or off. Drag an object onto the stage or enter its starting position under **More tools**. **Picture layer** places it behind the scenery, with the characters or at the front. Tap selection follows the visible actors’ paint order. Coordinates, block execution, learning checks and explicit mechanics continue through the scene interpreter.
+
+**Use my drawing as the backdrop** opens the profile’s My Art picker. The selected original is centered, scaled proportionally to fit the stage and kept as a pinned scene actor with the backdrop display layer. A new selection replaces that placement in the current draft. Keep, Undo, saved versions, portable scene-with-art bundles and retained-reference checks include the original art ID and byte fingerprint. Use **More → Make a copy** to carry a customized world, art and placements into another scene. Existing games, saved scenes and other placements continue to resolve their selected revisions. The middle and front scenery are switched off on initial placement. The child can turn them back on or use **Show my backdrop** in Scene settings. Personal backdrops never enter bundled world manifests.
+
+The stage draws a world background, personal backdrop, back actors, middle scenery, ordinary actors, front scenery, then front actors. Speech and counters remain readable on top. The same stage paints saved-card previews, edit, playback, expanded view and the captured video. The gallery decodes visible cards serially and retains small canvases. A selected picture that cannot be prepared blocks Play and recording and produces a recoverable message. Custom stage ratios use a shared centered crop across the bundled layers. The stage has a fixed camera and preserves its hit-coordinate mapping through layout changes. [Art provenance and versioned catalogue](WORLD_ART.md) · [Creative Asset and World Standard](../creative-universe/STANDARD.md)
+
+
 [Draw a path](DRAWN_PATHS.md) with a saved picture or cutout. Named paths become editable Move blocks, and keeping a scene makes its paths available to other scenes under the same profile.
 
 

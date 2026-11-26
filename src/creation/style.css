@@ -282,6 +282,13 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
 @media (orientation:portrait) {
   .creation-workspace-grid { grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,35fr) minmax(0,65fr); }
 }
+/* Preserve the full stage when the reduced-motion Step control shares a
+   portrait toolbar with playback status. Long status text can wrap in place. */
+@media (orientation:portrait) and (min-width:761px) and (max-width:900px) {
+  .creation-playbar { gap:6px; padding-inline:8px; }
+  .creation-playbar .creation-button { padding-inline:10px; }
+  #creationRunStatus { flex:1 1 8ch; min-width:0; }
+}
 @media (max-width:700px), (max-height:600px) {
   #creationCharacterTools { display:block; flex:none; align-self:flex-start; margin:6px 10px; color:#583093; }
   #creationCharacterTools[aria-expanded=false] + #creationCharacterPanel { display:none; }

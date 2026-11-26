@@ -88,6 +88,7 @@
     "docs/creative-universe/STANDARD.md",
     "docs/decisions/2026-11-26-connected-creative-universe.md",
     "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md",
+    "docs/creation-studio/evidence/worlds/README.md",
     "docs/creation-studio/world-art-manifest.json",
     "docs/creation-studio/CREATIVE_ASSET_AND_WORLD_STANDARD.md"
   ],
@@ -406,6 +407,7 @@
         "PRODUCT-DOCTRINE.md",
         "ARCHITECTURE-CURRENT.md",
         "docs/creation-studio/*.md",
+        "docs/creation-studio/evidence/worlds/README.md",
         "docs/decisions/0007-creation-and-rebuild-practice.md",
         "docs/rewards/*.md",
         "docs/pals/*.md",
@@ -421,10 +423,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "556b0bccfe3630c9850068e0ad3c3c60a3d59e2e635872b445426789fc055561",
-      "reviewedAt": "2026-11-26T03:15:06.595Z",
+      "sourceDigest": "cd9653f54e491ad2f89304c996ddfbfb90db107ee393272b3357181681dfa736",
+      "reviewedAt": "2026-11-26T03:29:09.502Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The scene catalogue and manifest record immutable WebP identities, scale, alpha, intended uses and matching worlds for the host renderer.",
+      "reviewReason": "The reduced-motion portrait toolbar preserves the fixed scene and visible Step control at 768x1024. The rendered evidence index includes the corrected layout and build digests.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -903,10 +905,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:16:21.879Z",
-      "sourceDigest": "dedced7ca1216427fb9dcd7dab0dfe66155e6e247badac489bfa291d715f1f82",
+      "reviewedAt": "2026-11-26T03:25:10.586Z",
+      "sourceDigest": "241c6b1eb2baa3547f7028a0500c8f2acda2d56c562f009b01521b2c69acd456",
       "reviewOutcome": "updated",
-      "reviewReason": "The real PNG fixtures exercise legal transparency, palette bounds, compressed raster lengths, metadata rejection and exact bytes through the reviewed family importer.",
+      "reviewReason": "World pixel, classic scene, hit, reuse and offline browser checks are included in the creative shard alongside crayon and drawn-path journeys. The evidence index records their rendered scope.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1147,10 +1149,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:15:06.970Z",
-      "sourceDigest": "afc3429a3eff1716069b1f4e978036c86f244c2ed5ae56a4b6ed2b7cde46f0a6",
+      "reviewedAt": "2026-11-26T03:25:11.203Z",
+      "sourceDigest": "084881c1e96ebf0eccc4063931979ed4ccd431030b4dc9a2372872c4bae67fd3",
       "reviewOutcome": "updated",
-      "reviewReason": "The delivery record distinguishes these candidate crayon, path and catalogue capabilities from deployed activity rendering and owner artwork acceptance.",
+      "reviewReason": "The dated source record identifies the convergence base, rendered features and local qualification separately from hosted release and family activation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1405,10 +1407,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:15:07.223Z",
-      "sourceDigest": "9949b49fee52f9382ac0c405465d30627ee3e2c0719b222034b4032eaf85978a",
+      "reviewedAt": "2026-11-26T03:25:29.001Z",
+      "sourceDigest": "968fcd23e7be49e88481858bf405ee29ba1dc02e2c99777f4ae8d0dd59c729d8",
       "reviewOutcome": "updated",
-      "reviewReason": "The registry retains the shared creative standard, compatibility link and both incoming source routes for editable crayons and world artwork.",
+      "reviewReason": "The registry now requires the linked rendered world evidence index and includes it in the Creative Studio review area.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1679,10 +1681,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "ada2accbff6a1c4c26061297e83a2ab48bdb799664d38749f63d7cf76e56d403",
-      "reviewedAt": "2026-11-26T01:23:10.842Z",
+      "sourceDigest": "be0b8202af9ac9121efae99be7597909475312e434dcc8ab5ce51bec1288a7aa",
+      "reviewedAt": "2026-11-26T03:25:12.140Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The reload regression verifies the retained owner, active Navi and timestamp before and after the visible maker welcome. Starter rules, menu behavior and approved artwork are unchanged.",
+      "reviewReason": "Only the initial bundled stage background changes for newly created Pal playgrounds. The owned catalogue, exact form artwork, previous scenes, rewards and progression rules use their existing contracts.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",

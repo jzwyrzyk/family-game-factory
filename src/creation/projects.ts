@@ -1,6 +1,7 @@
 /** Trusted assets and explicit adapters into the editable scene model.
  * A scene is a new creation pinned to its source. This does not translate game JavaScript.
  */
+import { ILLUSTRATED_WORLDS, WORLD_PROPS } from './illustrated-art';
 import historicalArt from '../pals/historical-scene-art.json';
 import { defaults, validateConfig } from '../runtime/manifests';
 import type { Mechanics } from '../runtime/types';
@@ -64,8 +65,10 @@ const historicalAssets: readonly CreationAsset[] = [
     url: './' + asset.url, palForm: asset.form as PalForm })),
 ];
 
+const illustratedProps = new Map<string, CreationAsset>(WORLD_PROPS.map(prop => [prop.id, { ...prop, kind: 'image' }]));
+
 export function creationAsset(id: string): CreationAsset | undefined {
-  return CREATION_ASSETS.find(asset=>asset.id===id) ?? historicalAssets.find(asset=>asset.id===id);
+  return CREATION_ASSETS.find(asset=>asset.id===id) ?? historicalAssets.find(asset=>asset.id===id) ?? illustratedProps.get(id);
 }
 
 /** Opaque local references are data, never paths or fetchable URLs. The browser
@@ -148,6 +151,20 @@ function starter(kind:CreationStarter,title:string,config?:Mechanics):CreationPr
 export function createStarterProject(kind:CreationStarter,title=titleFor[kind]):CreationProject {
   if(!Object.hasOwn(titleFor,kind))throw Error('Choose an available scene starter.');
   return starter(kind,title);
+}
+
+export function createIllustratedStarter(kind: CreationStarter, worldId?: string): CreationProject {
+  const defaults = { dragon: 'world-forest-v1', buckets: 'world-cloud-v1', robot: 'world-workshop-v1', blank: 'world-moon-v1' };
+  const world = ILLUSTRATED_WORLDS.find(item => item.id === (worldId ?? defaults[kind]));
+  if (!world) throw Error('Choose an available illustrated world.');
+  const project = starter(kind, worldId ? world.label : titleFor[kind]);
+  project.background = world.id;
+  if (worldId) {
+    const prop = creationAsset(world.props[0]);
+    if (!prop) throw Error('This world is missing its starter object.');
+    Object.assign(project.actors[0], { assetId: prop.id, name: prop.label });
+  }
+  return project;
 }
 
 export class CreationSourceUnavailableError extends Error {

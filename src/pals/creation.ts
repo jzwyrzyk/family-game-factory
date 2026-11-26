@@ -31,7 +31,7 @@ function palParts(id: CreationPalId, width: number, height: number, form: PalFor
 export function createPalPlayground(id: CreationPalId, form: PalForm = 'base'): CreationProject {
   const { actor, program } = palParts(id, 800, 450, form);
   return validateEditableProject({ schema: 'jems.creation.v1', id: uid(), title: `${actor.name}'s playground`,
-    width: 800, height: 450, background: 'meadow', actors: [actor], variables: {},
+    width: 800, height: 450, background: 'world-forest-v1', actors: [actor], variables: {},
     provenance: { createdBy: 'starter' }, programs: [
       { id: uid(), actorId: actor.id, trigger: { type: 'start' }, actions: [
         { id: uid(), origin: 'starter', type: 'say', text: 'Tap me. I have a very important wobble.', durationMs: 1800 },

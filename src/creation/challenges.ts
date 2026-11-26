@@ -123,7 +123,7 @@ function baseProject(id:CreationChallengeId, target:boolean):CreationProject {
   const robot=id==='turn-the-corner'||id==='robot-route'||id==='robot-taps';
   return {
     schema:'jems.creation.v1', id:`challenge-${id}-${target?'target':'work'}`,
-    title:challenge.title,width:800,height:450,background:robot?'workshop':'meadow',
+    title:challenge.title,width:800,height:450,background:robot?'world-workshop-v1':'world-forest-v1',
     actors:[
       {id:robot?'robot':'dragon',name:robot?'Robot':'Dragon',assetId:robot?'robot':'dragon',x:150,y:320,size:82,visible:true},
       {id:'bucket',name:'Blue bucket',assetId:'bucket-blue',x:600,y:320,size:84,visible:true},
