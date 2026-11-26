@@ -418,10 +418,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "c3079a69897a566d9223d4775e7b1dfa2a021024a127e44a048f165e1778d98e",
-      "reviewedAt": "2026-11-26T03:21:23.398Z",
+      "sourceDigest": "580d11d3319ffa5f34f1fa358494d25d520b72d73e3e1a839d377dc70cdb9aea",
+      "reviewedAt": "2026-11-26T03:56:04.471Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented world rendering, asset selection and scene ownership in the Creative Studio and architecture records with pinned references, failed loads and retained histories.",
+      "reviewReason": "Recorded the graphical Jump control spacing requirement and refreshed the actual phone, tablet and desktop inspection evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -900,10 +900,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:21:23.553Z",
-      "sourceDigest": "ac1bf024047c463b787e9182b5284049a7d1e31167345abd31a5ebea92844171",
-      "reviewOutcome": "updated",
-      "reviewReason": "The delivery entry identifies local drawing, scene and synthetic game evidence along with physical-device, provider and hosted qualification limits.",
+      "reviewedAt": "2026-11-26T03:56:04.601Z",
+      "sourceDigest": "8593cb5b622ee560468d825caa6d1d0ce05250af72a3413f2cd2d42366f8c065",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The existing learner layout suite adds one geometry assertion for Jump. Its existing viewport, execution and release coverage remain applicable.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
