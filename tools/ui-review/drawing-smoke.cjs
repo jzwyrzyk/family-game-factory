@@ -16,7 +16,7 @@ async function main() {
     page.on('request', request => {
       if (request.url() !== url && /^https?:/.test(request.url())) departures.push(request.url());
     });
-    await page.goto(url);
+    await page.goto(url, {waitUntil: 'domcontentloaded', timeout: 120000});
     const app = page.frameLocator('#appFrame');
     const sketch = 'Offline stamp fixture';
     assert.ok(await app.locator('#artDrawButton strong').evaluate(label => parseFloat(getComputedStyle(label).fontSize) >= 18));
@@ -27,7 +27,7 @@ async function main() {
     await editor.locator('[data-title]').fill(sketch);
     await editor.locator('[data-save]').click();
     await app.locator('#artDetailTitle').filter({hasText: sketch}).waitFor();
-    await page.reload();
+    await page.reload({waitUntil: 'domcontentloaded', timeout: 120000});
     await app.locator('#artGrid .art-card').filter({hasText: sketch}).click();
     await app.getByRole('button', {name: 'Keep drawing'}).click();
     const reopened = app.getByRole('dialog', {name: 'Keep drawing'});

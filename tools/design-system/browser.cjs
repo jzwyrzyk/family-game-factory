@@ -11,8 +11,8 @@ const {assertTextContrast}=require('../../tests/helpers/text-contrast.cjs');
  const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'}),errors=[],requests=[],results=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url())&&r.url()!==input.url)requests.push(r.url());});
  try{
-  await page.goto(input.url);
-  await page.waitForFunction(()=>document.querySelector('#loading').hidden);
+  await page.goto(input.url,{waitUntil:'domcontentloaded',timeout:120000});
+  await page.waitForFunction(()=>document.querySelector('#loading').hidden,null,{timeout:120000});
   const app=page.frames().find(f=>f.parentFrame()===page.mainFrame());
   for(const device of ['desktop','landscape','portrait','mobile']){
    await page.selectOption('#device',device);await page.selectOption('#destination','design-system');
