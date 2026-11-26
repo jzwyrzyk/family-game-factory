@@ -7,7 +7,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT/'.github/workflows/sandbox-publish.yml'
-PUBLIC_SOURCE = '68b92cd7cfcc3b77c7dd5724920573192b31cfd3'
+PUBLIC_SOURCE = 'f0c17d0bb2fed410e83d275674fad395ca3b714a'
 
 class ManualSandboxPublisherTests(unittest.TestCase):
     def source(self):
