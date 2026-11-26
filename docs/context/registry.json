@@ -897,10 +897,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:28:44.076Z",
-      "sourceDigest": "e91783b6abf2d59e1fc0f77b7a9d277e1a7143fc10223a2f251599b2adf80614",
+      "reviewedAt": "2026-11-26T14:31:03.619Z",
+      "sourceDigest": "3b1256549f4071a722f02e48bf000b1c847d59c3b8a966dfb505464e49fab3c9",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded first-attempt hosted contrast failure, synchronous DOM measurement, initial runner evidence and source-bound startup byte counts in the execution guide.",
+      "reviewReason": "Reconciled operations recovery coverage with current CI foundation; reviewed targeted build, cleanup, handoff and environment regression boundaries without changing application behavior.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T05:28:44.476Z",
-      "sourceDigest": "2a3f91df028a7a8f3038f80e187a1c4b9ade3c706824ffdfd0e1b9b320b27e98",
+      "reviewedAt": "2026-11-26T17:51:28.915Z",
+      "sourceDigest": "6b5a8aeeef9d3421df019284f845f74754f8a218c3fd10f0543c545b8b70daa0",
       "reviewOutcome": "updated",
-      "reviewReason": "Linked the concurrent review-only Creative Universe integration and retained separate Learning, engineering and frozen application sources.",
+      "reviewReason": "Reviewed pinned one-file nonproduction handoff against tested ea97198 and exact launcher checksum; read-only default and separate exact-plan approval, with missing-state and broker-coverage blockers stated. No runtime or infrastructure scope added.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1400,10 +1400,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:43:54.709Z",
-      "sourceDigest": "6a82d9e760b2acf553296077219283a0611744977077ef029b48a4dadba0fce0",
+      "reviewedAt": "2026-11-26T14:31:04.437Z",
+      "sourceDigest": "eb1f5269f5149f20cbbebc15949c22b4dfd9a20a71dd969f0ede9957eab47162",
       "reviewOutcome": "updated",
-      "reviewReason": "The maintenance instructions now explain comparison with the preceding independently committed source so future additions remain protected without manual count maintenance.",
+      "reviewReason": "Preserved new concise canonical-reference/archive routing and source-only diagnostic instructions; operations history remains linked rather than restoring long root documents.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

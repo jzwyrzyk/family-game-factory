@@ -1,6 +1,18 @@
 # Browser setup for production request diagnostics
 
+November 26 continuation: [consolidated Cloud Shell setup and verified blockers](PERMANENT_CLOUD_SETUP.md), [autonomous triage and 401 investigation](AUTONOMOUS_TRIAGE.md). Earlier receipts below retain their original scope.
+
 **Status on November 24, 2026.** This is a proposed setup for `family-game-factory-jzw` (number `1054529152893`). The diagnostics PR provides source. Creating the view, deploying the diagnostic function, allowing federation, approving costs and verifying the production read path each require separate operational evidence. This procedure uses Google Cloud Console and GitHub. A signed-in administrator with existing authority performs the approved steps.
+
+**November 26 filter correction:** administrator audit evidence identifies a
+view-filter **nesting depth limit**, not a confirmed prohibition on OR or labels.
+The candidate below uses one anchored RE2 comparison for the same three service
+names, retaining the project, request log, resource type and region restrictions.
+It is source-tested, not provider-accepted. The previously qualified image embeds
+the older exact expression and cannot be used with the corrected view. Preserve it
+as historical evidence; a separately approved new build and full source/digest
+qualification must precede a fresh remaining-actions plan. Never resubmit the
+original build or relax runtime filter readback to accept arbitrary expressions.
 
 ## Trust and cost decision
 
@@ -30,7 +42,7 @@ There is no additional log-routing sink, raw log copy or retention extension in 
 3. In **Logging → Logs Storage → _Default → Log views → Create log view**, use ID `jems-production-requests`. In **Build filter** enter this exact flexible filter. On **Set permissions**, grant `projects/family-game-factory-jzw/roles/jemsRequestViewReader` to **only the broker service account** on this specific view. For an existing view open **Actions → Adjust permissions**. Save and reopen the view to verify the effective filter and resource-level grant. If the project rejects the flexible service or region clauses, stop. [Flexible filter syntax and view-level IAM](https://docs.cloud.google.com/logging/docs/logs-views#filters)
 
    ```text
-   source("projects/family-game-factory-jzw") AND resource.type="cloud_run_revision" AND log_id("run.googleapis.com/requests") AND resource.labels.location="us-east5" AND (resource.labels.service_name="factory-gateway" OR resource.labels.service_name="factory-preview" OR resource.labels.service_name="factory-coach-private")
+   source("projects/family-game-factory-jzw") AND resource.type="cloud_run_revision" AND log_id("run.googleapis.com/requests") AND resource.labels.location="us-east5" AND resource.labels.service_name=~"^(factory-gateway|factory-preview|factory-coach-private)$"
    ```
 
    If the Console role picker cannot select the custom role, the signed-in Google API Explorer supports the same **view-level** operation. Read the view policy with `options.requestedPolicyVersion=3`. Use the returned policy, preserving its version, bindings and etag, and add a single binding with role `projects/family-game-factory-jzw/roles/jemsRequestViewReader` and member `serviceAccount:jems-request-broker@family-game-factory-jzw.iam.gserviceaccount.com`. An etag conflict requires a fresh read. Verify the saved policy immediately. [View getIamPolicy](https://docs.cloud.google.com/logging/docs/reference/v2/rest/v2/projects.locations.buckets.views/getIamPolicy) · [View setIamPolicy](https://docs.cloud.google.com/logging/docs/reference/v2/rest/v2/projects.locations.buckets.views/setIamPolicy)

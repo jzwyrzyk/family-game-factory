@@ -1,5 +1,16 @@
 # Nonproduction setup and activation
 
+**November 26 executable update:** the owner selected `jems-jzw-nonprod`, `us-east5`,
+their named Google account for IAP, existing billing subject to verification, and
+$15/month with live AI off. They requested preparation and the exact plan **before
+provisioning approval**. Use the [consolidated Cloud Shell handoff](../operations/PERMANENT_CLOUD_SETUP.md)
+for one-time administrator checks and saved-plan application, superseding the manual
+sequence below. No repeated managed SDK qualification is required. Both DEV and TEST
+static runtime accounts are now distinct; the initial Terraform baseline leaves
+federation disabled and registry deletion dry-run. Complete TEST backend and independent
+per-lane hard spending limits are not established by that static baseline.
+
+
 **Status:** reviewable setup plan, not provisioned infrastructure. The [environment contract](DEV-TEST-PROD.md) governs the result. The foundation is disabled until the actual project, identities, browser audience, costs and trusted workflow bindings are configured and independently verified. No routine operation requires Cloud Shell.
 
 **Owner authorization received:** November 23, 2026, the owner approved the one-time dedicated nonproduction project, restricted GitHub WIF/IAP setup and a $15/month initial disconnected-preview planning budget, with live AI off. The budget is an alert target, not a hard billing cap. Do not request this setup-scope approval again; actual account access, billing selection and scoped activation evidence are still required. This approval does not enable paid AI or production changes.
