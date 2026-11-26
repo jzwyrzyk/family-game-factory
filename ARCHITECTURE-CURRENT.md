@@ -108,6 +108,8 @@ Actions repair feedback preserves all allowlisted quality findings and the valid
 
 ### Adult Private premium game builder
 
+The creative-art-review localhost build uses a fixed archived generated-module worker to qualify one host-rendered sprite. Game code receives symbolic actions. Only the trusted host checks and paints private pixels. General generated-game reuse requires an independently qualified revision/slot binding, scoped delivery, revocation and release. [Private artwork in 2D games](docs/game-intelligence/CREATIVE-ART-SLOTS.md)
+
 Adult Private premium admission enforces a cumulative ceiling of up to 5,000,000 micro-USD across a game’s Build, repairs, explicit retries and later paid edits, including forks. The gateway counts settled usage and outstanding reservations in the same transaction as the current family allowance check. A fresh Build reserves the full approved envelope. A saved edit reserves a reviewed first pass and adds a bounded repair hold only when needed. Existing jobs retain their original reservations. Legacy admission retains its configured ceiling up to 1,000,000 micro-USD. [Testing decision and activation package](docs/game-intelligence/premium-benchmark/NOVEMBER-26.md)
 
 PR139 now integrates the disabled DEV/TEST foundation and shared exact-source CI verifier. Premium image labels avoid repeated metadata while preserving original evidence and all captures. Staged admission, durable scheduling and contact sheets remain offline feasibility tools, never production import paths. The clean hosted sandbox package check uses no publication permission. [Completion and activation boundaries](docs/game-intelligence/premium-benchmark/COMPLETION.md)

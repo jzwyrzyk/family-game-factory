@@ -745,6 +745,19 @@ export function installCreationStudio(host: Host) {
         void renderPrivateChoices(actor.id);
       });
       appearance.append(replace);
+      if (import.meta.env.MODE === 'creative-art-review' && ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) && parsePrivateArtId(actor.assetId)) {
+        const play = iconNode('button', 'creation-button', 'play', 'Try Gem Hunt');
+        play.id = 'creationLocalArtGame';
+        play.onclick = () => act(async () => {
+          assertEditing();
+          const capturedView = viewEpoch, capturedOwner = owner();
+          const current = () => capturedView === viewEpoch && capturedOwner === owner() && isCurrent() && !FG.learning.active;
+          const resolved = await privateArt.load(actor.assetId);
+          const { openGemHunt } = await import('../../tools/creative-art-review/gem-hunt');
+          if (current()) await openGemHunt(resolved.image, current);
+        });
+        appearance.append(play);
+      }
     }
     const remove = iconNode('button', 'creation-text-button', 'trash', 'Remove'); remove.setAttribute('aria-label', 'Remove ' + actor.name); remove.disabled = !!challengeId || scene!.actors.length < 2;
     remove.onclick = async () => await act(async () => await mutation(project => { project.actors = project.actors.filter(a => a.id !== actor.id); project.programs = project.programs.filter(p => p.actorId !== actor.id); selectedActor = project.actors[0].id; selectedProgram = project.programs.find(p => p.actorId === selectedActor)?.id || ''; insert = null; })); box.append(remove);

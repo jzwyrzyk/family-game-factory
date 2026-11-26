@@ -421,10 +421,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "880031cce64ca9c825a48f7154b0e3c0ec63b1515cd18c99e76e28839562e740",
-      "reviewedAt": "2026-11-26T03:38:29.773Z",
+      "sourceDigest": "ccb1eee156f416b8a80f59aac740ad26056427bdd4974ca14aa4668ca520fcdc",
+      "reviewedAt": "2026-11-26T03:44:26.790Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented exact rig preview alongside composite actor playback, editable coding paths, inert roles, pinned scene versions and preserved programs.",
+      "reviewReason": "Architecture records the localhost-only launch beside actor appearance and saved joint controls in the merged scene editor.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -745,10 +745,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:55.850Z",
-      "sourceDigest": "3c42ed09d4394afe0c109b5a6fa6d9d87f119c2474a5101fb24cafd81bf20c81",
+      "reviewedAt": "2026-11-26T03:44:26.982Z",
+      "sourceDigest": "06ea1cfffc2016285163697abf332e57e44caac7908bc4d5ee74acb21c46864b",
       "reviewOutcome": "updated",
-      "reviewReason": "Scene authoring uses active Pal IDs. The ADR and scene rendering contract cover reading saved generated versions through the historical asset resolver.",
+      "reviewReason": "Planning and coding require original child art and a 2D canvas within the established companion and premium budgets.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -903,10 +903,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:44:04.033Z",
-      "sourceDigest": "6250f981436ceaa3a5cade8b53a75f54a098c4b896ae8b8fc4a1c201b1520e42",
+      "reviewedAt": "2026-11-26T03:44:27.180Z",
+      "sourceDigest": "30d777e3766c9dc3e6441c77164c36f4238ba5083a3291891054e065f89b9dc0",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified the 48 pinned public world assets and three offline-decoded scene layers alongside existing private endpoint, practice, storage and recovery checks; recorded results in the delivery record.",
+      "reviewReason": "Offline shell checks verify versioned static world files and exclude private routes; the separate review build exercises synthetic sprite gameplay.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1147,10 +1147,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:44:04.231Z",
-      "sourceDigest": "7b9569db3b02a67e355fd5e1118879981ac71338d629a7262a0e2effe42b7120",
+      "reviewedAt": "2026-11-26T03:44:27.409Z",
+      "sourceDigest": "c463a838951862898344793bd26f8adfe6bb707ddf5a39aaeb1c0bdf051dd7e7",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the final integrated input head, offline playback evidence and current parallel workstreams; protected and hosted release gates retain separate authority.",
+      "reviewReason": "The learner workflow exercises the dedicated local review build while ordinary game delivery remains independently gated.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
