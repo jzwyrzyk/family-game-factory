@@ -310,10 +310,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:45:20.619Z",
+      "reviewedAt": "2026-11-26T02:26:04.897Z",
       "sourceDigest": "47252f4893832a8830dfedcd10360acefc30e9cdb3ebd7c5ae12c8d92ccf833d",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Math layouts now reuse the brand palette and child target sizes. The approved brand library, touch conventions and asset source selections still apply.",
+      "reviewReason": "The production Language renderer now mounts the shared shell in both trusted hosts, including the restricted family-beta route. Its native and fitted-stage overlays use the common selector, so the temporary pre-migration selector is retired with the same viewport and exit contract.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
