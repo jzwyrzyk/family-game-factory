@@ -1,0 +1,16 @@
+# Draw a path
+
+A child can open a picture or saved cutout in Creative Studio, select that actor, and choose **Draw a path**. Trace on the pad, tap destinations, or use the four direction buttons. The picture follows the end of the path on the pad. Undo step removes the most recent point. Give the path a name and choose its speed, then add it to the actor’s selected script. Play runs the sequence, including existing actions before it. In reduced-motion mode the first-steps play bar also exposes Step for deliberate 100 ms advances. The composer has no automatic playback.
+
+## Persistence and reuse
+
+The composer writes a named Repeat group containing at most 24 relative Move blocks. The scene’s fixed-clock interpreter executes position changes. Each segment has a saved duration in milliseconds. The actor’s image or rig ID and SHA-256 remain pinned. Its original and cutout pixels never enter the path data. Keep, draft recovery, undo, portable scene export and profile switching use the existing scene and artwork authorities.
+
+Keep the scene to make its named paths available under **Paths from my kept scenes**. The picker reads the selected player’s explicitly kept revision. A path copied into another actor receives new block IDs and its own copy of the moves and timing. Later edits or removal of the source scene cannot change that copy. Only named child-authored groups made entirely of relative moves on a private-art actor are eligible. A group edited to depend on other scene objects, events or absolute positions stays in its source program.
+
+The stage clamps playback to its own boundaries. The composer edits whole-actor translation. Independent joint animation and wheel physics continue to use the Drawing Lab’s rig contracts. Local samples do not attest hosted, real-device or family acceptance.
+
+## Acceptance
+
+- [Path and storage tests](../../tests/creation-motion-path.test.ts) cover deterministic timing, copied IDs, exact Keep selection, profile authorization, group eligibility and private manifest rejection.
+- [Browser journey](../../tests/creation-motion-browser.cjs) exercises a synthetic transparent picture, path editing, reduced-motion stepping, ordinary playback, pixel-reference pinning, cross-scene reuse and undo. It writes screenshots to `test-results/creation-motion` by default.

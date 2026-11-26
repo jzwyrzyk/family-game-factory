@@ -1,5 +1,8 @@
 # Creation Studio: make scenes and rebuild behavior
 
+[Draw a path](DRAWN_PATHS.md) with a saved picture or cutout. Named paths become editable Move blocks, and keeping a scene makes its paths available to other scenes under the same profile.
+
+
 ## Creative Studio entrances — November 25, 2026
 
 The landing page follows My Art: **Make it. Make it move.**, approved gem artwork, three action cards and My scenes. **Make a scene** reveals existing worlds and optional characters/Pals/art; **Rebuild a scene** opens existing deterministic challenges; **Try an experiment** opens authored reasoning practice and returns here. Scene files belong beside saved scenes. A first visit offers a skippable arrow-and-Play introduction using the real interpreter, with no project or evidence write. `studio-intro` lives in existing owner-scoped guidance. First steps, More tools, checks, hints, Keep, draft recovery and program semantics are unchanged. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
