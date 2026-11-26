@@ -4,7 +4,7 @@ const http = require('node:http');
 const { build } = require('esbuild');
 const { chromium } = require('playwright');
 (async () => {
- const bundled = await build({ stdin: { contents: `export {IndexedCreationStore} from './src/storage/indexed-creation'; export {nativeScope} from './src/storage/native-workspace'; export {createStarterProject, privateArtId} from './src/creation/projects'; export * from './src/assets/private-drawings'; export * from './src/drawing/store'; export * from './src/drawing/library'; export * from './src/drawing/transfer'; export * from './src/rewards/write-guard';`, resolveDir: process.cwd() }, bundle: true, write: false, format: 'iife', globalName: 'art', platform: 'browser', define:{'import.meta.env':'globalThis.artTestBuild'} });
+ const bundled = await build({ stdin: { contents: `export * from './src/drawing/sketch-keep'; export {renderPaper} from './src/drawing/workspace-engine'; export {IndexedCreationStore} from './src/storage/indexed-creation'; export {nativeScope} from './src/storage/native-workspace'; export {createStarterProject, privateArtId} from './src/creation/projects'; export * from './src/assets/private-drawings'; export * from './src/drawing/store'; export * from './src/drawing/library'; export * from './src/drawing/transfer'; export * from './src/rewards/write-guard';`, resolveDir: process.cwd() }, bundle: true, write: false, format: 'iife', globalName: 'art', platform: 'browser', define:{'import.meta.env':'globalThis.artTestBuild'} });
  const server = http.createServer((req, res) => { res.setHeader('Content-Type', req.url === '/test.js' ? 'text/javascript' : 'text/html'); res.end(req.url === '/test.js' ? bundled.outputFiles[0].text : '<!doctype html><html><body><script src="/test.js"></script></body></html>'); }).listen(0, '127.0.0.1');
  await new Promise(resolve => server.listening ? resolve() : server.once('listening', resolve));
  let browser;
@@ -147,6 +147,11 @@ const { chromium } = require('playwright');
   });
   assert.deepEqual(errors, []); assert.deepEqual(posts, []);
   for (const result of results) console.log('PASS ' + result);
+  const keepPage = await browser.newPage();
+  await keepPage.goto(`http://127.0.0.1:${server.address().port}/`);
+  await keepPage.evaluate(require('./sketch-keep-storage.cjs'));
+  await keepPage.close();
+  console.log('PASS pending sketch ownership, source integrity, exact backup, restore, retry and discard');
   const migrationPage = await browser.newPage();
   await migrationPage.goto(`http://127.0.0.1:${server.address().port}/`);
   const migrationResult = await migrationPage.evaluate(async () => {
