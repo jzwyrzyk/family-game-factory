@@ -1,5 +1,10 @@
 # jems delivery state
 
+## November 26 · Connected drawing workspace candidate
+
+[Draft #213](https://github.com/jzwyrzyk/family-game-factory/pull/213) integrates My Art, the scene picker, illustrated worlds and child-authored motion. Application source `e9b4332432e90359deb9cd4f5f7d030a7a2a3f35`. The generated-game adapter is independently reviewable in [#206](https://github.com/jzwyrzyk/family-game-factory/pull/206). The [workstream receipt](docs/creative-universe/DRAWING_WORKSPACE_ACCEPTANCE.md) identifies source heads, synthetic local checks, screenshots, overlapping work and the separate hosted and release gates. This candidate has no production or family activation.
+
+
 ## November 26, 2026 — connected creative universe development
 
 The standard and exact-byte reviewed-family PNG admission are source candidates based on protected main `bc602f1ede502f398308ad56f973c4bf7997ff08`. GitHub recorded a successful household production deployment for that base at 01:37 UTC on November 26. This baseline receipt precedes the creative work. No candidate deployment or external family activation has been observed. The open learning stack #192–195 is a parallel integration. Its scratchpad and supported interaction contracts remain separate from permanent artwork. [Creative standard](docs/creative-universe/STANDARD.md) · [Baseline deployment](https://api.github.com/repos/jzwyrzyk/family-game-factory/deployments/8074075203/statuses)

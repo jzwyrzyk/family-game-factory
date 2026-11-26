@@ -61,3 +61,5 @@ New development uses 2D sprites, layered environments and compatible physics. Ar
 For each change record its PR and dependencies, exact head, reproducible tests, screenshots and motion capture where relevant. Record what passed locally, hosted checks and private preview identity, TEST acceptance, production state and external family activation separately. Use synthetic work in public artifacts. Existing parent reports, learning evidence, reward receipts, earned Pals and prior histories retain their own authorities. [Delivery governance](../development/DEV-TEST-PROD.md)
 
 Four versioned Creative Studio worlds pair painted plates with aligned middle and foreground layers and transparent props. Keep the versioned files and catalogue IDs used by saved scenes. [Artwork manifest and review status](../creation-studio/WORLD_ART.md)
+
+[Drawing workspace and A–F implementation evidence](DRAWING_WORKSPACE_ACCEPTANCE.md)
