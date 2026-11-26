@@ -152,10 +152,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:13:42.771Z",
-      "sourceDigest": "ff9c02d667b54ac95443882ff6269ecf8d27444f45635284e0f055eacb1974d2",
+      "reviewedAt": "2026-11-26T03:19:43.263Z",
+      "sourceDigest": "6992a5f266040a1a50925ba7820c7086818d843a5ab15b2c10cf64b7dbc6cb26",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Coded paths and editable crayon sources follow the canonical child artwork, explicit Keep and version pinning decisions in the reconciled standard.",
+      "reviewReason": "The implemented motion choices, ink fidelity and closed general game delivery follow the approved doctrine and existing decision record.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -316,10 +316,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:16:21.329Z",
-      "sourceDigest": "879a3ff172bd4e85db495b78e71238eeec47198589ed524ec6caa7e1d090ac0e",
+      "reviewedAt": "2026-11-26T03:19:43.737Z",
+      "sourceDigest": "986119e6357be66dc301a8f28b1e683756880263d318d3740652cc09fcad4709",
       "reviewOutcome": "updated",
-      "reviewReason": "The reviewed family PNG entry now enforces exact bounded raster structure before consent admission, retaining the input bytes only after validation.",
+      "reviewReason": "Documented selectable whole-picture animation, keyboard and touch paths, contextual art reuse and the shared pointer input used for temporary learning paper.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -421,10 +421,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "556b0bccfe3630c9850068e0ad3c3c60a3d59e2e635872b445426789fc055561",
-      "reviewedAt": "2026-11-26T03:15:06.595Z",
+      "sourceDigest": "03a005be73a8505ffb7934c69fb7c58ec9b7774522c21c0da92998362e0f0178",
+      "reviewedAt": "2026-11-26T03:19:45.541Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The scene catalogue and manifest record immutable WebP identities, scale, alpha, intended uses and matching worlds for the host renderer.",
+      "reviewReason": "The scene contract records deterministic saved-motion playback, immutable illustrated worlds, custom backdrops and reusable kept scenery.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -903,10 +903,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:16:21.879Z",
-      "sourceDigest": "dedced7ca1216427fb9dcd7dab0dfe66155e6e247badac489bfa291d715f1f82",
+      "reviewedAt": "2026-11-26T03:19:45.769Z",
+      "sourceDigest": "025f2c2d0135dce7ffb82e4f5c1587428ab50e8391c08f4eb04746cd70a0c946",
       "reviewOutcome": "updated",
-      "reviewReason": "The real PNG fixtures exercise legal transparency, palette bounds, compressed raster lengths, metadata rejection and exact bytes through the reviewed family importer.",
+      "reviewReason": "Delivery records link actual seven-drawing fidelity, recovery, profile isolation and touch journeys with rendered screenshots and playback evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1147,10 +1147,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:15:06.970Z",
-      "sourceDigest": "afc3429a3eff1716069b1f4e978036c86f244c2ed5ae56a4b6ed2b7cde46f0a6",
+      "reviewedAt": "2026-11-26T03:19:46.043Z",
+      "sourceDigest": "c27fd7a61f45f8956fb0366ad2d4cb50190eb425e3f46cf977b10ef23437dda7",
       "reviewOutcome": "updated",
-      "reviewReason": "The delivery record distinguishes these candidate crayon, path and catalogue capabilities from deployed activity rendering and owner artwork acceptance.",
+      "reviewReason": "The candidate links the reviewed prerequisite heads and adds reproducible connected movement and world tests to the existing coding review workflow.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1634,10 +1634,10 @@
         "tests/crayon-revision-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "180a66e42bea5c5f7982bd316476525280fbdb0897b7867dff392942737ac4a6",
-      "reviewedAt": "2026-11-26T03:13:44.713Z",
+      "sourceDigest": "91d4fc1688b9da83e9f9f4e5cbcf37b4f04e02c1028a31fdff471e997b544a0a",
+      "reviewedAt": "2026-11-26T03:19:46.299Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The My Art contract describes a new crayon revision from saved editable strokes and compatibility with original and prior drawing bytes.",
+      "reviewReason": "The My Art guide explains editable PNG originals, the shared version picker, opt-in corner smoothing, preset movement and advanced articulated parts.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1717,10 +1717,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3b669cf847b1ba4c4642c8130894505a04e7b12f3707b8ffd273b74370ed92df",
-      "reviewedAt": "2026-11-26T03:08:54.218Z",
+      "sourceDigest": "8102ea087841753d9e7d9d4a7dae48283132e40dff1b39d6ca9706f8782aa561",
+      "reviewedAt": "2026-11-26T03:19:46.542Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Architecture records reads of the active owner’s kept scene revision in both original and indexed scene storage. Copying motion writes a new group of block IDs through existing autosave, keep and backup."
+      "reviewReason": "The storage contract covers hash verification and reference remapping for private actors, backdrops and scenery on parent recovery and cross-owner copy."
     }
   ]
 }

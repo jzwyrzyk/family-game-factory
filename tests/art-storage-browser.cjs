@@ -4,7 +4,7 @@ const http = require('node:http');
 const { build } = require('esbuild');
 const { chromium } = require('playwright');
 (async () => {
- const bundled = await build({ stdin: { contents: `export * from './src/assets/private-drawings'; export * from './src/drawing/store'; export * from './src/drawing/library'; export * from './src/drawing/transfer'; export * from './src/rewards/write-guard';`, resolveDir: process.cwd() }, bundle: true, write: false, format: 'iife', globalName: 'art', platform: 'browser' });
+ const bundled = await build({ stdin: { contents: `export * from './src/assets/private-drawings'; export * from './src/drawing/store'; export * from './src/drawing/library'; export * from './src/drawing/transfer'; export * from './src/drawing/creative-assets'; export * from './src/drawing/crayon-source'; export {listArtChoices} from './src/creation/private-art'; export * from './src/rewards/write-guard';`, resolveDir: process.cwd() }, bundle: true, write: false, format: 'iife', globalName: 'art', platform: 'browser' });
  const server = http.createServer((req, res) => { res.setHeader('Content-Type', req.url === '/test.js' ? 'text/javascript' : 'text/html'); res.end(req.url === '/test.js' ? bundled.outputFiles[0].text : '<!doctype html><html><body><script src="/test.js"></script></body></html>'); }).listen(0, '127.0.0.1');
  await new Promise(resolve => server.listening ? resolve() : server.once('listening', resolve));
  let browser;
@@ -118,6 +118,46 @@ const { chromium } = require('playwright');
    await rejects(() => art.deleteArtwork(owner, source.id), 'original cannot be erased while a derivative depends on it');
    await art.deleteArtwork(owner, derivative.id); await art.deleteArtwork(owner, source.id);
    check((await art.drawings(owner)).length === 0, 'unused derivative then original can be explicitly erased');
+   const marks=[{color:'#6d61ca',size:8,points:[{x:100,y:80},{x:136,y:90}]}];
+   const paper=document.createElement('canvas');paper.width=art.paperWidth;paper.height=art.paperHeight;
+   const picture=async transparent=>{
+     art.renderStrokes(paper.getContext('2d'),marks,transparent);
+     const png=await new Promise(resolve=>paper.toBlob(resolve,'image/png'));
+     return art.includeCrayonSource(png,{transparent,strokes:marks});
+   };
+   const sketched=await art.saveDrawing(owner,'My glimmer',await picture(true));
+   const continued=await art.saveDrawing(owner,'My glimmer again',await picture(false),sketched.id);
+   await art.updateDrawing(owner, continued.id, {semanticName:'Moon rock'});
+   const family = await art.listCreativeAssets(owner);
+   check(family.length === 2 && family.every(row => row.assetId === sketched.id && row.semanticName === 'Moon rock'),
+     'one logical asset connects editable editions and child-selected semantic identity');
+   check((await art.originalDrawing(owner,continued.id)).id === sketched.id,'download original from a later edition follows validated lineage');
+   const cards = await art.drawingPage(owner, {search:'moon ro'});
+   check(cards.items.length === 2 && cards.items.every(card => !('bytes' in card) && !('strokes' in card)), 'semantic search pages metadata without hydrating marks');
+   const choices = await art.listArtChoices(owner);
+   check(choices.length===2 && new Set(choices.map(choice=>choice.assetId)).size===2 && choices.every(choice=>choice.creativeAssetId===sketched.id),
+     'picker pins the exact selected edition independently of stable artwork identity');
+   const crayonBackup=await art.exportArtBundle(owner);
+   const damaged=continued.bytes.slice(0);
+   const chunk=new Uint8Array(damaged);
+   const payloadEnd=chunk.length-16;
+   chunk[payloadEnd]^=1;
+   check(!art.readCrayonSource(damaged),'invalid editable chunk checksum blocks stroke replay');
+   const wrongPng=document.createElement('canvas');wrongPng.width=art.paperWidth;wrongPng.height=art.paperHeight;
+   const blank=await new Promise(resolve=>wrongPng.toBlob(resolve,'image/png'));
+   const mismatch=art.includeCrayonSource(blank,{transparent:false,strokes:marks});
+   await rejects(async()=>art.verifiedCrayonSource(await mismatch.arrayBuffer()),'foreign raster cannot reopen with unrelated editable strokes');
+   const copies=await art.importArtBundle(owner,crayonBackup);
+   const restoredSketch=await art.drawing(owner,copies.drawingIds[continued.id]);
+   const restoredSource=await art.verifiedCrayonSource(restoredSketch.bytes);
+   check(restoredSketch.sourceId===copies.drawingIds[sketched.id] && restoredSketch.sha256===continued.sha256 &&
+     !restoredSource.transparent && JSON.stringify(restoredSource.strokes)===JSON.stringify(marks),
+     'private art bundle round-trips editable marks, paper, and remapped lineage');
+   await art.deleteArtwork(owner,continued.id);
+   await art.updateDrawing(owner,sketched.id,{semanticName:'Moon pebble'});
+   await art.restoreArtBundle(owner,crayonBackup);
+   check((await art.drawing(owner,continued.id)).semanticName==='Moon pebble',
+     'restoring a missing edition keeps the current logical asset identity');
    return report;
   });
   assert.deepEqual(errors, []); assert.deepEqual(posts, []);

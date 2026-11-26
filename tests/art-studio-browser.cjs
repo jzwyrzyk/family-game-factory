@@ -122,6 +122,24 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   await page.setViewportSize({width:1360,height:950});await page.locator('#artHome').click();const menu=page.locator('#studioProfileMenu');if(!await menu.evaluate(e=>e.open))await menu.locator('summary').click();await page.locator('#profile-choices .profile-choice').nth(1).click();await waitForWelcome(page);
   assert.equal(await page.locator('#studioWelcome').isVisible(),true,'another player’s saved artwork does not dismiss this fresh sibling’s welcome');
   await exploreWelcome(page);await page.locator('#studioArt').click();await page.locator('#artEmpty').waitFor({state:'visible'});assert.equal(await page.locator('.art-card').count(),0,'another player cannot see prior art');
+  await page.locator('#artDrawButton').click();
+  const painter=page.locator('.drawing-paint');
+  const paper=painter.locator('[data-paper]');
+  await painter.getByLabel('Paper',{exact:true}).selectOption('transparent');
+  await paper.press('Enter');
+  const centerAlpha=()=>paper.evaluate(canvas=>canvas.getContext('2d').getImageData(450,280,1,1).data[3]);
+  assert.equal(await centerAlpha(),255,'crayon dot uses real opaque pixels');
+  await painter.getByRole('button',{name:'Eraser',exact:true}).click();
+  await paper.press('Enter');
+  assert.equal(await centerAlpha(),0,'eraser restores actual transparency');
+  await painter.locator('[data-undo]').click();
+  assert.equal(await centerAlpha(),255,'undo restores erased ink');
+  await painter.locator('[data-save]').click();
+  await painter.waitFor({state:'detached'});
+  await page.locator('#artContinueDrawing').click();
+  assert.equal(await painter.getByLabel('Paper',{exact:true}).inputValue(),'transparent');
+  assert.equal(await centerAlpha(),255,'reopened crayon marks keep the saved paper and ink');
+  await painter.locator('[data-exit]').click();
   assert.deepEqual(posts,[],'private artwork makes no POST or model request');assert.deepEqual(errors,[],'no browser exceptions');
   console.log('PASS Art Studio: default navigation, upload, private shelf, truthful refresh failure, metadata/filter, recovered movement draft, notebook quota retry, optional usage-index failure, saved physical ride, picture transform/original preservation, cross-scene use, art export, mobile reflow, invalid image and profile isolation');
  }catch(error){if(page)await page.screenshot({path:path.join(output,'failure.png'),fullPage:true}).catch(()=>{});throw error;}

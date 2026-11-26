@@ -222,3 +222,41 @@ test('runScene applies scheduled taps reproducibly and rejects impossible observ
   assert.throws(() => runScene(p, {durationMs: 99999999}), /observation window/);
   assert.throws(() => new SceneEngine(p).advance(-1), /playback duration/);
 });
+
+test('illustrated worlds retain their edition, scenery has no mechanics, and earlier worlds remain unchanged', async () => {
+  const { WORLD_PLATES, SCENERY_ART, sceneAssetIds, remapSceneAssets } = await import('../src/creation/worlds');
+  const { createStarterProject, validateEditableProject, validateGeneratedCreationManifest } = await import('../src/creation/projects');
+  const { createHash } = await import('node:crypto');
+  const { readFile } = await import('node:fs/promises');
+  const expectedHashes: Record<string,string> = {
+    'world-v1-village': '1b1460063ff8d1d3c353b0952731f3a73059c500800d3118ba558fd76300be84',
+    'world-v1-cliffs': '9b2446de258abe52782287ea620d65a0ac7abd5bbc210938439b02658d4d132f',
+    'world-v1-moon': '914d0bf6ca36ec41475aa3239c2c703b09f4eb367202601cf93656aeffcb5754',
+    'world-v1-workshop': 'b6e81f59ab4d1e05475b85817264645ecda30ed105eb7934fcc69b956f065afe',
+    'world-v1-flowers': '280adfebcb3c608cb819962ca6b463e30a5c403f1dcf7bd935130e414cccab51',
+    'world-v1-castle': '0e1b072992f643906bddbbb4a67c977a3c3cf63c8d1e406f03c196d6f093bdb0',
+    'world-v1-crystal': '49f0d0a03ec9e602b5ecfca143a88c33a2d3383c804cff32a6646ba4da7618b5',
+  };
+  for (const asset of [...Object.values(WORLD_PLATES), ...SCENERY_ART].filter(a => Object.hasOwn(expectedHashes, a.id))) {
+    const bytes = await readFile(new URL('../public/' + asset.url.slice(2), import.meta.url));
+    assert.equal(createHash('sha256').update(bytes).digest('hex'), expectedHashes[asset.id], asset.id);
+  }
+  const scene = createStarterProject('blank');
+  const legacy = structuredClone(scene); delete legacy.world; legacy.background = 'meadow';
+  assert.deepEqual(validateEditableProject(legacy), legacy);
+  const backdrop = 'art:image:test-sheet:' + '1'.repeat(64);
+  const decoration = 'art:rig:test-version:' + '2'.repeat(64);
+  scene.world = { edition:'jems.world.v1', backdrop, framing:'fit', scenery:[
+    {id:'prop', label:'My cloud', assetId:decoration, x:130, y:80, size:75, layer:'in-front'},
+  ]};
+  assert.deepEqual(validateEditableProject(scene), scene);
+  assert.deepEqual(sceneAssetIds(scene), ['gem', backdrop, decoration]);
+  assert.deepEqual(new SceneEngine(scene).snapshot().actors, new SceneEngine(legacy).snapshot().actors);
+  assert.throws(() => validateGeneratedCreationManifest(scene), /Private artwork/);
+  assert.throws(() => validateEditableProject({...scene, world:{...scene.world,backdrop:'https://example.invalid'}}));
+  assert.throws(() => validateEditableProject({...scene, world:{...scene.world,scenery:Array(9).fill(scene.world!.scenery![0])}}));
+  assert.throws(() => validateEditableProject({...scene, world:{...scene.world,edition:'future'}}));
+  remapSceneAssets(scene, id => id === backdrop ? id.replace('test-sheet','imported') : id);
+  assert.equal(scene.world.backdrop, backdrop.replace('test-sheet','imported'));
+  assert.equal(scene.world.scenery![0].assetId, decoration);
+});

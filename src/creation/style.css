@@ -49,7 +49,7 @@
 .creation-starter:hover { border-color:#af8fe3; box-shadow:0 8px 22px #152b4b16; }
 .creation-starter>img { display:block; width:100%; height:180px; object-fit:cover; background:#ede6ff; }
 .creation-starter-buckets>img { background:#fff0df; }.creation-starter-robot>img { background:#e3f7ee; }
-.creation-starter-blank>img { object-fit:contain; padding:16px; }
+
 .creation-starter-copy { display:flex; flex-direction:column; gap:16px; padding:20px; }
 .creation-starter-copy strong { color:var(--creation-ink); font:800 23px/1.25 var(--jems-round,system-ui); }
 .creation-starter-copy b { display:flex; align-items:center; gap:8px; color:#6133ad; font-size:18px; }
@@ -335,3 +335,13 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
  @keyframes creation-small-hop{50%{transform:translateY(-20%)}}
  @keyframes creation-small-dance{35%{transform:rotate(-12deg)}70%{transform:rotate(12deg)}}
 }
+
+.world-close { float:right; position:sticky; top:0; z-index:1; }
+.world-editor { width:100%; display:grid; gap:12px; }
+.world-editor label { display:grid; gap:4px; color:#39294e; font-weight:700; }
+.world-editor .world-buttons,.world-decoration-tools,.world-piece { display:flex; flex-wrap:wrap; gap:8px; align-items:end; }
+.world-editor summary { padding:10px 2px; min-height:44px; color:#583093; cursor:pointer; }
+.world-editor .world-piece { margin:8px 0; border:1px solid #d7c8e8; border-radius:14px; padding:10px; }
+.world-piece legend { font-weight:700; }
+.world-piece [aria-pressed=true] { background:#e6dcf9; border-color:#7040c7; }
+#creationWorldPieces { width:100%; }

@@ -3,6 +3,13 @@ on:
   pull_request:
     paths:
       - 'src/creation/**'
+      - 'src/drawing/**'
+      - 'src/assets/private-drawings.ts'
+      - 'public/art/creative-worlds/**'
+      - 'scripts/connected-universe-browser.cjs'
+      - 'tests/animation-editor-browser.cjs'
+      - 'tests/creative-world-browser.cjs'
+      - 'tests/drawing-animation.test.ts'
       - 'tests/creation-learner*'
       - 'tests/pal-scene-image.test.ts'
       - 'src/pals/creation.ts'
@@ -38,6 +45,21 @@ jobs:
       - name: Exact movement and Pal compositing contracts
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: node --import tsx --test tests/creation-learner-controls.test.ts tests/pal-scene-image.test.ts tests/pals-creation.test.ts
+      - name: Draw, animate, change worlds and reopen exact private versions
+        run: |
+          node --import tsx --test tests/drawing-animation.test.ts tests/creative-world-art.test.ts
+          node tests/animation-editor-browser.cjs
+          node tests/creative-world-browser.cjs
+          node scripts/connected-universe-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: connected-creative-universe
+          path: |
+            test-results/connected-animation/
+            test-results/connected-universe/
+          if-no-files-found: warn
+          retention-days: 7
       - uses: actions/upload-artifact@v4
         if: always()
         with:

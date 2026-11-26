@@ -1,5 +1,8 @@
 # Storage reliability and continuity — PR166
 
+The creative editor continues to use the existing owner-scoped drawing database and scene authority. Exact PNGs carry editable mark data when authored in My Art. Scene history and recovery remap private IDs for actors, world backdrops and decorations together. A portable scene includes the selected rigs and source ancestry. Restore verifies hashes before writing. Rollback readers must understand the new local animation and world fields before opening newly saved projects. Retain those readers or restore an exact verified copy with a compatible build. [Creative standard](../creative-universe/STANDARD.md)
+
+
 **Current-main completion continuation, November 25:** the application now combines protected main `0f459f5` with the preserved storage and family-beta/audit source. The [combined acceptance register](../family-beta/COMPLETION.md) records current requirements and dispositions; the [nine-stage runbook](../family-beta/ACTIVATION.md#nine-stage-activation-plan) is the consolidated future cloud plan. The dated PR166 measurements and implementation record below remain historical evidence for their original tree. Final-source implementation/evidence must not be inferred from those old results.
 
 ## Current integrated implementation

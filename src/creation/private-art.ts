@@ -1,15 +1,18 @@
 /** Trusted local-art adapter. Private pixels never become a URL or a model input. */
-import { drawing, drawingPage, drawingBlob } from '../assets/private-drawings';
+import { drawing, type DrawingCategory, drawingBlob } from '../assets/private-drawings';
+import { listCreativeAssets } from '../drawing/creative-assets';
 import { rigById, listRigs } from '../drawing/store';
 import { validateAssembly, type DrawingAssembly } from '../drawing/model';
-import { layerCanvas } from '../drawing/segmentation';
+import { assemblyLayers } from '../drawing/segmentation';
 import { parsePrivateArtId, privateArtId, validateEditableProject } from './projects';
+import type {DrawingMotion} from '../drawing/animation-path';
+import { sceneAssetIds, remapSceneAssets } from './worlds';
 import type { CreationProject } from './model';
 import {exportArtBundle,validateArtBundle,importArtBundle,type ArtBundle} from '../drawing/transfer';
 
 export interface ArtSelection {drawingId:string;rigId?:string}
-export interface ArtChoice extends ArtSelection {assetId:string;label:string;detail:string}
-export interface ResolvedPrivateArt extends ArtChoice {image:HTMLCanvasElement}
+export interface ArtChoice extends ArtSelection {assetId:string;label:string;detail:string;creativeAssetId?:string;assetName?:string;semanticName?:string;category?:DrawingCategory}
+export interface ResolvedPrivateArt extends ArtChoice {image:HTMLCanvasElement;motion?:DrawingMotion}
 const stale=()=>Error('The player or page changed. Reopen your artwork in your own profile.');
 const hex=(bytes:ArrayBuffer)=>Array.from(new Uint8Array(bytes),byte=>byte.toString(16).padStart(2,'0')).join('');
 /** Union cutout masks without repeatedly blending the original's translucent
@@ -36,24 +39,32 @@ export async function artChoice(owner:string,selection:ArtSelection,current:()=>
     if(rig.assembly.sourceId!==source.id||rig.assembly.sourceSha256!==source.sha256)throw Error('This design no longer matches its original drawing.');
     const sha256=await assemblyHash(rig.assembly);
     if(!current())throw stale();
-    return {drawingId:source.id,rigId:rig.id,assetId:privateArtId({kind:'rig',id:rig.id,sha256}),label:source.name,detail:'Saved cutout design'};
+    return {drawingId:source.id,rigId:rig.id,assetId:privateArtId({kind:'rig',id:rig.id,sha256}),label:source.name,detail:rig.assembly.motion?'Saved animation':'Saved cutout design'};
   }
   return {drawingId:source.id,assetId:privateArtId({kind:'image',id:source.id,sha256:source.sha256}),label:source.name,detail:'Original artwork'};
 }
 export async function listArtChoices(owner:string,current:()=>boolean=()=>true):Promise<ArtChoice[]> {
-  const [sources,rigs]=await Promise.all([drawingPage(owner,{limit:100,archived:false}),listRigs(owner)]);
-  if(!current())throw stale();
-  const choices:ArtChoice[]=[];
-  for(const source of sources.items){
-    choices.push({drawingId:source.id,assetId:privateArtId({kind:'image',id:source.id,sha256:source.sha256}),label:source.name,detail:'Original artwork'});
-    const latest=rigs.find(rig=>rig.assembly.sourceId===source.id&&rig.assembly.sourceSha256===source.sha256);
-    if(latest)choices.push({drawingId:source.id,rigId:latest.id,assetId:privateArtId({kind:'rig',id:latest.id,sha256:await assemblyHash(latest.assembly)}),label:source.name,detail:'Latest saved cutout design'});
-    if(!current())throw stale();
+  const [sources, rigs] = await Promise.all([listCreativeAssets(owner), listRigs(owner)]);
+  if (!current()) throw stale();
+  const choices: ArtChoice[] = [];
+  for (const source of sources) {
+    if (source.archived) continue;
+    const identity = {drawingId: source.revisionId, creativeAssetId: source.assetId, assetName: source.assetName,
+      category: source.category, semanticName: source.semanticName, label: source.name};
+    choices.push({...identity, assetId: privateArtId({kind: 'image', id: source.revisionId, sha256: source.sha256}),
+      detail: source.parentRevisionId ? 'Edited picture' : 'Original artwork'});
+    const versions = rigs.filter(rig => rig.assembly.sourceId === source.revisionId && rig.assembly.sourceSha256 === source.sha256);
+    for (const [index, rig] of versions.entries()) {
+      const sha256 = await assemblyHash(rig.assembly);
+      if (!current()) throw stale();
+      choices.push({...identity, rigId: rig.id, assetId: privateArtId({kind: 'rig', id: rig.id, sha256}),
+        detail: (rig.assembly.motion ? 'Saved animation' : index === 0 ? 'Latest saved cutout design' : 'Saved cutout design') + ' · ' + (versions.length - index)});
+    }
   }
   return choices;
 }
 export function privateArtReferences(project:CreationProject):string[] {
-  return [...new Set(project.actors.map(actor=>actor.assetId).filter(id=>parsePrivateArtId(id)))];
+  return [...new Set(sceneAssetIds(project).filter(id=>parsePrivateArtId(id)))];
 }
 export interface SceneArtBundle {schema:'jems.scene-art.v1';scene:CreationProject;art:ArtBundle}
 /** A download includes immutable originals and the exact cutout versions used. */
@@ -97,7 +108,7 @@ export async function importSceneArt(owner:string,input:unknown,current:()=>bool
   }
   if(!current())throw stale();
   const scene=bundle.scene;
-  for(const actor of scene.actors)actor.assetId=references.get(actor.assetId)||actor.assetId;
+  remapSceneAssets(scene, id => references.get(id) ?? id);
   if(scene.provenance?.sourceKind==='art'){
     const source=scene.provenance;
     if(source.sourceProjectId)source.sourceProjectId=imported.drawingIds[source.sourceProjectId]||source.sourceProjectId;
@@ -130,20 +141,21 @@ export async function resolvePrivateArt(owner:string,assetId:string,current:()=>
     const original=document.createElement('canvas');original.width=Math.max(1,Math.round(bitmap.width*scale));original.height=Math.max(1,Math.round(bitmap.height*scale));
     original.getContext('2d')!.drawImage(bitmap,0,0,original.width,original.height);
     let image=original;
-    if(rig){
+    if(rig && rig.assembly.motion?.sprite!=='original'){
       image=document.createElement('canvas');image.width=original.width;image.height=original.height;
       const context=image.getContext('2d')!,sourcePixels=original.getContext('2d')!.getImageData(0,0,original.width,original.height);
       const mask=document.createElement('canvas');mask.width=original.width;mask.height=original.height;
       const maskContext=mask.getContext('2d',{willReadFrequently:true})!;let pixels:Uint8ClampedArray|undefined;
+      const layers=assemblyLayers(original,rig.assembly);
       for(const piece of rig.assembly.pieces){
-        const region=piece.region,layer=layerCanvas(original,original.width,original.height,piece,rig.assembly.pieces);
+        const region=piece.region,layer=layers.get(piece.id)!;
         maskContext.clearRect(0,0,mask.width,mask.height);
         maskContext.drawImage(layer,region.x*image.width,region.y*image.height,region.w*image.width,region.h*image.height);
         pixels=unionOriginalArtPixels(sourcePixels.data,maskContext.getImageData(0,0,mask.width,mask.height).data,pixels);
       }
       const output=context.createImageData(image.width,image.height);if(pixels)output.data.set(pixels);context.putImageData(output,0,0);
     }
-    return {assetId,drawingId:source.id,...(rig?{rigId:rig.id}:{}),label:source.name,detail:rig?'Saved cutout design':'Original artwork',image};
+    return {assetId,drawingId:source.id,...(rig?{rigId:rig.id}:{}),label:source.name,detail:rig?.assembly.motion?'Saved animation':rig?'Saved cutout design':'Original artwork',...(rig?.assembly.motion?{motion:rig.assembly.motion}:{}),image};
   }finally{bitmap.close();}
 }
 
