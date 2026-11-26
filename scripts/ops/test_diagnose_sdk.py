@@ -206,6 +206,20 @@ class PreflightTests(unittest.TestCase):
                 self.assertEqual(preflight.main(), 2)
                 select.assert_not_called()
 
+    def test_live_failure_never_retains_configured_status(self):
+        with patch.object(preflight, 'git', side_effect=['a' * 40, '']), \
+             patch.object(preflight.managed, 'identity_environment', return_value={
+                 'GOOGLE_APPLICATION_CREDENTIALS': '/managed/fixture', 'JEMS_DIAGNOSTIC_IDENTITY_ALIAS': 'GCP'}), \
+             patch.object(preflight.diagnose_sdk, 'credential_info'), \
+             patch.object(preflight.diagnose_sdk, 'report', side_effect=diagnose.DiagnosticError('TOKENINFO_UNAVAILABLE')), \
+             patch.object(sys, 'argv', ['preflight', '--expected-source', 'a' * 40, '--live']), \
+             contextlib.redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(preflight.main(), 2)
+            result = json.loads(out.getvalue())
+            self.assertEqual(result['status'], 'NOT_READY')
+            self.assertTrue(result['live_attempted'])
+            self.assertFalse(result['live_checked'])
+
     def test_offline_preflight_never_reads_cloud(self):
         with patch.object(preflight, 'git', side_effect=['a' * 40, '']), \
              patch.object(preflight.managed, 'identity_environment', return_value={

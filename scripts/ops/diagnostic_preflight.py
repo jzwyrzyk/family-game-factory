@@ -49,14 +49,17 @@ def main():
         diagnose_sdk.credential_info(env['GOOGLE_APPLICATION_CREDENTIALS'])
         result.update(identity_alias=env['JEMS_DIAGNOSTIC_IDENTITY_ALIAS'], status='CONFIGURED_NOT_VERIFIED')
         if args.live:
+            result['live_attempted'] = True
             result['self_check'] = diagnose_sdk.report(args.identity_alias, True)
             result['diagnostics'] = diagnose_sdk.report(args.identity_alias, verify_permissions=args.verify_permissions)
             result['live_checked'] = True
             result['status'] = 'READY_METADATA' if result['self_check']['exit_code'] == result['diagnostics']['exit_code'] == 0 else 'NOT_READY'
         code = 0 if result['status'] in ('CONFIGURED_NOT_VERIFIED', 'READY_METADATA') else 2
     except diagnose.DiagnosticError as error:
+        result['status'] = 'NOT_READY'
         result['error'] = str(error); code = 2
     except Exception:
+        result['status'] = 'NOT_READY'
         result['error'] = 'PREFLIGHT_UNAVAILABLE: Source, SDK or connection could not be verified.'; code = 2
     print(json.dumps(result, indent=2))
     return code

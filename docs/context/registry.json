@@ -1135,10 +1135,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T05:39:26.306Z",
-      "sourceDigest": "ecdc02e720b97ff6a3f137774ea2a420796fd938c2f613350b6fd3955a66d5bd",
+      "reviewedAt": "2026-11-26T05:40:16.097Z",
+      "sourceDigest": "fb5367cf9071c2792911dbb469c84cd5d9e3cf680b4d8efdca5b1e61c61a7f44",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented strict managed proxy authentication, authoritative identity blocker, and existence-qualified finite permission coverage in assistant access and delivery state.",
+      "reviewReason": "Reviewed canonical preflight failure reporting alongside documented managed identity and inventory blockers; failed live attempts now remain explicitly NOT_READY.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
