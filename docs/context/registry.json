@@ -890,10 +890,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T21:23:13.837Z",
-      "sourceDigest": "87d114b2a9156651ec4eefb2459822281d69a7e47ccaac6cc2882c257785941f",
+      "reviewedAt": "2026-11-26T00:34:18.335Z",
+      "sourceDigest": "a647b3cd456ed009ba0101ed704114dc253d3ec471bbe3aaf5f22e4b56010269",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved 77b failures and exact causal negatives/positives: native request cancellation versus simulated handler aborts, metadata-only empty-host observer ownership, and actual Change in both pending local read gaps; no browser errors or original assertions relaxed.",
+      "reviewReason": "The directory contract now asserts the observed working household URL. All 112 environment tests passed using synthetic services, with deployment and owner acceptance pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1134,10 +1134,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T22:22:20.675Z",
-      "sourceDigest": "88f269e5f104f50c96fb0e878d55fb16e09c75cdf070e55a85edb426be31674a",
+      "reviewedAt": "2026-11-26T00:33:51.707Z",
+      "sourceDigest": "5ab540b6e7bca7505f21d65bf01bf8c933c2a1828d29f40d152f222d025ca428",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the verified #186 merge, its 11 successful push workflows, tree equality, PR dispositions, worker continuity and the #188 handoff.",
+      "reviewReason": "Verified the household Pages site and marker and corrected the directory generator's broken production link. DEV and TEST still require private deployment receipts.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
