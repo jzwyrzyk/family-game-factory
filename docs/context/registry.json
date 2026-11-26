@@ -85,9 +85,10 @@
     "docs/development/COSTS.md",
     "docs/decisions/2026-11-23-dev-test-prod.md",
     "docs/ui-review/README.md",
-    "docs/creation-studio/CREATIVE_ASSET_AND_WORLD_STANDARD.md",
-    "docs/creation-studio/world-art-manifest.json",
-    "docs/decisions/2026-11-26-connected-creative-universe.md"
+    "docs/creative-universe/STANDARD.md",
+    "docs/decisions/2026-11-26-connected-creative-universe.md",
+    "docs/creation-studio/WORLD_ART.md",
+    "docs/creation-studio/world-art-manifest.json"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -128,7 +129,8 @@
     "docs/development/*.md",
     "infra/nonproduction/*.md",
     "docs/development/evidence/*.md",
-    "docs/storage/*.md"
+    "docs/storage/*.md",
+    "docs/creative-universe/*.md"
   ],
   "areas": [
     {
@@ -313,10 +315,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:09:22.226Z",
+      "reviewedAt": "2026-11-26T03:12:00.058Z",
       "sourceDigest": "ba3d8d381cc13596fc5c1f4ea0f721398f46956285bff57bbb074bb55a7fe07c",
-      "reviewOutcome": "updated",
-      "reviewReason": "Documented the owner's permanent authentic-art and 2D principles. Product illustrations carry separate authorship, scale, activity use and review status.",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Four newly illustrated product environments have separate origin and version records. The accepted standard already covers child authorship and immutable uses.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -417,9 +419,9 @@
       ],
       "reviewAfterDays": 30,
       "sourceDigest": "a8bb53d3aa90d9c1e7af9d7752cc1ee6727276a145a0ab9a399c5f9a10909404",
-      "reviewedAt": "2026-11-26T03:09:23.437Z",
+      "reviewedAt": "2026-11-26T03:12:02.230Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the four composition plates, registered transparent layers and individual object manifest. Stage integration uses these immutable catalogue references.",
+      "reviewReason": "Registered the four original environments and their layer, prop and preview files in the creative world artwork manifest.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -897,10 +899,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:09:23.676Z",
+      "reviewedAt": "2026-11-26T03:12:02.488Z",
       "sourceDigest": "83c23ae7f11c5e9a126b91d2cd247e3751ec0f01e85def1206f1090964231b99",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the catalogue integrity check and exact source stage in the delivery record. Owner visual review and hosted qualification remain pending.",
+      "reviewReason": "Recorded the manifest checks for content identity, scale and mapped files in the delivery entry for this source candidate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1141,10 +1143,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:09:41.235Z",
+      "reviewedAt": "2026-11-26T03:12:03.342Z",
       "sourceDigest": "d6691c0e7097678f19c4b2277e4782b32634074014cb41f4b11b9bc94c906b82",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded current household embedded source and identified these illustrations as a source candidate awaiting owner review and hosted acceptance.",
+      "reviewReason": "Recorded the consulted protected baseline and current household embedded release independently of local art readiness.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1399,10 +1401,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:09:24.151Z",
-      "sourceDigest": "2f3dea80168267acab79eb3aa72ba759d4f2baabd86fb9995a52493a5c232548",
-      "reviewOutcome": "updated",
-      "reviewReason": "Added the canonical standard and ownership decision to required documents and routed world illustrations through Creation review. Expanded the pull request evidence template.",
+      "reviewedAt": "2026-11-26T03:12:03.174Z",
+      "sourceDigest": "7a051079928b455c2ce3057ed43f727e5774c1c79cf8889bca2fd94e78dc13f0",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The current governance requires a single canonical creative standard. The catalogue and provenance now participate in existing creation documentation checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1612,7 +1614,8 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/drawings/*.md",
         "docs/creation-studio/*.md",
-        "docs/decisions/2026-11-19-private-art-studio.md"
+        "docs/decisions/2026-11-19-private-art-studio.md",
+        "docs/creative-universe/*.md"
       ],
       "sources": [
         "src/drawing/**",
@@ -1623,10 +1626,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "467544c05466d8d0c1045244fa942dbfccf7b81e1e04635e8f5ecae1c0b62afc",
-      "reviewedAt": "2026-11-25T23:21:00.320Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "My Creations uses the shared header and retains the My Art action. The drawing library, private assets and editor use the inherited My Art contract.",
+      "sourceDigest": "b0021e16fa3a1ec1088b8ed9d923b951798654608b6d7ef72522c4c9bf76512e",
+      "reviewedAt": "2026-11-26T03:05:50.127Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Routed the shared identity, original-byte, pinning, ownership and lifecycle standard into Art Studio review.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
