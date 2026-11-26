@@ -413,10 +413,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fee0252694b94e3f1254485510ef5c6da2cbd6ca19ac18af19c0ec8e8e26b54d",
-      "reviewedAt": "2026-11-25T23:20:54.040Z",
+      "sourceDigest": "85c2cb423be8d914e7c156ff35069f127a261f094a3d6716e41687ced2d46e80",
+      "reviewedAt": "2026-11-26T03:08:53.760Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The scene rendering contract distinguishes legacy pinned tokens and neutral bytes from new active actor choices.",
+      "reviewReason": "Creative Studio documents the path pad, optional name on Repeat groups, 24 relative moves, local private actor pins and reuse from an explicit Keep.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -894,10 +894,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:07:05.195Z",
-      "sourceDigest": "13b55f506d582f6afa8a3f6100cfbb6df884f0c3813427ce6b4c51f9e2095b55",
+      "reviewedAt": "2026-11-26T03:08:54.619Z",
+      "sourceDigest": "59d4fbfecc3bce64ec3fb9ae8b525ec0509ecdcc42e2ed6d6d4ebfe9b8de3e87",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The new offline sketch and recovery journey joins the existing test:art-browser creative CI shard and adds no separate CI authority or provider coverage.",
+      "reviewReason": "Attached path regression cases to the existing creation unit and browser suites; the checked CI manifest expands both existing creative shard commands and preserves full coverage.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1138,10 +1138,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:07:06.155Z",
-      "sourceDigest": "0f06813f92e2b9a100767df63ef687efd9e63be61f4792c3852b63f9572bb2b8",
+      "reviewedAt": "2026-11-26T03:08:55.290Z",
+      "sourceDigest": "407481a3b75669bdaeafbb738f58e1d82d582963d41ecba68eb2cd85da8fc5de",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The package change registers one local artwork regression in its existing gate. Deployment identity, traffic, provider and family activation contracts remain as recorded.",
+      "reviewReason": "The package changes extend the existing creation test commands. Deployment controls, release audiences and service or worker configuration retain the documented contracts.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1705,10 +1705,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "381260b659e8d8ed26b7fdddb3c2182a49d2f8f9cffd808e7d167695f25bfb3a",
-      "reviewedAt": "2026-11-26T00:23:36.006Z",
+      "sourceDigest": "3b669cf847b1ba4c4642c8130894505a04e7b12f3707b8ffd273b74370ed92df",
+      "reviewedAt": "2026-11-26T03:08:54.218Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled merged F06 rollback limits with the owner-scoped Pal migration, retained readers and repeat restore contract."
+      "reviewReason": "Architecture records reads of the active owner’s kept scene revision in both original and indexed scene storage. Copying motion writes a new group of block IDs through existing autosave, keep and backup."
     }
   ]
 }

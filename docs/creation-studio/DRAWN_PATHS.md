@@ -14,3 +14,5 @@ The stage clamps playback to its own boundaries. The composer edits whole-actor 
 
 - [Path and storage tests](../../tests/creation-motion-path.test.ts) cover deterministic timing, copied IDs, exact Keep selection, profile authorization, group eligibility and private manifest rejection.
 - [Browser journey](../../tests/creation-motion-browser.cjs) exercises a synthetic transparent picture, path editing, reduced-motion stepping, ordinary playback, pixel-reference pinning, cross-scene reuse and undo. It writes screenshots to `test-results/creation-motion` by default.
+
+The local production build at `fe015626a235e9f53928458f866eb7da6ecd1eae` passed the 90 Creative Studio unit checks and the focused mouse and keyboard journey. The screenshots show a synthetic transparent moon rock on a [desktop path pad](../creative-universe/evidence/motion/draw-a-path.png), the [390 px path pad](../creative-universe/evidence/motion/draw-a-path-phone.png) and the [completed scene](../creative-universe/evidence/motion/path-playback.png). The phone screenshot uses Chromium viewport emulation.
