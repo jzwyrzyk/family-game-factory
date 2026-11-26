@@ -1,11 +1,11 @@
-import {saveDrawing, type Drawing, type DrawingCategory} from '../assets/private-drawings';
+import {drawing, saveDrawing, type Drawing, type DrawingCategory} from '../assets/private-drawings';
 import {iconMarkup} from '../brand/icons';
 import {assertRewardSourceWritable, rewardSourceWritable} from '../rewards/write-guard';
 import {
   PaperHistory, prepareStamps, renderPaper, renderMark, hitMark, transformMark, pointerPoint,
-  markBounds, maxPointsPerMark, type Sheet, type Tool, type Point, type Mark, type Stamp,
+  markBounds, maxPointsPerMark, sheetSize, type Sheet, type Tool, type Point, type Mark, type Stamp,
 } from './workspace-engine';
-import {sketchPng} from './sketch';
+import {readSketchKeep, verifySketchKeep, stageSketchKeep, finishSketchKeep, discardSketchKeep, type SketchKeep} from './sketch-keep';
 import './style.css';
 
 const palette = {
@@ -28,9 +28,39 @@ const invitations: Record<string,{category:DrawingCategory;hint:string}> = {
 };
 const limit = (n:number, min:number, max:number) => Math.max(min,Math.min(max,n));
 
+async function unfinishedChoice(keep:SketchKeep, isCurrent:()=>boolean):Promise<'keep'|'resume'|'discard'|'close'> {
+  const dialog=document.createElement('dialog');
+  dialog.className='drawing-lab dp-recovery';
+  dialog.setAttribute('aria-labelledby','sketchRecoveryHeading');
+  dialog.innerHTML=`<h2 id="sketchRecoveryHeading">Finish saving your art?</h2><p data-name></p>
+    <div><button type="button" data-keep>${iconMarkup('save')} Keep this picture</button><button type="button" data-resume>${iconMarkup('edit')} Open my drawing</button>
+    <button type="button" data-discard>Discard unfinished save</button>
+    <button type="button" data-close>Close</button></div>`;
+  dialog.querySelector('[data-name]')!.textContent=keep.name;
+  document.body.append(dialog);
+  const onChange=()=>{if(!isCurrent())dialog.close('close');};
+  window.addEventListener('factory-profile',onChange);window.addEventListener('factory-page',onChange);
+  return new Promise(resolve=>{
+    dialog.querySelector<HTMLButtonElement>('[data-keep]')!.onclick=()=>dialog.close('keep');
+    dialog.querySelector<HTMLButtonElement>('[data-resume]')!.onclick=()=>dialog.close('resume');
+    dialog.querySelector<HTMLButtonElement>('[data-close]')!.onclick=()=>dialog.close('close');
+    dialog.querySelector<HTMLButtonElement>('[data-discard]')!.onclick=()=>{
+      if(isCurrent() && confirm('Discard this unfinished save? Earlier saved art stays in My Art.'))dialog.close('discard');
+    };
+    dialog.addEventListener('close',()=>{
+      const action=dialog.returnValue;
+      window.removeEventListener('factory-profile',onChange);window.removeEventListener('factory-page',onChange);
+      dialog.remove();resolve(isCurrent() && (action==='keep' || action==='resume' || action==='discard')?action:'close');
+    },{once:true});
+    dialog.showModal();
+  });
+}
+
 /** My Art and the older drawing entry share this editor and private save path. */
 export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Promise<void>|void,
   isCurrent:()=>boolean=()=>true, previous?:{item:Drawing;sketch:Sheet}) {
+  const hasEditor=()=>Boolean(document.querySelector('dialog.drawing-paint[open],dialog.dp-recovery[open]'));
+  if(hasEditor())return;
   const profile = () => (window as any).FG?.store?.current();
   const checkOwner = () => String(profile()?.id ?? '') === owner;
   if (!checkOwner() || previous && previous.item.owner !== owner) throw Error('Choose the player who owns this drawing.');
@@ -38,20 +68,47 @@ export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Prom
   assertRewardSourceWritable();
   const returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   const originPage = document.querySelector<HTMLElement>('.page:not(.hidden)')?.id.replace(/^page-/,'');
+  const openingCurrent = () => checkOwner() && isCurrent() && (!originPage || document.getElementById('page-'+originPage)?.classList.contains('hidden')===false);
+  let source=previous?.item, initial=previous?.sketch, token:string=crypto.randomUUID();
+  let initialName=source?.name??'', initialCategory:DrawingCategory='other', recovered=false;
+  const pending=await readSketchKeep(owner);
+  if(!openingCurrent() || hasEditor())return;
+  if(pending){
+    const choice=await unfinishedChoice(pending,openingCurrent);
+    if(choice==='close' || !openingCurrent())return;
+    if(choice==='keep'){
+      const saved=await finishSketchKeep(owner,pending.token,openingCurrent);
+      if(openingCurrent())await onSaved(saved);
+      return;
+    }
+    if(choice==='discard'){
+      await discardSketchKeep(owner,pending.token,openingCurrent);
+    }else{
+      const checked=await verifySketchKeep(owner,pending.token);
+      if(!openingCurrent())return;
+      source=checked.sourceId?await drawing(owner,checked.sourceId):undefined;
+      if(checked.sourceId && source?.sha256!==checked.sourceSha256)throw Error('Restore the earlier version to finish this save. Your unfinished page is safe.');
+      token=checked.token;initial=checked.sheet;initialName=checked.name;initialCategory=checked.category;recovered=true;
+    }
+  }
+  if(!openingCurrent() || hasEditor())return;
+  if(!initial && matchMedia('(max-width: 600px) and (orientation: portrait)').matches){
+    initial={version:1,transparent:false,marks:[],orientation:'portrait'};
+  }
   const dialog = document.createElement('dialog');
   dialog.className = 'drawing-lab drawing-paint';
-  dialog.setAttribute('aria-label',previous?'Keep drawing':'Draw something new');
+  dialog.setAttribute('aria-label',source || recovered?'Keep drawing':'Draw something new');
   const grade = profile()?.grade ?? 1;
   const basic: Tool[] = grade <= 0 ? ['crayon','eraser','circle'] : ['pencil','crayon','brush','eraser','circle'];
   const extras: Tool[] = ['pencil','brush','marker','fill','line','circle','rectangle','triangle','star','select'];
   dialog.innerHTML = `<header class="dp-head">
     <img src="./jems-art/spot_first_idea.webp" alt="" width="78" height="70">
-    <div><h2>${previous?'Keep drawing':'Draw your idea!'}</h2><p data-hint>${previous?'Keep a new version when you’re ready.':invitations.Anything.hint}</p></div>
+    <div><h2>${source || recovered?'Keep drawing':'Draw your idea!'}</h2><p data-hint>${source || recovered?'Keep a new version when you’re ready.':invitations.Anything.hint}</p></div>
     <button type="button" data-exit aria-label="Close drawing page">${iconMarkup('close')} Close</button>
   </header>
   <div class="dp-work">
     <section class="dp-desk" aria-label="Drawing page">
-      ${previous?'':`<div class="dp-invite" role="group" aria-label="Drawing ideas">${Object.keys(invitations).map((name,i)=>`<button type="button" data-idea="${name}" aria-pressed="${i===0}">${name}</button>`).join('')}</div>`}
+      ${source || recovered?'':`<div class="dp-invite" role="group" aria-label="Drawing ideas">${Object.keys(invitations).map((name,i)=>`<button type="button" data-idea="${name}" aria-pressed="${i===0}">${name}</button>`).join('')}</div>`}
       <canvas data-paper width="900" height="560" tabindex="0" aria-label="Drawing page. Arrow keys move. Hold Space and use arrows to draw. Enter makes one mark."></canvas>
       <div class="dp-history"><button data-focus type="button" aria-pressed="false">${iconMarkup('search')} Focus on paper</button><button type="button" data-undo>${iconMarkup('undo')} Undo</button><button type="button" data-redo>${iconMarkup('retry')} Redo</button>
         <details><summary>Keyboard help</summary><p>Arrows move. Hold Space and use arrows to draw. Enter places a mark. With Select, Enter picks a mark and arrows move it.</p></details>
@@ -75,26 +132,29 @@ export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Prom
       </details>
     </aside>
   </div>
-  <footer class="dp-keep"><label>My drawing is called<input data-title maxlength="60" placeholder="My drawing"></label>
+  <footer class="dp-keep"><button type="button" data-tray aria-expanded="false">${iconMarkup('edit')} Tools</button><label>My drawing is called<input data-title maxlength="60" placeholder="My drawing"></label>
     <button type="button" data-save>${iconMarkup('save')} Keep my art</button><p role="status" aria-live="polite" data-message></p></footer>`;
   document.body.append(dialog);
   const find = <T extends HTMLElement>(selector:string) => dialog.querySelector<T>(selector)!;
   const canvas = find<HTMLCanvasElement>('[data-paper]');
+  const history = new PaperHistory(initial);
+  const extent=sheetSize(history.sheet);
+  canvas.width=extent.width;canvas.height=extent.height;
+  canvas.style.setProperty('--dp-aspect',String(extent.width/extent.height));
   const ctx = canvas.getContext('2d');
   const committed = document.createElement('canvas');
   committed.width = canvas.width; committed.height = canvas.height;
   const cache = committed.getContext('2d');
   if (!ctx || !cache) { dialog.remove(); throw Error('This device could not open a drawing page. Your pictures are safe.'); }
   const renderer = ctx, backing = cache;
-  const history = new PaperHistory(previous?.sketch);
   const title = find<HTMLInputElement>('[data-title]');
-  title.value = previous?.item.name ?? '';
+  title.value = initialName;
   const status = find('[data-message]'), paper = find<HTMLSelectElement>('[data-background]');
-  let tool:Tool='crayon', stamp:Stamp='blue', color:string=palette.Charcoal, size=10, category:DrawingCategory='other';
+  let tool:Tool='crayon', stamp:Stamp='blue', color:string=palette.Charcoal, size=10, category:DrawingCategory=initialCategory;
   let selected=-1, active:Mark|null=null, start:Point|null=null, drag:Mark|null=null, pointer:number|null=null;
-  let keyboard=false, showCursor=false, saving=false, dirty=false, disposed=false, pageCurrent=true, pendingFrame=0;
-  let stampsReady=false, loadingPrevious=Boolean(previous?.sketch.marks.some(mark=>mark.tool==='stamp'));
-  const cursor:Point={x:450,y:280};
+  let keyboard=false, showCursor=false, saving=false, dirty=recovered, disposed=false, pageCurrent=true, pendingFrame=0;
+  let stampsReady=false, loadingPrevious=Boolean(initial?.marks.some(mark=>mark.tool==='stamp'));
+  const cursor:Point={x:extent.width/2,y:extent.height/2};
   const alive=()=>!disposed && pageCurrent && checkOwner() && isCurrent();
   const canEdit=()=>{
     if(!alive() || saving || loadingPrevious)return false;
@@ -160,7 +220,7 @@ export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Prom
   }
   function move(point:Point){
     if(tool==='select' && start && selected>=0){
-      drag=transformMark(history.sheet.marks[selected],point.x-start.x,point.y-start.y);
+      drag=transformMark(history.sheet.marks[selected],point.x-start.x,point.y-start.y,1,history.sheet);
     }else if(active){
       const last=active.points.at(-1)!;
       if(freehand.includes(active.tool)){
@@ -200,7 +260,7 @@ export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Prom
   function transformSelected(dx:number,dy:number,scale=1){
     if(selected<0)return;
     const sheet=history.sheet, marks=sheet.marks.slice();
-    marks[selected]=transformMark(marks[selected],dx,dy,scale);commit({...sheet,marks});
+    marks[selected]=transformMark(marks[selected],dx,dy,scale,sheet);commit({...sheet,marks});
   }
   canvas.addEventListener('keydown',event=>{
     if(!canEdit() || pointer!==null)return;
@@ -243,9 +303,31 @@ export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Prom
   for(const action of ['undo','redo'] as const)find('[data-'+action+']').onclick=()=>{
     if(!canEdit())return;discardGesture();selected=-1;history[action]();dirty=true;refresh();
   };
+  const mobile=matchMedia('(max-width:600px) and (orientation:portrait)');
+  const basicTools=find<HTMLElement>('[aria-label="Drawing tools"]');
+  basicTools.classList.add('dp-basic-tools');
+  function placeBasicTools(){
+    if(mobile.matches && !dialog.classList.contains('dp-pocket-open'))canvas.before(basicTools);
+    else find('.dp-tools h3').after(basicTools);
+  }
+  mobile.addEventListener('change',placeBasicTools);placeBasicTools();
+  const tray=find<HTMLButtonElement>('[data-tray]');
+  const trayPanel=find<HTMLElement>('.dp-tools');
+  trayPanel.id='drawingSupplies';tray.setAttribute('aria-controls',trayPanel.id);
+  function closeTray(){
+    dialog.classList.remove('dp-pocket-open');tray.setAttribute('aria-expanded','false');
+    tray.innerHTML=iconMarkup('edit')+' Tools';placeBasicTools();
+  }
+  tray.onclick=()=>{
+    if(dialog.classList.contains('dp-pocket-open')){closeTray();canvas.focus({preventScroll:true});}
+    else{
+      dialog.classList.add('dp-pocket-open');tray.setAttribute('aria-expanded','true');tray.innerHTML=iconMarkup('check')+' Done';
+      placeBasicTools();trayPanel.scrollTop=0;trayPanel.querySelector('button')?.focus({preventScroll:true});
+    }
+  };
   const focusMode=find<HTMLButtonElement>('[data-focus]');
   focusMode.onclick=()=>{
-    const focused=dialog.classList.toggle('dp-focus');
+    closeTray();const focused=dialog.classList.toggle('dp-focus');
     focusMode.setAttribute('aria-pressed',String(focused));
     focusMode.innerHTML=iconMarkup(focused?'edit':'search')+(focused?' Show tools':' Focus on paper');
     if(focused){dialog.scrollTop=0;canvas.focus({preventScroll:true});}
@@ -264,10 +346,11 @@ export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Prom
     if(!canEdit() || !history.sheet.marks.length)return;
     discardGesture();saving=true;updateControls();
     try{
-      const raster=await new Promise<Blob>((resolve,reject)=>committed.toBlob(blob=>blob?resolve(blob):reject(Error('Could not save this page. Please try again.')),'image/png'));
+      const keep={token,name:title.value.trim() || 'My drawing',category,sheet:history.sheet,
+        ...(source?{sourceId:source.id,sourceSha256:source.sha256}:{})};
+      const file=await stageSketchKeep(owner,keep,alive,committed);
       if(!alive())return;
-      const file=sketchPng(raster,history.sheet);
-      const saved=await saveDrawing(owner,title.value.trim() || 'My drawing',file,previous?.item.id,alive,category);
+      const saved=await saveDrawing(owner,keep.name,file,source?.id,alive,category,token);
       if(!alive())return;
       dirty=false;await onSaved(saved);if(alive())dialog.close();
     }catch(error){if(alive())status.textContent=(error as Error).message;}
@@ -291,7 +374,7 @@ export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Prom
   window.addEventListener('factory-profile',onProfile);
   window.addEventListener('factory-page',onPage);
   dialog.addEventListener('close',()=>{
-    disposed=true;cancelAnimationFrame(pendingFrame);discardGesture();
+    disposed=true;cancelAnimationFrame(pendingFrame);discardGesture();mobile.removeEventListener('change',placeBasicTools);
     window.removeEventListener('factory-profile',onProfile);window.removeEventListener('factory-page',onPage);
     dialog.remove();committed.width=canvas.width=1;
     if(checkOwner() && pageCurrent && isCurrent() && returnFocus?.isConnected)returnFocus.focus({preventScroll:true});

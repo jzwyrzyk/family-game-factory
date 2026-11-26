@@ -137,3 +137,28 @@
   .drawing-paint.dp-focus .dp-history button,.drawing-paint.dp-focus .dp-keep button{padding:6px 4px;min-height:44px;font-size:13px}
   .drawing-paint.dp-focus .dp-keep{grid-area:3/2;position:static;padding:0;border:0;display:grid}
 }
+.drawing-paint [data-paper]{aspect-ratio:var(--dp-aspect)}
+.drawing-paint.dp-focus [data-paper]{aspect-ratio:var(--dp-aspect)}
+.dp-recovery{width:min(450px,94vw);padding:22px}.dp-recovery h2{margin-top:0;font-family:var(--jems-round,system-ui)}
+.dp-recovery p{overflow-wrap:anywhere}.dp-recovery div{display:flex;flex-wrap:wrap;gap:8px}
+.dp-recovery [data-resume]{background:#6842b5;color:white;border-color:#6842b5}
+@media(orientation:portrait) and (max-width:600px){
+  .drawing-paint .dp-desk [data-paper]{width:auto;height:auto;max-width:100%;max-height:53dvh;margin:0 auto}
+  .drawing-paint.dp-focus .dp-desk [data-paper]{max-height:calc(100dvh - 208px)}
+  .drawing-paint.dp-focus .dp-head p,.drawing-paint.dp-focus .dp-head img,.drawing-paint.dp-focus .dp-history details{display:none}
+  .drawing-paint.dp-focus .dp-head{padding:7px 12px}
+}
+.drawing-paint .dp-keep [data-tray]{display:none}
+@media(max-width:600px) and (orientation:portrait){
+  .drawing-paint .dp-keep [data-tray]{display:inline-flex}
+  .drawing-paint.dp-focus .dp-keep [data-tray]{display:none}
+  .drawing-paint .dp-keep>button{font-size:14px;padding-inline:9px}
+  .drawing-paint .dp-keep label{min-width:75px;font-size:12px}
+  .drawing-paint.dp-pocket-open .dp-tools{position:fixed;z-index:3;left:6px;right:6px;bottom:78px;padding:14px;max-height:45dvh;overflow:auto;overscroll-behavior:contain;border:2px solid #b59dcb;box-shadow:0 -6px 26px #40255829}
+}
+@media(max-width:600px) and (orientation:portrait){
+  .dp-desk>.dp-basic-tools{flex-wrap:nowrap;overflow:auto;padding:2px 2px 6px;gap:5px}
+  .dp-desk>.dp-basic-tools button{display:inline-flex;flex-direction:column;gap:3px;min-width:55px;min-height:50px;padding:3px 5px;font-size:12px}
+  .drawing-paint.dp-focus .dp-desk>.dp-basic-tools{display:none}
+  .drawing-paint:not(.dp-focus) .dp-desk [data-paper]{max-height:47dvh}
+}

@@ -19,10 +19,23 @@ async function pictures(page) {
         const canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;
         const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0);image.close();
         return {id:item.id,digest:item.sha256,parent:item.sourceId,parentDigest:item.sourceSha256,category:item.category,
-          background:[...ctx.getImageData(0,0,1,1).data],ink:[...ctx.getImageData(450,280,1,1).data]};
+          background:[...ctx.getImageData(0,0,1,1).data],ink:[...ctx.getImageData(Math.floor(canvas.width/2),Math.floor(canvas.height/2),1,1).data]};
       }));
     }finally{db.close();}
   });
+}
+
+async function failNextDrawingWrite(page){
+  await page.evaluate(()=>{
+      const native=IDBObjectStore.prototype.add;
+      IDBObjectStore.prototype.add=function(...args){
+        if(this.name==='drawings'){
+          IDBObjectStore.prototype.add=native;
+          throw new DOMException('Fixture storage is full','QuotaExceededError');
+        }
+        return native.apply(this,args);
+      };
+    });
 }
 
 (async()=>{
@@ -44,20 +57,16 @@ async function pictures(page) {
     if(!await options.evaluate(node=>node.open))await options.locator('summary').click();
     await options.locator('[data-background]').selectOption('clear');
     await editor.locator('[data-title]').fill('Moon mole');
-    await page.evaluate(()=>{
-      const native=IDBObjectStore.prototype.add;
-      IDBObjectStore.prototype.add=function(...args){
-        if(this.name==='drawings'){
-          IDBObjectStore.prototype.add=native;
-          throw new DOMException('Fixture storage is full','QuotaExceededError');
-        }
-        return native.apply(this,args);
-      };
-    });
+    await failNextDrawingWrite(page);
     await editor.locator('[data-save]').click();
     await editor.locator('[data-message]').filter({hasText:/full/i}).waitFor();
     assert.equal(await editor.locator('[data-title]').inputValue(),'Moon mole');
     assert.deepEqual(await pictures(page),[],'failed first save rolls back and keeps the open drawing');
+    await page.reload();await page.locator('#artDrawButton').click();
+    const recovery=page.locator('dialog.dp-recovery');await recovery.getByRole('button',{name:'Open my drawing'}).click();
+    assert.equal(await editor.locator('[data-title]').inputValue(),'Moon mole','interrupted Keep reopens the private page');
+    assert.equal(await editor.locator('[data-background]').inputValue(),'clear');
+    assert.equal(await editor.locator('[data-save]').isEnabled(),true);
     await editor.locator('[data-save]').click();await editor.waitFor({state:'detached'});
     const [original]=await pictures(page);
     assert.equal(original.category,'character');assert.equal(original.background[3],0);assert.ok(original.ink[3]>0);
@@ -66,8 +75,11 @@ async function pictures(page) {
     assert.equal(await editor.locator('[data-title]').inputValue(),'Moon mole');
     assert.equal(await editor.locator('[data-background]').inputValue(),'clear');
     await editor.locator('[data-tool=eraser]').click();await paper.press('Enter');
-    await editor.locator('[data-title]').fill('Moon mole hiding');await editor.locator('[data-save]').click();
-    await editor.waitFor({state:'detached'});
+    await editor.locator('[data-title]').fill('Moon mole hiding');await failNextDrawingWrite(page);
+    await editor.locator('[data-save]').click();await editor.locator('[data-message]').filter({hasText:/full/i}).waitFor();
+    await page.reload();await page.locator('#artDrawButton').click();
+    await page.locator('dialog.dp-recovery').getByRole('button',{name:'Keep this picture'}).click();
+    await page.locator('#artDetailTitle').filter({hasText:'Moon mole hiding'}).waitFor();
     const rows=await pictures(page),version=rows.find(x=>x.parent===original.id);
     assert.ok(version);assert.deepEqual(rows.find(x=>x.id===original.id),original);
     assert.equal(version.parentDigest,original.digest);assert.notEqual(version.digest,original.digest);assert.equal(version.ink[3],0);
@@ -86,6 +98,6 @@ async function pictures(page) {
     assert.equal(await recovered.locator('[data-title]').inputValue(),'Moon mole');
     assert.equal(await recovered.locator('[data-background]').inputValue(),'clear');
     assert.deepEqual(errors,[]);assert.deepEqual(posts,[]);
-    console.log('PASS sketch save retry, true transparency, editable reopen, immutable version and private bundle restore');
+    console.log('PASS sketch retry across reload, true transparency, editable reopen, immutable version and private bundle restore');
   }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(e=>{console.error(e);process.exitCode=1;});
