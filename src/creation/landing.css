@@ -58,3 +58,8 @@
 .creation-scene-options:not([open]) > div { display: none; }
 .creation-kept-world { display: grid; align-content: start; gap: 4px; }
 .creation-kept-world > .creation-button { justify-self: start; min-height: 44px; }
+
+.creation-blank-paper { display: block; min-height: 100px; background: white; border-bottom: 1px solid #d7cee3; }
+.creation-placement-controls { display: flex; flex-wrap: wrap; gap: .45rem; grid-column: 1 / -1; }
+.creation-placement-controls button, #creationJemsProps summary { min-height: 44px; }
+#creationJemsProps summary { cursor: pointer; padding: .65rem; font-weight: 700; }

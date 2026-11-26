@@ -154,6 +154,11 @@ export function createStarterProject(kind:CreationStarter,title=titleFor[kind]):
 }
 
 export function createIllustratedStarter(kind: CreationStarter, worldId?: string): CreationProject {
+  if (kind === 'blank' && worldId === 'blank') {
+    const project = starter('blank', 'My world');
+    project.background = 'blank';
+    return project;
+  }
   const defaults = { dragon: 'world-forest-v1', buckets: 'world-cloud-v1', robot: 'world-workshop-v1', blank: 'world-moon-v1' };
   const world = ILLUSTRATED_WORLDS.find(item => item.id === (worldId ?? defaults[kind]));
   if (!world) throw Error('Choose an available illustrated world.');

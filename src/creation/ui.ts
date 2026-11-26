@@ -5,14 +5,14 @@ import {earlySoundMuted} from '../learning/early/audio';
 import {profileGrade} from '../learning/engine';
 import {isEarlyGrade,withinGrade} from '../learning/grades';
 import { SceneEngine, type SceneSnapshot } from './engine';
-import { validateCreationProject, type CreationProject, type CreationBlock } from './model';
+import { validateCreationProject, type CreationProject, type CreationBlock, type SceneActor } from './model';
 import { CREATION_ASSETS, createIllustratedStarter, createProjectFromStudio, creationAsset, validateEditableProject, parsePrivateArtId } from './projects';
 import { CreationStore, CREATION_KEY, validateCreationWorkspace, type CreationEntry } from './storage';
 import {CreationWorkspace,prepareIndexedCreation} from '../storage/creation-workspace';
 import { challengesForGrade, getCreationChallenge, createChallengeStarter, createChallengeTarget, evaluateChallenge, predictActor, firstMovement, movementChoices, type MovementChoice } from './challenges';
 import { profileStorage } from '../adult-pilot/storage';
 import { CreationStage } from './stage';
-import { ILLUSTRATED_WORLDS } from './illustrated-art';
+import { ILLUSTRATED_WORLDS, WORLD_PROPS } from './illustrated-art';
 import { placeBackdrop, setWorldLayer, worldControls, worldTiles } from './world-tools';
 import { sceneThumbnails } from './scene-thumbnails';
 import type { StudioSession } from '../studio/notebook';
@@ -119,7 +119,7 @@ export function installCreationStudio(host: Host) {
       <section id="creationVersions" class="creation-versions" hidden><div class="creation-shelf-heading"><h2>Saved versions</h2><button id="creationCloseHistory" class="creation-button">${iconMarkup('close')} Close</button></div><div id="creationVersionList"></div></section>
     </div>
     <input id="creationImport" type="file" accept="application/json,.json" hidden>
-    <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">${iconMarkup('close')}</button></div><div id="creationPalSlot"></div><section><div class="creation-shelf-heading"><h3>My art</h3><button id="creationOpenArtStudio" class="creation-button">${iconMarkup('edit')} My Art</button></div><p id="creationActorArtStatus" role="status"></p><div id="creationPrivateActorChoices"></div></section><h3>Characters & things</h3><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
+    <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">${iconMarkup('close')}</button></div><div id="creationPalSlot"></div><section><div class="creation-shelf-heading"><h3>My art</h3><button id="creationOpenArtStudio" class="creation-button">${iconMarkup('edit')} My Art</button></div><p id="creationActorArtStatus" role="status"></p><div id="creationPrivateActorChoices"></div></section><section id="creationJemsProps"></section><h3>Characters & things</h3><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
   document.querySelector('main')!.append(page);
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => page.querySelector<T>('#' + id)!;
   const introduction=createStudioIntroduction(host.guidance,()=>shelf('landing'));
@@ -131,6 +131,7 @@ export function installCreationStudio(host: Host) {
   const worldSelect = $<HTMLSelectElement>('creationBackground');
   const choices = document.createElement('optgroup');
   choices.label = 'Illustrated worlds';
+  choices.append(new Option('Blank world', 'blank'));
   for (const world of ILLUSTRATED_WORLDS) choices.append(new Option(world.label, world.id));
   worldSelect.prepend(choices);
   const palShelf = node('section', 'creation-pal-shelf'); palShelf.id = 'creationPals';
@@ -227,7 +228,7 @@ export function installCreationStudio(host: Host) {
   function paint() {
     if (!scene || !engine) return;
     const snapshot = engine.snapshot();
-    stage.render(targetMode && targetProject ? targetProject : scene, snapshot, targetMode || snapshot.status === 'running' ? '' : selectedActor);
+    stage.render(targetMode && targetProject ? targetProject : scene, snapshot, targetMode || recording || page.dataset.workspaceView === 'play' || snapshot.status !== 'idle' ? '' : selectedActor);
     $('creationClock').textContent = (snapshot.timeMs / 1000).toFixed(1) + ' s';
     $('creationRunStatus').textContent = snapshot.status === 'limit' ? snapshot.reason || 'Try fewer repeats.' : snapshot.status === 'running' ? 'Follow your blocks' : snapshot.status === 'paused' ? 'Paused' : snapshot.status === 'completed' ? 'Try a change, or tap a character' : 'Ready to try';
     const words = [...snapshot.actors.filter(actor => actor.visible && actor.speech).map(actor => `${actor.name}: ${actor.speech}`),
@@ -462,12 +463,13 @@ export function installCreationStudio(host: Host) {
       ['dragon', 'A dragon’s big day', 'Old friends. A brand-new story.', './jems-world-dragon.svg'],
       ['buckets', 'A splash of silliness', 'Surprises, splashes, and silly dances.', './jems-world-buckets.svg'],
       ['robot', 'A robot with a plan', 'Every little step starts with you.', './jems-world-robot.svg'],
-      ['blank', 'Anything you imagine', 'An open stage for your next idea.', './jems-workbench.svg'],
+      ['blank', 'Blank world', 'An open stage for your next idea.', ''],
     ] as const) {
       const button = node('button', 'creation-starter creation-starter-' + kind); button.type = 'button'; button.dataset.creationStarter = kind;
-      const image = node('img'); image.src = src; image.alt = '';
+      const image = src ? node('img') : node('span', 'creation-blank-paper');
+      if (image instanceof HTMLImageElement) { image.src = src; image.alt = ''; }
       const info = node('span', 'creation-starter-copy'); info.append(node('strong', '', name), iconNode('b', '', 'arrow', 'Make a scene'));
-      button.append(image, info); button.onclick = async () => await act(async () => await create(kind)); starters.append(button);
+      button.append(image, info); button.onclick = async () => await act(async () => await create(kind, kind === 'blank' ? 'blank' : undefined)); starters.append(button);
     }
     const current=await store(),captured=owner(),view=viewEpoch,first=await current.page(captured,null,24),projects=first.items;let after=first.next;
     thumbnails?.clear();
@@ -770,6 +772,33 @@ export function installCreationStudio(host: Host) {
         box.append(changeVersion);
       }
     }
+    if (!challengeId) {
+      const controls = node('div', 'creation-placement-controls');
+      const action = (name: string, change: (project: CreationProject, placed: SceneActor) => void) => {
+        const button = node('button', 'creation-button', name);
+        button.type = 'button';
+        button.onclick = () => act(() => mutation(project => change(project, project.actors.find(item => item.id === actor.id)!)));
+        controls.append(button);
+      };
+      action('Move left', (_, a) => { a.x = Math.max(0, a.x - 20); });
+      action('Move right', (p, a) => { a.x = Math.min(p.width, a.x + 20); });
+      action('Move up', (_, a) => { a.y = Math.max(0, a.y - 20); });
+      action('Move down', (p, a) => { a.y = Math.min(p.height, a.y + 20); });
+      action('Smaller', (_, a) => { a.size = Math.max(16, (a.size ?? 100) - 20); });
+      action('Bigger', (_, a) => { a.size = Math.min(240, (a.size ?? 100) + 20); });
+      action('Turn', (_, a) => { a.angle = (((a.angle ?? 0) + 195) % 360) - 180; });
+      if (actor.layer === 'backdrop') {
+        box.append(choice('Fit drawing', actor.backdropFit ?? 'contain',
+          [['contain','Show whole drawing'], ['cover','Fill the stage']], value => set('backdropFit', value)));
+      } else {
+        action('Duplicate', (p, a) => {
+          const twin = {...a, id:uid(), x:Math.min(p.width, a.x + 20), y:Math.min(p.height, a.y + 20)};
+          p.actors.push(twin);
+          selectedActor = twin.id; selectedProgram = ''; insert = null;
+        });
+      }
+      box.prepend(controls);
+    }
     if (actor.layer !== 'backdrop' && !challengeId) box.append(choice('Picture layer', actor.layer || 'middle',
       [['back','Behind the scenery'], ['middle','With the characters'], ['front','At the front']], value => set('layer', value)));
     const remove = iconNode('button', 'creation-text-button', 'trash', 'Remove'); remove.setAttribute('aria-label', 'Remove ' + actor.name); remove.disabled = !!challengeId || scene!.actors.length < 2;
@@ -1017,8 +1046,8 @@ export function installCreationStudio(host: Host) {
     const button = $('creationCharacterTools');
     if (!locked()) button.setAttribute('aria-expanded', String(button.getAttribute('aria-expanded') !== 'true'));
   };
-  $('creationCodeView').onclick = () => { if (!locked()) setWorkspaceView('code'); };
-  $('creationPlayView').onclick = () => { if (!locked()) setWorkspaceView('play'); };
+  $('creationCodeView').onclick = () => { if (!locked()) { setWorkspaceView('code'); paint(); } };
+  $('creationPlayView').onclick = () => { if (!locked()) { setWorkspaceView('play'); paint(); } };
   $('creationLandingBack').onclick=()=>act(()=>shelf());
   $('creationFreeMode').onclick = async () => await act(async () => await shelf('free'));
   $('creationChallengeMode').onclick = async () => await act(async () => await shelf('challenge'));
@@ -1126,7 +1155,11 @@ export function installCreationStudio(host: Host) {
       if(!current())return;
       indexSceneArt(entryId,capturedOwner,[resolved]);
       dialog.close();status('Your own art is in the scene.');
-    });
+    }, challengeId ? {} : {bundled:{
+      container:$('creationJemsProps'), items:WORLD_PROPS,
+      recommended:ILLUSTRATED_WORLDS.find(world => world.id === scene?.background)?.props ?? [],
+      choose:async id => { if (current()) await addWorldProp(id); if (current()) dialog.close(); }
+    }});
     dialog.addEventListener('close',()=>picker.dispose(),{once:true});
     await picker.ready;
   }

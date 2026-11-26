@@ -123,6 +123,8 @@ export class CreationStage {
     if (world) {
       c.fillStyle = '#eee9f6'; c.fillRect(0, 0, w, h);
       this.worldPicture(world.background);
+    } else if (scene.background === 'blank') {
+      c.fillStyle = '#fff'; c.fillRect(0, 0, w, h);
     } else this.background(scene);
     const drawActors = (layer: SceneLayer) => {
       for (const actor of snapshot.actors) {
@@ -219,7 +221,7 @@ export class CreationStage {
     const c = this.context, s = actor.size, asset = creationAsset(actor.assetId);
     c.save(); c.translate(actor.x, actor.y);
     if (actor.layer !== 'backdrop') { c.fillStyle = '#152B4B15'; c.beginPath(); c.ellipse(0, s * .48, s * .38, s * .08, 0, 0, Math.PI * 2); c.fill(); }
-    c.translate(0, actor.jumpOffset); c.rotate(actor.rotation * Math.PI / 180);
+    c.translate(0, actor.jumpOffset); c.rotate((actor.rotation + (actor.angle ?? 0)) * Math.PI / 180);
     if (selected) {
       c.strokeStyle = '#7452CF'; c.lineWidth = 2; c.setLineDash([5, 4]);
       c.beginPath(); c.roundRect(-s * .58, -s * .57, s * 1.16, s * 1.16, 15); c.stroke(); c.setLineDash([]);
@@ -227,8 +229,9 @@ export class CreationStage {
     if(parsePrivateArtId(actor.assetId)){
       const resolved=this.privateArt?.get(actor.assetId);
       if(resolved){
+        const fit = actor.backdropFit === 'cover' ? Math.max : Math.min;
         const scale = actor.layer === 'backdrop'
-          ? Math.min(this.canvas.width / resolved.image.width, this.canvas.height / resolved.image.height) * s / 100
+          ? fit(this.canvas.width / resolved.image.width, this.canvas.height / resolved.image.height) * s / 100
           : s / Math.max(resolved.image.width, resolved.image.height);
         c.drawImage(resolved.image,-resolved.image.width*scale/2,-resolved.image.height*scale/2,resolved.image.width*scale,resolved.image.height*scale);
       }else{
