@@ -8,7 +8,7 @@ Design once. Approve once. Reuse everywhere. This is the canonical implementatio
 2. Find its existing archetype in [the inventory](INVENTORY.md). Use the collection template for the migrated secondary pages. Preserve focused onboarding and canvas layouts.
 3. Reuse `src/design-system/tokens.css`, production components and existing feature-owned specialist components. Do not create a competing header, palette or action implementation.
 4. Keep authorization, persistence, provider calls, learning/evidence, rewards and game mechanics in their existing controllers. Pass their guarded callbacks to presentation.
-5. Run `npm run design:check && npm run design:test`, typecheck and the relevant feature regression. Use the Phase 2 `check:changed` guidance once #219 lands; shared changes still require full integration qualification.
+5. Run `npm run design:check && npm run design:test`, typecheck and the relevant feature regression. Use the Phase 2 `check:changed` guidance from merged #219; shared changes still require full integration qualification.
 6. Inspect actual composed surfaces in the live Vite gallery and the standalone product review, including phone, touch, focus and failure states. Record exact-source evidence and remaining owner/device acceptance.
 
 If feedback applies to every header or control, change its shared implementation first. A feature exception must identify its product need and owner; never turn child artwork or a game world into a uniform host illustration.

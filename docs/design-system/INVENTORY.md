@@ -20,7 +20,7 @@ Coordination was posted to [#218](https://github.com/jzwyrzyk/family-game-factor
 | My Art `art-studio`: collection/import/drawing/edit/reuse | Illustrated destination + creative workspace; #188 and #220 | Exact semantic color substitutions. Drawing workspace layout, asset cards and original-revision adapter await #220 acceptance. |
 | Creative Studio `creation`: introduction/Make/Rebuild/code/play/Keep | Destination + creative workspace; #188, first-learner contract and #220 | Exact semantic color substitutions. Layered world composition and canvas templates await integrated feature qualification. |
 | Creation conversation `studio`: draft/sending/ready/building/error | Guided conversation; saved-concept Build #188 | Exact semantic color substitutions. Single input, explicit Send/Build and saved concept remain untouched; template extraction pending. |
-| Learning overlays and return to paused activity | Learning; #218 integrated shell is canonical candidate | Reviewed source and rendered evidence; not reconstructed from old main. Assessment, grade ceiling and hints remain feature authority. Pending integration. |
+| Learning overlays and return to paused activity | Learning; #218 integrated shell is canonical candidate | Reviewed source and rendered evidence; not reconstructed from old main. The combined candidate integrates the qualified light workspace. Assessment, grade ceiling and hints remain feature authority. |
 | `game` and Studio native/generated game host | Gameplay host; current pause/fullscreen/learning contracts | Shared global tokens only. Game-world visuals are intentional exceptions; host extraction pending. |
 | Parent `parent`, privacy/settings/evidence/profile management | Grown-up shell; existing dashboard | Shared action construction and exact color substitutions. Adult density, access/consent and report components stay intact; template extraction pending. |
 | Welcome, character/Pal choice, learning setup | Focused onboarding; #188/#190 | Retained dedicated journey. Do not replace with a collection page. Shared entry template pending. |
@@ -45,3 +45,5 @@ Intentional specialized implementations: Pal masks and form fallback, selected-m
 4. Independent review, required hosted checks, owner visual acceptance and applicable device/DEV/TEST gates precede a protected-main merge. Production, paid services, infrastructure and frozen release pins are outside this assignment.
 
 The product still has substantial feature-owned layouts. This first increment does not satisfy the complete assignment definition of done.
+
+The consolidated draft incorporates the six collection consumers at the exact #218 and #220 heads. Drawing, layered worlds, learning, conversation, gameplay, adult reporting and onboarding retain their specialist layouts. Further template extraction remains deferred.

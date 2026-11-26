@@ -167,10 +167,10 @@
         "docs/creative-universe/STANDARD.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T07:32:33.541Z",
-      "sourceDigest": "a5e26723144b0c44400ea8ec5bf4a6eea13f76a5a5d60f073122ca64a55b2d43",
+      "reviewedAt": "2026-11-26T22:12:16.152Z",
+      "sourceDigest": "4c7a1db83673a81b4d7e5ac0192ad982e3d684643b4be3af1f33fc31e441ed03",
       "reviewOutcome": "updated",
-      "reviewReason": "Joined the approved learning evidence rules and persistent creative ownership in the rehearsal contract.",
+      "reviewReason": "Documented shared presentation and retained creator choice in the consolidated release.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -331,10 +331,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T07:32:33.960Z",
-      "sourceDigest": "8cfa0f3fd2b6b4ef2c0587afd490699c1aaa45e63f2dc829208bea5bde86eb91",
+      "reviewedAt": "2026-11-26T22:12:16.318Z",
+      "sourceDigest": "5993bf02b11990959cf73d7e4cbd5218fa296d91b015d2aa2ad6b95e127e75d9",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the single full-screen learning dialog, personal world return, responsive drawing and stage controls and the joined owner journeys.",
+      "reviewReason": "Inspected component imports, destination callbacks, context navigation and specialist host styles.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -435,10 +435,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "2980e4e9c369a03bf76bf6719d6caadb8a9de15d44dcca859663fbe04babd3cd",
-      "reviewedAt": "2026-11-26T07:32:34.816Z",
+      "sourceDigest": "47a8d0911954e9fbe6367ff63ae3413b6a1b1b4b86483cec5a9cde97ab1737ab",
+      "reviewedAt": "2026-11-26T22:12:17.359Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Checked both source stage editors, the kept-world and version picker dialogs, drag ownership and the exact paused-scene callback.",
+      "reviewReason": "Checked Creative canvas and state ownership against the joined branch. Only host presentation is migrated.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -522,10 +522,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "f0d8616e98a929194cc48633547325b692b859a669051feaba6edba64ac93d40",
-      "reviewedAt": "2026-11-26T04:21:40.809Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The browser journey now confirms gap and passage selections through real controls. Award triggers, amounts, ownership, deduplication and persisted totals are unchanged.",
+      "sourceDigest": "49d3def63835c53a12190dc6acf96fdad46fd50da8985a96c9a30dd50847be27",
+      "reviewedAt": "2026-11-26T22:12:17.481Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed shared buttons and collection headers. Reward eligibility and receipts remain owned by Rewards.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -929,10 +929,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T07:46:17.617Z",
-      "sourceDigest": "90049cbfe53965f251ce2d391309d0c8b20051efe48632ffd5da05e169d75d09",
+      "reviewedAt": "2026-11-26T22:12:17.583Z",
+      "sourceDigest": "7b1bca20bf2826f0ae857b25107d2ab1bad7a1ca19536408ef90ad3564befe3e",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified the original CI inventory and the live My Art game with a suspended second tap, one scored or supported attempt, and exact rewards.",
+      "reviewReason": "Merged design gallery checks with learning browser checks and preserved the broader exact-asset fingerprint.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1174,10 +1174,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T07:46:18.056Z",
-      "sourceDigest": "fd2978034817f82342bed677dbfc8ed5c0bec46819fb29259bb1377ab9ee35b8",
+      "reviewedAt": "2026-11-26T22:12:18.046Z",
+      "sourceDigest": "fe3c45665b50f8fb19e43cf765c8ae5cc1cf8c77dc5893d53aafda8e308502bf",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the joined synthetic owner and live gameplay tests and their applicable documentation.",
+      "reviewReason": "Bound the source matrix, guarded recovery, static TEST limits and separate release gates in the coordinated handoff.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1432,10 +1432,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T07:32:36.013Z",
-      "sourceDigest": "9731d6cad7b13be78ce693ab983f34234997d8007f9e9f1c213db734a57601e3",
+      "reviewedAt": "2026-11-26T22:12:18.243Z",
+      "sourceDigest": "1ae25cf8cd452064d5919af9f1d6f46ad643dac946ec4bd29776f22ab3fb0492",
       "reviewOutcome": "updated",
-      "reviewReason": "The register retains both subject and creative source/document routes and their historical reviews.",
+      "reviewReason": "Combined registry source and document routes from the selected branches without replacing canonical history.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1536,10 +1536,10 @@
         "tests/parent-dashboard*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "6eec1383215c1abfc6281933bfd4372a504d5690ffdefb790d290486b8ab4f3f",
-      "reviewedAt": "2026-11-25T16:41:38.340Z",
+      "sourceDigest": "14eb7a52bfb7480a84f51d3ff6fb148a90c4a921ce023227abccbf0081dd00a2",
+      "reviewedAt": "2026-11-26T22:12:18.373Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented lazy Parent snapshots from the active scene authority, late-result owner/request fences and unavailable prepared-source errors; reporting remains read-only with existing learning interpretation.",
+      "reviewReason": "Reviewed native action delegation and semantic style substitutions in the existing adult dashboard.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-19T17:17:56.552Z",
@@ -1617,10 +1617,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "1c1c86f312ab8f397e0d7e43258bf3f65ddcdedc7cdde971e9d2b3f8192d96d0",
-      "reviewedAt": "2026-11-26T01:45:23.597Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The workspace consumes existing active species portraits and approved expressions. The original selected source and all character forms retain their current art approval.",
+      "sourceDigest": "93d372ec168d22127c306f8a1ac5a4285447b0b9cdc6c3e59c8a568b747be233",
+      "reviewedAt": "2026-11-26T22:12:18.465Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Original images and Pal variants match the rehearsal. Header and action consumers now share the design system.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1671,10 +1671,10 @@
         "tests/game-art/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "b2e64f71390f1e7147cde7c53bf0bd047d18318ce1363310d0e3a50796aaf212",
-      "reviewedAt": "2026-11-26T06:53:07.717Z",
+      "sourceDigest": "26271a703ffdbcdd73b55a73cc516bc791b767e0717d284cbb064f103627d213",
+      "reviewedAt": "2026-11-26T22:12:18.869Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed supported editors, legacy data readers and exact PNG admission.",
+      "reviewReason": "Reviewed drawing CSS substitutions while retaining drawing controls, owner-specific library and image revisions.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1716,10 +1716,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "2619fc4d1521d49e3ae08fb016e980ca2fb2bdb3c3d1051b244af6bf1194a60b",
-      "reviewedAt": "2026-11-26T07:32:36.572Z",
+      "sourceDigest": "ac4fecb27cfb0593643695633a16aef5b052514969276efe0efbb890b6eafaf2",
+      "reviewedAt": "2026-11-26T22:12:19.056Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The renderer, original Pal variants and earned owner checks are preserved in the shared standalone Pal capture.",
+      "reviewReason": "Shared controls preserve the existing Pal eligibility, artwork choice and click callbacks.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1777,10 +1777,10 @@
         "docs/design-system/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "d3f02dfa9720ae3b2315c14a7340db2b84ee1252b587f96b26bd9bb4da3671c2",
-      "reviewedAt": "2026-11-26T05:17:05.044Z",
+      "sourceDigest": "9cace7c7a81b3d5915d7898474f3b655fef23ad01d63ef3b2f9f2114b929505c",
+      "reviewedAt": "2026-11-26T22:12:48.325Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded distinct original capture and final follow-up source identities, canonical destination ownership, and stricter gallery packaging provenance; no owner acceptance or full migration completion is inferred."
+      "reviewReason": "Updated the migration inventory to identify the six integrated consumers and deferred specialist templates on the joined candidate."
     }
   ]
 }
