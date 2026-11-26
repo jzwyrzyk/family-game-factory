@@ -1,5 +1,6 @@
 """Credential-free deployment/cleanup trust-boundary tests."""
 from copy import deepcopy
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -111,6 +112,26 @@ def deploy(fake, **kwargs):
 
 
 class CloudTrustTests(unittest.TestCase):
+    def test_private_audience_binding_for_protected_controller(self):
+        record = json.dumps({"nonce": "b" * 64, "members": ["user:adult@example.invalid"]})
+        public = {**config(), "ownerIapMembers": [],
+                  "ownerIapBindingSha256": hashlib.sha256(record.encode()).hexdigest()}
+        cloud.validate_config(public, public_record=True)
+        hydrated = cloud.bind_private_members(public, record)
+        self.assertEqual(hydrated["ownerIapMembers"], ["user:adult@example.invalid"])
+        self.assertEqual(public["ownerIapMembers"], [])
+        for value in (None, "", record.replace("adult", "other")):
+            with self.assertRaises(cloud.EnvironmentError):
+                cloud.bind_private_members(public, value)
+        with self.assertRaises(cloud.EnvironmentError):
+            cloud.Cloud(public)
+        with self.assertRaises(cloud.EnvironmentError):
+            cloud.validate_config(hydrated, public_record=True)
+        for members in ([], ["allUsers"], ["group:team@example.invalid"], ["user:a@b.test"] * 2):
+            bad = json.dumps({"nonce": "b" * 64, "members": members})
+            with self.assertRaises(cloud.EnvironmentError):
+                cloud.bind_private_members({**public, "ownerIapBindingSha256": hashlib.sha256(bad.encode()).hexdigest()}, bad)
+
     def test_dev_and_test_cannot_share_runtime_or_use_other_lane_identity(self):
         c = config()
         c['testRuntimeServiceAccount'] = c['runtimeServiceAccount']

@@ -170,3 +170,18 @@ plan/receipt/marker, and prepares a private successor state. Budget user ADC quo
 is explicitly `jems-jzw-nonprod` on an alias used only by the budget. No existing
 resource update, replacement, deletion, project IAM grant or federation activation
 is permitted. See [provider requirements and exact guards](../../docs/operations/NONPRODUCTION_RECOVERY.md).
+
+### Private adult IAP audience
+
+An enabled public controller record keeps `ownerIapMembers` empty. Its `ownerIapBindingSha256` commits to the exact bytes of an environment secret containing a random 256-bit nonce and the approved adult user principals. The nonce protects low-entropy addresses from dictionary lookup of the public digest. The protected deploy and cleanup steps resolve the secret and check its digest and individual principals before any service or IAM action. The prepare, source validation, directory and ordinary browser jobs do not receive it.
+
+Start from the verified Terraform identifiers, reviewed OAuth audience and the empty owner list. Run the following in the administrator’s private directory. The helper prompts without echoing the addresses. Install only the public output through protected configuration review. Set the secret on the main-only environment after the owner approves its exact audience.
+
+```bash
+python3 scripts/environments/private_iap.py proposal.json iap-release
+gh secret set JEMS_OWNER_IAP_BINDING --repo jzwyrzyk/family-game-factory \
+  --env jems-nonproduction < iap-release/iap-binding.json
+python3 scripts/environments/cloud.py --config iap-release/environments.json plan
+```
+
+A mismatched secret stops deployment and cleanup. Keep both files privately for recovery. For rotation, prepare a fresh nonce and new matching pair. Update both under the approved change and verify anonymous, unrelated, adult and UAT access on the actual service.
