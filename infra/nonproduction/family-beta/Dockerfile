@@ -2,7 +2,7 @@ FROM node:22-bookworm-slim AS builder
 WORKDIR /source
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts --no-audit --no-fund
-COPY index.html ./
+COPY index.html tsconfig.json ./
 COPY src ./src
 COPY public ./public
 COPY scripts/beta/build.mjs ./scripts/beta/build.mjs
