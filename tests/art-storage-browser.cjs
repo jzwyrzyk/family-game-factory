@@ -138,6 +138,23 @@ const { chromium } = require('playwright');
    check(choices.length===2 && new Set(choices.map(choice=>choice.assetId)).size===2 && choices.every(choice=>choice.creativeAssetId===sketched.id),
      'picker pins the exact selected edition independently of stable artwork identity');
    const crayonBackup=await art.exportArtBundle(owner);
+   check(crayonBackup.drawings.every(row=>row.semanticIdentity==='Moon rock' && !('semanticName' in row)),
+     'new exports use the interoperable semanticIdentity field');
+   const oldLabels=structuredClone(crayonBackup);
+   for(const row of oldLabels.drawings){row.semanticName=row.semanticIdentity;delete row.semanticIdentity;}
+   const normalized=await art.validateArtBundle(oldLabels);
+   check(normalized.drawings.every(row=>row.semanticIdentity==='Moon rock' && !('semanticName' in row)),
+     'older semanticName imports normalize to the portable spelling');
+   oldLabels.drawings[0].semanticIdentity='Contradictory';
+   const beforeConflict=(await art.drawings(owner)).length;
+   await rejects(()=>art.importArtBundle(owner,oldLabels),'conflicting semantic fields reject the entire import');
+   check((await art.drawings(owner)).length===beforeConflict,'semantic conflict preserves all prior rows');
+   const halfCoordinates=marks.map(stroke=>({...stroke,points:stroke.points.map(({x,y})=>({x:x/2,y:y/2}))}));
+   art.renderStrokes(paper.getContext('2d'),marks,true);
+   const earlyBlob=art.includeCrayonSource(await new Promise(resolve=>paper.toBlob(resolve,'image/png')),
+     {transparent:true,strokes:halfCoordinates});
+   const early=await art.verifiedCrayonSource(await earlyBlob.arrayBuffer());
+   check(JSON.stringify(early.strokes)===JSON.stringify(marks),'early 1/32-coordinate jeMS source reopens only after exact pixel replay');
    const damaged=continued.bytes.slice(0);
    const chunk=new Uint8Array(damaged);
    const payloadEnd=chunk.length-16;
@@ -156,7 +173,7 @@ const { chromium } = require('playwright');
    await art.deleteArtwork(owner,continued.id);
    await art.updateDrawing(owner,sketched.id,{semanticName:'Moon pebble'});
    await art.restoreArtBundle(owner,crayonBackup);
-   check((await art.drawing(owner,continued.id)).semanticName==='Moon pebble',
+   check((await art.drawing(owner,continued.id)).semanticIdentity==='Moon pebble',
      'restoring a missing edition keeps the current logical asset identity');
    return report;
   });

@@ -12,7 +12,7 @@ import {exportArtBundle,validateArtBundle,importArtBundle,type ArtBundle} from '
 
 export interface ArtSelection {drawingId:string;rigId?:string}
 export interface ArtChoice extends ArtSelection {assetId:string;label:string;detail:string;creativeAssetId?:string;assetName?:string;semanticName?:string;category?:DrawingCategory}
-export interface ResolvedPrivateArt extends ArtChoice {image:HTMLCanvasElement;motion?:DrawingMotion}
+export interface ResolvedPrivateArt extends ArtChoice {image:HTMLCanvasElement;motion?:DrawingMotion;articulated:boolean}
 const stale=()=>Error('The player or page changed. Reopen your artwork in your own profile.');
 const hex=(bytes:ArrayBuffer)=>Array.from(new Uint8Array(bytes),byte=>byte.toString(16).padStart(2,'0')).join('');
 /** Union cutout masks without repeatedly blending the original's translucent
@@ -117,10 +117,8 @@ export async function importSceneArt(owner:string,input:unknown,current:()=>bool
   return validateEditableProject(scene);
 }
 
-/** Decoding is bounded and checked again after each asynchronous operation.
- * A rig is composited in its saved pose; the scene's blocks move the resulting
- * actor. Independent joints remain in the Drawing Lab and physical games. */
-export async function resolvePrivateArt(owner:string,assetId:string,current:()=>boolean=()=>true):Promise<ResolvedPrivateArt> {
+/** Resolve the exact owner-scoped records again when opening an interactive preview. */
+export async function loadPinnedArtSource(owner:string,assetId:string,current:()=>boolean) {
   const ref=parsePrivateArtId(assetId);
   if(!ref||!owner)throw Error('Choose available artwork from your own Art Studio.');
   if(!current())throw stale();
@@ -133,6 +131,14 @@ export async function resolvePrivateArt(owner:string,assetId:string,current:()=>
   const expected=rig?rig.assembly.sourceSha256:ref.sha256;
   if(source.sha256!==expected||hex(await crypto.subtle.digest('SHA-256',source.bytes))!==expected)throw Error('The original drawing does not match this saved version.');
   if(!current())throw stale();
+  return {rig,source};
+}
+
+/** Decoding is bounded and checked again after each asynchronous operation.
+ * A rig is composited in its saved pose; the scene's blocks move the resulting
+ * actor. Independent joints remain in the Drawing Lab and physical games. */
+export async function resolvePrivateArt(owner:string,assetId:string,current:()=>boolean=()=>true):Promise<ResolvedPrivateArt> {
+  const {rig,source}=await loadPinnedArtSource(owner,assetId,current);
   const bitmap=await createImageBitmap(drawingBlob(source));
   try{
     if(!current())throw stale();
@@ -155,7 +161,9 @@ export async function resolvePrivateArt(owner:string,assetId:string,current:()=>
       }
       const output=context.createImageData(image.width,image.height);if(pixels)output.data.set(pixels);context.putImageData(output,0,0);
     }
-    return {assetId,drawingId:source.id,...(rig?{rigId:rig.id}:{}),label:source.name,detail:rig?.assembly.motion?'Saved animation':rig?'Saved cutout design':'Original artwork',...(rig?.assembly.motion?{motion:rig.assembly.motion}:{}),image};
+    const articulated=!!rig && rig.assembly.motion?.sprite!=='original' && rig.assembly.pieces.some(
+      piece=>piece.physical && piece.parentId!==null && ['wheel','wing','limb','propeller'].includes(piece.role));
+    return {assetId,drawingId:source.id,articulated,...(rig?{rigId:rig.id}:{}),label:source.name,detail:rig?.assembly.motion?'Saved animation':rig?'Saved cutout design':'Original artwork',...(rig?.assembly.motion?{motion:rig.assembly.motion}:{}),image};
   }finally{bitmap.close();}
 }
 

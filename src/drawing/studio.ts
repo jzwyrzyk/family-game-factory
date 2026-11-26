@@ -6,6 +6,7 @@ import {openAnimationEditor} from './animation-editor';
 import {MOTION_LABELS} from './animation-path';
 import {openDrawingLab} from './lab';
 import {vehicleGeometry} from './model';
+import {semanticWord} from './semantic-identity';
 import {hasCrayonSource} from './crayon-source';
 import {drawOnTablet} from './paint';
 import {editPicture} from './picture';
@@ -89,7 +90,7 @@ export function installArtStudio(host:Host){
     const metadata=node('form','art-metadata'),label=node('label','','Name'),name=node('input');name.value=item.name;name.maxLength=60;name.setAttribute('aria-label','Artwork name');label.append(name);
     const kindLabel=node('label','','Collection'),kind=node('select');kind.setAttribute('aria-label','Artwork collection');for(const [key,text]of Object.entries(categories)){const option=node('option','',text);option.value=key;kind.append(option);}kind.value=item.category??'other';kindLabel.append(kind);
     const semanticLabel=node('label','','What is it?'),semantic=node('input');
-    semantic.value=item.semanticName??'';semantic.maxLength=60;semantic.placeholder='Anything you imagine';semanticLabel.append(semantic);
+    semantic.value=semanticWord(item)??'';semantic.maxLength=60;semantic.placeholder='Anything you imagine';semanticLabel.append(semantic);
     const metadataSave=button('Save details','check',async()=>{await updateDrawing(captured,id,{name:name.value,category:kind.value as DrawingCategory,semanticName:semantic.value},()=>current(captured,run));if(!current(captured,run)||!await refresh())return;status('Artwork details saved.');notify(captured);});metadata.append(label,semanticLabel,kindLabel,metadataSave);metadata.onsubmit=e=>{e.preventDefault();metadataSave.click();};pane.append(metadata);
     const versions=rigs.filter(r=>r.assembly.sourceId===id),versionLabel=node('label','art-version-label','Movement version'),choice=node('select');choice.id='artVersion';choice.setAttribute('aria-label','Movement version');
     const original=node('option','','Original picture');original.value='';choice.append(original);

@@ -31,7 +31,7 @@ function locateSource(bytes: ArrayBuffer) {
 }
 export const hasCrayonSource = (bytes: ArrayBuffer) => !!locateSource(bytes);
 
-export function readCrayonSource(bytes: ArrayBuffer): CrayonSource | undefined {
+export function readCrayonSource(bytes: ArrayBuffer, scale: 32 | 64 = coordinateScale): CrayonSource | undefined {
   const chunk = locateSource(bytes);
   if (!chunk) return;
   const {offset, size} = chunk;
@@ -47,7 +47,7 @@ export function readCrayonSource(bytes: ArrayBuffer): CrayonSource | undefined {
     if (ink > crayons.length || width < 3 || width > 24 || length < 1 || length > maxStrokePoints || pos + length * 4 > size) return;
     const stroke: Stroke = {color: crayons[ink] ?? 'erase', size: width, points: []};
     for (let point = 0; point < length; point++) {
-      const x = data.getUint16(pos) / coordinateScale, y = data.getUint16(pos + 2) / coordinateScale;
+      const x = data.getUint16(pos) / scale, y = data.getUint16(pos + 2) / scale;
       if (x > paperWidth || y > paperHeight) return;
       stroke.points.push({x, y});
       pos += 4;
@@ -120,9 +120,16 @@ export async function verifiedCrayonSource(bytes: ArrayBuffer): Promise<CrayonSo
     try {
       ctx.drawImage(bitmap, 0, 0);
       const original = ctx.getImageData(0, 0, paperWidth, paperHeight).data;
-      renderStrokes(ctx, source.strokes, source.transparent);
-      const replay = ctx.getImageData(0, 0, paperWidth, paperHeight).data;
-      if (original.every((channel, index) => channel === replay[index])) return source;
+      const matches = (candidate: CrayonSource) => {
+        renderStrokes(ctx, candidate.strokes, candidate.transparent);
+        const replay = ctx.getImageData(0, 0, paperWidth, paperHeight).data;
+        return original.every((channel, index) => channel === replay[index]);
+      };
+      if (matches(source)) return source;
+      // Early jeMS v1 snapshots used 1/32 units with the same format tag.
+      // Accept that interpretation only when it exactly reproduces every pixel.
+      const early = readCrayonSource(bytes, 32);
+      if (early && matches(early)) return early;
     } finally { bitmap.close(); canvas.width = canvas.height = 1; }
   }
   throw Error('These strokes could not reopen exactly. Your saved picture is safe. You can still use Picture tools.');

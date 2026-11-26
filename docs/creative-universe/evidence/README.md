@@ -26,6 +26,14 @@ On emulated touch screens the test tapped a three-spot path, undid its last spot
 
 The advanced parts fixture uses a separate butterfly drawing. Its moving wing can be inspected in the stage recording and the tablet and phone editors. [Articulated butterfly playback](c-articulated-butterfly.webm) · [Tablet](c-articulated-butterfly.png) · [Phone](c-articulated-butterfly-phone.png)
 
+The 768 × 1024 portrait beginner scene retains a 415 × 233 CSS-pixel stage. The existing learner journey also passed small phone, landscape and native 150% browser zoom. In a Moon world learning checkpoint, the white question heading measured at least 11.38:1 against the pixels behind it. [Rendered checkpoint](b-moon-learning.png)
+
+The scene actor inspector can reopen an exact articulated rig from the shared picker. **Try the saved parts** runs its joints and **Back to scene** returns to the actor and its existing code. The scene itself plays the actor's blocks on a single composited sprite. The second recording shows the independently selected wing on a synthetic Plum bird. [Scene inspector](c-scene-saved-parts.png) · [Saved joint playback](c-scene-saved-parts.webm)
+
+## Library interoperability
+
+The #208 library at `0e58853773` and this candidate exchanged a synthetic editable PNG through their respective browser import and export controls. The return trip preserved the original record, the optional semantic label and the editable child revision. Both readers verified replayed pixels. Separate storage tests cover conflicting labels, independently retained roles and earlier 1/32-coordinate crayon records.
+
 ## Reproduction and qualification
 
 Run `npm run build` followed by `node scripts/connected-universe-browser.cjs`. The runner starts a static loopback server and accepts only local GET requests. It uses a disconnected factory configuration and fresh browser contexts. `CHROMIUM_PATH` selects an installed Chromium. `UNIVERSE_BUILD` selects the built frontend, and `UNIVERSE_EVIDENCE` selects the output directory. The defaults are `dist` and `test-results/connected-universe`.

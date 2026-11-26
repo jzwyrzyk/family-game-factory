@@ -11,7 +11,7 @@
 #page-creation :is(button,summary) { cursor:pointer; touch-action:manipulation; }
 #page-creation button:disabled { cursor:default; opacity:1; color:#58647b; background:#edf0f6; border-color:#d6dce7; box-shadow:none; }
 #page-creation :is(button,input,select,summary):focus-visible,#creationCanvas:focus-visible { outline:3px solid var(--jems-blue,#2e6bff); outline-offset:3px; }
-#page-creation :is(h1,h2,h3) { font-family:var(--jems-round,system-ui); color:var(--creation-ink); line-height:1.2; }
+#page-creation :is(h1,h2,h3):not(:where(#creationLearning *)) { font-family:var(--jems-round,system-ui); color:var(--creation-ink); line-height:1.2; }
 #page-creation :is(p,li,small,label,.creation-eyebrow) { font-size:var(--jems-child-label,18px); }
 #page-creation :is(input,select) { min-height:48px; border:1px solid #adb9d3; border-radius:12px; padding:9px 12px; color:var(--creation-ink); background:white; max-width:100%; }
 .creation-heading { display:flex; align-items:center; justify-content:space-between; gap:20px; margin:0 0 22px; }
@@ -279,6 +279,9 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
 
 #page-creation.has-scene.creation-expanded-view .creation-workspace-grid { grid-template-rows:minmax(0,1fr); grid-template-columns:minmax(0,1fr); }
 
+@media (orientation:portrait) and (min-width:761px) {
+  .creation-playbar { column-gap:6px; }
+}
 @media (orientation:portrait) {
   .creation-workspace-grid { grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,35fr) minmax(0,65fr); }
 }

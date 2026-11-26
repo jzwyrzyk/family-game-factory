@@ -43,7 +43,7 @@ Local Chromium checks cover synthetic artwork on phone and desktop viewports. Th
 
 **Bring its parts to life** starts with the selected drawing. For a new selected-parts rig, the original paper and alpha remain visible until the child prepares the picture or changes a mask. Each visible mark belongs to one moving layer. Later pieces are picked first where pieces overlap. Erasing a pixel from the wing mask makes that pixel available to the body beneath it. Older saved rigs retain their existing extraction behavior.
 
-During a parts test, wings, limbs and propellers use Planck motors. Wheels use suspension. Fixed parts follow their parent, and the child can pause and resume the simulation. A scene uses a single composite sprite in the saved pose. Whole-picture motion can move that sprite around the scene. [Butterfly test capture](../creative-universe/evidence/c-articulated-butterfly.png) · [Motion recording](../creative-universe/evidence/c-articulated-butterfly.webm)
+During a parts test, wings, limbs and propellers use Planck motors. Wheels use suspension. Fixed parts follow their parent, and the child can pause and resume the simulation. A scene uses a single composite sprite in the saved pose. Whole-picture motion can move that sprite around the scene. For a selected articulated actor, **Scene settings → Try the saved parts** rechecks both hashes and opens live Drawing Lab physics. Reduced motion starts the preview paused. Back to scene restores focus without saving a revision or changing the actor’s script. [Butterfly test capture](../creative-universe/evidence/c-articulated-butterfly.png) · [Motion recording](../creative-universe/evidence/c-articulated-butterfly.webm)
 
 ## Artwork authorship
 

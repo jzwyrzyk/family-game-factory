@@ -24,6 +24,7 @@ const button=(label:string,action:()=>void)=>{const b=document.createElement('bu
 export interface DrawingLabOptions {
  rigId?:string;
  startWithParts?:boolean;
+ previewRig?:SavedRig;
  isCurrent?:()=>boolean;
  onSaved?:(rig:SavedRig)=>void|Promise<void>;
 }
@@ -33,7 +34,9 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
  const currentPage=()=>options.isCurrent?.()!==false;
  if(!stillOwner()||source.owner!==owner)throw Error('That drawing belongs to another player.');
  if(!currentPage())throw Error('Open this drawing again from your Art Studio.');
- assertRewardSourceWritable();
+ const preview=options.previewRig;
+ if(preview && (preview.owner!==owner || preview.assembly.sourceId!==source.id || preview.assembly.sourceSha256!==source.sha256))throw Error('Restore the exact saved design to try its parts.');
+ if(!preview)assertRewardSourceWritable();
  const returnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
  const originPage=document.querySelector<HTMLElement>('.page:not(.hidden)')?.id.replace(/^page-/,'');
  let openingCurrent=true,ownerCurrent=true;
@@ -104,6 +107,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
  let carScene:VehicleSnapshot|null=null,otherScene:PlayScene|null=null;
  let go=false,jump=false,paused=false;
  const worldImage=new Image();
+ worldImage.addEventListener('load',()=>{if(!disposed&&mode==='play')clockHolder.clock?.invalidate();},{once:true});
  worldImage.src=new URL(WORLD_PLATES.meadow.url,document.baseURI).href;
  const pauseButton=q<HTMLButtonElement>(working,'[data-pause]');
  let layerCache=new Map<string,HTMLCanvasElement>();
@@ -112,7 +116,8 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
  const message=(value:string)=>{if(!disposed)status.textContent=value;};
  const alive=()=>!disposed&&ownerCurrent&&!leaving&&stillOwner()&&currentPage();
  const draftAlive=()=>!disposed&&ownerCurrent&&stillOwner()&&(currentPage()||leaving);
- const canEdit=()=>{if(!alive())return false;if(saving){message('Finishing your save…');return false;}if(!rewardSourceWritable()){message('Saving is paused. Return to the active Jems tab to continue.');return false;}return true;};
+ const canEdit=()=>{if(preview||!alive())return false;if(saving){message('Finishing your save…');return false;}if(!rewardSourceWritable()){message('Saving is paused. Return to the active Jems tab to continue.');return false;}return true;};
+ const canPlay=()=>preview?alive():canEdit();
  const draftStatus=q<HTMLElement>(working,'[data-draft-status]');
  function queueDraft(){
   dirty=true;const sequence=++draftSequence,copy=validateAssembly(assembly),parent=history?.id??null;
@@ -343,13 +348,19 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
    q<HTMLButtonElement>(working,'[data-jump]').hidden=assembly.kind==='car';
    q<HTMLButtonElement>(working,'[data-retry]').hidden=false;pauseButton.hidden=false;
    const update=(dt:number)=>{
+    if(preview&&!alive()){working.close();return;}
     if(car){car.step(dt,{throttle:go?1:0,brake:false});carScene=car.snapshot();if(carScene.status!=='playing'){go=false;clockHolder.clock?.pause('game');message(carScene.reason+' Try again or fix a part.');}}
     else if(other){other.step(dt,{go,jump});otherScene=other.snapshot();}
    };
-   clockHolder.clock=createFixedClock({update,render:()=>drawPlay()});clockHolder.clock.start();
+   clockHolder.clock=createFixedClock({update,render:()=>drawPlay()});
+   if(preview&&matchMedia('(prefers-reduced-motion: reduce)').matches){
+    paused=true;clockHolder.clock.pause('user');pauseButton.textContent='Play';updatePanel();
+   }
+   clockHolder.clock.start();
    message(assembly.kind==='car'?'Hold Move to drive on your wheels.':assembly.pieces.length===1?'Your picture moves in one piece. Add a piece to make a part move.':'Hold Move to turn wheels or swing limbs. Wings flap and propellers spin on their hinges.');
    canvas.focus({preventScroll:true});
   }catch(e){
+   if(preview)throw e;
    mode='edit';message((e as Error).message);refresh();
   }
  }
@@ -440,7 +451,12 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
  canvas.addEventListener('lostpointercapture',cancelDrag);
  q<HTMLButtonElement>(working,'[data-close]').addEventListener('click',()=>{void requestClose();});
  working.addEventListener('cancel',event=>{event.preventDefault();void requestClose();});
- working.addEventListener('click',event=>{const target=event.target as HTMLElement;if(target.closest('button')&&!target.closest('[data-close]')&&!canEdit()){event.preventDefault();event.stopImmediatePropagation();}},true);
+ working.addEventListener('click',event=>{
+  const target=(event.target as HTMLElement).closest('button');
+  if(!target||target.matches('[data-close]'))return;
+  const allowed=preview?alive()&&target.matches('[data-pause],[data-retry],[data-go],[data-jump]'):canEdit();
+  if(!allowed){event.preventDefault();event.stopImmediatePropagation();}
+ },true);
  working.addEventListener('change',event=>{if(!canEdit()){event.preventDefault();event.stopImmediatePropagation();refresh();}},true);
  working.addEventListener('close',()=>{
   disposed=true;stopPlay();window.removeEventListener('factory-profile',onProfile);window.removeEventListener('factory-page',onPage);imageRect={x:0,y:0,w:1,h:1};working.remove();
@@ -524,11 +540,11 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
  });
  const goButton=q<HTMLButtonElement>(working,'[data-go]'),jumpButton=q<HTMLButtonElement>(working,'[data-jump]');
  for(const [b,key] of [[goButton,'go'],[jumpButton,'jump']] as const){
-   const down=(e:PointerEvent)=>{e.preventDefault();if(mode!=='play'||paused||!canEdit())return;b.setPointerCapture(e.pointerId);if(key==='go')go=true;else jump=true;};
+   const down=(e:PointerEvent)=>{e.preventDefault();if(mode!=='play'||paused||!canPlay())return;b.setPointerCapture(e.pointerId);if(key==='go')go=true;else jump=true;};
   const up=(e:PointerEvent)=>{if(key==='go')go=false;else jump=false;};
   b.addEventListener('pointerdown',down);
   for(const name of ['pointerup','pointercancel','lostpointercapture'] as const)b.addEventListener(name,up);
-  b.addEventListener('keydown',event=>{if((event.code==='Space'||event.code==='Enter')&&mode==='play'&&!paused&&canEdit()){event.preventDefault();if(key==='go')go=true;else jump=true;}});
+  b.addEventListener('keydown',event=>{if((event.code==='Space'||event.code==='Enter')&&mode==='play'&&!paused&&canPlay()){event.preventDefault();if(key==='go')go=true;else jump=true;}});
   b.addEventListener('keyup',event=>{if(event.code==='Space'||event.code==='Enter'){event.preventDefault();if(key==='go')go=false;else jump=false;}});
   b.addEventListener('blur',()=>{if(key==='go')go=false;else jump=false;});
  }
@@ -538,7 +554,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
   const target=e.target as HTMLElement;
   if(mode==='edit'&&(e.ctrlKey||e.metaKey)&&e.code==='KeyZ'&&!target.closest('input,textarea')){e.preventDefault();restoreUndo(e.shiftKey?'redo':'undo');return;}
   if(target.closest('input,select,textarea,button'))return;
-  if(!canEdit())return;
+  if(mode==='play'?!canPlay():!canEdit())return;
   if(mode==='edit'&&e.code==='Enter'&&pendingNew){
    e.preventDefault();const before=structuredClone(assembly),id='piece_'+crypto.randomUUID().slice(0,8);
    assembly.pieces.push({id,name:'My new piece',role:assembly.cutoutMode?'decoration':'limb',region:{x:.4,y:.4,w:.2,h:.2,shape:'rect'},parentId:assembly.pieces[0].id,physical:!assembly.cutoutMode});
@@ -606,6 +622,19 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
   }catch(e){message((e as Error).message);}finally{saving=false;if(alive())refresh();}
  });
  try{
+  if(preview){
+   if(!alive())throw Error('Open the drawing again from your scene.');
+   assembly=validateAssembly(preview.assembly);kind=assembly.kind;selected=assembly.pieces[0].id;
+   working.classList.add('dl-rig-preview');working.setAttribute('aria-label','Try the saved parts');
+   q<HTMLElement>(working,'h2').textContent=source.name;
+   q<HTMLElement>(working,'.dl-header p').textContent='Try the joints here. Your scene moves this picture with blocks.';
+   q<HTMLElement>(working,'.dl-tools').hidden=true;
+   q<HTMLElement>(working,'[data-mode="edit"]').hidden=true;
+   const back=q<HTMLButtonElement>(working,'[data-close]');
+   back.textContent='Back to scene';back.setAttribute('aria-label','Back to scene');
+   working.showModal();startPlay();
+   return working;
+  }
   proposals(kind);
   const all=await versions(),draft=options.rigId?null:await loadDrawingDraft(owner,source.id);
   const saved=options.rigId?await rigById(owner,options.rigId):all[0];
