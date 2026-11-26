@@ -897,10 +897,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:43:31.122Z",
-      "sourceDigest": "caf68c9ddb086bef4f410c055fc8b85a0d2c5dbb5b35f08310f831ac761aa441",
+      "reviewedAt": "2026-11-26T05:28:44.076Z",
+      "sourceDigest": "e91783b6abf2d59e1fc0f77b7a9d277e1a7143fc10223a2f251599b2adf80614",
       "reviewOutcome": "updated",
-      "reviewReason": "Added predecessor-source inventory checks for future regressions, tested coordinated removal and verified all frozen hosted command receipts independently. Measured the local navigation loop and shadow reader.",
+      "reviewReason": "Recorded first-attempt hosted contrast failure, synchronous DOM measurement, initial runner evidence and source-bound startup byte counts in the execution guide.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T04:43:31.531Z",
-      "sourceDigest": "fc45a616c21770ab57cdf96ab12dd864fc36a524cfca9997e52d420c231e2620",
+      "reviewedAt": "2026-11-26T05:28:44.476Z",
+      "sourceDigest": "2a3f91df028a7a8f3038f80e187a1c4b9ade3c706824ffdfd0e1b9b320b27e98",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved repository-default retention of the transferred factory captures and corrected the manual reviewer change link. Linked current delivery to the exact engineering PR and its protected push evidence.",
+      "reviewReason": "Linked the concurrent review-only Creative Universe integration and retained separate Learning, engineering and frozen application sources.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1669,10 +1669,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "ada2accbff6a1c4c26061297e83a2ab48bdb799664d38749f63d7cf76e56d403",
-      "reviewedAt": "2026-11-26T01:23:10.842Z",
+      "sourceDigest": "08d6c2637ec033c45775d4d86c087d3767314bff224eae63cee81a079beeb84f",
+      "reviewedAt": "2026-11-26T05:28:44.940Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The reload regression verifies the retained owner, active Navi and timestamp before and after the visible maker welcome. Starter rules, menu behavior and approved artwork are unchanged.",
+      "reviewReason": "The browser test selects and measures live rendered labels in one browser task. Required selectors, all-match 4.5 contrast threshold, approved art, interaction and persistence assertions are preserved.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
