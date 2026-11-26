@@ -1,4 +1,5 @@
 import {sceneAssetSlots} from '../creation/model';
+import {retainedPins,validateGameArt} from '../game-art/bindings';
 /** One private transaction boundary for original art, physical versions and references. */
 import { assertRewardSourceWritable, rewardSourceWritable } from '../rewards/write-guard';
 import { validateAssembly } from './model';
@@ -193,6 +194,18 @@ export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'own
       }
       if (complete) known.add(kind);
     } catch { /* Preserve indexed protection until the source is recoverable. */ }
+  }
+  if(typeof localStorage!=='undefined'){
+    const raw=localStorage.getItem(adultStorageKey('family-game-factory-studio-v1',owner.startsWith('adult:')?owner:null));
+    if(raw){
+      const notebook=JSON.parse(raw);
+      if(!Array.isArray(notebook.sessions))throw Error('Recover the studio notebook before checking picture usage.');
+      for(const session of notebook.sessions){
+        if(session?.owner!==owner||session.gameArt===undefined)continue;
+        validateGameArt(session.gameArt);
+        for(const pin of retainedPins(session.gameArt))add(session.id,'game',pin.drawingId);
+      }
+    }
   }
   for (const item of indexed) if (item.owner === owner && !known.has(item.targetKind)) result.set(item.id, item);
   return [...result.values()];

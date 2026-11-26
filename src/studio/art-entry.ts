@@ -20,8 +20,8 @@ export function installArtEntryPoints({homeAction,libraryTools,open}:ArtEntryOpt
   byId('creationFreeShelf').querySelector('.creation-shelf-heading')!.append(button('creationArtStudio','My Art','creation-button'));
   byId('page-creations').querySelector('.page-head')!.append(button('collectionArtStudio','My Art'));
 
-  const picture=button('studioUseDrawing','Use my picture');
-  picture.setAttribute('aria-label','Use my picture in My Art');
+  const picture=button('studioUseDrawing','Use my art');
+  picture.setAttribute('aria-label','Use my art');
   const composer=byId('studioExtraTools'),gameHelp=byId('studioHelp');
   gameHelp.after(picture);
   return {

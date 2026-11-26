@@ -1,6 +1,6 @@
 import { originalFor } from './art-lineage';
 import { type DrawingCategory, drawingHash } from './private-drawings';
-import { type DrawingMetadata, artOwner, ownerArtRecords, withArtTransaction } from '../drawing/library';
+import { type DrawingMetadata, ART_LIMITS, artOwner, artRequest, ownerArtRecords, withArtTransaction } from '../drawing/library';
 import { validateAssembly, type DrawingAssembly } from '../drawing/model';
 import type { SavedRig } from '../drawing/store';
 import { privateArtId } from '../creation/projects';
@@ -28,6 +28,33 @@ export async function assemblyHash(input: DrawingAssembly): Promise<string> {
   return drawingHash(new TextEncoder().encode(JSON.stringify(validateAssembly(input))).buffer);
 }
 
+function imageChoice(image: DrawingMetadata, root: DrawingMetadata): CreativeAssetChoice {
+  return {
+    archived: Boolean(image.archived), logicalId: root.id, originalId: root.id, originalSha256: root.sha256, logicalName: root.name,
+    drawingId: image.id, sourceSha256: image.sha256, label: image.name, category: image.category ?? 'other',
+    semanticIdentity: image.semanticIdentity, assetId: privateArtId({kind:'image',id:image.id,sha256:image.sha256}),
+    sha256: image.sha256, representation:'image',detail:image.sourceId?'Edited picture':'Original artwork',
+  };
+}
+
+/** A selected revision needs only its ancestry. The game never receives the catalog. */
+export async function selectedCreativeImage(owner:string, drawingId:string) {
+  artOwner(owner);
+  return withArtTransaction(['drawingMetadata'],'readonly',async tx=>{
+    const chain=new Map<string,DrawingMetadata>();
+    let key:string|undefined=drawingId;
+    while(key && !chain.has(key) && chain.size<ART_LIMITS.drawingsPerOwner){
+      const row:DrawingMetadata|undefined=await artRequest(tx.objectStore('drawingMetadata').get(key));
+      if(!row || row.owner!==owner)throw Error('Restore the original picture in My Art.');
+      chain.set(key,row);
+      key=row.sourceId;
+    }
+    const selected=chain.get(drawingId);
+    if(!selected)throw Error('Choose a picture in My Art.');
+    return imageChoice(selected,originalFor(selected,chain));
+  });
+}
+
 export async function listCreativeAssetChoices(owner: string, current: () => boolean = () => true, includeArchived = false): Promise<CreativeAssetChoice[]> {
   artOwner(owner);
   const check = () => { if (!current()) throw Error('The player or page changed. Reopen your artwork.'); };
@@ -44,15 +71,8 @@ export async function listCreativeAssetChoices(owner: string, current: () => boo
   for (const image of images) {
     if (image.archived && !includeArchived) continue;
     const root = originalFor(image, byId);
-    const common = {
-      archived: Boolean(image.archived), logicalId: root.id, originalId: root.id, originalSha256: root.sha256, logicalName: root.name,
-      drawingId: image.id, sourceSha256: image.sha256, label: image.name, category: image.category ?? 'other',
-      semanticIdentity: image.semanticIdentity,
-    };
-    result.push({
-      ...common, assetId: privateArtId({ kind: 'image', id: image.id, sha256: image.sha256 }),
-      sha256: image.sha256, representation: 'image', detail: image.sourceId ? 'Edited picture' : 'Original artwork',
-    });
+    const common = imageChoice(image,root);
+    result.push(common);
     const versions = rigs.filter(rig => rig.assembly.sourceId === image.id && rig.assembly.sourceSha256 === image.sha256);
     for (const [index, rig] of versions.entries()) {
       const sha256 = await assemblyHash(rig.assembly);

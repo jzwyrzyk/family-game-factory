@@ -1,3 +1,4 @@
+import {encodeReviewRaster} from './raster';
 import {revisionSource} from './revision';
 import {resolvePrivateArt} from '../../src/creation/private-art';
 import type {ReviewCapsule} from './capsule';
@@ -34,22 +35,11 @@ export async function openDrawingPlaytest(
 
   const art = await resolvePrivateArt(owner, assetPin, current);
   check();
-  const canvas = document.createElement('canvas');
-  canvas.width = slot.width;
-  canvas.height = slot.height;
-  const scale = Math.min(canvas.width / art.image.width, canvas.height / art.image.height);
-  const width = art.image.width * scale, height = art.image.height * scale;
-  // Leave transparent margins around the authentic silhouette. Raster export
-  // discards PNG metadata, names, editable strokes, masks and original bytes.
-  const graphics = canvas.getContext('2d')!;
-  graphics.imageSmoothingEnabled = false;
-  graphics.drawImage(art.image, (canvas.width - width) / 2, (canvas.height - height) / 2, width, height);
-  const png = canvas.toDataURL('image/png');
-  if (!png.startsWith('data:image/png;base64,') || png.length > 1500000) throw Error('Choose a smaller sprite.');
+  const pixels = encodeReviewRaster(art.image, slot.width, slot.height);
   const documentCopy = new DOMParser().parseFromString(html, 'text/html');
   const template = documentCopy.createElement('template');
   template.id = 'local-sprite-pixels';
-  template.content.append(png.slice('data:image/png;base64,'.length));
+  template.content.append(pixels);
   documentCopy.body.prepend(template);
 
   check();

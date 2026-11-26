@@ -1,3 +1,4 @@
+import {validateGameArt,type GameArtPlan} from '../game-art/bindings';
 import {freshDesign, validateDesign, validateExperiments, experiment, DESIGN_IDEA_CAPACITY, DesignCapacityError, type DesignRecord, type Experiment, type Origin} from './design';
 import { isGameId } from '../runtime/manifests';
 import type { GameId } from '../runtime/types';
@@ -29,6 +30,7 @@ export interface StudioSession {
   job: PendingJob | null; updated: string; hypothesis: string; reflection: boolean;
   design?:DesignRecord; experiments?:Experiment[]; selectedTest?:string|null; playOnly?:boolean;
   pendingExperiment?:{parents:string[];depth:Experiment['depth'];origin:Origin;baseId:string|null;prompt:string}|null;
+  gameArt?:GameArtPlan;
   pendingSubmission?:PendingBuildSubmission|null;
   pendingCopy?:{requestId:string;sourceRevisionId:string;name:string;api:string}|null;
   archived?:boolean; resumeDismissed?:boolean;
@@ -86,6 +88,7 @@ export function validateNotebook(input: unknown,clone=true): Notebook {
   for (const s of n.sessions) {
     if (!s || !ident(s.id) || ids.has(s.id) || !ident(s.owner) || !safeText(s.name, 60) || !(s.game==='new'||isGameId(s.game)) || !safeText(s.draft,2000) || !safeText(s.hypothesis,300) || typeof s.reflection !== 'boolean' || !safeText(s.updated,40) || !Number.isFinite(Date.parse(s.updated))) throw Error('Invalid studio project.');
     ids.add(s.id);
+    if(s.gameArt!==undefined)validateGameArt(s.gameArt);
     if (s.projectId !== null && !ident(s.projectId) || s.remoteId !== null && !ident(s.remoteId) || s.remoteKind !== undefined && !safeText(s.remoteKind,60)) throw Error('Invalid studio reference.');
     if(s.rewardProjectId!==undefined&&!ident(s.rewardProjectId))throw Error('Invalid reward project reference.');
     if (!validMessages(s.messages)) throw Error('Invalid studio conversation.');
@@ -130,7 +133,7 @@ export function validateNotebook(input: unknown,clone=true): Notebook {
     }
   }
   // Reject accidental capability/secret persistence anywhere in the notebook schema.
-  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment','pendingSubmission','pendingCopy','archived','resumeDismissed','keptExperiments','verifiedRemoteExperiments','rewardProjectId','previousConversationId'];
+  const allowed = ['id','owner','name','game','gameArt','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment','pendingSubmission','pendingCopy','archived','resumeDismissed','keptExperiments','verifiedRemoteExperiments','rewardProjectId','previousConversationId'];
   if (n.sessions.some(s=>Object.keys(s).some(k=>!allowed.includes(k)))) throw Error('Unknown studio data; not restored.');
   if(n.rewardOutbox!==undefined){
     const facts=validateRewardOutbox(n.rewardOutbox);

@@ -14,6 +14,8 @@ Synthetic Chromium checks exercise keyboard creation, a failed write followed by
 
 The compatibility browser test opens a synthetic PNG written by the original binary editor at `dc1dba8a6c4d139ca887aaf3f8bc1eb622d7ecfb`. A clean build of `1167a30fe91ba6ce8420383befbcd4fc6882b7c7` reopened it, undid and redid its erase stroke, saved and reopened an opaque child revision, and retained the uploaded parent bytes. It also refused mismatched raster/source pairs in both binary and current formats. [Reopened crayon sheet](evidence/connected/legacy-crayon-reopened.png) · [Browser check](../../tests/crayon-revision-browser.cjs)
 
+Game ideas now accept a role and exact picture version from this shelf. A local sample can render the four synthetic review drawings. [Game art protocol](../game-art/README.md)
+
 ## My Art navigation and preserved visual reference — November 25, 2026
 
 **My Art** is the canonical destination in Home and Menu → Make. The original **You drew it. Now let’s play.** heading, gem illustration, gradient panel, Upload a drawing / Take a photo / Draw here arrangement and collection remain the visual reference. Readability is improved without replacing the composition or assets. Optional picture controls in a game/scene open the same library and offer an owner-bound return to that activity. Scene links use **Creative Studio**. Original pixels, derivatives, exact references, camera/upload and private storage contracts below are unchanged. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.

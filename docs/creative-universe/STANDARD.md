@@ -63,3 +63,7 @@ For each change record its PR and dependencies, exact head, reproducible tests, 
 Four versioned Creative Studio worlds pair painted plates with aligned middle and foreground layers and transparent props. Keep the versioned files and catalogue IDs used by saved scenes. [Artwork manifest and review status](../creation-studio/WORLD_ART.md)
 
 [Drawing workspace and A–F implementation evidence](DRAWING_WORKSPACE_ACCEPTANCE.md)
+
+## Notebook game-art tests
+
+Workstream E owns contextual roles and immutable program and picture pins. Workstream D owns logical asset identity, lineage and the private catalog. Use the original ID and fingerprint from the catalog when selecting a drawing revision. A game-local handle grants access only within its specific rendering context. The local review strips editable sources and file metadata before rendering. Hosted enablement also requires protecting quality-review screenshots. [Game-art protocol and evidence](../game-art/README.md)

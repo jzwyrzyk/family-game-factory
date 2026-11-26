@@ -1,4 +1,5 @@
 import {sceneAssetSlots} from '../creation/model';
+import {retainedPins} from '../game-art/bindings';
 import {currentAdultSession} from '../adult-pilot/session';
 import {adultStorageKey,adultWorkspaceId} from '../adult-pilot/storage';
 import {familyFetch} from '../builder/session';
@@ -54,6 +55,7 @@ export async function mapTransferredAdultBackup(archive:RecoveryArchive,mapping:
  for(const entry of snapshot.art){if(entry.owner!==source)throw Error('Private artwork belongs to another player.');entry.owner=target;for(const drawing of entry.bundle.drawings)pictures.set(drawing.id,await mappedId('picture',drawing.id));for(const rig of entry.bundle.rigs)rigs.set(rig.id,await mappedId('rig',rig.id));}
  const picture=(id:string)=>{const result=pictures.get(id);if(!result)throw Error('An original private picture is missing.');return result;},rig=(id:string)=>{const result=rigs.get(id);if(!result)throw Error('An original private movement version is missing.');return result;};
  for(const entry of snapshot.art){for(const drawing of entry.bundle.drawings){drawing.id=picture(drawing.id);if(drawing.sourceId)drawing.sourceId=picture(drawing.sourceId);}for(const saved of entry.bundle.rigs){const prior=saved.id;saved.id=rig(prior);if(saved.parentId)saved.parentId=rig(saved.parentId);saved.assembly.sourceId=picture(saved.assembly.sourceId);rigHashes.set(prior,await assemblyHash(saved.assembly));}for(const draft of entry.bundle.drafts??[]){draft.sourceId=picture(draft.sourceId);draft.assembly.sourceId=picture(draft.assembly.sourceId);if(draft.parentId)draft.parentId=rig(draft.parentId);}if(entry.activeRigId)entry.activeRigId=rig(entry.activeRigId);}
+ for(const session of p.factoryStudio.sessions)if(session.gameArt)for(const pin of retainedPins(session.gameArt)){pin.drawingId=picture(pin.drawingId);pin.logicalId=picture(pin.logicalId);}
  for(const saved of p.factoryWorkspace.revisions)if(saved.drawingRigId)saved.drawingRigId=rig(saved.drawingRigId);
  for(const saved of [...p.factoryCreation.revisions,...p.factoryCreation.drafts]){
   remapArtOrigin(saved.scene,id=>pictures.get(id),id=>rigs.get(id));
