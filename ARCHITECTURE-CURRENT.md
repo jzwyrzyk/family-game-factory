@@ -2,6 +2,13 @@
 
 The browser owns play, local creation and the learning host. The family gateway owns authorization and durable job admission. A separate preview origin runs generated content. The private worker and private coach have independent credentials, consent and spending boundaries. The family beta adds per-family workspaces and isolated origins. [Family architecture](docs/family-beta/ARCHITECTURE.md) · [Deployment and acceptance](DELIVERY-STATE.md)
 
+The nonproduction partial-recovery operator preserves the original evidence and
+plans against a private successor state. It accepts only the two remaining
+provider/budget creations or exact no-op imports, with all 25 existing instances
+unchanged. The IAP controller retains per-service invocation grants. Source
+implementation and actual cloud acceptance remain separate.
+[Recovery contract](docs/operations/NONPRODUCTION_RECOVERY.md)
+
 ## Operational access and recovery
 
 The PR #222 source candidate keeps direct managed identity qualification fail-closed

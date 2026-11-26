@@ -55,6 +55,16 @@ provider "google-beta" {
   region  = var.region
 }
 
+# User ADC needs a quota project for the billing-account-scoped Budget API.
+# Isolate this override from all existing resources and production billing.
+provider "google" {
+  alias                 = "nonproduction_budget"
+  project               = "jems-jzw-nonprod"
+  billing_project       = "jems-jzw-nonprod"
+  user_project_override = true
+  region                = var.region
+}
+
 data "google_project" "nonproduction" {
   project_id = var.project_id
 }
@@ -215,11 +225,9 @@ resource "google_project_service_identity" "iap" {
   depends_on = [google_project_service.api]
 }
 
-resource "google_project_iam_member" "iap_agent" {
-  project = var.project_id
-  role    = "roles/iap.serviceAgent"
-  member  = "serviceAccount:${google_project_service_identity.iap.email}"
-}
+# Direct Cloud Run IAP uses service-level roles/run.invoker, assigned and
+# verified by scripts/environments/cloud.py. No project-wide IAP agent grant.
+# Recovery refuses removal if the historical binding is actually in state.
 
 resource "google_iam_workload_identity_pool" "github" {
   workload_identity_pool_id = "jems-nonproduction"
@@ -232,7 +240,7 @@ resource "google_iam_workload_identity_pool" "github" {
 resource "google_iam_workload_identity_pool_provider" "github" {
   workload_identity_pool_id          = google_iam_workload_identity_pool.github.workload_identity_pool_id
   workload_identity_pool_provider_id = "github-main"
-  display_name                       = "Protected main environment controller"
+  display_name                       = "Jems protected main controller"
   disabled                           = !var.enable_federation
   attribute_mapping = {
     "google.subject"        = "assertion.sub"
@@ -284,6 +292,7 @@ output "configuration_identifiers" {
 
 # Notification only: never disable billing or production as a budget response.
 resource "google_billing_budget" "nonproduction" {
+  provider        = google.nonproduction_budget
   billing_account = var.billing_account
   display_name    = "Jems nonproduction monthly USD 15"
   budget_filter {

@@ -6,41 +6,40 @@ The frozen application candidate is `bc602f1ede502f398308ad56f973c4bf7997ff08`. 
 
 The development-efficiency integration changes validation and session startup. See [the engineering integration and protected push record](https://github.com/jzwyrzyk/family-game-factory/pull/219) for the tested source, measured results and activation. The Learning Workspace consolidation is tracked by [#218](https://github.com/jzwyrzyk/family-game-factory/pull/218). The review-only [Connected Creative Universe consolidation #220](https://github.com/jzwyrzyk/family-game-factory/pull/220) reconciles the overlapping source branches. Resolve current [open PR dependencies](https://github.com/jzwyrzyk/family-game-factory/pulls) before starting another branch.
 
-## Permanent operations — November 26 checkpoint
+## Permanent operations — November 26 recovery checkpoint
 
-PR #222 incorporates correction `34fd728…`; direct SDK identity qualification remains
-blocked and independent operations continue. Authenticated GitHub observation
-[45764873156](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764873156)
-verified the release account and three Ready/reconciled services at 100% traffic,
-without mutation. All three operational environments are now main-only (read back).
-Administrator reports nonproduction project `jems-jzw-nonprod`/`1092405124984` ACTIVE,
-billing verified, and the original 28-resource Terraform plan intact/unapplied.
+The owner reports the original and pre-apply Terraform plans matched exactly,
+then a partial apply recorded 25 of 28 instances. Outstanding: GitHub workload
+provider, project IAP agent binding, and the USD 15 nonproduction budget. Reported
+administrative errors are provider creation code 3 and IAM policy codes 3/10.
+The [guarded recovery](docs/operations/NONPRODUCTION_RECOVERY.md) corrects the
+37-character provider name, isolates budget ADC quota to `jems-jzw-nonprod`, and
+retires the uncreated project IAP role in favor of the controller's existing
+service-level Cloud Run invocation grant. It preserves all original evidence and
+requires zero existing-resource modifications. The private state directory and
+saved partial plan are absent from this Codex computer: actual error correlation,
+cloud reconciliation, corrected plan and approval hash remain blocked. No apply,
+federation enablement or live AI activation is claimed.
 
-The existing broker build/image was qualified without rebuilding. Administrator
-apply at `9072b7d…` then completed six account/role/federation commands and stopped
-with `INVALID_ARGUMENT` creating the filtered log view. No broker deployment or
-request-evidence acceptance is established. Preserve partial state; the consolidated
-recovery read at `057daa4` verified all six existing resources/bindings and left
-four actions. Audit evidence at `2628bd3` now identifies a filter nesting-depth limit of 1. The
-corrected flat expression retains every restriction but requires a separately
-approved new image build; the historical image and plan must not be reused with it.
-The one approved build from `476c2b9` reached `SUCCESS`; qualification stopped at
-`SOURCE_ARCHIVE_HASH_MISMATCH` with every other reported build predicate passing.
-A generation-pinned archive inspection is prepared; no resubmission, registry
-qualification, deployment or live acceptance is claimed.
-View-IAM POST and Cloud Run metadata corrections retain narrow permissions.
+Production diagnostic [run 45869033203](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45869033203)
+passed protected-main verification and Google ID-token acquisition and reached
+the private deployed broker. Its validated report returned
+`UNAVAILABLE/COVERAGE_UNVERIFIED`; effective view reads and request counts remain
+unverified. Empty revision input unexpectedly received the workflow's historical
+default, so requested service-wide acceptance was rejected. The prepared fix
+removes that default and requires exact-attempt successful job/step evidence as
+well as artifact provenance. Full broker acceptance needs actual initial IAM and
+dated source-coverage attestation through existing authorized access. GitHub
+dispatch, readback and artifact retrieval were performed directly, without owner
+command relay. No production IAM/configuration, schedule or AI setting changed.
 
-Expanded cleanup at `5d98d67` found 1,192,248,614 source bytes across five eligible
-repositories, including the registered recovery-named worktree, but no exact-pack
-deduplication savings; the 2 GiB target remains unproven. Locks and unique contents stay
-protected; private off-disk archival needs separate approval.
-No historical deletion or archival has been performed. DEV/TEST's original saved
-28-resource plan passed integrity readback again at `5d98d67`, remains independent and
-must not be regenerated for these tools.
-
-[Exact ledger and prior Coach HTTP 200 evidence](docs/operations/PERMANENT_CLOUD_LEDGER.md) ·
-[Executable setup](docs/operations/PERMANENT_CLOUD_SETUP.md) ·
-[Build/storage recovery and independent Terraform continuation](docs/operations/OPERATIONS_RECOVERY.md).
+All three operational GitHub environments were freshly read back as exact-main
+restricted with no setup actions remaining. Direct managed SDK identity retains
+its documented blocker; denied authentication endpoints were not retried. Earlier
+broker build/filter failure and private storage cleanup receipts remain preserved
+in the [permanent operations ledger](docs/operations/PERMANENT_CLOUD_LEDGER.md).
+The current source supersedes their old unapplied/not-deployed status only to the
+extent established by the owner's new report and the live broker response.
 
 ## Release and environment gates
 
@@ -49,7 +48,7 @@ These are the last recorded observations from the frozen source. Reverify each v
 | Phase | Status | Completed work | Evidence | Blocker | Next action |
 | --- | --- | --- | --- | --- | --- |
 | Recovery preparation | Implemented in part | Protected observe job re-read all three services and the existing rollback revision. Pages release marker selects `aa56b60abe152e750f9f0b5e8949bdb44be53196`. | [Read-only receipt](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45728127526), [storage rollout](docs/storage/ROLLOUT.md) | Private settings, WIF trust, runner group and recovery readback | Capture effective settings and rehearse compatible restoration using synthetic copies. |
-| DEV provisioning | Baseline planned, unapplied | Project/billing verified by administrator; 28-resource plan preserved, distinct static runtimes prepared; GitHub restrictions verified. | [Setup and existing $15/month planning authorization](docs/development/SETUP.md) | Exact saved-plan apply and one-time IAP setup | Continue original-source approved Terraform apply independently of broker verification. |
+| DEV provisioning | Partial apply reported: 25/28 | Original plan, state and apply marker retained; guarded two-resource recovery implemented. | [Recovery requirements](docs/operations/NONPRODUCTION_RECOVERY.md) | Private state access, actual provider-error correlation and fresh zero-drift plan/hash | Reconcile and review corrected remaining actions; never replay the original apply. |
 | TEST provisioning | Externally blocked | Isolated TEST contract and private worker dependencies identified. | [Environment contract](docs/development/DEV-TEST-PROD.md) | Isolated project, backend and worker | Verify IAP and exact-source UAT after provisioning. |
 | Sandbox integration | Repository validated on #190 | Clean hosted packaging matched all 29 public source files and exercised legacy and premium protocols. | [Hosted package](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45732287681), [publication controller](https://github.com/jzwyrzyk/family-game-factory/pull/169) | Frozen pin, signed digest and publication approval | Reconcile the protected publication controller and qualify packaging on the final source. |
 | Worker integration | Repository validated on interim public pin | Combined #20, #21 and #19. Candidate and ephemeral DEV overlay passed 182 tests each. Separate DEV passed 23. Packaging verified 41 commands. Production main and execution tag still select `dddf53dbc76796be19782c1bb5bbb99b86e99909`. | [Private #22](https://github.com/family-game-factory-lab/family-game-factory-worker/pull/22), [hosted proof](https://github.com/family-game-factory-lab/family-game-factory-worker/actions/runs/45732371029) | Final public pin, runner/WIF readback and rotation authority | Requalify the candidate at the frozen source and rehearse coordinated recovery. |

@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T17:11:29.619Z",
-      "sourceDigest": "09f71cec8e7ce38624ca9edfdc29afe70a307dbd6c238de655417ef4f0df9d22",
+      "reviewedAt": "2026-11-26T17:49:15.404Z",
+      "sourceDigest": "001d0cbdff085013be9b83c6f799bc873a2fe8d12508f61d3aec9b41a2a79110",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented gcloud URL-safe versus REST standard base64 representation, strict shared 32-byte SHA-256 decoding and 360 passing operations tests; live corrected readback remains pending and no source identity check is waived.",
+      "reviewReason": "Reviewed exact recovery implementation and negative tests: two-resource/no-op-import allowlist, original and successor preservation, pinned ADC identity/inputs/plan, durable one-shot marker and post-apply lineage/no-drift checks. Updated provider requirements, missing-state approval blocker and actual broker COVERAGE_UNVERIFIED/scope-mismatch evidence; no activation claim.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

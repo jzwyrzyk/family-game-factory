@@ -1,5 +1,13 @@
 # Operational activation recovery
 
+**November 26 supersession:** The owner now reports a partial nonproduction apply
+(25/28), and direct GitHub acceptance reached the deployed diagnostic broker but
+returned `COVERAGE_UNVERIFIED`. The original apply command below is historical
+and **must not be replayed**. Use [nonproduction partial recovery](NONPRODUCTION_RECOVERY.md)
+and [current diagnostic acceptance](PRODUCTION_DIAGNOSTICS.md). Preserve every old
+plan, state, marker and receipt. A corrected remaining-actions approval is separate.
+
+
 November 26, 2026. This supplements [permanent setup](PERMANENT_CLOUD_SETUP.md).
 It does not approve deletion or regenerate any saved Terraform plan.
 

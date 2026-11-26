@@ -515,3 +515,31 @@ are blocked independently of those offline results. Learning #218, creative #220
 CI #219 remain separate; all frozen release identities and production controls are
 preserved.
 
+
+## November 26 — partial Terraform recovery and live broker check
+
+The owner's current report supersedes the earlier unapplied Terraform status:
+25/28 original instances were recorded; original/recheck plans matched. The
+private `~/work/jems-nonprod-state` and `partial-recovery-1795714051.tfplan` are
+unavailable on the attached computer. Specific original provider causes and a
+corrected live plan are not independently verified here. Source review confirms
+the display-name limit, budget ADC quota requirement and direct-IAP architecture.
+[Exact changes, provider requirements and guarded operator](NONPRODUCTION_RECOVERY.md).
+No recovery apply or activation was performed.
+
+Live [diagnostic run 45869033203](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45869033203),
+at protected main `652bf9e312fc0776e37b7ef7893835e0fd8136d4`, passed protected-main
+verification, workload token acquisition and private broker invocation. The report
+at `2026-11-26T17:35:52Z` returned `UNAVAILABLE/COVERAGE_UNVERIFIED` with null counts,
+no rows and `permissions_verified=false`. Artifact SHA-256:
+`6b46985b95af3e71218e5a53e8fa567073c528549fd34e06394f966337bccf19`.
+Its empty revision request was replaced by the workflow's historical default;
+strict retrieval correctly rejected the resulting scope mismatch. Prepared source
+removes that default and additionally checks the exact attempt's successful job
+and mandatory steps. Full acceptance still needs effective IAM and genuine dated
+coverage evidence. No raw request logs, tokens, child content or application
+secrets were printed. Private dispatch intent, artifact and receipt are preserved.
+
+Direct GitHub inventory confirmed exact-main restrictions for all three operational
+environments with zero setup actions. No second query, permission expansion,
+production deployment, scheduler activation or paid AI request was issued.
