@@ -26,6 +26,7 @@ export interface MathActivityOptions {
   legacyIds?: boolean;
   challenge?: boolean;
   onLeave?:()=>void;
+  leaveLabel?:string;
 }
 let nextActivity = 0;
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, className?: string, text?: string): HTMLElementTagNameMap[K] {
@@ -64,7 +65,7 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   const listeners = new AbortController();
   const shell = createLearningWorkspace({subject:'math', grade:profileGrade(options.profile),
     title:item.question, id:`${prefix}-question`, owner:String(options.profile.id ?? ''), gameId:options.context?.gameId,
-    signal:listeners.signal, onLeave:options.onLeave && (()=>{ if(!disposed&&!done) options.onLeave?.(); })});
+    signal:listeners.signal, leaveLabel:options.leaveLabel, onLeave:options.onLeave && (()=>{ if(!disposed&&!done) options.onLeave?.(); })});
   const {root,title,feedback,helpPanel:hintPanel} = shell;
   root.dataset.answerKind = item.answerKind; root.dataset.skillId = item.skillId;
   const early=isEarlyGrade(item.grade);root.classList.toggle('early-activity',early);

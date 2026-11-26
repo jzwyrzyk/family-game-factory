@@ -84,7 +84,9 @@
     "docs/development/SETUP.md",
     "docs/development/COSTS.md",
     "docs/decisions/2026-11-23-dev-test-prod.md",
-    "docs/ui-review/README.md"
+    "docs/ui-review/README.md",
+    "docs/learning/LEARNING_WORKSPACE_STANDARD.md",
+    "docs/decisions/2026-11-26-unified-learning-workspace.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -125,7 +127,9 @@
     "docs/development/*.md",
     "infra/nonproduction/*.md",
     "docs/development/evidence/*.md",
-    "docs/storage/*.md"
+    "docs/storage/*.md",
+    "docs/learning/*.md",
+    "docs/evidence/learning-workspace/*.md"
   ],
   "areas": [
     {
@@ -146,10 +150,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:45:19.713Z",
-      "sourceDigest": "dcfdddcc90aace523b5b773160d919ae2d689b18c302275c500dfa172eba6d3b",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The workspace changes presentation and optional working tools. The existing child-owned learning, profile and reward principles continue to govern the host.",
+      "reviewedAt": "2026-11-26T01:57:50.249Z",
+      "sourceDigest": "f6de9df1adbac3f7732d2e8501d12dc842cc854cd84a7c18f6485a809554918b",
+      "reviewOutcome": "updated",
+      "reviewReason": "The owner-approved shared learning presentation and evidence distinctions are recorded in the doctrine and the unified workspace decision.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -310,10 +314,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:45:20.619Z",
-      "sourceDigest": "47252f4893832a8830dfedcd10360acefc30e9cdb3ebd7c5ae12c8d92ccf833d",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Math layouts now reuse the brand palette and child target sizes. The approved brand library, touch conventions and asset source selections still apply.",
+      "reviewedAt": "2026-11-26T01:59:18.597Z",
+      "sourceDigest": "d4c09d12fe4f3663f63189d128ce9efbdb7cfd7ccbc4c1f076a887fdfb59a9ac",
+      "reviewOutcome": "updated",
+      "reviewReason": "The shared host, game exits, brand and theme presentation, and isolated family entry now use the workspace controls. Reviewed private stylesheet inclusion separately from the ordinary gallery.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -410,10 +414,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fee0252694b94e3f1254485510ef5c6da2cbd6ca19ac18af19c0ec8e8e26b54d",
-      "reviewedAt": "2026-11-25T23:20:54.040Z",
+      "sourceDigest": "308e1dfdead1043d2e7a7ccfad1a278b664ccaab58f35a80f984cd641f8020c8",
+      "reviewedAt": "2026-11-26T01:57:54.336Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The scene rendering contract distinguishes legacy pinned tokens and neutral bytes from new active actor choices.",
+      "reviewReason": "The fitted editor now opens learning over the whole workspace and restores focus and play through the guarded host return. Updated the Creation Studio contract.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -636,19 +640,24 @@
         "docs/adaptive-math/*.md",
         "docs/adaptive-language/*.md",
         "docs/rewards/*.md",
-        "docs/brand/CHILD_INTERFACE.md"
+        "docs/brand/CHILD_INTERFACE.md",
+        "docs/learning/*.md"
       ],
       "sources": [
         "src/learning/**",
         "src/language/**",
         "docs/adaptive-math/*.md",
-        "docs/adaptive-language/*.md"
+        "docs/adaptive-language/*.md",
+        "docs/learning/*.md",
+        "public/learning-counters/**",
+        "src/family-beta/learning.ts",
+        "tests/theme-workspace.test.ts"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:53:23.533Z",
-      "sourceDigest": "27365f9674b56033af370fca73478bd7919e4b633a915127e686b60002e10d94",
+      "reviewedAt": "2026-11-26T01:59:38.817Z",
+      "sourceDigest": "82acc836b21962e9f6102ad37bd1d3f253f94f2b1cb39e591905960990a8d82d",
       "reviewOutcome": "updated",
-      "reviewReason": "The English integration and curriculum contracts document v3 authored responses, picture and passage interactions, isolated prompt delivery, and explicit target-reading assistance.",
+      "reviewReason": "Verified model routing, new versioned literacy responses, narration evidence, restricted host entry and reviewed counter assets against the standard and skill-family matrices.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -891,10 +900,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T02:02:21.161Z",
-      "sourceDigest": "5d915acb677c990b41cbc746f0fc02178ce579e8a35fb1822d87b607bea6efae",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the merged contrast and unused-checkpoint exit assertions with Math construction/geometry cases and English token ordering, passage evidence, independent writing and scoring tests. The established CI suites still exercise these behaviors without altering production or learning policy.",
+      "reviewedAt": "2026-11-26T02:11:52.582Z",
+      "sourceDigest": "af69f01e58a8af63e125bc00824c5cd54fcd3c8121ab1fda06ff100494e38dd5",
+      "reviewOutcome": "updated",
+      "reviewReason": "The Arcade inventory now includes the additional Creation Studio checkpoint command and verifies its assignment to the existing creative shard. The delivery record identifies the added check.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1135,10 +1144,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T01:50:07.685Z",
-      "sourceDigest": "407ba629bd4f34955f20a5e6c69735d1a2b95e1cf6510accae9f3f1d6c53b927",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Adding deterministic local Math model and geometry tests to the existing learning command changes neither deployment routing nor the approved release source.",
+      "reviewedAt": "2026-11-26T02:11:52.882Z",
+      "sourceDigest": "1fdfe42a78932f956478f54b6520d34733492c55ca97dafac7ea2bcaff45db77",
+      "reviewOutcome": "updated",
+      "reviewReason": "The integrated delivery record identifies the 66-command creative suite including the fullscreen checkpoint regression.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1393,10 +1402,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:58.459Z",
-      "sourceDigest": "37c0c3f9ee5432f31d4741e23cb41fe2cc54569af18aec957152e780590aad46",
+      "reviewedAt": "2026-11-26T01:59:42.842Z",
+      "sourceDigest": "06b6cdc9548a346c70109a13aef56cbafadaeadf996f89b49b34661052e14574",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the roster and Journey decision with companion contracts and updated the documentation index.",
+      "reviewReason": "Registered learning standards, counter assets, family entry, theme contract tests and rendered evidence links. Updated the template and maintenance guide for future reviews.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -31,7 +31,10 @@ test('aggregates reject replaced or self-claimed plan bytes before parsing', () 
 });
 
 test('all original Arcade leaf commands occur exactly once in their original required group', () => {
-  assert.deepEqual(verifyCoverage(manifest, pkg), { notifications: 2, browser: 43, learning: 12, creative: 65 });
+  assert.deepEqual(verifyCoverage(manifest, pkg), { notifications: 2, browser: 43, learning: 12, creative: 66 });
+  const creation = expandCommands(manifest.shards['creation-art'].commands, pkg.scripts);
+  assert.ok(creation.some(([runner, script]) => runner === 'node' && script === 'tests/creation-learning-workspace.cjs'),
+    'the Creation Studio shard exercises fullscreen learning and game return');
   for (const mutation of [m => m.shards.mining.commands.pop(), m => m.shards.factory.commands.push('node tests/mind-your-jems-browser.cjs')]) {
     const changed = structuredClone(manifest); mutation(changed);
     assert.throws(() => verifyCoverage(changed, pkg), /CI_COVERAGE_MISMATCH/);

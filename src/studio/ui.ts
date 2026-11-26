@@ -1510,7 +1510,7 @@ export async function installStudio(){
   iframe=document.createElement('iframe');iframe.title='Private game preview';iframe.setAttribute('sandbox','allow-scripts');iframe.referrerPolicy='no-referrer';
   previewChannel=crypto.randomUUID();previewArtifact=preview.artifactId;previewOwner=s.owner;
   host.replaceChildren(iframe);openPreviewFrame(iframe,preview,previewChannel);
-  previewLearning=attachPreviewLearning(iframe,{channel:previewChannel,artifactId:previewArtifact,ownerId:s.owner,gameId:'generated',projectId:s.id,versionId:id,onReadyChange:()=>queueMicrotask(()=>{if(sameView(s,generation))render();}),onRound:async d=>(await announceOutcome(s,`You ${d.won?'finished':'tried'} that round. Score: ${d.score}.`,false,playedTest))});
+  previewLearning=attachPreviewLearning(iframe,{channel:previewChannel,artifactId:previewArtifact,ownerId:s.owner,gameId:'generated',projectId:s.id,versionId:id,onLeave:()=>{if(sameView(s,generation))act(homeFromNavigation);},onReadyChange:()=>queueMicrotask(()=>{if(sameView(s,generation))render();}),onRound:async d=>(await announceOutcome(s,`You ${d.won?'finished':'tried'} that round. Score: ${d.score}.`,false,playedTest))});
   $('studioPlayNote').textContent=preview.adapter==='mock'?'Test builder (mock)—not a real AI generation.':'Private preview. Your working game stays unchanged until you keep it.';
   render();(await setTab('game'));enterPlayView();
  }

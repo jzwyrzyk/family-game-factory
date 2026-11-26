@@ -10,6 +10,7 @@ test('trusted game IDs resolve local counter artwork and unknown IDs share one f
   for (const id of ['mining','factory','gum','dragon','moon']) {
     const theme = learningTheme(id);
     assert.equal(theme.id,id);
+    assert.equal(Object.isFrozen(theme),true);
     assert.match(theme.counter,/^(learning-counters|early-pictures)\/[a-z_]+\.webp$/);
     assert.ok(existsSync('public/'+theme.counter));
   }
@@ -23,6 +24,7 @@ test('themed counting, unchanged named stimuli and owner-bound Pal reactions in 
     export * from './src/learning/early/render';
     export * from './src/learning/workspace/theme';
     export {createPalPortrait, retirePortrait} from './src/pals/ui';
+    export {open as openFamilyPractice} from './src/family-beta/learning';
   `},bundle:true,format:'iife',globalName:'WorkspaceTest',outdir:'out',write:false});
   const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH || (!process.env.CI && existsSync('/usr/bin/chromium') ? '/usr/bin/chromium' : undefined),args:['--no-sandbox']});
   try {
@@ -88,5 +90,25 @@ test('themed counting, unchanged named stimuli and owner-bound Pal reactions in 
       const w=window as any;w.pal.dispose(); w.select('owner-a',true);w.pal.setState('correct');
     });
     assert.equal(await portrait.count(),0);
+
+    const familyProfile={id:'fixture',grade:2,skills:{}};
+    for (const subject of ['math','language']) {
+      await page.evaluate(profile=>{
+        const w=window as any,main=document.querySelector('main')!;
+        main.replaceChildren();
+        w.FG={store:{current(){return profile;},save(){return true;}}};
+        w.disposeFamilyPractice=w.WorkspaceTest.openFamilyPractice(main,()=>{
+          w.disposeFamilyPractice();main.replaceChildren();
+        });
+        w.fixtureProfile=profile;
+      },familyProfile);
+      await page.getByRole('button',{name:subject==='math'?'Practice math':'Practice English'}).click();
+      await page.getByRole('button',{name:'Back to activities'}).click();
+      const outcome=await page.evaluate(key=>{
+        const profile=(window as any).fixtureProfile;
+        return profile[key].attempts.at(-1).outcome;
+      },subject==='math'?'learning':'language');
+      assert.equal(outcome,'interrupted');
+    }
   } finally { await browser.close(); }
 });

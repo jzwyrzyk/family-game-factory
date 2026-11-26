@@ -85,3 +85,5 @@
 }
 /* Placed and unavailable pieces still carry task content after submission. */
 .learning-workspace.language-activity :is(.language-choice,.language-tile,.language-placed,.language-evidence-line):disabled { opacity: 1; }
+.learning-workspace.language-early-item .early-word { background:var(--workspace-tint); color:var(--workspace-ink); border-radius:16px; padding:10px; }
+.learning-workspace.language-early-item .language-choice-grid .language-choice { border-color:#678977; color:var(--workspace-ink); }

@@ -125,3 +125,25 @@ test('scratchpad keeps finger, pen, mouse and keyboard work within one activity 
     assert.equal(await page.locator('.learning-keypad-keys').getByRole('button', {name:'Fraction slash'}).count(), 0);
   } finally { await page.close(); }
 });
+
+test('old ink survives the undo limit, and branching after undo removes the abandoned redo path', async () => {
+  const page = await mount('number',320);
+  try {
+    await page.locator('.learning-scratchpad > summary').click();
+    const canvas=page.locator('canvas');
+    await canvas.focus();
+    await canvas.press('Enter');
+    for(let i=0;i<20;i++)await canvas.press('ArrowRight');
+    for(let i=0;i<64;i++)await canvas.press('Enter');
+    const undo=page.getByRole('button',{name:'Undo',exact:true});
+    for(let i=0;i<64;i++)await undo.press('Enter');
+    assert.equal(await undo.isDisabled(),true);
+    assert.ok(await ink(page)>0,'the first dot is kept in the baseline');
+    const redo=page.getByRole('button',{name:'Redo',exact:true});
+    assert.equal(await redo.isEnabled(),true);
+    await canvas.press('Enter');
+    assert.equal(await redo.isDisabled(),true);
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    assert.ok(await page.locator('.learning-keypad-keys button').first().evaluate(el=>el.getBoundingClientRect().height>=48));
+  } finally {await page.close();}
+});

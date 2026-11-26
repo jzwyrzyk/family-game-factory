@@ -18,6 +18,8 @@
 
 <!-- For child-facing UI, apply docs/brand/CHILD_INTERFACE.md: remove redundant copy, retain 18px labels / 20px task text, verify actual-surface contrast at phone sizes and in help/error states, and preserve explicit friendly narration and cancellation. State observed coverage, not a site-wide claim from one screenshot. -->
 
+<!-- Learning changes use docs/learning/LEARNING_WORKSPACE_STANDARD.md. Identify the skill family, profile band, response serialization and evidence impact. Link a rendered child interaction, accessible tap/keyboard route and a retry/help/return case. Report which delivery gates and real-device observations remain open. -->
+
 ## Preview and acceptance
 
 <!-- Follow docs/development/DEV-TEST-PROD.md. Applicable application changes need an interactive private DEV preview; documentation-only changes may state not applicable. Automated status must bind the current PR head and actual deployment receipt. A merged PR is not necessarily deployed. -->

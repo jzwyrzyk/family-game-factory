@@ -30,7 +30,7 @@ function safeCheckpoint(kind){
  const open=()=>{
   if(session!==gameSession||activeGame!==game||FG.store.current()!==profile)return;
   const overlay=overlayHtml('<div id="native-learning-activity" class="learning-modal-card"></div>');
-  try{if(!FG.learning.checkpoint(overlay.firstElementChild,{...learningContext,opportunity:'mid-play'},complete,{roundId:token,legacyIds:true,onLeave:()=>page('home')}))complete();}
+  try{if(!FG.learning.checkpoint(overlay.firstElementChild,{...learningContext,opportunity:'mid-play'},complete,{roundId:token,legacyIds:true,onLeave:()=>$('homeBtn').click()}))complete();}
   catch{const box=overlay.firstElementChild;box.replaceChildren();const title=document.createElement('h2'),copy=document.createElement('p'),retry=document.createElement('button');title.textContent='Your game is paused';copy.textContent='A learning activity could not open. Try again, or leave this game and ask a grown-up for help.';retry.className='btn primary';setIconLabel(retry,'retry','Try learning again');retry.onclick=open;box.append(title,copy,retry);retry.focus();}
  };
  open();return true;
@@ -56,7 +56,7 @@ function finish(game,result){
    if(session!==gameSession)return;
    const outcome=activeGameId==='buckets'&&!isEarlyGrade(p.grade)&&p.punish&&p.learningSubject!=='language'&&!response.independent?{...result,won:false,title:'Run complete',description:'Original Challenge: this answer ended the run. Try again when ready.'}:result;
    showResult(outcome,response.independent);
- },{legacyIds:true,challenge:activeGameId==='buckets'&&!isEarlyGrade(p.grade)&&p.punish&&p.learningSubject!=='language',onLeave:()=>page('home')});
+ },{legacyIds:true,challenge:activeGameId==='buckets'&&!isEarlyGrade(p.grade)&&p.punish&&p.learningSubject!=='language',onLeave:()=>$('homeBtn').click()});
  if(!asked)showResult(result,true);
 }
 function showResult(result,mathFirstTry){if(!activeGame)return;const p=FG.store.current();const penalty=!isEarlyGrade(p.grade)&&!!p.punish&&p.learningSubject!=='language'&&!mathFirstTry&&result.won;const won=!!result.won&&!penalty;FG.store.recordGame(activeGameId,won,result.level);let txt=penalty?'Math challenge missed on the first try. Parent challenge mode means repeating this level.':result.description;
@@ -88,7 +88,7 @@ function loadLab(){
 function renderLabReport(){FG.learning.renderReport($('skill-report'),FG.store.current(),FG.learning.subject);}
 function nextLab(){
  $('lab-controls').replaceChildren();
- FG.learning.mount($('lab-question'),{profile:FG.store.current(),context:{gameId:FG.learning.subject==='language'?'language-lab':'math-lab',projectId:FG.learning.subject==='language'?'language-lab':'math-lab',mode:'both',opportunity:'practice'},mode:'both',legacyIds:false,onSave:renderLabReport,onComplete:()=>{
+ FG.learning.mount($('lab-question'),{profile:FG.store.current(),context:{gameId:FG.learning.subject==='language'?'language-lab':'math-lab',projectId:FG.learning.subject==='language'?'language-lab':'math-lab',mode:'both',opportunity:'practice'},mode:'both',legacyIds:false,onLeave:()=>$('homeBtn').click(),onSave:renderLabReport,onComplete:()=>{
    renderLabReport();renderLabSubjectPicker();const b=document.createElement('button');b.id='lab-next';b.className='btn primary';setIconLabel(b,'retry','Try another');b.onclick=nextLab;$('lab-controls').replaceChildren(b);b.focus();
  }});renderLabSubjectPicker();
 }

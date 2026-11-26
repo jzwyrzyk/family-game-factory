@@ -2,6 +2,8 @@
 
 ## Ownership
 
+The [workspace standard](../learning/LEARNING_WORKSPACE_STANDARD.md) covers shared presentation, profile bands, model selection and the distinction between access and instructional help.
+
 The host owns learner records, grade eligibility, item selection, exact evaluation, evidence, persistence, question budget, and allowed presentation modes. Games own their ordinary mechanics and run outcome. A new game must integrate with the shared host; it must not implement a parallel learner score or remove math in response to a child prompt.
 
 ```mermaid

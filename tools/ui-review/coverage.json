@@ -284,5 +284,292 @@
     "Local synthetic IndexedDB storage is isolated by a review-run prefix. Review findings persist separately where browser storage permits, with explicit JSON and Markdown exports.",
     "Mobile/tablet viewport emulation does not establish real hardware, Safari, touch keyboard, sound or educational acceptance."
   ],
-  "excludedPRs": []
+  "excludedPRs": [],
+  "learningSamples": [
+    {
+      "action": "learn:pk-touch",
+      "label": "Count objects",
+      "subject": "math",
+      "grade": -1,
+      "skill": "pk-touch"
+    },
+    {
+      "action": "learn:k-pattern",
+      "label": "Continue a pattern",
+      "subject": "math",
+      "grade": 0,
+      "skill": "k-pattern"
+    },
+    {
+      "action": "learn:g1-make-ten",
+      "label": "Make ten",
+      "subject": "math",
+      "grade": 1,
+      "skill": "g1-make-ten"
+    },
+    {
+      "action": "learn:g1-subtract-10",
+      "label": "Number line",
+      "subject": "math",
+      "grade": 1,
+      "skill": "g1-subtract-10"
+    },
+    {
+      "action": "learn:g2-hundreds",
+      "label": "Place value",
+      "subject": "math",
+      "grade": 2,
+      "skill": "g2-hundreds"
+    },
+    {
+      "action": "learn:g3-groups",
+      "label": "Multiplication array",
+      "subject": "math",
+      "grade": 3,
+      "skill": "g3-groups"
+    },
+    {
+      "action": "learn:g4-add-fraction",
+      "label": "Fraction construction",
+      "subject": "math",
+      "grade": 4,
+      "skill": "g4-add-fraction"
+    },
+    {
+      "action": "learn:g2-time",
+      "label": "Read a clock",
+      "subject": "math",
+      "grade": 2,
+      "skill": "g2-time"
+    },
+    {
+      "action": "learn:g2-length",
+      "label": "Ruler",
+      "subject": "math",
+      "grade": 2,
+      "skill": "g2-length"
+    },
+    {
+      "action": "learn:paper",
+      "label": "Scratchpad and number pad",
+      "subject": "math",
+      "grade": 4,
+      "skill": "g4-time-money",
+      "state": "tools"
+    },
+    {
+      "action": "learn:g4-angles",
+      "label": "Angle",
+      "subject": "math",
+      "grade": 4,
+      "skill": "g4-angles"
+    },
+    {
+      "action": "learn:letter-recognition",
+      "label": "Letter recognition",
+      "subject": "language",
+      "grade": -1,
+      "skill": "pk-ela-letters",
+      "tier": 0,
+      "random": 0.41
+    },
+    {
+      "action": "learn:find-the-starting-letter",
+      "label": "Find the starting letter",
+      "subject": "language",
+      "grade": 0,
+      "skill": "k-ela-sound-letter",
+      "tier": 0,
+      "random": 0.41
+    },
+    {
+      "action": "learn:picture-matching",
+      "label": "Picture matching",
+      "subject": "language",
+      "grade": 0,
+      "skill": "k-ela-printed-word",
+      "tier": 0,
+      "random": 0.41
+    },
+    {
+      "action": "learn:build-a-word",
+      "label": "Build a word",
+      "subject": "language",
+      "grade": 1,
+      "skill": "g1-short-a-e",
+      "tier": 2,
+      "random": 0.41
+    },
+    {
+      "action": "learn:build-a-sentence",
+      "label": "Build a sentence",
+      "subject": "language",
+      "grade": 3,
+      "skill": "g3-agreement",
+      "tier": 2,
+      "random": 0.41
+    },
+    {
+      "action": "learn:sequence-a-picture-story",
+      "label": "Sequence a picture story",
+      "subject": "language",
+      "grade": 0,
+      "skill": "k-ela-sequence",
+      "tier": 0,
+      "random": 0.999
+    },
+    {
+      "action": "learn:punctuation",
+      "label": "Punctuation",
+      "subject": "language",
+      "grade": 1,
+      "skill": "g1-punctuation",
+      "tier": 0,
+      "random": 0.41
+    },
+    {
+      "action": "learn:grammar",
+      "label": "Grammar",
+      "subject": "language",
+      "grade": 2,
+      "skill": "g2-complete-sentences",
+      "tier": 0,
+      "random": 0.41
+    },
+    {
+      "action": "learn:read-for-the-main-idea",
+      "label": "Read for the main idea",
+      "subject": "language",
+      "grade": 3,
+      "skill": "g3-main-idea",
+      "tier": 0,
+      "random": 0.41
+    },
+    {
+      "action": "learn:select-supporting-evidence",
+      "label": "Select supporting evidence",
+      "subject": "language",
+      "grade": 3,
+      "skill": "g3-text-evidence",
+      "tier": 0,
+      "random": 0.87
+    },
+    {
+      "action": "learn:edit-a-sentence",
+      "label": "Edit a sentence",
+      "subject": "language",
+      "grade": 1,
+      "skill": "g1-punctuation",
+      "tier": 2,
+      "random": 0.41
+    },
+    {
+      "action": "learn:creative-writing",
+      "label": "Creative writing",
+      "subject": "language",
+      "grade": 4,
+      "skill": "g4-revision",
+      "tier": 0,
+      "random": 0.41
+    },
+    {
+      "action": "learn:selected",
+      "label": "A letter placed",
+      "subject": "language",
+      "grade": 1,
+      "skill": "g1-short-a-e",
+      "state": "selected",
+      "tier": 2
+    },
+    {
+      "action": "learn:incorrect",
+      "label": "Retry after a choice",
+      "subject": "language",
+      "grade": 1,
+      "skill": "g1-cvc-patterns",
+      "state": "incorrect"
+    },
+    {
+      "action": "learn:hint",
+      "label": "Visual hint",
+      "subject": "math",
+      "grade": 1,
+      "skill": "g1-make-ten",
+      "state": "hint"
+    },
+    {
+      "action": "learn:worked",
+      "label": "Worked example",
+      "subject": "math",
+      "grade": 2,
+      "skill": "g2-hundreds",
+      "state": "worked"
+    },
+    {
+      "action": "learn:correct",
+      "label": "Successful choice",
+      "subject": "language",
+      "grade": 1,
+      "skill": "g1-cvc-patterns",
+      "state": "correct"
+    },
+    {
+      "action": "learn:voice",
+      "label": "Unavailable voice and reading fallback",
+      "subject": "language",
+      "grade": 0,
+      "skill": "k-ela-printed-word",
+      "state": "voice"
+    },
+    {
+      "action": "learn:save-failure",
+      "label": "Save warning and retry",
+      "subject": "math",
+      "grade": 2,
+      "skill": "g2-hundreds",
+      "state": "save-failure"
+    },
+    {
+      "action": "learn:ending",
+      "label": "Match ending sounds",
+      "subject": "language",
+      "grade": 0,
+      "skill": "k-ela-ending"
+    },
+    {
+      "action": "learn:segment",
+      "label": "Count sounds",
+      "subject": "language",
+      "grade": 0,
+      "skill": "k-ela-segment"
+    },
+    {
+      "action": "learn:coin",
+      "label": "Coin collection",
+      "subject": "math",
+      "grade": 2,
+      "skill": "g2-money"
+    },
+    {
+      "action": "learn:compose",
+      "label": "Shape composition",
+      "subject": "math",
+      "grade": 0,
+      "skill": "k-compose"
+    },
+    {
+      "action": "learn:data",
+      "label": "Read a chart",
+      "subject": "math",
+      "grade": 2,
+      "skill": "g2-data"
+    },
+    {
+      "action": "learn:plot",
+      "label": "Line plot",
+      "subject": "math",
+      "grade": 4,
+      "skill": "g4-data"
+    }
+  ]
 }
