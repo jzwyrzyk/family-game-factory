@@ -1,3 +1,5 @@
+import {pointerPoint} from '../../drawing/pointer-input';
+
 type Point = {x: number; y: number};
 type Tool = 'Pencil' | 'Eraser';
 type Mark = {tool: Tool; points: Point[]};
@@ -131,11 +133,6 @@ export function mountPaper(details: HTMLDetailsElement, signal: AbortSignal) {
     active.points.push(point);
     drawSegment(ctx, active.tool, last ?? point, point);
   }
-  function pointFor(event: PointerEvent) {
-    const rect = canvas.getBoundingClientRect();
-    return {x: bound((event.clientX - rect.left) / rect.width * width, width),
-      y: bound((event.clientY - rect.top) / rect.height * height, height)};
-  }
   canvas.addEventListener('pointerdown', event => {
     if (pointer !== null || event.button !== 0 || !event.isPrimary) return;
     event.preventDefault();
@@ -144,14 +141,14 @@ export function mountPaper(details: HTMLDetailsElement, signal: AbortSignal) {
     cursor.hidden = true;
     canvas.setPointerCapture(pointer);
     active = {tool, points: []};
-    addPoint(pointFor(event));
+    addPoint(pointerPoint(canvas, event, 'position'));
   }, {signal});
   canvas.addEventListener('pointermove', event => {
-    if (pointer === event.pointerId) addPoint(pointFor(event));
+    if (pointer === event.pointerId) addPoint(pointerPoint(canvas, event, 'position'));
   }, {signal});
   canvas.addEventListener('pointerup', event => {
     if (pointer !== event.pointerId) return;
-    addPoint(pointFor(event));
+    addPoint(pointerPoint(canvas, event, 'position'));
     finish();
   }, {signal});
   function cancel(event: PointerEvent) {
