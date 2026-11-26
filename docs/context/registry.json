@@ -87,7 +87,9 @@
     "docs/ui-review/README.md",
     "docs/creative-universe/STANDARD.md",
     "docs/decisions/2026-11-26-connected-creative-universe.md",
-    "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md"
+    "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md",
+    "docs/creation-studio/world-art-manifest.json",
+    "docs/creation-studio/CREATIVE_ASSET_AND_WORLD_STANDARD.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -150,10 +152,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:09:46.422Z",
-      "sourceDigest": "c5ff9ed2fdc9e2eee322a0d699b3d7fc1de9a2754074f929934386104d3bbfe6",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reconciled both simultaneous standard proposals into one permanent authentic-art reference for drawing, movement, worlds and context-owned game roles.",
+      "reviewedAt": "2026-11-26T03:13:42.771Z",
+      "sourceDigest": "ff9c02d667b54ac95443882ff6269ecf8d27444f45635284e0f055eacb1974d2",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Coded paths and editable crayon sources follow the canonical child artwork, explicit Keep and version pinning decisions in the reconciled standard.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -314,10 +316,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:06:14.867Z",
-      "sourceDigest": "cec11c6abfe338d300c585a6b062e905a07024c747e0d3d68e5d938ab97392b5",
+      "reviewedAt": "2026-11-26T03:16:21.329Z",
+      "sourceDigest": "879a3ff172bd4e85db495b78e71238eeec47198589ed524ec6caa7e1d090ac0e",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed workshop input now retains the exact authorized PNG and rejects embedded file details before the adult digest request.",
+      "reviewReason": "The reviewed family PNG entry now enforces exact bounded raster structure before consent admission, retaining the input bytes only after validation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -414,13 +416,15 @@
         "src/creation/**",
         "server/agent/creation-schema.ts",
         "tests/creation-*",
-        "public/art/creative-worlds/**"
+        "public/art/creative-worlds/**",
+        "docs/creation-studio/world-art-manifest.json",
+        "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "4bfdf27858ae0a63fe083cc59cbe7775d6e2454ef761f8bc7d567c1db66e37f1",
-      "reviewedAt": "2026-11-26T03:06:15.823Z",
+      "sourceDigest": "923c7f34435ddd149c27453009fc5adeb37d185235156c4609ce318971bea52a",
+      "reviewedAt": "2026-11-26T03:35:35.213Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Creative Studio now has a canonical standard for versioned world scenery and the separation between contextual roles and private artwork identity.",
+      "reviewReason": "The scene contract records portrait playback spacing and the active learning question’s own foreground color.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -899,10 +903,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:06:15.971Z",
-      "sourceDigest": "d3ee69b44d711cd709ce46c2855a7454a1b54e18e4655859b4881d1888f6443d",
-      "reviewOutcome": "updated",
-      "reviewReason": "The new synthetic browser and container checks verify exact byte admission, metadata rejection, owner changes and digest-only authorization.",
+      "reviewedAt": "2026-11-26T03:43:22.238Z",
+      "sourceDigest": "9755f1f29e52dbb4a755627954365061622a186d2d360a90cc80daccdd6c7ce0",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The offline smoke test checks the existing build against all 48 independent world-manifest hashes, decodes the three Moon Adventure stage layers offline and preserves private-route, quota and Pal canaries. The shipped caching and release contracts already describe these boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1143,10 +1147,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:06:16.162Z",
-      "sourceDigest": "d1a2a0bdbf766f8b99256225ed6b5feae3af6991caa35a0b3a828f8b4127c5f7",
+      "reviewedAt": "2026-11-26T03:15:06.970Z",
+      "sourceDigest": "afc3429a3eff1716069b1f4e978036c86f244c2ed5ae56a4b6ed2b7cde46f0a6",
       "reviewOutcome": "updated",
-      "reviewReason": "The family security workflow exercises original-byte admission and the release record distinguishes the production baseline from the proposed development.",
+      "reviewReason": "The delivery record distinguishes these candidate crayon, path and catalogue capabilities from deployed activity rendering and owner artwork acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1401,10 +1405,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:09:46.541Z",
-      "sourceDigest": "bd7a3c55e5817607328a7345dde6b20c938ff17bfd42d7d942a1f7be9130ac44",
+      "reviewedAt": "2026-11-26T03:15:07.223Z",
+      "sourceDigest": "9949b49fee52f9382ac0c405465d30627ee3e2c0719b222034b4032eaf85978a",
       "reviewOutcome": "updated",
-      "reviewReason": "The maintenance guide, registry and review template now share one standard while preserving both concurrent PR documentation paths.",
+      "reviewReason": "The registry retains the shared creative standard, compatibility link and both incoming source routes for editable crayons and world artwork.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1626,13 +1630,14 @@
         "tests/art-*",
         "tests/drawing-*",
         "tests/creation-private-art*",
-        "tests/picture-tools-browser.cjs"
+        "tests/picture-tools-browser.cjs",
+        "tests/crayon-revision-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "a04e0449fc863d945b55d4a7d2b401d189d5c401e7d629e62d3a0cd79b2c5015",
-      "reviewedAt": "2026-11-26T03:09:46.666Z",
+      "sourceDigest": "180a66e42bea5c5f7982bd316476525280fbdb0897b7867dff392942737ac4a6",
+      "reviewedAt": "2026-11-26T03:13:44.713Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The drawing standard follows the shared canonical world reference and protects exact original and revision identities on archive and recovery.",
+      "reviewReason": "The My Art contract describes a new crayon revision from saved editable strokes and compatibility with original and prior drawing bytes.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1712,10 +1717,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "381260b659e8d8ed26b7fdddb3c2182a49d2f8f9cffd808e7d167695f25bfb3a",
-      "reviewedAt": "2026-11-26T00:23:36.006Z",
+      "sourceDigest": "3b669cf847b1ba4c4642c8130894505a04e7b12f3707b8ffd273b74370ed92df",
+      "reviewedAt": "2026-11-26T03:08:54.218Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled merged F06 rollback limits with the owner-scoped Pal migration, retained readers and repeat restore contract."
+      "reviewReason": "Architecture records reads of the active owner’s kept scene revision in both original and indexed scene storage. Copying motion writes a new group of block IDs through existing autosave, keep and backup."
     }
   ]
 }

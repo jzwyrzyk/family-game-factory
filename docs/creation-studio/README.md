@@ -1,5 +1,8 @@
 # Creation Studio: make scenes and rebuild behavior
 
+[Draw a path](DRAWN_PATHS.md) with a saved picture or cutout. Named paths become editable Move blocks, and keeping a scene makes its paths available to other scenes under the same profile.
+
+
 ## Creative Studio entrances — November 25, 2026
 
 The landing page follows My Art: **Make it. Make it move.**, approved gem artwork, three action cards and My scenes. **Make a scene** reveals existing worlds and optional characters/Pals/art; **Rebuild a scene** opens existing deterministic challenges; **Try an experiment** opens authored reasoning practice and returns here. Scene files belong beside saved scenes. A first visit offers a skippable arrow-and-Play introduction using the real interpreter, with no project or evidence write. `studio-intro` lives in existing owner-scoped guidance. First steps, More tools, checks, hints, Keep, draft recovery and program semantics are unchanged. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
@@ -107,6 +110,8 @@ Free creation offers Dragon, Buckets, Robot, and blank starters, actor placement
 ### First steps and More tools
 
 **First steps** is the default presentation. The fitted workspace shares its width equally between stage and code on desktop and landscape tablets. Portrait tablets give the stage 35% and code 65% of the available rows. At widths up to 700 CSS pixels or heights up to 600 CSS pixels, a scene opens in Code. The Code and Play buttons switch views of the same project. The stage’s Play button runs the program. Watch, Check and a due learning activity bring their stage into view.
+
+At 768 × 1024 the playback buttons and status share a row so the stage retains its drawing area. During a learning checkpoint, the mounted activity controls the heading color. The scene browser journey checks the visible math question against its background at a minimum contrast ratio of 4.5:1.
 
 All six First steps actions appear first in the code pane. Adding a block reveals its selected editor. Children can swipe the whole pane to reach a long sequence, use the reorder and remove buttons, or choose an insertion point to return to the palette. On compact screens, Characters & tools contains character selection, scene settings and the More tools switch. My Games, My scenes, playback, Try tap, Undo, Keep and Full screen remain available. Fullscreen keeps the exit and trusted learning overlay inside the same workspace. An unavailable or refused browser fullscreen request uses a truthfully labeled expanded view.
 

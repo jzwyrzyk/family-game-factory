@@ -36,6 +36,8 @@ For young children, begin with visible movement choices and a single playback ac
 
 New development uses 2D sprites, layered environments and compatible physics. Artwork, light, shadows and parallax can supply depth. Preserve legacy readers, retained games and historical staging. Introduce no 3D asset conversion. Pin illustrated world editions so later scenery changes cannot silently redesign a saved adventure. Review the rendered activity with the actor visible at phone and tablet sizes. Use approved Jems environment art or new Jems-specific illustrations created independently of private work. Keep controls, text and interactive subjects readable against the actual plate. [Game presentation](../game-intelligence/PRESENTATION-QUALITY.md) · [Brand library](../brand/LIBRARY_V1_2.md)
 
+Catalogue each released illustration by immutable ID, dimensions, digest, straight or opaque alpha, intended scale, layer, allowed use and approval state. Collection 1 supplies Enchanted Gem Forest, Inventor’s Workshop, Cloud Kingdom and Moon Adventure. Each has a plate, two transparent depth layers, a preview and eight individually selectable props. Inspect the actual composed editor and playback before owner approval. [Illustration collection and provenance](../creation-studio/WORLD_ART.md)
+
 ## Generated games and privacy
 
 1. The trusted host checks the active owner, exact chosen image or design, digest, consent and intended game use. Read only that version. Stop if the owner changes or the digest fails.
@@ -51,5 +53,7 @@ New development uses 2D sprites, layered environments and compatible physics. Ar
 | B and F | Creative Studio owns versioned world art, scene settings, layered placement and scene reference enumeration. | Actual rendered worlds, older scene playback, pins for decorations and backgrounds, save/load and reference remapping. |
 | C | Movement editor owns the design and pose evaluator. Scene interpreter owns fixed-clock playback. Drawing Lab owns segmentation, masks, constraints and supported real mechanics. | Immediate motion, scene continuation, pause/resume and cancel, manual correction, version selection, representative synthetic drawing playback. |
 | E | Game host owns explicit adapters and trust checks. Security and release owners independently qualify any future change to general delivery. | A named playable example, preserved game behavior, an isolated generated realm, and confirmation of disabled production delivery. |
+
+The owner introducing a new reference kind updates its validator, renderer, authoritative usage checks, transfer and recovery remapping, and the destination compatibility matrix together.
 
 For each change record its PR and dependencies, exact head, reproducible tests, screenshots and motion capture where relevant. Record what passed locally, hosted checks and private preview identity, TEST acceptance, production state and external family activation separately. Use synthetic work in public artifacts. Existing parent reports, learning evidence, reward receipts, earned Pals and prior histories retain their own authorities. [Delivery governance](../development/DEV-TEST-PROD.md)

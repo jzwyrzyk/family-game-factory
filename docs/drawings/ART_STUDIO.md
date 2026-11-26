@@ -22,6 +22,14 @@ The [first-creation entry](../child-journey/FIRST-CREATION.md) recognizes saved 
 
 After an upload/photo import, local drawing save or edited-picture save, the newly selected artwork receives focus. Narrow screens scroll its details into view. Drawing and picture dialogs finish closing before focus moves; owner, page and selected-art checks prevent a stale save callback from moving focus in another player's work.
 
+## Keep drawing on the same idea
+
+**Draw here** includes crayons, an eraser, a brush-size control and a clear-background choice. White paper is the default. The checkerboard shows transparency and stays outside the saved pixels. Children can draw with a pointer, tap to make a dot, or use the canvas keyboard controls. Keeping a sketch saves the displayed PNG and the ordered, editable strokes together. Select the sketch in My Art and choose **Keep drawing** to undo or redo strokes, add new marks, and keep another version. The saved parent and any adventure using it retain their exact bytes and hash.
+
+The existing private drawing record owns the complete PNG. Its versioned, private PNG ancillary chunk contains only tool choices, brush sizes, ordered points and paper choice. Both the raster and strokes travel through the same byte quotas, export, recovery and owner-scoped transactions. The 900 × 560 page supports 160 strokes, 4096 points per stroke and coordinates on a 1/64-pixel grid. Opening checks chunk bounds, checksum and tool values, then compares the rendered strokes against every decoded pixel. An incompatible renderer or inconsistent source leaves the original available in the ordinary picture tools. Older images without a stroke source retain their existing tools. A raster crop or rotation keeps its source link and an immutable new PNG.
+
+The learning workspace's working paper remains ephemeral. Opening and saving permanent artwork requires the child's explicit My Art action. [Browser regression](../../tests/crayon-revision-browser.cjs) · [Desktop drawing](../creative-universe/evidence/editable-sketch.png) · [Recovered drawing on a phone viewport](../creative-universe/evidence/restored-sketch-phone.png)
+
 ## Later web-journey and menu integration
 
 The owner requested these corrections first and the broader navigation integration later. The compact menu provides **Make → Art Studio**. Preserve the corrected entry module and the optional **More choices** placement when integrating later branches. `src/studio/art-entry.ts` retains the existing `studioArt`, `studioArtShortcut`, `studioUseDrawing`, `creationArtStudio` and `collectionArtStudio` IDs and uses the host's existing guarded Art Studio callback. `?art=1` and `FG.artStudio.open` remain compatible; no upload handler or art store is duplicated.
