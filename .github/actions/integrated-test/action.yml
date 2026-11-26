@@ -1,0 +1,46 @@
+name: Run exact integrated TEST acceptance
+description: Exercise protected TEST routes with the existing read-only UAT identity
+inputs:
+  provider: {description: Existing nonproduction workload provider, required: true}
+  uat: {description: Existing UAT principal, required: true}
+  audience: {description: Exact protected IAP OAuth client ID, required: true}
+  manifest: {description: Protected reviewed release manifest, required: false}
+  credentials: {description: Enrolled synthetic TEST device grants, required: false}
+  funding: {description: Separately approved limited premium trial, required: false}
+runs:
+  using: composite
+  steps:
+    - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      with:
+        name: integrated-test-serving-${{ github.run_id }}-${{ github.run_attempt }}
+        path: ${{ runner.temp }}
+    - shell: bash
+      run: python3 scripts/environments/test_target.py check-target
+    - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+      with: {node-version: 22, cache: npm}
+    - shell: bash
+      run: |
+        npm ci --ignore-scripts --no-audit --no-fund
+        npm run build:family-beta
+    - if: env.FAMILY_OPERATION != 'prepare-uat'
+      shell: bash
+      env: {TEST_MANIFEST: '${{ inputs.manifest }}'}
+      run: |
+        python3 scripts/environments/test_target.py bind
+        npx playwright install --with-deps chromium
+    - id: auth
+      uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+      with:
+        workload_identity_provider: ${{ inputs.provider }}
+        service_account: ${{ inputs.uat }}
+        token_format: id_token
+        id_token_audience: ${{ inputs.audience }}
+        id_token_include_email: true
+        create_credentials_file: false
+        export_environment_variables: false
+    - shell: bash
+      env:
+        TEST_IAP_TOKEN: ${{ steps.auth.outputs.id_token }}
+        TEST_CREDENTIALS: ${{ inputs.credentials }}
+        TEST_FUNDING: ${{ inputs.funding }}
+      run: node scripts/environments/test-run.cjs

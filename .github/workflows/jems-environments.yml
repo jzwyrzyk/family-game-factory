@@ -8,7 +8,7 @@ on:
       family_beta:
         description: Optional authenticated family candidate operation in an existing nonproduction environment
         type: choice
-        options: ['off', verify, stage]
+        options: ['off', verify, stage, prepare-uat, qualify-fixture, uat, live-uat]
         default: 'off'
       family_stage:
         description: Existing private family environment
@@ -267,3 +267,171 @@ jobs:
           path: ${{ runner.temp }}/family-receipt.json
           if-no-files-found: error
           retention-days: 14
+
+  integrated-test-serving:
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && inputs.family_stage == 'test' && inputs.family_source == github.sha && contains(fromJSON('["prepare-uat","qualify-fixture","uat","live-uat"]'), inputs.family_beta)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: jems-nonproduction
+    permissions: {contents: read, actions: read, checks: read, pull-requests: read, id-token: write}
+    env:
+      TEST_TARGET: ${{ vars.JEMS_TEST_UAT_TARGET }}
+      TEST_COMPARISON_REVISIONS: ${{ vars.JEMS_TEST_COMPARISON_REVISIONS }}
+      REVIEWED_RELEASE: ${{ vars.JEMS_FAMILY_TEST_RELEASE }}
+      FAMILY_SOURCE: ${{ inputs.family_source }}
+      FAMILY_OPERATION: ${{ inputs.family_beta }}
+    outputs:
+      audience: ${{ steps.preflight.outputs.audience }}
+      provider: ${{ steps.config.outputs.provider }}
+      uat: ${{ steps.config.outputs.uat }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {ref: '${{ github.sha }}', persist-credentials: false}
+      - id: preflight
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: python3 scripts/environments/test_target.py preflight
+      - id: config
+        run: python3 scripts/environments/automation.py config
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          workload_identity_provider: ${{ steps.config.outputs.provider }}
+          service_account: ${{ steps.config.outputs.deployer }}
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f
+      - run: |
+          node scripts/beta/environment-release.mjs "$RUNNER_TEMP/test-reviewed.json" verify test "$FAMILY_SOURCE" "$RUNNER_TEMP/routing.json"
+          python3 scripts/environments/test_target.py observe
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: integrated-test-serving-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/test-serving.json
+            ${{ runner.temp }}/test-configurations.json
+          if-no-files-found: error
+          retention-days: 30
+
+  integrated-test-frontend:
+    needs: integrated-test-serving
+    if: inputs.family_beta == 'prepare-uat'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    environment: jems-nonproduction-uat
+    permissions: {contents: read, actions: read, id-token: write}
+    env:
+      TEST_TARGET: ${{ vars.JEMS_TEST_UAT_TARGET }}
+      TEST_CONFIGURATION_PINS: ${{ vars.JEMS_TEST_REVIEWED_CONFIGURATIONS }}
+      FAMILY_SOURCE: ${{ inputs.family_source }}
+      FAMILY_OPERATION: ${{ inputs.family_beta }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: ./.github/actions/integrated-test
+        with:
+          provider: ${{ needs.integrated-test-serving.outputs.provider }}
+          uat: ${{ needs.integrated-test-serving.outputs.uat }}
+          audience: ${{ needs.integrated-test-serving.outputs.audience }}
+          manifest: ${{ vars.JEMS_TEST_UAT_MANIFEST }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: integrated-test-frontend-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/frontend.json
+          if-no-files-found: error
+          retention-days: 30
+
+  integrated-test-uat:
+    needs: integrated-test-serving
+    if: inputs.family_beta == 'uat' || inputs.family_beta == 'qualify-fixture'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    environment: jems-nonproduction-uat
+    permissions: {contents: read, actions: read, id-token: write}
+    env:
+      PRIOR_FIXTURE_RUN: ${{ inputs.family_beta == 'uat' && vars.JEMS_TEST_PRIOR_FIXTURE_RUN || '' }}
+      TEST_TARGET: ${{ vars.JEMS_TEST_UAT_TARGET }}
+      TEST_CONFIGURATION_PINS: ${{ vars.JEMS_TEST_REVIEWED_CONFIGURATIONS }}
+      FAMILY_SOURCE: ${{ inputs.family_source }}
+      FAMILY_OPERATION: ${{ inputs.family_beta }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: ./.github/actions/integrated-test
+        with:
+          provider: ${{ needs.integrated-test-serving.outputs.provider }}
+          uat: ${{ needs.integrated-test-serving.outputs.uat }}
+          audience: ${{ needs.integrated-test-serving.outputs.audience }}
+          manifest: ${{ vars.JEMS_TEST_UAT_MANIFEST }}
+          credentials: ${{ secrets.JEMS_TEST_SYNTHETIC_DEVICES }}
+
+      - name: Bind an unchanged protected fixture qualification
+        if: env.PRIOR_FIXTURE_RUN != ''
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: python3 scripts/environments/test_fixture_reuse.py
+      - name: Verify completed private runner identity and cleanup for each game version
+        if: env.PRIOR_FIXTURE_RUN == ''
+        env:
+          GH_TOKEN: ${{ secrets.JEMS_TEST_WORKER_EVIDENCE_READ }}
+        run: python3 scripts/environments/test_worker_evidence.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: integrated-test-${{ inputs.family_beta == 'qualify-fixture' && 'fixture' || 'uat' }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/receipt.json
+          if-no-files-found: error
+          retention-days: 30
+
+  integrated-test-live:
+    needs: integrated-test-serving
+    if: inputs.family_beta == 'live-uat'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    environment: jems-nonproduction-uat
+    permissions: {contents: read, actions: read, id-token: write}
+    env:
+      TEST_TARGET: ${{ vars.JEMS_TEST_UAT_TARGET }}
+      TEST_CONFIGURATION_PINS: ${{ vars.JEMS_TEST_REVIEWED_CONFIGURATIONS }}
+      FAMILY_SOURCE: ${{ inputs.family_source }}
+      FAMILY_OPERATION: ${{ inputs.family_beta }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: ./.github/actions/integrated-test
+        with:
+          provider: ${{ needs.integrated-test-serving.outputs.provider }}
+          uat: ${{ needs.integrated-test-serving.outputs.uat }}
+          audience: ${{ needs.integrated-test-serving.outputs.audience }}
+          manifest: ${{ vars.JEMS_TEST_UAT_MANIFEST }}
+          credentials: ${{ secrets.JEMS_TEST_SYNTHETIC_DEVICES }}
+          funding: ${{ vars.JEMS_TEST_TRIAL_AUTHORIZATION }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: integrated-test-live-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/receipt.json
+          if-no-files-found: error
+          retention-days: 30
+
+  integrated-test-final-observation:
+    needs: [integrated-test-serving, integrated-test-frontend, integrated-test-uat, integrated-test-live]
+    if: always() && needs.integrated-test-serving.result == 'success' && contains(needs.*.result, 'success') && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: jems-nonproduction
+    permissions: {contents: read, actions: read, id-token: write}
+    env:
+      TEST_TARGET: ${{ vars.JEMS_TEST_UAT_TARGET }}
+      FAMILY_SOURCE: ${{ inputs.family_source }}
+      FAMILY_OPERATION: ${{ inputs.family_beta }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {ref: '${{ github.sha }}', persist-credentials: false}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: integrated-test-serving-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/original
+      - id: config
+        run: python3 scripts/environments/automation.py config
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          workload_identity_provider: ${{ steps.config.outputs.provider }}
+          service_account: ${{ steps.config.outputs.deployer }}
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f
+      - run: |
+          python3 scripts/environments/test_target.py observe
+          cmp "$RUNNER_TEMP/original/test-serving.json" "$RUNNER_TEMP/test-serving.json"

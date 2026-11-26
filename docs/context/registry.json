@@ -711,10 +711,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:19:59.740Z",
-      "sourceDigest": "8aec10f384d09c1592dc6758e68333d58d254f0da000b4131c63ef65b4a6fdd0",
+      "reviewedAt": "2026-11-26T23:34:53.387Z",
+      "sourceDigest": "4de058388fa8c3e15a8ffd3b85b17a280db9cd7466bbda8f5864d99c8d17dbda",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed exact validator and restricted family build dependencies.",
+      "reviewReason": "Documented TEST financial admission and content-free settlement and source-matched household asset handling.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -929,10 +929,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T22:35:32.999Z",
-      "sourceDigest": "62a93630c83508e452c3c6bc433b38f0fcab5a826f922457d5ee660d5c025ba2",
+      "reviewedAt": "2026-11-26T23:34:53.809Z",
+      "sourceDigest": "c30538f498b4f9aad3b90834609a2334e6f6d4df2d5bd48e1ce0dedab4361146",
       "reviewOutcome": "updated",
-      "reviewReason": "The standalone review guide records the full-size notebook pointer journey and the navigation budget used to open the exact download.",
+      "reviewReason": "Documented actual household, enrolled family, worker attestation, paid trial, partial fixture qualification and exact reuse contracts.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1157,6 +1157,7 @@
       ],
       "sources": [
         ".github/workflows/**",
+        ".github/actions/integrated-test/**",
         "scripts/deployment/**",
         "scripts/ops/**",
         "ops/**",
@@ -1174,10 +1175,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T22:35:33.293Z",
-      "sourceDigest": "c33452d055868eeec7b810391f107d1aaab7ed0e6f0c90934aa70720734d4e85",
+      "reviewedAt": "2026-11-26T23:34:54.479Z",
+      "sourceDigest": "6f44c2562794c135510ffe3fe71e3c0ec52478723ff2f92be628fb78a8150e7c",
       "reviewOutcome": "updated",
-      "reviewReason": "The delivery record now directs owners to the combined draft and current household revision observation while preserving each historic receipt.",
+      "reviewReason": "Documented source-pinned existing workflow operations, isolated setup and emergency stops for both TEST configurations.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1432,10 +1433,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T22:12:18.243Z",
-      "sourceDigest": "1ae25cf8cd452064d5919af9f1d6f46ad643dac946ec4bd29776f22ab3fb0492",
+      "reviewedAt": "2026-11-26T23:34:52.953Z",
+      "sourceDigest": "c41ca15dbe4e9ffc35e89f7a556bc94de145d25d794af68ecea3d28caa1bfe6c",
       "reviewOutcome": "updated",
-      "reviewReason": "Combined registry source and document routes from the selected branches without replacing canonical history.",
+      "reviewReason": "Registered the protected TEST composite workflow action under delivery operations without changing product scope.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

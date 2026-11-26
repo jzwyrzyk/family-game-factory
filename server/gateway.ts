@@ -1,3 +1,4 @@
+import {isolatedHousehold,trialContext,trialReadback,type TestTrialAuthorization} from './beta/test-trial';
 import {generatedRecoveryHttp,runGeneratedCloudRecovery} from './beta/generated-recovery';
 import {cloudBackupSchedule,runFamilyCloudRecovery,familyBackupLedger} from './beta/recovery';
 import {reconcileFamilies} from './beta/reconcile';
@@ -44,6 +45,7 @@ import {sessionHandler} from './sessions';
 import {trustedDeviceHandler} from './trusted-devices';
 import {adultPilotConfigured,adultPilotFlags} from './adult-pilot';
 export interface GatewayConfig {
+ testTrial?:TestTrialAuthorization;
  platformMode?:'HOUSEHOLD'|'PRIVATE_FAMILY_BETA'|'PUBLIC'; beta?:BetaConfig;householdPrivateHost?:HouseholdHost;householdBudgetBinding?:HouseholdBinding;
  active:boolean;appOrigin:string;gatewayOrigin:string;previewOrigin:string;sessionKey:string;previewKey:string;familyId:string;
  repository:string;repositoryId:string;workflow:string;approvedSha:string;
@@ -132,6 +134,14 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
  })();
  return {service,repo,coordinator,handler:async(req:Parameters<typeof api>[0],res:Parameters<typeof api>[1])=>{
   const url=new URL(req.url!,config.gatewayOrigin);
+  if(url.pathname.startsWith('/v1/test-trial/')||isolatedHousehold(config)&&req.method==='POST'&&
+     (/^\/v1\/(jobs(?:\/[^/]+\/retry)?|coach(?:\/(?:audio|narration))?)$/.test(url.pathname))){
+   try{
+    if(url.pathname==='/v1/test-trial/preflight'||url.pathname==='/v1/test-trial/settlement'){await trialReadback(config,repo,req,res);return;}
+    if(url.pathname.startsWith('/v1/test-trial/')||['/v1/coach/audio','/v1/coach/narration'].includes(url.pathname))throw Error('TEST_TRIAL_NOT_AUTHORIZED');
+    await trialContext(config,repo,req);
+   }catch{res.writeHead(403,{'Cache-Control':'no-store'});res.end();return;}
+  }
   if(url.pathname==='/health'){res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','no-store');try{await repo.snapshot();res.end(JSON.stringify({ready:true,paidExecution:paidEnabled}));}catch{res.statusCode=503;res.end(JSON.stringify({ready:false,paidExecution:false}));}return;}
   if(url.pathname.startsWith('/preview/')){res.writeHead(403);res.end('Separate preview origin required');return;}
   if(url.pathname==='/v1/recovery/adult/mappings'||url.pathname.startsWith('/v1/recovery/generated/')){if(householdRecovery)await householdRecovery.handler(req,res);else{res.writeHead(503,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:'GENERATED_RECOVERY_DISABLED'}));}return;}
