@@ -897,10 +897,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:28:44.076Z",
-      "sourceDigest": "e91783b6abf2d59e1fc0f77b7a9d277e1a7143fc10223a2f251599b2adf80614",
+      "reviewedAt": "2026-11-26T23:18:07.185Z",
+      "sourceDigest": "abed4476c977351fd56c219cfb2fbbb3e34a7377728616ad0468980b56d25769",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded first-attempt hosted contrast failure, synchronous DOM measurement, initial runner evidence and source-bound startup byte counts in the execution guide.",
+      "reviewReason": "The release guide describes rejection of drift in the conflict-resolution PR and both separate source-bound sets of hosted CI evidence; the existing default-main Arcade commands stay intact.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T05:28:44.476Z",
-      "sourceDigest": "2a3f91df028a7a8f3038f80e187a1c4b9ade3c706824ffdfd0e1b9b320b27e98",
+      "reviewedAt": "2026-11-26T23:17:37.771Z",
+      "sourceDigest": "07fd14c20648643e6841555e6fa5d5fc56dba3de5a0567f2b71a1428b01a0091",
       "reviewOutcome": "updated",
-      "reviewReason": "Linked the concurrent review-only Creative Universe integration and retained separate Learning, engineering and frozen application sources.",
+      "reviewReason": "Documented protected adoption of the exact consolidated CI policy, independently authenticated merge and source receipts, and the restricted resolution for the held DEV review.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
