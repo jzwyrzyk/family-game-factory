@@ -9,27 +9,36 @@ export type Tool = typeof tools[number] | 'select';
 export type Stamp = 'blue' | 'gold' | 'mint';
 export interface Point { x: number; y: number; p?: number }
 export interface Mark { tool: Exclude<Tool, 'select'>; color: string; size: number; points: Point[]; stamp?: Stamp }
-export interface Sheet { version: 1; transparent: boolean; marks: Mark[] }
+export interface Sheet { version: 1; orientation?: 'portrait'; transparent: boolean; marks: Mark[] }
+export function sheetSize(sheet?: Sheet) {
+  return sheet?.orientation === 'portrait' ? {width:560,height:800} : {width,height};
+}
 const clamp = (n: number, a: number, b: number) => Math.max(a, Math.min(n, b));
 const bounded = (v: unknown, min: number, max: number) => typeof v === 'number' && Number.isFinite(v) && v >= min && v <= max;
 const freehand = (tool: Tool) => ['pencil', 'crayon', 'brush', 'marker', 'eraser'].includes(tool);
 const colors = /^#[a-f0-9]{6}$/i;
 
+function hasOnly(value: unknown, keys: readonly string[]): boolean {
+  return !!value && typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype
+    && Object.keys(value).every(key=>keys.includes(key));
+}
 export function parseSheet(value: unknown): Sheet {
   const sheet = value as Sheet;
-  if (!sheet || sheet.version !== 1 || typeof sheet.transparent !== 'boolean' || !Array.isArray(sheet.marks) || sheet.marks.length > maxMarks)
+  if (!hasOnly(sheet, ['version','orientation','transparent','marks']) || sheet.version !== 1 || (sheet.orientation !== undefined && sheet.orientation !== 'portrait') || typeof sheet.transparent !== 'boolean' || !Array.isArray(sheet.marks) || sheet.marks.length > maxMarks)
     throw Error('This drawing needs a smaller page.');
+  const size = sheetSize(sheet);
   let points = 0, fills = 0;
   for (const mark of sheet.marks) {
-    if (!mark || !tools.includes(mark.tool) || typeof mark.color !== 'string' || !colors.test(mark.color)
+    if (!hasOnly(mark, ['tool','color','size','points','stamp']) || !tools.includes(mark.tool) || typeof mark.color !== 'string' || !colors.test(mark.color)
       || !bounded(mark.size, 1, 100) || !Array.isArray(mark.points) || !mark.points.length
       || mark.points.length > (freehand(mark.tool) ? maxPointsPerMark : 2)
+      || (mark.tool !== 'stamp' && mark.stamp !== undefined)
       || (mark.tool === 'stamp' && !['blue', 'gold', 'mint'].includes(mark.stamp ?? '')))
       throw Error('This mark could not be opened.');
     points += mark.points.length;
     if (mark.tool === 'fill') fills++;
     if (points > maxPoints || fills > 24) throw Error('Your paper is full. Keep your art to start another drawing.');
-    for (const p of mark.points) if (!p || !bounded(p.x, 0, width) || !bounded(p.y, 0, height) || (p.p !== undefined && !bounded(p.p, 0, 1)))
+    for (const p of mark.points) if (!hasOnly(p, ['x','y','p']) || !bounded(p.x, 0, size.width) || !bounded(p.y, 0, size.height) || (p.p !== undefined && !bounded(p.p, 0, 1)))
       throw Error('This point is outside the drawing.');
   }
   return sheet;
@@ -99,9 +108,10 @@ export function hitMark(sheet: Sheet, p: Point): number {
   }
   return -1;
 }
-export function transformMark(mark: Mark, dx: number, dy: number, scale = 1): Mark {
+export function transformMark(mark: Mark, dx: number, dy: number, scale = 1, sheet?: Sheet): Mark {
+  const {width,height} = sheetSize(sheet);
   const b = markBounds(mark), cx = (b.left+b.right)/2, cy = (b.top+b.bottom)/2;
-  scale = clamp(scale, 0.1, 8);
+  scale = clamp(scale, 0.1, Math.min(8, width/Math.max(1,b.right-b.left), height/Math.max(1,b.bottom-b.top)));
   const projected = mark.points.map(p => ({ ...p, x: cx + (p.x-cx)*scale, y: cy + (p.y-cy)*scale }));
   const xs = projected.map(p => p.x), ys = projected.map(p => p.y);
   dx = clamp(dx, -Math.min(...xs), width-Math.max(...xs));
@@ -206,6 +216,7 @@ export function renderMark(ctx: CanvasRenderingContext2D, mark: Mark, transparen
   } finally { ctx.restore(); }
 }
 export function renderPaper(ctx: CanvasRenderingContext2D, sheet: Sheet) {
+  const {width,height} = sheetSize(sheet);
   ctx.clearRect(0,0,width,height);
   if (!sheet.transparent) { ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,width,height); }
   for (const mark of sheet.marks) renderMark(ctx,mark,sheet.transparent);

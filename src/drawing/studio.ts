@@ -93,12 +93,7 @@ export function installArtStudio(host:Host){
     for(const [i,rig]of versions.entries()){const count=rig.assembly.pieces.length,option=node('option','',rig.assembly.motion ? `Version ${rig.assembly.revision} · animation path` : `${versions.length-i} · ${rig.assembly.kind} · ${count} ${count===1?'part':'parts'}`);option.value=rig.id;choice.append(option);}if(versions.length)choice.value=versions[0].id;versionLabel.append(choice);pane.append(versionLabel);
     const actions=node('div','art-detail-actions');
     const sketch=item.mime==='image/png'?readSketch(item.bytes):null;
-    if(sketch)actions.append(button('Keep drawing','edit',()=>drawOnTablet(captured,async saved=>{
-      if(!current(captured,run))return;
-      selected=saved.id;archive=false;category='all';$<HTMLInputElement>('artSearch').value='';
-      if(!await refresh())return;
-      status('New version saved. Your earlier drawing is safe.');notify(captured);focusSelectedArtwork(saved.id,captured,run);
-    },()=>current(captured,run),{item,sketch})));
+    if(sketch)actions.append(button('Keep drawing','edit',()=>drawOnTablet(captured,saved=>showKeptDrawing(saved,captured,run),()=>current(captured,run),{item,sketch})));
     const editMovement=async(rigId?:string)=>{const editor=await openDrawingLab(captured,item,savedId=>host.openCar(savedId,()=>current(captured,run)),{...(rigId?{rigId}:{}),isCurrent:()=>current(captured,run),onSaved:async()=>{if(current(captured,run)&&await refresh()){status('Movement saved. Choose where it goes next.');notify(captured);}}});editor?.addEventListener('close',()=>{if(current(captured,run))void refresh();},{once:true});};
     const openEditor=button(versions.length?'Edit movement':'Make it move','play',()=>editMovement(choice.value||undefined),true);openEditor.id='artEditMovement';
     const path=button('Draw a path','edit',()=>editMotionPath(captured,item,choice.value||undefined,()=>current(captured,run),async saved=>{
@@ -121,6 +116,30 @@ export function installArtStudio(host:Host){
     if(draft){const note=node('div','art-draft-note');note.append(node('p','','You have an unfinished movement design.'),button('Resume unfinished design','edit',()=>editMovement()));note.querySelector('button')!.id='artResumeDraft';actions.before(note);}
     if(usage.length){const count=new Set(usage.map(item=>item.targetKind+':'+item.targetId)).size;pane.append(node('p','art-small',`Used in ${count} saved ${count===1?'creation':'creations'}. Archiving keeps those adventures working.`));}
   }
+  async function showKeptDrawing(saved:Drawing, captured:string, run:number) {
+    if (!current(captured,run)) return;
+    selected=saved.id; archive=false; category='all'; $<HTMLInputElement>('artSearch').value='';
+    if (!await refresh() || !current(captured,run) || selected!==saved.id) return;
+    const pane=$('artDetails'), preview=pane.querySelector('.art-detail-image');
+    if (!preview) return;
+    const options=node('section','art-kept-options');
+    options.setAttribute('aria-label','Your saved drawing');
+    const move=$<HTMLButtonElement>('artDrawPath'), scene=$<HTMLButtonElement>('artUseScene');
+    setIconLabel(move,'play','Make it move');
+    setIconLabel(scene,'grid','Make a scene');
+    const game=node('details','art-kept-game'), summary=node('summary','','Make a game with it');
+    game.append(summary,node('p','','Give your picture wheels to drive it in Rally.'),button('Build a Rally car','edit',()=>{
+      if(current(captured,run) && selected===saved.id) $<HTMLButtonElement>('artEditMovement').click();
+    }));
+    options.append(move,scene,game,button('Keep it in My Art','check',async()=>{
+      if(!current(captured,run)) return;
+      selected=''; pane.hidden=true; renderGrid();
+      const card=Array.from($('artGrid').querySelectorAll<HTMLButtonElement>('[data-art-id]')).find(card=>card.dataset.artId===saved.id);
+      card?.focus();
+    }));
+    preview.after(options);
+    status('Saved in My Art.'); notify(captured); focusSelectedArtwork(saved.id,captured,run);
+  }
   async function open(id?:string){if(!await host.enter())return;visible=true;selected=id??selected;status('');await refresh(true);}
   $('artHome').onclick=()=>void action(()=>host.home());
   $('artUploadButton').onclick=()=>$<HTMLInputElement>('artUpload').click();$('artCameraButton').onclick=()=>$<HTMLInputElement>('artCamera').click();
@@ -130,7 +149,7 @@ export function installArtStudio(host:Host){
     finally{input.value='';controls.forEach(b=>b.disabled=false);}
   };
   for(const id of ['artUpload','artCamera'])$<HTMLInputElement>(id).onchange=()=>void action(()=>upload($<HTMLInputElement>(id)));
-  $('artDrawButton').onclick=()=>void action(()=>{const id=owner(),run=epoch;return drawOnTablet(id,async saved=>{if(!current(id,run))return;selected=saved.id;archive=false;category='all';$<HTMLInputElement>('artSearch').value='';if(!await refresh())return;status('Drawing saved. Let’s see what it can do.');notify(id);focusSelectedArtwork(saved.id,id,run);},()=>current(id,run));});
+  $('artDrawButton').onclick=()=>void action(()=>{const id=owner(),run=epoch;return drawOnTablet(id,saved=>showKeptDrawing(saved,id,run),()=>current(id,run));});
   $('artSearch').oninput=()=>{void action(async()=>{await refresh();});};
   $('artFilters').onclick=e=>{const target=(e.target as HTMLElement).closest<HTMLButtonElement>('[data-category]');if(!target)return;category=target.dataset.category!;void action(async()=>{await refresh();});};
   $('artShowArchive').onclick=()=>{archive=!archive;selected='';$('artDetails').hidden=true;void action(async()=>{await refresh();});};
