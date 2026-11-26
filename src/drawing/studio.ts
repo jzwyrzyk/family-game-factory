@@ -4,6 +4,7 @@ import {listRigs,loadDrawingDraft,type SavedRig} from './store';
 import {exportArtBundle,importArtBundle,restoreArtBundle} from './transfer';
 import {openDrawingLab} from './lab';
 import {drawOnTablet} from './paint';
+import {hasSketchSource} from './sketch';
 import {editPicture} from './picture';
 import {createIcon,iconMarkup,setIconLabel,type IconName} from '../brand/icons';
 import {assertRewardSourceWritable} from '../rewards/write-guard';
@@ -95,6 +96,12 @@ export function installArtStudio(host:Host){
     const car=button('Make a Rally game','arrow',async()=>{const at=epoch;await host.openCar(choice.value,()=>current(captured,at));});car.id='artUseRally';
     const updateCar=()=>{car.hidden=!versions.some(r=>r.id===choice.value&&r.assembly.kind==='car');};choice.onchange=updateCar;updateCar();actions.append(openEditor,scene,car);pane.append(actions);
     const hint=node('p','art-small','This choice is copied into the new game or scene. Earlier adventures keep their chosen version.');pane.append(hint);
+    if(hasSketchSource(item.bytes))actions.append(button('Keep drawing','edit',()=>drawOnTablet(captured,async result=>{
+      if(!current(captured,run))return;
+      selected=result.id;
+      if(!await refresh())return;
+      status('New drawing version saved.');notify(captured);focusSelectedArtwork(result.id,captured,run);
+    },()=>current(captured,run),item)));
     const tools=node('details','art-detail-tools'),summary=node('summary','','Picture & storage tools');tools.append(summary);
     tools.append(button('Trim, turn & clean up','edit',async()=>{await editPicture(captured,item,async result=>{if(!current(captured,run))return;selected=result.id;if(!await refresh())return;status('New picture saved. Your original is still in My art.');notify(captured);focusSelectedArtwork(result.id,captured,run);},()=>current(captured,run));}));
     tools.append(button('Download original picture','download',()=>download(drawingBlob(item),'my-drawing.'+(item.mime==='image/png'?'png':'jpg'))));

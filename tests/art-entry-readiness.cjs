@@ -19,7 +19,7 @@ const inView=(page,selector)=>page.locator(selector).evaluate(node=>{
 async function artRecords(page){
  return page.evaluate(async()=>{
   const db=await new Promise((resolve,reject)=>{const request=indexedDB.open('family-private-drawings-v1');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
-  try{return await new Promise((resolve,reject)=>{const request=db.transaction('drawings').objectStore('drawings').getAll();request.onsuccess=()=>resolve(request.result.map(({id,owner,name,sha256})=>({id,owner,name,sha256})));request.onerror=()=>reject(request.error);});}
+  try{return await new Promise((resolve,reject)=>{const request=db.transaction('drawings').objectStore('drawings').getAll();request.onsuccess=()=>resolve(request.result.map(({id,owner,name,sha256,sourceId,sourceSha256})=>({id,owner,name,sha256,sourceId,sourceSha256})));request.onerror=()=>reject(request.error);});}
   finally{db.close();}
  });
 }
@@ -156,6 +156,73 @@ async function rejectedConfig(browser,base){
   await page.locator('#page-art-studio').waitFor({state:'visible'});
   await page.waitForFunction(()=>document.querySelectorAll('.art-card').length===2);
   assert.deepEqual(await artRecords(page),originals,'both originals survive a reload with remote configuration unavailable');
+  const dot=originals.find(record=>record.name==='My offline dot');
+  await page.locator('[data-art-id="'+dot.id+'"]').click();
+  const reopen=page.getByRole('button',{name:'Keep drawing',exact:true});
+  await reopen.click();
+  const canvas=drawing.locator('[data-paper]');
+  const pixel=()=>canvas.evaluate(c=>[...c.getContext('2d').getImageData(450,280,1,1).data]);
+  assert.deepEqual(await pixel(),[32,43,57,255],'saved strokes reproduce the original dot');
+  await drawing.locator('[data-undo]').click();
+  assert.deepEqual(await pixel(),[255,255,255,255],'a mark from before reload can be undone');
+  await drawing.locator('[data-redo]').click();
+  await drawing.getByLabel('Clear background').check();
+  await drawing.getByRole('button',{name:'Eraser',exact:true}).click();
+  await canvas.press('Enter');
+  await drawing.locator('[data-title]').focus();
+  assert.equal((await pixel())[3],0,'the eraser clears actual alpha');
+  await drawing.locator('[data-undo]').click();
+  assert.deepEqual(await pixel(),[32,43,57,255],'undoing an eraser recovers the exact mark');
+  await drawing.getByRole('button',{name:'Use Teal crayon'}).click();
+  // Synthetic rocket traced on the real canvas with the ordinary pointer controls.
+  const trace=async points=>{
+    await canvas.scrollIntoViewIfNeeded();
+    const box=await canvas.boundingBox();
+    for(const [i,[x,y]] of points.entries()){
+      await page.mouse.move(box.x+x*box.width,box.y+y*box.height,{steps:i?3:1});
+      if(!i)await page.mouse.down();
+    }
+    await page.mouse.up();
+  };
+  await trace([[.40,.65],[.405,.52],[.45,.36],[.51,.24],[.57,.17],[.62,.16],[.64,.25],[.63,.37],[.60,.49],[.51,.65],[.46,.70],[.40,.65]]);
+  await trace([[.41,.49],[.34,.53],[.29,.68],[.40,.63]]);
+  await trace([[.48,.68],[.48,.78],[.54,.76],[.59,.60],[.55,.57]]);
+  await drawing.getByRole('button',{name:'Use Berry crayon'}).click();
+  await trace([[.51,.39],[.53,.36],[.56,.36],[.57,.40],[.56,.44],[.53,.45],[.51,.42],[.51,.39]]);
+  await drawing.getByRole('button',{name:'Use Sunshine crayon'}).click();
+  await trace([[.39,.66],[.34,.73],[.38,.71],[.32,.83],[.42,.74],[.42,.78],[.46,.71]]);
+  await drawing.locator('[data-title]').fill('My rocket');
+  await canvas.scrollIntoViewIfNeeded();
+  assert.ok(await inView(page,'dialog.drawing-paint [data-save]'),'the phone Keep action remains visible while drawing');
+  await page.screenshot({path:path.join(output,'editable-drawing-phone.png')});
+  await page.setViewportSize({width:1280,height:900});
+  await page.screenshot({path:path.join(output,'editable-drawing-desktop.png')});
+  await drawing.getByRole('button',{name:'Keep new version'}).click();
+  await drawing.waitFor({state:'detached'});
+  const revision=(await artRecords(page)).find(record=>record.name==='My rocket');
+  assert.equal(revision.sourceId,dot.id);
+  assert.equal(revision.sourceSha256,dot.sha256);
+  assert.deepEqual((await artRecords(page)).find(record=>record.id===dot.id),dot);
+  // Download the ordinary art backup, then import into a fresh offline browser.
+  await page.locator('.art-library-more summary').click();
+  const download=page.waitForEvent('download');await page.locator('#artExport').click();
+  const backup=fs.readFileSync(await (await download).path());
+  const restored=await prepare(browser);
+  try{
+    await restored.page.route('**/factory-config.json',route=>route.abort('failed'));
+    await restored.page.goto(base+'?art=1');await ready(restored.page);
+    await restored.page.locator('#artImport').setInputFiles({name:'art.json',mimeType:'application/json',buffer:backup});
+    await restored.page.waitForFunction(()=>document.getElementById('artStatus')?.textContent.includes('pictures added'));
+    const records=await artRecords(restored.page),copy=records.find(record=>record.name==='My rocket');
+    assert.ok(copy&&copy.id!==revision.id&&copy.sha256===revision.sha256,'portable copy preserves all original PNG bytes');
+    await restored.page.locator('[data-art-id="'+copy.id+'"]').click();
+    await restored.page.getByRole('button',{name:'Keep drawing',exact:true}).click();
+    const restoredEditor=restored.page.locator('dialog.drawing-paint');
+    await restoredEditor.waitFor({state:'visible'});
+    assert.equal(await restoredEditor.getByLabel('Clear background').isChecked(),true);
+    assert.equal(await restoredEditor.getByRole('button',{name:'Undo',exact:true}).isEnabled(),true);
+    assert.deepEqual(restored.posts,[]);assert.deepEqual(restored.errors,[]);
+  }finally{await restored.context.close();}
   assert.deepEqual(posts,[],'offline drawing and upload never post private images');
   assert.deepEqual(errors,[],'failed remote configuration does not cause a local-art exception');
   console.log('PASS Art entry with rejected configuration: phone upload, keyboard drawing, post-dialog focus and durable private library');

@@ -42,6 +42,16 @@ The source [gold standard](GOLD_STANDARD.md) still requires visible artwork fide
 
 Changing a library picture's metadata or saving a later rig does not rewrite earlier game or scene references. A new use is explicit. The legacy `activeRig` pointer remains a picker convenience, never the authority for a saved Studio game.
 
+## Keep drawing on a saved picture
+
+**Draw here** starts with white paper. Children can choose a crayon, change its size, erase a mark, or select a clear background for a sprite. Undo restores marks removed by the eraser or Start over. Touch, mouse and keyboard work on the same canvas. **Keep my drawing** saves the picture on the active player's shelf. **Keep drawing** reopens its strokes. **Keep new version** pins the result to the selected parent picture and hash. The earlier picture and adventures remain recoverable.
+
+Each new crayon PNG contains its finished raster plus a versioned private ancillary `jeMS` chunk holding the editable source. Both travel in the exact bytes already covered by the artwork hash, byte quota, export, restore and parent backup. The chunk records the paper choice, palette indices, brush widths and bounded coordinates on the 900 × 560 canvas. The limits are 160 strokes and 4,096 points per stroke. The PNG contains no profile or family identifier. Treat the entire file, including those strokes, as private artwork.
+
+On reopen the host checks the chunk checksum, bounds and decoded pixels against a local rendering of the stroke source. A mismatch leaves the original available on the shelf. Re-encoding a PNG in another app can remove its source. Older raster-only drawings, photos and flattened picture-tool derivatives retain the existing picture and movement tools. Pending strokes live in the open editor until the child keeps or discards them. Learning-workspace scratch paper has a separate, temporary lifetime.
+
+The offline phone and desktop journey uses a synthetic drawing, reopens saved strokes after reload, erases and restores real alpha, saves a pinned version, and opens its downloaded library in a fresh browser. [Phone capture](evidence/editable-drawing-phone.png) · [Desktop capture](evidence/editable-drawing-desktop.png) · [Browser regression](../../tests/art-entry-readiness.cjs)
+
 ## Storage and lifecycle
 
 `family-private-drawings-v1` is upgraded in place to database version 3, with stores for originals, rigs, drafts, selected legacy rig, usage, migration metadata and the regenerable drawing catalog. Existing original records remain compatible. Metadata and previews page separately from original bytes, which are read when selected or explicitly backed up. While a prepared native or scene authority exists, physical deletion is blocked under the shared maintenance lock because the legacy usage index cannot prove all references; Archive remains available and preserves original bytes. The old draft PR's separate rig database is read once for compatible migration; it is not erased. When native database inventory is available, an absent legacy name is not opened merely to discover absence; inventory failures remain visible. Existing databases and browsers without that inventory API retain their validated legacy reader.
