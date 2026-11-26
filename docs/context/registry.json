@@ -891,10 +891,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:23:11.824Z",
-      "sourceDigest": "5f7b1ef674e2b84dd647d329848d15cf1839bc2b621d5472752fe3445bcdc3d3",
+      "reviewedAt": "2026-11-26T01:43:51.125Z",
+      "sourceDigest": "71677dda452902ed4f4cf8391169b14983b2fe761435a5b382eeb428530adba3",
       "reviewOutcome": "updated",
-      "reviewReason": "Delivery state records the failed hosted Pal reload and the visible onboarding path. The exact same regression commands, assertions, rendering code and timeouts remain in force, with two new pre-navigation persistence assertions.",
+      "reviewReason": "The directory refresh regression pins the verified household Pages landing URL. Environment selection and fixture acceptance logic are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1135,10 +1135,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T01:23:12.305Z",
-      "sourceDigest": "3a5ab9bfd335677e581d5e32600605a1c3cf253d9a45b9e0e271b77ea454684f",
+      "reviewedAt": "2026-11-26T01:43:51.831Z",
+      "sourceDigest": "43a76d9b595538bc60947802558a7a59234b578bc86737f9527a9097c2fd9bfe",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the passing protected-main suite and the subsequent failed documentation-candidate Pal shard with its retained evidence and correction.",
+      "reviewReason": "The directory generator retains the existing working household link during future refreshes, with private DEV and TEST setup still pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
