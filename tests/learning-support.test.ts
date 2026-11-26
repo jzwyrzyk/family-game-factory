@@ -2,6 +2,7 @@ import {after, before, test} from 'node:test';
 import assert from 'node:assert/strict';
 import {existsSync, readFileSync} from 'node:fs';
 import {build} from 'esbuild';
+import {pointerPoint} from '../src/drawing/pointer-input';
 import {chromium, type Browser, type Page} from 'playwright';
 
 let browser: Browser;
@@ -35,6 +36,18 @@ async function mount(kind: 'number' | 'fraction', width = 320) {
   }, kind);
   return page;
 }
+
+test('scaled paper uses its own bitmap dimensions and precision', () => {
+  const canvas = {
+    width: 840, height: 560, getBoundingClientRect: () => ({left: 12, top: 24, width: 400, height: 320}),
+  } as HTMLCanvasElement;
+  const pen = {clientX: 12.5, clientY: 25.5, pointerType: 'pen', pressure: .407} as PointerEvent;
+  assert.deepEqual(pointerPoint(canvas, pen, 'position'), {x: 1.05, y: 2.625});
+  assert.deepEqual(pointerPoint(canvas, pen), {x: 1, y: 2.75, p: .41});
+  canvas.width = 560; canvas.height = 800;
+  const edge = {...pen, clientX: 520, clientY: -30} as PointerEvent;
+  assert.deepEqual(pointerPoint(canvas, edge, 'position'), {x: 560, y: 0});
+});
 
 test('number pad preserves selection, native typing, bounded input and deliberate submission', async () => {
   const page = await mount('fraction');

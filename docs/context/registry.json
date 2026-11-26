@@ -654,10 +654,10 @@
         "tests/theme-workspace.test.ts"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:59:38.817Z",
-      "sourceDigest": "82acc836b21962e9f6102ad37bd1d3f253f94f2b1cb39e591905960990a8d82d",
+      "reviewedAt": "2026-11-26T03:11:56.852Z",
+      "sourceDigest": "59174fa148217946cae717ea004149e6e657f009fabd2ae826b075db7609afec",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified model routing, new versioned literacy responses, narration evidence, restricted host entry and reviewed counter assets against the standard and skill-family matrices.",
+      "reviewReason": "Documented CSS-to-bitmap input, full precision and the activity-local lifetime for scratch paper.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -900,10 +900,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T02:11:52.582Z",
-      "sourceDigest": "af69f01e58a8af63e125bc00824c5cd54fcd3c8121ab1fda06ff100494e38dd5",
-      "reviewOutcome": "updated",
-      "reviewReason": "The Arcade inventory now includes the additional Creation Studio checkpoint command and verifies its assignment to the existing creative shard. The delivery record identifies the added check.",
+      "reviewedAt": "2026-11-26T03:11:57.603Z",
+      "sourceDigest": "1af605a71d959fb768746b16b02d5ba06ceffa718cc5be6e318d18bac8643fa3",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The existing learning-support test command now checks portrait and landscape scaling and precision alongside pointer, undo, cleanup and assessment isolation checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1626,10 +1626,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "467544c05466d8d0c1045244fa942dbfccf7b81e1e04635e8f5ecae1c0b62afc",
-      "reviewedAt": "2026-11-25T23:21:00.320Z",
+      "sourceDigest": "607032417cac0b831646536e04ab00411eaeeda411f6d5875155889425a7d1cd",
+      "reviewedAt": "2026-11-26T03:11:58.131Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "My Creations uses the shared header and retains the My Art action. The drawing library, private assets and editor use the inherited My Art contract.",
+      "reviewReason": "The shared coordinate helper has no drawing-store or rendering imports. This learning branch uses only coordinates from the transient scratchpad.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
