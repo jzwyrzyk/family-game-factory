@@ -5,11 +5,12 @@ interface ArtEntryOptions {
   homeAction: HTMLElement;
   libraryTools: HTMLElement;
   open(): void;
+  chooseGameArt():void;
 }
 
 /** Keep each entrance on the same guarded Art Studio route. The wider menu
  * can call that route without owning a second library or upload handler. */
-export function installArtEntryPoints({homeAction,libraryTools,open}:ArtEntryOptions){
+export function installArtEntryPoints({homeAction,libraryTools,open,chooseGameArt}:ArtEntryOptions){
   const byId=(id:string)=>document.getElementById(id)!;
   const button=(id:string,label:string,className='studio-button')=>{
     const element=document.createElement('button');
@@ -22,8 +23,10 @@ export function installArtEntryPoints({homeAction,libraryTools,open}:ArtEntryOpt
 
   const picture=button('studioUseDrawing','Use my art');
   picture.setAttribute('aria-label','Use my art');
+  const playable=button('studioChooseGamePicture','Use my picture');
+  playable.onclick=chooseGameArt;
   const composer=byId('studioExtraTools'),gameHelp=byId('studioHelp');
-  gameHelp.after(picture);
+  gameHelp.after(picture,playable);
   return {
     setCreating(creating:boolean){
       // Creation has one optional tool section. Reuse the same guarded art
@@ -34,6 +37,7 @@ export function installArtEntryPoints({homeAction,libraryTools,open}:ArtEntryOpt
         if(playMenu){if(picture.parentElement!==playMenu)playMenu.append(picture);}
         else if(picture.parentElement!==gameHelp.parentElement)gameHelp.after(picture);
       }
+      if(picture.nextElementSibling!==playable)picture.after(playable);
     },
   };
 }

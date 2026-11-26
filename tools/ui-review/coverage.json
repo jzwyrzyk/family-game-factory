@@ -302,6 +302,11 @@
       "label": "Moon Adventure",
       "action": "creative:world-plate-moon",
       "id": "creative-world-plate-moon"
+    },
+    {
+      "id": "recovery-family",
+      "label": "Save or restore a synthetic family recovery copy",
+      "action": "review-recovery"
     }
   ],
   "journeys": [

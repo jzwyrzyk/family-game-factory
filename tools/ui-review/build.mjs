@@ -26,6 +26,11 @@ const exact=drawingOnly||process.env.UI_REVIEW_EXACT_ASSETS==='1';
 if(!exact)execFileSync('python3',['tools/ui-review/prepare-assets.py'],{stdio:'inherit'});
 for(const name of files){const ext=path.extname(name);if(!types[ext]||name==='factory-config.json')continue;assets[name.replaceAll('\\','/')]=[types[ext],(await fs.readFile(path.join(!exact&&name.startsWith('jems-pals/')&&name.endsWith('.webp')?'work/ui-review/assets':'public',name))).toString('base64')];}
 const options={bundle:true,write:false,format:'iife',target:'chrome110',minify:true,define:{'import.meta.env.BASE_URL':'"./"','import.meta.env.MODE':'"early-preview"','import.meta.env.DEV':'false','import.meta.env.PROD':'true'},plugins:[{name:'review-only',setup(b){
+ // A srcdoc frame has an opaque URL. Recovery still validates a single origin
+ // and the full family scope. The private synthetic run owns its own databases.
+ b.onLoad({filter:/src[\/]storage[\/](complete-backup|native-workspace)\.ts$/},async a=>({
+   contents:(await fs.readFile(a.path,'utf8')).replaceAll('location.origin',JSON.stringify('https://jems-offline-review.invalid')),loader:'ts',
+ }));
  b.onResolve({filter:/\/offline$/},()=>({path:'offline',namespace:'review'}));
  b.onLoad({filter:/.*/,namespace:'review'},()=>({contents:'export function installOffline(){}',loader:'js'}));
  b.onResolve({filter:/^\//},a=>a.kind==='url-token'?{path:a.path,external:true}:null);

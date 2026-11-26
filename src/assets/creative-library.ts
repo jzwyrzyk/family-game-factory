@@ -14,6 +14,7 @@ export interface CreativeAssetChoice {
   drawingId: string;
   sourceSha256: string;
   rigId?: string;
+  rigKind?:DrawingAssembly['kind'];
   assetId: string;
   sha256: string;
   archived: boolean;
@@ -90,7 +91,7 @@ export async function listCreativeAssetChoices(owner: string, current: () => boo
       check();
       const animated = 'motion' in rig.assembly && Boolean(rig.assembly.motion);
       result.push({
-        ...common, savedAt:rig.savedAt, rigId: rig.id, sha256, representation: animated ? 'animation' : 'cutout',
+        ...common, savedAt:rig.savedAt, rigId: rig.id, rigKind:rig.assembly.kind, sha256, representation: animated ? 'animation' : 'cutout',
         assetId: privateArtId({ kind: 'rig', id: rig.id, sha256 }),
         detail: (animated ? 'Animation path' : index === 0 ? 'Latest saved cutout design' : 'Saved cutout design')
           + (versions.length > 1 ? ' · ' + (versions.length - index) : ''),

@@ -106,6 +106,18 @@ window.__reviewNavigate=async action=>{
  else if(action==='coding-intro'){FG.creation.openIntroduction();}
  else if(action==='coding-editor'){FG.creation.open();await delay(80);click('creationIntroSkip');click('creationFreeMode');document.querySelector('[data-creation-starter="robot"]')?.click();}
  else if(action==='coding-challenge'){FG.creation.openChallenges();await delay(80);document.querySelector('[data-challenge]')?.click();}
+ else if(action==='review-recovery') {
+  await enterParent();
+  const section=document.getElementById('jemsRecovery');
+  if(!section)throw Error('The recovery controls are unavailable.');
+  const origin=section.parentNode,next=section.nextSibling,dialog=document.createElement('dialog');
+  dialog.setAttribute('aria-label','Synthetic family recovery');
+  dialog.style.cssText='max-width:min(680px,95vw);max-height:86vh;overflow:auto;border-radius:16px';
+  const close=document.createElement('button');close.textContent='Back to parent view';close.onclick=()=>dialog.close();
+  dialog.append(close,section);
+  dialog.addEventListener('close',()=>{origin.insertBefore(section,next?.parentNode===origin?next:null);dialog.remove();},{once:true});
+  document.body.append(dialog);dialog.showModal();section.scrollIntoView();
+ }
  else if(action==='privacy'){await enterParent();FG.parentDashboard.openTab('settings');document.getElementById('builderParentUnlockPassphrase').value='review-demo-only';document.getElementById('builderParentUnlock')?.requestSubmit();}
 
  else if(action==='powers'||action==='math'||action==='english'){if(action!=='powers'){FG.store.current().learningSubject=action==='math'?'math':'language';FG.store.current().allowSubjectSwitch=true;}FG.app.page('lab');}

@@ -1504,7 +1504,7 @@ export function installCreationStudio(host: Host) {
         if (captured === owner()) await loadScene(saved.id);
       });
     },
-    async openArt(selection:ArtSelection, kind:'scene'|'picture-hunt'='scene'){
+    async openArt(selection:ArtSelection, kind:'scene'|'picture-hunt'='scene',returnSessionId?:string){
       if(!await enter())return;
       try{await shelf();}catch(error){status((error as Error).message,true);return;}
       const capturedOwner=owner(),capturedView=viewEpoch,current=()=>capturedOwner===owner()&&capturedView===viewEpoch&&visible&&!FG.learning.active;
@@ -1512,6 +1512,7 @@ export function installCreationStudio(host: Host) {
       try{
         const choice=await artChoice(capturedOwner,selection,current);const resolved=await privateArt.load(choice.assetId);if(!current())return;
         const project = createArtAdventure(choice, kind);
+        if(returnSessionId)project.provenance!.sourceSessionId=returnSessionId;
         if (kind === 'scene' && resolved.motion) {
           project.programs = [];
           applyArtMotion(project, project.actors[0], resolved.motion, true);

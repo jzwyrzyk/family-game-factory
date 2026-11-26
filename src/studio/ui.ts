@@ -1,3 +1,6 @@
+import {chooseGameArtwork} from './game-art-picker';
+import {loadDrawnCar} from '../drawing/rally';
+import {artChoice} from '../creation/private-art';
 import {artBuildHold,emptyArtPlan,roleLabels,selectGameArt,saveArtTest} from '../game-art/bindings';
 import {renderArtPlan} from '../game-art/plan-view';
 import { createPageHeader } from '../brand/page-header';
@@ -1971,7 +1974,35 @@ export async function installStudio(){
    await open(session.id);
   },
  });
- artEntries=installArtEntryPoints({homeAction:library.querySelector('.studio-home-action')!,libraryTools,open:()=>act(()=>artStudio.open())});
+ async function selectArtForGame(){
+  if(guardMath()||route!=='studio'||!activeId)return;
+  const session=current(),capturedEpoch=epoch;
+  const valid=()=>sameView(session,capturedEpoch)&&!FG.learning.active;
+  stopSpeech();await flushDraft();if(!valid())return;
+  const rally=session.game==='hill'&&!!session.projectId&&!session.remoteId;
+  if(rally&&(session.candidate||showing==='history')){
+    status('Open your main Rally game and finish your current experiment before choosing a new car.');return;
+  }
+  const base=rally?await games.revision(session.projectId!,session.owner):null;
+  if(!valid())return;
+  const choice=await chooseGameArtwork({owner:session.owner,current:valid,rally,existing:session.game!=='new'||!!session.remoteId});
+  if(!choice||!valid())return;
+  if(choice==='library'){await artStudio.open();return;}
+  const pin=await artChoice(session.owner,choice,valid);
+  if(pin.assetId!==choice.assetId)throw Error('Choose the saved version again.');
+  if(!valid())return;
+  if(!base){await creation.openArt(pin,'picture-hunt',session.id);return;}
+  if(!pin.rigId)throw Error('Choose a saved car design.');
+  await loadDrawnCar(session.owner,pin.rigId);
+  if(!valid())return;
+  await saveLocalStudioProject(profileStorage(localStorage),FG,session.owner,(staged,book)=>{
+    if(!valid()||book.get(session.id,session.owner).candidate)throw Error('Your game changed. Open its current version again.');
+    staged.keep(session.owner,session.projectId!,base.id,base.config,'Changed the Rally car','',base.id,pin.rigId);
+    return book.get(session.id,session.owner);
+  },notifyRewardSourceSaved,undefined,session.projectId!);
+  if(valid())await playWorking();
+ }
+ artEntries=installArtEntryPoints({homeAction:library.querySelector('.studio-home-action')!,libraryTools,open:()=>act(()=>artStudio.open()),chooseGameArt:()=>act(selectArtForGame)});
  installCreationProgress();
  const scenesNav=iconEl('button','','grid','Creative Studio') as HTMLButtonElement;scenesNav.id='studioNavScenes';scenesNav.type='button';scenesNav.onclick=()=>creation.open();$('studioNavCreate').after(scenesNav);
  const scenesEntry=el('button','studio-scene-entry') as HTMLButtonElement;scenesEntry.id='studioScenes';scenesEntry.type='button';

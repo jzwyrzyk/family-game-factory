@@ -357,3 +357,4 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
   align-content: center;
   cursor: pointer;
 }
+.creation-scene-options:not([open]) > div { display: none; }

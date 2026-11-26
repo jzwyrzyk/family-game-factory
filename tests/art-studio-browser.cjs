@@ -25,6 +25,46 @@ async function fixture(page,kind='car'){
 }
 async function upload(page,name,kind){await page.setInputFiles('#artUpload',{name,mimeType:'image/png',buffer:await fixture(page,kind)});await page.waitForFunction(()=>document.getElementById('artStatus').textContent.includes('picture is saved'));}
 async function count(page){return page.evaluate(async()=>{const db=await new Promise((resolve,reject)=>{const r=indexedDB.open('family-private-drawings-v1');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});try{return await new Promise((resolve,reject)=>{const r=db.transaction('drawings').objectStore('drawings').getAll();r.onsuccess=()=>resolve(r.result.filter(x=>x.owner===window.FG.store.current().id));r.onerror=()=>reject(r.error);});}finally{db.close();}});}
+async function changeRallyCar(page,projectId,originalBinding,originalArt){
+ const workspace=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')));
+ const openMore=async()=>{const menu=page.locator('#studioMore');if(!await menu.evaluate(node=>node.open))await menu.locator(':scope > summary').click();};
+ const original=await workspace(),starting=original.revisions.find(revision=>revision.id===original.projects.find(project=>project.id===projectId).headId);
+ assert.equal(starting.drawingRigId,originalBinding);
+ await openMore();await page.getByRole('button',{name:'Use my picture',exact:true}).click();
+ const picker=page.getByRole('dialog',{name:'Choose game artwork'});
+ await picker.getByLabel('Art collection').selectOption('versions');
+ const replacement=picker.locator('[data-private-art^="art:rig:"]:enabled').filter({hasNotText:'Latest saved cutout design'});
+ assert.equal(await replacement.count(),1,'the earlier saved car can be explicitly selected');
+ const selectedRig=(await replacement.getAttribute('data-private-art')).split(':')[2];
+ assert.notEqual(selectedRig,originalBinding);
+ await replacement.click();
+ const confirm=picker.getByRole('button',{name:'Keep this car version',exact:true});
+ await confirm.waitFor({state:'visible'});
+ assert.deepEqual((await workspace()).revisions,original.revisions,'selecting a thumbnail creates no game revision');
+ await picker.screenshot({path:path.join(output,'rally-choose-car-version.png')});
+ await confirm.click();
+ await page.waitForFunction(id=>FG.runtime.snapshot()?.state.drawingRigId===id,selectedRig);
+ const changed=await workspace(),current=changed.projects.find(project=>project.id===projectId);
+ assert.equal(changed.projects.length,original.projects.length,'the existing adventure receives the change');
+ assert.equal(changed.revisions.length,original.revisions.length+1);
+ const kept=changed.revisions.find(revision=>revision.id===current.headId);
+ assert.equal(kept.parentId,starting.id);
+ assert.equal(kept.drawingRigId,selectedRig);
+ assert.deepEqual(kept.config,starting.config,'changing the car keeps every configured mechanic');
+ assert.deepEqual(changed.revisions.find(revision=>revision.id===starting.id),starting,'the prior revision remains immutable');
+ await openMore();await page.locator('#studioUndo').click();
+ await page.waitForFunction(id=>FG.runtime.snapshot()?.state.drawingRigId===id,originalBinding);
+ const undone=await workspace();
+ assert.equal(undone.projects.find(project=>project.id===projectId).headId,starting.id);
+ assert.deepEqual(undone.revisions,changed.revisions,'Undo moves only the head and retains the alternative car revision');
+ assert.equal(await page.evaluate(async id=>{
+  const db=await new Promise((resolve,reject)=>{const request=indexedDB.open('family-private-drawings-v1');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
+  try{
+   const image=await new Promise((resolve,reject)=>{const request=db.transaction('drawings').objectStore('drawings').get(id);request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
+   return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',image.bytes)),byte=>byte.toString(16).padStart(2,'0')).join('');
+  }finally{db.close();}
+ },originalArt.id),originalArt.sha256,'the original artwork bytes remain intact after Keep and Undo');
+}
 async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),label+' has no horizontal overflow');}
 (async()=>{
  const server=start();await new Promise(resolve=>server.listening?resolve():server.once('listening',resolve));
@@ -94,6 +134,7 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   const ride=await page.evaluate(()=>window.FG.runtime.snapshot().state);assert.ok(ride.drawingRigId,'Rally uses immutable selected art');
   const originalBinding=await page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')).revisions.find(r=>r.drawingRigId)?.drawingRigId);assert.equal(originalBinding,ride.drawingRigId);
   await page.screenshot({path:path.join(output,'rally-with-my-art.png'),fullPage:true});
+  await changeRallyCar(page,recovered.projects[0].id,originalBinding,before);
   await navigate(page,'#studioNavHome');await page.locator('#studioArt').click();
   await page.locator('[data-art-id]').first().click();await page.locator('.art-detail-tools summary').click();await page.getByRole('button',{name:'Trim, turn & clean up',exact:true}).click();
   await page.locator('.art-picture').waitFor({state:'visible'});await page.locator('[data-edge="left"]').fill('10');await page.locator('[data-edge="left"]').dispatchEvent('change');

@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {validateAssembly,vehicleGeometry,vehicleParts,assemblyRig,type DrawingAssembly} from '../src/drawing/model';
-import {suggestParts} from '../src/drawing/segmentation';
+import {pointerPoint} from '../src/drawing/pointer-input';
+import {snapCoordinate} from '../src/drawing/crayon-source';
+import {sampleInk,suggestParts} from '../src/drawing/segmentation';
 import {createVehicle} from '../src/quality/physics';
 import {createDrawingPlayground} from '../src/drawing/playground';
 const hash='a'.repeat(64);
@@ -230,4 +232,61 @@ test('animation paths round-trip inside bounded immutable movement assemblies', 
     {...motion,url:'private'}, {...motion,stepMs:-1}, {...motion,sprite:'remote'}]) {
     assert.throws(()=>validateAssembly({...sample,motion:invalid}));
   }
+});
+
+test('Selected wheels drive on suspension and fixed layers can carry another hinge',()=>{
+ const machine:DrawingAssembly={...sample,kind:'machine',cutoutMode:'selected-parts'};
+ machine.pieces=structuredClone(sample.pieces);
+ const body=machine.pieces[0];
+ const badge={...body,id:'badge',name:'Badge',role:'decoration' as const,parentId:body.id,physical:false};
+ const arm:DrawingAssembly['pieces'][number]={...body,id:'arm',name:'Arm',role:'limb' as const,parentId:badge.id,region:{x:.65,y:.42,w:.1,h:.24,shape:'rect' as const}};
+ machine.pieces.push(badge,arm);
+ const driving=createDrawingPlayground(machine,1.5),parked=createDrawingPlayground(machine,1.5);
+ try{
+  for(let i=0;i<120;i++){driving.step(1/60,{go:true});parked.step(1/60);}
+  const relativeWheel=(world:ReturnType<typeof createDrawingPlayground>)=>{
+   const [body,wheel]=world.snapshot().parts;
+   return wheel.angle-body.angle;
+  };
+  assert.ok(relativeWheel(driving)-relativeWheel(parked)>1,'the wheel itself rotates relative to the body');
+  assert.equal(driving.snapshot().joints.filter(j=>j.kind==='suspension').length,2);
+  assert.ok(driving.snapshot().joints.some(j=>j.b===arm.id&&j.kind==='axle'),'the hinge uses the physical ancestor of the fixed badge');
+ }finally{driving.dispose();parked.dispose();}
+ arm.parentId=null;
+ assert.throws(()=>assemblyRig(machine),/Attach the moving piece/);
+});
+
+test('Arm and leg action swings the cutout relative to its parent on the move control',()=>{
+ const creature:DrawingAssembly={...sample,kind:'character',cutoutMode:'selected-parts',pieces:[
+  {...sample.pieces[0],id:'robot_body',name:'Robot'},
+  {id:'leg',name:'Leg',role:'limb',parentId:'robot_body',physical:true,pivot:{x:.5,y:.1},
+   region:{x:.36,y:.52,w:.08,h:.22,shape:'rect'}}
+ ]};
+ const world=createDrawingPlayground(creature,1);
+ try{
+  const relative:number[]=[];
+  for(let i=0;i<90;i++){
+   world.step(1/60,{go:true});
+   const [body,leg]=world.snapshot().parts;relative.push(leg.angle-body.angle);
+  }
+  assert.ok(Math.max(...relative)-Math.min(...relative)>.2);
+ }finally{world.dispose();}
+});
+
+
+test('Opaque black crayon on transparent paper remains selectable ink',()=>{
+ const width=50,height=40,data=new Uint8ClampedArray(width*height*4);
+ for(let y=12;y<20;y++)for(let x=10;x<30;x++)data[4*(y*width+x)+3]=255;
+ const ink=sampleInk({width,height,data} as ImageData);
+ assert.equal(ink.count,160);
+ assert.ok(ink.bounds.x<.2&&ink.bounds.x+ink.bounds.w>.59);
+});
+
+test('shared pointer coordinates preserve My Art precision at a scaled canvas edge', () => {
+ const paper = {width:900,height:560,getBoundingClientRect:()=>({left:10,top:20,width:450,height:280})} as HTMLCanvasElement;
+ const pen = {clientX:10.1,clientY:1000,pointerType:'pen',pressure:.51} as PointerEvent;
+ const point = pointerPoint(paper,pen,'position');
+ assert.deepEqual({x:snapCoordinate(point.x),y:snapCoordinate(point.y)}, {x:13/64,y:560});
+ assert.equal('p' in point,false);
+ assert.deepEqual(pointerPoint(paper,pen), {x:.25,y:560,p:.51});
 });
