@@ -1,3 +1,4 @@
+import {assertQuestionEntry} from './learning-entry-viewport.cjs';
 import {authorizeLearningParent} from './learning-parent-fixture.cjs';
 /** Production-shell integration; all game content here is a named local fixture. No model calls. */
 import assert from 'node:assert/strict';
@@ -80,6 +81,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
 
     // A real Math Lab item, including a first error, help request, and abandoned activity.
     await nav(page,'My Powers');await activity(page).waitFor({state:'visible'});
+    await assertQuestionEntry(activity(page));
     const first=await activeItem(page),firstId=await page.evaluate(()=>window.FG.learning.activeAttemptId),owner=(await profile(page)).id;
     await submitWritten(page,first,wrongAnswer(first));
     const savedWrong=await page.evaluate(({key,owner,id})=>JSON.parse(localStorage.getItem(key)!).profiles.find((p:any)=>p.id===owner).learning.attempts.find((a:any)=>a.id===id),{key:STORE,owner,id:firstId});

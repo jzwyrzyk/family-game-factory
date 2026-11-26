@@ -1,3 +1,4 @@
+import {assertQuestionEntry} from './learning-entry-viewport.cjs';
 import {answerLanguageChoice} from './language-choice-fixture.cjs';
 import {authorizeLearningParent} from './learning-parent-fixture.cjs';
 /** Production Family Game Factory ELA journeys; only audited local games and fixtures. */
@@ -63,6 +64,7 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     assert.equal(await page.evaluate(()=>window.FG.learning.subject),'language');
     await page.getByRole('button',{name:'My Powers',exact:true}).click();
     await active(page).waitFor({state:'visible'});
+    await assertQuestionEntry(active(page));
     const item=await page.evaluate(()=>window.FG.learning.activeItem);
     assert.equal(item.source,'reviewed-local');
     assert.equal(item.grade<=2,true);
