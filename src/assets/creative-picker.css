@@ -9,6 +9,6 @@
 .creative-picker-controls input, .creative-picker-controls select { width:100%; padding:0 .55rem; box-sizing:border-box; }
 .creative-picker-grid { margin-top:.8rem; }
 .creative-picker-grid button { background:#fff; color:#322644; border:1px solid #ab9aba; border-radius:1rem; display:grid; align-content:start; justify-items:center; gap:.25rem; padding:.65rem; min-height:48px; font:inherit; font-size:18px; overflow-wrap:anywhere; }
-.creative-picker-grid img { width:100%; height:5rem; object-fit:contain; }
+.creative-picker-grid img, .creative-picker-grid canvas { width:100%; height:5rem; object-fit:contain; }
 .creative-picker-grid button:focus-visible, .creative-picker-dialog button:focus-visible { outline:3px solid #5449a3; outline-offset:2px; }
 .creative-picker [role=status]:empty { display:none; }

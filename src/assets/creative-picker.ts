@@ -1,4 +1,5 @@
 import {creativeAssetChoices, type CreativeAssetChoice} from './creative-catalog';
+import {resolvePrivateArt} from '../creation/private-art';
 import {matchesArtSearch} from './creative-identity';
 import type {DrawingCategory} from './private-drawings';
 import type {DrawingKind} from '../drawing/model';
@@ -49,8 +50,11 @@ export function mountCreativePicker(box:HTMLElement, owner:string, current:()=>b
   box.classList.add('creative-picker');
   box.replaceChildren(controls,status,grid);
   let choosing = false;
+  let renderId = 0;
+  let previewQueue = Promise.resolve();
   function render() {
     if (!active()) return;
+    const generation = ++renderId;
     grid.replaceChildren();
     const query = search.value.trim().toLowerCase();
     const matches = choices.filter(choice =>
@@ -61,7 +65,31 @@ export function mountCreativePicker(box:HTMLElement, owner:string, current:()=>b
       const button = element('button');
       button.type = 'button';
       button.dataset.privateArt = choice.assetId;
-      if (choice.preview) {
+      if (choice.rigId || !choice.preview) {
+        // Saved cutouts can differ materially from the original thumbnail.
+        // Decode visible choices one at a time, then retain only a card-sized
+        // raster. A stale search or profile cannot paint the next shelf.
+        const canvas = element('canvas');
+        canvas.width = canvas.height = 120;
+        canvas.setAttribute('aria-hidden','true');
+        button.append(canvas);
+        const live = () => active() && generation === renderId;
+        previewQueue = previewQueue.then(async () => {
+          if (!live()) return;
+          try {
+            const {image} = await resolvePrivateArt(owner,choice.assetId,live);
+            if (!live()) return;
+            const scale = Math.min(120 / image.width,120 / image.height);
+            const w = image.width * scale, h = image.height * scale;
+            canvas.getContext('2d')!.drawImage(image,(120-w)/2,(120-h)/2,w,h);
+          } catch {
+            if (live()) {
+              button.disabled = true;
+              button.append(element('span','Restore this art in My Art.'));
+            }
+          }
+        });
+      } else if (choice.preview) {
         let url = urls.get(choice.drawingId);
         if (!url) {
           url = URL.createObjectURL(new Blob([choice.preview],{type:'image/png'}));
