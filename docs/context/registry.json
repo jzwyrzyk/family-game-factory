@@ -905,10 +905,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:22:17.224Z",
-      "sourceDigest": "23b8872f023de77daba93e5f52f3b9a5c5505afa62592f54f0c97dc888bcebec",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The A and C browser journeys add two creative leaf commands to the previous 65. Exact expansion has 67 creative and 43 browser leaves; every existing shard, negative missing/duplicate check and evidence rule still applies.",
+      "reviewedAt": "2026-11-26T03:26:10.642Z",
+      "sourceDigest": "72ed819537605ed580b3b4c7c83e2e6a7ee54e174072500f7ab223f5b5e20bad",
+      "reviewOutcome": "updated",
+      "reviewReason": "Verified the combined drawing, movement and selected-slot suites. The exact manifest has 67 creative and 44 browser commands, with all prior required tests retained.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
