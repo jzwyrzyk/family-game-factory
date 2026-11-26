@@ -1,5 +1,27 @@
 # jems delivery state
 
+## November 26, 2026 — administrator activation checkpoint; build verification pending
+
+Owner reports all six GitHub restrictions applied. This task independently reread
+all three exact main-only environment policies: no remaining actions. Current main
+advanced separately to `652bf9e312fc0776e37b7ef7893835e0fd8136d4`; no application or
+release identity was changed by this operations task.
+
+Administrator-reported nonproduction project is ACTIVE: `jems-jzw-nonprod`, number
+`1092405124984`, matching existing approved billing. Terraform 1.13.5 produced all
+28 expected resources; plan integrity checked, **not applied**. Preserve source
+`446a245e624f44c36e1e3847ae7779477272d899`, current files/state and approval hash
+`821d722ee140ffdef4c8ae4ba4e1fed89307e6c997153b3a8597f726a8caaad6`.
+
+Existing broker Cloud Build `7fcac19a-8444-4c17-955a-1a381006069e` reports SUCCESS
+but verification stops. The tool now emits fixed predicate/stage failure codes and
+supports a read-only all-predicate probe with the original build source. No build
+was resubmitted, no provenance check relaxed, and no image accepted. This task has
+no attached Google identity; exact live failure attribution needs the administrator
+probe. Existing GitHub release observation does not authorize arbitrary build reads.
+Cloud Shell storage recovery is being prepared separately; no historical file,
+credential, journal, receipt, recovery record or Terraform state has been deleted.
+
 ## November 26, 2026 — operational priority realignment and live GitHub observation
 
 The PR #222 candidate incorporates independent managed-auth correction

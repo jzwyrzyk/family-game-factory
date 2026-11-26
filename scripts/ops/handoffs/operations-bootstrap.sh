@@ -17,7 +17,11 @@ operations_checkout="$(mktemp -d "${TMPDIR:-/tmp}/jems-operations.XXXXXXXX")"
 trap 'rm -rf -- "$operations_checkout"' EXIT
 git -C "$operations_checkout" init -q
 git -C "$operations_checkout" remote add origin https://github.com/jzwyrzyk/family-game-factory.git
-git -C "$operations_checkout" fetch --quiet --depth=1 origin "$operations_sha"
+git -C "$operations_checkout" config remote.origin.promisor true
+git -C "$operations_checkout" config remote.origin.partialclonefilter blob:none
+git -C "$operations_checkout" sparse-checkout init --cone
+git -C "$operations_checkout" sparse-checkout set scripts/ops scripts/deployment scripts/environments infra/nonproduction ops .github/workflows
+git -C "$operations_checkout" fetch --quiet --filter=blob:none --depth=1 origin "$operations_sha"
 git -C "$operations_checkout" checkout --quiet --detach FETCH_HEAD
 [[ "$(git -C "$operations_checkout" rev-parse HEAD)" == "$operations_sha" ]]
 if [[ "$operations_lane" == github ]]; then

@@ -20,6 +20,27 @@ def receipt():
 
 
 class PublicationTests(unittest.TestCase):
+    def test_exact_predicate_codes_and_no_provider_value_leakage(self):
+        value = receipt()
+        value['artifacts'] = {'images': build.configuration(SHA)['images']}
+        result = build.diagnostic(value, SHA, HASH)
+        self.assertEqual(result['first_failed_predicate'], 'BUILD_ARTIFACTS_UNEXPECTED')
+        self.assertTrue(result['provider_shape']['artifacts_is_exact_images_mirror'])
+        with self.assertRaisesRegex(build.BuildVerificationError, '^BUILD_ARTIFACTS_UNEXPECTED$'):
+            build.verify(value, SHA, HASH)
+        value['serviceAccount'] = 'private-token-marker'
+        value['steps'][0]['env'] = ['SECRET=private-token-marker']
+        import json
+        result = build.diagnostic(value, SHA, HASH)
+        self.assertNotIn('private-token-marker', json.dumps(result))
+        self.assertEqual(result['first_failed_predicate'], 'BUILD_SERVICE_ACCOUNT_MISMATCH')
+        self.assertIn('BUILD_EXECUTABLE_STEPS_MISMATCH', result['failed_predicates'])
+
+    def test_stage_specific_read_errors_suppress_upstream_exception(self):
+        with patch.object(build.publication, 'cloud', side_effect=RuntimeError('private-token-marker')):
+            with self.assertRaisesRegex(build.BuildVerificationError, '^BUILD_METADATA_READ_FAILED$'):
+                build.qualify('12345678-1234-1234-1234-123456789abc', SHA, HASH)
+
     def test_provider_hash_and_runtime_metadata(self):
         value = receipt()
         value['steps'][0]['status'] = 'SUCCESS'

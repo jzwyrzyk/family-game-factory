@@ -8,6 +8,26 @@ managed proxy or broaden IAM. That limitation does not gate the independent lane
 below. Frozen application source `bc602f1ede502f398308ad56f973c4bf7997ff08`, release
 identities and production services are unchanged.
 
+## Administrator checkpoint and recovery
+
+The administrator reports the six GitHub restrictions applied (independently read
+back), project `jems-jzw-nonprod` ACTIVE with number `1092405124984`, matching approved
+billing, Terraform 1.13.5 and an intact **unapplied** 28-resource plan. Preserve its
+original source `446a245e624f44c36e1e3847ae7779477272d899` and approval hash
+`821d722ee140ffdef4c8ae4ba4e1fed89307e6c997153b3a8597f726a8caaad6`.
+Do not regenerate, migrate or rebind it to a newer recovery-tool commit. An approval
+hash identifies the reviewed plan; it is not evidence that apply occurred.
+
+Existing broker build `7fcac19a-8444-4c17-955a-1a381006069e` is reported SUCCESS,
+but source/image/provenance verification is not yet accepted. **Never resubmit it.**
+The verifier now names each failed predicate and can run a bounded `--diagnose`
+against an existing build. Use `--build-source-sha 446a245e624f44c36e1e3847ae7779477272d899`
+with a newer verifier to retain the actual image's original source, labels and archive.
+The new launcher fetches sparse, blob-filtered operations source to reduce temporary
+disk usage. Current task access has no Google identity or Cloud Build reader; one
+administrator probe is required to identify the actual failed provider predicate.
+No check has been relaxed merely because the build is marked successful.
+
 ## One verified launcher
 
 Use an existing administrator Cloud Shell session with `gcloud`, `gh`, Python 3 and
@@ -16,7 +36,7 @@ The reviewed handoff supplies the full `OPS_SHA` for this candidate. Download on
 
 ```sh
 curl -fsSL "https://raw.githubusercontent.com/jzwyrzyk/family-game-factory/$OPS_SHA/scripts/ops/handoffs/operations-bootstrap.sh" -o /tmp/jems-operations.sh
-printf '%s  %s\n' 81adb6cdf38379f60b184e68b5daf1758a8c929f7c68d53e93b149dbafed9572 /tmp/jems-operations.sh | sha256sum -c -
+printf '%s  %s\n' 2cb995775480ae526c3ff1a0fdef245a695985e6221a942081875175e2e13d0a /tmp/jems-operations.sh | sha256sum -c -
 bash /tmp/jems-operations.sh "$OPS_SHA" github --check
 bash /tmp/jems-operations.sh "$OPS_SHA" broker-build --check
 bash /tmp/jems-operations.sh "$OPS_SHA" nonprod --inventory
