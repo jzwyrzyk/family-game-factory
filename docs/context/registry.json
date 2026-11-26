@@ -152,10 +152,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:19:43.263Z",
-      "sourceDigest": "6992a5f266040a1a50925ba7820c7086818d843a5ab15b2c10cf64b7dbc6cb26",
+      "reviewedAt": "2026-11-26T03:38:28.855Z",
+      "sourceDigest": "6567185f45b3e657f35252005e88657e6d99c0895c24cb7ea650ca3d607f28a8",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The implemented motion choices, ink fidelity and closed general game delivery follow the approved doctrine and existing decision record.",
+      "reviewReason": "Confirmed original-byte preservation, reversible preparation and optional scene roles against the permanent authenticity and 2D doctrine. The library bridge and joint viewer use those established rules.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -316,10 +316,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:19:43.737Z",
-      "sourceDigest": "986119e6357be66dc301a8f28b1e683756880263d318d3740652cc09fcad4709",
+      "reviewedAt": "2026-11-26T03:38:28.971Z",
+      "sourceDigest": "b23d35c4fa7bcf9613323071b3dd9dccf4b96ce757d3806be948b595d48981c4",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented selectable whole-picture animation, keyboard and touch paths, contextual art reuse and the shared pointer input used for temporary learning paper.",
+      "reviewReason": "Reviewed child-facing immediate motion, touch and keyboard cancellation, the portrait stage, readable practice checkpoint and explicit return from the joint viewer.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -421,10 +421,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "03a005be73a8505ffb7934c69fb7c58ec9b7774522c21c0da92998362e0f0178",
-      "reviewedAt": "2026-11-26T03:19:45.541Z",
+      "sourceDigest": "880031cce64ca9c825a48f7154b0e3c0ec63b1515cd18c99e76e28839562e740",
+      "reviewedAt": "2026-11-26T03:38:29.773Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The scene contract records deterministic saved-motion playback, immutable illustrated worlds, custom backdrops and reusable kept scenery.",
+      "reviewReason": "Documented exact rig preview alongside composite actor playback, editable coding paths, inert roles, pinned scene versions and preserved programs.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -692,10 +692,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T00:23:35.574Z",
-      "sourceDigest": "ca7b341e9de009c700ec5b750b52d88705543bbb56fe2f4833bd1dc2dfd64a33",
+      "reviewedAt": "2026-11-26T03:38:29.965Z",
+      "sourceDigest": "05b159a0f1f0c6e00857b5e836526de214c73ab451ea69862ebeb3493a94643a",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified the protected worker main and tag, scoped production observation, and preserved the historical scene JSON package for all three readers.",
+      "reviewReason": "Verified the exact scene validation module import closure for gateway, preview and family gateway against the service packaging contract. Host-only private artwork stays outside these modules.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -903,10 +903,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:19:45.769Z",
-      "sourceDigest": "025f2c2d0135dce7ffb82e4f5c1587428ab50e8391c08f4eb04746cd70a0c946",
+      "reviewedAt": "2026-11-26T03:38:30.111Z",
+      "sourceDigest": "e752013d215d8d312af88bc777bd311d65fbd521da849f6a12dcbf6ae6415827",
       "reviewOutcome": "updated",
-      "reviewReason": "Delivery records link actual seven-drawing fidelity, recovery, profile isolation and touch journeys with rendered screenshots and playback evidence.",
+      "reviewReason": "Recorded synthetic cross-library round trips, all seven independent artwork comparisons, three real playback recordings and the portrait and checkpoint regressions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1147,10 +1147,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:19:46.043Z",
-      "sourceDigest": "c27fd7a61f45f8956fb0366ad2d4cb50190eb425e3f46cf977b10ef23437dda7",
+      "reviewedAt": "2026-11-26T03:38:30.314Z",
+      "sourceDigest": "2e34f4fbb53298a28e5b6763cccb518335a83757ed09f984973c14fbbc85a9b3",
       "reviewOutcome": "updated",
-      "reviewReason": "The candidate links the reviewed prerequisite heads and adds reproducible connected movement and world tests to the existing coding review workflow.",
+      "reviewReason": "Updated the integrated input head, concurrent PR compatibility checks, release dependencies and local qualification boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1634,10 +1634,10 @@
         "tests/crayon-revision-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "91d4fc1688b9da83e9f9f4e5cbcf37b4f04e02c1028a31fdff471e997b544a0a",
-      "reviewedAt": "2026-11-26T03:19:46.299Z",
+      "sourceDigest": "068f916b141f612702a53707371cb9f85d4a86e74252dbda646ae1946a57c6d7",
+      "reviewedAt": "2026-11-26T03:38:30.451Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The My Art guide explains editable PNG originals, the shared version picker, opt-in corner smoothing, preset movement and advanced articulated parts.",
+      "reviewReason": "Documented verified older editable strokes, optional semantic labels, immutable originals, saved movement versions and pinned joint simulation opened from Studio.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",

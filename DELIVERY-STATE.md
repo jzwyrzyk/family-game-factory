@@ -2,7 +2,7 @@
 
 ## November 26, 2026 — draw-to-animation candidate
 
-The application candidate builds on the converged input head `4be7c6dd70b588cfbd288cc8d7a68fe94d9ae37c`. #198 reconciles #196 and #197. #207 combines the #199 editable PNG, #200 layered art, #201 editable coded paths and #204 exact-family-PNG validation. The pointer utility also matches the learning bridge in #203, while #192–195 keep ownership of learning scratchpads. #202 is a parallel isolated game-slot qualification. #205 supplies a separate reviewer baseline. Production and family enrollment remain under their existing release controls.
+The application candidate builds on the converged input head `97a8c418ebffad3c5946eb0c1fabda48a6ca7f4c`. #198 reconciles #196 and #197. #207 combines the #199 editable PNG, #200 layered art, #201 editable coded paths and #204 exact-family-PNG validation. The pointer utility also matches the learning bridge in #203, while #192–195 keep ownership of learning scratchpads. #202 is a parallel isolated game-slot qualification. #205 supplies a separate reviewer baseline. Production and family enrollment remain under their existing release controls.
 
 The My Art candidate adds nine whole-picture choices, manual articulation, saved versions, image preparation, and shared selection across local destinations. The activity browser compared seven synthetic drawings to independent PNG decodes and exercised kept versions, recovery and profile switching. Recordings show the whole-picture scene and physically articulated butterfly. Desktop, phone and tablet viewport evidence uses Chromium. Owner review, physical devices, authenticated DEV/TEST and independent generated-game delivery review remain open. [Acceptance and playback](docs/creative-universe/evidence/README.md)
 
