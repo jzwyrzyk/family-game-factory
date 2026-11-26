@@ -31,7 +31,7 @@ export async function assemblyHash(assembly:DrawingAssembly) {
 
 /** One bounded, owner-scoped snapshot. Include archived ancestors solely to
  * resolve identity. Existing consumers may still resolve archived pinned IDs. */
-export async function creativeAssetChoices(owner:string, current:()=>boolean):Promise<CreativeAssetChoice[]> {
+export async function creativeAssetChoices(owner:string, current:()=>boolean, relatedToDrawingId?:string):Promise<CreativeAssetChoice[]> {
   function check() {
     const activeOwner = typeof window !== 'undefined' ? (window as any).FG?.store?.current?.()?.id : undefined;
     if (!current() || activeOwner !== undefined && String(activeOwner) !== owner)
@@ -42,12 +42,16 @@ export async function creativeAssetChoices(owner:string, current:()=>boolean):Pr
     Promise.all([ownerArtRecords<DrawingMetadata>(transaction,'drawingMetadata',owner), ownerArtRecords<SavedRig>(transaction,'rigs',owner)]));
   check();
   const byId = new Map(images.map(image => [image.id,image]));
+  const selected = relatedToDrawingId === undefined ? undefined : byId.get(relatedToDrawingId);
+  if (relatedToDrawingId !== undefined && !selected) throw Error('Restore this picture in My Art to choose another version.');
+  const family = selected && creativeOriginal(selected,byId);
   images.sort((a,b) => b.createdAt.localeCompare(a.createdAt) || a.id.localeCompare(b.id));
   rigs.sort((a,b) => b.savedAt.localeCompare(a.savedAt) || a.id.localeCompare(b.id));
   const choices:CreativeAssetChoice[] = [];
   for (const image of images) {
     if (image.archived) continue;
     const root = creativeOriginal(image, byId);
+    if (family && root.id !== family.id) continue;
     const picture:CreativeAssetChoice = {
       identityId:root.id, identityName:root.name, originalSha256:root.sha256,
       drawingId:image.id, drawingSha256:image.sha256, parentDrawingId:image.sourceId,

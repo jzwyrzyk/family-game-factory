@@ -10,6 +10,7 @@ export interface CreativePickerOptions {
   category?:DrawingCategory;
   imagesOnly?:boolean;
   rigKind?:DrawingKind;
+  relatedToDrawingId?:string;
 }
 const categoryLabels:Record<DrawingCategory,string> = {
   character:'Characters', prop:'Things', vehicle:'Vehicles', world:'Worlds', other:'Other art'
@@ -124,7 +125,7 @@ export function mountCreativePicker(box:HTMLElement, owner:string, current:()=>b
     }
   }
   search.oninput = category.onchange = () => { visibleCount = 12; render(); };
-  const ready = creativeAssetChoices(owner,active).then(items => {
+  const ready = creativeAssetChoices(owner,active,options.relatedToDrawingId).then(items => {
     if (!active()) return;
     choices = items.filter(item => (!options.imagesOnly || !item.rigId) && (!options.rigKind || item.rigKind === options.rigKind));
     render();
