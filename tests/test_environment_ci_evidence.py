@@ -402,3 +402,23 @@ class ReviewedPolicyTests(unittest.TestCase):
         api.commits[resolved]['parents'].reverse()
         companion['base']['sha']=HEAD
         with self.assertRaisesRegex(ci.EvidenceError,'RESOLUTION_PR_CHANGED'):verify(api)
+
+    def test_activation_overlap_rejects_uninstalled_or_public_owner_config(self):
+        path = 'ops/environments.json'
+        old = {path: ('100644', 'blob', '1' * 40)}
+        active = {path: ('100644', 'blob', '2' * 40)}
+        held = {path: ('100644', 'blob', '3' * 40)}
+        with self.assertRaisesRegex(ci.EvidenceError, 'CONFIG_CHANGED'):
+            ci.verify_resolution_tree(self.api, {}, old, active, held, held)
+        with patch.object(ci, 'policy_json', return_value=({'enabled':True, 'ownerIapMembers':['user:redacted']}, '')):
+            with self.assertRaisesRegex(ci.EvidenceError, 'PRIVATE_BINDING_REQUIRED'):
+                ci.verify_resolution_tree(self.api, {}, old, active, held, active)
+
+    def test_resolution_blob_requires_both_integrated_and_result_ids(self):
+        path = 'scripts/environments/cloud.py'
+        old, active, held, resolved = ({path: ('100644', 'blob', ch * 40)} for ch in '1234')
+        policy = {'resolvedBlobs': {path: {'installed': ['2' * 40], 'resolved': '4' * 40}}}
+        ci.verify_resolution_tree(self.api, policy, old, active, held, resolved)
+        active[path] = ('100644', 'blob', '5' * 40)
+        with self.assertRaisesRegex(ci.EvidenceError, 'TREE_MISMATCH'):
+            ci.verify_resolution_tree(self.api, policy, old, active, held, resolved)

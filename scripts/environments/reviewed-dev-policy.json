@@ -22,6 +22,30 @@
   "baseline": "652bf9e312fc0776e37b7ef7893835e0fd8136d4",
   "resolutionBranch": "ops/dev-resolution-223",
   "resolvedBlobs": {
-    "scripts/environments/github.py": "177f917eb85b6dcf56d8ba3b41ddb5f4d3eb3f7f"
+    "scripts/environments/github.py": {
+      "installed": [
+        "3f36b398ae163a0effc655b7473a147338d9785c",
+        "177f917eb85b6dcf56d8ba3b41ddb5f4d3eb3f7f"
+      ],
+      "resolved": "177f917eb85b6dcf56d8ba3b41ddb5f4d3eb3f7f"
+    },
+    "scripts/environments/cloud.py": {
+      "installed": [
+        "eee4c7cda712fe31bcd0a4a1ff7bfd34331615f8"
+      ],
+      "resolved": "eee4c7cda712fe31bcd0a4a1ff7bfd34331615f8"
+    },
+    "tests/test_environment_cloud.py": {
+      "installed": [
+        "9d2ca062855e4be1211b31bcf31b6ed5d9b5b01f"
+      ],
+      "resolved": "9d2ca062855e4be1211b31bcf31b6ed5d9b5b01f"
+    },
+    "docs/development/DEV-TEST-PROD.md": {
+      "installed": [
+        "e222fa3e58f295791a1cdcdc3e45bb53ea86c785"
+      ],
+      "resolved": "6da5c046763979d40f46b4b3be719d1acf5b9eb2"
+    }
   }
 }
