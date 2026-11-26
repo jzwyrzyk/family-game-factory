@@ -1,54 +1,55 @@
 # Creative Asset & World Design Standard
 
-A child can draw a rock once, give it a name, and recognize the same brush marks in several adventures. The drawing is the finished artwork. Jems supplies a stage, movement and game rules around it. This standard governs new development in My Art, Creative Studio and games. Release evidence belongs in the delivery record.
+Accepted November 26, 2026, for My Art, Creative Studio, movement design and new 2D games. This standard defines the product contract. Each feature PR records the surfaces and versions it actually implements.
 
-## Artwork and authorship
+## The drawing is finished art
 
-Retain the exact accepted original bytes under the child's profile, including a recoverable editable source when the tool produces one. A new crop, rotation, flip, scale, transparency change, background removal or bounded compression produces a separate representation with a checked source reference. If an editor offers deterministic edge smoothing, the child explicitly selects it, can reverse it, and starts with it off. A professional backdrop may intentionally look different from the child's art. Preserve each child's style across destinations.
+Keep every accepted source byte for byte. Preserve its SHA-256, owner and a recoverable original representation. Keep editable strokes when the drawing tool supplies them. Drawings made on paper, photographs and flattened imports can be finished art without editable strokes. Give each saved edit a distinct revision and bind it to its source. Keep render previews and lossless or bounded compressed sprites separate from the original.
 
-Redrawing, beautifying, enhancing or reinterpreting a child's artwork with generative AI is permanently prohibited. Never send its pixels, thumbnails, derived cutouts, or a screenshot containing them to a generative model. Artwork from Jems and earned Pals carry their own attribution and access rules. A saved Jems illustration cannot become a child-authored original by selecting it.
+The prohibition on generative alteration is permanent. Private art, partial cutouts and captures containing private art must stay out of generative image, coaching, repair and visual-review inputs. Never redraw, beautify, reinterpret, match an environment's style, synthesize missing parts or offer a stock replacement under the child's name. A hand-drawn rock belongs in an illustrated workshop with all its original lines.
 
-## Identity, versions and uses
+Let the child explicitly crop, turn, scale, flip, remove paper or edit a component mask. Conservative deterministic smoothing requires a separate, initially off control, a preview, a way to undo and a new derivative on save. Record provenance of Jems-supplied scenery independently of child-authored artwork.
 
-| Question | Contract |
+## Identity, versions and use
+
+| Question | Authority and rule |
 | --- | --- |
-| Whose rock is this? | Resolve the current profile within its authorized workspace or family origin, then its stable original record ID. An identifier alone confers no access. |
-| What did the child call it? | A short display name and optional free-form semantic description. Accept invented objects. Classification can wait until after drawing. |
-| Where does it appear in the library? | Existing character, prop, vehicle, world and other categories drive logical views. Movement designs point to the picture they animate. Pals and approved catalogue objects resolve through their own existing authorities. |
-| Which version? | Save a pin to a particular immutable image or movement version. Preserve content hash, checked derivative ancestry, and the editable version where available. Shared uses reference these records without duplicating pixels. |
-| What does it do here? | Store the role on the scene instance or game binding. One rock can be a collectible, obstacle or decoration. Behaviors, colliders and controls require explicit scene or game rules. |
-| What happens after editing? | A child chooses whether to bind a later revision to a new version of the adventure. Earlier saved versions keep their pins. Missing art gets a visible recovery state. |
-| Where is it used? | Read retained owner-scoped projects, drafts and revisions. A usage index accelerates discovery. An empty or stale index cannot authorize erasure. |
+| Whose rock is it? | Resolve within the active profile and family origin. The source drawing and its validated ancestry define owner-local identity. Possession of an ID or digest grants no access. |
+| What is it called? | The child can give the asset a display name such as “My moon rock”, a semantic name such as “rock”, and an optional broad category. Imaginative and unnamed drawings work immediately. |
+| Which artwork was chosen? | A scene pins the selected image ID and SHA-256, or the selected rig ID and validated assembly digest. A rig pins its source image revision and digest. Verify references at use and restoration. |
+| How is it used here? | The scene owns each placement, actor program, backdrop and decoration. A game owns the explicit obstacle, collectible or vehicle contract. Naming a rock never assigns a collider, gravity or points. |
+| What if I change it later? | Archive preserves historical uses. A new picture or motion is a separate version. Updating a use requires explicit selection and a new scene or game revision. A missing version offers recovery. |
 
-Archive hides an item from ordinary selection and preserves existing uses. Restore makes it discoverable again. Erasure checks retained uses, derivative ancestry and compatible movement designs under the write guard. Refuse erasure if that check cannot establish safety. Preserve existing backup, restore and owner-remapping contracts. Validate every reference before committing an import. Validate each restored rig against the exact selected drawing.
+The existing private drawings database, scene workspace, generated companion and native saved-game authorities own their respective records. Extend their existing storage, reference remapping, backup, capacity and deletion checks. Concurrent saves and restores must preserve profile isolation and immutable history. Any incompatible new field needs a forward and rollback reader plan before release. A cached catalog and a thumbnail can be rebuilt. Read drafts, revisions and retained projects before erasure. An empty usage index cannot establish that deletion is safe. Inspect derivative ancestry and rig dependencies under the existing writer lock.
 
-## Authoring and world design
+## Drawing, movement and continuation
 
-New games use 2D sprites, layered settings and suitable 2D movement or physics. Side, top-down, isometric and illustrated perspective are available treatments. Shadows, occlusion, scale and parallax may communicate depth. An indispensable unsupported spatial action needs the child's choice. Retained games keep their existing runtimes and histories. Development introduces no 3D asset conversion.
+A child can go from saving or importing a drawing to seeing it move, choose the action and pause it. Whole-image animation translates or rotates the drawing as one sprite. Coded movement runs an editable actor program in the scene interpreter. Articulated motion needs independently selected pixels, pivots, joints and an applicable simulator. Give these modes distinct names in the interface. A moving sprite is insufficient evidence of working wheels, flapping wings or a usable physical game adapter.
 
-Use original premium Jems illustration for built-in worlds, with a versioned backdrop identity and a clear playable area. Inspect artwork on the actual running stage at phone and tablet sizes. Store background placement, scenery, actors and movement separately. A decorative foreground element has no collider or actor script. A child may use a personal picture as the environment. Keep the background's framing independent of its source pixels.
+Offer manual parts, masks and placement corrections when a guess misses. Show initial simple actions, reveal advanced geometry on request and keep the original available throughout. A saved design can return to My Art, enter Creative Studio or enter a specifically compatible game. Preserve the selected profile, version, world and existing save/learning guards on these transitions.
 
-Give young children direct thumbnail selection, short action labels, visible focus and touch targets. Offer keyboard equivalents for drawing, placement and movement. Preserve undo, reduced-motion preferences, optional help and the current activity when creating new art. A canceled picker returns to its origin. A profile change invalidates pending previews, decodes and callbacks. Learning scratchpads are ephemeral unless the child explicitly creates a permanent artwork through an authorized creative action. Creative activity does not award learning mastery.
+Give the canvas and its palette priority on the drawing surface. Preserve a failed Keep for retry and honor pointer cancellation on mouse, pen and touch. Reopening a flattened picture must never invent editable marks.
 
-## Delivery boundaries
+For young children, begin with visible movement choices and a single playback action. Use the current Jems label sizes, focus order, contrast and touch targets. Provide keyboard alternatives to path and part placement. A cancelled pointer must discard the unfinished gesture. Pause, reduced motion, profile change and dismissal must stop unsolicited playback. Use the existing grade and parent supervision policies. Scratchpad marks from Math or English remain transient unless a future, separately designed explicit Keep journey is accepted. [Child interface](../brand/CHILD_INTERFACE.md)
 
-Only the trusted host resolves private image and rig pins. A new generated-game adapter requires its own review of owner admission, the allowed game/revision/slot, representation integrity, resource bounds, expiry, revocation, reporting and backup. An untrusted game receives no profile identifier, library enumeration, unrestricted URL or storage authority. Keep private art out of generation, screenshot review, repair and telemetry. A synthetic local qualification cannot enable real family access. Preserve parent consent, rewards and existing host-managed learning checkpoints.
+## Worlds and 2D mechanics
 
-## Interface and migration ownership
+New development uses 2D sprites, layered environments and compatible physics. Artwork, light, shadows and parallax can supply depth. Preserve legacy readers, retained games and historical staging. Introduce no 3D asset conversion. Pin illustrated world editions so later scenery changes cannot silently redesign a saved adventure. Review the rendered activity with the actor visible at phone and tablet sizes. Use approved Jems environment art or new Jems-specific illustrations created independently of private work. Keep controls, text and interactive subjects readable against the actual plate. [Game presentation](../game-intelligence/PRESENTATION-QUALITY.md) · [Brand library](../brand/LIBRARY_V1_2.md)
 
-| Workstream | Owns | Compatibility obligation |
+## Generated games and privacy
+
+1. The trusted host checks the active owner, exact chosen image or design, digest, consent and intended game use. Read only that version. Stop if the owner changes or the digest fails.
+2. Generated content may request only reviewed bounded gameplay operations. Keep image records, owner IDs, unrestricted URLs, storage handles, bytes and host credentials out of generated code. Prefer a trusted renderer that composites a selected sprite after receiving validated positions.
+3. Keep private art out of model calls, build payloads, gameplay-review captures, logs and worker artifacts. An offline review build can qualify a named adapter with synthetic marks. Scope any future grant to one game revision, slot and session. Bound its lifetime and revoke it on a profile or consent change. A generated companion customized in the trusted editor and an executable generated game are separate destinations.
+4. General asset delivery stays closed until independent security review, isolation and revocation tests, exact-source hosted qualification and release approval. Exact reviewed-family PNG admission remains subject to the adult, operator, device and family gates. [Family privacy](../family-beta/PRIVACY.md) · [Premium pilot](../game-intelligence/premium-benchmark/ARTWORK-PILOT.md)
+
+## Ownership and release evidence
+
+| Work | Shared module owner | Required integration evidence |
 | --- | --- | --- |
-| A — Drawing | Original capture, editable sketch and preparation tools | Existing PNG/JPEG records open without conversion |
-| B — Illustrated worlds | Versioned illustrated catalogue and stage drawing | Old scenes retain their selected stage |
-| C — Animation | Editable motion, timing and accessible playback | Movement stays pinned with its scene or reviewed rig |
-| D — Library | Identity, metadata, selection, pin resolution, usage and return to origin | One logical view over existing stores, checked owner across asynchronous operations |
-| E — Games | Local game contract and independently qualified generated-game delivery | Explicit binding and mechanics, existing games retain their selected versions |
-| F — World building | Environment placements and editing | Include all references in validation, export, import and recovery |
+| A and D | My Art owns originals, editable source, logical identity, revisions, metadata projections and picker. Storage maintainer owns compatibility and recovery decisions with My Art. | Original hash after editing, archive, history, cross-profile denial and backup round trip. |
+| B and F | Creative Studio owns versioned world art, scene settings, layered placement and scene reference enumeration. | Actual rendered worlds, older scene playback, pins for decorations and backgrounds, save/load and reference remapping. |
+| C | Movement editor owns the design and pose evaluator. Scene interpreter owns fixed-clock playback. Drawing Lab owns segmentation, masks, constraints and supported real mechanics. | Immediate motion, scene continuation, pause/resume and cancel, manual correction, version selection, representative synthetic drawing playback. |
+| E | Game host owns explicit adapters and trust checks. Security and release owners independently qualify any future change to general delivery. | A named playable example, preserved game behavior, an isolated generated realm, and confirmation of disabled production delivery. |
 
-The owner of a new reference kind updates validators, renderers, authoritative usage checks, backup/restore, copy/remap and the destination matrix together. The storage maintainer reviews migrations and rollback compatibility. Integration review covers overlapping files and stacked PR heads before release.
-
-## Acceptance and extension
-
-Exercise a synthetic hand-drawn rock, a character, a vehicle and a world. Name and revise them, select exact versions across activities, change roles, archive, restore and switch profiles. Compare original bytes and hashes following recovery. Check visible pixels, editor return, keyboard and touch input, missing versions and failed writes. Inspect a live game outcome as well as its artwork. Keep local implementation, offline evidence, hosted qualification, production deployment and family activation separately evidenced.
-
-Related contracts cover detailed [Art Studio behavior](../drawings/ART_STUDIO.md), [scene authoring](../creation-studio/README.md), [private family storage](../family-beta/ARCHITECTURE.md), [child interface](../brand/CHILD_INTERFACE.md), and [game generation](../game-intelligence/PREMIUM-BUILDER.md).
+For each change record its PR and dependencies, exact head, reproducible tests, screenshots and motion capture where relevant. Record what passed locally, hosted checks and private preview identity, TEST acceptance, production state and external family activation separately. Use synthetic work in public artifacts. Existing parent reports, learning evidence, reward receipts, earned Pals and prior histories retain their own authorities. [Delivery governance](../development/DEV-TEST-PROD.md)

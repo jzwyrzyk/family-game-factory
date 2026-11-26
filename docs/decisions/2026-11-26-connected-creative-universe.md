@@ -1,7 +1,9 @@
-# Keep authentic artwork across the connected creative universe
+# Children keep and reuse their original artwork
 
-The product owner's November 26 master directive and Workstream D directive establish the permanent artwork doctrine and a 2D architecture for new development. The child retains the exact original, can recover it, and decides when an adventure should use a newer version. Setting a rock against a polished illustrated world preserves the contrast the child created.
+The owner adopted a permanent authentic-artwork doctrine and standardized new game work on 2D experiences on November 26, 2026.
 
-Extend owner-scoped drawings, movement designs and existing scene/game histories. Use the original drawing as stable identity and save the selected version and role at the destination. Independent per-feature libraries would introduce divergent copies, ownership and recovery. Rewriting earlier adventures to point at the latest picture would lose the child's prior creative decisions.
+A drawing keeps its owner-scoped identity through preparation, movement design and reuse. The child selects an exact revision for each saved adventure. The trusted scene or game supplies the role and its mechanics. An edited drawing creates a new revision. Existing adventures continue to use their selected version.
 
-This decision refines [game-form selection](0002-intent-faithful-game-forms.md) for new games. It preserves explicit simulation choices and retained games. General generated-game asset delivery requires independent security and release qualification. The [design standard](../creative-universe/STANDARD.md) owns the contract, including lifecycle and cross-workstream responsibilities.
+This extends the existing private drawing, rig and scene authorities. A second asset store would split ownership and recovery. Sending private images to a generative provider would replace the child's creative judgment and violate the product commitment. Preserve legacy games and review any future generated-game adapter independently.
+
+The [Creative Asset & World Design Standard](../creative-universe/STANDARD.md) specifies the boundaries and acceptance evidence. Source and deployment status belong in [delivery state](../../DELIVERY-STATE.md).

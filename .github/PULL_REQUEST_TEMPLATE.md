@@ -8,6 +8,8 @@
 
 ## Evidence
 
+<!-- For creative asset and world changes, list affected workstreams and shared-module owners. Bind each applicable assertion to an exact source, synthetic screenshot or playback capture, integrity/restore test and negative owner or generated-game boundary test. Identify prior-reader rollback compatibility and unresolved independent release gates. -->
+
 | Claim / acceptance criterion | Check or observation | Exact SHA / run / artifact | Result and limits |
 | --- | --- | --- | --- |
 | | | | |
@@ -18,7 +20,6 @@
 
 <!-- For child-facing UI, apply docs/brand/CHILD_INTERFACE.md: remove redundant copy, retain 18px labels / 20px task text, verify actual-surface contrast at phone sizes and in help/error states, and preserve explicit friendly narration and cancellation. State observed coverage, not a site-wide claim from one screenshot. -->
 
-<!-- For creative assets, identify the reference owner, exact revision and lineage, supported destinations, migration and rollback behavior, and synthetic proof of isolation and recovery. Include rendered activity evidence. Record the independent qualification status of any generated-game delivery. -->
 
 ## Preview and acceptance
 
