@@ -51,6 +51,13 @@ const {start}=require('./browser-server.cjs');
         await page.waitForTimeout(180);
         assert.equal(await sprite.getAttribute('style'),initial);
         assert.ok(await button('Pause').isDisabled(),'opening, focusing and adjusting pace keep artwork still');
+        for(const name of ['Jump','Bounce','Spin','Dance','Left','Right','Float','Shake']){
+          await button(name).click();
+          const before=await sprite.getAttribute('style');
+          await page.waitForFunction(style=>document.querySelector('.art-motion-sprite').getAttribute('style')!==style,before);
+          assert.equal(await button(name).getAttribute('aria-pressed'),'true');
+          await button('Pause').click();
+        }
         await button('Spin').click();await page.waitForFunction(()=>document.querySelector('.art-motion-sprite').style.transform.match(/rotate\((\d+(\.\d+)?)deg\)/)?.[1]>10);
         await button('Pause').click();
         const fixed=await sprite.getAttribute('style');await page.waitForTimeout(160);assert.equal(await sprite.getAttribute('style'),fixed);

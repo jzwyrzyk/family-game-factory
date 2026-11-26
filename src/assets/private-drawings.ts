@@ -2,16 +2,16 @@ import {assertRewardSourceLockHeld,setRewardSourceMaintenance} from '../rewards/
 /** Private immutable image bytes. Metadata and visibility can change; the image cannot. */
 import { sceneAssetIds } from '../creation/worlds';
 import { ART_LIMITS, artOwner, artRequest, assertArtWrite, checkArtCapacity, deriveArtUsages, withArtTransaction, saveDrawingMetadata, ownerArtRecords, type DrawingMetadata, type ArtGuard, type ArtUsage } from '../drawing/library';
+import {semanticWord,setSemanticWord,type SemanticFields} from '../drawing/semantic-identity';
 import { originalOf } from '../drawing/creative-assets';
 import type { SavedRig } from '../drawing/store';
 import { adultStorageKey } from '../adult-pilot/storage';
 
 export type DrawingCategory = 'character' | 'vehicle' | 'prop' | 'world' | 'other';
 export const DRAWING_CATEGORIES: readonly DrawingCategory[] = ['character', 'vehicle', 'prop', 'world', 'other'];
-export interface Drawing {
+export interface Drawing extends SemanticFields {
   id: string; owner: string; name: string; mime: 'image/png' | 'image/jpeg'; bytes: ArrayBuffer; sha256: string; createdAt: string;
   sourceId?: string; sourceSha256?: string; preview?: ArrayBuffer;
-  semanticName?: string;
   category?: DrawingCategory; archived?: boolean; updatedAt?: string;
 }
 export const drawingHash = async (bytes: ArrayBuffer) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), byte => byte.toString(16).padStart(2, '0')).join('');
@@ -106,37 +106,35 @@ export async function saveDrawing(owner: string, name: string, file: Blob, sourc
       const source = metadata.find(original => original.owner === owner && original.id === sourceId);
       if (!source) throw Error('Original drawing not found in this profile.');
       item.sourceId = sourceId; item.sourceSha256 = source.sha256; item.category = source.category || 'other';
-      if (source.semanticName) item.semanticName = source.semanticName;
+      setSemanticWord(item, semanticWord(source));
     }
     if(metadata.filter(original=>original.owner===owner).length>=ART_LIMITS.drawingsPerOwner||metadata.reduce((bytes,original)=>bytes+original.originalBytes+(original.preview?.byteLength??0),0)+item.bytes.byteLength+(item.preview?.byteLength??0)>ART_LIMITS.storageBytes)throw Error('Your art storage is full. Keep a complete backup before adding more pictures.'); assertArtWrite(owner, guard); store.add(item); saveDrawingMetadata(transaction,item); return item;
   });
 }
-export async function updateDrawing(owner: string, id: string, changes: { name?: string; semanticName?: string;
+export async function updateDrawing(owner: string, id: string, changes: SemanticFields & { name?: string;
   category?: DrawingCategory; archived?: boolean }, guard?: ArtGuard): Promise<Drawing> {
   assertArtWrite(owner, guard);
-  if (!changes || Object.keys(changes).some(key => !['name', 'semanticName', 'category', 'archived'].includes(key)) ||
+  if (!changes || Object.keys(changes).some(key => !['name', 'semanticName', 'semanticIdentity', 'category', 'archived'].includes(key)) ||
     changes.name !== undefined && (typeof changes.name !== 'string' || !changes.name.trim() || changes.name.trim().length > 60) ||
-    changes.semanticName !== undefined && (typeof changes.semanticName !== 'string' || changes.semanticName.trim().length > 60 || /[\u0000-\u001f]/.test(changes.semanticName)) ||
     changes.category !== undefined && !DRAWING_CATEGORIES.includes(changes.category) || changes.archived !== undefined && typeof changes.archived !== 'boolean') throw Error('Choose a short name and an available art category.');
   return withArtTransaction(['drawings'], 'readwrite', async transaction => {
     const store = transaction.objectStore('drawings'), item = await artRequest(store.get(id)) as Drawing | undefined;
     if (!item || item.owner !== owner) throw Error('Choose artwork from this profile.');
     const updated = { ...item, ...changes, ...(changes.name !== undefined ? { name: changes.name.trim() } : {}), updatedAt: new Date().toISOString() };
-    if (changes.semanticName !== undefined) {
-      if (changes.semanticName.trim()) updated.semanticName = changes.semanticName.trim();
-      else delete updated.semanticName;
-    }
+    const changingWord = changes.semanticName !== undefined || changes.semanticIdentity !== undefined;
+    const priorWord = semanticWord(item);
+    const word = changingWord ? semanticWord(changes) : priorWord;
+    setSemanticWord(updated, word);
     // The child's word for the object belongs to the entire artwork. Keep the
     // metadata index searchable on every edition without changing any picture.
-    if (changes.semanticName !== undefined && updated.semanticName !== item.semanticName) {
+    if (changingWord && word !== priorWord) {
       const rows = await ownerArtRecords<DrawingMetadata>(transaction, 'drawingMetadata', owner);
       const byId = new Map(rows.map(row => [row.id, row]));
       const root = originalOf(byId.get(id)!, byId);
       for (const row of rows) {
         if (row.id === id || originalOf(row, byId).id !== root.id) continue;
         const sibling = await artRequest(store.get(row.id)) as Drawing;
-        if (updated.semanticName) sibling.semanticName = updated.semanticName;
-        else delete sibling.semanticName;
+        setSemanticWord(sibling, word);
         store.put(sibling);
         saveDrawingMetadata(transaction, sibling);
       }
@@ -219,9 +217,9 @@ export const deleteDrawing = (owner: string, id: string, guard?: ArtGuard) => re
 export const deleteArtwork = (owner: string, id: string, guard?: ArtGuard) => removeDrawing(owner, id, true, guard);
 export function drawingBlob(item: Drawing) { return new Blob([item.bytes], { type: item.mime }); }
 
-export function artNameMatches(item: {name: string; semanticName?: string}, query: string) {
+export function artNameMatches(item: SemanticFields & {name: string}, query: string) {
   const text = query.trim().toLowerCase();
-  return [item.name, item.semanticName].some(value => value?.toLowerCase().includes(text));
+  return [item.name, semanticWord(item)].some(value => value?.toLowerCase().includes(text));
 }
 
 export interface DrawingPageQuery {after?:[string,string];limit?:number;search?:string;category?:DrawingCategory;archived?:boolean}
@@ -232,7 +230,7 @@ export async function drawingPage(owner:string,query:DrawingPageQuery={}):Promis
   const store=transaction.objectStore('drawingMetadata'),total=await artRequest(store.index('owner').count(IDBKeyRange.only(owner)));
   const range=IDBKeyRange.bound([owner,'',''],[owner,...(query.after??['\uffff','\uffff'])],false,!!query.after);
   const items:DrawingMetadata[]=[],search=(query.search??'').trim().toLowerCase();
-  await new Promise<void>((resolve,reject)=>{const request=store.index('ownerCreated').openCursor(range,'prev');request.onerror=()=>reject(request.error);request.onsuccess=()=>{const cursor=request.result;if(!cursor||items.length>limit){resolve();return;}const item=cursor.value as DrawingMetadata;if((query.archived===undefined||Boolean(item.archived)===query.archived)&&(!query.category||(item.category??'other')===query.category)&&(!search||artNameMatches(item, search)))items.push(item);cursor.continue();};});
+  await new Promise<void>((resolve,reject)=>{const request=store.index('ownerCreated').openCursor(range,'prev');request.onerror=()=>reject(request.error);request.onsuccess=()=>{const cursor=request.result;if(!cursor||items.length>limit){resolve();return;}const item=cursor.value as DrawingMetadata;try{if((query.archived===undefined||Boolean(item.archived)===query.archived)&&(!query.category||(item.category??'other')===query.category)&&(!search||artNameMatches(item, search)))items.push(item);cursor.continue();}catch(error){reject(error);}};});
   const hasMore=items.length>limit;if(hasMore)items.pop();const last=items.at(-1);return {items,next:hasMore&&last?[last.createdAt,last.id]:null,total};
  });
 }

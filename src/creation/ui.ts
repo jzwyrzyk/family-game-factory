@@ -6,7 +6,7 @@ import {earlySoundMuted} from '../learning/early/audio';
 import {profileGrade} from '../learning/engine';
 import {isEarlyGrade,withinGrade} from '../learning/grades';
 import { SceneEngine, type SceneSnapshot } from './engine';
-import { validateCreationProject, type CreationProject, type CreationBlock } from './model';
+import { CREATIVE_ROLES, type CreativeRole, validateCreationProject, type CreationProject, type CreationBlock } from './model';
 import { CREATION_ASSETS, createStarterProject, createProjectFromStudio, creationAsset, validateEditableProject, parsePrivateArtId } from './projects';
 import { CreationStore, CREATION_KEY, validateCreationWorkspace, type CreationEntry } from './storage';
 import {CreationWorkspace,prepareIndexedCreation} from '../storage/creation-workspace';
@@ -21,7 +21,7 @@ import { createIcon, iconMarkup, setIconLabel, type IconName } from '../brand/ic
 import {rewardSourceWritable} from '../rewards/write-guard';
 import { createGuideCard, type GuideHost } from '../studio/guide-card';
 import {showAssetPicker} from '../drawing/asset-picker';
-import {PrivateArtResolver,artChoice,listArtChoices,privateArtReferences,exportSceneArt,importSceneArt,type ArtSelection,type ResolvedPrivateArt} from './private-art';
+import {PrivateArtResolver,loadPinnedArtSource,artChoice,listArtChoices,privateArtReferences,exportSceneArt,importSceneArt,type ArtSelection,type ResolvedPrivateArt} from './private-art';
 import {ART_LIMITS,registerArtUsage,releaseArtUsage} from '../drawing/library';
 import { addPalToProject, createPalPlayground, isCreationPalId, type CreationPalId } from '../pals/creation';
 import { palSceneAssetId, type PalForm } from '../pals/catalog';
@@ -697,6 +697,43 @@ export function installCreationStudio(host: Host) {
     const appearance = $('creationActorAppearance');
     appearance.replaceChildren();
     box.append(input('Name', actor.name, async value => await set('name', value.trim() || 'My character'), { maxLength: 40 }), input('Start x', actor.x, async value => await set('x', +value), { min: 0, max: scene!.width }), input('Start y', actor.y, async value => await set('y', +value), { min: 0, max: scene!.height }), input('Size', actor.size || 100, async value => await set('size', +value), { min: 20, max: 240 }));
+    if (!challengeId && parsePrivateArtId(actor.assetId)) {
+      const roleLabel = node('label','creation-field','Role in this scene');
+      const role = node('select');
+      role.add(new Option('Choose a role',''));
+      for (const value of CREATIVE_ROLES) role.add(new Option(value[0].toUpperCase()+value.slice(1),value));
+      role.value = actor.creativeRole ?? '';
+      role.onchange = () => act(async () => {
+        const value = role.value as CreativeRole | '';
+        await mutation(project => {
+          const placed = project.actors.find(entry => entry.id === actor.id)!;
+          if (value) placed.creativeRole = value;
+          else delete placed.creativeRole;
+        });
+      });
+      roleLabel.append(role);
+      box.append(roleLabel);
+    }
+    if(!challengeId&&parsePrivateArtId(actor.assetId)?.kind==='rig'){
+      const profile=owner(),project=scene,epoch=viewEpoch,pin=actor.assetId;
+      const current=()=>isCurrent()&&owner()===profile&&scene===project&&viewEpoch===epoch&&selectedActor===actor.id&&actor.assetId===pin&&!FG.learning.active;
+      const preview=iconNode('button','creation-button','play','Try the saved parts');
+      preview.id='creationTryParts';preview.hidden=true;appearance.append(preview);
+      void privateArt.load(pin).then(art=>{if(current()&&preview.isConnected)preview.hidden=!art.articulated;}).catch(()=>{});
+      preview.onclick=()=>act(async()=>{
+        assertEditing();
+        if(recording)throw Error('Finish your scene recording before trying the parts.');
+        await learningThen(async()=>{
+          if(!current())return;
+          const {rig,source}=await loadPinnedArtSource(profile,pin,current);
+          if(!rig||!current())return;
+          const {openDrawingLab}=await import('../drawing/lab');
+          if(!current())return;
+          if(engine?.snapshot().status==='running'){stop();paint();}
+          await openDrawingLab(profile,source,undefined,{previewRig:rig,isCurrent:current});
+        });
+      });
+    }
     if (!challengeId) {
       const replace = iconNode('button', 'creation-button', 'edit', 'Use my art');
       replace.id = 'creationReplaceActorArt';

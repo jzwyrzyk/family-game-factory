@@ -126,3 +126,20 @@ test('a path is relative to the chosen placement and can lead into the next code
   assert.equal(engine.advance(500).actors[0].speech,'There!');
   assert.deepEqual(engine.reset().actors[0].x,x);
 });
+
+test('role metadata survives local scenes without assigning physics or widening generated manifests',()=>{
+  const scene=sceneWith();
+  scene.id='inert-role';
+  const before=new SceneEngine(scene);
+  before.start();before.advance(400);
+  scene.actors[0].creativeRole='obstacle';
+  const restored=validateEditableProject(scene);
+  assert.equal(restored.actors[0].creativeRole,'obstacle');
+  const after=new SceneEngine(restored);
+  after.start();after.advance(400);
+  assert.deepEqual(after.snapshot().actors.map(({creativeRole: _role, ...state})=>state),before.snapshot().actors);
+  assert.throws(()=>validateEditableProject({...scene,actors:[{...scene.actors[0],creativeRole:'invented'}]}));
+  const bundled=createStarterProject('blank');
+  bundled.actors[0].creativeRole='decoration';
+  assert.throws(()=>validateGeneratedCreationManifest(bundled),/roles/);
+});

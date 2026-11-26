@@ -44,7 +44,10 @@ export type CreationBlock = BlockBase & (
   | {type: 'emit'; name: string}
 );
 export type SceneTrigger = {type: 'start' | 'tap'} | {type: 'event'; name: string};
+export const CREATIVE_ROLES = ['character','decoration','scenery','obstacle','collectible'] as const;
+export type CreativeRole = typeof CREATIVE_ROLES[number];
 export interface SceneActor {
+  creativeRole?: CreativeRole;
   id: string; name: string; assetId: string; x: number; y: number;
   size?: number; visible?: boolean;
 }
@@ -134,9 +137,10 @@ export function validateCreationProject(input: unknown, options: {allowSavedMoti
   if (!p.actors.length) fail('Add at least one character.');
   const actorIds = new Set<string>();
   for (const raw of p.actors) {
-    const a = record(raw, ['id','name','assetId','x','y','size','visible'], 'character');
+    const a = record(raw, ['id','name','assetId','x','y','size','visible','creativeRole'], 'character');
     id(a.id, 'character ID');
     if(!isCreationId(a.assetId)&&!parsePrivateArtId(a.assetId))fail('Invalid asset reference.');
+    if (a.creativeRole !== undefined && !CREATIVE_ROLES.includes(a.creativeRole as CreativeRole)) fail('Choose a supported role for this scene.');
     text(a.name, 60, 'character name');
     if (actorIds.has(a.id)) fail('Character IDs must be unique.');
     actorIds.add(a.id);

@@ -21,7 +21,8 @@ async function restore(page, bundle) {
 }
 
 async function run() {
-  const [peerDist, currentDist] = process.argv.slice(2);
+  const [peerDist, currentDist, peerVersion='199'] = process.argv.slice(2);
+  assert.ok(['199','208'].includes(peerVersion));
   assert.ok(peerDist && currentDist, 'Pass the PR199 dist directory and the integrated dist directory.');
   const servers = [start(peerDist), start(currentDist)];
   let browser;
@@ -48,9 +49,16 @@ async function run() {
     await peerPaper.press('Enter');
     await peerEditor.locator('[data-save]').click();
     await peerEditor.waitFor({state:'detached'});
+    if(peerVersion==='208'){
+      await peer.getByLabel('What is it?',{exact:true}).fill('Moon pebble');
+      await peer.getByRole('button',{name:'Save details',exact:true}).click();
+      await peer.waitForFunction(()=>document.getElementById('artStatus').textContent==='Artwork details saved.');
+    }
     const before = await harvest(peer);
+    if(peerVersion==='208') assert.equal(before.drawings[0].semanticIdentity,'Moon pebble');
     assert.equal(before.drawings.length, 1);
     await restore(current, before);
+    if(peerVersion==='208') assert.equal(await current.getByLabel('What is it?',{exact:true}).inputValue(),'Moon pebble');
     await current.locator('#artContinueDrawing').click();
     const editor = current.locator('dialog.drawing-paint');
     await editor.getByRole('button',{name:'Use Teal crayon'}).click();
@@ -66,13 +74,14 @@ async function run() {
     assert.deepEqual(parent, before.drawings[0]);
     const revision = after.drawings.find(item => item.sourceId === parent.id);
     assert.equal(revision.sourceSha256, parent.sha256);
+    if(peerVersion==='208') assert.equal(revision.semanticIdentity,'Moon pebble');
     await restore(peer, after);
     await peer.getByRole('button',{name:/Shared pebble two/}).click();
     await peer.getByRole('button',{name:'Keep drawing',exact:true}).click();
     assert.equal(await peerPaper.evaluate(canvas => canvas.toDataURL()), raster);
     assert.deepEqual(posts, []);
     assert.deepEqual(errors, []);
-    console.log('PASS PR199-authored library restores byte-exactly, integrated edition reopens pixel-exactly in PR199, zero POSTs.');
+    console.log('PASS PR'+peerVersion+'-authored library restores byte-exactly, integrated edition reopens pixel-exactly in its source build, zero POSTs.');
   } finally {
     await browser?.close();
     for (const server of servers) server.close();

@@ -101,3 +101,6 @@
   min-height: 48px;
   font-size: var(--jems-child-label,18px);
 }
+
+.drawing-lab.dl-rig-preview { width:min(850px,96vw); }
+.dl-rig-preview .dl-main { grid-template-columns:minmax(0,1fr); }

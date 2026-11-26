@@ -1,4 +1,5 @@
 import { type DrawingCategory } from '../assets/private-drawings';
+import {semanticWord} from './semantic-identity';
 import { ownerArtRecords, withArtTransaction, type DrawingMetadata } from './library';
 
 /** Owner-local identity joins exact stored revisions without assigning scene or game mechanics. */
@@ -41,7 +42,7 @@ export async function listCreativeAssets(owner: string): Promise<CreativeAssetRe
     return {
       owner, assetId: original.id, revisionId: row.id, sha256: row.sha256,
       name: row.name, assetName: original.name, category: row.category ?? 'other',
-      semanticName: original.semanticName, parentRevisionId: row.sourceId, archived: !!row.archived,
+      semanticName: semanticWord(original), parentRevisionId: row.sourceId, archived: !!row.archived,
       createdAt: row.createdAt,
     };
   });

@@ -81,6 +81,9 @@ export function privateArtId(reference:PrivateArtReference):string {
  * deliberately restricted to the bundled catalogue by its own entry point. */
 export function validateEditableProject(input: unknown,options:{allowPrivateArt?:boolean}={}): CreationProject {
   const project=validateCreationProject(input,{allowSavedMotion:options.allowPrivateArt});
+  if (options.allowPrivateArt === false && project.actors.some(actor => actor.creativeRole !== undefined)) {
+    throw Error('Choose actor roles in the local scene editor.');
+  }
   if (options.allowPrivateArt === false && sceneAssetIds(project).some(id => parsePrivateArtId(id))) {
     throw Error('Private artwork is not available in a generated scene.');
   }
