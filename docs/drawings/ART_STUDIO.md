@@ -1,5 +1,7 @@
 # Art Studio: draw it, develop it, reuse it
 
+The crayon editor uses the same stateless CSS-to-canvas coordinate helper as Learning Workspace PR #203. My Art applies its own stored stroke precision after coordinate mapping. The learning paper remains transient and owns its own tools and undo.
+
 ## Connected creative asset picker
 
 My Art accepts an optional **What is it?** description. A child can enter “rock” or an invented word, leave the field empty, and change it later. The shelf and picker search the description and artwork names. Updating the description from any picture updates the related pictures in one owner-scoped transaction. Pinned image bytes and movement versions retain their original hashes.
