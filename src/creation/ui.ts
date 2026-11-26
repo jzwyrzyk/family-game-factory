@@ -602,7 +602,9 @@ export function installCreationStudio(host: Host) {
     page.dataset.graphical=String(!fullTools&&withinGrade(profileGrade(FG.store.current()),1));
     $('creationSimpleMode').setAttribute('aria-pressed', String(!fullTools));
     $('creationFullMode').setAttribute('aria-pressed', String(fullTools));
-    $('creationStep').hidden = !fullTools && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const selectedArt = scene.actors.find(actor => actor.id === selectedActor)?.assetId;
+    const stepThroughArt = parsePrivateArtId(selectedArt) && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    $('creationStep').hidden = !fullTools && !stepThroughArt;
     $('creationActorSettings').hidden = !fullTools;
     $('creationVariables').hidden = !fullTools;
     $('creationSimpleEvents').hidden = fullTools;
