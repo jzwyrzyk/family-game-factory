@@ -54,6 +54,33 @@ test('all original Arcade leaf commands occur exactly once in their original req
   assert.throws(() => verifyCoverage(manifest, changed), /CI_NPM_TEST_COVERAGE_MISMATCH/);
 });
 
+function assertPreviousLeaves(oldManifest, oldPackage, currentManifest, currentPackage) {
+  for (const [group, previous] of Object.entries(oldManifest.legacyGroups)) {
+    const assigned = Object.values(currentManifest.shards).filter(shard => shard.group === group)
+      .flatMap(shard => expandCommands(shard.commands, currentPackage.scripts));
+    const actual = new Set(assigned.map(JSON.stringify));
+    for (const command of expandCommands(previous, oldPackage.scripts)) {
+      assert.ok(actual.has(JSON.stringify(command)), 'Previous regression removed from ' + group + ': ' + command.join(' '));
+    }
+  }
+}
+
+test('newly integrated regressions survive coordinated changes to both npm and the assignment', () => {
+  const previous = structuredClone(pkg);
+  previous.scripts['test:gem-factory'] += ' && node tests/added-after-freeze.cjs';
+  assert.throws(() => assertPreviousLeaves(manifest, previous, manifest, pkg), /Previous regression removed/);
+  assertPreviousLeaves(manifest, pkg, manifest, previous);
+});
+
+test('retain the independent PR base or previous protected-push inventory', () => {
+  if (!['pull_request', 'push'].includes(process.env.GITHUB_EVENT_NAME)) return;
+  const event = readJSON(process.env.GITHUB_EVENT_PATH);
+  const base = process.env.GITHUB_EVENT_NAME === 'pull_request' ? event.pull_request.base.sha : event.before;
+  assert.match(base, /^[a-f0-9]{40}$/);
+  const readBase = path => JSON.parse(execFileSync('git', ['show', base + ':' + path], {encoding: 'utf8'}));
+  assertPreviousLeaves(readBase('scripts/ci/suites.json'), readBase('package.json'), manifest, pkg);
+});
+
 test('argv parser rejects executable shell expansion; hooks and recursive scripts require review', () => {
   assert.deepEqual(parseCommand('python3 -p "test_*.py"'), ['python3', '-p', 'test_*.py']);
   for (const command of ['node x; true', 'node $(x)', 'node `x`', 'node x\ntrue', 'node "unclosed']) assert.throws(() => parseCommand(command));

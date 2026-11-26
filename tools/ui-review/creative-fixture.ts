@@ -1,3 +1,7 @@
+import {StudioNotebook} from '../../src/studio/notebook';
+import {selectedCreativeImage} from '../../src/assets/creative-library';
+import {emptyArtPlan, selectGameArt, type GameArtRole} from '../../src/game-art/bindings';
+declare const __JEMS_FLIGHT_FIXTURES__: Record<string,string>;
 import {saveDrawing, updateDrawing, type Drawing} from '../../src/assets/private-drawings';
 import {artChoice} from '../../src/creation/private-art';
 import {createArtAdventure} from '../../src/creation/art-game';
@@ -75,9 +79,32 @@ async function element(selector:string):Promise<HTMLElement>{
   }
   throw Error('The review could not open '+selector);
 }
+async function openNotebookGame(owner:string) {
+  const key='jems-review-notebook-flight:'+owner;
+  let id=localStorage.getItem(key);
+  if (!id) {
+    const plan=emptyArtPlan();
+    const roles:Record<string,GameArtRole[]>={rocket:['player'],rock:['collectible','obstacle'],dragon:['character'],world:['background']};
+    for(const [name,encoded] of Object.entries(__JEMS_FLIGHT_FIXTURES__)) {
+      const bytes=Uint8Array.from(atob(encoded),char=>char.charCodeAt(0));
+      const drawing=await saveDrawing(owner,'Flight sample '+name,new Blob([bytes],{type:'image/png'}));
+      const choice=await selectedCreativeImage(owner,drawing.id);
+      for(const role of roles[name])selectGameArt(plan,{
+        logicalId:choice.logicalId,originalSha256:choice.originalSha256,drawingId:drawing.id,sha256:choice.sha256,
+        role,name:drawing.name,...(role==='collectible'?{intent:'Give me one point'}:{}),
+      });
+    }
+    const book=new StudioNotebook(localStorage);
+    const session=book.create(owner,'new','Flight through the valley',null,{creationStandard:2});
+    book.update(session.id,owner,s=>{s.gameArt=plan;});
+    id=session.id;localStorage.setItem(key,id);
+  }
+  await (window as any).FG.studio.openGame(id);
+}
 export async function creativeDestination(action:string){
   const fg=(window as any).FG;
   const owner=fg.store.current().id;
+  if(action==='notebook-flight')return openNotebookGame(owner);
   if(action.startsWith('world-plate-')){
     await fg.creation.openMake();
     (await element('[data-world="world-'+action.slice(12)+'-v1"]')).click();return;

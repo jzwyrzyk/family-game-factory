@@ -10,8 +10,8 @@ permissions:
   contents: read
   deployments: read
 concurrency:
-  group: jems-preview-build-${{ github.event.pull_request.number || 'test' }}
-  cancel-in-progress: true
+  group: jems-preview-build-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   bundle:
     if: github.repository == 'jzwyrzyk/family-game-factory' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)

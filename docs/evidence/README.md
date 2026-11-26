@@ -6,6 +6,8 @@ The learner browser suite checks usable workspace dimensions, the viewport and c
 
 ## CI architecture and performance
 
+For the Phase 2 workflow inventory, current editing command, partition timings and baseline sampling, read [Development validation](DEVELOPMENT-VELOCITY.md). The dated observations below retain their original sources and scope.
+
 Draft #139 extends the merged #154 baseline of 96 leaves to 99. The browser-generated shard gains the long premium capture, existing star-map benchmark and three-game artwork benchmark. Browser now expands to 22 leaves, learning 12, creative 63 and notifications 2. The 13 shards, immutable build/receipt binding, keyless image gate and required contexts stay in effect. [Pilot evidence](../game-intelligence/premium-benchmark/ARTWORK-PILOT.md)
 
 **Current integration:** PR154 merged with explicit owner approval as `c73472554d56148541d5ed3fed2641b7c0f15ee0`; all14 PR workflows passed first attempt, full Arcade595seconds /52.02 runner-minutes. The merged and tested trees match. Its first full main [run45425253363](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45425253363) passed on attempt1 in467seconds /48.72 runner-minutes, all13 shards and full receipt production. This meets the7–10minute full target; runner consumption remains29.47% above the37.63minute original single-run baseline. PR157 now includes the prepared duplicate-contract, dependency-shadow, event-delivery and reporting-baseline follow-ups;118 CI and239 operations tests pass locally. Its privileged plan and protected-main equivalence activation still require explicit owner approval after hosted checks.

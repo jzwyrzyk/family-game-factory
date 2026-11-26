@@ -317,6 +317,11 @@
       "id": "world-builder",
       "label": "Build in the Enchanted Gem Forest",
       "action": "world-builder"
+    },
+    {
+      "id": "creative-notebook-flight",
+      "label": "Play the local notebook artwork sample",
+      "action": "creative:notebook-flight"
     }
   ],
   "journeys": [

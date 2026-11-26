@@ -9,7 +9,7 @@ import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 export const ALL_SHARDS = Object.freeze([
-  'browser-core', 'browser-generated', 'browser-storage', 'learning-math',
+  'browser-core', 'browser-generated', 'browser-quality', 'browser-storage', 'learning-math',
   'learning-language', 'notifications', 'studio-core', 'mining', 'factory',
   'physical', 'creation-art', 'pals-rewards', 'child-coach',
 ]);

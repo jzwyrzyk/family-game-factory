@@ -8,11 +8,9 @@ on:
       - 'src/pals/creation.ts'
       - '.github/workflows/creation-learner.yml'
       - 'package.json'
-  push:
-    branches: ['feature/coding-first-learner-overhaul-*']
 concurrency:
-  group: coding-learner-${{ github.head_ref || github.ref_name }}
-  cancel-in-progress: true
+  group: creation-learner-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 permissions:
   contents: read
 jobs:

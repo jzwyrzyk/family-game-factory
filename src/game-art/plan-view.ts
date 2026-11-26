@@ -1,3 +1,4 @@
+import {gameArtReview} from './review-mode';
 import {artBuildHold,roleLabels,roleQuestion,type GameArtPlan,type GameArtRole} from './bindings';
 export function renderArtPlan(box:HTMLElement,plan:GameArtPlan|undefined,actions:{
   remove(role:GameArtRole):void;sample(faster:boolean):void;play(id:string):void;
@@ -21,7 +22,7 @@ export function renderArtPlan(box:HTMLElement,plan:GameArtPlan|undefined,actions
     question.textContent=roleQuestion[plan.pins.at(-1)!.role];hold.textContent=artBuildHold;
     if(!plan.pins.at(-1)!.intent)box.append(question);box.append(hold);
   }
-  if(import.meta.env.MODE==='game-art-review'){
+  if(gameArtReview){
     if(plan.pins.length)box.append(button(plan.tests.length?'Try faster flight':'Try art in a sample game',()=>actions.sample(!!plan.tests.length)));
     for(const [i,test] of plan.tests.entries())box.append(button('Play art test '+(i+1)+(test.id===plan.kept?' · kept':''),()=>actions.play(test.id)));
   }

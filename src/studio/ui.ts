@@ -1,3 +1,4 @@
+import {gameArtReview} from '../game-art/review-mode';
 import {chooseGameArtwork} from './game-art-picker';
 import {loadDrawnCar} from '../drawing/rally';
 import {artChoice} from '../creation/private-art';
@@ -769,7 +770,7 @@ export async function installStudio(){
   const live=()=>authorized() && route==='studio' && activeId===s.id && owner()===s.owner && !FG.learning.active;
   const active=()=>{if(!live())return null;const plan=current().gameArt;return plan?{owner:s.owner,game:s.id,plan}:null;};
   const play=async(id:string)=>{
-   if(import.meta.env.MODE!=='game-art-review'||!live())return;
+   if(!gameArtReview||!live())return;
    const {playArtTest}=await import('../game-art/review');
    const view=epoch;
    await playArtTest({origin:location.origin,owner:s.owner,game:s.id,version:id},()=>epoch===view?active():null,async()=>{
@@ -781,7 +782,7 @@ export async function installStudio(){
   renderArtPlan(artPlanBox,s.gameArt,{
    remove:role=>act(async()=>{if(!live())return;await notebook.update(s.id,s.owner,x=>{if(live()&&x.gameArt)x.gameArt.pins=x.gameArt.pins.filter(p=>p.role!==role);});render();}),
    sample:faster=>act(async()=>{
-    if(import.meta.env.MODE!=='game-art-review'||!live())return;
+    if(!gameArtReview||!live())return;
     const {sampleProgram}=await import('../game-art/review');
     let id='';await notebook.update(s.id,s.owner,x=>{
      if(!live()||!x.gameArt?.pins.length)throw Error('Choose a picture first.');

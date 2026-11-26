@@ -1,3 +1,4 @@
+import {gameArtReview} from './review-mode';
 import {encodeReviewRaster} from '../../tools/creative-game-art/raster';
 import archive from './review-package';
 import {resolveArtTest,type ReviewScope} from './resolve';
@@ -18,7 +19,7 @@ const base64 = (bytes:ArrayBuffer) => {
 /** A fresh opaque frame per explicit launch. No frame precedes byte verification. */
 export async function playArtTest(scope:ReviewScope,
   active:()=>{owner:string;game:string;plan:GameArtPlan}|null,onKeep:()=>Promise<void>) {
-  if(import.meta.env.MODE!=='game-art-review')throw Error('This art test needs the offline review build.');
+  if(!gameArtReview)throw Error('This art test needs the offline review build.');
   const resolved=await resolveArtTest(scope,active);
   const program=archive.programs.find(p=>p.id===resolved.program);
   if(!program || await drawingHash(new TextEncoder().encode(program.html).buffer)!==program.id)

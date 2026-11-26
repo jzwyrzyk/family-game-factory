@@ -85,6 +85,9 @@
     "docs/development/COSTS.md",
     "docs/decisions/2026-11-23-dev-test-prod.md",
     "docs/ui-review/README.md",
+    "docs/history/2026-11-26/PRODUCT-DOCTRINE.md",
+    "docs/history/2026-11-26/ARCHITECTURE-CURRENT.md",
+    "docs/history/2026-11-26/DELIVERY-STATE.md",
     "docs/creative-universe/STANDARD.md",
     "docs/decisions/2026-11-26-connected-creative-universe.md",
     "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md",
@@ -133,6 +136,8 @@
     "infra/nonproduction/*.md",
     "docs/development/evidence/*.md",
     "docs/storage/*.md",
+    "docs/history/2026-11-26/*.md",
+    "docs/evidence/DEVELOPMENT-VELOCITY.md",
     "docs/creative-universe/*.md"
   ],
   "areas": [
@@ -156,10 +161,10 @@
         "docs/creative-universe/STANDARD.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:38:42.156Z",
-      "sourceDigest": "20628bd864adf37c9fb1864456641a85fe8bb5535ef697512832dcb387b81d3a",
+      "reviewedAt": "2026-11-26T06:31:04.274Z",
+      "sourceDigest": "e97598ae01a06db8bf3c488d938f304c1a9e43578f37f045ec01a2b4dd5dbb70",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed product guidance and linked Creation Studio and Drawing Studio behavior for exact reuse and editable crayon admission.",
+      "reviewReason": "Reviewed the Creative Universe compatibility and local playback specification.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -320,8 +325,8 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:19:58.717Z",
-      "sourceDigest": "f740f6d49d532881f707f2ecd8314f001a89ebb86178a3a67926ff86052a6ae5",
+      "reviewedAt": "2026-11-26T06:31:04.693Z",
+      "sourceDigest": "3ad2f81c04e8cb81fe57e568099baf10a628319806f34ccc613c97ac9b7e0eb3",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed whole-picture, arrow and articulated editing via the established child-facing surfaces.",
       "reviewHistory": [
@@ -754,8 +759,8 @@
         "tools/game-art-review/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:43:29.504Z",
-      "sourceDigest": "246b12cef423d02ddb0dd98dc8e1779b225db82a742b50cc1e089b193edbf54a",
+      "reviewedAt": "2026-11-26T06:31:05.691Z",
+      "sourceDigest": "bbc14bf55c40022eb6d37c0b3d2a278ca446f04f4837a91148eb92aafcc86424",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed linked domain documentation for this candidate and its tested private-art boundary.",
       "reviewHistory": [
@@ -900,7 +905,8 @@
         "docs/game-intelligence/premium-benchmark/*.md",
         "docs/development/*.md",
         "infra/nonproduction/*.md",
-        "docs/ui-review/*.md"
+        "docs/ui-review/*.md",
+        "docs/evidence/DEVELOPMENT-VELOCITY.md"
       ],
       "sources": [
         "tests/**",
@@ -912,8 +918,8 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:20:00.109Z",
-      "sourceDigest": "dac969387a8a799e89dbaf2fc363dff681401a33228380430e61a700ca741083",
+      "reviewedAt": "2026-11-26T06:31:06.292Z",
+      "sourceDigest": "c8514ccbc7eb85507b68be63425d08990cd895805275917bed1b3f4f4c291b70",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed integrated CI leaves and source assertions for original admissions, game binding, movement and recovery.",
       "reviewHistory": [
@@ -1135,7 +1141,8 @@
         "docs/development/*.md",
         "infra/nonproduction/*.md",
         "docs/evidence/README.md",
-        "docs/ui-review/*.md"
+        "docs/ui-review/*.md",
+        "docs/evidence/DEVELOPMENT-VELOCITY.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -1156,8 +1163,8 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T05:57:49.878Z",
-      "sourceDigest": "2ea2d6d731573de4a01fb115810f83d43468d0b2c266fa64b5517caee3bccd81",
+      "reviewedAt": "2026-11-26T06:31:06.770Z",
+      "sourceDigest": "420e437def3b6583c2605d39c108f3783596368260139aad6bd5ed9bd5ab9a2a",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed unchanged release pins and the disabled general hosted-art boundary.",
       "reviewHistory": [
@@ -1414,10 +1421,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:35:54.855Z",
-      "sourceDigest": "c19481ac6d7282173f01c20b7ef73cbe7ae5905d6a7a72c1807eb2b3a4f745d4",
+      "reviewedAt": "2026-11-26T06:31:07.253Z",
+      "sourceDigest": "6c31a785fce8007fe65ce358417ca2605cbc69ba30ee0b42f5544ba906516f9d",
       "reviewOutcome": "updated",
-      "reviewReason": "Routed the game-art module, its synthetic fixture tools and evidence to the existing documentation review owners.",
+      "reviewReason": "Reviewed linked domain documentation for this candidate and its tested private-art boundary.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1653,8 +1660,8 @@
         "tests/game-art/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "78a92c1fdd6aaf9c0ceeabdafac98c9630e86211a1471272477cc6cb48b1de41",
-      "reviewedAt": "2026-11-26T05:56:57.725Z",
+      "sourceDigest": "f0d5a35465b752e48be7a414b709e746a4a2f2fa612a95bb141d46c6bd3875dd",
+      "reviewedAt": "2026-11-26T06:31:07.826Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed supported editors, legacy data readers and exact PNG admission.",
       "reviewHistory": [
@@ -1698,8 +1705,8 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "093f37cf80e6440ca3d779cc7654691f29754ce950b3e116d1acc68616f26e52",
-      "reviewedAt": "2026-11-26T05:35:54.855Z",
+      "sourceDigest": "485e6897284d26de14d0b33d057cedd94300c0e8d7af400edbbf045920ced206",
+      "reviewedAt": "2026-11-26T06:31:08.262Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed linked domain documentation for this candidate and its tested private-art boundary.",
       "reviewHistory": [
@@ -1739,7 +1746,8 @@
       "sourceDigest": "55d3c6c4180bfcfd58811139b7676cf879b7316c0c4f0e212af69fa2146c88e9",
       "reviewedAt": "2026-11-26T04:58:58.090Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed immutable image and rig pins, legacy label readers, and cross-owner recovery rejection."
+      "reviewReason": "Reviewed immutable image and rig pins, legacy label readers, and cross-owner recovery rejection.",
+      "reviewHistory": []
     }
   ]
 }

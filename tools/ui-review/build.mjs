@@ -1,4 +1,5 @@
 import {build} from 'esbuild';
+import {reviewPackage} from '../game-art-review/package.cjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
@@ -6,7 +7,7 @@ const root=process.cwd(),out=path.resolve(process.env.UI_REVIEW_OUT||'dist-revie
 await fs.mkdir(out,{recursive:true});
 const drawingOnly=process.argv.includes('--drawing');
 const sha=process.env.UI_REVIEW_BASE_SHA||execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
-const sourcePaths=['src','public','index.html','tests/parent-dashboard-fixture.ts','tools/ui-review','tools/design-system'];
+const sourcePaths=['src','public','index.html','tests/parent-dashboard-fixture.ts','tools/ui-review','tools/design-system','tools/game-art-review','tools/creative-game-art','tests/game-art','server/sandbox'];
 execFileSync('git',['diff','--exit-code',sha,'--',...sourcePaths],{stdio:'pipe'});
 const untracked=execFileSync('git',['ls-files','--others','--exclude-standard','--',...sourcePaths],{encoding:'utf8'}).trim();
 if(untracked)throw Error('Review source contains untracked files: '+untracked);
@@ -28,7 +29,14 @@ const assets={};
 const exact=drawingOnly||process.env.UI_REVIEW_EXACT_ASSETS==='1';
 if(!exact)execFileSync('python3',['tools/ui-review/prepare-assets.py'],{stdio:'inherit'});
 for(const name of files){const ext=path.extname(name);if(!types[ext]||name==='factory-config.json')continue;assets[name.replaceAll('\\','/')]=[types[ext],(await fs.readFile(path.join(!exact&&name.startsWith('jems-pals/')&&name.endsWith('.webp')?'work/ui-review/assets':'public',name))).toString('base64')];}
-const options={bundle:true,write:false,format:'iife',target:'chrome110',minify:true,define:{'import.meta.env.BASE_URL':'"./"','import.meta.env.MODE':'"early-preview"','import.meta.env.DEV':'false','import.meta.env.PROD':'true'},plugins:[{name:'review-only',setup(b){
+const sampleNames=drawingOnly?[]:['rocket','rock','dragon','world'];
+const samplePictures=Object.fromEntries(await Promise.all(sampleNames.map(async name=>[name,(await fs.readFile('tests/game-art/'+name+'.png')).toString('base64')])));
+const options={bundle:true,write:false,format:'iife',target:'chrome110',minify:true,define:{__JEMS_FLIGHT_FIXTURES__:JSON.stringify(samplePictures),'import.meta.env.BASE_URL':'"./"','import.meta.env.MODE':'"early-preview"','import.meta.env.DEV':'false','import.meta.env.PROD':'true'},plugins:[{name:'review-only',setup(b){
+ if(!drawingOnly){
+   b.onResolve({filter:/review-mode$/},a=>path.resolve(a.resolveDir,a.path)===path.join(root,'src/game-art/review-mode')?{path:'mode',namespace:'sample-game'}:null);
+   b.onResolve({filter:/^\.\/review-package$/},a=>a.importer===path.join(root,'src/game-art/review.ts')?{path:'archive',namespace:'sample-game'}:null);
+   b.onLoad({filter:/.*/,namespace:'sample-game'},a=>({contents:a.path==='mode'?'export const gameArtReview=true;':'export default '+JSON.stringify(reviewPackage()),loader:'js'}));
+ }
  // A srcdoc frame has an opaque URL. Recovery still validates a single origin
  // and the full family scope. The private synthetic run owns its own databases.
  b.onLoad({filter:/src[\/]storage[\/](complete-backup|native-workspace)\.ts$/},async a=>({
