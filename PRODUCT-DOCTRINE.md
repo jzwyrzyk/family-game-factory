@@ -2,20 +2,7 @@
 
 Family beta participation belongs to an invited, authorized adult. Children use supervised local profiles. Each family controls its own work and allowance. Provider approval, verified guardian consent, adult development privileges and play-session acknowledgment are separate decisions. Public release requires a further owner decision.
 
-**Purpose:** canonical summary of existing product intent and principles. These are standards to build toward, not a claim that every capability is implemented or validated.
-**Source review:** original doctrine audit November 18, 2026 (America/New_York), application `493eb9ce2a98de5f3be8f6d17e63dfe2f6a7e3a7`; the owner's subsequent style-diverse quality direction is recorded in [ADR0006](docs/decisions/0006-style-diverse-playable-quality.md), November 19, 2026 (UTC).
-**Scoped addition:** November 18, 2026, 11:52 p.m. America/New_York (`2026-11-19T04:52Z`), [PR #57](https://github.com/jzwyrzyk/family-game-factory/pull/57), source `f650bdac730be9bb6655325b32052a9524880933`: the illustrated making journey described in section 7. Other principles retain their recorded review scope.
-**Integration review:** November 19, 2026: preserve the merged Creation Studio, style-diverse quality, learning/evidence and adult/guardian contracts on main `c4ce21be410e7fccb16922c4711f4c4172edbc7e` while adopting the owner-approved v1.2 visual library and PR57 making journey. [ADR0009](docs/decisions/0009-approved-brand-library-v1-2.md) records the accepted visual refinement; earning and authorization rules are unchanged.
-
-**Rewards extension:** November 19, 2026: the owner subsequently requested shared lifetime gem increments, milestones and a cohesive Rewards page while reserving companion artwork and the companion system for separate work. [ADR0010](docs/decisions/0010-lifetime-gems-and-shared-rewards.md) records this additive earning policy; the creator-rank criteria and learning assessment remain separate.
-
-**Companion extension:** November 19, 2026: the owner approved implementation of the separate companion framework, including funny encouragement and easy use in children's games. [ADR0012](docs/decisions/0012-pals-from-earned-activity.md) records the accepted engagement balance. Final character artwork remains a separate owner review.
-
-**Historical first Gem Pal art tranche:** November 20, 2026: PR85 preserved the selected S–X Base boards, Pleeko/Talli/Whorl Grown portraits and Brio's two approved neutral forms from PR74. The original roster's later approved package 2.9 now resolves its former form/expression gaps in the [artwork index](docs/pals/art/README.md). Brio's six expressions retain their separate **in-review** status. Artwork approval does not assign a creature identity to the provisional three-Pal collection or change growth policy.
-
-**Maintainer:** the author of a change that affects product behavior; the product owner resolves new product choices.
-
-Read [current architecture](ARCHITECTURE-CURRENT.md) for implementation boundaries and [delivery state](DELIVERY-STATE.md) for what is planned, merged, deployed, activated and verified. A past feature document's draft/release wording is not current operational evidence. The [decision index](docs/decisions/README.md) preserves the reasons behind these commitments.
+The product owner resolves changes to these principles. The [decision index](docs/decisions/README.md) records accepted decisions and the [detailed doctrine](docs/history/2026-11-26/PRODUCT-DOCTRINE.md) preserves their full scope and source.
 
 ## 1. The child owns the idea and the creative judgment
 
@@ -25,21 +12,13 @@ Support tuning, redesigning the interaction and rethinking the objective. An unu
 
 The [owner-approved coaching standard](docs/design-coach/GOLD_STANDARD.md) is the detailed behavioral contract. A software defect is the system's responsibility, not evidence of a child's poor thinking.
 
-The [guided-chat creation decision](docs/decisions/2026-11-20-guided-chat-creation.md), clarified by the owner on November 21, 2026, makes the default creation workspace a real conversation coach, one input and useful action buttons. The coach guides the child toward their own answers with relevant open questions, including the experience they want; it does not replace creative thinking with suggested-answer chips or a **Choose the rest** shortcut. A new game cannot be built until the child has supplied enough coherent detail to make a reasonable game. Readiness follows the meaning of that particular idea, not a fixed questionnaire or a count of completed fields. Put additional tools and details behind an optional disclosure. An explicit Build follows readiness, and internal build instructions and lifecycle output stay out of the child's conversation.
-
-Judge readiness for a faithful playable first version. The child's chosen challenge, stakes or free-play purpose can express the intended experience. New v2 creations also need a child-grounded visual direction and intended mood. One phrase can supply more than one dimension. Specific art treatments, numerical tuning and conventional scoring remain optional. Invite invention first. A child who chooses a jems example keeps both the choice and its helper provenance. Keep Build discoverable with a short reason when it is unavailable; an explicit **Check my idea** reassesses saved words without inventing another child statement or starting a game. A chat outage receives an honest reconnect action, not a scripted substitute for the conversation.
-
 ### One creation journey: games, scenes, and problem solving
 
 The owner's November 19, 2026 direction adds child-facing computational practice to the creation experience. A child's game characters and ideas can become editable stories, animations, and behavior rules. Free creation and **watch a scene, then rebuild it** practice share meaningful actions; practice should help children gain control of their own creations. Children can start with a game, a story, or a challenge without a compulsory ladder.
 
-The [first-creation journey](docs/child-journey/FIRST-CREATION.md), refined by the owner on November 20, begins with **Choose your character** and one **Let’s create** action. The two existing human makers, Spark and Nova, are equal cosmetic choices. The opening screen does not ask the child to jump into a ready-made game; existing play becomes useful during an acknowledged build. Returning creators and intentional direct entrances retain their existing routes. [The refinement decision](docs/decisions/2026-11-20-character-first-navigation.md) supersedes the former Explore-first invitation. Use brief contextual hints as the child imagines, waits, plays, tries a change, chooses a version and returns. Keep the child's ready result or unfinished intention easy to continue. The child can dismiss hints and show them again; those preferences are never achievements or learning evidence. A **Done for now** action must save through the existing guards and report a failed save honestly. The [decision record](docs/decisions/2026-11-19-first-creation-journey.md) preserves this approved scope.
-
 Use demonstrated behavior, predictions, experiments, and revisions as specific formative observations. Allow equivalent working programs. An AI-authored scene, copied solution, or hint-supported attempt must not be counted as independent mastery. Critical thinking and computational thinking are intended capabilities, with no global thinking score or validated growth claim implied by this first implementation. [ADR0007](docs/decisions/0007-creation-and-rebuild-practice.md) records the accepted development direction; the [Creation Studio contract](docs/creation-studio/README.md) distinguishes current source adapters from the broader continuous-project vision.
 
 ## 2. Deliver the actual playable experience
-
-Games opened through the child journey should occupy a consistent visible play area with an easy exit, readable controls and explicit fullscreen where supported. Accidental page scrolling must not lose the game. The trusted learning activity remains available inside the same view. [The profile, play and reading decision](docs/decisions/2026-11-21-profile-play-and-reading.md) records the owner's November 21 refinement.
 
 The requested player action must produce the intended visible consequence, and the essential payoff must happen. Collection without the requested growth, assembly without the launch, or a changed label without a changed mechanic does not fulfill an idea. Open-ended play can be complete without a manufactured win condition.
 
@@ -47,11 +26,7 @@ A ready experiment must combine correct function with deliberate presentation, r
 
 Hold pixel art, flat digital 2D, illustration, dimensional art and realistic treatment to equivalent standards of craft in their own styles. Preserve the child's chosen appearance and the identity of saved artwork through unrelated mechanic changes. Gem Factory can set a reference for finish without becoming every game's palette, theme or loop. A simple complete game can meet the standard; an open-ended toy does not need a forced win, and a beautiful static scene does not establish meaningful play.
 
-The owner's [November 22 Factory refinement](docs/decisions/2026-11-22-factory-play-clarity.md) applies this principle within the existing illustrated workshop: make pattern matching the clear focus, attach sorting controls to the machine, give a missed cut a gentle current-jem consequence, and advance pattern difficulty after two completed gifts while preserving the expressive polishing and wrapping stages.
-
 See the [Game Intelligence standard](docs/game-intelligence/README.md), [presentation and playable quality contract](docs/game-intelligence/PRESENTATION-QUALITY.md), [style-diversity decision](docs/decisions/0006-style-diverse-playable-quality.md) and [cross-vertical review](docs/game-intelligence/cross-vertical-standard.md). Automated checks and model opinions do not establish fun, engagement or educational benefit. Human calibration and observed play remain separate evidence.
-
-The owner's [November 22 Bubble Gum correction](docs/decisions/2026-11-22-bubble-gum-assembly.md) requires recognizable component objects, gum that visibly connects their actual joins, varied assembly and an extended payoff that keeps the invention on screen. Guided puzzles are allowed. The child can replay or revise before choosing the next build; decoration of a finished illustration does not meet this assembly intent. See [the builder contract](docs/bubble-gum-builders/README.md).
 
 ## 3. Choose the simplest method that preserves the intent
 
@@ -60,8 +35,6 @@ The premium builder plans the artwork and its playable roles together. Side, top
 Choose a game's form from its actions and consequences. Rendering (2D or true 3D), input, simulation, visual style and goal/free-play mode are independent decisions. A robot does not imply 3D; a launch animation does not imply physical simulation.
 
 Use actual physics when weight, contact, balance, momentum, suspension or another physical cause materially determines the requested experience, or when it is an explicit requirement. Preserve verified existing mechanics when editing a saved game. If an essential requirement exceeds the runtime's capabilities, explain the gap or resolve the choice; do not silently substitute an easier experience and claim completion. Reusable game families should support invention rather than confine every idea to the same game.
-
-See [the game-form decision](docs/decisions/0002-intent-faithful-game-forms.md). The current runtime capability is an architecture fact, not a permanent limit on the product's ambition.
 
 ### Original drawings belong to the child across creations
 
@@ -73,13 +46,7 @@ Keep the current playable game and earlier editions safe while a new experiment 
 
 While a build runs, the child can keep playing, make supported local edits and choose optional practice. A ready result must not seize focus, replace a newer decision or interrupt the learning host. Failure, cancellation, disconnection or a stale callback must not destroy the last working version. Report save failures honestly.
 
-The [November 22 continuation decision](docs/decisions/2026-11-22-unified-game-notifications.md) puts important results and unfinished work in one Home card and an owner-scoped Notifications page. Menu/card counts indicate unseen changes that need attention, not every poll or saved thought. Reading or dismissing an alert does not complete, cancel or delete its work. Keep results discoverable without automatic navigation or repeated banners.
-
-An explicit Build receives an immediate focused handoff: acknowledge submission truthfully, then offer **Play while I wait** and **Stay here** after a job is accepted. Dismissing that handoff does not cancel the job. Polling and background completion must not reopen it; the child explicitly opens a ready result. Keep the distinction between a submitted request, an acknowledged job and a saved playable result.
-
 A known failed build offers a working explicit retry, including after reopening its saved idea. An uncertain connection offers a status check when the job is known; neither uncertainty nor closing a dialog authorizes another paid build. Recover an already accepted retry before creating another one, and preserve the exact accepted request and owner.
-
-See [child continuity](docs/child-continuity/README.md) and [the ownership decision](docs/decisions/0001-child-led-creation.md). Supported local edits must change real mechanics; an unsupported novel request must identify the need for the builder.
 
 ## 5. Conversation, dictation and building have distinct actions
 
@@ -88,10 +55,6 @@ The coach helps understand intentions, examine friction and explore choices. The
 The approved voice interaction is **Speak → finish/transcribe → editable draft → explicit Send to jems → a normal text reply**. Build/Try a change is separate. Hear reply is optional and user initiated. Preserve the draft through cancellation, errors and navigation; late results must not appear in another player's project. Availability and fallback must be truthful.
 
 Read-aloud stays discoverable across child interactions, including saved replies, questions, revealed help and Creator. A speaker requests reading; a microphone requests dictation. The target voice is natural, caring and clearly spoken by a young adult female voice. Hosted narration has separate approval and spending boundaries; choosing a device voice cannot authorize it. [The reading contract](docs/speech/READ_ALOUD.md) records implementation and its device-listening limits.
-
-A healthy service check establishes availability. Only a successful validated conversation reply establishes that chat connected. Do not erase a failed conversation result with a healthy status response, or describe an incomplete technical response as a refusal of the child's idea.
-
-Continuous listening, automatic send, voice-triggered builds and automatic favorite selection are outside this decision. See [the voice decision](docs/decisions/0003-explicit-voice-and-build.md) and [detailed acceptance contract](docs/issue-28/PUSH_TO_TALK_MVP.md). The active pilot and provider permissions belong in delivery state, not in this durable product contract.
 
 ## 6. Learning belongs to the trusted host and needs honest evidence
 
@@ -102,8 +65,6 @@ Make the current profile's grade and learning difficulty explicit. An unconfigur
 Keep Math and Language Arts evidence distinct. Preserve independent responses, hints, corrections, read-aloud support, interrupted tasks and delayed retrieval as different observations. A grade is a content ceiling, not a diagnosis. A supported answer is not unaided recall; listening is not independent reading; creative writing is not a single right/wrong response.
 
 Computational thinking and active problem solving are intended opportunities, not automatically validated scores. Engineering tests, game performance, clicks and session length do not prove mastery, intelligence, emotions or learning gains. Product thresholds require calibration and appropriate real-use evidence before stronger claims. See [Math](docs/adaptive-math/README.md), [Language Arts](docs/adaptive-language/README.md) and [coaching evidence boundaries](docs/design-coach/GOLD_STANDARD.md).
-
-The owner's November 19, 2026 direction adds [formative problem-solving observations](docs/problem-solving/README.md) across the three existing mechanisms and game creation. Quiet source context and optional structured reasoning opportunities share provenance, not a combined ability score. Keep six dimensions distinct: define, compare, test, interpret, revise and transfer. A missing opportunity remains unknown; a failed initial prediction can be followed by useful revision; no recorded hint does not prove no outside help. Neutral access support and reasoning assistance have different effects on the construct being observed. Only known task rules may produce a structured result; arbitrary chat, game complexity and AI-authored work cannot earn competence credit. [ADR0011](docs/decisions/0011-formative-problem-solving-evidence.md) records the accepted design. Independent benchmark research remains separate from this formative layer, and early/recent records do not establish calibrated growth.
 
 ### Parent reporting follows the evidence
 
@@ -123,10 +84,6 @@ Tablet/touch use and desktop/keyboard/mouse use are first-class product targets.
 
 The brand is lowercase **jems**. Preserve the approved gem/wrench mark and wordmark; use the supplied assets and documented palette rather than inventing a replacement logo. The host's supporting characters, banners and rewards should form a coherent visual family. Child-created game worlds can have distinct styles; host brand consistency must not flatten their creative choices into one house look. Keep learning and grown-up surfaces calm and legible. Do not describe reconstructed assets as certified masters without the required visual review. See [brand standards](docs/brand/README.md) and [journey acceptance](docs/child-journey/acceptance.md).
 
-The approved [v1.2 library](docs/brand/LIBRARY_V1_2.md) carries that identity across the shell: the supplied ray-free SVGs, a separate five-pose Gem companion, preserved factory artwork, local Nunito/Inter fonts and consistent control states. Rank thumbnails use the chosen Spark/Nova character in the exact original outfit holding its level gem across Journey, cards and earned popups. Keep the soft original characters; retired metal medals and generated replacements do not return. Shared shell styling does not constrain the visual style of a child-created game.
-
-The shell keeps **My Games**, **Create** and a labelled **Menu** as its three ordinary primary actions. Secondary creative, progress, learning, help and grown-up destinations remain accessible in the menu; parent access is available even before character selection. Mobile navigation must leave game and editing controls usable.
-
 The making journey uses a bright white illustrated page, short labels, and two equally capable character choices that evolve across **Gem Maker → Gem Cutter → Gem Polisher → Gem Master**. Once chosen, only that player’s human maker appears in the host’s profile, banners, journey cards and earned celebrations. Before selection, use neutral gem imagery outside the explicit two-character chooser. Changing the character must update those surfaces without resetting work, changing earned ranks or replaying rewards. Gem Pals, the separate Gem brand helper and children’s own game artwork retain their identities. The choices are cosmetic; do not label or store gender. Show the earned level separately from previews of future artwork. Popups celebrate a durably saved making transition without blocking play, taking focus, or replaying on reload/profile changes.
 
 Making progress comes from saved child-authored design evidence, real experiments, the child's linked reflection, and explicit Keep of that same experiment. It is separate from learning assessment, game scores and provider activity. The initial Gem Master rule is three distinct polished projects, an implementation threshold rather than a calibrated measure of ability. Retained work remains the authority for maker rank: archives preserve evidence, while erasing required evidence removes its dependent credit. See the [detailed evidence contract](docs/brand/GEM_PROGRESS.md) and [making-journey decision](docs/decisions/0008-cosmetic-making-journey.md).
@@ -140,9 +97,6 @@ The shared [Rewards experience](docs/rewards/README.md) adds nonspendable lifeti
 Use clear goals, anticipation, expressive personalities and creative utility to encourage return visits. Avoid paid luck, subscription pressure, disappearing companions, care chores, lost-progress threats and guilt about taking breaks. A funny line should respond to something the child did, stay brief, and never ridicule a mistake or claim the Pal needs the child emotionally. Parent controls can hide appearances and encouragement without reducing earned growth.
 
 Pals remain separate from the Gem brand helper and the Spark/Nova maker choices. A Pal can delegate to an existing host hint, retaining recorded assistance; it cannot grade answers, award currency, bypass a checkpoint or become an unbounded AI relationship. Editable Pal starter programs retain their starter attribution and do not prove independent coding ability. Use approved character artwork in the actual selection, collection, earned forms and new scenes. Original gem-token scene references remain readable for existing creations.
-
-
-**Approved core emotion artwork and application previews (November 20, 2026):** The owner approved all 184 core images for 23 original individual Gem Pal profiles: 46 Base/Grown neutral masters and 138 form-specific expressions. The [expression runtime decision](docs/decisions/2026-11-20-pal-expression-runtime.md) implements exact versioned artwork previews, same-character/same-form neutral fallback and a finite Wink Base motion pilot. Preview selections have no collection, growth, scene-save, learning or reward authority; the subsequent approved-collection integration retains saved Glim/Kip/Riff IDs as compatibility aliases for Luma/Nook/Wink without changing their receipt histories. Brio remains an independent profile with two approved neutrals and six expressions in review. Source, merge and production acceptance remain separately recorded in delivery state.
 
 ### Gem Pal character design
 
@@ -160,7 +114,6 @@ For the accepted temporary development scope, the adult profile lives on the exi
 
 The owner should develop Jems as a product without administering its infrastructure. Follow [DEV → TEST → PROD](docs/development/DEV-TEST-PROD.md): independent private PR previews, one permanent integrated TEST website, and exact tested-release approval before the existing controlled production promotion. Ordinary merges do not imply production deployment. Keep synthetic and real-provider evidence, automated results, owner visual judgment, observed play and learning effectiveness distinct.
 
-Routine operations must be automated through GitHub and scoped cloud identities without Cloud Shell. DEV and TEST may not use production family data, model credentials or deployment authority. Preserve saved user work and compatible recovery. [The accepted method](docs/decisions/2026-11-23-dev-test-prod.md) supersedes older standalone environment proposals; delivery evidence determines which parts are actually available.
 ## Changing this doctrine
 
 Update the affected principle and its linked detailed contract in the same PR as a material behavior change. Record a consequential choice and its source in [a decision record](docs/decisions/README.md). Distinguish an owner decision, a research hypothesis and an implementation observation. Automated maintenance may flag conflicts and stale evidence; it must not silently rewrite product intent or turn a proposal into an accepted decision.
@@ -168,5 +121,3 @@ Update the affected principle and its linked detailed contract in the same PR as
 ## Pre-K through Grade 4
 
 Parents explicitly select Pre-K, Kindergarten or Grades 1–4. Pre-K and Kindergarten use illustrated, audio-led play and local visual coding. Creating an AI game requires a grown-up handoff and separately authorized family processing. The child's selected grade sets a learning ceiling across subjects and Stretch. Reading access, game difficulty, adult access and provider permissions each retain their own controls.
-
-Secondary collection and progress pages use the left-aligned Choose your Pal header pattern. Preserve the route announcement and visible keyboard cues on actions. Keep contextual shortcuts within the shared My Journey destination. [Child interface standards](docs/brand/CHILD_INTERFACE.md#secondary-page-headers-and-focus)

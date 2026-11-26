@@ -57,6 +57,12 @@ npm run docs:check -- --base BASE_SHA --head HEAD_SHA
 
 An **updated** review for an impacted area must have an applicable document change in the PR. An **unchanged** review must have a concrete explanation. Neither a general checkbox nor a single global "docs not needed" label replaces the area review. A source path without an assigned area must be routed explicitly. The registry declares the link-check scope; legacy evidence archives are not advertised as exhaustively checked.
 
+## Starting a session and adding a regression
+
+Read the current sections of the three root references, inspect related open PRs and diff the last verified source against current main. Use the dated [delivery](../history/2026-11-26/DELIVERY-STATE.md), [architecture](../history/2026-11-26/ARCHITECTURE-CURRENT.md) and [doctrine](../history/2026-11-26/PRODUCT-DOCTRINE.md) records for historical questions. Keep new dated receipts in the relevant evidence record and link them from current state. Maintain old heading routes when archiving.
+
+Add a regression to its applicable npm test chain and shard. Run `npm run test:ci`. The independent frozen argv inventory in `scripts/ci/retained-coverage.json` protects the historical groups against coordinated deletion. Additions are discovered from npm and verified against the assigned commands. Hosted CI also reads the independently committed PR base or preceding main commit so regressions added after the freeze remain protected on later changes. Review command identities, fixture prerequisites and cross-group duplication. Local editing checks never issue hosted receipts.
+
 ## 3. Automatic repository checks
 
 CI policy and test assignment are maintained with application contracts. Changes to the test manifest, classifier, aggregate checks or evidence verifier require validation and delivery reviews. New suites must have an explicit shard assignment; the coverage check rejects missing, duplicated and unassigned commands. Compare elapsed time, cumulative runner minutes, queue time and first-attempt outcomes before claiming a speed improvement. Preserve failure receipts and distinguish fixture regression from visual, device, provider and owner acceptance. See the [CI evidence guide](../evidence/README.md#ci-architecture-and-performance).

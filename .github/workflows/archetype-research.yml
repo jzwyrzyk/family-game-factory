@@ -14,6 +14,9 @@ on:
       - 'tests/archetypes.test.ts'
       - 'tests/archetype-diversity.test.ts'
       - 'docs/archetypes/**'
+concurrency:
+  group: archetype-research-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   catalog-and-reuse:
     runs-on: ubuntu-latest

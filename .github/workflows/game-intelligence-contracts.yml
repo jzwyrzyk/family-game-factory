@@ -34,7 +34,6 @@ on:
   push:
     branches:
       - main
-      - 'research/game-intelligence-*'
     paths:
       - '.github/workflows/game-intelligence-contracts.yml'
       - 'server/quality/**'
@@ -62,8 +61,8 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: jems-intelligence-contracts-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
-  cancel-in-progress: true
+  group: game-intelligence-contracts-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   contract:
     runs-on: ubuntu-24.04
