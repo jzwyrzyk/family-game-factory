@@ -1,5 +1,12 @@
 # Jems current architecture
 
+## Connected creative library candidate
+
+My Art, the trusted scene editor and compatible local games use one owner-scoped picture and movement catalogue. An adventure stores a pin and its own actor role, scenery placement or vehicle binding. The same art can appear in several projects without additional original images. Kept sketch PNGs embed bounded editable strokes and verify them against their raster before reopening. Replacing a scene actor preserves its programs. Keeping a different car in Rally creates a new revision through the existing compound writer. New-game and improvement entrances retain the source notebook when a child starts a separate local picture hunt. Generated executable delivery remains independently restricted. The [shared interfaces and compatibility matrix](docs/creative-universe/STANDARD.md#destination-compatibility) specify the actual destinations.
+
+Retained classic scenes render through their existing paths. New world references and contextual roles extend the scene validator. The current reader handles old records with missing optional fields. A release or rollback that opens newly authored work needs a reader that understands the new scene fields and embedded references. Preserve complete recovery and verify the rollback reader with candidate data before any cutover.
+
+
 The local [drawn path editor](docs/creation-studio/DRAWN_PATHS.md) records movement as named groups of bounded relative moves on private-art actors. Scene revisions own timing and positions. A cross-scene copy reads the active owner’s explicitly kept revision and writes new block IDs into the destination scene.
 
 

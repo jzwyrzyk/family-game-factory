@@ -1,5 +1,7 @@
 # Storage reliability and continuity — PR166
 
+Creative Studio scenes can pin the same private drawing in an actor, background or placed object. Complete recovery checks each selected owner, original and digest. Portable scene export includes only referenced revisions, their original ancestry and selected rig dependencies. [Creative recovery evidence](../creative-universe/EVIDENCE.md)
+
 **Current-main completion continuation, November 25:** the application now combines protected main `0f459f5` with the preserved storage and family-beta/audit source. The [combined acceptance register](../family-beta/COMPLETION.md) records current requirements and dispositions; the [nine-stage runbook](../family-beta/ACTIVATION.md#nine-stage-activation-plan) is the consolidated future cloud plan. The dated PR166 measurements and implementation record below remain historical evidence for their original tree. Final-source implementation/evidence must not be inferred from those old results.
 
 ## Current integrated implementation

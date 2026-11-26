@@ -66,6 +66,11 @@ test('legacy token scenes keep their exact historical assets through edit, Keep,
   }
 });
 
+/** Isolate portrait failures from backdrop loads in the legacy-scene fixtures. */
+function portraitStageScene(...args:Parameters<typeof createPalPlayground>) {
+  const scene = createPalPlayground(...args); delete scene.world; return scene;
+}
+
 test('approved scene artwork stays identifiable during loading, retries after reopening and keeps its aspect ratio', t => {
   const originals = new Map(['Image', 'document'].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
   t.after(() => {
@@ -90,7 +95,7 @@ test('approved scene artwork stays identifiable during loading, retries after re
   } as Record<string, unknown>, { get: (target, key) => target[key as string] ?? (() => {}), set: (target, key, value) => { target[key as string] = value; return true; } });
   const canvas = { width: 800, height: 450, getContext: () => context } as unknown as HTMLCanvasElement;
   const stage = new CreationStage(canvas, undefined, message => errors.push(message));
-  const scene = createPalPlayground('navi', 'mature'), snapshot = new SceneEngine(scene).snapshot();
+  const scene = portraitStageScene('navi', 'mature'), snapshot = new SceneEngine(scene).snapshot();
   stage.render(scene, snapshot);
   assert.equal(images.length, 1);
   assert.equal(images[0].src, new URL(palArtworkPath('navi', 'mature'), 'https://example.test/jems/').href);
@@ -169,7 +174,7 @@ test('scene Pal composites prepare once per active asset and stale loads cannot 
     drawImage: (image: unknown) => draws.push(image),
   } as Record<string, unknown>, { get: (target, key) => target[key as string] ?? (() => {}), set: (target, key, value) => { target[key as string] = value; return true; } });
   const canvas = { width: 800, height: 450, getContext: () => context } as unknown as HTMLCanvasElement;
-  const stage = new CreationStage(canvas), scene = createPalPlayground('kip'), snapshot = new SceneEngine(scene).snapshot();
+  const stage = new CreationStage(canvas), scene = portraitStageScene('kip'), snapshot = new SceneEngine(scene).snapshot();
   stage.render(scene, snapshot); images[0].ready();
   const prepared = draws.at(-1);
   assert.notEqual(prepared, images[0], 'The scene uses the transient alpha composite.');
@@ -316,27 +321,27 @@ test('playback preparation shares rendered loads and waits for hidden actors and
   scene.actors[1].visible = false;
   scene.actors.push({ ...scene.actors[0], id: 'same-picture-again' });
   stage.render(scene, new SceneEngine(scene).snapshot());
-  assert.equal(images.length, 1, 'Repeated visible actors share their exact source load.');
+  assert.equal(images.length, 2, 'The backdrop and repeated visible actor each load once.');
   let ready = false;
   const preparing = stage.prepare(scene).then(() => { ready = true; });
   const alsoPreparing = stage.prepare(scene);
-  assert.equal(images.length, 2, 'A hidden actor is prepared before a later Show block needs it.');
+  assert.equal(images.length, 3, 'A hidden actor is prepared before a later Show block needs it.');
   for (const image of images) image.load();
   await Promise.resolve();
   assert.equal(ready, false, 'A load event alone does not make playback ready.');
   images[0].finishDecode();
   await Promise.resolve(); await Promise.resolve();
   assert.equal(ready, false, 'All exact assets must finish decoding.');
-  images[1].finishDecode();
+  images[1].finishDecode(); images[2].finishDecode();
   await Promise.all([preparing, alsoPreparing]);
   assert.equal(ready, true);
   assert.ok(draws.includes(images[0]));
   await stage.prepare(scene);
-  assert.equal(images.length, 2, 'Repeated Play or export reuses the prepared images.');
+  assert.equal(images.length, 3, 'Repeated Play or export reuses the prepared images.');
 });
 
 test('playback preparation rejects an obsolete scene both before and after image readiness', async t => {
-  const { stage, images } = stageImageFixture(t), scene = createPalPlayground('navi');
+  const { stage, images } = stageImageFixture(t), scene = portraitStageScene('navi');
   await assert.rejects(stage.prepare(scene, () => false), /scene or player changed/);
   assert.equal(images.length, 0, 'An already obsolete scene cannot start new artwork requests.');
   let current = true;
@@ -347,7 +352,7 @@ test('playback preparation rejects an obsolete scene both before and after image
 });
 
 test('clearing the stage cancels pending preparation and retires late load and decode callbacks', async t => {
-  const { stage, images, draws, errors } = stageImageFixture(t), scene = createPalPlayground('navi');
+  const { stage, images, draws, errors } = stageImageFixture(t), scene = portraitStageScene('navi');
   const snapshot = new SceneEngine(scene).snapshot();
   stage.render(scene, snapshot);
   const rejected = assert.rejects(stage.prepare(scene), /scene or player changed/);
@@ -369,7 +374,7 @@ test('clearing the stage cancels pending preparation and retires late load and d
 
 test('unresponsive scene art times out once, identifies its Pal and can retry after reopening', async t => {
   t.mock.timers.enable({ apis: ['setTimeout'] });
-  const { stage, images, errors } = stageImageFixture(t), scene = createPalPlayground('navi');
+  const { stage, images, errors } = stageImageFixture(t), scene = portraitStageScene('navi');
   stage.render(scene, new SceneEngine(scene).snapshot());
   const rejected = assert.rejects(stage.prepare(scene), /Navi's picture could not load in time/);
   t.mock.timers.tick(CREATION_ART_LOAD_TIMEOUT_MS - 1);
@@ -389,7 +394,7 @@ test('unresponsive scene art times out once, identifies its Pal and can retry af
 });
 
 test('an invalid decoded bitmap fails playback instead of starting an empty export', async t => {
-  const { stage, images } = stageImageFixture(t), scene = createPalPlayground('kip');
+  const { stage, images } = stageImageFixture(t), scene = portraitStageScene('kip');
   const rejected = assert.rejects(stage.prepare(scene), /Nook's picture could not load/);
   images[0].load(); images[0].failDecode();
   await rejected;

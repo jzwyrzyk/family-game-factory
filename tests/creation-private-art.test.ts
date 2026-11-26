@@ -90,3 +90,39 @@ test('private art does not grant profile access, challenge credit, or an interpr
   const invalid=sceneWith();(invalid.actors[0] as any).url='https://example.invalid/private.png';
   assert.throws(()=>store.create('player1',invalid),/Unknown field/);
 });
+
+import {creativeAssetChoices} from '../src/drawing/creative-assets';
+import {type DrawingMetadata} from '../src/drawing/library';
+
+test('picker derives a stable owner-scoped identity from immutable, hash-checked ancestors',async()=>{
+  const picture:DrawingMetadata={id:'rock',owner:'owner',name:'My rock',semantic:'moon rock',mime:'image/png',sha256:'a'.repeat(64),
+    createdAt:'2026-11-01T01:00:00Z',originalBytes:6,category:'prop',archived:true};
+  const crop:DrawingMetadata={...picture,id:'crop',sourceId:picture.id,sourceSha256:picture.sha256,sha256:'b'.repeat(64),
+    createdAt:'2026-11-02T01:00:00Z',archived:false};
+  const other:DrawingMetadata={...picture,owner:'sibling',id:'sibling-picture',archived:false};
+  const choices=await creativeAssetChoices('owner',[other,picture,crop],[]);
+  assert.equal(choices.length,1);
+  assert.equal(choices[0].creativeId,picture.id);
+  assert.equal(choices[0].revisionNumber,2);
+  assert.equal(choices[0].assetId,privateArtId({id:crop.id,sha256:crop.sha256,kind:'image'}));
+  assert.equal(choices[0].semantic,'moon rock');
+  await assert.rejects(creativeAssetChoices('owner',[{...crop,sourceId:other.id},other],[]),/original/);
+  await assert.rejects(creativeAssetChoices('owner',[{...crop,sourceSha256:'c'.repeat(64)},picture],[]),/original/);
+  await assert.rejects(creativeAssetChoices('owner',[{...crop,sourceId:crop.id,sourceSha256:crop.sha256}],[]),/original/);
+});
+
+test('private draft role aliases preserve context without assigning mechanics',()=>{
+  for(const [alias,role] of [['character','character'],['scenery','environment'],['decoration','decoration'],['obstacle','obstacle'],['collectible','collectible']]){
+    const raw=createStarterProject('blank');
+    const actor = raw.actors[0] as typeof raw.actors[number] & {creativeRole:string};
+    actor.creativeRole=alias;
+    const migrated=validateEditableProject(raw);
+    assert.equal(migrated.actors[0].role,role);
+    assert.equal('creativeRole' in migrated.actors[0],false);
+    assert.equal('role' in actor,false);
+    assert.deepEqual(migrated.programs,raw.programs);
+    assert.throws(()=>validateGeneratedCreationManifest(raw),/Unknown field/);
+    assert.deepEqual(validateEditableProject({...raw,actors:[{...actor,role}]}).actors,migrated.actors);
+    assert.throws(()=>validateEditableProject({...raw,actors:[{...actor,role:'player'}]}),/conflicting roles/);
+  }
+});

@@ -1,3 +1,4 @@
+import {parsePrivateArtId, sceneAssetIds} from '../creation/model';
 import {indexedStoragePreview} from './native-workspace';
 import {mapTransferredAdultBackup,transferredAdultMappings,remoteRecoveryReferences,requestAdultRecovery,type AdultRecoveryMapping} from './adult-transfer-recovery';
 import {REWARDS_DB_NAME} from '../rewards/store';
@@ -32,10 +33,31 @@ export function completeSources(snapshot:CompleteBackup){
 }
 export async function checkCompleteArtwork(snapshot:CompleteBackup):Promise<void>{
  const owners=snapshot.progress.profiles?.map((p:any)=>p.id);if(!Array.isArray(owners)||!owners.length||new Set(owners).size!==owners.length||snapshot.art.length!==owners.length||new Set(snapshot.art.map(x=>x.owner)).size!==owners.length||snapshot.art.some(x=>!owners.includes(x.owner)))throw Error('This backup is missing a player’s original artwork.');
- for(const entry of snapshot.art){await validateArtBundle(entry.bundle);if(entry.activeRigId!==undefined&&entry.activeRigId!==null&&!entry.bundle.rigs.some(r=>r.id===entry.activeRigId))throw Error('The selected movement version is missing.');}
+ // The art database has separate global key spaces for images and rigs. Catch
+ // ownership collisions during review, before handing out a complete recovery point.
+ const pictureIds = new Set<string>(), rigIds = new Set<string>();
+ for (const entry of snapshot.art) {
+   await validateArtBundle(entry.bundle);
+   for (const [records, ids] of [[entry.bundle.drawings, pictureIds], [entry.bundle.rigs, rigIds]] as const) {
+     for (const {id} of records) {
+       if (ids.has(id)) throw Error('An artwork version in this backup belongs to more than one player.');
+       ids.add(id);
+     }
+   }
+   if (entry.activeRigId != null && !entry.bundle.rigs.some(rig => rig.id === entry.activeRigId)) throw Error('The selected movement version is missing.');
+ }
  const find=(owner:string)=>snapshot.art.find(x=>x.owner===owner)?.bundle,sources=completeSources(snapshot);
  for(const {owner,workspace}of sources.native)for(const revision of workspace.revisions){if(revision.drawingRigId&&!find(owner)?.rigs.some(r=>r.id===revision.drawingRigId))throw Error('A saved game is missing its original movement artwork. Restore that art before making a complete recovery point.');}
- for(const {owner,workspace}of sources.creations)for(const revision of [...workspace.revisions,...workspace.drafts])for(const actor of revision.scene.actors){const ref=/^art:(image|rig):([A-Za-z0-9_-]{1,100}):([a-f0-9]{64})$/.exec(actor.assetId);if(!ref)continue;const bundle=find(owner);if(ref[1]==='image'){if(!bundle?.drawings.some(x=>x.id===ref[2]&&x.sha256===ref[3]))throw Error('A coding scene is missing its original picture.');}else{const rig=bundle?.rigs.find(x=>x.id===ref[2]);if(!rig||await assemblyHash(rig.assembly)!==ref[3])throw Error('A coding scene is missing its exact movement version.');}}
+ for(const {owner,workspace}of sources.creations)for(const revision of [...workspace.revisions,...workspace.drafts])for(const assetId of sceneAssetIds(revision.scene)){
+   const ref=parsePrivateArtId(assetId);if(!ref)continue;
+   const bundle=find(owner);
+   if(ref.kind==='image'){
+     if(!bundle?.drawings.some(x=>x.id===ref.id&&x.sha256===ref.sha256))throw Error('A coding scene is missing its original picture.');
+   }else{
+     const rig=bundle?.rigs.find(x=>x.id===ref.id);
+     if(!rig||await assemblyHash(rig.assembly)!==ref.sha256)throw Error('A coding scene is missing its exact movement version.');
+   }
+ }
 }
 function checkPreparedDomains(snapshot:CompleteBackup){
  if(!snapshot.preparedDomains){if(JSON.stringify(mergeCreationRecovery(snapshot.progress.factoryCreation,snapshot.creations??[]))!==JSON.stringify(snapshot.progress.factoryCreation)||JSON.stringify(mergeNativeRecovery(snapshot.progress.factoryWorkspace,snapshot.native??[]))!==JSON.stringify(snapshot.progress.factoryWorkspace)||JSON.stringify(mergeNotebookRecovery(snapshot.progress.factoryStudio,snapshot.notebooks??[]))!==JSON.stringify(snapshot.progress.factoryStudio))throw Error('Prepared records do not match the complete recovery snapshot.');return;}

@@ -1,5 +1,10 @@
 # jems delivery state
 
+## Connected library integration candidate, November 26
+
+The integrated source combines the original/2D decision (#196, #197 and #198), editable drawing (#199), illustrated-world catalogue (#200), reusable movement (#201), scoped offline generated-slot qualification (#202) and reviewed-original admission (#204). The local studio and picker share verified image and movement pins across actors, worlds and game roles. #192–195 and #203 concern independent learning authoring and temporary input. The running household release has its own pre-candidate deployment receipt below. Draft review, hosted DEV, TEST, production rollout and external family activation are separate stages. The [standard and destination matrix](docs/creative-universe/STANDARD.md) and [offline review](docs/ui-review/README.md#connected-creative-universe) describe scope and synthetic evaluation.
+
+
 ## November 26, 2026 — connected creative universe development
 
 The standard and exact-byte reviewed-family PNG admission are source candidates based on protected main `bc602f1ede502f398308ad56f973c4bf7997ff08`. GitHub recorded a successful household production deployment for that base at 01:37 UTC on November 26. This baseline receipt precedes the creative work. No candidate deployment or external family activation has been observed. The open learning stack #192–195 is a parallel integration. Its scratchpad and supported interaction contracts remain separate from permanent artwork. [Creative standard](docs/creative-universe/STANDARD.md) · [Baseline deployment](https://api.github.com/repos/jzwyrzyk/family-game-factory/deployments/8074075203/statuses)

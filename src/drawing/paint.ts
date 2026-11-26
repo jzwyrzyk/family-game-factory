@@ -1,4 +1,5 @@
 import {saveDrawing,type Drawing} from '../assets/private-drawings';
+import {pointerPoint} from './pointer-input';
 import {iconMarkup} from '../brand/icons';
 import {assertRewardSourceWritable,rewardSourceWritable} from '../rewards/write-guard';
 import {crayons as colors, paperWidth, paperHeight, maxStrokes, maxStrokePoints, renderStrokes, includeCrayonSource, verifiedCrayonSource, snapCoordinate, type Stroke} from './crayon-source';
@@ -44,9 +45,8 @@ export async function drawOnTablet(owner:string,onSaved:(drawing:Drawing)=>Promi
   for(const control of dialog.querySelectorAll<HTMLInputElement|HTMLButtonElement>('[data-colors] button,input,[data-eraser]'))control.disabled=saving||committed;
  };
  const point=(e:PointerEvent)=>{
-  const r=canvas.getBoundingClientRect();
-  return {x:snapCoordinate(clamp((e.clientX-r.left)*cw/Math.max(1,r.width),0,cw)),
-    y:snapCoordinate(clamp((e.clientY-r.top)*ch/Math.max(1,r.height),0,ch))};
+  const {x,y}=pointerPoint(canvas,e,'position');
+  return {x:snapCoordinate(x),y:snapCoordinate(y)};
  };
  canvas.addEventListener('pointerdown',e=>{
   if(!canEdit()||e.button>0||active)return;keyboardCursor=false;
