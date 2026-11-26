@@ -897,10 +897,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:18:07.185Z",
-      "sourceDigest": "abed4476c977351fd56c219cfb2fbbb3e34a7377728616ad0468980b56d25769",
+      "reviewedAt": "2026-11-26T23:28:56.850Z",
+      "sourceDigest": "33455ca47335184e0ff58ece067c45bad1c22027f6dcbd72dd29677e82e213e3",
       "reviewOutcome": "updated",
-      "reviewReason": "The release guide describes rejection of drift in the conflict-resolution PR and both separate source-bound sets of hosted CI evidence; the existing default-main Arcade commands stay intact.",
+      "reviewReason": "Added negative tests for public owner lists, uninstalled public config, and changed installed code beneath a pinned resolution.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T23:17:37.771Z",
-      "sourceDigest": "07fd14c20648643e6841555e6fa5d5fc56dba3de5a0567f2b71a1428b01a0091",
+      "reviewedAt": "2026-11-26T23:28:42.821Z",
+      "sourceDigest": "1d51ff4a9d82d487d32fe7af3aea036338454621984b2d0a47aa4cf946bf5ddf",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented protected adoption of the exact consolidated CI policy, independently authenticated merge and source receipts, and the restricted resolution for the held DEV review.",
+      "reviewReason": "Reconciled the activation order with distinct site identities and protected membership binding before fresh source and merge evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -2,7 +2,8 @@
 
 Receipt contents are data. No candidate code, imports, shell or artifact payload
 executes here. A prospective merge can validate a PR-head preview only when the
-current GitHub merge commit has the exact head tree. Otherwise rebase and rerun.
+current GitHub merge commit has the exact head tree, or an installed protected
+policy proves the merge and exact head independently.
 The disconnected site bundle retains its separate derivation and smoke gates.
 """
 import base64
@@ -272,6 +273,37 @@ def registry_policy(document):
     return document
 
 
+def verify_resolution_tree(api, profile, old, trusted_tree, source_tree, resolved):
+    for key in set(old) | set(trusted_tree) | set(source_tree) | set(resolved):
+        before, installed, application, actual = [t.get(key) for t in (old, trusted_tree, source_tree, resolved)]
+        if all(row is None or row[1] == 'tree' for row in (before, installed, application, actual)):
+            continue
+        if application == before or application == installed:
+            require(actual == installed, 'CI_RESOLUTION_TREE_MISMATCH')
+        elif installed == before:
+            require(actual == application, 'CI_RESOLUTION_TREE_MISMATCH')
+        elif key == 'docs/context/registry.json':
+            require(registry_policy(policy_json(api, resolved, key)[0])
+                    == registry_policy(policy_json(api, source_tree, key)[0]), 'CI_RESOLUTION_REGISTRY_CHANGED')
+        elif key == 'ops/environments.json':
+            # Only an already-installed, privately bound operational config can
+            # replace the held disabled template. The trusted deployer repeats
+            # this validation and verifies the protected secret before use.
+            import cloud
+            require(actual == installed and actual is not None, 'CI_RESOLUTION_CONFIG_CHANGED')
+            public_config, _ = policy_json(api, trusted_tree, key)
+            require(public_config.get('enabled') is True and public_config.get('ownerIapMembers') == []
+                    and isinstance(public_config.get('ownerIapBindingSha256'), str)
+                    and re.fullmatch(r'[a-f0-9]{64}', public_config['ownerIapBindingSha256']),
+                    'CI_RESOLUTION_PRIVATE_BINDING_REQUIRED')
+            cloud.validate_config(public_config, public_record=True)
+        else:
+            selected = profile['resolvedBlobs'].get(key, {})
+            require(installed is not None and installed[:2] == ('100644', 'blob')
+                    and installed[2] in selected.get('installed', [])
+                    and actual == ('100644', 'blob', selected.get('resolved')), 'CI_RESOLUTION_TREE_MISMATCH')
+
+
 def resolve_conflicted_pr(api, current_pr, main, trusted_tree, source_commit, source_tree, now):
     path = 'scripts/environments/reviewed-dev-policy.json'
     require(path in trusted_tree and current_pr.get('mergeable') is False
@@ -300,20 +332,7 @@ def resolve_conflicted_pr(api, current_pr, main, trusted_tree, source_commit, so
     # The protected baseline is the merge base used to review the policy patch.
     old = tree(api, commit(api, profile['baseline']))
     resolved = tree(api, resolution)
-    for key in set(old) | set(trusted_tree) | set(source_tree) | set(resolved):
-        before, installed, application, actual = [t.get(key) for t in (old, trusted_tree, source_tree, resolved)]
-        if all(row is None or row[1] == 'tree' for row in (before, installed, application, actual)):
-            continue
-        if application == before or application == installed:
-            require(actual == installed, 'CI_RESOLUTION_TREE_MISMATCH')
-        elif installed == before:
-            require(actual == application, 'CI_RESOLUTION_TREE_MISMATCH')
-        elif key == 'docs/context/registry.json':
-            require(registry_policy(policy_json(api, resolved, key)[0])
-                    == registry_policy(policy_json(api, source_tree, key)[0]), 'CI_RESOLUTION_REGISTRY_CHANGED')
-        else:
-            require(key in profile['resolvedBlobs'] and actual == ('100644','blob',profile['resolvedBlobs'][key]),
-                    'CI_RESOLUTION_TREE_MISMATCH')
+    verify_resolution_tree(api, profile, old, trusted_tree, source_tree, resolved)
     suites, manifest_digest = required_suites(api, expected[0], resolved)
     require(policy_digest(suites) == expected[1], 'CI_REVIEW_PROFILE_COMMAND_DRIFT')
     pr_run = latest_run(api, resolution['sha'], ('pull_request',))
