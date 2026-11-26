@@ -1,5 +1,9 @@
 # Jems current architecture
 
+## World composition in Creative Studio
+
+The trusted editor resolves included props through the versioned world registry and personal assets through the existing owner-scoped picker. Backdrops use a bounded single-image cache and render from their pinned source. Canvas transforms, clean preview, recording and thumbnail generation share the stage implementation. Visual ordering is independent of actor execution order. Local and IndexedDB scene stores implement **Use this world** by copying the requested kept revision with new project identity and source provenance. [Creative Asset & World Design Standard](docs/creative-universe/STANDARD.md#building-and-keeping-a-world)
+
 ## Connected Creative Studio renderer and animation
 
 The trusted stage resolves versioned public world plates, aligned middle and foreground layers, reusable transparent props and owner-checked private art. Scene placements use the existing 2D coordinate system. Stored world choices, actor roles, visible layers and movement programs belong to the kept scene. The legacy background IDs keep their established rendering. My Art stores an authored path with its immutable assembly and drawing pin. The scene adapter makes the movement visible as editable blocks. The generated companion uses that trusted scene editor. A separate offline fixture tests a bounded host-rendered sprite slot for one reviewed generated module. It has no production delivery route. [World rendering and evidence](docs/creation-studio/evidence/worlds/README.md) · [Private game qualification](docs/game-intelligence/creative-assets/README.md)

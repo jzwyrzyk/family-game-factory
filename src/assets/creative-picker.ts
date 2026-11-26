@@ -5,7 +5,15 @@ import type {DrawingCategory} from './private-drawings';
 import type {DrawingKind} from '../drawing/model';
 import './creative-picker.css';
 
+interface BundledChoices {
+  container: HTMLElement;
+  items: readonly {id:string; label:string; url:string}[];
+  recommended: readonly string[];
+  choose: (id:string) => Promise<void>;
+}
+
 export interface CreativePickerOptions {
+  bundled?: BundledChoices;
   title?:string;
   category?:DrawingCategory;
   imagesOnly?:boolean;
@@ -51,6 +59,33 @@ export function mountCreativePicker(box:HTMLElement, owner:string, current:()=>b
   box.classList.add('creative-picker');
   box.replaceChildren(controls,status,grid);
   let choosing = false;
+  const bundled = options.bundled;
+  if (bundled) {
+    const shelf = element('details');
+    const heading = element('summary','Jems objects');
+    const grid = element('div');
+    grid.className = 'creative-picker-grid';
+    const recommended = new Set(bundled.recommended);
+    const items = [...bundled.items].sort((a,b) => Number(recommended.has(b.id)) - Number(recommended.has(a.id)));
+    for (const item of items) {
+      const button = element('button');
+      button.type = 'button';
+      button.dataset.bundledArt = item.id;
+      const image = element('img');
+      image.src = item.url; image.alt = ''; image.loading = 'lazy';
+      button.append(image,element('strong',item.label));
+      button.onclick = async () => {
+        if (choosing || !active()) return;
+        choosing = true;
+        try { await bundled.choose(item.id); }
+        catch (error) { if (active()) status.textContent = (error as Error).message; }
+        finally { choosing = false; }
+      };
+      grid.append(button);
+    }
+    shelf.append(heading,grid);
+    bundled.container.replaceChildren(shelf);
+  }
   let renderId = 0;
   let previewQueue = Promise.resolve();
   function render() {
@@ -134,6 +169,7 @@ export function mountCreativePicker(box:HTMLElement, owner:string, current:()=>b
     disposed = true;
     for (const url of urls.values()) URL.revokeObjectURL(url);
     urls.clear();
+    bundled?.container.replaceChildren();
     choices = [];
     box.replaceChildren();
   }};

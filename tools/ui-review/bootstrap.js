@@ -101,6 +101,7 @@ window.__reviewNavigate=async action=>{
  else if(action==='art')await FG.artStudio.open();
  else if(action==='art-draw'){await FG.artStudio.open();click('artDrawButton');}
  else if(action==='coding-make'){FG.creation.open();await delay(80);click('creationIntroSkip');click('creationFreeMode');}
+ else if(action==='world-builder'){await FG.creation.openMake();document.querySelector('[data-world="world-forest-v1"]')?.click();}
  else if(action==='coding-intro'){FG.creation.openIntroduction();}
  else if(action==='coding-editor'){FG.creation.open();await delay(80);click('creationIntroSkip');click('creationFreeMode');document.querySelector('[data-creation-starter="robot"]')?.click();}
  else if(action==='coding-challenge'){FG.creation.openChallenges();await delay(80);document.querySelector('[data-challenge]')?.click();}

@@ -10,7 +10,7 @@ export const CREATION_LIMITS = {
 } as const;
 
 export type CreationOrigin = 'child' | 'starter' | 'assisted';
-export type SceneBackground = 'meadow' | 'night' | 'workshop' | 'sky' | typeof ILLUSTRATED_WORLDS[number]['id'];
+export type SceneBackground = 'blank' | 'meadow' | 'night' | 'workshop' | 'sky' | typeof ILLUSTRATED_WORLDS[number]['id'];
 export type SceneLayer = 'backdrop' | 'back' | 'middle' | 'front';
 export type ComparisonOperator = 'eq' | 'neq' | 'lt' | 'lte' | 'gt' | 'gte';
 export type SceneCondition =
@@ -37,7 +37,7 @@ export type CreativeRole = typeof CREATIVE_ROLES[number];
 export interface SceneActor {
   creativeRole?: CreativeRole;
   id: string; name: string; assetId: string; x: number; y: number;
-  size?: number; visible?: boolean; layer?: SceneLayer;
+  size?: number; visible?: boolean; layer?: SceneLayer; stackOrder?: number; angle?: number; backdropFit?: 'contain' | 'cover';
 }
 export interface SceneProgram {
   id: string; actorId: string; trigger: SceneTrigger; actions: CreationBlock[];
@@ -99,7 +99,7 @@ export function validateCreationProject(input: unknown): CreationProject {
   if (p.schema !== CREATION_SCHEMA) fail('Unsupported saved project version.');
   id(p.id, 'project ID'); text(p.title, 80, 'project title');
   number(p.width, 200, 1600, 'stage width', true); number(p.height, 160, 1200, 'stage height', true);
-  if (!['meadow','night','workshop','sky'].includes(p.background as string) && !ILLUSTRATED_WORLDS.some(world => world.id === p.background)) fail('Choose a supported background.');
+  if (!['blank','meadow','night','workshop','sky'].includes(p.background as string) && !ILLUSTRATED_WORLDS.some(world => world.id === p.background)) fail('Choose a supported background.');
   if (p.worldLayers !== undefined) {
     const layers = record(p.worldLayers, ['middle','foreground'], 'world layers');
     if (typeof layers.middle !== 'boolean' || typeof layers.foreground !== 'boolean') fail('Choose visible world layers.');
@@ -108,7 +108,7 @@ export function validateCreationProject(input: unknown): CreationProject {
   if (!p.actors.length) fail('Add at least one character.');
   const actorIds = new Set<string>();
   for (const raw of p.actors) {
-    const a = record(raw, ['id','name','assetId','x','y','size','visible','layer','creativeRole'], 'character');
+    const a = record(raw, ['id','name','assetId','x','y','size','visible','layer','creativeRole','angle','backdropFit','stackOrder'], 'character');
     id(a.id, 'character ID');
     if(!isCreationId(a.assetId)&&!parsePrivateArtId(a.assetId))fail('Invalid asset reference.');
     text(a.name, 60, 'character name');
@@ -116,6 +116,9 @@ export function validateCreationProject(input: unknown): CreationProject {
     actorIds.add(a.id);
     number(a.x, 0, p.width, 'character x'); number(a.y, 0, p.height, 'character y');
     if (a.size !== undefined) number(a.size, 16, 240, 'character size');
+    if (a.stackOrder !== undefined) number(a.stackOrder, 0, CREATION_LIMITS.actors - 1, 'stack position', true);
+    if (a.angle !== undefined) number(a.angle, -180, 180, 'picture angle');
+    if (a.backdropFit !== undefined && (a.layer !== 'backdrop' || !['contain','cover'].includes(a.backdropFit as string))) fail('Choose a supported backdrop fit.');
     if (a.layer !== undefined && !['backdrop','back','middle','front'].includes(a.layer as string)) fail('Choose a supported scene layer.');
     if (a.layer === 'backdrop' && parsePrivateArtId(a.assetId)?.kind !== 'image') fail('Choose an original drawing for your backdrop.');
     if (a.creativeRole !== undefined && !CREATIVE_ROLES.includes(a.creativeRole as CreativeRole)) fail('Choose a supported role for this scene.');

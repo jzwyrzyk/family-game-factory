@@ -51,8 +51,19 @@
   .creation-world-tiles strong { padding: 10px; font-size: 18px; }
 }
 
-#creationCloseSettings { display: block; margin: 0 0 8px auto; }
+#creationCloseSettings { position: sticky; top: 0; z-index: 1; display: block; margin: 0 0 8px auto; }
 
 #page-creation[data-illustrated=true] .creation-canvas-wrap { background: #28243d; }
 
 .creation-scene-options:not([open]) > div { display: none; }
+.creation-kept-world { display: grid; align-content: start; gap: 4px; }
+.creation-kept-world > .creation-button { justify-self: start; min-height: 44px; }
+
+.creation-blank-paper { display: block; min-height: 100px; background: white; border-bottom: 1px solid #d7cee3; }
+.creation-placement-controls { display: flex; flex-wrap: wrap; gap: .45rem; grid-column: 1 / -1; }
+.creation-placement-controls button, #creationJemsProps summary { min-height: 44px; }
+#creationJemsProps summary { cursor: pointer; padding: .65rem; font-weight: 700; }
+#creationPlacementActions { display: grid; justify-items: start; gap: 8px; color: #302347; }
+#creationPlacementActions h3 { margin: 0; font-size: 20px; }
+#creationPlacementActions .creation-layer-tools > summary { min-height: 44px; padding: 10px 4px; color: #513575; cursor: pointer; font-weight: 700; }
+#creationSceneOptions > div { color: #302347; }

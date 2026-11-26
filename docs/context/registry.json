@@ -88,7 +88,8 @@
     "docs/creative-universe/STANDARD.md",
     "docs/decisions/2026-11-26-connected-creative-universe.md",
     "docs/creation-studio/WORLD_ART.md",
-    "docs/creation-studio/world-art-manifest.json"
+    "docs/creation-studio/world-art-manifest.json",
+    "docs/creation-studio/evidence/world-composition/README.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -315,10 +316,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:21:23.044Z",
-      "sourceDigest": "16e8b4724d0c4f3477750994e99eae0f36789dc83d2db0f861c4c9cddc5c28f0",
+      "reviewedAt": "2026-11-26T03:44:38.462Z",
+      "sourceDigest": "9b745889fea313ced3a3417a5051fb40620bfd970d5123ca38e688c802ed9c8e",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed actor and backdrop selection, immutable drawing replay, scene history and owner changes against the source. The architecture describes these trusted host paths.",
+      "reviewReason": "The Creative Studio walkthrough now covers touch placement, accessible controls and direct reuse of a kept scene.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -407,7 +408,9 @@
         "docs/creation-studio/*.md",
         "docs/decisions/0007-creation-and-rebuild-practice.md",
         "docs/rewards/*.md",
-        "docs/pals/*.md"
+        "docs/pals/*.md",
+        "docs/creation-studio/evidence/world-composition/README.md",
+        "docs/creative-universe/STANDARD.md"
       ],
       "sources": [
         "src/creation/**",
@@ -418,10 +421,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "c3079a69897a566d9223d4775e7b1dfa2a021024a127e44a048f165e1778d98e",
-      "reviewedAt": "2026-11-26T03:21:23.398Z",
+      "sourceDigest": "37032131d8f9c6c0893ea678415530fe7f77f48c417878fc52d925c82c1fa5b9",
+      "reviewedAt": "2026-11-26T03:45:37.087Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented world rendering, asset selection and scene ownership in the Creative Studio and architecture records with pinned references, failed loads and retained histories.",
+      "reviewReason": "Recorded final inspector contrast, touch placement and layer control behavior with the exact world editor source and responsive screenshots.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -900,10 +903,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:21:23.553Z",
-      "sourceDigest": "ac1bf024047c463b787e9182b5284049a7d1e31167345abd31a5ebea92844171",
+      "reviewedAt": "2026-11-26T03:44:39.073Z",
+      "sourceDigest": "037d34b439cb9cbb0a77e79180f552f3a01c52ea18e43d2a5f538b172f039152",
       "reviewOutcome": "updated",
-      "reviewReason": "The delivery entry identifies local drawing, scene and synthetic game evidence along with physical-device, provider and hosted qualification limits.",
+      "reviewReason": "Documented the new standalone destination, canvas comparisons, decoded video fidelity and three responsive world editing journeys.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1144,10 +1147,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:25:18.487Z",
-      "sourceDigest": "6d9a0966438f55ba668e86cbf4319cbc1d2f0bd15a518b82bd9f03b74160b2d3",
+      "reviewedAt": "2026-11-26T03:46:13.007Z",
+      "sourceDigest": "a49b88f9281dbc68273d0bb875926ebfa9cef3bcd44450ed09c8be801cc53456",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded source dependencies, private worktree qualification and current household release separately. No change to production traffic or provider activation was made.",
+      "reviewReason": "The delivery register identifies final application source for the bundled world editor and distinguishes local evidence from future deployment and household activation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1402,10 +1405,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:21:23.728Z",
-      "sourceDigest": "36216899cb8ad83b618d1c61f87431554ed621b626bbdd8c37713dd93f489bea",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The existing shared documentation process and reviewed area ownership accommodate the creative source paths and updated CI inventory.",
+      "reviewedAt": "2026-11-26T03:44:39.423Z",
+      "sourceDigest": "d5f73f8a2afb5062c11cab33e02b4a1770cd1d25c9fa4e74775c6f6f7dd0efa4",
+      "reviewOutcome": "updated",
+      "reviewReason": "Registered the composition evidence with the canonical design standard for Creative Studio source reviews.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1627,10 +1630,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "d50f5ad634ba0f18552cd121eaf6b3b2d8f1fc2ab71956b72d2da0333f0cd4ad",
-      "reviewedAt": "2026-11-26T03:23:59.999Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Updated the My Art contract for editable source bytes, recovery, selection and retained version behavior. Stale owner and version failures preserve the current drawing.",
+      "sourceDigest": "0849c90775d9b187ea09b8f24e93031ad953248f91f52e986bf8d66d4cbf7684",
+      "reviewedAt": "2026-11-26T03:44:39.549Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The included Jems object section and stage resolution cache use the established private drawing selector and byte preserving ownership contract.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1672,10 +1675,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "be0b8202af9ac9121efae99be7597909475312e434dcc8ab5ce51bec1288a7aa",
-      "reviewedAt": "2026-11-26T03:21:23.873Z",
+      "sourceDigest": "824b451b76e5608d6f40b2a270900a9c76b28a82fe2bb38f35302d45e324fc65",
+      "reviewedAt": "2026-11-26T03:44:39.642Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Only the new scene starter selects a versioned environment. Pal ownership, progression, approved forms, image sampling and earned artwork contracts retain their prior behavior.",
+      "reviewReason": "Test fixtures cover both legacy portraits and the illustrated stage layers without changing earned Pal availability or progression.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1710,10 +1713,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "381260b659e8d8ed26b7fdddb3c2182a49d2f8f9cffd808e7d167695f25bfb3a",
-      "reviewedAt": "2026-11-26T00:23:36.006Z",
+      "sourceDigest": "c5cf2fb8ce5fca4ad0bf790685c812da6fae64aeddeaf9ba4f993677dc5b0f80",
+      "reviewedAt": "2026-11-26T03:44:39.922Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled merged F06 rollback limits with the owner-scoped Pal migration, retained readers and repeat restore contract."
+      "reviewReason": "Architecture now records that both scene stores fork a requested kept revision after checking the owner and preserve its exact provenance."
     }
   ]
 }

@@ -99,6 +99,8 @@ export function validateGeneratedCreationManifest(input:unknown):CreationProject
 
 export function validateSavedCreationManifest(input:unknown):CreationProject {
   const scene=validateEditableProject(input,{allowPrivateArt:false});
+  if (scene.background === 'blank' || scene.actors.some(actor => actor.angle !== undefined || actor.stackOrder !== undefined || actor.backdropFit !== undefined))
+    throw Error('These placements belong to a locally edited world.');
   const mark=(blocks:CreationBlock[])=>{for(const block of blocks){block.origin='assisted';if(block.type==='repeat')mark(block.actions);if(block.type==='if'){mark(block.then);if(block.else)mark(block.else);}}};
   for(const program of scene.programs)mark(program.actions);
   scene.provenance={createdBy:'assisted'};
@@ -154,6 +156,11 @@ export function createStarterProject(kind:CreationStarter,title=titleFor[kind]):
 }
 
 export function createIllustratedStarter(kind: CreationStarter, worldId?: string): CreationProject {
+  if (kind === 'blank' && worldId === 'blank') {
+    const project = starter('blank', 'My world');
+    project.background = 'blank';
+    return project;
+  }
   const defaults = { dragon: 'world-forest-v1', buckets: 'world-cloud-v1', robot: 'world-workshop-v1', blank: 'world-moon-v1' };
   const world = ILLUSTRATED_WORLDS.find(item => item.id === (worldId ?? defaults[kind]));
   if (!world) throw Error('Choose an available illustrated world.');

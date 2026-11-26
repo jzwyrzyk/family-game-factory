@@ -1,5 +1,9 @@
 # jems delivery state
 
+## Customizable worlds — Workstream F candidate
+
+Application and acceptance source `7c31f717712a23001c0d95ed9ed88fa3e4ade3a3` extends the illustrated Studio integration at `1969df66038d5d1e9b77534f3d08d5d0c01b3380`. The child can mix collections, place personal art, give a single placement code, play, keep and reuse the exact saved world. The [acceptance record](docs/creation-studio/evidence/world-composition/README.md) includes browser captures, export checks, storage compatibility and outstanding release gates. This is draft source for review. Hosted DEV/TEST qualification, owner review of the new world collection, physical devices, production promotion and external family activation are outstanding.
+
 ## Connected Creative Universe — integrated source and local evidence
 
 The [independent continuity receipt](docs/creation-studio/evidence/worlds/continuity-37679c1.json) binds the integrated application to `37679c14c45418ab52597a850f48da83325cdaed`. The subsequent `e326f1874f6ea9c32070aea9e6b027b650148cd9` local build passed 118 CI orchestration tests, 27 art tests, 90 Creation tests, the three world layouts, motion authoring and generated-art regressions. The My Art pointer mapping subsequently adopted the exact stateless helper from #203 at `7f2172d75740e9311f715e40208154c3c01104c1`. A clean build of this pointer revision passed the drawing-entry, source-recovery and no-replay checks, followed by all three world layouts and offline reopen. The stack consumes the standard from #196, versioned catalogue from #200 and My Art and picker from #208. The earlier household release remains the deployment baseline. Local Chromium used only synthetic family and child records.

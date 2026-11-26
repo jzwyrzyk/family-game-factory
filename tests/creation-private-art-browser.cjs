@@ -109,7 +109,7 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     await page.locator('.creative-picker-dialog [data-private-art]').filter({hasText:'Latest saved cutout design'}).click();
     await page.waitForFunction(id=>FG.creation.scene().actors[1].assetId===id,first.actors[0].assetId);
     assert.equal((await page.evaluate(()=>FG.creation.scene())).actors[1].creativeRole,'collectible');
-    await page.locator('#creationSceneOptions > summary').click();
+    await page.locator('#creationCloseSettings').click();
     await page.locator('#creationSimpleMode').click();
     await page.locator('[data-add-block="say"]').click();await page.locator('#creationKeep').click();
     const retained=await page.evaluate(id=>FG.creation.export().revisions.filter(revision=>revision.projectId===id),firstId);

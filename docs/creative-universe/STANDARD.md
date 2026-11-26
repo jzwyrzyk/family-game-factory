@@ -30,6 +30,16 @@ Use original premium Jems illustration for built-in worlds, with a versioned bac
 
 Give young children direct thumbnail selection, short action labels, visible focus and touch targets. Offer keyboard equivalents for drawing, placement and movement. Preserve undo, reduced-motion preferences, optional help and the current activity when creating new art. A canceled picker returns to its origin. A profile change invalidates pending previews, decodes and callbacks. Learning scratchpads are ephemeral unless the child explicitly creates a permanent artwork through an authorized creative action. Creative activity does not award learning mastery.
 
+## Building and keeping a world
+
+Start from Enchanted Gem Forest, Inventor’s Workshop, Cloud Kingdom, Moon Adventure or a white stage. Each illustrated tile previews its registered world revision. Keep earlier background identifiers resolvable. The collection recommends nearby objects first and lets children choose any registered prop. A moon rocket keeps its identity when placed in the forest.
+
+A placement owns its position, size, optional angle, visual layer and order within that layer. Painting order must preserve interpreter and event order. Duplicating a placement creates a fresh instance that points to the same artwork. Give the new instance its own code only when the child chooses an action. The stage, clean Play view, saved thumbnail and recording use the same composition rules.
+
+My Art backgrounds pin a verified image version in the scene’s existing actor list. The author can move, scale or turn the placement, show the whole image or center-crop it to fill the stage. These operations act on the host canvas. Keep original bytes, hash and derivative lineage recoverable through the usual asset export. Resolve the backdrop at stage resolution within bounded memory for the current owner.
+
+**Use this world** reads the exact kept revision of a personal free scene. Preserve its image and motion pins, programs and layers under a new scene identity. Keep the source revision in provenance. A later draft or edit to either scene belongs to that scene alone. Preserve legacy defaults when optional fields are absent. A strict older reader may reject new fields or a blank background. Qualify mixed-version restore and rollback before promoting the format to a household.
+
 ## Delivery boundaries
 
 Only the trusted host resolves private image and rig pins. A new generated-game adapter requires its own review of owner admission, the allowed game/revision/slot, representation integrity, resource bounds, expiry, revocation, reporting and backup. An untrusted game receives no profile identifier, library enumeration, unrestricted URL or storage authority. Keep private art out of generation, screenshot review, repair and telemetry. A synthetic local qualification cannot enable real family access. Preserve parent consent, rewards and existing host-managed learning checkpoints.

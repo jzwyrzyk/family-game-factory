@@ -58,6 +58,58 @@ async function checkWorldPixels(page, key, foreground = true) {
   }, {key,foreground});
   assert.ok(result.count>500 && result.same/result.count>.995, 'stage pixels match selected illustration layers '+JSON.stringify(result));
 }
+async function buildMixedWorld(page) {
+  const rocket = 'world-prop-rocket-v1';
+  await settings(page);
+  await page.locator('#creationCloseSettings').click();
+  await page.locator('#creationAddActor').click();
+  const shelf = page.locator('#creationJemsProps');
+  await shelf.locator('summary').click();
+  await shelf.locator('[data-bundled-art="' + rocket + '"]').click();
+  await page.waitForFunction(id => FG.creation.scene().actors.some(a => a.assetId === id), rocket);
+  const original = (await scene(page)).actors.find(a => a.assetId === rocket);
+  assert.ok(!(await scene(page)).programs.some(p => p.actorId === original.id), 'new decoration is inert');
+
+  const canvas = page.locator('#creationCanvas');
+  await canvas.scrollIntoViewIfNeeded();
+  const rect = await canvas.boundingBox();
+  const project = await scene(page);
+  const sx = rect.width / project.width, sy = rect.height / project.height;
+  const gripX = rect.x + (original.x + original.size * .58) * sx;
+  const gripY = rect.y + (original.y + original.size * .57) * sy;
+  await page.mouse.move(gripX, gripY); await page.mouse.down();
+  await page.mouse.move(gripX + 25*sx, gripY + 25*sy, {steps:5}); await page.mouse.up();
+  await page.waitForFunction(id => FG.creation.scene().actors.find(a => a.id === id).size > 110, original.id);
+  await page.locator('#creationUndo').click();
+  await page.waitForFunction(id => FG.creation.scene().actors.find(a => a.id === id).size === 110, original.id);
+  await settings(page);
+  const placement = page.locator('.creation-placement-controls');
+  const duplicate = placement.getByRole('button',{name:'Duplicate'});
+  await duplicate.focus(); await duplicate.press('Enter');
+  await page.waitForFunction(id => FG.creation.scene().actors.filter(a => a.assetId === id).length === 2, rocket);
+  const twin = (await scene(page)).actors.at(-1);
+  assert.notEqual(twin.id,original.id);
+  for (const action of ['Move right','Bigger','Turn']) await placement.getByRole('button',{name:action}).click();
+  await page.locator('.creation-layer-tools > summary').click();
+  await page.getByLabel('Picture layer').selectOption('front');
+  await page.waitForFunction(id => FG.creation.scene().actors.find(a => a.id === id)?.layer === 'front',twin.id);
+  const placed = (await scene(page)).actors.find(a => a.id === twin.id);
+  assert.deepEqual([placed.x,placed.size,placed.angle],[twin.x + 20,twin.size + 20,15]);
+  await page.locator('#creationCloseSettings').click();
+  await page.locator('[data-move-direction="right"]').first().click();
+  await prepared(page);
+  await page.waitForFunction(id => FG.creation.snapshot()?.status === 'completed' && FG.creation.snapshot().actors.find(a => a.id === id),twin.id);
+  const played = await page.evaluate(() => FG.creation.snapshot());
+  assert.equal(played.actors.find(a => a.id === original.id).x,original.x);
+  assert.ok(played.actors.find(a => a.id === twin.id).x > placed.x);
+  await save(page.locator('#creationCanvas'),'forest-cross-world-play');
+  await settings(page);
+  await page.getByRole('button',{name:'Remove Rocket',exact:true}).click();
+  await page.waitForFunction(id => !FG.creation.scene().actors.some(a => a.id === id),twin.id);
+  await page.locator('#creationCloseSettings').click();
+  await page.locator('#creationUndo').click();
+  await page.waitForFunction(id => FG.creation.scene().actors.some(a => a.id === id),twin.id);
+}
 async function decorationFixture(page) {
   return page.evaluate(async () => {
     const canvas = document.createElement('canvas'); canvas.width = 180; canvas.height = 150;
@@ -108,6 +160,7 @@ async function decorationFixture(page) {
           assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'viewport width');
           if (key==='forest' || layout!=='desktop') await save(page,'after-'+layout);
           if (layout==='desktop' && key==='forest') {
+            await buildMixedWorld(page);
             await settings(page);
             const prop=page.locator('#creationWorldTools [data-prop]').nth(1), id=await prop.getAttribute('data-prop');
             await prop.click();
@@ -129,6 +182,17 @@ async function decorationFixture(page) {
             await checkWorldPixels(page,key,false);
             await save(page,'forest-expanded');
             await page.locator('#creationFullscreen').click();
+          }
+          if (layout !== 'desktop') {
+            await settings(page);
+            const starter = (await scene(page)).actors[0];
+            const controls = page.locator('.creation-placement-controls');
+            await controls.getByRole('button',{name:'Move right'}).tap();
+            await page.waitForFunction(({id,x}) => FG.creation.scene().actors.find(a => a.id === id).x === x+20,starter);
+            await controls.getByRole('button',{name:'Turn'}).tap();
+            await page.waitForFunction(id => FG.creation.scene().actors.find(a => a.id === id).angle === 15,starter.id);
+            await save(page,'placement-'+layout);
+            await page.locator('#creationCloseSettings').tap();
           }
           await page.evaluate(()=>FG.creation.openMake());
         }
@@ -155,7 +219,10 @@ async function decorationFixture(page) {
           await page.locator('.creative-picker-dialog [data-private-art="'+pebble.pin+'"]').click();
           await page.waitForFunction(pin=>FG.creation.scene().actors.some(a=>a.layer==='backdrop'&&a.assetId===pin),pebble.pin);
           assert.equal((await scene(page)).worldLayers.middle,false);
-          if (await page.locator('#creationCloseSettings').isVisible()) await page.locator('#creationCloseSettings').click();
+          await settings(page);
+          await page.getByLabel('Fit drawing').selectOption('cover');
+          await page.waitForFunction(() => FG.creation.scene().actors.find(a => a.layer === 'backdrop')?.backdropFit === 'cover');
+          await page.locator('#creationCloseSettings').click();
           await page.locator('#creationKeep').click();
           const held=await scene(page);
           await page.locator('#creationBack').click();await page.locator('[data-scene="'+held.id+'"]').click();
@@ -165,8 +232,8 @@ async function decorationFixture(page) {
           const bundle=JSON.parse(fs.readFileSync(await (await download).path(),'utf8'));
           assert.equal(bundle.scene.actors.find(a=>a.layer==='backdrop').assetId,pebble.pin);
           assert.ok(bundle.art.drawings.some(d=>d.sha256===pebble.sha));
-          if (!await page.locator('#creationCopy').isVisible()) await page.locator('#creationMore > summary').click();
-          await page.locator('#creationCopy').click();
+          await page.locator('#creationBack').click();
+          await page.locator('[data-use-world="'+held.id+'"]').click();
           await page.waitForFunction(id => FG.creation.scene().id !== id, held.id);
           const copy = await scene(page);
           assert.deepEqual(copy.actors,held.actors);

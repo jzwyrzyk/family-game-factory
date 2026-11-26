@@ -1,4 +1,6 @@
+import { pointerPoint } from '../drawing/pointer-input';
 import { ILLUSTRATED_WORLDS } from './illustrated-art';
+import { orderedPlacements } from './world-tools';
 import type { CreationProject, SceneLayer } from './model';
 import type { ActorSnapshot, SceneSnapshot } from './engine';
 import { creationAsset, drawCreationVector, parsePrivateArtId, type CreationAsset } from './projects';
@@ -38,14 +40,18 @@ export class CreationStage {
   private scene: CreationProject | null = null;
   private snapshot: SceneSnapshot | null = null;
   private selected = '';
+  private allowResize = false;
+  private grip: {id:string; x:number; y:number} | null = null;
+  private readonly backdropArt?:PrivateArtResolver;
   private artEpoch=0;
   private requestedArt=new Set<string>();
   private failedArt=new Set<string>();
   constructor(readonly canvas: HTMLCanvasElement,private privateArt?:PrivateArtResolver,private artError?:(message:string)=>void) {
     this.context = canvas.getContext('2d')!;
+    this.backdropArt = privateArt?.backdropResolver();
   }
   clear() {
-    this.artEpoch++; this.requestedArt.clear();
+    this.backdropArt?.clear(); this.grip = null; this.artEpoch++; this.requestedArt.clear();
     for (const entry of this.images.values()) entry.cancel();
     this.images.clear(); this.failedArt.clear(); this.scene = null; this.snapshot = null; this.selected = '';
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -59,7 +65,9 @@ export class CreationStage {
     };
     assertCurrent();
     const assets = scenePictures(project);
-    await Promise.all(assets.map(asset => this.loadImage(asset).ready));
+    const backdrop = project.actors.find(actor => actor.layer === 'backdrop');
+    await Promise.all([...assets.map(asset => this.loadImage(asset).ready),
+      ...(backdrop && this.backdropArt ? [this.backdropArt.load(backdrop.assetId)] : [])]);
     assertCurrent();
   }
   private loadImage(asset: CreationAsset): SceneImage {
@@ -83,7 +91,7 @@ export class CreationStage {
     } };
     this.images.set(asset.id, entry);
     const active = () => epoch === this.artEpoch && this.images.get(asset.id) === entry;
-    const repaint = () => { if (active() && this.scene && this.snapshot) this.render(this.scene, this.snapshot, this.selected); };
+    const repaint = () => { if (active() && this.scene && this.snapshot) this.render(this.scene, this.snapshot, this.selected, this.allowResize); };
     const fail = (timedOut = false) => {
       if (!active() || settled) return;
       const message = `${asset.label}'s picture could not load${timedOut ? ' in time' : ''}. Reopen this scene to try again.`;
@@ -109,7 +117,9 @@ export class CreationStage {
     image.src = new URL(asset.url!, document.baseURI).href;
     return entry;
   }
-  render(scene: CreationProject, snapshot: SceneSnapshot, selected = '') {
+  render(scene: CreationProject, snapshot: SceneSnapshot, selected = '', allowResize = false) {
+    this.allowResize = allowResize;
+    this.grip = null;
     this.scene = scene; this.snapshot = snapshot; this.selected = selected;
     // Approved portraits are large. Retain only this scene's pinned pictures,
     // not every Pal/form visited across the whole collection.
@@ -123,9 +133,12 @@ export class CreationStage {
     if (world) {
       c.fillStyle = '#eee9f6'; c.fillRect(0, 0, w, h);
       this.worldPicture(world.background);
+    } else if (scene.background === 'blank') {
+      c.fillStyle = '#fff'; c.fillRect(0, 0, w, h);
     } else this.background(scene);
+    const placements = orderedPlacements(snapshot.actors);
     const drawActors = (layer: SceneLayer) => {
-      for (const actor of snapshot.actors) {
+      for (const actor of placements) {
         if (actor.visible && (actor.layer ?? 'middle') === layer) this.actor(actor, actor.id === selected);
       }
     };
@@ -135,6 +148,14 @@ export class CreationStage {
     drawActors('middle');
     if (world && scene.worldLayers?.foreground !== false) this.worldPicture(world.foreground);
     drawActors('front');
+    const placement = allowResize && selected ? snapshot.actors.find(actor => actor.id === selected && actor.visible && actor.layer !== 'backdrop') : undefined;
+    if (placement) {
+      const x = placement.x + placement.size * .58, y = placement.y + placement.size * .57;
+      this.grip = {id:placement.id,x,y};
+      c.save(); c.translate(x,y); c.fillStyle = '#50318c'; c.strokeStyle = '#fff'; c.lineWidth = 2;
+      c.beginPath(); c.arc(0,0,10,0,Math.PI*2); c.fill(); c.stroke();
+      c.beginPath(); c.moveTo(-4,-4); c.lineTo(4,4); c.lineTo(4,-1); c.moveTo(4,4); c.lineTo(-1,4); c.stroke(); c.restore();
+    }
     for (const actor of snapshot.actors) if (actor.visible && actor.speech) this.bubble(actor);
     let badgeX = 12;
     for (const [name, value] of Object.entries(snapshot.variables).slice(0, 6)) {
@@ -146,7 +167,7 @@ export class CreationStage {
     }
   }
   hit(x: number, y: number): string | null {
-    const actors = this.snapshot?.actors ?? [];
+    const actors = orderedPlacements(this.snapshot?.actors ?? []);
     for (const layer of ['front', 'middle', 'back']) {
       for (let i = actors.length - 1; i >= 0; i--) {
         const actor = actors[i];
@@ -156,10 +177,13 @@ export class CreationStage {
     }
     return null;
   }
+  resizeHit(x:number, y:number):string | null {
+    if (!this.grip) return null;
+    const radius = 14 * this.canvas.width / Math.max(1, this.canvas.getBoundingClientRect().width);
+    return Math.hypot(x-this.grip.x,y-this.grip.y) <= radius ? this.grip.id : null;
+  }
   point(event: PointerEvent) {
-    const bounds = this.canvas.getBoundingClientRect();
-    return { x: Math.round((event.clientX - bounds.left) / bounds.width * this.canvas.width),
-      y: Math.round((event.clientY - bounds.top) / bounds.height * this.canvas.height) };
+    return pointerPoint(this.canvas,event,'position');
   }
   private worldPicture(asset: CreationAsset) {
     const entry = this.loadImage(asset);
@@ -219,35 +243,38 @@ export class CreationStage {
     const c = this.context, s = actor.size, asset = creationAsset(actor.assetId);
     c.save(); c.translate(actor.x, actor.y);
     if (actor.layer !== 'backdrop') { c.fillStyle = '#152B4B15'; c.beginPath(); c.ellipse(0, s * .48, s * .38, s * .08, 0, 0, Math.PI * 2); c.fill(); }
-    c.translate(0, actor.jumpOffset); c.rotate(actor.rotation * Math.PI / 180);
+    c.translate(0, actor.jumpOffset); c.rotate((actor.rotation + (actor.angle ?? 0)) * Math.PI / 180);
     if (selected) {
       c.strokeStyle = '#7452CF'; c.lineWidth = 2; c.setLineDash([5, 4]);
       c.beginPath(); c.roundRect(-s * .58, -s * .57, s * 1.16, s * 1.16, 15); c.stroke(); c.setLineDash([]);
     }
     if(parsePrivateArtId(actor.assetId)){
-      const resolved=this.privateArt?.get(actor.assetId);
+      const resolver = actor.layer === 'backdrop' ? this.backdropArt : this.privateArt;
+      const key = actor.layer === 'backdrop' ? 'backdrop:'+actor.assetId : actor.assetId;
+      const resolved=resolver?.get(actor.assetId);
       if(resolved){
+        const fit = actor.backdropFit === 'cover' ? Math.max : Math.min;
         const scale = actor.layer === 'backdrop'
-          ? Math.min(this.canvas.width / resolved.image.width, this.canvas.height / resolved.image.height) * s / 100
+          ? fit(this.canvas.width / resolved.image.width, this.canvas.height / resolved.image.height) * s / 100
           : s / Math.max(resolved.image.width, resolved.image.height);
         c.drawImage(resolved.image,-resolved.image.width*scale/2,-resolved.image.height*scale/2,resolved.image.width*scale,resolved.image.height*scale);
       }else{
-        if(this.privateArt&&!this.requestedArt.has(actor.assetId)&&!this.failedArt.has(actor.assetId)){
-          this.requestedArt.add(actor.assetId);const epoch=this.artEpoch;
-          void this.privateArt.load(actor.assetId).then(()=>{
-            if(epoch!==this.artEpoch)return;this.requestedArt.delete(actor.assetId);
-            if(this.scene&&this.snapshot)this.render(this.scene,this.snapshot,this.selected);
+        if(resolver&&!this.requestedArt.has(key)&&!this.failedArt.has(key)){
+          this.requestedArt.add(key);const epoch=this.artEpoch;
+          void resolver.load(actor.assetId).then(()=>{
+            if(epoch!==this.artEpoch)return;this.requestedArt.delete(key);
+            if(this.scene&&this.snapshot)this.render(this.scene,this.snapshot,this.selected,this.allowResize);
           }).catch(error=>{
             if(epoch!==this.artEpoch)return;
-            this.requestedArt.delete(actor.assetId);
-            this.failedArt.add(actor.assetId);this.artError?.('Some artwork is unavailable in this profile. Open Art Studio to restore its art bundle. '+(error as Error).message);
-            if(this.scene&&this.snapshot)this.render(this.scene,this.snapshot,this.selected);
+            this.requestedArt.delete(key);
+            this.failedArt.add(key);this.artError?.('Some artwork is unavailable in this profile. Open Art Studio to restore its art bundle. '+(error as Error).message);
+            if(this.scene&&this.snapshot)this.render(this.scene,this.snapshot,this.selected,this.allowResize);
           });
         }
         c.fillStyle='#F5F1FA';c.strokeStyle='#786489';c.lineWidth=2;c.setLineDash([4,4]);
         c.beginPath();c.roundRect(-s*.46,-s*.4,s*.92,s*.8,10);c.fill();c.stroke();c.setLineDash([]);
         c.fillStyle='#4C3C61';c.font='600 '+Math.max(10,Math.min(14,s*.12))+'px system-ui';c.textAlign='center';c.textBaseline='middle';
-        c.fillText(this.failedArt.has(actor.assetId)?'Art unavailable':'Loading art…',0,0,s*.85);
+        c.fillText(this.failedArt.has(key)?'Art unavailable':'Loading art…',0,0,s*.85);
       }
     } else if (asset?.url) {
       const entry = this.loadImage(asset), img = entry.image;

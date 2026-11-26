@@ -233,3 +233,7 @@ Final-head [Arcade](https://github.com/jzwyrzyk/family-game-factory/actions/runs
 The merged source provides specific algorithmic challenge checks and history, alongside existing adaptive subject engines. It does not continuously assess general reasoning from conversation/free creation or adapt the five Creation challenges. This receipt changes documentation only and records no deployment, paid call, live-provider result, physical-device acceptance or educational-efficacy claim.
 
 At 320 × 667 the regular First steps palette uses short direction labels and a three-column layout. Check all nine actions with the touch-screen reachability fixture while the challenge brief is open, including Jump in the middle row. Direction buttons retain their spoken Move labels.
+
+## Workstream F world composition
+
+Run the illustrated stage journey, standalone sandbox journey, scene unit tests and IndexedDB reconstruction test. Check the same personal picture on retained backgrounds, the centered crop against decoded original pixels, and changes to a fresh copy of a kept world. Verify the original kept scene reopens with its selected world and private assets offline. Test independent movement, paint order, touch and keyboard controls. [Reproduction and screenshots](evidence/world-composition/README.md)

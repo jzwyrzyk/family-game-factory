@@ -271,3 +271,23 @@ test('private backdrops retain exact actor references and layer validation rejec
     {...scene, actors:[{...changed, layer:'execute'}]}
   ]) assert.throws(() => validateEditableProject(invalid));
 });
+
+test('placement transforms round trip and paint order is independent of interpreter order', async () => {
+  const {orderedPlacements, stackPlacement} = await import('../src/creation/world-tools');
+  const scene = createIllustratedStarter('dragon');
+  const initial = scene.actors.map(a => a.id);
+  const interpreted = runScene(scene, {durationMs:2500});
+  stackPlacement(scene, scene.actors[0], true);
+  assert.deepEqual(orderedPlacements(scene.actors).map(a => a.id), initial.slice().reverse());
+  assert.deepEqual(scene.actors.map(a => a.id), initial);
+  const replay = runScene(scene, {durationMs:2500});
+  assert.deepEqual(replay.trace, interpreted.trace);
+  scene.actors[0].angle = 90;
+  assert.equal(validateEditableProject(scene).actors[0].angle,90);
+  assert.throws(() => validateGeneratedCreationManifest(scene));
+  scene.actors[0].angle = 181;
+  assert.throws(() => validateEditableProject(scene), /angle/);
+  delete scene.actors[0].angle;
+  scene.actors[0].backdropFit = 'cover';
+  assert.throws(() => validateEditableProject(scene), /backdrop fit/);
+});

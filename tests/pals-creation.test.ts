@@ -9,6 +9,14 @@ import { SceneEngine } from '../src/creation/engine';
 import { CreationStore } from '../src/creation/storage';
 import { CreationStage, CREATION_ART_LOAD_TIMEOUT_MS } from '../src/creation/stage';
 
+// Isolate single-portrait cancellation, timeout and retry from the three independently
+// decoded world plates. Retained meadow scenes still exercise this path in production.
+function portraitFixture(...args:Parameters<typeof createPalPlayground>) {
+  const scene = createPalPlayground(...args);
+  scene.background = 'meadow';
+  return scene;
+}
+
 class MemoryStorage implements Storage {
   data = new Map<string, string>(); fail = false;
   get length() { return this.data.size; }
@@ -90,7 +98,7 @@ test('approved scene artwork stays identifiable during loading, retries after re
   } as Record<string, unknown>, { get: (target, key) => target[key as string] ?? (() => {}), set: (target, key, value) => { target[key as string] = value; return true; } });
   const canvas = { width: 800, height: 450, getContext: () => context } as unknown as HTMLCanvasElement;
   const stage = new CreationStage(canvas, undefined, message => errors.push(message));
-  const scene = createPalPlayground('navi', 'mature'), snapshot = new SceneEngine(scene).snapshot();
+  const scene = portraitFixture('navi', 'mature'), snapshot = new SceneEngine(scene).snapshot();
   stage.render(scene, snapshot);
   assert.equal(images.length, 1);
   assert.equal(images[0].src, new URL(palArtworkPath('navi', 'mature'), 'https://example.test/jems/').href);
@@ -169,7 +177,7 @@ test('scene Pal composites prepare once per active asset and stale loads cannot 
     drawImage: (image: unknown) => draws.push(image),
   } as Record<string, unknown>, { get: (target, key) => target[key as string] ?? (() => {}), set: (target, key, value) => { target[key as string] = value; return true; } });
   const canvas = { width: 800, height: 450, getContext: () => context } as unknown as HTMLCanvasElement;
-  const stage = new CreationStage(canvas), scene = createPalPlayground('kip'), snapshot = new SceneEngine(scene).snapshot();
+  const stage = new CreationStage(canvas), scene = portraitFixture('kip'), snapshot = new SceneEngine(scene).snapshot();
   stage.render(scene, snapshot); images[0].ready();
   const prepared = draws.at(-1);
   assert.notEqual(prepared, images[0], 'The scene uses the transient alpha composite.');
@@ -312,7 +320,7 @@ function stageImageFixture(t: TestContext) {
 
 test('playback preparation shares rendered loads and waits for hidden actors and decoded artwork', async t => {
   const { stage, images, draws } = stageImageFixture(t);
-  const scene = addPalToProject(createPalPlayground('navi'), 'kip').scene;
+  const scene = addPalToProject(portraitFixture('navi'), 'kip').scene;
   scene.actors[1].visible = false;
   scene.actors.push({ ...scene.actors[0], id: 'same-picture-again' });
   stage.render(scene, new SceneEngine(scene).snapshot());
@@ -336,7 +344,7 @@ test('playback preparation shares rendered loads and waits for hidden actors and
 });
 
 test('playback preparation rejects an obsolete scene both before and after image readiness', async t => {
-  const { stage, images } = stageImageFixture(t), scene = createPalPlayground('navi');
+  const { stage, images } = stageImageFixture(t), scene = portraitFixture('navi');
   await assert.rejects(stage.prepare(scene, () => false), /scene or player changed/);
   assert.equal(images.length, 0, 'An already obsolete scene cannot start new artwork requests.');
   let current = true;
@@ -347,7 +355,7 @@ test('playback preparation rejects an obsolete scene both before and after image
 });
 
 test('clearing the stage cancels pending preparation and retires late load and decode callbacks', async t => {
-  const { stage, images, draws, errors } = stageImageFixture(t), scene = createPalPlayground('navi');
+  const { stage, images, draws, errors } = stageImageFixture(t), scene = portraitFixture('navi');
   const snapshot = new SceneEngine(scene).snapshot();
   stage.render(scene, snapshot);
   const rejected = assert.rejects(stage.prepare(scene), /scene or player changed/);
@@ -369,7 +377,7 @@ test('clearing the stage cancels pending preparation and retires late load and d
 
 test('unresponsive scene art times out once, identifies its Pal and can retry after reopening', async t => {
   t.mock.timers.enable({ apis: ['setTimeout'] });
-  const { stage, images, errors } = stageImageFixture(t), scene = createPalPlayground('navi');
+  const { stage, images, errors } = stageImageFixture(t), scene = portraitFixture('navi');
   stage.render(scene, new SceneEngine(scene).snapshot());
   const rejected = assert.rejects(stage.prepare(scene), /Navi's picture could not load in time/);
   t.mock.timers.tick(CREATION_ART_LOAD_TIMEOUT_MS - 1);
@@ -389,7 +397,7 @@ test('unresponsive scene art times out once, identifies its Pal and can retry af
 });
 
 test('an invalid decoded bitmap fails playback instead of starting an empty export', async t => {
-  const { stage, images } = stageImageFixture(t), scene = createPalPlayground('kip');
+  const { stage, images } = stageImageFixture(t), scene = portraitFixture('kip');
   const rejected = assert.rejects(stage.prepare(scene), /Nook's picture could not load/);
   images[0].load(); images[0].failDecode();
   await rejected;
@@ -410,4 +418,16 @@ test('saved retired scene references resolve exact artwork while new generation 
     engine.start();
     assert.ok(engine.advance(16).actors.some(actor => actor.id === scene.actors[0].id));
   }
+});
+
+
+test('an illustrated Pal stage waits for its three world plates and exact Pal image', async t => {
+  const {stage, images} = stageImageFixture(t);
+  const scene = createPalPlayground('navi');
+  stage.render(scene, new SceneEngine(scene).snapshot());
+  const prepared = stage.prepare(scene);
+  assert.equal(images.length, 4);
+  for (const image of images) { image.load(); image.finishDecode(); }
+  await prepared;
+  assert.equal(new Set(images.map(image => image.src)).size, 4);
 });
