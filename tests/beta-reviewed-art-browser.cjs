@@ -18,7 +18,7 @@ const {chromium} = require('playwright');
       const request = route.request(), url = new URL(request.url());
       assert.equal(url.origin, origin);
       if (url.pathname === '/') {
-        await route.fulfill({contentType:'text/html', body:'<input id="reviewedArtPassphrase"><input type="file" id="betaReviewedArt"><p id="familyExitStatus"></p><script>let owner="player1"; window.FG={store:{current:()=>({id:owner})}};</script>'});
+        await route.fulfill({contentType:'text/html', body:'<input type="checkbox" id="prepareReviewedArt"><input id="reviewedArtPassphrase"><input type="file" id="betaReviewedArt"><p id="familyExitStatus"></p><script>let owner="player1"; window.FG={store:{current:()=>({id:owner})}};</script>'});
       } else if (url.pathname === '/v1/devices/unlock') {
         unlockCount++;
         if (swapDuringUnlock) await page.evaluate(()=>{
@@ -108,6 +108,31 @@ const {chromium} = require('playwright');
     assert.equal(unlockCount,counts.unlock+1,'the invalidated file read cannot unlock');
     assert.equal(reviewCount,counts.review,'a changed-then-restored profile invalidates both pending selections');
     assert.equal((await rows('player1')).length,2);
+    let preparationInput=bytes;
+    for (let pass=0; pass<2; pass++) {
+      approved=createHash('sha256').update(preparationInput).digest('hex');
+      await page.locator('#prepareReviewedArt').check();
+      await choose(preparationInput);
+      const link=page.getByRole('link',{name:'Download prepared PNG'});
+      await link.waitFor();
+      const output=Buffer.from(await link.evaluate(async a=>Array.from(new Uint8Array(await (await fetch(a.href)).arrayBuffer()))));
+      assert.notEqual(createHash('sha256').update(output).digest('hex'),approved);
+      const imageData=buffer=>{
+        const parts=[];
+        for(let at=8;at<buffer.length;){
+          const length=buffer.readUInt32BE(at);
+          if(buffer.toString('ascii',at+4,at+8)==='IDAT')parts.push(buffer.subarray(at+8,at+8+length));
+          at+=length+12;
+        }
+        return require('node:zlib').inflateSync(Buffer.concat(parts));
+      };
+      assert.deepEqual(imageData(output),imageData(bytes));
+      assert.equal((await rows('player1')).length,2);
+      await choose(output);
+      await page.getByText('Ask the operator to review and approve', {exact:false}).waitFor();
+      assert.equal((await rows('player1')).length,2);
+      preparationInput=output;
+    }
     changeOwner = true;
     await choose(bytes);
     await page.waitForFunction(() => owner === 'player2' && document.querySelector('#betaReviewedArt').value === '');

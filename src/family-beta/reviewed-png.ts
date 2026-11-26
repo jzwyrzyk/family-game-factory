@@ -126,13 +126,23 @@ export async function checkReviewedPng(bytes: ArrayBuffer) {
       const stream = new Blob(compressed).stream()
         .pipeThrough(new DecompressionStream('deflate')).pipeThrough(new CompressionStream('deflate'));
       const pixels = new Uint8Array(await new Response(stream).arrayBuffer());
-      const chunk = new Uint8Array(12 + pixels.length);
-      const fields = new DataView(chunk.buffer);
-      fields.setUint32(0, pixels.length);
-      chunk.set([73,68,65,84], 4); // IDAT
-      chunk.set(pixels, 8);
-      fields.setUint32(chunk.length - 4, pngChecksum(chunk.subarray(4, -4)));
-      return new Blob([data.subarray(0, firstImageChunk), chunk, data.subarray(-12)], {type:'image/png'});
+      function imageChunk(payload:Uint8Array<ArrayBuffer>) {
+        const chunk = new Uint8Array(12 + payload.length);
+        const fields = new DataView(chunk.buffer);
+        fields.setUint32(0, payload.length);
+        chunk.set([73,68,65,84], 4); // IDAT
+        chunk.set(payload, 8);
+        fields.setUint32(chunk.length - 4, pngChecksum(chunk.subarray(4, -4)));
+        return chunk;
+      }
+      // The user explicitly requested another file for separate approval.
+      // Preserve the entire deflate stream while giving even an already
+      // normalized original a different chunk layout and digest.
+      const split = Math.ceil(pixels.length / 2);
+      const chunks = compressed.length === 1
+        ? [imageChunk(pixels.subarray(0,split)), imageChunk(pixels.subarray(split))]
+        : [imageChunk(pixels)];
+      return new Blob([data.subarray(0, firstImageChunk), ...chunks, data.subarray(-12)], {type:'image/png'});
     },
   };
 }
