@@ -900,10 +900,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:57:57.199Z",
-      "sourceDigest": "25c4fc595fd23823c650db7152b2313c4ec95c16e6114587193c6a14d417c2ab",
-      "reviewOutcome": "updated",
-      "reviewReason": "The offline gallery and browser exercises now cover six grades, outcomes, accessible editing and game contexts. The delivery record documents measured scope and the open acceptance gates.",
+      "reviewedAt": "2026-11-26T02:04:23.762Z",
+      "sourceDigest": "f4ba7c637b1e58d413e8bb8deb8ba15975e56769b1b329844abbb022d9686ff3",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The inherited browser tests measure actual heading contrast and exercise visible checkpoint exits, preserved interruption state and budget refunds. Existing CI commands and evidence classes apply.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1144,10 +1144,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T01:59:22.696Z",
-      "sourceDigest": "c4dde15ecf5d644f1e0d0220ffef1ab699f58c75da44cf53231b3de6dfdcf8ef",
+      "reviewedAt": "2026-11-26T02:04:34.277Z",
+      "sourceDigest": "4e0fcc4058148ea8ac6f36420b31e933163d746624d7156551ffb0655f92e191",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the exact private family entry follow-up separately from the frozen gallery, performance and browser receipts, retaining the release and owner acceptance boundaries.",
+      "reviewReason": "Delivery records the final 679-test receipt and all eight Creation Studio learner layouts, with separate owner and private release gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

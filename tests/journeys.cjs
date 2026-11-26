@@ -35,6 +35,7 @@ const fs = require('node:fs');
  // Improvement save and safe text rendering.
  await nav('Remix');await page.fill('#feedbackText','<img src=x onerror=alert(1)> More dancing donuts');await page.click('#feedbackForm button[type=submit]');assert.match(await page.textContent('#feedbackStatus'),/Saved/);await nav('My Creations');assert.equal(await page.locator('#feedbackList img').count(),0);
  // Every original game and each difficulty can launch and exit.
+ const exitPaths=new Set();
  for(const game of ['gum','buckets','dragon'])for(const difficulty of ['gentle','classic','stretch']){
  await nav('Remix');await page.selectOption('#remixGame',game);await page.selectOption('#remixDifficulty',difficulty);await page.click('#playRemix');await page.waitForSelector('#page-game:not(.hidden)');
  // This loop verifies the retained original engines. Preserve the chosen UI
@@ -45,8 +46,28 @@ const fs = require('node:fs');
  if(game==='gum')assert.ok(await page.locator('.builder-piece').count()>0);
  if(game==='dragon'){await page.waitForFunction(()=>FG.runtime.snapshot().state.assets===22);await page.locator('#startBtn').click();assert.equal(await page.evaluate(()=>FG.runtime.snapshot().state.dragonHP),2)}
  if(game==='buckets'){for(let i=0;i<4;i++)await page.locator('#go').click();await page.waitForFunction(()=>FG.runtime.snapshot().state.mode==='result');await page.locator('#go').click();assert.equal(await page.locator('#stage-overlay').isVisible(),true)}
- await page.click('#exitGame');
+ const checkpoint=await page.evaluate(()=>FG.learning.activeAttemptId?{
+   id:FG.learning.activeAttemptId, budget:FG.store.current().mathWindow.length
+ }:null);
+ if(checkpoint){
+   await page.locator('#stage-overlay [data-action="leave-game"]').click();
+   const ended=await page.evaluate(id=>{
+     const saved=JSON.parse(localStorage.getItem('family-game-factory-state-v1'));
+     const child=saved.profiles.find(profile=>profile.id===saved.activeProfile);
+     const attempt=child.learning.attempts.find(entry=>entry.id===id);
+     return {outcome:attempt.outcome,answers:attempt.answers.length,budget:child.mathWindow.length};
+   },checkpoint.id);
+   assert.deepEqual(ended,{outcome:'interrupted',answers:0,budget:checkpoint.budget-1},
+     'Leaving an unanswered checkpoint saves its interruption and refunds the single opportunity');
+   exitPaths.add('checkpoint');
+ }else{
+   await page.click('#exitGame');
+   exitPaths.add('game');
  }
+ await page.waitForSelector('#page-home:not(.hidden)');
+ assert.equal(await page.locator('#game-mount').evaluate(node=>node.inert),false);
+ }
+ assert.deepEqual([...exitPaths].sort(),['checkpoint','game'],'Both visible exits take the player home');
  // Shared math: wrong response saved immediately, a useful hint, and supported recovery.
  await nav('My Powers');const labAttempt=await answerActivity(false);
  assert.equal(await page.locator('#lab-question .math-feedback').getAttribute('data-state'),'incorrect');

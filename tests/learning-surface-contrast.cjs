@@ -126,7 +126,7 @@ function productionStyles() {
 
         await mountMath(page, true);
         await page.locator('#math-answer').fill('55');
-        await check(page, '.math-activity h2, .math-answer-form label, #math-answer', `${label} dark math question and answer`);
+        await check(page, '.math-activity h2, .math-answer-form label, #math-answer', `${label} math question and answer`);
         await check(page, '.math-save-warning', `${label} math save failure`);
         await page.locator('#math-submit').click();
         await check(page, '.math-feedback', `${label} math incorrect feedback`);
