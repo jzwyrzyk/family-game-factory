@@ -31,7 +31,7 @@ test('aggregates reject replaced or self-claimed plan bytes before parsing', () 
 });
 
 test('all original Arcade leaf commands occur exactly once in their original required group', () => {
-  assert.deepEqual(verifyCoverage(manifest, pkg), { notifications: 2, browser: 47, learning: 12, creative: 71 });
+  assert.deepEqual(verifyCoverage(manifest, pkg), { notifications: 2, browser: 50, learning: 12, creative: 76 });
   const covered = Object.values(manifest.shards).flatMap(shard => expandCommands(shard.commands, pkg.scripts));
   for (const file of ['tests/game-art-security.cjs', 'tests/game-art-browser.cjs', 'tests/drawing-workspace-browser.cjs']) {
     assert.equal(covered.filter(argv => argv.includes(file)).length, 1, file);

@@ -132,6 +132,10 @@ export class CreationStore {
     const data=this.read(),project=this.entry(data,id,owner),revision=data.revisions.find(r=>r.id===project.headId)!;
     return clone({project,revision,scene:revision.scene,draft:data.drafts.find(d=>d.projectId===id)??null});
   }
+  keptRevision(id:string,owner:string):CreationRevision|null {
+    const data=this.read(),project=this.entry(data,id,owner);
+    return project.keptId ? clone(data.revisions.find(r=>r.projectId===id&&r.id===project.keptId)!) : null;
+  }
   history(id:string,owner:string):CreationRevision[]{const data=this.read();this.entry(data,id,owner);return clone(data.revisions.filter(r=>r.projectId===id));}
   attempts(id:string,owner:string):CreationAttempt[]{const data=this.read();this.entry(data,id,owner);return clone(data.attempts.filter(a=>a.projectId===id));}
   create(owner:string,input:CreationProject,options:{challengeId?:string}={}):CreationEntry {

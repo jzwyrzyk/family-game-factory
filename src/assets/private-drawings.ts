@@ -1,6 +1,6 @@
 import {artFootprint, checkReservedArtRoom, clearSketchRecord, pendingSketchRecord} from '../drawing/sketch-keep-record';
 import {sceneAssetSlots} from '../creation/model';
-import { originalFor, validSemanticIdentity } from './art-lineage';
+import { originalFor, normalizeDrawingLabel, validSemanticIdentity } from './art-lineage';
 import {retainedPins} from '../game-art/bindings';
 import {assertRewardSourceLockHeld,setRewardSourceMaintenance} from '../rewards/write-guard';
 /** Private immutable image bytes. Metadata and visibility can change; the image cannot. */
@@ -74,7 +74,7 @@ export async function prepareDrawing(owner: string, name: string, file: Blob): P
 }
 
 export async function drawings(owner: string): Promise<Drawing[]> {
-  artOwner(owner); return withArtTransaction(['drawings'], 'readonly', async transaction => ownerArtRecords<Drawing>(transaction,'drawings',owner));
+  artOwner(owner); return withArtTransaction(['drawings'], 'readonly', async transaction => (await ownerArtRecords<Drawing>(transaction,'drawings',owner)).map(normalizeDrawingLabel));
 }
 export async function drawing(owner: string, id: string): Promise<Drawing> {
   artOwner(owner);
@@ -83,7 +83,7 @@ export async function drawing(owner: string, id: string): Promise<Drawing> {
     if (!item || item.owner !== owner) throw Error('Choose a drawing from this profile.'); return item;
   });
   if (await drawingHash(result.bytes) !== result.sha256) throw Error('The original drawing does not match its saved fingerprint. Open your art backup to recover a copy.');
-  return result;
+  return normalizeDrawingLabel(result);
 }
 export async function saveDrawing(owner: string, name: string, file: Blob, sourceId?: string, guard?: ArtGuard, category?: DrawingCategory, keepToken?: string): Promise<Drawing> {
   assertArtWrite(owner, guard); const item = await prepareDrawing(owner, name, file); assertArtWrite(owner, guard);
@@ -97,7 +97,8 @@ export async function saveDrawing(owner: string, name: string, file: Blob, sourc
       const source = metadata.find(original => original.owner === owner && original.id === sourceId);
       if (!source) throw Error('Original drawing not found in this profile.');
       item.sourceId = sourceId; item.sourceSha256 = source.sha256; item.category = source.category || 'other';
-      if (source.semanticIdentity) item.semanticIdentity = source.semanticIdentity;
+      const meaning = normalizeDrawingLabel(source).semanticIdentity;
+      if (meaning) item.semanticIdentity = meaning;
     }
     if (keepToken) {
       const pending = await pendingSketchRecord(transaction,owner);
@@ -124,18 +125,19 @@ export async function updateDrawing(owner: string, id: string, changes: { name?:
   return withArtTransaction(['drawings'], 'readwrite', async transaction => {
     const store = transaction.objectStore('drawings'), item = await artRequest(store.get(id)) as Drawing | undefined;
     if (!item || item.owner !== owner) throw Error('Choose artwork from this profile.');
-    const updated = { ...item, ...changes, ...(changes.name !== undefined ? { name: changes.name.trim() } : {}), updatedAt: new Date().toISOString() };
+    const label = normalizeDrawingLabel(item);
+    const updated = { ...label, ...changes, ...(changes.name !== undefined ? { name: changes.name.trim() } : {}), updatedAt: new Date().toISOString() };
     if (changes.semanticIdentity !== undefined) {
       const meaning = changes.semanticIdentity.trim();
       if (meaning) updated.semanticIdentity = meaning;
       else delete updated.semanticIdentity;
-      if (meaning !== (item.semanticIdentity ?? '')) {
+      if (meaning !== (label.semanticIdentity ?? '')) {
         const records = await ownerArtRecords<DrawingMetadata>(transaction, 'drawingMetadata', owner);
         const byId = new Map(records.map(row => [row.id, row]));
         const root = originalFor(byId.get(id)!, byId);
         for (const row of records) {
           if (row.id === id || originalFor(row, byId).id !== root.id) continue;
-          const version = await artRequest(store.get(row.id)) as Drawing;
+          const version = normalizeDrawingLabel(await artRequest(store.get(row.id)) as Drawing);
           if (meaning) version.semanticIdentity = meaning;
           else delete version.semanticIdentity;
           assertArtWrite(owner, guard);
@@ -241,7 +243,10 @@ export async function drawingPage(owner:string,query:DrawingPageQuery={}):Promis
   const store=transaction.objectStore('drawingMetadata'),total=await artRequest(store.index('owner').count(IDBKeyRange.only(owner)));
   const range=IDBKeyRange.bound([owner,'',''],[owner,...(query.after??['\uffff','\uffff'])],false,!!query.after);
   const items:DrawingMetadata[]=[],search=(query.search??'').trim().toLowerCase();
-  await new Promise<void>((resolve,reject)=>{const request=store.index('ownerCreated').openCursor(range,'prev');request.onerror=()=>reject(request.error);request.onsuccess=()=>{const cursor=request.result;if(!cursor||items.length>limit){resolve();return;}const item=cursor.value as DrawingMetadata;if((query.archived===undefined||Boolean(item.archived)===query.archived)&&(!query.category||(item.category??'other')===query.category)&&(!search||item.name.toLowerCase().includes(search)||item.semanticIdentity?.toLowerCase().includes(search)))items.push(item);cursor.continue();};});
+  await new Promise<void>((resolve,reject)=>{const request=store.index('ownerCreated').openCursor(range,'prev');request.onerror=()=>reject(request.error);request.onsuccess=()=>{const cursor=request.result;if(!cursor||items.length>limit){resolve();return;}let item: DrawingMetadata;
+    try { item = normalizeDrawingLabel(cursor.value as DrawingMetadata); }
+    catch (error) { reject(error); return; }
+    if((query.archived===undefined||Boolean(item.archived)===query.archived)&&(!query.category||(item.category??'other')===query.category)&&(!search||item.name.toLowerCase().includes(search)||item.semanticIdentity?.toLowerCase().includes(search)))items.push(item);cursor.continue();};});
   const hasMore=items.length>limit;if(hasMore)items.pop();const last=items.at(-1);return {items,next:hasMore&&last?[last.createdAt,last.id]:null,total};
  });
 }

@@ -173,3 +173,24 @@
   .drawing-paint.dp-pocket-open .dp-desk{display:none}
   .drawing-paint.dp-pocket-open .dp-tools{position:static;max-height:none;overflow:visible;overscroll-behavior:auto;box-shadow:none}
 }
+
+.drawing-lab:has(.dl-canvas) .dl-header p,
+.drawing-lab:has(.dl-canvas) .dl-note { font-size: var(--jems-child-body,20px); }
+.drawing-lab:has(.dl-canvas) :is(button,input,select,summary,.dl-canvas-help,.dl-tools label,.dl-guidance,.dl-footer,.dl-steps [data-draft-status],figcaption) {
+  font-size: var(--jems-child-label,18px);
+}
+.drawing-lab .dl-steps:not(:has([data-draft-status]:not(:empty))) { display: none; }
+.drawing-lab .dl-steps [data-draft-status] { margin-left: 0; max-width: 100%; }
+.drawing-lab .dl-piece-list button { min-width: 0; }
+@media(max-width:480px){
+ .drawing-lab:has(.dl-canvas) .dl-footer>span:last-child { display:none; }
+ .drawing-lab:has(.dl-canvas) .dl-header { align-items:center; }
+}
+.drawing-paint [data-eraser][aria-pressed="true"] { outline: 3px solid #7952c9; }
+.drawing-paint .dl-header > button, .drawing-paint .dp-tools button:not([aria-label]) {
+  min-height: 48px;
+  font-size: var(--jems-child-label,18px);
+}
+
+.drawing-lab.dl-rig-preview { width:min(850px,96vw); }
+.dl-rig-preview .dl-main { grid-template-columns:minmax(0,1fr); }

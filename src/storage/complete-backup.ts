@@ -35,7 +35,17 @@ export function completeSources(snapshot:CompleteBackup){
 }
 export async function checkCompleteArtwork(snapshot:CompleteBackup):Promise<void>{
  const owners=snapshot.progress.profiles?.map((p:any)=>p.id);if(!Array.isArray(owners)||!owners.length||new Set(owners).size!==owners.length||snapshot.art.length!==owners.length||new Set(snapshot.art.map(x=>x.owner)).size!==owners.length||snapshot.art.some(x=>!owners.includes(x.owner)))throw Error('This backup is missing a player’s original artwork.');
- for(const entry of snapshot.art){await validateArtBundle(entry.bundle);if(entry.activeRigId!==undefined&&entry.activeRigId!==null&&!entry.bundle.rigs.some(r=>r.id===entry.activeRigId))throw Error('The selected movement version is missing.');}
+ const pictureIds = new Set<string>(), rigIds = new Set<string>();
+ for (const entry of snapshot.art) {
+   await validateArtBundle(entry.bundle);
+   for (const [records, ids] of [[entry.bundle.drawings, pictureIds], [entry.bundle.rigs, rigIds]] as const) {
+     for (const {id} of records) {
+       if (ids.has(id)) throw Error('An artwork version in this backup belongs to more than one player.');
+       ids.add(id);
+     }
+   }
+   if (entry.activeRigId != null && !entry.bundle.rigs.some(rig => rig.id === entry.activeRigId)) throw Error('The selected movement version is missing.');
+ }
  const find=(owner:string)=>snapshot.art.find(x=>x.owner===owner)?.bundle,sources=completeSources(snapshot);
  for(const {owner,notebook} of sources.notebooks){
   const images=new Map(find(owner)?.drawings.map(d=>[d.id,{...d,owner}]));

@@ -1,5 +1,5 @@
 import { ILLUSTRATED_WORLDS, WORLD_PROPS } from './illustrated-art';
-import type { CreationProject, SceneActor } from './model';
+import {worldView, type CreationProject, type SceneActor } from './model';
 
 // Paint order is independent of interpreter order, including simultaneous programs.
 export function orderedPlacements<T extends SceneActor>(actors:T[]):T[] {
@@ -37,7 +37,8 @@ export function worldTiles(open: (id: string) => void) {
 
 type LayerName = 'middle' | 'foreground';
 export function setWorldLayer(project: CreationProject, name: LayerName, visible: boolean) {
-  project.worldLayers = { middle: true, foreground: true, ...project.worldLayers, [name]: visible };
+  const version = worldView(project);
+  project.worldLayers = {middle:version.middle,foreground:version.foreground,[name]:visible};
 }
 
 export function placeBackdrop(project: CreationProject, art: { assetId: string; label: string }): SceneActor {
@@ -58,7 +59,8 @@ export function worldControls(project: CreationProject, handlers: {
   addProp: (id: string) => void;
 }) {
   const tools = document.createDocumentFragment();
-  const world = ILLUSTRATED_WORLDS.find(item => item.id === (project.world?.assetId ?? project.background));
+  const version = worldView(project);
+  const world = ILLUSTRATED_WORLDS.find(item => item.id === version.assetId);
   const layers = document.createElement('div');
   layers.className = 'creation-world-layers';
   const check = (name: string, on: boolean, update: (value: boolean) => void) => {
@@ -68,8 +70,8 @@ export function worldControls(project: CreationProject, handlers: {
     label.append(input, name); layers.append(label);
   };
   if (world) {
-    check('Middle scenery', project.worldLayers?.middle !== false, on => handlers.layer('middle', on));
-    check('Front scenery', project.worldLayers?.foreground !== false, on => handlers.layer('foreground', on));
+    check('Middle scenery', version.middle, on => handlers.layer('middle', on));
+    check('Front scenery', version.foreground, on => handlers.layer('foreground', on));
   }
   const backdrop = project.actors.find(actor => actor.layer === 'backdrop');
   if (backdrop) check('Show my backdrop', backdrop.visible !== false, handlers.toggleBackdrop);

@@ -1943,7 +1943,7 @@ export async function installStudio(){
    }
    check();await open(id,false);if(authorized()&&activeId===id){await setTab('talk');artPlanBox.scrollIntoView({block:'nearest'});}
   },
-  openScene:async art=>{await creation.openArt(art);},
+  openScene:async (art,kind)=>{await creation.openArt(art,kind);},
   openCar:async(rigId,isCurrent)=>{
    if(!isCurrent()||guardMath())return;const capturedOwner=owner(),capturedEpoch=epoch;
    const stillCurrent=()=>isCurrent()&&owner()===capturedOwner&&epoch===capturedEpoch;

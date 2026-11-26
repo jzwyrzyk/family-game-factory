@@ -1,8 +1,9 @@
+import {editRelativeSteps} from './step-editor';
 import type { Drawing } from '../assets/private-drawings';
 import { artChoice, resolvePrivateArt } from '../creation/private-art';
 import { assertRewardSourceWritable } from '../rewards/write-guard';
 import { defaultAssembly } from './model';
-import { MAX_PATH_POINTS, type DrawingMotion, type PathPoint } from './motion';
+import { MAX_PATH_POINTS, type AbsolutePath, type PathPoint } from './motion';
 import { rigById, saveRig, type SavedRig } from './store';
 import './motion.css';
 
@@ -10,7 +11,7 @@ const unit = (value: number) => Math.max(0, Math.min(1, value));
 
 /** A path is another immutable movement version in the same private art store. */
 export async function editMotionPath(owner: string, source: Drawing, rigId: string | undefined,
-  current: () => boolean, onSaved: (saved: SavedRig) => Promise<void>) {
+  current: () => boolean, onSaved: (saved: SavedRig) => Promise<void>, steps?:{create:boolean; editParts:()=>void}) {
   const sameView = () => current() && String((window as any).FG.store.current().id) === owner;
   assertRewardSourceWritable();
   if (!sameView() || source.owner !== owner) throw Error('Open a drawing from your own art.');
@@ -22,7 +23,17 @@ export async function editMotionPath(owner: string, source: Drawing, rigId: stri
     id:'picture', name:'My picture', role:'decoration', physical:false, parentId:null,
     region:{x:0, y:0, w:1, h:1, shape:'rect'},
   }]);
-  const motion: DrawingMotion = structuredClone(assembly.motion ?? {points:[], stepMs:600, sprite:parent ? 'cutout' : 'original'});
+  if (steps?.create || (assembly.motion && 'stops' in assembly.motion)) {
+    const stored = assembly.motion && 'stops' in assembly.motion ? assembly.motion : undefined;
+    editRelativeSteps(resolved.image,source.name,stored,sameView,async motion => {
+      const result = await saveRig(owner,{...assembly,motion,revision:parent ? assembly.revision + 1 : 1},
+        parent?.id ?? null,sameView);
+      if (sameView()) await onSaved(result);
+    },steps?.editParts ?? (()=>{}));
+    return;
+  }
+  const prior = assembly.motion && !('move' in assembly.motion) && !('stops' in assembly.motion) ? assembly.motion : undefined;
+  const motion: AbsolutePath = structuredClone(prior ?? {points:[], stepMs:600, sprite:parent ? 'cutout' : 'original'});
   const dialog = document.createElement('dialog');
   dialog.className = 'motion-path';
   dialog.setAttribute('aria-labelledby', 'motionPathTitle');
@@ -52,7 +63,7 @@ export async function editMotionPath(owner: string, source: Drawing, rigId: stri
   let dragging: {id:number; before:PathPoint[]} | null = null;
   let frame = 0, busy = false, saved = false, keyboard = false;
   const alive = () => dialog.open && sameView();
-  const changed = () => JSON.stringify(motion) !== JSON.stringify(assembly.motion ?? {points:[],stepMs:600,sprite:motion.sprite});
+  const changed = () => JSON.stringify(motion) !== JSON.stringify(prior ?? {points:[],stepMs:600,sprite:motion.sprite});
   const paint = (sprite: PathPoint = motion.points.at(-1) ?? cursor) => {
     const {width:w,height:h} = canvas;
     ctx.clearRect(0,0,w,h);

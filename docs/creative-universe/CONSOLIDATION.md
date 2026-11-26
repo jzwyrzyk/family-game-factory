@@ -1,0 +1,9 @@
+# Creative Universe review candidate
+
+This candidate reads the three stored movement formats. The original format determines the starting point, scaling, timing and block semantics. Stage-space paths use absolute positions, inset paths start at the center and produce relative moves, and preset animations use the saved pose function. All use the existing owner-scoped drawing and rig store. A child can edit branches of a drawing's revision history independently.
+
+The stage reads three world object formats and versioned background IDs. Earlier percentage placements retain their proportions. Earlier stage-coordinate scenery keeps its original dimensions. Draw order, foreground visibility, private asset pins and the kept version survive an independent world copy. A named path remains attached to the saved block sequence and can be reused from the exact kept version. Full library restoration validates each reference against the matching owner's image or rig digest.
+
+The trusted local picture hunt retains the authored tap rules and each saved game version. The separately packaged local Gem Hunt uses the existing archived rules and its host-rendered private sprite. The sample notebook playback and isolated sprite-slot qualification have independent entry points. Restricted family builds omit the local review players. General hosted private-art delivery requires separate authorization and qualification.
+
+Before rolling out new writers, qualify the receiving build's readers against the archived original writers and restored synthetic records. Retain original revision bytes and owner backups. Older writers can resume against their own compatible saved snapshot. Cross-format downgrade of newly authored movements, layered scenery and compound worlds requires an independently validated reader before those records can be edited. This candidate has no production rollout authorization.

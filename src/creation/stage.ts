@@ -1,7 +1,7 @@
 import { pointerPoint } from '../drawing/pointer-input';
 import { orderedPlacements } from './world-tools';
 import type { SceneLayer } from './model';
-import { SCENE_WORLDS, sceneAssetSlots, type CreationProject } from './model';
+import { SCENE_WORLDS, sceneAssetSlots, worldView, sceneryPlacements, type CreationProject } from './model';
 import type { ActorSnapshot, SceneSnapshot } from './engine';
 import { creationAsset, drawCreationVector, parsePrivateArtId, type CreationAsset } from './projects';
 import type { PrivateArtResolver } from './private-art';
@@ -18,7 +18,7 @@ const worldImages = new Map(SCENE_WORLDS.map(world => {
 }));
 
 function worldArt(project: CreationProject) {
-  return worldImages.get(project.world?.assetId ?? project.background);
+  return worldImages.get(worldView(project).assetId ?? '');
 }
 
 export const CREATION_ART_LOAD_TIMEOUT_MS = 8_000;
@@ -59,7 +59,7 @@ export class CreationStage {
       if (epoch !== this.artEpoch || !current()) throw Error('The scene or player changed. Choose Play again when you are ready.');
     };
     assertCurrent();
-    const assets = [...new Set(project.actors.map(actor => actor.assetId))]
+    const assets = [...new Set(sceneAssetSlots(project).map(slot => slot.assetId))]
       .map(id => creationAsset(id)).filter((asset): asset is CreationAsset => !!asset?.url);
     const world = worldArt(project);
     if (world) {
@@ -67,7 +67,7 @@ export class CreationStage {
       if (world.middle) assets.push(world.middle);
       if (world.foreground) assets.push(world.foreground);
     }
-    const backdrop = project.actors.find(actor => actor.layer === 'backdrop')?.assetId ?? project.world?.assetId;
+    const backdrop = project.actors.find(actor => actor.layer === 'backdrop')?.assetId ?? worldView(project).assetId;
     await Promise.all([...assets.map(asset => this.loadImage(asset).ready),
       ...(backdrop && parsePrivateArtId(backdrop) && this.backdropArt ? [this.backdropArt.load(backdrop)] : [])]);
     assertCurrent();
@@ -128,6 +128,7 @@ export class CreationStage {
     // not every Pal/form visited across the whole collection.
     const assets = new Set(sceneAssetSlots(scene).map(slot => slot.assetId));
     const world = worldArt(scene);
+    if (world) assets.add(world.plate.id);
     if (world?.middle) assets.add(world.middle.id);
     if (world?.foreground) assets.add(world.foreground.id);
     for (const [id, entry] of this.images) if (!assets.has(id)) { entry.cancel(); this.images.delete(id); this.failedArt.delete(id); }
@@ -137,6 +138,8 @@ export class CreationStage {
     c.clearRect(0, 0, w, h);
     this.background(scene);
     const placements = orderedPlacements(snapshot.actors);
+    const version = worldView(scene);
+    const scenery = sceneryPlacements(scene);
     const drawActors = (layer: SceneLayer) => {
       for (const actor of placements) {
         if (actor.visible && (actor.layer ?? 'middle') === layer) this.actor(actor, actor.id === selected);
@@ -144,15 +147,17 @@ export class CreationStage {
     };
     drawActors('backdrop');
     drawActors('back');
-    if (world?.middle && scene.worldLayers?.middle !== false) {
+    if (world?.middle && version.middle) {
       const layer = this.loadImage(world.middle);
       if (layer.loaded) this.paintWorldImage(scene, layer.image);
     }
+    this.paintScenery(scenery, false);
     drawActors('middle');
-    if (world?.foreground && scene.worldLayers?.foreground !== false) {
+    if (world?.foreground && version.foreground) {
       const layer = this.loadImage(world.foreground);
       if (layer.loaded) this.paintWorldImage(scene, layer.image);
     }
+    this.paintScenery(scenery, true);
     drawActors('front');
     const placement = allowResize && selected ? snapshot.actors.find(actor => actor.id === selected && actor.visible && actor.layer !== 'backdrop') : undefined;
     if (placement) {
@@ -209,14 +214,27 @@ export class CreationStage {
     });
     return undefined;
   }
+  private paintScenery(placements: ReturnType<typeof sceneryPlacements>, front: boolean) {
+    for (const piece of placements) {
+      if (piece.front !== front) continue;
+      const asset = creationAsset(piece.assetId);
+      const bundled = asset && this.loadImage(asset);
+      const image = bundled ? (bundled.loaded ? bundled.image : undefined) : this.privatePicture(piece.assetId)?.image;
+      if (!image) continue;
+      const scale = piece.size / Math.max(image.width, image.height);
+      const width = image.width * scale, height = image.height * scale;
+      this.context.drawImage(image, piece.x - width / 2, piece.y - height / 2, width, height);
+    }
+  }
   private paintWorldImage(scene: CreationProject, image: HTMLImageElement | HTMLCanvasElement) {
-    const scale = (scene.world?.framing === 'fit' ? Math.min : Math.max)(scene.width / image.width, scene.height / image.height);
+    const scale = (worldView(scene).framing === 'fit' ? Math.min : Math.max)(scene.width / image.width, scene.height / image.height);
     const width = image.width * scale, height = image.height * scale;
     this.context.drawImage(image, (scene.width - width) / 2, (scene.height - height) / 2, width, height);
   }
   private background(scene: CreationProject) {
-    if (scene.world || worldArt(scene)) {
-      const context = this.context, assetId = scene.world?.assetId ?? scene.background;
+    const version = worldView(scene);
+    if ((scene.world || worldArt(scene)) && !version.classic) {
+      const context = this.context, assetId = version.assetId ?? scene.background;
       const bundled = worldArt(scene);
       const entry = bundled && this.loadImage(bundled.plate);
       const image = bundled ? (entry?.loaded ? entry.image : undefined) : this.privatePicture(assetId, this.backdropArt, "backdrop:"+assetId)?.image;
@@ -236,7 +254,8 @@ export class CreationStage {
     }
     // Retained scenes without a world pin keep their original visual design.
     const c = this.context, w = scene.width, h = scene.height;
-    const night = scene.background === 'night', workshop = scene.background === 'workshop', sky = scene.background === 'sky';
+    const background = version.classic ?? scene.background;
+    const night = background === 'night', workshop = background === 'workshop', sky = background === 'sky';
     const gradient = c.createLinearGradient(0, 0, 0, h);
     gradient.addColorStop(0, night ? '#222B66' : workshop ? '#E7DEFF' : '#B9E7F5');
     gradient.addColorStop(1, night ? '#7564B8' : workshop ? '#FFF4E5' : '#FFF3DC');

@@ -1,0 +1,14 @@
+.dl-motion {display:grid;grid-template-columns:minmax(0,2.5fr) minmax(225px,1fr);align-items:start;gap:20px;padding:22px}
+.dl-motion h3 {font:800 1.55rem var(--jems-round,system-ui);margin:0}
+.dl-motion p {font-size:1rem;color:#48435a;line-height:1.4;margin:.5em 0}
+.dl-motion canvas {display:block;width:100%;border:2px solid #cabedb;border-radius:16px;background-color:#fffcf6;touch-action:manipulation;cursor:crosshair}
+.dl-motion-controls {display:grid;gap:10px;padding:14px;background:#f7f1fd;border-radius:16px}
+.drawing-lab .dl-motion-controls button,.drawing-lab .dl-motion-controls select {font:700 1.05rem var(--jems-body,system-ui);min-height:48px}
+.dl-motion-controls [data-directions] {display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.dl-motion-controls [data-directions] button {font-size:1.4rem;padding:6px}
+.dl-motion-controls label {display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dl-motion-controls [data-save-motion] {color:white;background:#6741a6}
+@media(max-width:760px){.dl-motion{grid-template-columns:1fr;padding:14px;gap:12px}.dl-motion-controls{grid-template-columns:repeat(2,minmax(0,1fr))}.dl-motion-controls [data-directions],.dl-motion-controls label{grid-column:1/-1}}
+
+.drawing-lab.is-path-editor .dl-header {align-items:center}
+.drawing-lab.is-path-editor .dl-footer {font-size:1rem}

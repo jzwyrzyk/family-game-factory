@@ -1,21 +1,33 @@
+import {validateDrawingMotion, type DrawingMotion as PresetMotion} from './animation-path';
+import {validateMotion as validateStops, placeDrawingMotion, type DrawingMotion as StopMotion} from './relative-stops';
 import type { CreationProject, SceneActor } from '../creation/model';
 
 export interface PathPoint { x: number; y: number }
-export interface DrawingMotion {
+export interface AbsolutePath {
   /** Positions are fractions of the stage. The first point places the actor. */
   points: PathPoint[];
   stepMs: number;
   sprite: 'original' | 'cutout';
 }
+export type DrawingMotion = AbsolutePath | PresetMotion | StopMotion;
+
+export function usesOriginalSprite(motion: DrawingMotion | undefined): boolean {
+  return !!motion && ('stops' in motion || motion.sprite === 'original');
+}
+
 export const MAX_PATH_POINTS = 16;
 
 export function validateMotion(input: unknown): asserts input is DrawingMotion {
-  const motion = input as DrawingMotion;
+  if (input && typeof input === 'object') {
+    if ('move' in input) { validateDrawingMotion(input); return; }
+    if ('stops' in input) { validateStops(input); return; }
+  }
+  const motion = input as AbsolutePath;
   const coordinate = (value: unknown) => typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1;
   if (!motion || typeof motion !== 'object' || Object.keys(motion).some(key => !['points','stepMs','sprite'].includes(key))
     || !['original','cutout'].includes(motion.sprite) || ![300,600,1000].includes(motion.stepMs)
     || !Array.isArray(motion.points) || motion.points.length < 2 || motion.points.length > MAX_PATH_POINTS
-    || motion.points.some(point => !point || typeof point !== 'object' || Object.keys(point).some(key => key !== 'x' && key !== 'y')
+    || Array.from(motion.points).some(point => !point || typeof point !== 'object' || Object.keys(point).some(key => key !== 'x' && key !== 'y')
       || !coordinate(point.x) || !coordinate(point.y))) throw Error('Choose two to sixteen stops and a speed for your path.');
 }
 
@@ -25,6 +37,14 @@ export function applyArtMotion(project: CreationProject, actor: SceneActor, moti
   validateMotion(motion);
   if (project.programs.some(program => program.actorId === actor.id && program.trigger.type === 'start')) {
     throw Error('This character already has a start program.');
+  }
+  if ('stops' in motion || 'move' in motion) {
+    const actions = 'stops' in motion
+      ? placeDrawingMotion(motion, actor, project, () => crypto.randomUUID())
+      : [{id: crypto.randomUUID(), type: 'animation' as const, motion: structuredClone(motion),
+          origin: motion.move === 'path' ? 'child' as const : 'starter' as const}];
+    project.programs.push({id:crypto.randomUUID(), actorId:actor.id, trigger:{type:'start'}, actions});
+    return;
   }
   const [first, ...rest] = motion.points;
   actor.x = Math.round(first.x * project.width);

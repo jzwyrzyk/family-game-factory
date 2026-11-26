@@ -1,6 +1,6 @@
 import {listCreativeAssetChoices} from '../assets/creative-library';
 import {renderCreativePicker} from '../assets/creative-picker';
-import {SCENE_WORLDS, type CreationProject, type SceneWorld} from './model';
+import {SCENE_WORLDS, worldView, type CreationProject, type SceneWorld} from './model';
 
 /** A world is a picture behind the stage. It never receives an actor or a program. */
 export function worldSettings(host:HTMLElement, dialog:HTMLDialogElement, actions:{
@@ -70,23 +70,25 @@ export function worldSettings(host:HTMLElement, dialog:HTMLDialogElement, action
     else if(assetId!=='private') await actions.choose(undefined,assetId as CreationProject['background']);
   };
   frame.onchange = async () => {
-    if(scene?.world) await actions.choose({...scene.world,framing:frame.value==='fill'?'fill':'fit'});
+    if (!scene?.world) return;
+    const w = scene.world, fill = frame.value === 'fill';
+    await actions.choose('fit' in w ? {...w, fit:fill?'cover':'contain'} : {...w, framing:fill?'fill':'fit'});
   };
   return {
     close, open,
     render(project:CreationProject){
       scene=project;
-      const world=project.world;
-      const bundled = SCENE_WORLDS.find(item => item.id === (world?.assetId ?? project.background));
-      const own = world && !bundled;
+      const world=project.world, version = worldView(project);
+      const bundled = SCENE_WORLDS.find(item => item.id === version.assetId);
+      const own = world && !bundled && !version.classic;
       preview.hidden = !bundled?.preview;
       if (bundled?.preview) {
         if (preview.getAttribute('src') !== bundled.preview) preview.src = bundled.preview;
       } else preview.removeAttribute('src');
       if(own) select.append(privateOption); else privateOption.remove();
-      select.value=own?'private':world?.assetId??project.background;
+      select.value=own?'private':version.classic ?? version.assetId ?? project.background;
       frameLabel.hidden=!world;
-      frame.value=world?.framing??'fit';
+      frame.value=version.framing;
     },
   };
 }

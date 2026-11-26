@@ -320,10 +320,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:35:53.832Z",
-      "sourceDigest": "36dbdb45e6493c96d3f8db5fb000705c3e35bb2ed2471d30012b463cfceebfaf",
+      "reviewedAt": "2026-11-26T04:58:55.416Z",
+      "sourceDigest": "1f4db66648521e9474e3cad259e72d54ba389f093fb90c773a7d9cf6c7ec2951",
       "reviewOutcome": "updated",
-      "reviewReason": "My Art entries and existing game tools now return a role and local action to the same idea. The normal online Build and review sample have distinct availability.",
+      "reviewReason": "Reviewed separate whole-picture, step-path and articulated-part entry points and accessible controls.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -424,10 +424,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "ed4992daf896357520826f418cefd93793c21876ee726c9e255d747d5c1b6fb7",
-      "reviewedAt": "2026-11-26T04:37:49.983Z",
+      "sourceDigest": "0f104c3ab757743b950768f42393cd0b1a6a1eb84a0428ba2be53da61cdb2d6f",
+      "reviewedAt": "2026-11-26T04:59:33.575Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed integrated world editing and kept-copy storage, exact crayon coordinate recovery, the explicit service archive input and CI leaf contracts against current documentation.",
+      "reviewReason": "Verified world edition readers, placement behavior and scoped authored movement blocks against CAD and storage documentation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -695,10 +695,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:37:50.739Z",
-      "sourceDigest": "04ba1e7226ba9eb97da748000d996e8f432806a244f8187e3e6dc8612fc9c74a",
+      "reviewedAt": "2026-11-26T04:58:56.326Z",
+      "sourceDigest": "a0be9070db1755553326aa1b2f69e7969a6bc7e82cdc74eb95a1e9c65ca1221e",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed integrated world editing and kept-copy storage, exact crayon coordinate recovery, the explicit service archive input and CI leaf contracts against current documentation.",
+      "reviewReason": "Reviewed the restricted family build and explicit, static service-validator source scope.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -912,10 +912,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:37:51.119Z",
-      "sourceDigest": "efae1b74d8f561606c563dee96f44d0d204f7fddb9b5742983ced3361cfae6dd",
+      "reviewedAt": "2026-11-26T04:58:56.695Z",
+      "sourceDigest": "010918f26c558162deafd312c9c00ba7ca95ffb2230edaa4257983764ebda9d6",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed integrated world editing and kept-copy storage, exact crayon coordinate recovery, the explicit service archive input and CI leaf contracts against current documentation.",
+      "reviewReason": "Reconciled local hunt, selected-slot, path, recovery, CI and packaging test entry points.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1156,10 +1156,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T04:37:51.504Z",
-      "sourceDigest": "91c6673e7811701a9f46ed6035236d477b4db7169ae07c45efbeb990b392663d",
+      "reviewedAt": "2026-11-26T04:58:57.331Z",
+      "sourceDigest": "66d2665a5507b6c54357d80b4047ee63bc829bdb2142efed2e79fb3bfb62ae79",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed integrated world editing and kept-copy storage, exact crayon coordinate recovery, the explicit service archive input and CI leaf contracts against current documentation.",
+      "reviewReason": "Reviewed release separation and non-deploying candidate qualification.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1653,10 +1653,10 @@
         "tests/game-art/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "554a48193c631bb36dbb99682273c99adf0aee2fc64cc1aeaa6b59a584ad6624",
-      "reviewedAt": "2026-11-26T04:37:51.880Z",
+      "sourceDigest": "065d864f764235137d67c5126a283352a5de64425da58eafb9a6d64bff5ad0c1",
+      "reviewedAt": "2026-11-26T04:58:57.711Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed integrated world editing and kept-copy storage, exact crayon coordinate recovery, the explicit service archive input and CI leaf contracts against current documentation.",
+      "reviewReason": "Documented whole-drawing and articulated movement and CRC-checked exact private PNG admission.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1736,10 +1736,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "c6b5ee414e0a948ebf15addc0e5bfa6bd17c2ecc4363999ddfbb129299b152ef",
-      "reviewedAt": "2026-11-26T04:37:52.282Z",
+      "sourceDigest": "55d3c6c4180bfcfd58811139b7676cf879b7316c0c4f0e212af69fa2146c88e9",
+      "reviewedAt": "2026-11-26T04:58:58.090Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed integrated world editing and kept-copy storage, exact crayon coordinate recovery, the explicit service archive input and CI leaf contracts against current documentation."
+      "reviewReason": "Reviewed immutable image and rig pins, legacy label readers, and cross-owner recovery rejection."
     }
   ]
 }

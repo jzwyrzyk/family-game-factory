@@ -243,3 +243,5 @@ On the four early directional challenges, **Predict a move** accepts an optional
 The four illustrated starters share the versioned artwork used by the player and thumbnails. The world settings retain the static whole-stage art slot and also support a separately selectable drawing backdrop with its own visibility and framing. A child can mix props from different worlds, duplicate a placement, change its layer and move it with the keyboard or the stage handle. Layer changes change the paint order within a plane and preserve the order used by simultaneous scripts.
 
 Use this world creates an independent project from the exact kept version inside the creation store transaction. The copy keeps its pinned artwork, actor IDs, programs and placement settings. Both the local and IndexedDB authorities check the owner and kept version before copying.
+
+[Creative Universe compatibility and local playback](../creative-universe/CONSOLIDATION.md)

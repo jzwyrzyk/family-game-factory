@@ -52,13 +52,41 @@ const {chromium} = require('playwright');
     await page.getByText('Your reviewed drawing is ready.').waitFor();
     assert.deepEqual(await rows('player1'), [{name:'Reviewed workshop artwork',hash:approved,bytes:[...bytes]}]);
     await choose(Buffer.concat([bytes,Buffer.from('trailing file details')]));
-    await page.getByText('Choose a reviewed PNG without extra file data.').waitFor();
+    await page.getByText('Ask a grown-up for a reviewed PNG saved without extra file information.').waitFor();
     assert.equal(reviewCount,2);
+    // Use a previously unapproved byte identity for the copy. Its transparent
+    // canvas pixels and the compressed stream remain unchanged after stripping.
+    const chunk = (kind, payload) => {
+      const result = Buffer.alloc(12 + payload.length);
+      result.writeUInt32BE(payload.length);
+      result.write(kind,4); payload.copy(result,8);
+      result.writeUInt32BE(require('node:zlib').crc32(result.subarray(4,-4)),result.length-4);
+      return result;
+    };
+    const end = bytes.length - 12;
+    const cleanCopy = Buffer.concat([bytes.subarray(0,end),chunk('IDAT',Buffer.alloc(0)),bytes.subarray(end)]);
+    const index = cleanCopy.indexOf('IDAT') - 4;
+    const suggested = Buffer.concat([cleanCopy.subarray(0,index),chunk('PLTE',Buffer.from([24,112,243])),cleanCopy.subarray(index)]);
+    approved = createHash('sha256').update(suggested).digest('hex');
+    await choose(suggested);
+    const link = page.getByRole('link',{name:'Download image-only PNG for separate review'});
+    await link.waitFor();
+    const prepared = await link.evaluate(async el => [...new Uint8Array(await (await fetch(el.href)).arrayBuffer())]);
+    assert.deepEqual(prepared,[...cleanCopy]);
+    assert.equal(reviewCount,2);
+    assert.equal((await rows('player1')).length,1);
+    await choose(Buffer.from(prepared));
+    await page.getByText('Ask the operator to review and approve', {exact:false}).waitFor();
+    assert.equal((await rows('player1')).length,1);
+    approved = createHash('sha256').update(cleanCopy).digest('hex');
+    await choose(cleanCopy);
+    await page.getByText('Your reviewed drawing is ready.').waitFor();
+    assert.ok((await rows('player1')).some(draw => draw.hash === approved && Buffer.from(draw.bytes).equals(cleanCopy)));
     changeOwner = true;
     await choose(bytes);
     await page.waitForFunction(() => owner === 'player2' && document.querySelector('#betaReviewedArt').value === '');
     assert.deepEqual(await rows('player2'),[]);
-    assert.equal((await rows('player1')).length,1);
+    assert.equal((await rows('player1')).length,2);
     console.log('Reviewed family import passed exact bytes, digest-only review, metadata rejection and concurrent profile change.');
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

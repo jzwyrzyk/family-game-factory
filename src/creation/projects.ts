@@ -9,7 +9,7 @@ import type { Mechanics } from '../runtime/types';
 import type { Revision } from '../factory/workspace';
 import type { StudioSession } from '../studio/notebook';
 import { PAL_CATALOG, palArtworkPath, palSceneAssetId, type PalForm, type PalId } from '../pals/catalog';
-import { starterWorld, SCENE_WORLDS, validateCreationProject, parsePrivateArtId, type PrivateArtReference, type CreationProject, type CreationBlock } from './model';
+import { starterWorld, sceneAssetSlots, EARLIER_PROPS, SCENE_WORLDS, validateCreationProject, parsePrivateArtId, type PrivateArtReference, type CreationProject, type CreationBlock } from './model';
 export {parsePrivateArtId};
 export type {PrivateArtReference};
 
@@ -66,7 +66,7 @@ const historicalAssets: readonly CreationAsset[] = [
     url: './' + asset.url, palForm: asset.form as PalForm })),
 ];
 
-const worldProps = new Map<string, CreationAsset>(WORLD_PROPS.map(prop => [prop.id, {...prop, kind:'image'}]));
+const worldProps = new Map<string, CreationAsset>([...WORLD_PROPS,...EARLIER_PROPS].map(prop => [prop.id, {...prop, kind:'image'}]));
 
 /** Product-owned objects appear in their world's existing actor picker. */
 export function propsForWorld(id?: string): CreationAsset[] {
@@ -89,8 +89,8 @@ export function privateArtId(reference:PrivateArtReference):string {
 /** Local persistence allows opaque private references; remote model output is
  * deliberately restricted to the bundled catalogue by its own entry point. */
 export function validateEditableProject(input: unknown,options:{allowPrivateArt?:boolean}={}): CreationProject {
-  const project=validateCreationProject(input);
-  if(options.allowPrivateArt===false && parsePrivateArtId(project.world?.assetId)) throw Error('Private world pictures stay in the local scene editor.');
+  const project=validateCreationProject(input,{allowSavedMotion:options.allowPrivateArt});
+  if(options.allowPrivateArt===false && sceneAssetSlots(project).some(slot => parsePrivateArtId(slot.assetId))) throw Error('Private artwork and world pictures stay in the local scene editor.');
   if(project.actors.some(actor=>!creationAsset(actor.assetId)&&!(options.allowPrivateArt!==false&&parsePrivateArtId(actor.assetId)))) {
     throw Error('This scene uses artwork that is not available in this version of jems. Your saved work was not replaced.');
   }

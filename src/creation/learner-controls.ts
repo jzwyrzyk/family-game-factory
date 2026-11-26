@@ -28,6 +28,7 @@ export function firstStepsSummary(block: CreationBlock): string {
     case 'say': return `“${block.text}”`;
     case 'jump': return block.height < 50 ? 'A little hop' : block.height > 90 ? 'A big hop' : 'A happy hop';
     case 'repeat': return `${block.count} times`;
+    case 'animation': return 'Play the saved '+block.motion.move+' movement';
     case 'wait': return `${block.durationMs / 1000} seconds`;
     case 'dance': return 'Do a little dance';
     case 'show': return 'Appear in the scene';

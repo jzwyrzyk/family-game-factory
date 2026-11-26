@@ -1,3 +1,5 @@
+import {openAnimationEditor} from './animation-editor';
+import {usesOriginalSprite} from './motion';
 import {selectedCreativeImage} from '../assets/creative-library';
 import {roleLabels,roleQuestion,type GameArtPin,type GameArtRole} from '../game-art/bindings';
 import {drawing,drawingPage,drawingBlob,saveDrawing,updateDrawing,deleteArtwork,type Drawing,type DrawingCategory} from '../assets/private-drawings';
@@ -15,7 +17,7 @@ import {createIcon,iconMarkup,setIconLabel,type IconName} from '../brand/icons';
 import {assertRewardSourceWritable} from '../rewards/write-guard';
 import './studio.css';
 
-type Host={planGame(pin:GameArtPin,current:()=>boolean):Promise<void>;enter():boolean|Promise<boolean>;home():void;openCar(rigId:string,current:()=>boolean):Promise<void>;openScene(art:{drawingId:string;rigId?:string}):Promise<void>};
+type Host={planGame(pin:GameArtPin,current:()=>boolean):Promise<void>;enter():boolean|Promise<boolean>;home():void;openCar(rigId:string,current:()=>boolean):Promise<void>;openScene(art:{drawingId:string;rigId?:string},kind?:'picture-hunt'):Promise<void>};
 const categories:Record<DrawingCategory,string>={character:'Characters',vehicle:'Vehicles',prop:'Things',world:'Worlds',other:'Other art'};
 const node=<K extends keyof HTMLElementTagNameMap>(tag:K,className='',text='')=>{const e=document.createElement(tag);e.className=className;e.textContent=text;return e;};
 
@@ -106,16 +108,28 @@ export function installArtStudio(host:Host){
         if(active())await drawOnTablet(captured,saved,()=>current(captured,run),{item,sketch});
       }else await editLegacyCrayons(captured,item,saved,active);
     }));
-    const editMovement=async(rigId?:string)=>{const editor=await openDrawingLab(captured,item,savedId=>host.openCar(savedId,()=>current(captured,run)),{...(rigId?{rigId}:{}),isCurrent:()=>current(captured,run),onSaved:async()=>{if(current(captured,run)&&await refresh()){status('Movement saved. Choose where it goes next.');notify(captured);}}});editor?.addEventListener('close',()=>{if(current(captured,run))void refresh();},{once:true});};
-    const openEditor=button(versions.length?'Edit movement':'Make it move','play',()=>editMovement(choice.value||undefined),true);openEditor.id='artEditMovement';
-    const path=button('Draw a path','edit',()=>editMotionPath(captured,item,choice.value||undefined,()=>current(captured,run),async saved=>{
+    const editMovement=async(rigId?:string)=>{const editor=await openDrawingLab(captured,item,savedId=>host.openCar(savedId,()=>current(captured,run)),{startWithParts:true,...(rigId && !usesOriginalSprite(versions.find(r=>r.id===rigId)?.assembly.motion)?{rigId}:{}),isCurrent:()=>current(captured,run),onSaved:async()=>{if(current(captured,run)&&await refresh()){status('Movement saved. Choose where it goes next.');notify(captured);}}});editor?.addEventListener('close',()=>{if(current(captured,run))void refresh();},{once:true});};
+    const openEditor=button('Bring its parts to life','edit',()=>editMovement(choice.value||undefined));openEditor.id='artEditMovement';
+    const animate=button('Make it move','play',async()=>{
+      const valid=()=>current(captured,run)&&selected===id;
+      await openAnimationEditor(captured,item,versions.find(r=>r.id===choice.value),valid,async savedId=>{
+        if(!valid()||!await refresh())return;
+        const version=$<HTMLSelectElement>('artVersion');version.value=savedId;version.dispatchEvent(new Event('change'));
+        status('Animation saved. Try it in Creative Studio.');notify(captured);focusSelectedArtwork(id,captured,run);
+      },async()=>{await action(()=>editMovement(choice.value||undefined));});
+    },true);animate.id='artAnimatePath';
+    const openPath=(useSteps:boolean)=>editMotionPath(captured,item,choice.value||undefined,()=>current(captured,run),async saved=>{
       if(!await refresh())throw Error('Reopen My Art to find your saved path.');
       const version=$<HTMLSelectElement>('artVersion');version.value=saved.id;version.dispatchEvent(new Event('change'));
       status('Path saved. Choose Use in Creative Studio to play it.');notify(captured);focusSelectedArtwork(item.id,captured,run);
-    }));path.id='artDrawPath';
+    },{create:useSteps,editParts:()=>void action(()=>editMovement(choice.value||undefined))});
+    const path=button('Draw a path','edit',()=>openPath(false));path.id='artDrawPath';
+    const steps=button('Plot a path with arrows','edit',()=>openPath(true));steps.id='artStepPath';
     const scene=button('Use in Creative Studio','grid',async()=>{await host.openScene({drawingId:item.id,...(choice.value?{rigId:choice.value}:{})});});scene.id='artUseScene';
+    const hunt=button('Make a picture hunt','play',()=>host.openScene({drawingId:item.id,...(choice.value?{rigId:choice.value}:{})},'picture-hunt'));
+    hunt.id='artPictureHunt';
     const car=button('Make a Rally game','arrow',async()=>{const at=epoch;await host.openCar(choice.value,()=>current(captured,at));});car.id='artUseRally';
-    const updateCar=()=>{car.hidden=!versions.some(r=>r.id===choice.value&&r.assembly.kind==='car');};choice.onchange=updateCar;updateCar();actions.append(openEditor,path,scene,car);pane.append(actions);
+    const updateCar=()=>{car.hidden=!versions.some(r=>r.id===choice.value&&r.assembly.kind==='car');};choice.onchange=updateCar;updateCar();actions.append(animate,openEditor,path,steps,scene,hunt,car);pane.append(actions);
     if(!item.archived){
       const roleLabel=node('label','art-version-label','In my game, this picture is a…');
       const role=node('select');role.id='artGameRole';

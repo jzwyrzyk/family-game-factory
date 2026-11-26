@@ -1,4 +1,4 @@
-import { originalFor } from './art-lineage';
+import { activeArtView, normalizeDrawingLabel, originalFor } from './art-lineage';
 import { type DrawingCategory, drawingHash } from './private-drawings';
 import { type DrawingMetadata, ART_LIMITS, artOwner, artRequest, ownerArtRecords, withArtTransaction } from '../drawing/library';
 import { validateAssembly, type DrawingAssembly } from '../drawing/model';
@@ -32,7 +32,7 @@ function imageChoice(image: DrawingMetadata, root: DrawingMetadata): CreativeAss
   return {
     archived: Boolean(image.archived), logicalId: root.id, originalId: root.id, originalSha256: root.sha256, logicalName: root.name,
     drawingId: image.id, sourceSha256: image.sha256, label: image.name, category: image.category ?? 'other',
-    semanticIdentity: image.semanticIdentity, assetId: privateArtId({kind:'image',id:image.id,sha256:image.sha256}),
+    semanticIdentity: normalizeDrawingLabel(image).semanticIdentity, assetId: privateArtId({kind:'image',id:image.id,sha256:image.sha256}),
     sha256: image.sha256, representation:'image',detail:image.sourceId?'Edited picture':'Original artwork',
   };
 }
@@ -57,7 +57,8 @@ export async function selectedCreativeImage(owner:string, drawingId:string) {
 
 export async function listCreativeAssetChoices(owner: string, current: () => boolean = () => true, includeArchived = false): Promise<CreativeAssetChoice[]> {
   artOwner(owner);
-  const check = () => { if (!current()) throw Error('The player or page changed. Reopen your artwork.'); };
+  const visible = activeArtView(owner,current);
+  const check = () => { if (!visible()) throw Error('The player changed. Reopen your artwork.'); };
   check();
   const [images, rigs] = await withArtTransaction(['drawingMetadata', 'rigs'], 'readonly', tx => Promise.all([
     ownerArtRecords<DrawingMetadata>(tx, 'drawingMetadata', owner),
