@@ -47,10 +47,10 @@ older build. Changing an image's source label to a newer tool SHA is forbidden.
 
 ## Next broker inventory (read-only)
 
-The initial inventory invocation below stopped with a generic validation error;
-it produced no plan or approval hash. Use the corrective immutable tooling SHA from
-the latest reviewed PR #222 handoff for the next read. Keep the original build/image
-identities below unchanged. The launcher checksum is unchanged.
+The initial inventory invocation at `7867b4e…` stopped with a generic validation
+error; it produced no plan or approval hash. The next read uses corrective tooling
+`9e598d7aa7d7929601b7ba40270ca396348f69f4`. The original build/image identities and
+launcher checksum remain unchanged.
 
 The corrective error output includes `stage`, `code`, allowlisted `provider_codes`,
 `cli_category` and completed read statuses. `READ_OK` records a completed read only;
@@ -59,12 +59,12 @@ CLI message hints are diagnostic only and cannot authorize resource creation.
 Raw errors, token values and provider bodies remain suppressed. No new plan exists
 until the complete check succeeds.
 
-Initial inventory command (superseded tooling pin; see the reviewed handoff):
+Read-only diagnostic inventory command:
 
 ```sh
 (
   set -euo pipefail
-  r=7867b4e44e78adaec2e0d1152b51e3e789664a13
+  r=9e598d7aa7d7929601b7ba40270ca396348f69f4
   p=$(mktemp /tmp/jems-broker-plan.XXXXXXXX)
   trap 'rm -f -- "$p"' EXIT
   curl -fsSL "https://raw.githubusercontent.com/jzwyrzyk/family-game-factory/$r/scripts/ops/handoffs/operations-bootstrap.sh" -o "$p"

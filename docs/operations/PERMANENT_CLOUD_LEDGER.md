@@ -23,9 +23,23 @@ bytes. The original broker image files and nonproduction Terraform inputs remain
 unchanged. A checksum-verified administrator read must identify the actual failed
 stage before any evidence-based repair or infrastructure approval can proceed.
 
-Local validation: **311 operations tests passed**, including CLI failures, strict
-absence, malformed provider responses, source/provenance stops, read-only planning
-and redaction. The actual administrator inventory remains unqualified.
+Corrective executable source: `9e598d7aa7d7929601b7ba40270ca396348f69f4`.
+Local validation: **311 operations tests** and **113 environment tests** passed,
+including CLI failures, strict absence, malformed provider responses,
+source/provenance stops, read-only planning and redaction. The source-only preflight
+passed with identity and live access explicitly unchecked.
+
+An actual checksum-verified sparse launcher at this source was exercised with a
+**synthetic CLI**, fictional build/digest and no Google requests. It fetched and
+compared the original committed broker source, returned `BROKER_ACCOUNT_METADATA` /
+`GCLOUD_COMMAND_FAILED` / `PERMISSION_DENIED` for the injected failure, suppressed
+the private marker and removed the temporary checkout after exit 2. This tests the
+handoff and error reporting; it does not identify the actual administrator failure.
+Hosted [operations](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45848404911),
+[environment](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45848404863)
+and [documentation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45848405081)
+checks passed at this source. Broader candidate checks were still running at this
+checkpoint; the actual administrator inventory remains unqualified.
 
 
 ## November 26, 2026 — existing broker image qualified by administrator
