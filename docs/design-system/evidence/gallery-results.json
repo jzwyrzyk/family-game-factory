@@ -1,0 +1,43 @@
+{
+  "results": [
+    {
+      "device": "desktop",
+      "fit": true,
+      "touch": true,
+      "contrast": true,
+      "dialogKeyboard": true
+    },
+    {
+      "device": "landscape",
+      "fit": true,
+      "touch": true,
+      "contrast": true,
+      "dialogKeyboard": true
+    },
+    {
+      "device": "portrait",
+      "fit": true,
+      "touch": true,
+      "contrast": true,
+      "dialogKeyboard": true
+    },
+    {
+      "device": "mobile",
+      "fit": true,
+      "touch": true,
+      "contrast": true,
+      "dialogKeyboard": true
+    }
+  ],
+  "propagation": [
+    "journey",
+    "pals",
+    "rewards",
+    "powers",
+    "creations",
+    "notifications"
+  ],
+  "externalRequests": [],
+  "errors": [],
+  "transport": "loopback in-memory; not file acceptance"
+}

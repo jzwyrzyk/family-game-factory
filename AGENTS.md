@@ -58,3 +58,7 @@ After merge, deployment, activation, rollback or observed acceptance, refresh th
 ## What these instructions can and cannot do
 
 Repository-aware assistants can load this file as their entry point. Ordinary chats do not necessarily read GitHub automatically. [ChatGPT Project instructions](docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md) provide the matching retrieval rule. The checks establish reference coverage and recorded review, not automatic semantic correctness or production readiness.
+
+## Shared frontend presentation
+
+Before changing host UI, read [the design-system guide](docs/design-system/README.md) and [migration inventory](docs/design-system/INVENTORY.md). Identify the feature owner and current archetype; reuse production templates, components and semantic tokens. Apply general owner feedback in the shared layer before patching individual pages. Preserve guarded callbacks, original artwork and existing specialist controls. Run focused design contracts and inspect the actual rendered product; the gallery alone does not establish integration or owner acceptance.

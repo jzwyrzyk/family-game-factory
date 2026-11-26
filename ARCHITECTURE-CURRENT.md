@@ -482,3 +482,7 @@ Complete local copies keep each prepared native/notebook/scene owner in its own 
 ## Standalone UI review adapter
 
 The optional [UI review build](docs/ui-review/README.md) imports the application entry without editing product UI. Its isolated tool directory owns synthetic storage/service adapters, an embedded-asset packager, a separate iframe toolbar, coverage inventory and file-based smoke tests. Production builds do not import it. A deny-network CSP and transport stubs keep review offline; generated previews and authentication are explicitly simulated. The compact build downsamples only Gem Pal images; the exact-asset option preserves their bytes. Early grades use the merged preview compile mode without changing ordinary production availability.
+
+## Shared design-system increment
+
+`src/design-system/` owns semantic foundations, extracted headers/dashboard/destination cards, native actions, Journey contextual navigation, collection layout and the existing Menu focus-containment utility. Six actual secondary pages use the collection template; legacy brand imports delegate for active-branch compatibility. Studio, Creation, Art, Pals, Rewards and Parent CSS consume exact semantic aliases. Feature controllers retain all domain authority. The review-only `tools/design-system/` gallery imports production exports and is embedded by the existing standalone review build; it is not a second deployed frontend. [Guide and interfaces](docs/design-system/README.md) · [remaining archetypes and dependencies](docs/design-system/INVENTORY.md).

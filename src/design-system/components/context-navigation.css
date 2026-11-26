@@ -1,0 +1,10 @@
+@import '../tokens.css';
+.jems-world-nav { display:flex; flex-wrap:wrap; gap:var(--jems-space-2); margin:0 0 var(--jems-space-6); }
+.jems-world-page .jems-world-nav button {
+  padding:12px 18px; border:1px solid var(--jems-color-border); border-radius:var(--jems-radius-pill);
+  background:var(--jems-color-surface); color:var(--jems-color-nav-text);
+  min-height:var(--jems-target-primary); font:800 var(--jems-child-label) var(--jems-round); cursor:pointer;
+}
+.jems-world-nav [aria-current=page] { background:var(--jems-color-nav-selected-surface); color:var(--jems-color-nav-selected-text); border-color:var(--jems-color-nav-selected-border); }
+.jems-world-nav button:focus-visible { outline:3px solid var(--jems-color-action-primary); outline-offset:3px; }
+@media(max-width:640px) { .jems-world-nav{gap:6px} .jems-world-page .jems-world-nav button{flex:1 1 44%;padding:10px;font-size:var(--jems-child-label)} }

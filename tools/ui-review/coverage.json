@@ -242,6 +242,11 @@
       "id": "coding-intro",
       "label": "Creative Studio: optional movement introduction",
       "action": "coding-intro"
+    },
+    {
+      "id": "design-system",
+      "label": "Design system \u00b7 foundations, components & product archetypes",
+      "action": "design-system"
     }
   ],
   "journeys": [

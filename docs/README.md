@@ -83,3 +83,7 @@ Prefer a link to the detailed contract over a copied version. Add new feature fa
 [PR166 storage report](storage/README.md) · [complete source inventory](storage/INVENTORY.md) · [migration, retention and activation boundaries](storage/ROLLOUT.md). Integrated local recovery is distinct from the disabled indexed/cloud preparation and remaining application migration.
 
 For private family operations, use the [owner guide](family-beta/OWNER.md) and [privacy review](family-beta/PRIVACY.md).
+
+## Shared frontend design
+
+[Design-system guide](design-system/README.md) documents canonical foundations, component contracts and editing checks. [Migration inventory](design-system/INVENTORY.md) maps actual pages, selected integration candidates, exceptions and pending acceptance. Consult these before introducing a new host header, action, palette or page layout.
