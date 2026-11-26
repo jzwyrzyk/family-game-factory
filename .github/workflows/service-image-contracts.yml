@@ -25,6 +25,7 @@ on:
       - 'src/creation/projects.ts'
       - 'src/pals/catalog.ts'
       - 'src/pals/catalog-artwork.generated.ts'
+      - 'src/pals/historical-scene-art.json'
       - 'scripts/deployment/build.py'
       - 'scripts/deployment/test_build.py'
   pull_request:
@@ -51,6 +52,7 @@ on:
       - 'src/creation/projects.ts'
       - 'src/pals/catalog.ts'
       - 'src/pals/catalog-artwork.generated.ts'
+      - 'src/pals/historical-scene-art.json'
       - 'scripts/deployment/build.py'
       - 'scripts/deployment/test_build.py'
 permissions:

@@ -126,7 +126,9 @@ body.studio-review>.notice{color:#f7f5ff}
 .studio-review .studio-dialog{box-sizing:border-box;max-height:85dvh;overflow:auto}
 .studio-review .studio-dialog input{font-size:16px}
 .studio-review :is(button,summary,select,textarea,input,a):focus-visible{outline:3px solid #515bc0;outline-offset:3px}
-.studio-review :is(h1,h2,#studioPromptLabel):focus{outline:2px solid #515bc0;outline-offset:4px;border-radius:4px}
+/* Route announcements retain DOM focus without painting a control ring. */
+:where(h1,h2,h3,h4,h5,h6):where([tabindex="-1"]:not([role]):not([contenteditable])):focus{outline:none}
+.studio-review #studioPromptLabel:focus-visible{outline:2px solid #515bc0;outline-offset:4px;border-radius:4px}
 .studio-review #studioGameHost:focus{outline:3px solid #515bc0;outline-offset:3px}
 .studio-review :is(h1,h2,button,summary,input,textarea,select){scroll-margin-block:16px}
 @media(max-width:1000px){.studio-library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.studio-actions .studio-button{font-size:14px;padding:10px 12px}}

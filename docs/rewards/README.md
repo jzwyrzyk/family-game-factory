@@ -1,5 +1,9 @@
 # Lifetime gems and shared rewards
 
+## Gems inside My Journey — November 25, 2026
+
+The canonical entrance is **My Journey → Gems & achievements**; the overview shows the existing committed lifetime gem widget. The original reward detail view and earning activity actions remain. This supersedes the separate top-level My rewards menu item. The ledger, milestones, grant receipts, ownership, backup and earning schedule are unchanged. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
+
 **Scope:** first implementation on `feature/jems-rewards-v1`, prepared directly against main `c6576c16e005ae58ce8c706801414be4d864242e` after PR57's approved-brand merge. Artwork and the maker journey inherit from main. Rewards is a separate feature; this contract describes its implementation and acceptance requirements. [Delivery state](../../DELIVERY-STATE.md) records exact source pins, validation, publication, merge and deployment separately.
 
 The owner requested shared gem increments for completed learning activities, developed games and meaningful milestones, with a cohesive rewards page, progress, popups and the approved web branding. [ADR0010](../decisions/0010-lifetime-gems-and-shared-rewards.md) records this decision. The subsequently approved [Jem Pals](../pals/README.md) feature is a separate consumer of this ledger; companion artwork remains its own review.
@@ -122,3 +126,5 @@ The [review captures](previews/README.md) preserve the synthetic-profile [deskto
 ### PR166 source recovery coordination
 
 The [local project journal](../storage/README.md) blocks ordinary source writes and family backup replacement while an intent remains. Startup reconciles it under the existing writer lock before reward projection; Adult recovery requires a fresh grant. Atomic Studio replies retain their reward outbox in the same source save. Earning amounts, lifetime receipt semantics, Pals progression and existing backup rollback formats are unchanged.
+
+Nook and Navi are the free starter choices. Welcoming an eligible Pal has always cost zero gems. Retiring Luma and Zippa therefore requires zero compensation and leaves the lifetime reward ledger intact. [Migration contract](../decisions/2026-11-25-journey-cards-and-starter-pals.md)

@@ -97,10 +97,10 @@ async function shellJourney(browser, base, viewport) {
     await page.locator('#studioProfileMenu summary').click();
 
     await drawer(page);
-    for (const id of SECONDARY) assert.equal(await page.locator('#' + id).isVisible(), true, `${id} is discoverable in Menu`);
+    for (const id of SECONDARY) assert.equal(await page.locator('#' + id).isVisible(), ['studioNavNotifications','studioNavScenes','studioNavJourney'].includes(id), `${id} follows consolidated navigation`);
     assert.equal(await page.locator('#studioMenuArt').isVisible(), true);
     assert.equal(await page.locator('#studioJourneyHelp').isVisible(), true);
-    assert.equal(await page.locator('#jemsRewardsWidget').isVisible(), true);
+    assert.equal(await page.locator('#jemsRewardsWidget').isVisible(), false,'gems belong inside My Journey');
     await menuGeometry(page, viewport);
     // Native modal focus stays inside the menu in both directions.
     await page.locator('#studioMenuClose').focus();
@@ -126,7 +126,7 @@ async function shellJourney(browser, base, viewport) {
       assert.equal(await page.locator('#studioMenuDialog').isVisible(), false, `${id} closes the menu before navigating`);
       if (id.startsWith('studioNav')) {
         assert.equal(await page.locator('#' + id).getAttribute('aria-current'), 'page', `${id} retains current-route semantics`);
-        assert.equal(await page.locator('#studioNavMenu').getAttribute('data-current-destination'), id);
+        assert.equal(await page.locator('#studioNavMenu').getAttribute('data-current-destination'), ({studioNavPals:'studioNavJourney',studioNavRewards:'studioNavJourney',studioNavPowers:'studioNavJourney',studioNavProblemSolving:'studioNavScenes'})[id]||id);
       }
     }
     await navigate(page, '#studioMenuParent');

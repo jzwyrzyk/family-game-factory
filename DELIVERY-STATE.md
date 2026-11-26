@@ -1,5 +1,39 @@
 # jems delivery state
 
+## November 26, 2026 — consolidated release in progress
+
+[PR189](https://github.com/jzwyrzyk/family-game-factory/pull/189) merged as `3b92ad7906c5ab82788ff9194a098844073ad964`, tree `15c413086e95e4992166567f49fe02c8813ee28c`. Its seven hosted workflows passed. The prospective PR190 reconciliation retains the runtime tree of `0299841ea19da4952e58c659e008cec0f7ac9873`. The final application release pin must follow protected merge, full regression and artifact verification.
+
+| Phase | Status | Completed work | Evidence | Blocker | Next action |
+| --- | --- | --- | --- | --- | --- |
+| Application consolidation | Awaiting owner acceptance | #189 merged. #190 includes #188 and #186. Both sides of the two documentation conflicts are reconciled. | [#190 and exact-source checks](https://github.com/jzwyrzyk/family-game-factory/pull/190), [25-path handoff](https://github.com/jzwyrzyk/family-game-factory/pull/188#issuecomment-7176047611) | Fresh hosted checks, authenticated preview and owner visual review | Review the rebuilt HTML and gallery, qualify and merge #190, then dispose of #188 and freeze main. |
+| Recovery preparation | Implemented in part | Protected observe job re-read all three services and the existing rollback revision. Pages release marker selects `aa56b60abe152e750f9f0b5e8949bdb44be53196`. | [Read-only receipt](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45728127526), [storage rollout](docs/storage/ROLLOUT.md) | Private settings, WIF trust, runner group and recovery readback | Capture effective settings and rehearse compatible restoration using synthetic copies. |
+| DEV provisioning | Externally blocked | #155 controller configuration inspected. It is disabled with unset project, identities and IAP. | [Setup and existing $15/month planning authorization](docs/development/SETUP.md) | Authenticated nonproduction account, billing target and allowed owner audience | Verify the target project and narrow setup diff before provisioning. |
+| TEST provisioning | Externally blocked | Isolated TEST contract and private worker dependencies identified. | [Environment contract](docs/development/DEV-TEST-PROD.md) | Isolated project, backend and worker | Verify IAP and exact-source UAT after provisioning. |
+| Sandbox integration | Implemented in part | #169 carries protected publication and digest-bound provenance. | [#169](https://github.com/jzwyrzyk/family-game-factory/pull/169) | Frozen application and publication approval | Reconcile the pin and packaging, verify protocols, retain previous digest. |
+| Worker integration | Repository validated in part | Offline integration of #20, #21 and #19 passed 182 Python tests with the prior premium application pin. Production main and execution tag both resolve to `dddf53dbc76796be19782c1bb5bbb99b86e99909`. #16 remains a separate DEV export. | [Worker continuity](docs/family-beta/COMPLETION.md#protected-main-integration) | Frozen public pin, live runner/WIF/variable readback and rotation authority | Reconcile the exact fixture and images, then qualify the coordinated change and recovery pair. |
+| Premium generation trial | Disabled by policy | Reviewed initial reservation $3.912, including up to one repair. The cumulative lineage ceiling is $5. | [Stage envelope and model review](docs/game-intelligence/premium-benchmark/NOVEMBER-26.md) | Project entitlement, actual prices, isolated worker, funded trial authority | Price and reserve one synthetic Adult Private trial, then measure playable outcome, Keep and remaining revision funds. |
+| Integrated acceptance | Externally blocked | Existing synthetic regression evidence retained on #186 and #190. | [Family register](docs/family-beta/COMPLETION.md), [visual gallery](docs/evidence/journey-refinements/README.md) | Hosted TEST, hardware, owner and funded-path evidence | Bind hosted results to the frozen release and record physical observations separately. |
+| Household production release | Awaiting upstream acceptance | Current household website, gateway and preview responded. Observe read back Gateway, Preview and Coach traffic. | [Household website](https://jzwyrzyk.github.io/family-game-factory/), [production observation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45728127526) | Integrated TEST, compatible rollback and specific promotion approval | Seal release manifest, rehearse rollback, present exact release and interruption scope. |
+| External family readiness | Disabled by policy | Merged family administration, revocation and zero-allowance source and activation checklist retained. | [Private beta activation](docs/family-beta/ACTIVATION.md) | Authenticated hosting, operational retention/deletion, provider and independent legal review | Complete synthetic acceptance, document retention expiry and emergency stops, retain invitation hold. |
+
+### Other pull requests during the freeze
+
+Application #188 is incorporated in #190 pending protected merge. #166, #170–174 and #180 are closed with their heads in #186. #181 is a closed rehearsal. Preserve #182's Coding receipt below. #138's enduring decisions are the three environment tiers from #155, the stage policy from #139, the cumulative game budget from #168 and the #152/#161 production history. Its pre-#186 family status is historical. Use the [current stage envelope](docs/game-intelligence/premium-benchmark/NOVEMBER-26.md) and [environment contract](docs/development/DEV-TEST-PROD.md).
+
+#169 and worker #19–21 are release dependencies. Worker #16 is a separate DEV dependency. #50 (native fast edit), #54/#60 (independent assessment), and #83 (analytics) remain independent future work. #45 and #106 are superseded controller proposals. Preserve #29/#31 (privacy and coach), #84 (tablet and drawing tests), #105 (retired Coach revision), #109/#110/#113/#116 (prior cutovers and recovery), and #143 (staging helper) as historical evidence for the applicable contracts. Prior release commands and approvals apply to their recorded identities. No duplicate source merge is requested for these records.
+
+## November 25, 2026 — responsive Coding workspace merged
+
+The Coding workspace correction merged to main at 01:36 UTC as `912fd31bd18b5f657e782addc75c749fe878b71d`. Main already included PR168 at `6a9532763da4ec986b03df1cbc6d0a4b614810fb`. The merge has the same tree (`943a0dc5ff328474f0e570b6ad3c7a7e04024925`) as the prospective merge tested by all 13 Arcade shards. [PR175](https://github.com/jzwyrzyk/family-game-factory/pull/175) · [Full PR validation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45523137268) · [Protected-main validation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45526986561)
+
+All six First steps controls were reachable on entry at all eight requested viewports. Chromium journeys covered editing, playback, Undo, Keep/reopen and recovery. A private, disconnected Cloud desktop preview was verified on candidate `4765869d1b9e21eb733b99a4ab5cab14719bb4d4`. Owner visual and interactive acceptance and physical-device evidence were outstanding at merge. Production release remains pending. [Viewport measurements and screenshots](docs/creation-studio/ACCEPTANCE.md#responsive-coding-workspace--november-25-2026) · [Hosted learner review](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45523137167)
+
+
+## November 25, 2026 — Journey, secondary headers and starter roster candidate
+
+The review branch combines the UI work from #188 at `f813052` with main at `d777f46`, including the merged #186 storage and family changes. This candidate covers Journey shortcuts, secondary navigation focus, the active roster and per-profile compatibility. Private family beta acceptance and release controls continue separately. The [decision and migration contract](docs/decisions/2026-11-25-journey-cards-and-starter-pals.md) describes the accepted scope.
+
 ## November 25, 2026 — family beta and F06 merged into protected application main
 
 [Application #186](https://github.com/jzwyrzyk/family-game-factory/pull/186) merged as `d777f466b449b85de3164fd67957189403dd2f9c`. Its two Git parents and tree match the prospective merge tested on all 16 applicable PR workflows. All 11 push workflows then passed on the merged SHA, including all six required checks. The merge included the exact heads of #166, #170–174 and #180. GitHub marked #166 and #170 merged through ancestry. The five remaining stacked PRs were closed as incorporated. [#181](https://github.com/jzwyrzyk/family-game-factory/pull/181) was closed as evidence only, with its review, findings and branch retained.
@@ -53,6 +87,24 @@ The `c423550` candidate passed the real hosted offline file review but exposed a
 On `9a0152a`, WebKit verified the delayed-configuration and operator fixes, then reached a later household-export `AbortError`. The follow-up preserves precise database/stage diagnostics and avoids creating an absent legacy-art database merely to probe for it. Its real-IDB negative/positive checks retain original records and strict export inventory; the exact browser abort cause remains qualified. WebKit storage can now report independent results after entry fails, provided builds/browser setup succeeded, without turning a failed security job green.
 
 No protected-main merge, deployment, cloud provisioning, IAM/WIF change, real household transfer/deletion, invitation, paid request or capability activation was performed by this assignment. DEV/TEST deployment, independently reviewed provider/legal readiness, physical-device and owner acceptance remain separate gates.
+
+## Pal transparency correction — owner acceptance pending
+
+The owner’s physical Android review of PR188's offline candidate found opaque
+paper in the Journey “Choose your free Pal” card and excessive height. The
+follow-up begins from `40063a13352b90344318a61e4fe86d74e4020433`. Application and
+offline reproduction show the same defects: portraits bypassed the existing
+scene-only alpha preparation, and a vertical card inherited a 240px horizontal
+flex basis. The [correction evidence](docs/evidence/child-modernization/pal-fidelity/README.md)
+records implementation, visual comparison and scoped tests. The PR carries final
+CI/artifact identities. Corrected physical-device acceptance is pending; no merge
+or deployment is authorized by this follow-up.
+
+## Child experience modernization candidate, November 25, 2026
+
+The owner's comprehensive modernization is implemented on `codex/child-experience-modernization-20261125`, based on current protected main `af11650ea35a29bb0ef9f6b0aa6edd7d8ee84a9e`. Home, canonical navigation, My Journey, Creative Studio and the saved-concept Build flow are updated; My Art remains the visual reference. The [decision](docs/decisions/2026-11-25-child-experience-modernization.md) records data/guard boundaries and the [acceptance record](docs/evidence/child-modernization/README.md) maps workstreams, visual evidence, tests, integration and remaining acceptance.
+
+The standalone workflow now builds the exact PR head, labels candidate versus main, and uploads the actual app HTML plus complete four-viewport journeys. This is candidate source and synthetic review evidence. Concurrent family-beta/storage PR186 is excluded. Owner acceptance, hosted test disposition and private DEV/TEST evidence are recorded on the PR; no merge, deployment, activation, paid generation or destructive migration is authorized or performed here.
 
 
 ## Standalone offline UI review integrated, November 25, 2026

@@ -3,7 +3,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome,openRetainedGame,openProfiles}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,openRetainedGame,openProfiles}=require('./studio-entry.cjs');
 require('tsx/cjs');
 const {RevisionStore,WORKSPACE_KEY}=require('../src/factory/workspace.ts');
 const {StudioNotebook,STUDIO_KEY}=require('../src/studio/notebook.ts');
@@ -32,7 +32,7 @@ const ready=page=>page.waitForFunction(()=>window.FG?.studio&&window.FG?.runtime
 async function collection(page){
  if(await page.locator('#page-studio').isVisible())await page.locator('#studioHome').click();
  if(await page.locator('#page-game').isVisible())await page.locator('#exitGame').click();
- if(!await page.locator('#page-creations').isVisible())await page.getByRole('button',{name:'My Creations',exact:true}).click();
+ if(!await page.locator('#page-creations').isVisible())await page.getByRole('button',{name:'Saved ideas & versions',exact:true}).click();
  await page.locator('#page-creations').waitFor({state:'visible'});
 }
 async function nativeReady(page,game){
@@ -60,11 +60,11 @@ async function nativeReady(page,game){
     try{
      await page.goto(`http://127.0.0.1:${server.address().port}/arcade/`);await ready(page);await exploreWelcome(page);
      assert.deepEqual(await page.locator('#studioStarters [data-starter]').evaluateAll(nodes=>nodes.map(n=>n.dataset.starter)),['factory','mining','gum','hill']);
-     assert.equal(await page.locator('#page-studio-library #studioOriginalsSection').count(),0);
+     assert.equal(await page.locator('#page-studio-library #studioOriginalsSection').count(),1);
      const before=await readWorkspace(page);
      await collection(page);
-     assert.deepEqual(await page.locator('#page-creations #studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(n=>n.dataset.starter)),['dragon','buckets']);
-     assert.equal(await page.locator('#studioOriginalsTitle').innerText(),'Play your games');
+     assert.deepEqual(await page.locator('#page-studio-library #studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(n=>n.dataset.starter)),['dragon','buckets']);
+     assert.equal(await page.locator('#studioOriginalsTitle').innerText(),'Your original games');
      assert.deepEqual(await readWorkspace(page),before,'opening My Creations does not create or rewrite a project');
      if(existing){
       const names=await page.locator('#savedRemixes button').allTextContents();
@@ -72,6 +72,7 @@ async function nativeReady(page,game){
       assert.ok(names.every(name=>!name.includes('player2')),'the sibling’s saved versions remain private');
      }
      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'My Creations fits the viewport');
+     await navigate(page,'#studioNavHome');
      const cards=await page.locator('#studioOriginals .studio-starter').evaluateAll(nodes=>nodes.map(node=>({
       padding:getComputedStyle(node).padding,overflow:getComputedStyle(node).overflow,
       transition:getComputedStyle(node).transitionDuration,height:node.getBoundingClientRect().height,

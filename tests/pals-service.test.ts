@@ -64,7 +64,7 @@ test('the bridge maps all five eligible activity kinds and exposes only their st
 
 test('practice and maker bonuses count toward gem unlocks without creating extra adventures', async () => {
   const { rewards, pals, snapshot } = fixture();
-  await pals.chooseStarter(OWNER, 'glim', await snapshot());
+  await pals.chooseStarter(OWNER, 'navi', await snapshot());
   await rewards.project(OWNER, [
     ...learning(10), activity('scene.challenge', 'scene'), activity('game.developed', 'project'),
     ...([1, 2, 3, 4] as const).map(level => maker(level)),
@@ -76,17 +76,17 @@ test('practice and maker bonuses count toward gem unlocks without creating extra
   assert.equal(projected.lifetimeGems, 138);
   assert.equal(projected.activities.length, 12);
   assert.ok(projected.activities.every(row => !row.id.startsWith('practice.milestone:') && !row.id.startsWith('maker.milestone:')));
-  const result = await pals.sync(OWNER, projected), glim = result.profile.owned[0];
-  assert.equal(glim.practiceActivities, 10);
-  assert.equal(glim.creationAdventures, 2);
-  assert.equal(glim.adventures, 4);
-  assert.equal(glim.stage, 1, 'bonuses must not cause a premature Grown form');
+  const result = await pals.sync(OWNER, projected), navi = result.profile.owned[0];
+  assert.equal(navi.practiceActivities, 10);
+  assert.equal(navi.creationAdventures, 2);
+  assert.equal(navi.adventures, 4);
+  assert.equal(navi.stage, 1, 'bonuses must not cause a premature Grown form');
   assert.deepEqual(result.profile.availableIds, ['kip'], 'the same lifetime gem total still unlocks the other starter');
 });
 
 test('the bridge selects one owner, treats an absent valid owner as empty, and cannot cross-project into another Pal profile', async () => {
   const { rewards, pals, snapshot } = fixture();
-  await pals.chooseStarter(OWNER, 'glim', await snapshot());
+  await pals.chooseStarter(OWNER, 'navi', await snapshot());
   await pals.chooseStarter(OTHER, 'kip', await snapshot(OTHER));
   await rewards.project(OWNER, [activity('scene.challenge', 'same-scene', 100)]);
   await rewards.project(OTHER, [activity('scene.challenge', 'same-scene', 200, OTHER), activity('game.developed', 'other-project', 210, OTHER)]);
@@ -158,18 +158,18 @@ test('historical receipt baselines and repeated reward projection remain stable 
 test('late committed reward receipts use the Pal selected at activity time even after another switch', async () => {
   const { rewards, pals, snapshot, clock } = fixture();
   await rewards.project(OWNER, ([1, 2, 3, 4] as const).map(level => maker(level, -100)));
-  await pals.chooseStarter(OWNER, 'glim', await snapshot());
+  await pals.chooseStarter(OWNER, 'navi', await snapshot());
   await pals.collect(OWNER, 'kip', await snapshot());
   clock(200); await pals.equip(OWNER, 'kip', await snapshot());
-  clock(400); await pals.equip(OWNER, 'glim', await snapshot());
-  await rewards.project(OWNER, [activity('scene.challenge', 'while-glim', 100), activity('game.developed', 'while-kip', 300)]);
+  clock(400); await pals.equip(OWNER, 'navi', await snapshot());
+  await rewards.project(OWNER, [activity('scene.challenge', 'while-navi', 100), activity('game.developed', 'while-kip', 300)]);
   const result = await pals.sync(OWNER, await snapshot());
-  assert.equal(result.profile.activeId, 'glim');
-  assert.equal(result.profile.owned.find(pal => pal.id === 'glim')!.adventures, 1);
+  assert.equal(result.profile.activeId, 'navi');
+  assert.equal(result.profile.owned.find(pal => pal.id === 'navi')!.adventures, 1);
   assert.equal(result.profile.owned.find(pal => pal.id === 'kip')!.adventures, 1);
   const assignments = (await pals.export()).data.profiles[0].assignments;
   assert.deepEqual(assignments.map(row => ({ id: row.id, palId: row.palId })), [
-    { id: 'scene.challenge:while-glim', palId: 'glim' },
+    { id: 'scene.challenge:while-navi', palId: 'navi' },
     { id: 'game.developed:while-kip', palId: 'kip' },
   ]);
 });

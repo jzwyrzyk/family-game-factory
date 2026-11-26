@@ -7,11 +7,11 @@ const publicRoot = new URL('../../public/', import.meta.url);
 const manifest = JSON.parse(await readFile(new URL('jems-pals/manifest.json', publicRoot), 'utf8'));
 const copy = () => structuredClone(manifest);
 
-test('all 184 slots preserve the original 23 identities and same-form neutral fallbacks', () => {
+test('all 168 slots preserve the original 21 active identities and same-form neutral fallbacks', () => {
   const assets = validateManifest(manifest);
-  assert.equal(assets.length, 184);
-  assert.equal(new Set(assets.map(asset => asset.characterKey)).size, 23);
-  assert.equal(assets.filter(asset => asset.expression === 'neutral').length, 46);
+  assert.equal(assets.length, 168);
+  assert.equal(new Set(assets.map(asset => asset.characterKey)).size, 21);
+  assert.equal(assets.filter(asset => asset.expression === 'neutral').length, 42);
 });
 
 test('rejects extra public provenance fields instead of exposing private source metadata', () => {

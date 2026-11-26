@@ -6,6 +6,10 @@ These records explain durable choices without turning chat history into another 
 
 ## Index
 
+- [Journey cards, starter eligibility and permanent retirements](2026-11-25-journey-cards-and-starter-pals.md)
+
+- [November 25: one child-facing Jems world](2026-11-25-child-experience-modernization.md) — owner-approved navigation, landing-page reference, purpose-driven scenes and unified Send/Build concept. Supersedes earlier menu and retained-game placement only.
+
 | Record | Decision | Status | Source |
 | --- | --- | --- | --- |
 | [Private Family Beta](2026-11-25-private-family-beta.md) | Family origins, server-authorized workspaces, verified privacy controls, shared accounting and authenticated household delivery | Proposed for release review | Owner assignment, November 2026 |

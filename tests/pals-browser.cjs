@@ -244,7 +244,7 @@ async function answerMath(page, { palHint = false } = {}) {
   const item = await page.evaluate(() => FG.learning.activeItem);
   assert.ok(item, 'The trusted learning host supplies the active item');
   if (palHint) {
-    await activeMath(page).locator('[data-pal-hint="glim"]').click();
+    await activeMath(page).locator('[data-pal-hint="navi"]').click();
     const back = activeMath(page).getByRole('button', { name: 'Back to my answer', exact: true });
     if (await back.isVisible()) await back.click();
   }
@@ -312,15 +312,16 @@ async function installReceiptFixture(page) {
 
     phase = 'choosing a starter and reloading';
     assert.equal(await page.locator('#studioNavPals').count(), 1);
+    await navigate(page,'#studioNavJourney');
     assert.equal(await page.locator('#studioPalsEntry').isVisible(), true);
-    await readablePalText(page, '.pals-widget-copy strong');
+    await readablePalText(page, '#studioPalsEntry .jems-dashboard-copy strong');
     assert.equal(await gems(page), 0);
-    await page.locator('#studioPalsEntry .pals-widget-open').click(); await idle(page);
+    await page.locator('#studioPalsEntry').click(); await idle(page);
     assert.equal(await page.locator('#page-jems-pals').isVisible(), true);
-    assert.equal(await page.locator('[data-pals-focus="starter-glim"]').count(), 1);
+    assert.equal(await page.locator('[data-pals-focus="starter-navi"]').count(), 1);
     assert.equal(await page.locator('[data-pals-focus="starter-kip"]').count(), 1);
-    await page.click('[data-pals-focus="starter-glim"]');
-    await page.waitForFunction(() => FG.pals.view()?.activeId === 'glim'); await idle(page);
+    await page.click('[data-pals-focus="starter-navi"]');
+    await page.waitForFunction(() => FG.pals.view()?.activeId === 'navi'); await idle(page);
     assert.equal((await view(page)).owned.length, 1);
     assert.equal((await view(page)).owned[0].stage, 1);
     assert.equal(await gems(page), 0, 'The free starter spends and awards no gems');
@@ -330,21 +331,21 @@ async function installReceiptFixture(page) {
     await selectedNav(page, 'studioNavPals');
     await readablePalText(page, '.pals-growth > strong');
     assert.equal((await view(page)).owned[0].joinedAt, joinedAt);
-    assert.equal(await page.locator('#jemsPalDetailTitle').innerText(), 'Luma');
-    assert.match(await page.locator('.pals-hero-portrait img').getAttribute('src'), /jems-pals\/luma\/base\/neutral-/);
+    assert.equal(await page.locator('#jemsPalDetailTitle').innerText(), 'Navi');
+    assert.match(await page.locator('.pals-hero-portrait img').getAttribute('src'), /jems-pals\/navi\/base\/neutral-/);
     assert.match(await page.locator('.pals-card[data-pal="kip"]').innerText(), /50 more gems/);
     mark('free starter, My Pals navigation, home entry and persisted collection');
 
     phase = 'trying the selected approved character expressions without changing the collection';
     assert.equal(await page.locator('.pal-expression-explorer').count(), 0, 'The primary page no longer exposes a disconnected roster preview');
-    assert.equal(await page.locator('.pals-card').count(), 24, 'The complete approved character roster is in the actual collection');
+    assert.equal(await page.locator('.pals-card').count(), 22, 'The complete approved character roster is in the actual collection');
     assert.ok(expressionRequests.filter(url => /\.(webp|png)$/.test(url)).every(url => /\/neutral-/.test(url)), 'Collection browsing loads neutral pictures, not every expression');
     const collectionBeforeExpressions = await view(page), gemsBeforeExpressions = await gems(page);
     const playground = page.locator('.pals-expression-options');
     const portrait = page.locator('.pals-hero-portrait');
     await playground.locator('summary').click();
-    const luma = approvedArtwork.characters.find(character => character.name === 'Luma');
-    assert.ok(luma, 'The actual equipped character has an exact approved manifest identity');
+    const navi = approvedArtwork.characters.find(character => character.name === 'Navi');
+    assert.ok(navi, 'The actual equipped character has an exact approved manifest identity');
     for (const expression of ['neutral', 'celebrate', 'thinking', 'encouraging_retry']) {
       await playground.locator(`button[data-expression="${expression}"]`).click();
       await page.waitForFunction(({ expression, url, key }) => {
@@ -353,7 +354,7 @@ async function installReceiptFixture(page) {
         return current?.dataset.state === 'ready' && current.dataset.form === 'base'
           && current.dataset.expression === expression && current.dataset.characterKey === key
           && image?.src.endsWith(url) && image.naturalWidth > 0;
-      }, { expression, url: luma.forms.base.expressions[expression].url, key: luma.characterKey });
+      }, { expression, url: navi.forms.base.expressions[expression].url, key: navi.characterKey });
     }
     assert.deepEqual(await view(page), collectionBeforeExpressions, 'Expression play grants or equips nothing');
     assert.equal(await gems(page), gemsBeforeExpressions);
@@ -375,17 +376,17 @@ async function installReceiptFixture(page) {
     assert.equal(await portrait.getAttribute('data-expression'), 'neutral');
     assert.deepEqual(await view(page), collectionBeforeExpressions, 'Returning preserves the exact original saved collection');
     assert.equal(await gems(page), gemsBeforeExpressions);
-    assert.ok(new Set(expressionRequests.filter(url => url.endsWith('.webp'))).size < 40, 'Browsing loads displayed portraits rather than all 184 original images');
-    mark('approved collection art and bound expressions: exact Luma identity, four moods, lazy loading, profile isolation and phone layout without reward changes');
+    assert.ok(new Set(expressionRequests.filter(url => url.endsWith('.webp'))).size < 40, 'Browsing loads displayed portraits rather than all 168 active images');
+    mark('approved collection art and bound expressions: exact Navi identity, four moods, lazy loading, profile isolation and phone layout without reward changes');
 
     phase = 'creating, tapping, editing and keeping a Pal playground';
     await pacingFixture(page);
-    await page.click('[data-pals-focus="create-glim"]');
+    await page.click('[data-pals-focus="create-navi"]');
     await page.locator('#page-creation').waitFor({ state: 'visible' });
     await selectedNav(page, 'studioNavScenes');
     const original = await scene(page), projectId = original.id;
-    assert.equal(original.title, "Luma's playground");
-    assert.equal(original.actors[0].assetId, 'pal-luma-base-core-2026-11-20');
+    assert.equal(original.title, "Navi's playground");
+    assert.equal(original.actors[0].assetId, 'pal-navi-base-core-2026-11-20');
     const tapProgram = original.programs.find(program => program.trigger.type === 'tap');
     assert.deepEqual(tapProgram.actions.map(action => action.type), ['jump', 'dance', 'say']);
     assert.ok(original.programs.every(program => program.actions.every(action => action.origin === 'starter')));
@@ -397,7 +398,7 @@ async function installReceiptFixture(page) {
     await page.waitForFunction(() => FG.creation.snapshot()?.status === 'completed');
     await page.click('#creationTapActor');
     await page.waitForFunction(() => FG.creation.snapshot()?.trace.some(entry => entry.type === 'complete' && entry.actionType === 'jump'));
-    await page.waitForFunction(() => FG.creation.snapshot()?.actors.some(actor => actor.speech === 'A discovery! My dance has corners.'));
+    await page.waitForFunction(() => FG.creation.snapshot()?.actors.some(actor => actor.speech === 'What shall we discover?'));
     await page.waitForFunction(() => FG.creation.snapshot()?.status === 'completed');
     const jumps = (await snapshot(page)).trace.filter(entry => entry.type === 'complete' && entry.actionType === 'jump').length;
     await page.click('#creationTapActor');
@@ -405,7 +406,7 @@ async function installReceiptFixture(page) {
     await page.click('#creationReset');
     const childLine = 'My discovery: moon potatoes need tiny helmets.';
     await set(page.locator(`[data-block-id="${tapProgram.actions[2].id}"]`).getByRole('textbox', { name: 'Words', exact: true }), childLine);
-    await set(page.locator('#creationTitle'), 'Luma and the moon potatoes');
+    await set(page.locator('#creationTitle'), 'Navi and the moon potatoes');
     await page.click('#creationKeep');
     let saved = (await workspace(page)).projects.find(project => project.id === projectId);
     assert.equal(saved.keptId, saved.headId, 'Only the explicit Keep selects the saved version');
@@ -416,21 +417,21 @@ async function installReceiptFixture(page) {
     await page.reload(); await ready(page); await navigate(page,'#studioNavScenes');
     await page.click(`[data-scene="${projectId}"]`);
     const reopened = await scene(page);
-    assert.equal(reopened.title, 'Luma and the moon potatoes');
-    assert.equal(reopened.actors[0].assetId, 'pal-luma-base-core-2026-11-20');
+    assert.equal(reopened.title, 'Navi and the moon potatoes');
+    assert.equal(reopened.actors[0].assetId, 'pal-navi-base-core-2026-11-20');
     assert.equal(reopened.programs.find(program => program.trigger.type === 'tap').actions[2].text, childLine);
     assert.equal(reopened.programs.find(program => program.trigger.type === 'tap').actions[2].origin, 'child');
     mark('one-click editable playground, repeated real tap events, authored edit, explicit Keep and reload');
 
     phase = 'adding a Pal to another scene';
-    await page.click('#creationBack'); await page.click('[data-creation-starter="blank"]');
+    await page.click('#creationBack'); await page.click('#creationFreeMode'); await page.click('[data-creation-starter="blank"]');
     const beforeAdd = await scene(page);
     await page.click('#creationAddActor');await page.click('#creationAddPal');
     const afterAdd = await scene(page);
     assert.equal(afterAdd.actors.length, beforeAdd.actors.length + 1);
     assert.deepEqual(afterAdd.actors.slice(0, beforeAdd.actors.length), beforeAdd.actors);
     assert.deepEqual(afterAdd.programs.slice(0, beforeAdd.programs.length), beforeAdd.programs);
-    assert.equal(afterAdd.actors.at(-1).assetId, 'pal-luma-base-core-2026-11-20');
+    assert.equal(afterAdd.actors.at(-1).assetId, 'pal-navi-base-core-2026-11-20');
     assert.equal(afterAdd.programs.at(-1).trigger.type, 'tap');
     await page.click('#creationKeep');
     const addedProjectId = afterAdd.id;
@@ -464,7 +465,7 @@ async function installReceiptFixture(page) {
     assert.equal(await activeMath(page).isVisible(), true);
     assert.equal(await page.locator('#studioPalCameo').isVisible(), false);
     const helpedId = await page.evaluate(() => FG.learning.activeAttemptId);
-    assert.equal(await activeMath(page).locator('[data-pal-hint="glim"]').count(), 1);
+    assert.equal(await activeMath(page).locator('[data-pal-hint="navi"]').count(), 1);
     await answerMath(page, { palHint: true });
     const helped = await page.evaluate(id => FG.store.current().learning.attempts.find(attempt => attempt.id === id), helpedId);
     assert.equal(helped.outcome, 'completed');
@@ -472,7 +473,7 @@ async function installReceiptFixture(page) {
     for (let completed = 2; completed <= 5; completed++) {
       await page.click('#lab-next'); await activeMath(page).waitFor({ state: 'visible' }); await answerMath(page);
     }
-    await page.waitForFunction(() => FG.pals.view()?.owned.find(pal => pal.id === 'glim')?.adventures === 1);
+    await page.waitForFunction(() => FG.pals.view()?.owned.find(pal => pal.id === 'navi')?.adventures === 1);
     assert.equal(await gems(page), 10);
     assert.equal((await view(page)).owned[0].practiceActivities, 5);
     await openPals(page);
@@ -505,7 +506,7 @@ async function installReceiptFixture(page) {
     assert.equal(await page.locator(`[data-scene="${projectId}"]`).count(), 0);
     assert.equal(await page.locator(`[data-scene="${addedProjectId}"]`).count(), 0);
     await chooseFamily(page, 0); await openPals(page);
-    assert.equal((await view(page)).activeId, 'glim');
+    assert.equal((await view(page)).activeId, 'navi');
     assert.deepEqual((await view(page)).preferences, { showCompanion: false, encouragement: false });
     assert.equal((await view(page)).owned[0].adventures, 1);
     await page.locator('.pals-options summary').click();
@@ -531,9 +532,9 @@ async function installReceiptFixture(page) {
       await openPals(page); await idle(page);
     }
     await seed(5, 'scene.challenge', 'bright-and-50-gems', 50);
-    await page.waitForFunction(() => FG.pals.view()?.owned.find(pal => pal.id === 'glim')?.stage === 2);
-    assert.equal((await view(page)).owned.find(pal => pal.id === 'glim').adventures, 6);
-    assert.match(await page.locator('.pals-hero-portrait img').getAttribute('src'), /jems-pals\/luma\/mature\/neutral-/, 'Earned growth changes the actual approved picture');
+    await page.waitForFunction(() => FG.pals.view()?.owned.find(pal => pal.id === 'navi')?.stage === 2);
+    assert.equal((await view(page)).owned.find(pal => pal.id === 'navi').adventures, 6);
+    assert.match(await page.locator('.pals-hero-portrait img').getAttribute('src'), /jems-pals\/navi\/mature\/neutral-/, 'Earned growth changes the actual approved picture');
     assert.deepEqual((await view(page)).availableIds, ['kip']);
     assert.match(await page.locator('.pals-card[data-pal="riff"]').innerText(), /100 more gems/);
     await page.click('[data-pals-focus="collect-kip"]');
@@ -546,16 +547,16 @@ async function installReceiptFixture(page) {
     await page.waitForFunction(() => FG.pals.view()?.owned.some(pal => pal.id === 'riff')); await idle(page);
     assert.equal(await gems(page), 150);
     await seed(5, 'scene.challenge', 'radiant-at-15-adventures', 190);
-    await page.waitForFunction(() => FG.pals.view()?.owned.find(pal => pal.id === 'glim')?.adventures === 15);
-    const grown = (await view(page)).owned.find(pal => pal.id === 'glim');
+    await page.waitForFunction(() => FG.pals.view()?.owned.find(pal => pal.id === 'navi')?.adventures === 15);
+    const grown = (await view(page)).owned.find(pal => pal.id === 'navi');
     assert.equal(grown.adventures, 15); assert.equal(grown.stageName, 'Grown');
     assert.equal(grown.form, 'mature'); assert.equal(grown.stage, 2); assert.equal(grown.nextStageAt, null);
     assert.equal(await page.locator('.pals-growth-stages > li').count(), 2);
     await page.click('[data-pals-focus="equip-kip"]');
     await page.waitForFunction(() => FG.pals.view()?.activeId === 'kip'); await idle(page);
     assert.equal((await view(page)).owned.find(pal => pal.id === 'kip').adventures, 0, 'Changing the active Pal cannot reassign old receipts');
-    await page.click('[data-pals-focus="equip-glim"]');
-    await page.waitForFunction(() => FG.pals.view()?.activeId === 'glim'); await idle(page);
+    await page.click('[data-pals-focus="equip-navi"]');
+    await page.waitForFunction(() => FG.pals.view()?.activeId === 'navi'); await idle(page);
     mark('explicit receipt fixtures verify 50/150 gem collection, Base/Grown growth with no third form, no spending and no replay on equip');
 
     phase = 'responsive integrated collection and owned-Pal picker';
@@ -582,17 +583,28 @@ async function installReceiptFixture(page) {
     await navigate(page,'#studioNavScenes');
     await selectedNav(page, 'studioNavScenes');
     assert.equal(await page.locator('[data-creation-pal]').count(), 3);
-    await page.click('[data-creation-pal="glim"]');
-    assert.equal((await scene(page)).actors[0].assetId, 'pal-luma-mature-core-2026-11-20', 'A new playground uses the currently earned Grown artwork');
+    if(!await page.locator('[data-creation-pal="navi"]').isVisible())await page.click('#creationFreeMode');
+    await page.click('[data-creation-pal="navi"]');
+    assert.equal((await scene(page)).actors[0].assetId, 'pal-navi-mature-core-2026-11-20', 'A new playground uses the currently earned Grown artwork');
     await page.click('#creationBack');
     await page.click(`[data-scene="${addedProjectId}"]`);
     const beforeKip = await scene(page);
-    assert.equal(beforeKip.actors.at(-1).assetId, 'pal-luma-base-core-2026-11-20', 'Growing the companion never rewrites an existing scene’s pinned Base picture');
+    assert.equal(beforeKip.actors.at(-1).assetId, 'pal-navi-base-core-2026-11-20', 'Growing the companion never rewrites an existing scene’s pinned Base picture');
     await page.click('#creationAddActor');await page.click('#creationChoosePal');
     assert.equal(await page.locator('#creationActorDialog').isVisible(), true);
     assert.equal(await page.locator('#creationActorDialog [data-creation-asset]').count(), 3);
+    await page.waitForFunction(() => [...document.querySelectorAll('#creationActorDialog .pals-portrait')].every(p => p.dataset.state === 'ready'));
+    const pickerPictures = await page.locator('#creationActorDialog .pals-portrait').evaluateAll(portraits => portraits.map(p => ({
+      mask: getComputedStyle(p.querySelector('img')).maskImage,
+      width: p.getBoundingClientRect().width, parentWidth: p.parentElement.getBoundingClientRect().width,
+      unavailable: !p.querySelector('.pals-picture-unavailable').hidden,
+    })));
+    assert.equal(pickerPictures.length, 3);
+    for (const picture of pickerPictures) { assert.notEqual(picture.mask, 'none'); assert.ok(picture.width <= picture.parentWidth); assert.equal(picture.unavailable, false); }
+    await page.locator('#creationActorDialog').screenshot({ path: path.join(outputs, 'pals-creative-picker-mobile.png') });
+
     assert.deepEqual(await page.locator('#creationActorDialog [data-creation-asset]').evaluateAll(choices => choices.map(choice => choice.dataset.creationAsset).sort()), [
-      'pal-luma-mature-core-2026-11-20', 'pal-nook-base-core-2026-11-20', 'pal-wink-base-core-2026-11-20',
+      'pal-navi-mature-core-2026-11-20', 'pal-nook-base-core-2026-11-20', 'pal-wink-base-core-2026-11-20',
     ], 'The picker offers only owned characters in their earned form, with no legacy or unearned form choices');
     await page.click('[data-creation-asset="pal-nook-base-core-2026-11-20"]');
     const withKip = await scene(page);
@@ -600,7 +612,7 @@ async function installReceiptFixture(page) {
     assert.deepEqual(withKip.actors.slice(0, beforeKip.actors.length), beforeKip.actors);
     await page.click('#creationAddActor');await page.click('#creationAddPal');
     const withGrown = await scene(page);
-    assert.equal(withGrown.actors.at(-1).assetId, 'pal-luma-mature-core-2026-11-20');
+    assert.equal(withGrown.actors.at(-1).assetId, 'pal-navi-mature-core-2026-11-20');
     assert.deepEqual(withGrown.actors.slice(0, withKip.actors.length), withKip.actors, 'Adding a Grown Pal preserves all prior character/form versions');
     await page.click('#creationKeep');
     await page.setViewportSize({ width: 390, height: 844 }); await noOverflow(page, '390px companion editor');
@@ -608,7 +620,7 @@ async function installReceiptFixture(page) {
     await page.setViewportSize({ width: 1440, height: 1080 });
     await page.reload(); await ready(page); await openPals(page);
     assert.equal((await view(page)).owned.length, 3);
-    assert.equal((await view(page)).owned.find(pal => pal.id === 'glim').adventures, 15);
+    assert.equal((await view(page)).owned.find(pal => pal.id === 'navi').adventures, 15);
     assert.equal(await gems(page), 190);
     mark('integrated desktop/mobile layout, owned-Pal picker and persisted unlocked collection');
 

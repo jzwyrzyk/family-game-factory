@@ -44,6 +44,21 @@ The [delivery ledger](DELIVERY-STATE.md) owns current source and deployment iden
 
 The [reliability integration matrix](docs/child-continuity/RELIABILITY-2026-11-23.md) records the five-component precursor. The [current F06 register](docs/family-beta/COMPLETION.md) supersedes that precursor's implementation status; linked chat pages still do not remove independent evidence/store capacity limits.
 
+## Child experience modernization candidate
+
+The Android fidelity follow-up shares `src/pals/presentation-image.ts` across
+portrait DOM masks and scene canvas sprites, preserving exact artwork paths and
+source pixels. Presentation readiness includes alpha preparation; failure stays
+in existing unavailable/retry paths. No collection, growth, reward or scene-schema
+change is introduced. [Rendering contract](docs/creation-studio/PAL_SCENE_RENDERING.md).
+
+
+`src/studio/world-navigation.ts` supplies presentation-only destination cards and My Journey section navigation. Existing host callbacks retain owner, save and learning guards. `modernization.css` and `src/creation/landing.css` share the Art Studio visual reference; no activity engine or artwork file is replaced. Home embeds the retained native cards alongside owned notebook entries and contextual saved-library access. The legacy route controls remain compatible but are not extra menu entries.
+
+`src/creation/introduction.ts` runs a transient first-visit scene with the existing `SceneEngine` and `CreationStage`. The only durable change is the existing notebook guidance tip `studio-intro`, saved on explicit skip/finish. No scene, reward or assessment write occurs. A rollback needs a compatible guidance reader. My Art retains original/version storage and uses an owner-bound transient return target for its originating game or scene.
+
+The completion button is outside `studioPromptForm`. Send retains the existing coach path; Build on an empty composer compiles all eligible saved intent. A new draft after a ready review is passed once through the same coach and requires a new explicit Build after its recap. Busy, stale, uncertain and pending-submission checks stay in the existing host and backend. [Decision and preservation boundaries](docs/decisions/2026-11-25-child-experience-modernization.md).
+
 ## System boundaries
 
 ### Bubble Gum assembly candidate — November 22, 2026
@@ -298,11 +313,11 @@ The Rewards page and compact entry reuse the approved gem art and selected-maker
 
 ## Collectible companions and editable Pal scenes
 
-[catalog.ts](src/pals/catalog.ts) defines 24 approved character identities, exact Base/Grown art and bounded scripted lines. Persisted `glim`, `kip` and `riff` are explicit aliases for Luma, Nook and Wink, preserving owned inventory, receipt assignments and selection history. The compact [generated artwork lookup](src/pals/catalog-artwork.generated.ts) derives from the existing original-23 manifest and Brio's approved neutral records; its generator verifies every binding and copied byte. Luma and Nook are free first-Pal choices; the other starter remains eligible at 50 lifetime gems and Wink at 150. The other 20 original profiles follow manifest order from 200 through 1,150 in 50-gem steps; Brio is 1,200. These are explicit cosmetic collection settings, not prices or ability measures. No gems are subtracted. [model.ts](src/pals/model.ts) retains one adventure per five eligible saved Math/Language activities, or one per qualifying scene challenge/developed game. Base is 0–4 adventures and Grown starts at five, using the actual approved Grown image. Saved schemas and receipt history remain intact.
+The [catalog](src/pals/catalog.ts) binds 22 active characters. Nook and Navi are free first choices. The other starter qualifies at 50 lifetime gems. Each remaining threshold is keyed to its character. The [policy 2 migration](docs/decisions/2026-11-25-journey-cards-and-starter-pals.md) reconciles retired ownership and historical assignments on read and on transactional write. The generated active catalog feeds the picker and provider schema. A separate read-only mapping resolves retired assets in saved games. [model.ts](src/pals/model.ts) retains one adventure per five eligible saved Math/Language activities, or one per qualifying scene challenge/developed game. Base is 0–4 adventures and Grown starts at five, using the actual approved Grown image. Saved schemas and receipt history remain intact.
 
 [service.ts](src/pals/service.ts) validates an export of the shared reward ledger and extracts only activity receipts. Maker/practice bonuses can contribute to unlock totals but never become extra adventures. Pre-starter receipts are baselined. Immutable assignments and the equipment timeline attribute delayed rewards to the Pal selected when the activity occurred; replay, reload and subsequent switching cannot move or multiply old work. Captured owner/namespace and epochs protect async results; mutations share the source write guard and recheck an open learning activity immediately before applying a choice.
 
-[host.ts](src/pals/host.ts) installs My Pals, a home entry, an optional inline game cameo, parent settings and a delegated host hint button. Saved-action encouragement joins the existing reward toast where present, is throttled and defers while learning is active. It uses no autoplay audio, focus capture or generated-game message authority. `FG.pals` offers only navigation and a cloned read view. Disabling appearance/encouragement does not stop progress.
+[host.ts](src/pals/host.ts) installs My Pals, a Journey dashboard card, an optional inline game cameo, parent settings and a delegated host hint button. Saved-action encouragement joins the existing reward toast where present, is throttled and defers while learning is active. It uses no autoplay audio, focus capture or generated-game message authority. `FG.pals` offers only navigation and a cloned read view. Disabling appearance/encouragement does not stop progress.
 
 Owned Pals are available through one-click playgrounds and the free-scene actor picker in [Creation Studio](src/creation/ui.ts). [creation.ts](src/pals/creation.ts) creates validated starter-attributed scenes with editable start/tap programs; jump, dance and speech run in the existing deterministic engine. Adding a Pal preserves the other actors, program, exact game source and private-art hash/version bindings. Passive Pal updates do not dismiss an active art/actor choice. Existing token asset IDs stay stable. New scene uses select the owned form through the trusted `palForm` hook and pin `pal-{slug}-{form}-{assetVersion}`. Growth never rewrites an already saved actor. Scene images preserve aspect ratio, expose loading/unavailable states, retry on reopening, and retain only the current scene's decoded image cache. Challenge solutions/targets remain unchanged, and a scene imported with a Pal asset grants no collection entitlement. This is supported scene authoring, not automatic arbitrary-code injection into generated games.
 

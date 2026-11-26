@@ -431,6 +431,7 @@ async function hintsAcrossModes(browser,url){
   await page.route('**/factory-config.json',unavailable);
   await page.goto(url+'?creation=1');await ready(page);
   assert.equal(await page.locator('#page-creation').isVisible(),true,'a direct coding entry retains its intended destination');
+  await page.click('#creationIntroSkip');
   await page.click('#creationChallengeMode');
   await page.locator('#creationPracticeGuide').waitFor({state:'visible'});
   const empty=await page.evaluate(()=>FG.creation.export());

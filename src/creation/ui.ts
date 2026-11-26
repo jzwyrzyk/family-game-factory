@@ -1,3 +1,4 @@
+import { createPalPortrait } from '../pals/ui';
 import {earlySoundMuted} from '../learning/early/audio';
 import {profileGrade} from '../learning/engine';
 import {isEarlyGrade,withinGrade} from '../learning/grades';
@@ -21,6 +22,9 @@ import { palSceneAssetId, type PalForm } from '../pals/catalog';
 import {createReadAloudControl} from '../speech/read-aloud-control';
 import { firstStepsSummary, simpleMove, directionMove, FIRST_STEPS_ACTIONS } from './learner-controls';
 import './style.css';
+import './landing.css';
+import { applyPalArtworkMask } from '../pals/presentation-image';
+import {createStudioIntroduction} from './introduction';
 
 type Host = {
   enter(): boolean | Promise<boolean>;
@@ -75,14 +79,14 @@ export function installCreationStudio(host: Host) {
   const store=async()=>{const captured=owner();if(!activeStore||storeOwner!==captured){const old=activeStore;storeOwner=captured;indexedAuthority=false;activeStore=CreationWorkspace.open(profileStorage(localStorage),owner).then(value=>{if(owner()===captured)indexedAuthority=!!value.indexed;return value;});void old?.then(value=>value.close()).catch(()=>{});}return activeStore;};
   const page = node('section', 'page hidden'); page.id = 'page-creation';
   page.innerHTML = `
-    <header class="creation-heading"><div class="creation-heading-copy"><h1 id="creationHeading" tabindex="-1">Create & code</h1><p id="creationSubtitle">Make a little adventure.</p></div><div id="creationHeadingActions" class="creation-heading-actions"><button class="creation-button" id="creationHome">${iconMarkup('arrow', 'jems-icon--back')} My Games</button></div></header>
+    <header class="creation-heading"><div class="creation-heading-copy"><span class="creation-identity">Creative Studio</span><h1 id="creationHeading" tabindex="-1">Make it. <span>Make it move.</span></h1><p id="creationSubtitle">Bring your imagination to life.</p></div><div id="creationHeadingActions" class="creation-heading-actions"><button class="creation-button" id="creationHome">${iconMarkup('arrow', 'jems-icon--back')} My Games</button></div></header>
     <div id="creationStatus" class="creation-status" role="status" aria-live="polite"></div>
     <div id="creationShelf">
-      <div class="creation-mode-switch" role="group" aria-label="Choose how to create"><button id="creationFreeMode" aria-pressed="true">${iconMarkup('star')} Make your own</button><button id="creationChallengeMode" aria-pressed="false">${iconMarkup('grid')} Rebuild a scene</button></div>
-      <div class="creation-shelf-tools"><button id="creationShelfImport" class="creation-button">${iconMarkup('book')} Open a scene file</button></div>
+      <section id="creationWelcome" class="creation-welcome"><div class="creation-welcome-copy"><h2>Every idea<br>can come to life.</h2><p>Start with a scene.<br>See what you can make it do.</p></div><img src="./jems-art/character_spark_wave.webp" alt="" class="creation-welcome-art"><div class="creation-starts"><button id="creationFreeMode" class="creation-start">${iconMarkup('star')}<span><strong>Make a scene</strong><small>Bring your ideas to life.</small></span>${iconMarkup('arrow')}</button><button id="creationChallengeMode" class="creation-start">${iconMarkup('grid')}<span><strong>Rebuild a scene</strong><small>Watch it. Can you make it?</small></span>${iconMarkup('arrow')}</button><div id="creationExperimentSlot"></div></div></section>
+      <button id="creationLandingBack" class="creation-button" hidden>${iconMarkup('arrow','jems-icon--back')} Creative Studio</button>
       <section id="creationFreeShelf"><div class="creation-shelf-heading"><h2>Choose your world</h2></div><div id="creationStarters" class="creation-starters"></div></section>
       <section id="creationChallengeShelf" hidden><div class="creation-shelf-heading"><div><h2>Watch. Build. Try.</h2><p>Can your blocks make it happen?</p></div></div><div id="creationChallenges" class="creation-challenge-grid"></div><div id="creationPracticeGuideSlot"></div></section>
-      <section id="creationSavedSection"><div class="creation-shelf-heading"><h2>My scenes</h2></div><div id="creationSaved" class="creation-saved-grid"></div></section>
+      <section id="creationSavedSection"><div class="creation-shelf-heading"><h2>My scenes</h2><div class="creation-shelf-tools"><button id="creationShelfImport" class="creation-button">${iconMarkup('book')} Open a scene file</button></div></div><div id="creationSaved" class="creation-saved-grid"></div></section>
     </div>
     <div id="creationWorkspace" hidden>
       <div class="creation-project-bar"><button id="creationBack" class="creation-button creation-quiet">${iconMarkup('arrow', 'jems-icon--back')} My scenes</button><label class="creation-title-label"><span class="creation-sr">Scene title</span><input id="creationTitle" maxlength="80" aria-label="Scene title"></label><div class="creation-version-actions"><button id="creationUndo" class="creation-button" title="Undo last edit">${iconMarkup('undo')} <span>Undo</span></button><button id="creationKeep" class="creation-button creation-primary">${iconMarkup('check')} Keep</button><details class="creation-more" id="creationMore"><summary aria-label="More scene tools">${iconMarkup('menu')} <span>More</span></summary><div class="creation-more-content"><span id="creationSaveState" class="creation-save-state">Saved on this device</span><button id="creationMoreScenes">${iconMarkup('arrow', 'jems-icon--back')} My scenes</button><button id="creationRedo">${iconMarkup('undo', 'jems-icon--mirror')} Redo</button><button id="creationCopy">${iconMarkup('add')} Make a copy</button><button id="creationDownload">${iconMarkup('download')} Download editable scene</button><button id="creationImportButton">${iconMarkup('book')} Open scene file</button><button id="creationVideo">${iconMarkup('download')} Save a video</button><button id="creationHistory">${iconMarkup('clock')} Saved versions</button><div id="creationSource" class="creation-source" hidden></div><div id="creationGuideSlot"></div><button id="creationDelete">${iconMarkup('trash')} Delete this scene</button></div></details></div></div>
@@ -110,9 +114,11 @@ export function installCreationStudio(host: Host) {
       <section id="creationVersions" class="creation-versions" hidden><div class="creation-shelf-heading"><h2>Saved versions</h2><button id="creationCloseHistory" class="creation-button">${iconMarkup('close')} Close</button></div><div id="creationVersionList"></div></section>
     </div>
     <input id="creationImport" type="file" accept="application/json,.json" hidden>
-    <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">${iconMarkup('close')}</button></div><div id="creationPalSlot"></div><section><div class="creation-shelf-heading"><h3>My art</h3><button id="creationOpenArtStudio" class="creation-button">${iconMarkup('edit')} Art Studio</button></div><p id="creationActorArtStatus" role="status"></p><div id="creationPrivateActorChoices" class="creation-actor-choices"></div></section><h3>Characters & things</h3><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
+    <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">${iconMarkup('close')}</button></div><div id="creationPalSlot"></div><section><div class="creation-shelf-heading"><h3>My art</h3><button id="creationOpenArtStudio" class="creation-button">${iconMarkup('edit')} My Art</button></div><p id="creationActorArtStatus" role="status"></p><div id="creationPrivateActorChoices" class="creation-actor-choices"></div></section><h3>Characters & things</h3><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
   document.querySelector('main')!.append(page);
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => page.querySelector<T>('#' + id)!;
+  const introduction=createStudioIntroduction(host.guidance,()=>shelf('landing'));
+  $('creationShelf').before(introduction.element);
   const privateArt=new PrivateArtResolver(owner);
   const stage = new CreationStage($<HTMLCanvasElement>('creationCanvas'),privateArt,message=>status(message,true));
   const palShelf = node('section', 'creation-pal-shelf'); palShelf.id = 'creationPals';
@@ -138,6 +144,8 @@ export function installCreationStudio(host: Host) {
   const status = (message: string, error = false) => { $('creationStatus').textContent = message; $('creationStatus').classList.toggle('is-error', error); };
   const readingTools=node('div','creation-reading-tools'); readingTools.id='creationReadingTools';
   function readingText() {
+    if(!introduction.element.hidden)return 'Can you reach the gem? Choose arrows. Press Play. See what happens. You can skip for now.';
+    if(!$('creationWelcome').hidden)return 'Creative Studio. Make a scene, rebuild a scene, or try an experiment. Choose what you want to make.';
     const message=$('creationStatus').textContent?.trim();
     const feedback=$('creationFeedback');
     if(scene && !feedback.hidden && feedback.textContent?.trim())return [message,feedback.textContent,$('creationChallengeBrief').querySelector('.creation-hint')?.textContent].filter(Boolean).join('. ');
@@ -301,7 +309,7 @@ export function installCreationStudio(host: Host) {
     expandedBlockId = ''; page.classList.add('has-scene'); document.body.classList.add('creation-editing');
     $('creationShelf').hidden = true; $('creationWorkspace').hidden = false; $('creationCodePane').scrollTop = 0; $('creationVersions').hidden = true; $('creationFeedback').hidden = true;
     $('creationRecovery').hidden = !recoveryPending;
-    $('creationHeading').textContent = 'Create & code'; $('creationSubtitle').textContent = 'Make a little adventure.';
+    introduction.hide();$('creationHeading').textContent=challengeId?'Rebuild a scene':'Make a scene';$('creationSubtitle').textContent='Add an action. Play. Make it yours.';
     $('creationSaveState').textContent = loaded.project.keptId === revisionId ? 'Your kept version' : 'Saved on this device';
     $<HTMLButtonElement>('creationRun').disabled=false;$<HTMLButtonElement>('creationVideo').disabled=false;$<HTMLButtonElement>('creationDownload').disabled=false;
     if (loaded.project.challengeId && !challengeId) status('This scene’s original challenge is no longer available. You can still edit and keep your scene.');
@@ -310,13 +318,15 @@ export function installCreationStudio(host: Host) {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
   async function enter() { if (!await host.enter()) return false; visible = true; page.classList.remove('hidden'); startCheckpointTimer(); return true; }
-  async function open(id?: string) { await act(async () => { if (!await enter()) return; if (id) await loadScene(id); else await shelf(); }); }
+  async function open(id?: string) { await act(async () => { if (!await enter()) return; if (id) await loadScene(id); else {await shelf();if(introduction.needed()){ $('creationShelf').hidden=true;introduction.show();}} }); }
   async function openChallenges() { await act(async () => { if (!await enter()) return; await shelf('challenge'); }); }
-  async function shelf(mode: 'free' | 'challenge' = 'free') {
+  async function shelf(mode: 'landing' | 'free' | 'challenge' = 'landing') {
     if (locked()) return; await saveVersion(); stop(); viewEpoch++; scene = null; entryId = ''; sceneOwner = owner(); sourceSessionId = ''; recoveryPending = false;
     privateArt.clear();stage.clear(); setExpandedView(false); page.classList.remove('has-scene'); document.body.classList.remove('creation-editing');
     $('creationWorkspace').hidden = true; $('creationShelf').hidden = false;
-    $('creationHeading').textContent = 'Create & code'; $('creationSubtitle').textContent = 'Make a little adventure.';
+    introduction.hide();$('creationWelcome').hidden=mode!=='landing';$('creationLandingBack').hidden=mode==='landing';
+    $('creationHeading').innerHTML=mode==='landing'?'Make it. <span>Make it move.</span>':mode==='free'?'Make a scene':'Rebuild a scene';
+    $('creationSubtitle').textContent=mode==='landing'?'Bring your imagination to life.':mode==='free'?'Choose a world. Imagine what happens next.':'Watch it. Build it. Try again.';
     $('creationFreeShelf').hidden = mode !== 'free'; $('creationChallengeShelf').hidden = mode !== 'challenge';
     $('creationFreeMode').setAttribute('aria-pressed', String(mode === 'free')); $('creationChallengeMode').setAttribute('aria-pressed', String(mode === 'challenge'));
     await renderShelf(); status(''); if (mode === 'challenge') renderGuide('practice'); $('creationHeading').focus({ preventScroll: true });
@@ -415,9 +425,18 @@ export function installCreationStudio(host: Host) {
         preview.getContext('2d')!.drawImage(resolved.image,(128-w)/2,(128-h)/2,w,h);
         preview.style.cssText='width:100%;height:100%;object-fit:contain';wrap.replaceChildren(preview);
       }).catch(()=>{if(capturedOwner===owner()&&capturedView===viewEpoch&&wrap.isConnected)wrap.textContent='Art unavailable';});
+    }else if (asset?.palId && asset.palForm) {
+      wrap.append(createPalPortrait(asset.palId, asset.palForm === 'mature' ? 2 : 1));
     }else if (asset?.url) {
       const img = node('img'); img.alt = ''; img.decoding = 'async';
-      if (asset.palForm) img.onerror = () => { wrap.textContent = 'Picture unavailable'; };
+      if (asset.palForm) {
+        img.style.visibility = 'hidden';
+        img.onerror = () => { wrap.textContent = 'Picture unavailable'; };
+        img.onload = () => {
+          try { applyPalArtworkMask(img, asset.url!); img.style.visibility = 'visible'; }
+          catch { wrap.textContent = 'Picture unavailable'; }
+        };
+      }
       img.src = asset.url; wrap.append(img);
     }
     else { wrap.classList.add('creation-art-' + (asset?.shape || 'gem')); wrap.style.setProperty('--actor-color', asset?.color || '#9473D3'); wrap.textContent = asset?.emoji || (asset?.shape === 'robot' ? '▰' : asset?.shape === 'bucket' ? '◡' : '◆'); }
@@ -446,7 +465,8 @@ export function installCreationStudio(host: Host) {
       button.append(thumb, copy, createIcon('arrow', 'creation-saved-arrow')); button.onclick = async () => await act(async () => await loadScene(project.id)); saved.append(button);
     }};await append(projects);
     const more=node('button','creation-button','More scenes');more.id='creationMoreScenesPage';if(after)saved.append(more);more.onclick=()=>act(async()=>{if(!after)return;const page=await current.page(captured,after,24);more.remove();await append(page.items);after=page.next;if(after)saved.append(more);});
-    $('creationSavedSection').hidden = !saved.childElementCount;
+    $('creationSavedSection').hidden=false;
+    if(!saved.childElementCount){const empty=node('div','creation-saved-empty');const image=node('img');image.src='./jems-art/spot_safe_storage.webp';image.alt='';empty.append(image,node('p','','Your scenes will be waiting here.'));saved.append(empty);}
     const challenges = $('creationChallenges'); challenges.replaceChildren();
     challengesForGrade(profileGrade(FG.store.current())).forEach((item, index) => {
       const choice = node('div', 'creation-challenge-choice');
@@ -472,8 +492,8 @@ export function installCreationStudio(host: Host) {
       : 'A scene from your saved work · linked to its starting version'));
     if(hasPrivateArt){
       box.append(iconNode('span','','star','Your art · this scene keeps the exact version you chose'));
-      const artButton=iconNode('button','creation-text-button','edit','Art Studio');
-      artButton.onclick=async ()=>await act(async ()=>{assertEditing();await saveVersion();if(FG.artStudio?.open)FG.artStudio.open();else status('Art Studio is still opening. Try again in a moment.');});
+      const artButton=iconNode('button','creation-text-button','edit','My Art');
+      artButton.onclick=async ()=>await act(async ()=>{assertEditing();await saveVersion();if(FG.artStudio?.open)FG.artStudio.open();else status('My Art is still opening. Try again in a moment.');});
       box.append(artButton);
     }
     if (sourceSessionId) { const button = iconNode('button', 'creation-text-button', 'arrow', 'Back to my game'); button.onclick = async () => await act(async () => { await saveVersion(); stop(); void host.openGame(sourceSessionId); }); box.append(button); }
@@ -858,6 +878,7 @@ export function installCreationStudio(host: Host) {
   };
   $('creationCodeView').onclick = () => { if (!locked()) setWorkspaceView('code'); };
   $('creationPlayView').onclick = () => { if (!locked()) setWorkspaceView('play'); };
+  $('creationLandingBack').onclick=()=>act(()=>shelf());
   $('creationFreeMode').onclick = async () => await act(async () => await shelf('free'));
   $('creationChallengeMode').onclick = async () => await act(async () => await shelf('challenge'));
   $<HTMLInputElement>('creationTitle').maxLength = 60;
@@ -899,7 +920,7 @@ export function installCreationStudio(host: Host) {
   $('creationVideo').onclick = () => actAsync(async () => { if (recording) { if (recording.recorder.state !== 'inactive') recording.recorder.stop(); return; } await run(true); });
   function assertImportReady() {
     if (scene) { assertEditing(); return; }
-    if (!visible) throw Error('Open Create & code before opening a scene file.');
+    if (!visible) throw Error('Open Creative Studio before opening a scene file.');
     if (locked()) throw Error('Your learning activity is still open.');
   }
   const chooseImport = async () => await act(() => { assertImportReady();if(sceneImportPending){status('A scene file is still opening. Please wait a moment.');return;} $<HTMLInputElement>('creationImport').click(); });
@@ -924,7 +945,7 @@ export function installCreationStudio(host: Host) {
       if(!current())return;
       let project;
       try{project=await (await store()).create(capturedOwner,ready);}
-      catch(error){if(withArt)throw Error('The artwork was imported into Art Studio, but the scene could not be saved. '+(error as Error).message);throw error;}
+      catch(error){if(withArt)throw Error('The artwork was imported into My Art, but the scene could not be saved. '+(error as Error).message);throw error;}
       indexSceneArt(project.id,capturedOwner,bindings);
       await loadScene(project.id); status(withArt?'Your scene and its artwork are open as a new project. Earlier work is unchanged.':'Your scene file is open as a new project.');
     } catch (error) { if (owner() === capturedOwner && visible && viewEpoch ===capturedView) status((error as Error).message, true); } finally { sceneImportPending=false;input.value = ''; }
@@ -948,7 +969,7 @@ export function installCreationStudio(host: Host) {
     const choices=$('creationPrivateActorChoices'),message=$('creationActorArtStatus');choices.replaceChildren();message.textContent='Opening your art collection…';
     try{
       const items=await listArtChoices(capturedOwner,current);if(!current())return;
-      message.textContent=items.length?'Choose an original or a saved cutout. Its artwork stays linked to this exact version.':'Your drawings can join this scene. Add one in Art Studio.';
+      message.textContent=items.length?'Choose an original or a saved cutout. Its artwork stays linked to this exact version.':'Your drawings can join this scene. Add one in My Art.';
       for(const item of items){
         const choice=node('button','creation-character-choice');choice.type='button';choice.dataset.privateArt=item.assetId;
         choice.append(art(item.assetId),node('strong','',item.label),node('small','',item.detail));
@@ -969,7 +990,7 @@ export function installCreationStudio(host: Host) {
     }catch(error){if(current())message.textContent=(error as Error).message;}
   }
   $('creationAddActor').onclick = async () => await act(async () => { assertEditing(); renderActorChoices(); $<HTMLDialogElement>('creationActorDialog').showModal();void await renderPrivateChoices(); });
-  $('creationOpenArtStudio').onclick=async ()=>await act(async ()=>{assertEditing();await saveVersion();if(FG.artStudio?.open){$<HTMLDialogElement>('creationActorDialog').close();FG.artStudio.open();}else $('creationActorArtStatus').textContent='Art Studio is still opening. Try again in a moment.';});
+  $('creationOpenArtStudio').onclick=async ()=>await act(async ()=>{assertEditing();await saveVersion();if(FG.artStudio?.open){$<HTMLDialogElement>('creationActorDialog').close();FG.artStudio.open();}else $('creationActorArtStatus').textContent='My Art is still opening. Try again in a moment.';});
   $('creationCloseActor').onclick = () => $<HTMLDialogElement>('creationActorDialog').close();
   function renderActorChoices(palsOnly = false) {
     const box = $('creationActorChoices'), ids = ownedPals(); box.replaceChildren();
@@ -1036,6 +1057,8 @@ export function installCreationStudio(host: Host) {
   const api = {
     open, openChallenges, close:leave,
     prepareIndexedCreation:async()=>{await actionQueue;await saveVersion();await prepareIndexedCreation(profileStorage(localStorage),owner);const old=activeStore;activeStore=null;await old?.then(value=>value.close());await shelf();},
+    openMake(){return act(async()=>{if(await enter())await shelf('free');});},
+    openIntroduction(){return act(async()=>{if(!await enter())return;await shelf();$('creationShelf').hidden=true;introduction.show();});},
     async openArt(selection:ArtSelection){
       if(!await enter())return;
       try{await shelf();}catch(error){status((error as Error).message,true);return;}

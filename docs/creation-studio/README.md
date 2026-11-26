@@ -1,5 +1,9 @@
 # Creation Studio: make scenes and rebuild behavior
 
+## Creative Studio entrances — November 25, 2026
+
+The landing page follows My Art: **Make it. Make it move.**, approved gem artwork, three action cards and My scenes. **Make a scene** reveals existing worlds and optional characters/Pals/art; **Rebuild a scene** opens existing deterministic challenges; **Try an experiment** opens authored reasoning practice and returns here. Scene files belong beside saved scenes. A first visit offers a skippable arrow-and-Play introduction using the real interpreter, with no project or evidence write. `studio-intro` lives in existing owner-scoped guidance. First steps, More tools, checks, hints, Keep, draft recovery and program semantics are unchanged. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
+
 **Status:** merged in [PR62](https://github.com/jzwyrzyk/family-game-factory/pull/62) as [`c4ce21be410e7fccb16922c4711f4c4172edbc7e`](https://github.com/jzwyrzyk/family-game-factory/commit/c4ce21be410e7fccb16922c4711f4c4172edbc7e), November 19, 2026. This document describes source behavior and its acceptance contract; the merge does not establish deployment, real-device acceptance, or educational efficacy.
 
 **Decision:** [ADR0007 — One creation experience with free scenes and rebuild practice](../decisions/0007-creation-and-rebuild-practice.md). The owner expanded the earlier discussion into an explicit development request during the November 18–19, 2026 session: keep one Jems experience, reuse the child's game characters and ideas, offer editable scenes/actions, and provide a separate practice entrance where children rebuild demonstrated behavior.
