@@ -91,7 +91,15 @@ def state_hash(tf):
     return sha(private_path(state).read_bytes()) if state.exists() else None
 
 
-def review(plan):
+TRIAL_GRANTS = {
+    'google_secret_manager_secret_iam_member.funded_coach_key[0]':
+        ('roles/secretmanager.secretAccessor', 'coach'),
+    'google_cloud_run_v2_service_iam_member.funded_household_coach[0]':
+        ('roles/run.invoker', 'household')
+}
+
+
+def review(plan, closing=False):
     need(plan.get('errored') is not True and plan.get('complete', True) is True
          and not plan.get('resource_drift') and not plan.get('deferred_changes'), 'DRIFT_OR_INCOMPLETE_PLAN')
     need(all(c.get('status') in {'pass', 'unknown'} for c in plan.get('checks', [])), 'FAILED_PLAN_CHECK')
@@ -101,7 +109,16 @@ def review(plan):
         mode = resource['mode']
         need(not resource.get('previous_address') and not resource['change'].get('importing'),
              'UNEXPECTED_STATE_TRANSFER')
-        need((mode == 'managed' and actions in (['no-op'], ['create'], ['update']))
+        revoke = False
+        if closing and mode == 'managed' and actions == ['delete'] and resource['address'] in TRIAL_GRANTS:
+            role, service = TRIAL_GRANTS[resource['address']]
+            old = resource['change']['before']
+            revoke = (old.get('role') == role and old.get('member') ==
+                      'serviceAccount:jems-test-' + service + '@' + PROJECT + '.iam.gserviceaccount.com'
+                      and old.get('project') == PROJECT and
+                      (old.get('name') == 'jems-test-coach' if service == 'household'
+                       else old.get('secret_id') == 'jems-test-coach-key'))
+        need(revoke or (mode == 'managed' and actions in (['no-op'], ['create'], ['update']))
              or (mode == 'data' and actions in (['no-op'], ['read'])), 'DESTRUCTIVE_OR_UNKNOWN_ACTION')
         for value in ('before', 'after'):
             obj = resource['change'].get(value) or {}
@@ -112,13 +129,13 @@ def review(plan):
     return rows
 
 
-def tf_plan(tf, attempt, variables, name):
+def tf_plan(tf, attempt, variables, name, closing=False):
     binary = attempt / (name + '.tfplan')
     command(['terraform', 'plan', '-input=false', '-lock-timeout=30s', '-parallelism=1',
              '-var-file=' + str(variables), '-out=' + str(binary)], tf, 'TERRAFORM_PLAN', attempt)
     data = command(['terraform', 'show', '-json', str(binary)], tf, 'TERRAFORM_SHOW', attempt)
     write_new(attempt / (name + '.json'), data)
-    return review(json.loads(data)), binary
+    return review(json.loads(data), closing), binary
 
 
 def unresolved(home):
@@ -142,12 +159,27 @@ def prepare(home, tf, source, args, secret):
     attempt.mkdir(mode=0o700)
     write_new(attempt / 'inputs.tfvars.json', variables)
     state = state_hash(tf)
+    previous = None
+    if state:
+        for path in (home / 'attempts').glob('*/completed.json'):
+            if read_json(private_path(path)).get('successorStateSha256') == state:
+                previous = read_json(private_path(path.parent / 'inputs.tfvars.json'))
+                break
+    uncertain = any((home / 'attempts').glob('*/reconciled.json'))
+    if previous is None and not uncertain:
+        need(variables['stage'] == 'foundation' and not variables.get('enable_worker_federation')
+             and not variables.get('funded_trial'), 'CLOSED_FOUNDATION_FIRST')
+    if previous:
+        need(STAGES.index(variables['stage']) <= STAGES.index(previous['stage']) + 1, 'STAGE_SKIPPED')
+    closing = getattr(args, 'close_funded_trial', False)
+    need(not closing or previous and previous.get('funded_trial') and not variables.get('funded_trial'),
+         'NO_MATCHING_FUNDED_TRIAL')
     if state:
         write_new(attempt / 'before.tfstate', (tf / 'terraform.tfstate').read_bytes())
-    rows, binary = tf_plan(tf, attempt, attempt / 'inputs.tfvars.json', 'review')
+    rows, binary = tf_plan(tf, attempt, attempt / 'inputs.tfvars.json', 'review', closing)
     need(state_hash(tf) == state, 'STATE_CHANGED_DURING_PLAN')
     record = {'source': source, 'attempt': attempt.name, 'root': TF_ROOT, 'project': PROJECT,
-              'stage': variables['stage'], 'workerFederation': variables.get('enable_worker_federation', False),
+              'stage': variables['stage'], 'closeFundedTrial': closing, 'workerFederation': variables.get('enable_worker_federation', False),
               'changes': rows, 'historySha256': history_hash(home), 'beforeStateSha256': state, 'planSha256': sha(binary.read_bytes()),
               'inputsSha256': sha((attempt / 'inputs.tfvars.json').read_bytes()),
               'reviewSha256': sha((attempt / 'review.json').read_bytes()),
@@ -191,6 +223,7 @@ def main():
     modes.add_parser('initialize')
     plan = modes.add_parser('plan')
     plan.add_argument('--variables', type=Path, required=True)
+    plan.add_argument('--close-funded-trial', action='store_true', help='Allow removal of the two temporary trial IAM grants only')
     approved = modes.add_parser('apply')
     approved.add_argument('--attempt', required=True)
     approved.add_argument('--approve-sha256', required=True)
