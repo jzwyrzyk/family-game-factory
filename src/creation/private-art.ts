@@ -12,7 +12,6 @@ export interface ArtSelection {drawingId:string;rigId?:string}
 export interface ArtChoice extends ArtSelection {assetId:string;label:string;detail:string}
 export interface ResolvedPrivateArt extends ArtChoice {image:HTMLCanvasElement;motion?:import('../drawing/motion').DrawingMotion}
 const stale=()=>Error('The player or page changed. Reopen your artwork in your own profile.');
-const hex=(bytes:ArrayBuffer)=>Array.from(new Uint8Array(bytes),byte=>byte.toString(16).padStart(2,'0')).join('');
 /** Union cutout masks without repeatedly blending the original's translucent
  * pixels. RGB always comes from the original; alpha cannot exceed its alpha. */
 export function unionOriginalArtPixels(original:Uint8ClampedArray,mask:Uint8ClampedArray,accumulated?:Uint8ClampedArray):Uint8ClampedArray {
@@ -34,7 +33,7 @@ export async function artChoice(owner:string,selection:ArtSelection,current:()=>
     if(rig.assembly.sourceId!==source.id||rig.assembly.sourceSha256!==source.sha256)throw Error('This design no longer matches its original drawing.');
     const sha256=await assemblyHash(rig.assembly);
     if(!current())throw stale();
-    return {drawingId:source.id,rigId:rig.id,assetId:privateArtId({kind:'rig',id:rig.id,sha256}),label:source.name,detail:'Saved cutout design'};
+    return {drawingId:source.id,rigId:rig.id,assetId:privateArtId({kind:'rig',id:rig.id,sha256}),label:source.name,detail:rig.assembly.motion?'Animation path':'Saved cutout design'};
   }
   return {drawingId:source.id,assetId:privateArtId({kind:'image',id:source.id,sha256:source.sha256}),label:source.name,detail:'Original artwork'};
 }
@@ -111,7 +110,7 @@ export async function resolvePrivateArt(owner:string,assetId:string,current:()=>
   const source=await drawing(owner,rig?rig.assembly.sourceId:ref.id);
   if(!current())throw stale();
   const expected=rig?rig.assembly.sourceSha256:ref.sha256;
-  if(source.sha256!==expected||hex(await crypto.subtle.digest('SHA-256',source.bytes))!==expected)throw Error('The original drawing does not match this saved version.');
+  if(source.sha256!==expected)throw Error('The original drawing does not match this saved version.');
   if(!current())throw stale();
   const bitmap=await createImageBitmap(drawingBlob(source));
   try{

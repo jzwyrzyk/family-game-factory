@@ -76,10 +76,12 @@ export async function drawings(owner: string): Promise<Drawing[]> {
 }
 export async function drawing(owner: string, id: string): Promise<Drawing> {
   artOwner(owner);
-  return withArtTransaction(['drawings'], 'readonly', async transaction => {
+  const result = await withArtTransaction(['drawings'], 'readonly', async transaction => {
     const item = await artRequest(transaction.objectStore('drawings').get(id)) as Drawing | undefined;
     if (!item || item.owner !== owner) throw Error('Choose a drawing from this profile.'); return item;
   });
+  if (await drawingHash(result.bytes) !== result.sha256) throw Error('The original drawing does not match its saved fingerprint. Open your art backup to recover a copy.');
+  return result;
 }
 export async function saveDrawing(owner: string, name: string, file: Blob, sourceId?: string, guard?: ArtGuard, category?: DrawingCategory): Promise<Drawing> {
   assertArtWrite(owner, guard); const item = await prepareDrawing(owner, name, file); assertArtWrite(owner, guard);

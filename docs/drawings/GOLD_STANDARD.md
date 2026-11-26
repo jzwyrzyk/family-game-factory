@@ -43,6 +43,12 @@ Choose a picture or a saved movement version in **My Art**, then **Draw a path**
 
 Adding the path to a scene places the actor at the first stop and creates ordinary editable Move blocks for the remaining stops. Playback uses the existing scene engine. Changing the scene’s blocks affects that scene alone. Drawing a path on a picture assigns no physics body. Existing physical joints on an explicitly chosen rig remain available to the movement playground. Opening the saved design in the pieces editor allows a child to make a new cutout version. Whole-sprite path animation and the existing articulated physics playground have different controls. This flow records no learning result and needs no model service.
 
+The selected-original reader verifies the stored bytes against their SHA-256 before a drawing opens in a scene, animation, or Rally. The catalog reads lightweight metadata. In the prepared storage preview, My Art counts uses from the active game and scene histories, including private backdrops. Production continues to use its existing local histories.
+
+### Scene-local paths under review
+
+The separate Creative Studio composer in PR #201 at `e1b67c17fa3c2ff103b221173cf476ac82d09206` writes a named Repeat group with up to 24 relative Move blocks and per-step durations. Its kept-scene chooser copies that group into an actor’s selected script. The scene engine in this branch executes those relative moves and repeats. Its validator rejects the additional `pathName` property. The PR #201 validators also predate the private rig’s `motion` field and the scene’s `world` field. A combined release needs a reviewed schema change and round-trip coverage for named groups, immutable art references and worlds. Stripping a path name would lose the child’s saved name and the source composer’s reuse eligibility. [PR #201](https://github.com/jzwyrzyk/family-game-factory/pull/201)
+
 ## Fidelity ladder: when a drawing is hard
 
 **A. Automatic inference where justified:** Detect high-contrast shapes, isolated parts, and simple geometry. Disclose confidence qualitatively and show every layer.

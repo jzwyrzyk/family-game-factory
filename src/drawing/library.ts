@@ -4,6 +4,8 @@ import { assertRewardSourceWritable, rewardSourceWritable } from '../rewards/wri
 import { validateAssembly } from './model';
 import type { Drawing } from '../assets/private-drawings';
 import type { SavedRig } from './store';
+import type { CreationWorkspace } from '../creation/storage';
+import type { Workspace } from '../factory/workspace';
 import { adultStorageKey } from '../adult-pilot/storage';
 
 export const ART_DB_NAME = 'family-private-drawings-v1';
@@ -157,7 +159,8 @@ export async function releaseArtUsage(owner: string, targetId: string, guard?: A
 }
 /** Read the source histories as authority. A valid workspace can disprove an
  * obsolete index receipt; unavailable/corrupt source evidence cannot do so. */
-export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'owner'|'sha256'>[], rigs: SavedRig[], indexed: ArtUsage[]): ArtUsage[] {
+type PreparedHistories = {scene?: CreationWorkspace; game?: Workspace};
+export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'owner'|'sha256'>[], rigs: SavedRig[], indexed: ArtUsage[], prepared: PreparedHistories = {}): ArtUsage[] {
   const result = new Map<string, ArtUsage>(), known = new Set<ArtUsage['targetKind']>();
   const images = new Map(originals.filter(item => item.owner === owner).map(item => [item.id, item]));
   const versions = new Map(rigs.filter(item => item.owner === owner).map(item => [item.id, item]));
@@ -167,9 +170,7 @@ export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'own
   };
   if (typeof localStorage !== 'undefined') for (const [kind, key] of [['scene', 'family-game-factory-creation-v1'], ['game', 'family-game-factory-workspace-v2']] as const) {
     try {
-      const raw = localStorage.getItem(adultStorageKey(key, owner.startsWith('adult:') ? owner : null));
-      if (!raw) continue;
-      const workspace = JSON.parse(raw);
+      const workspace = prepared[kind] ?? JSON.parse(localStorage.getItem(adultStorageKey(key, owner.startsWith('adult:') ? owner : null)) ?? 'null');
       if (!workspace || !Array.isArray(workspace.projects) || !Array.isArray(workspace.revisions) || kind === 'scene' && !Array.isArray(workspace.drafts)) continue;
       const owned = new Set(workspace.projects.filter((project: any) => project?.owner === owner && typeof project.id === 'string').map((project: any) => project.id));
       const allProjects = new Set(workspace.projects.map((project: any) => project?.id));
@@ -198,11 +199,22 @@ export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'own
 }
 export async function artUsages(owner: string, drawingId?: string): Promise<ArtUsage[]> {
   artOwner(owner);
+  const prepared: PreparedHistories = {};
+  if (import.meta.env?.MODE === 'storage-preview') {
+    const [{captureCreationRecovery}, {captureNativeRecovery}] = await Promise.all([import('../storage/creation-recovery'), import('../storage/native-recovery')]);
+    const check = () => {
+      if (String((window as any).FG.store.current().id) !== owner) throw Error('Open your art in your own profile.');
+    };
+    const [scenes, games] = await Promise.all([captureCreationRecovery([owner], check), captureNativeRecovery([owner], check)]);
+    check();
+    prepared.scene = scenes[0]?.workspace;
+    prepared.game = games[0]?.workspace;
+  }
   return withArtTransaction(['usage', 'drawingMetadata', 'rigs'], 'readonly', async transaction => {
     const indexed = await ownerArtRecords<ArtUsage>(transaction,'usage',owner);
     const originals = await ownerArtRecords<DrawingMetadata>(transaction,'drawingMetadata',owner);
     const rigs = await ownerArtRecords<SavedRig>(transaction,'rigs',owner);
-    return deriveArtUsages(owner, originals, rigs, indexed).filter(item => !drawingId || item.drawingId === drawingId);
+    return deriveArtUsages(owner, originals, rigs, indexed, prepared).filter(item => !drawingId || item.drawingId === drawingId);
   });
 }
 

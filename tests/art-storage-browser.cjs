@@ -4,7 +4,7 @@ const http = require('node:http');
 const { build } = require('esbuild');
 const { chromium } = require('playwright');
 (async () => {
- const bundled = await build({ stdin: { contents: `export * from './src/assets/private-drawings'; export * from './src/drawing/store'; export * from './src/drawing/library'; export * from './src/drawing/transfer'; export * from './src/rewards/write-guard';`, resolveDir: process.cwd() }, bundle: true, write: false, format: 'iife', globalName: 'art', platform: 'browser' });
+ const bundled = await build({ stdin: { contents: `export {IndexedCreationStore} from './src/storage/indexed-creation'; export {nativeScope} from './src/storage/native-workspace'; export {createStarterProject, privateArtId} from './src/creation/projects'; export * from './src/assets/private-drawings'; export * from './src/drawing/store'; export * from './src/drawing/library'; export * from './src/drawing/transfer'; export * from './src/rewards/write-guard';`, resolveDir: process.cwd() }, bundle: true, write: false, format: 'iife', globalName: 'art', platform: 'browser', define:{'import.meta.env':'globalThis.artTestBuild'} });
  const server = http.createServer((req, res) => { res.setHeader('Content-Type', req.url === '/test.js' ? 'text/javascript' : 'text/html'); res.end(req.url === '/test.js' ? bundled.outputFiles[0].text : '<!doctype html><html><body><script src="/test.js"></script></body></html>'); }).listen(0, '127.0.0.1');
  await new Promise(resolve => server.listening ? resolve() : server.once('listening', resolve));
  let browser;
@@ -25,6 +25,11 @@ const { chromium } = require('playwright');
    const original = await art.saveDrawing(owner, 'Synthetic moon car', file);
    check(legacyProbes===0&&!(await indexedDB.databases()).some(row=>row.name==='family-drawing-rigs-v1'),'absent legacy database discovery never attempts creation');indexedDB.open=open;
    check(original.sha256 === await art.drawingHash(originalBytes) && original.bytes.byteLength === originalBytes.byteLength, 'original bytes and fingerprint preserved');
+   const corruptBytes = original.bytes.slice(0);
+   new Uint8Array(corruptBytes)[corruptBytes.byteLength-1] ^= 1;
+   await art.withArtTransaction(['drawings'],'readwrite',tx=>tx.objectStore('drawings').put({...original,bytes:corruptBytes}));
+   await rejects(()=>art.drawing(owner,original.id),'selected original read verifies actual bytes even when stored metadata matches');
+   await art.withArtTransaction(['drawings'],'readwrite',tx=>tx.objectStore('drawings').put(original));
    const assembly = { schemaVersion: 1, sourceId: original.id, sourceSha256: original.sha256, kind: 'car', revision: 1, notes: '', pieces: [
     { id: 'body', name: 'Body', role: 'body', region: { x: .1, y: .1, w: .8, h: .5, shape: 'rect' }, parentId: null, physical: true },
     { id: 'left', name: 'Left wheel', role: 'wheel', region: { x: .1, y: .55, w: .2, h: .3, shape: 'ellipse' }, parentId: 'body', physical: true },
@@ -124,6 +129,20 @@ const { chromium } = require('playwright');
    await rejects(() => art.deleteArtwork(owner, source.id), 'original cannot be erased while a derivative depends on it');
    await art.deleteArtwork(owner, derivative.id); await art.deleteArtwork(owner, source.id);
    check((await art.drawings(owner)).length === 0, 'unused derivative then original can be explicitly erased');
+   globalThis.artTestBuild = {MODE:'storage-preview'};
+   const preparedPic=await art.saveDrawing(owner,'Saved backdrop',file);
+   const legacy=JSON.stringify({schema:'jems.creation.workspace.v1',projects:[],revisions:[],drafts:[],attempts:[]});
+   localStorage.setItem('family-game-factory-creation-v1',legacy);
+   const indexedScenes=await art.IndexedCreationStore.open(await art.nativeScope(owner),()=>{});
+   try {
+    await indexedScenes.migrateLegacy(legacy);
+    const scene=art.createStarterProject('blank');
+    scene.world={assetId:art.privateArtId({kind:'image',id:preparedPic.id,sha256:preparedPic.sha256}),framing:'fit'};
+    const saved=await indexedScenes.create(scene);
+    const usage=await art.artUsages(owner,preparedPic.id);
+    check(usage.length===1 && usage[0].targetId===saved.id,'prepared usage reads its active scene history, including a backdrop missing from legacy and the index');
+    check(localStorage.getItem('family-game-factory-creation-v1')===legacy,'reading prepared usage preserves the previous storage authority');
+   } finally {indexedScenes.close();}
    return report;
   });
   assert.deepEqual(errors, []); assert.deepEqual(posts, []);
