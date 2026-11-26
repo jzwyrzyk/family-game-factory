@@ -1,5 +1,5 @@
 import {withinGrade, type Grade} from '../learning/grades';
-import {validateCreationProject,type CreationBlock,type CreationProject} from './model';
+import {starterWorld,validateCreationProject,type CreationBlock,type CreationProject} from './model';
 import {SceneEngine} from './engine';
 
 /** Open practice scenes, not protected assessment items or a measure of general ability. */
@@ -124,6 +124,7 @@ function baseProject(id:CreationChallengeId, target:boolean):CreationProject {
   return {
     schema:'jems.creation.v1', id:`challenge-${id}-${target?'target':'work'}`,
     title:challenge.title,width:800,height:450,background:robot?'workshop':'meadow',
+    world:starterWorld(robot?'workshop':'islands'),
     actors:[
       {id:robot?'robot':'dragon',name:robot?'Robot':'Dragon',assetId:robot?'robot':'dragon',x:150,y:320,size:82,visible:true},
       {id:'bucket',name:'Blue bucket',assetId:'bucket-blue',x:600,y:320,size:84,visible:true},

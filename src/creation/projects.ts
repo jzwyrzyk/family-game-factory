@@ -7,7 +7,7 @@ import type { Mechanics } from '../runtime/types';
 import type { Revision } from '../factory/workspace';
 import type { StudioSession } from '../studio/notebook';
 import { PAL_CATALOG, palArtworkPath, palSceneAssetId, type PalForm, type PalId } from '../pals/catalog';
-import { validateCreationProject, parsePrivateArtId, type PrivateArtReference, type CreationProject, type CreationBlock } from './model';
+import { starterWorld, validateCreationProject, parsePrivateArtId, type PrivateArtReference, type CreationProject, type CreationBlock } from './model';
 export {parsePrivateArtId};
 export type {PrivateArtReference};
 
@@ -80,6 +80,7 @@ export function privateArtId(reference:PrivateArtReference):string {
  * deliberately restricted to the bundled catalogue by its own entry point. */
 export function validateEditableProject(input: unknown,options:{allowPrivateArt?:boolean}={}): CreationProject {
   const project=validateCreationProject(input);
+  if(options.allowPrivateArt===false && parsePrivateArtId(project.world?.assetId)) throw Error('Private world pictures stay in the local scene editor.');
   if(project.actors.some(actor=>!creationAsset(actor.assetId)&&!(options.allowPrivateArt!==false&&parsePrivateArtId(actor.assetId)))) {
     throw Error('This scene uses artwork that is not available in this version of jems. Your saved work was not replaced.');
   }
@@ -110,6 +111,7 @@ const uid=()=>crypto.randomUUID();
 const titleFor:Record<CreationStarter,string>={dragon:'My dragon scene',buckets:'My bucket scene',robot:'My robot scene',blank:'My new scene'};
 function starter(kind:CreationStarter,title:string,config?:Mechanics):CreationProject {
   const scene:CreationProject={schema:'jems.creation.v1',id:uid(),title:title.trim().slice(0,60)||titleFor[kind],width:800,height:450,
+    world:starterWorld(kind==='robot'?'workshop':kind==='buckets'?'islands':'terrace'),
     background:kind==='robot'?'workshop':kind==='buckets'?'sky':'meadow',actors:[],programs:[],variables:{},provenance:{createdBy:'starter'}};
   const action=(block:Omit<CreationBlock,'id'>):CreationBlock=>({id:uid(),...block,origin:'starter'} as CreationBlock);
   if(kind==='dragon'){

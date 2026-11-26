@@ -1,8 +1,13 @@
-import type { CreationProject } from './model';
+import { SCENE_WORLDS, sceneAssetSlots, type CreationProject } from './model';
 import type { ActorSnapshot, SceneSnapshot } from './engine';
 import { creationAsset, drawCreationVector, parsePrivateArtId, type CreationAsset } from './projects';
 import type { PrivateArtResolver } from './private-art';
 import { preparePalSceneImage } from './pal-scene-image';
+
+function worldArt(project: CreationProject): CreationAsset | undefined {
+  const world = SCENE_WORLDS.find(item => item.id === project.world?.assetId);
+  return world && {...world, kind:'image'};
+}
 
 export const CREATION_ART_LOAD_TIMEOUT_MS = 8_000;
 type SceneImage = {
@@ -40,6 +45,8 @@ export class CreationStage {
     assertCurrent();
     const assets = [...new Set(project.actors.map(actor => actor.assetId))]
       .map(id => creationAsset(id)).filter((asset): asset is CreationAsset => !!asset?.url);
+    const world = worldArt(project);
+    if (world) assets.push(world);
     await Promise.all(assets.map(asset => this.loadImage(asset).ready));
     assertCurrent();
   }
@@ -69,7 +76,7 @@ export class CreationStage {
       if (!active() || settled) return;
       const message = `${asset.label}'s picture could not load${timedOut ? ' in time' : ''}. Reopen this scene to try again.`;
       entry.failed = true; this.failedArt.add(asset.id); settle(Error(message));
-      if (this.scene?.actors.some(actor => actor.assetId === asset.id)) this.artError?.(message);
+      if (this.scene && sceneAssetSlots(this.scene).some(slot => slot.assetId === asset.id)) this.artError?.(message);
       repaint();
     };
     const finish = () => {
@@ -94,7 +101,7 @@ export class CreationStage {
     this.scene = scene; this.snapshot = snapshot; this.selected = selected;
     // Approved portraits are large. Retain only this scene's pinned pictures,
     // not every Pal/form visited across the whole collection.
-    const assets = new Set(scene.actors.map(actor => actor.assetId));
+    const assets = new Set(sceneAssetSlots(scene).map(slot => slot.assetId));
     for (const [id, entry] of this.images) if (!assets.has(id)) { entry.cancel(); this.images.delete(id); this.failedArt.delete(id); }
     if (this.canvas.width !== scene.width) this.canvas.width = scene.width;
     if (this.canvas.height !== scene.height) this.canvas.height = scene.height;
@@ -122,7 +129,44 @@ export class CreationStage {
     return { x: Math.round((event.clientX - bounds.left) / bounds.width * this.canvas.width),
       y: Math.round((event.clientY - bounds.top) / bounds.height * this.canvas.height) };
   }
+  private privatePicture(id: string) {
+    const cached = this.privateArt?.get(id);
+    if (cached || !this.privateArt || this.requestedArt.has(id) || this.failedArt.has(id)) return cached;
+    this.requestedArt.add(id);
+    const epoch = this.artEpoch;
+    void this.privateArt.load(id).catch(error => {
+      if (epoch !== this.artEpoch) return;
+      this.failedArt.add(id);
+      if (this.scene && sceneAssetSlots(this.scene).some(slot => slot.assetId === id)) {
+        this.artError?.('Some artwork is unavailable in this profile. Open My Art to restore it. '+(error as Error).message);
+      }
+    }).finally(() => {
+      if (epoch !== this.artEpoch) return;
+      this.requestedArt.delete(id);
+      if (this.scene && this.snapshot) this.render(this.scene, this.snapshot, this.selected);
+    });
+    return undefined;
+  }
   private background(scene: CreationProject) {
+    if (scene.world) {
+      const context = this.context, {assetId, framing} = scene.world;
+      const bundled = worldArt(scene);
+      const entry = bundled && this.loadImage(bundled);
+      const image = bundled ? (entry?.loaded ? entry.image : undefined) : this.privatePicture(assetId)?.image;
+      context.fillStyle = '#f7f4ee';
+      context.fillRect(0, 0, scene.width, scene.height);
+      if (image) {
+        const scale = (framing === 'fit' ? Math.min : Math.max)(scene.width / image.width, scene.height / image.height);
+        const width = image.width * scale, height = image.height * scale;
+        context.drawImage(image, (scene.width-width)/2, (scene.height-height)/2, width, height);
+      } else {
+        context.font = '600 18px system-ui'; context.fillStyle = '#37304a';
+        context.textAlign = 'center'; context.textBaseline = 'middle';
+        context.fillText(this.failedArt.has(assetId) ? 'World picture unavailable' : 'Loading world…', scene.width/2, scene.height*.16);
+      }
+      return;
+    }
+    // Retained scenes without a world pin keep their original visual design.
     const c = this.context, w = scene.width, h = scene.height;
     const night = scene.background === 'night', workshop = scene.background === 'workshop', sky = scene.background === 'sky';
     const gradient = c.createLinearGradient(0, 0, 0, h);
@@ -176,23 +220,11 @@ export class CreationStage {
       c.beginPath(); c.roundRect(-s * .58, -s * .57, s * 1.16, s * 1.16, 15); c.stroke(); c.setLineDash([]);
     }
     if(parsePrivateArtId(actor.assetId)){
-      const resolved=this.privateArt?.get(actor.assetId);
+      const resolved=this.privatePicture(actor.assetId);
       if(resolved){
         const scale=s/Math.max(resolved.image.width,resolved.image.height);
         c.drawImage(resolved.image,-resolved.image.width*scale/2,-resolved.image.height*scale/2,resolved.image.width*scale,resolved.image.height*scale);
       }else{
-        if(this.privateArt&&!this.requestedArt.has(actor.assetId)&&!this.failedArt.has(actor.assetId)){
-          this.requestedArt.add(actor.assetId);const epoch=this.artEpoch;
-          void this.privateArt.load(actor.assetId).then(()=>{
-            if(epoch!==this.artEpoch)return;this.requestedArt.delete(actor.assetId);
-            if(this.scene&&this.snapshot)this.render(this.scene,this.snapshot,this.selected);
-          }).catch(error=>{
-            if(epoch!==this.artEpoch)return;
-            this.requestedArt.delete(actor.assetId);
-            this.failedArt.add(actor.assetId);this.artError?.('Some artwork is unavailable in this profile. Open Art Studio to restore its art bundle. '+(error as Error).message);
-            if(this.scene&&this.snapshot)this.render(this.scene,this.snapshot,this.selected);
-          });
-        }
         c.fillStyle='#F5F1FA';c.strokeStyle='#786489';c.lineWidth=2;c.setLineDash([4,4]);
         c.beginPath();c.roundRect(-s*.46,-s*.4,s*.92,s*.8,10);c.fill();c.stroke();c.setLineDash([]);
         c.fillStyle='#4C3C61';c.font='600 '+Math.max(10,Math.min(14,s*.12))+'px system-ui';c.textAlign='center';c.textBaseline='middle';

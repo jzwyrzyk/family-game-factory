@@ -5,7 +5,7 @@ import { assemblyHash } from '../assets/creative-library';
 export { assemblyHash, listCreativeAssetChoices as listArtChoices } from '../assets/creative-library';
 import { layerCanvas } from '../drawing/segmentation';
 import { parsePrivateArtId, privateArtId, validateEditableProject } from './projects';
-import type { CreationProject } from './model';
+import { sceneAssetSlots, type CreationProject } from './model';
 import {exportArtBundle,validateArtBundle,importArtBundle,type ArtBundle} from '../drawing/transfer';
 
 export interface ArtSelection {drawingId:string;rigId?:string}
@@ -39,7 +39,7 @@ export async function artChoice(owner:string,selection:ArtSelection,current:()=>
   return {drawingId:source.id,assetId:privateArtId({kind:'image',id:source.id,sha256:source.sha256}),label:source.name,detail:'Original artwork'};
 }
 export function privateArtReferences(project:CreationProject):string[] {
-  return [...new Set(project.actors.map(actor=>actor.assetId).filter(id=>parsePrivateArtId(id)))];
+  return [...new Set(sceneAssetSlots(project).map(slot=>slot.assetId).filter(id=>parsePrivateArtId(id)))];
 }
 export interface SceneArtBundle {schema:'jems.scene-art.v1';scene:CreationProject;art:ArtBundle}
 /** A download includes immutable originals and the exact cutout versions used. */
@@ -83,7 +83,7 @@ export async function importSceneArt(owner:string,input:unknown,current:()=>bool
   }
   if(!current())throw stale();
   const scene=bundle.scene;
-  for(const actor of scene.actors)actor.assetId=references.get(actor.assetId)||actor.assetId;
+  for(const slot of sceneAssetSlots(scene))slot.assetId=references.get(slot.assetId)||slot.assetId;
   if(scene.provenance?.sourceKind==='art'){
     const source=scene.provenance;
     if(source.sourceProjectId)source.sourceProjectId=imported.drawingIds[source.sourceProjectId]||source.sourceProjectId;

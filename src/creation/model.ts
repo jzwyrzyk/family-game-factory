@@ -9,6 +9,17 @@ export const CREATION_LIMITS = {
 
 export type CreationOrigin = 'child' | 'starter' | 'assisted';
 export type SceneBackground = 'meadow' | 'night' | 'workshop' | 'sky';
+/** IDs pin existing approved illustrations. A revised illustration needs a new ID and source path. */
+export const SCENE_WORLDS = [
+  {id:'world-islands-9b2446de258a', label:'Waterfall islands', url:'./art/mind-your-jems/scene-sky.webp'},
+  {id:'world-workshop-b6e81f59ab4d', label:'Gem Factory', url:'./gem-factory-workshop.webp'},
+  {id:'world-terrace-1b1460063ff8', label:'Garden terrace', url:'./jems-journey/background.webp'},
+] as const;
+export interface SceneWorld {assetId:string; framing:'fit'|'fill'}
+export function starterWorld(place:'islands'|'workshop'|'terrace'):SceneWorld {
+  const id = {islands:SCENE_WORLDS[0].id, workshop:SCENE_WORLDS[1].id, terrace:SCENE_WORLDS[2].id}[place];
+  return {assetId:id,framing:'fill'};
+}
 export type ComparisonOperator = 'eq' | 'neq' | 'lt' | 'lte' | 'gt' | 'gte';
 export type SceneCondition =
   | {type: 'variable'; variable: string; operator: ComparisonOperator; value: number}
@@ -48,11 +59,16 @@ export interface CreationProvenance {
 }
 export interface CreationProject {
   schema: typeof CREATION_SCHEMA;
-  id: string; title: string; width: number; height: number; background: SceneBackground;
+  id: string; title: string; width: number; height: number; background: SceneBackground; world?: SceneWorld;
   actors: SceneActor[]; programs: SceneProgram[]; variables: Record<string, number>;
   provenance?: CreationProvenance;
 }
 export type SceneProject = CreationProject;
+
+/** The trusted stores, portable files and recovery remappers traverse the same slots. */
+export function sceneAssetSlots(scene:CreationProject): {assetId:string}[] {
+  return scene.world ? [scene.world, ...scene.actors] : scene.actors;
+}
 
 const forbiddenIds = new Set(['__proto__', 'prototype', 'constructor']);
 export const isCreationId = (value: unknown): value is string =>
@@ -92,11 +108,16 @@ const operators = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte'];
 
 /** Strictly validates before cloning: unsupported executable/asset payloads are never retained. */
 export function validateCreationProject(input: unknown): CreationProject {
-  const p = record(input, ['schema','id','title','width','height','background','actors','programs','variables','provenance'], 'project');
+  const p = record(input, ['schema','id','title','width','height','background','world','actors','programs','variables','provenance'], 'project');
   if (p.schema !== CREATION_SCHEMA) fail('Unsupported saved project version.');
   id(p.id, 'project ID'); text(p.title, 80, 'project title');
   number(p.width, 200, 1600, 'stage width', true); number(p.height, 160, 1200, 'stage height', true);
   if (!['meadow','night','workshop','sky'].includes(p.background as string)) fail('Choose a supported background.');
+  if (p.world !== undefined) {
+    const world = record(p.world,['assetId','framing'],'world');
+    if (!SCENE_WORLDS.some(item=>item.id===world.assetId) && parsePrivateArtId(world.assetId)?.kind!=='image') fail('Choose an available world picture.');
+    if (world.framing!=='fit' && world.framing!=='fill') fail('Choose how the world picture fits.');
+  }
   list(p.actors, CREATION_LIMITS.actors, 'characters');
   if (!p.actors.length) fail('Add at least one character.');
   const actorIds = new Set<string>();

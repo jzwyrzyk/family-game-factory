@@ -1,3 +1,4 @@
+import {sceneAssetSlots} from '../creation/model';
 import { originalFor, validSemanticIdentity } from './art-lineage';
 import {assertRewardSourceLockHeld,setRewardSourceMaintenance} from '../rewards/write-guard';
 /** Private immutable image bytes. Metadata and visibility can change; the image cannot. */
@@ -149,7 +150,7 @@ function usedByRetainedScene(owner: string, original: Drawing, rigs: SavedRig[])
   for (const record of [...workspace.revisions, ...workspace.drafts]) {
     if (!ownedProjects.has(record?.projectId)) continue;
     if (!record.scene || !Array.isArray(record.scene.actors)) throw Error('A saved scene needs recovery before its artwork can be erased.');
-    if (record.scene.actors.some((actor: any) => typeof actor?.assetId === 'string' && (refs.has(actor.assetId) || rigPrefixes.some(prefix => actor.assetId.startsWith(prefix))))) return true;
+    if (sceneAssetSlots(record.scene).some((actor: any) => typeof actor?.assetId === 'string' && (refs.has(actor.assetId) || rigPrefixes.some(prefix => actor.assetId.startsWith(prefix))))) return true;
   }
   return false;
 }

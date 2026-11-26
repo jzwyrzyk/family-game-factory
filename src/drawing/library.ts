@@ -1,3 +1,4 @@
+import {sceneAssetSlots} from '../creation/model';
 /** One private transaction boundary for original art, physical versions and references. */
 import { assertRewardSourceWritable, rewardSourceWritable } from '../rewards/write-guard';
 import { validateAssembly } from './model';
@@ -178,7 +179,7 @@ export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'own
         if (!owned.has(revision.projectId)) continue;
         if (kind === 'scene') {
           if (!revision.scene || !Array.isArray(revision.scene.actors)) { complete = false; continue; }
-          for (const actor of revision.scene.actors) {
+          for (const actor of sceneAssetSlots(revision.scene)) {
             if (typeof actor?.assetId !== 'string') { complete = false; continue; }
             const match = /^art:(image|rig):([A-Za-z0-9_-]{1,100}):([a-f0-9]{64})$/.exec(actor.assetId);
             if (!match) continue;
