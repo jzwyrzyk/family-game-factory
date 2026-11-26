@@ -84,7 +84,8 @@ async function buildMixedWorld(page) {
   await page.waitForFunction(id => FG.creation.scene().actors.find(a => a.id === id).size === 110, original.id);
   await settings(page);
   const placement = page.locator('.creation-placement-controls');
-  await placement.getByRole('button',{name:'Duplicate'}).click();
+  const duplicate = placement.getByRole('button',{name:'Duplicate'});
+  await duplicate.focus(); await duplicate.press('Enter');
   await page.waitForFunction(id => FG.creation.scene().actors.filter(a => a.assetId === id).length === 2, rocket);
   const twin = (await scene(page)).actors.at(-1);
   assert.notEqual(twin.id,original.id);
@@ -182,6 +183,17 @@ async function decorationFixture(page) {
             await save(page,'forest-expanded');
             await page.locator('#creationFullscreen').click();
           }
+          if (layout !== 'desktop') {
+            await settings(page);
+            const starter = (await scene(page)).actors[0];
+            const controls = page.locator('.creation-placement-controls');
+            await controls.getByRole('button',{name:'Move right'}).tap();
+            await page.waitForFunction(({id,x}) => FG.creation.scene().actors.find(a => a.id === id).x === x+20,starter);
+            await controls.getByRole('button',{name:'Turn'}).tap();
+            await page.waitForFunction(id => FG.creation.scene().actors.find(a => a.id === id).angle === 15,starter.id);
+            await save(page,'placement-'+layout);
+            await page.locator('#creationCloseSettings').tap();
+          }
           await page.evaluate(()=>FG.creation.openMake());
         }
         if (layout==='desktop') {
@@ -211,7 +223,6 @@ async function decorationFixture(page) {
           await page.getByLabel('Fit drawing').selectOption('cover');
           await page.waitForFunction(() => FG.creation.scene().actors.find(a => a.layer === 'backdrop')?.backdropFit === 'cover');
           await page.locator('#creationCloseSettings').click();
-          if (await page.locator('#creationCloseSettings').isVisible()) await page.locator('#creationCloseSettings').click();
           await page.locator('#creationKeep').click();
           const held=await scene(page);
           await page.locator('#creationBack').click();await page.locator('[data-scene="'+held.id+'"]').click();

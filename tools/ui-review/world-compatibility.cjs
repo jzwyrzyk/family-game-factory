@@ -187,6 +187,8 @@ async function run() {
     await frame.locator('#creationBack').click();
     await frame.locator('#creationFreeMode').click();
     await frame.locator('[data-creation-starter="blank"]').click();
+    await frame.waitForFunction(() => FG.creation.scene()?.background === 'blank'
+      && document.getElementById('creationCanvas').getContext('2d').getImageData(5,5,1,1).data.join() === '255,255,255,255');
     const tools = frame.locator('#creationCharacterTools');
     if (!await frame.locator('#creationAddActor').isVisible() && await tools.isVisible()) await tools.click();
     await frame.locator('#creationAddActor').click();
