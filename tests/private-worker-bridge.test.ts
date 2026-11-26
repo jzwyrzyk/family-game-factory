@@ -76,7 +76,7 @@ test('paid execution still needs separate owner config AND runtime authorization
 
 import {randomUUID} from 'node:crypto';
 import {assertRunJob} from '../server/beta/worker';
-import {testExecution,testWorkerRepository,testWorkerWorkflow} from '../server/actions/test-execution';
+import {requireTestCallback,testExecution,testWorkerRepository,testWorkerWorkflow} from '../server/actions/test-execution';
 import {trialExpiry,testCoachOrigin,testGatewayPrincipal,testHouseholdPrincipal} from '../server/coach/test-identity';
 import {dedicatedCoachRuntime,googleCallerVerifier} from '../server/coach/private-executor';
 import {privateCoachOrigin} from '../server/coach/private-bridge';
@@ -145,4 +145,15 @@ test('TEST OIDC binds actual signed claims to exact workflow, environment, runne
  assert.equal((await verifier.verify(await sign({environment:'jems-test-sandbox',runner_environment:'self-hosted'}))).stage,'test');
  for(const delta of [{environment:'factory-generation'},{environment:'jems-test-sandbox'},{runner_environment:'self-hosted'},{repository_id:'1458899834'},{run_attempt:'2'},{repository_visibility:'public'},{workflow_sha:'d'.repeat(40)}])
   await assert.rejects(verifier.verify(await sign(delta)),/FORBIDDEN/);
+});
+
+test('test callback admits only the selected app source and separately bound trial authorization',()=>{
+ const headers={'x-jems-test-public-source':testPolicy.publicSourceSha},funded={...testPolicy,providerMode:'funded' as const,authorizationSha256:'5'.repeat(64)};
+ requireTestCallback(testPolicy,headers);
+ requireTestCallback(funded,{...headers,'x-jems-test-trial-authorization':funded.authorizationSha256});
+ assert.throws(()=>requireTestCallback(testPolicy,{}));
+ assert.throws(()=>requireTestCallback(testPolicy,{'x-jems-test-public-source':SHA}));
+ assert.throws(()=>requireTestCallback(testPolicy,{...headers,'x-jems-test-trial-authorization':funded.authorizationSha256}));
+ assert.throws(()=>requireTestCallback(funded,headers));
+ assert.throws(()=>requireTestCallback(funded,{...headers,'x-jems-test-trial-authorization':'3'.repeat(64)}));
 });

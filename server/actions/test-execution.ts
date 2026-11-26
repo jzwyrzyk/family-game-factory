@@ -1,3 +1,4 @@
+import type {IncomingHttpHeaders} from 'node:http';
 import {testCoachOrigin,trialExpiry} from '../coach/test-identity';
 import {requireResourceAudience} from '../pipeline/audience';
 import type {PipelineState} from '../pipeline/types';
@@ -54,4 +55,10 @@ export function fixtureRunEvidence(state:PipelineState,session:VerifiedSession,j
  if(job.status!=='ready'||job.testExecution?.providerMode!=='fixture'||job.testExecution.workerSha!==workerSha||job.adapter!=='mock'||job.usedUnits!==0||job.premiumPolicy||!job.revisionId||!e?.runId||
    !['generate','test'].every(stage=>e.reportReceipts?.some(r=>r.stage===stage&&r.attempt===e.attempt&&r.runId===e.runId&&r.repositoryId===workerRepositoryId&&r.sha===workerSha)))throw Error('TEST_WORKER_EVIDENCE_REQUIRED');
  return {jobId,revisionId:job.revisionId,runId:e.runId,runAttempt:1,dispatchAttempt:e.attempt,workerSha,workerRepositoryId};
+}
+
+export function requireTestCallback(policy:TestExecution,headers:IncomingHttpHeaders){
+ const authorization=headers['x-jems-test-trial-authorization'];
+ if(headers['x-jems-test-public-source']!==policy.publicSourceSha||
+    (policy.providerMode==='fixture'?authorization!==undefined:!policy.authorizationSha256||authorization!==policy.authorizationSha256))throw Error('WORKER_FORBIDDEN');
 }

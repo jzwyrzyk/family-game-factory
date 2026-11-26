@@ -169,7 +169,8 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    }else await (await options.runtime(id))(req,res);
   }catch(e){
    if(res.headersSent){res.end();return;}
-   const reason=e instanceof Error?e.message:'';
+   const jwtCode=e&&typeof e==='object'&&'code'in e?String(e.code):'';
+   const reason=req.url?.startsWith('/v1/worker/')&&(e instanceof Error&&e.message==='WORKER_FORBIDDEN'||/^ERR_(?:JWT_|JWS_|JOSE_ALG_NOT_ALLOWED$|JWKS_NO_MATCHING_KEY$)/.test(jwtCode))?'FORBIDDEN':e instanceof Error?e.message:'';
    const status=reason==='NOT_FOUND'||reason==='FAMILY_UNAVAILABLE'?404:
     ['PLAY_REQUIRED','UNAUTHENTICATED'].includes(reason)?401:['PROFILE_VERSION_CONFLICT','STORAGE_CONFLICT','STORAGE_OPERATION_REUSED','STORAGE_CONSENT_CHANGED','TEST_RESET_CONFLICT','TEST_RESET_BUSY'].includes(reason)?409:['RATE_LIMIT','PARENT_LOCKED'].includes(reason)?429:
     /^(FORBIDDEN|ADMIN_REQUIRED|INVALID_(PARENT_ACCESS|INVITATION)|.*_REQUIRED|FAMILY_ACCESS_PAUSED|INVITATIONS_PAUSED|INVALID_LIFECYCLE|DELETION_PENDING|CONTINUITY_DISABLED|CONTINUITY_DENIED|STORAGE_DOMAIN_DENIED)$/.test(reason)?403:

@@ -1,5 +1,5 @@
 import {resetSyntheticProject} from './beta/test-reset';
-import {fixtureRunEvidence,testExecution,type TestExecution} from './actions/test-execution';
+import {fixtureRunEvidence,requireTestCallback,testExecution,type TestExecution} from './actions/test-execution';
 import {generatedRecoveryHttp,runGeneratedCloudRecovery} from './beta/generated-recovery';
 import {cloudBackupSchedule,runFamilyCloudRecovery,familyBackupLedger} from './beta/recovery';
 import {reconcileFamilies} from './beta/reconcile';
@@ -168,6 +168,7 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
     const id=url.pathname.match(/^\/v1\/worker\/jobs\/([a-f0-9-]+)\/(?:claim|report|status)$/)?.[1];
     if(policy.providerMode!=='funded'||!uuid(id)){res.writeHead(403);res.end();return;}
     await workerHandler(coordinator,{verify:async(tokenValue:string)=>{
+     requireTestCallback(policy,req.headers);
      const ident=await verifier.verify(tokenValue);
      const attempt=await assertRunJob(ident,id,target.repository,token,'beta-test',fetch,'funded');
      return {...ident,dispatchAttempt:attempt};
@@ -220,6 +221,7 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
    const id=req.url?.match(/^\/v1\/worker\/jobs\/([a-f0-9-]+)\/(?:claim|report|status)$/)?.[1];
    const bearer=req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];
    if(!uuid(id)||!bearer)throw Error('FORBIDDEN');
+   if(policy)requireTestCallback(policy,req.headers);
    const workerIdentity=await verifier.verify(bearer);
    if(!beta.workerRoute)throw Error('FORBIDDEN');
    const dispatchAttempt=await assertRunJob(workerIdentity,id,config.workerRepository!,token,beta.workerRoute,fetch,policy?.providerMode);
