@@ -89,8 +89,8 @@ export function privateArtId(reference:PrivateArtReference):string {
 /** Local persistence allows opaque private references; remote model output is
  * deliberately restricted to the bundled catalogue by its own entry point. */
 export function validateEditableProject(input: unknown,options:{allowPrivateArt?:boolean}={}): CreationProject {
-  const project=validateCreationProject(input,{allowSavedMotion:options.allowPrivateArt});
-  if(options.allowPrivateArt===false && sceneAssetSlots(project).some(slot => parsePrivateArtId(slot.assetId))) throw Error('Private world pictures and other private artwork stay in the local scene editor.');
+  const project=validateCreationProject(input,{allowSavedMotion:options.allowPrivateArt,allowDraftRole:options.allowPrivateArt});
+  if(options.allowPrivateArt===false && sceneAssetSlots(project).some(slot => parsePrivateArtId(slot.assetId))) throw Error('Private artwork stays in the local scene editor. Private world pictures follow the same rule.');
   if(project.actors.some(actor=>!creationAsset(actor.assetId)&&!(options.allowPrivateArt!==false&&parsePrivateArtId(actor.assetId)))) {
     throw Error('This scene uses artwork that is not available in this version of jems. Your saved work was not replaced.');
   }
@@ -102,6 +102,8 @@ export function validateGeneratedCreationManifest(input:unknown):CreationProject
   const scene = validateSavedCreationManifest(input);
   if (scene.actors.some(actor => !CREATION_ASSETS.some(asset => asset.id === actor.assetId)))
     throw Error('Choose currently available artwork for a new scene.');
+  if (scene.actors.some(actor => actor.role !== undefined))
+    throw Error('Assign contextual artwork roles in the local scene editor.');
   return scene;
 }
 

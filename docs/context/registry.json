@@ -424,8 +424,8 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "10ccee64b85d8d0eaf9d39c73e67d201416534a6a5c0b605a4e4f916c7ee05b3",
-      "reviewedAt": "2026-11-26T05:56:55.648Z",
+      "sourceDigest": "761718168ce5f3c7917cf8a670c071439a8f37ce715f65cf479442d02d18fdf0",
+      "reviewedAt": "2026-11-26T06:03:02.046Z",
       "reviewOutcome": "updated",
       "reviewReason": "Verified world edition readers, placement behavior and scoped authored movement blocks against CAD and storage documentation.",
       "reviewHistory": [
@@ -912,8 +912,8 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:57:49.498Z",
-      "sourceDigest": "142dc652723520b9d516f36d1f016e4daa9f5c95a68e4cb3577918e320bf943f",
+      "reviewedAt": "2026-11-26T06:03:02.734Z",
+      "sourceDigest": "85a80a37635b8b150977328387dd9a980ea3003115ec0e8657509264875126e9",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed integrated CI leaves and source assertions for original admissions, game binding, movement and recovery.",
       "reviewHistory": [

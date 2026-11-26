@@ -281,7 +281,7 @@ function validateStageScenery(scenery:unknown, width:number, height:number, maxS
 }
 
 /** Strictly validates before cloning: unsupported executable/asset payloads are never retained. */
-export function validateCreationProject(input: unknown, options: {allowSavedMotion?:boolean} = {}): CreationProject {
+export function validateCreationProject(input: unknown, options: {allowSavedMotion?:boolean; allowDraftRole?:boolean} = {}): CreationProject {
   const p = record(input, ['schema','id','title','width','height','background','world','worldLayers','actors','programs','variables','provenance'], 'project');
   if (p.schema !== CREATION_SCHEMA) fail('Unsupported saved project version.');
   id(p.id, 'project ID'); text(p.title, 80, 'project title');
@@ -329,7 +329,7 @@ export function validateCreationProject(input: unknown, options: {allowSavedMoti
   if (!p.actors.length) fail('Add at least one character.');
   const actorIds = new Set<string>();
   for (const raw of p.actors) {
-    const a = record(raw, ['id','name','assetId','x','y','size','visible','role','creativeRole','layer','angle','stackOrder','backdropFit'], 'character');
+    const a = record(raw, ['id','name','assetId','x','y','size','visible','role',...(options.allowDraftRole === false ? [] : ['creativeRole']),'layer','angle','stackOrder','backdropFit'], 'character');
     id(a.id, 'character ID');
     if (a.role !== undefined && !SCENE_ROLES.includes(a.role as SceneRole)) fail('Choose a supported scene role.');
     if(!isCreationId(a.assetId)&&!parsePrivateArtId(a.assetId))fail('Invalid asset reference.');
