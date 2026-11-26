@@ -1,15 +1,17 @@
 const {chromium}=require('playwright');
 const fs=require('node:fs');
+const path=require('node:path');
+const {standaloneInput}=require('../ui-review/standalone-input.cjs');
 const assert=require('node:assert/strict');
 const {assertTextContrast}=require('../../tests/helpers/text-contrast.cjs');
 (async()=>{
  const out='test-results/design-system';fs.mkdirSync(out,{recursive:true});
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),args:['--no-sandbox']});
+ const input=await standaloneInput(path.resolve('dist-review/jems-ui-review.html'));
  const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'}),errors=[],requests=[],results=[];
- page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url())&&r.url()!=='http://localhost:43198/')requests.push(r.url());});
+ page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url())&&r.url()!==input.url)requests.push(r.url());});
  try{
-  if(process.env.UI_REVIEW_INLINE_HARNESS==='1'){await page.route('http://localhost:43198/',r=>r.fulfill({contentType:'text/html',path:'dist-review/jems-ui-review.html'}));await page.goto('http://localhost:43198/');}
-  else await page.goto('file://'+process.cwd()+'/dist-review/jems-ui-review.html');
+  await page.goto(input.url);
   await page.waitForFunction(()=>document.querySelector('#loading').hidden);
   const app=page.frames().find(f=>f.parentFrame()===page.mainFrame());
   for(const device of ['desktop','landscape','portrait','mobile']){
@@ -45,7 +47,7 @@ const {assertTextContrast}=require('../../tests/helpers/text-contrast.cjs');
   }
   await app.evaluate(()=>document.documentElement.style.removeProperty('--jems-color-heading'));
   assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);
-  fs.writeFileSync(out+'/results.json',JSON.stringify({results,propagation:['journey','pals','rewards','powers','creations','notifications'],externalRequests:requests,errors,transport:process.env.UI_REVIEW_INLINE_HARNESS==='1'?'loopback in-memory; not file acceptance':'actual file navigation'},null,2));
+  fs.writeFileSync(out+'/results.json',JSON.stringify({results,propagation:['journey','pals','rewards','powers','creations','notifications'],externalRequests:requests,errors,transport:process.env.UI_REVIEW_INLINE_HARNESS==='1'?'single-file loopback':'actual file navigation'},null,2));
   console.log('PASS design gallery: four viewports, native keyboard/dialog behavior, contrast, touch targets, six live template consumers, no external requests');
- }finally{await browser.close();}
+ }finally{await browser.close();await input.close();}
 })().catch(e=>{console.error(e);process.exitCode=1});

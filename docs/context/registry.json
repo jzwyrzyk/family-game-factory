@@ -929,10 +929,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T22:12:17.583Z",
-      "sourceDigest": "7b1bca20bf2826f0ae857b25107d2ab1bad7a1ca19536408ef90ad3564befe3e",
+      "reviewedAt": "2026-11-26T22:19:00.924Z",
+      "sourceDigest": "a10466d427ebdc9662b504a316b4197ea79782413991f785f1177d75cc338d1a",
       "reviewOutcome": "updated",
-      "reviewReason": "Merged design gallery checks with learning browser checks and preserved the broader exact-asset fingerprint.",
+      "reviewReason": "The exact gallery now uses the existing streaming file transport; all original viewport, focus, contrast, and route assertions still execute.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1174,10 +1174,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T22:12:18.046Z",
-      "sourceDigest": "fe3c45665b50f8fb19e43cf765c8ae5cc1cf8c77dc5893d53aafda8e308502bf",
+      "reviewedAt": "2026-11-26T22:19:01.170Z",
+      "sourceDigest": "d80be7ce5b60f7af35e8a18a2e5aaa5d9ee897da31171b08c3787decbe36fa47",
       "reviewOutcome": "updated",
-      "reviewReason": "Bound the source matrix, guarded recovery, static TEST limits and separate release gates in the coordinated handoff.",
+      "reviewReason": "Review workflow covers gallery-only changes and the recovery journal uses a durable private Cloud Shell path.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1777,10 +1777,10 @@
         "docs/design-system/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "9cace7c7a81b3d5915d7898474f3b655fef23ad01d63ef3b2f9f2114b929505c",
-      "reviewedAt": "2026-11-26T22:12:48.325Z",
+      "sourceDigest": "16a2856538533b93010ebdacdfad7eef4c732f4da2d28b05dcdb0b93bcd915ce",
+      "reviewedAt": "2026-11-26T22:19:01.372Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated the migration inventory to identify the six integrated consumers and deferred specialist templates on the joined candidate."
+      "reviewReason": "Qualified the gallery with its canonical single-file reader using the 301 MB consolidated offline package."
     }
   ]
 }
