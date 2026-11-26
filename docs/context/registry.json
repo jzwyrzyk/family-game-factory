@@ -899,10 +899,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:06:15.971Z",
-      "sourceDigest": "d3ee69b44d711cd709ce46c2855a7454a1b54e18e4655859b4881d1888f6443d",
+      "reviewedAt": "2026-11-26T03:14:08.547Z",
+      "sourceDigest": "72b3b96501e92f93e4259e87925026ff8f0004d97e2b99aca85737da873373e2",
       "reviewOutcome": "updated",
-      "reviewReason": "The new synthetic browser and container checks verify exact byte admission, metadata rejection, owner changes and digest-only authorization.",
+      "reviewReason": "The standalone world compatibility case uses actual local upload, two retained scenes, four canvas backgrounds, three viewports and byte-exact export. The review guide records the harness and evidence limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1143,10 +1143,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:06:16.162Z",
-      "sourceDigest": "d1a2a0bdbf766f8b99256225ed6b5feae3af6991caa35a0b3a828f8b4127c5f7",
+      "reviewedAt": "2026-11-26T03:14:09.220Z",
+      "sourceDigest": "dea79549004d64c605a8ee9a8f788d25a934ba2c5b2ac515f650e3bc4bcd6971",
       "reviewOutcome": "updated",
-      "reviewReason": "The family security workflow exercises original-byte admission and the release record distinguishes the production baseline from the proposed development.",
+      "reviewReason": "The standalone review workflow now runs the retained-world case and uploads its screenshots in the existing artifact. The delivery ledger separates the synthetic compatibility pass from premium world qualification and hosted release.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
