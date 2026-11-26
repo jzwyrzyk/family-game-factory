@@ -1,9 +1,5 @@
 # jems product doctrine
 
-## The child owns the finished artwork
-
-Keep exact original bytes and a recoverable source. Jems brings the drawing to life through explicit 2D composition and movement. Generative alteration or disclosure of private child art to an image model is permanently prohibited. Save permitted preparation as a linked derivative. A game or scene keeps its selected revision and contextual role. New games use 2D sprites and environments. [Creative Asset & World Design Standard](docs/creation-studio/CREATIVE_ASSET_AND_WORLD_STANDARD.md)
-
 Family beta participation belongs to an invited, authorized adult. Children use supervised local profiles. Each family controls its own work and allowance. Provider approval, verified guardian consent, adult development privileges and play-session acknowledgment are separate decisions. Public release requires a further owner decision.
 
 **Purpose:** canonical summary of existing product intent and principles. These are standards to build toward, not a claim that every capability is implemented or validated.
@@ -61,13 +57,15 @@ The owner's [November 22 Bubble Gum correction](docs/decisions/2026-11-22-bubble
 
 The premium builder plans the artwork and its playable roles together. Side, top-down, isometric and guided perspective use a bounded 2D canvas. Preserve the chosen view, action and payoff. Ask the creator about an indispensable spatial action the runtime cannot represent. [Artwork-first pilot](docs/game-intelligence/premium-benchmark/ARTWORK-PILOT.md)
 
-Choose a game's form from its actions and consequences. Rendering (2D or true 3D), input, simulation, visual style and goal/free-play mode are independent decisions. A robot does not imply 3D; a launch animation does not imply physical simulation.
+New games use 2D sprites and layered worlds. Choose input, simulation, visual style and goal or free-play behavior from the child's intended actions and consequences. Preserve the runtimes of retained games. A robot does not imply 3D; a launch animation does not imply physical simulation.
 
 Use actual physics when weight, contact, balance, momentum, suspension or another physical cause materially determines the requested experience, or when it is an explicit requirement. Preserve verified existing mechanics when editing a saved game. If an essential requirement exceeds the runtime's capabilities, explain the gap or resolve the choice; do not silently substitute an easier experience and claim completion. Reusable game families should support invention rather than confine every idea to the same game.
 
 See [the game-form decision](docs/decisions/0002-intent-faithful-game-forms.md). The current runtime capability is an architecture fact, not a permanent limit on the product's ambition.
 
 ### Original drawings belong to the child across creations
+
+The child’s artwork is the finished creation. Jems permanently prohibits generative redrawing, enhancement, reinterpretation or replacement, including sending private pictures to a generative image model. Retain exact originals, editable source where available, and checked lineage for each derivative. A game may place hand-drawn art in a professionally illustrated world. Label Jems artwork and earned Pals by their actual origin. See the [Creative Asset & World Design Standard](docs/creative-universe/STANDARD.md).
 
 The [Art Studio](docs/drawings/ART_STUDIO.md) is a dedicated place to import or draw pictures, prepare separate derivatives, develop meaningful parts and motion, and reuse chosen versions in games and scenes. Preserve original pixels and the child’s decisions. A saved use pins the chosen image or movement revision; later library edits cannot silently change an earlier adventure. Keep local storage, export/restore and missing-asset recovery explicit. Supported physical and block-scene adapters do not imply arbitrary generated-game compatibility, universal recognition or cloud synchronization. [The accepted decision](docs/decisions/2026-11-19-private-art-studio.md) records this extension.
 

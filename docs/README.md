@@ -1,7 +1,5 @@
 # jems documentation map
 
-The [Creative Asset & World Design Standard](creation-studio/CREATIVE_ASSET_AND_WORLD_STANDARD.md) governs private artwork, reusable motion, 2D games and illustrated environments across My Art and Creative Studio.
-
 For current release status and the evidence for each gate, start with [delivery state](../DELIVERY-STATE.md). The [November 24 cutover](operations/PRODUCTION_ACTIVATION.md) records the prior household release. Private preview, integrated TEST and production follow the [environment contract](development/DEV-TEST-PROD.md).
 
 Private family operating procedures are in the [owner guide](family-beta/OWNER.md) and the [consolidated activation and rollback checklist](family-beta/ACTIVATION.md).
@@ -20,6 +18,7 @@ The [standalone UI review](ui-review/README.md) packages the real UI for offline
 
 | Reference | Question it answers | Update when |
 | --- | --- | --- |
+| [Creative Asset & World Design Standard](creative-universe/STANDARD.md) | How does one child-owned artwork retain identity, versions, movement and roles across activities? | Creative storage, picker, worlds, games or destination support changes |
 | [Agent entry point](../AGENTS.md) | What should an assistant read and preserve before answering or developing? | Working method or context-loading rules change |
 | [Product doctrine](../PRODUCT-DOCTRINE.md) | Why are we building jems, and what must remain true? | An accepted product principle or tradeoff changes |
 | [Current architecture](../ARCHITECTURE-CURRENT.md) | What is implemented, where does it live, and how do boundaries interact? | Components, APIs, storage, trust or version contracts change |
