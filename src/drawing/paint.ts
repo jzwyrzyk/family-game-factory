@@ -1,3 +1,4 @@
+import { pointerPoint } from './pointer-input';
 import {drawingBlob, saveDrawing, type Drawing} from '../assets/private-drawings';
 import {iconMarkup} from '../brand/icons';
 import {assertRewardSourceWritable, rewardSourceWritable} from '../rewards/write-guard';
@@ -144,9 +145,8 @@ export async function drawOnTablet(owner: string, onSaved: (drawing: Drawing) =>
     controls();
   };
   const position = (event: PointerEvent) => {
-    const bounds = canvas.getBoundingClientRect();
-    return sketchPoint((event.clientX - bounds.left) * sketchWidth / bounds.width,
-      (event.clientY - bounds.top) * sketchHeight / bounds.height);
+    const point = pointerPoint(canvas, event, 'position');
+    return sketchPoint(point.x, point.y);
   };
   canvas.onpointerdown = event => {
     if (event.button !== 0 || !event.isPrimary) return;

@@ -1,0 +1,372 @@
+{
+  "application_source": "37679c14c45418ab52597a850f48da83325cdaed",
+  "observation_utc": "2026-11-26T03:22:53.123348+00:00",
+  "scope": "Independent synthetic local validation. No real accounts, provider calls, production release or external activation.",
+  "node": {
+    "tests": 162,
+    "passed": 162,
+    "failed": 0,
+    "command": "node --import tsx --test --test-concurrency=2 tests/beta-*.test.ts tests/storage-*.test.ts tests/rewards-backup.test.ts tests/pals-backup.test.ts tests/creation-private-art.test.ts"
+  },
+  "art_storage": {
+    "contracts": 54,
+    "network_posts": 0,
+    "command": "node tests/art-storage-browser.cjs",
+    "results": [
+      "\u25b2 [WARNING] \"import.meta\" is not available with the \"iife\" output format and will be empty [empty-import-meta]",
+      "",
+      "    src/storage/native-workspace.ts:8:39:",
+      "      8 \u2502 ... indexedStoragePreview=()=>import.meta.env.MODE==='storage-previ...",
+      "        \u2575                               ~~~~~~~~~~~",
+      "",
+      "  You need to set the output format to \"esm\" for \"import.meta\" to work correctly.",
+      "",
+      "PASS absent legacy database discovery never attempts creation",
+      "PASS original bytes and fingerprint preserved",
+      "PASS draft recovery does not save or select a version",
+      "PASS invalid parent identity cannot create a malformed saved history",
+      "PASS explicit version save clears its matching draft",
+      "PASS new movement version preserves prior immutable geometry",
+      "PASS explicit active-car choice remains pinned",
+      "PASS archiving and naming preserve saved version lookup",
+      "PASS cannot erase art used by a scene",
+      "PASS usage is stored separately from image identity",
+      "PASS portable bundle includes exact originals and all versions without source owner",
+      "PASS repeat restore reuses identical IDs without duplicates",
+      "PASS restore preserves current metadata and newer draft",
+      "PASS conflicting immutable version rejects the entire restore",
+      "PASS restore conflict does not add earlier valid images",
+      "PASS restore cannot reuse another profile\u2019s image identity",
+      "PASS cross-profile original lookup denied",
+      "PASS cross-profile version lookup denied",
+      "PASS import remaps owner and identifiers while preserving image hash",
+      "PASS import remaps all source and history references",
+      "PASS import does not silently choose a car",
+      "PASS corrupt fingerprint rejected",
+      "PASS cyclic movement history rejected",
+      "PASS foreign or unknown import fields rejected",
+      "PASS reserved object-key identities rejected",
+      "PASS rejected bundles leave no partial import",
+      "PASS stale profile writes rejected",
+      "PASS closed view guard prevents image write",
+      "PASS maintenance and backup lock blocks art writes",
+      "PASS disguised active content rejected",
+      "PASS oversized dimensions rejected before decode",
+      "PASS restored scene history protects original without a usage receipt",
+      "PASS usage listing derives restored scene references without an index row",
+      "PASS restored native game history protects rig without a usage receipt",
+      "PASS explicit erase removes unused versions without changing another profile",
+      "PASS restore into an empty profile reconnects original image, movement and draft identities",
+      "PASS concurrent image saves cannot exceed transactional quota",
+      "PASS whole art import rejected when any capacity would overflow",
+      "PASS capacity rejection adds no image or rig records",
+      "PASS concurrent rig saves cannot exceed transactional quota",
+      "PASS missing workspace cannot disprove a protective usage receipt",
+      "PASS valid source workspace disproves obsolete scene index rows",
+      "PASS original cannot be erased while a derivative depends on it",
+      "PASS unused derivative then original can be explicitly erased",
+      "PASS picture and animation share the stable original identity",
+      "PASS kept world, backdrop and animation survive archive and later revisions",
+      "PASS stored world history protects the archived background and animation",
+      "PASS generated manifest rejects local private pins",
+      "PASS portable scene includes exact selected art and its ancestry without newer designs or drafts",
+      "PASS another explorer starts with a separate catalog",
+      "PASS foreign background pixels remain private",
+      "PASS explicit import remaps backdrop and animation pins while preserving original bytes, editable marks and movement",
+      "PASS legacy image database upgrades with parent-first valid rigs, exact pixels and selected car; invalid originals retained for recovery",
+      "PASS inventory errors remain visible and unsupported inventory retains legacy fallback",
+      "PASS 54 private art storage contracts; zero network POSTs"
+    ]
+  },
+  "family_beta": {
+    "command": "node --import tsx tests/beta-browser.ts",
+    "fixture_engines": [
+      "Chromium"
+    ],
+    "builds": [
+      "ordinary",
+      "family beta",
+      "early-preview family beta"
+    ],
+    "stages": [
+      {
+        "engine": "chromium",
+        "stage": "browser-startup",
+        "status": "passed"
+      },
+      {
+        "engine": "chromium",
+        "stage": "entry",
+        "status": "passed"
+      },
+      {
+        "engine": "chromium",
+        "stage": "origin-isolation",
+        "status": "passed"
+      },
+      {
+        "engine": "chromium",
+        "stage": "early-guidance",
+        "status": "passed"
+      },
+      {
+        "engine": "chromium",
+        "stage": "operator",
+        "status": "passed"
+      },
+      {
+        "engine": "chromium",
+        "stage": "generic-migration",
+        "status": "passed"
+      },
+      {
+        "engine": "chromium",
+        "stage": "application-migration",
+        "status": "passed"
+      },
+      {
+        "engine": "chromium",
+        "stage": "preview",
+        "status": "passed"
+      }
+    ]
+  },
+  "complete_recovery": {
+    "command": "node tests/storage-complete-backup-browser.cjs",
+    "layout_contracts": {
+      "desktop": [
+        "original image bytes included",
+        "active IndexedDB-only creation included",
+        "active IndexedDB-only notebook included",
+        "active IndexedDB-only games included",
+        "original Studio identity included",
+        "complete format preserves 51 prepared games without a legacy aggregate cap",
+        "legacy game-count limit stays unchanged",
+        "duplicate point save is idempotent",
+        "complete point reopens with checksum",
+        "cross-family origin rejected",
+        "Adult audience rejected",
+        "unreferenced extra chunks rejected",
+        "missing original chunk rejected before publication",
+        "astral Unicode across chunk boundary is exact",
+        "chunks never split a surrogate pair",
+        "unknown manifest version rejected",
+        "reused recovery identity rejects changed content",
+        "missing game artwork blocks complete backup claim",
+        "quota interruption leaves no complete point",
+        "unfinished backup never appears complete",
+        "backup resumes after quota interruption",
+        "synthetic source art removed before restore",
+        "restore recovers missing original without source dependency",
+        "saved profiles restored",
+        "saved conversation identity restored",
+        "complete rollback point retained",
+        "restore receipt committed",
+        "reviewed scene pointer restored with newer originals retained",
+        "reviewed prepared notebook restored",
+        "reviewed native pointer restored",
+        "newer immutable native work remains available",
+        "duplicate import cannot replace newer work again"
+      ],
+      "tablet": [
+        "original image bytes included",
+        "active IndexedDB-only creation included",
+        "active IndexedDB-only notebook included",
+        "active IndexedDB-only games included",
+        "original Studio identity included",
+        "complete format preserves 51 prepared games without a legacy aggregate cap",
+        "legacy game-count limit stays unchanged",
+        "duplicate point save is idempotent",
+        "complete point reopens with checksum",
+        "cross-family origin rejected",
+        "Adult audience rejected",
+        "unreferenced extra chunks rejected",
+        "missing original chunk rejected before publication",
+        "astral Unicode across chunk boundary is exact",
+        "chunks never split a surrogate pair",
+        "unknown manifest version rejected",
+        "reused recovery identity rejects changed content",
+        "missing game artwork blocks complete backup claim",
+        "quota interruption leaves no complete point",
+        "unfinished backup never appears complete",
+        "backup resumes after quota interruption",
+        "synthetic source art removed before restore",
+        "restore recovers missing original without source dependency",
+        "saved profiles restored",
+        "saved conversation identity restored",
+        "complete rollback point retained",
+        "restore receipt committed",
+        "reviewed scene pointer restored with newer originals retained",
+        "reviewed prepared notebook restored",
+        "reviewed native pointer restored",
+        "newer immutable native work remains available",
+        "duplicate import cannot replace newer work again"
+      ],
+      "phone": [
+        "original image bytes included",
+        "active IndexedDB-only creation included",
+        "active IndexedDB-only notebook included",
+        "active IndexedDB-only games included",
+        "original Studio identity included",
+        "complete format preserves 51 prepared games without a legacy aggregate cap",
+        "legacy game-count limit stays unchanged",
+        "duplicate point save is idempotent",
+        "complete point reopens with checksum",
+        "cross-family origin rejected",
+        "Adult audience rejected",
+        "unreferenced extra chunks rejected",
+        "missing original chunk rejected before publication",
+        "astral Unicode across chunk boundary is exact",
+        "chunks never split a surrogate pair",
+        "unknown manifest version rejected",
+        "reused recovery identity rejects changed content",
+        "missing game artwork blocks complete backup claim",
+        "quota interruption leaves no complete point",
+        "unfinished backup never appears complete",
+        "backup resumes after quota interruption",
+        "synthetic source art removed before restore",
+        "restore recovers missing original without source dependency",
+        "saved profiles restored",
+        "saved conversation identity restored",
+        "complete rollback point retained",
+        "restore receipt committed",
+        "reviewed scene pointer restored with newer originals retained",
+        "reviewed prepared notebook restored",
+        "reviewed native pointer restored",
+        "newer immutable native work remains available",
+        "duplicate import cannot replace newer work again"
+      ]
+    },
+    "additional_results": [
+      {
+        "layout": "desktop",
+        "laterIndependentLossRepaired": true
+      },
+      {
+        "layout": "tablet",
+        "laterIndependentLossRepaired": true
+      },
+      {
+        "layout": "phone",
+        "laterIndependentLossRepaired": true
+      },
+      {
+        "ordinaryNearQuotaRestore": true,
+        "completeReceipt": true,
+        "originalWordsExact": true,
+        "indexedJournal": true,
+        "sameLengthChangedSourceRestored": true
+      },
+      {
+        "layout": "Adult Private",
+        "freshServerGrant": true,
+        "revokedDenied": true,
+        "familyUnchanged": true,
+        "adultRestored": true
+      },
+      {
+        "phase": "art-restored",
+        "nativeNotebookCreationProfilesConsistent": true,
+        "actualReload": true,
+        "sameReviewedAttemptResumed": true
+      },
+      {
+        "phase": "complete",
+        "nativeNotebookCreationProfilesConsistent": true,
+        "actualReload": true,
+        "sameReviewedAttemptResumed": true
+      }
+    ]
+  },
+  "learner_layouts": {
+    "command": "node tests/creation-learner-browser.cjs",
+    "results": [
+      {
+        "layout": "desktop",
+        "status": "passed",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        }
+      },
+      {
+        "layout": "laptop",
+        "status": "passed",
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        }
+      },
+      {
+        "layout": "portrait",
+        "status": "passed",
+        "viewport": {
+          "width": 768,
+          "height": 1024
+        }
+      },
+      {
+        "layout": "large-portrait",
+        "status": "passed",
+        "viewport": {
+          "width": 820,
+          "height": 1180
+        }
+      },
+      {
+        "layout": "tablet",
+        "status": "passed",
+        "viewport": {
+          "width": 1024,
+          "height": 768
+        }
+      },
+      {
+        "layout": "phone",
+        "status": "passed",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      {
+        "layout": "small-phone",
+        "status": "passed",
+        "viewport": {
+          "width": 320,
+          "height": 667
+        }
+      },
+      {
+        "layout": "landscape",
+        "status": "passed",
+        "viewport": {
+          "width": 844,
+          "height": 390
+        }
+      }
+    ],
+    "app_asset_comparison": {
+      "matched": 404,
+      "excluded": [
+        "build-info.json",
+        "sw.js"
+      ],
+      "hashes": {
+        "assets/index-Cvfr56Iy.js": "cca0222141d9b9f9258696ccd8b1f12ab1ae9b1be22894c7a3901f761ca78a83",
+        "assets/index-81Z32CvG.css": "900ce10c83d65e17097c2133aef6bbaffa5b7a5a0327c891758b7b91e0513bfb"
+      }
+    }
+  },
+  "release": {
+    "checked_household_pages_source": "aa56b60abe152e750f9f0b5e8949bdb44be53196",
+    "pages_marker": "https://jzwyrzyk.github.io/family-game-factory/jems-release.json",
+    "read_only_observation": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45736902741/job/139632221918",
+    "cloud_mutations_in_observation": 0
+  },
+  "local_limits": [
+    "The pinned Playwright WebKit binary could not be fetched from its official download hosts (HTTP 403 domain policy). Hosted dual-engine CI must separately qualify WebKit.",
+    "No physical device, child/guardian, hosted IAP, production or external family qualification is claimed.",
+    "The optional reviewed beta PNG input supports 8-bit noninterlaced RGB or RGBA images, image chunks and optional standard sRGB rendering intent. Older raster reconstructions retain their stored representation."
+  ]
+}

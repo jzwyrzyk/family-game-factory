@@ -6,6 +6,18 @@
 
 The image itself is never sufficient to prove an object's physical function. We separate **pixels**, **named components**, **physical constraints**, and **behavior/game intent**. The child can override all ordinary assumptions.
 
+## Draw-to-animation in My Art
+
+Choose **Animate picture** on a saved drawing. Tap a spot on the page or use the four keyboard-accessible direction buttons to add a step. Preview the route, choose its speed, or take back a step. The page moves the entire original picture, including its transparency. It adds no inferred joints or collisions. For a design with separate cutouts, the existing **Make it move** editor still offers the physical playground.
+
+Closing the editor keeps the unfinished path in the current player's drawing draft. **Save animation** creates an immutable movement version, with its source image ID and SHA-256, optional parent version, and child-authored path. A path begun from an original uses one whole-picture part with physics disabled, including for uncategorized and imaginary objects. The optional `DrawingAssembly.motion` field holds one to twelve normalized stops and a duration of 350, 700 or 1,200 milliseconds per step. Previous assemblies have no motion field and continue to use their saved cutout behavior. My Art's recovery bundle carries the editable design and its original image bytes together.
+
+**Use in Creative Studio** starts a new scene with the selected version. The scene's art binding includes the movement version ID and assembly hash. Its editable Play program contains relative move blocks derived from the saved path and the stage dimensions. Adding the same animation through the shared character picker uses the same conversion. The scene owner can move its starting spot or edit its blocks independently. A later animation save creates a separate version. Generated scripts receive no private drawing bytes, identifiers or paths from this editor.
+
+Run `npm run test:art` for path bounds, interpolation and coordinate conversion. After an ordinary build, `node tests/drawing-motion-browser.cjs` exercises tap and keyboard authoring, local draft recovery, preview and scene playback, reuse of an earlier version and a byte-for-byte original download. The browser fixture uses a synthetic jellyfish. Physical device performance and child usability require separate observation.
+
+[Desktop editor](evidence/animation-path-desktop.png) · [Phone editor](evidence/animation-path-phone.png) · [Scene playback](evidence/animation-path-scene.png)
+
 ## Product acceptance (every supported object)
 
 1. **Fidelity to the child:** The original photograph or drawing remains unchanged, always recoverable, and visually recognizable. Transparent cutouts are derived assets; a fallback stock object may not be passed off as a successful decomposition.

@@ -1,3 +1,4 @@
+import {ILLUSTRATED_WORLDS} from '../../src/creation/illustrated-art';
 /** Closed, code-free companion scene schema for optional provider output. */
 import { CREATION_ASSETS } from '../../src/creation/projects';
 const object=(properties:Record<string,unknown>)=>({type:'object',additionalProperties:false,required:Object.keys(properties),properties});
@@ -21,11 +22,11 @@ export const creationManifestDefinitions={
 };
 export const creationManifestSchema=object({
   schema:{type:'string',const:'jems.creation.v1'},id:string,title:string,width:{type:'integer',const:800},height:{type:'integer',const:450},
-  background:{type:'string',enum:['meadow','night','workshop','sky']},
+  background:{type:'string',enum:['meadow','night','workshop','sky',...ILLUSTRATED_WORLDS.map(world=>world.id)]},
   actors:{type:'array',items:object({id:string,name:string,assetId:{type:'string',enum:CREATION_ASSETS.map(asset=>asset.id)},x:number,y:number,size:number,visible:{type:'boolean'}})},
   programs:{type:'array',items:object({id:string,actorId:string,trigger:{anyOf:[object({type:{type:'string',enum:['start','tap']}}),object({type:{type:'string',const:'event'},name:string})]},actions:blocks})},
   // Named variables are represented by a closed object in strict provider output.
   // Host validation accepts this subset; children can add their own names later.
   variables:object({score:number,counter:number}),
 });
-export const creationManifestInstructions=`Optional editable companion: include creationManifest when a short animated companion fits the child's dragon, bucket, robot, story or compatible game; otherwise set it to null. The playable source remains authoritative and must satisfy the game request. This manifest is a separate editable scene, not a claim that arbitrary source or its artwork has been translated. Use only the assetId values in the response schema; these are reviewed jems characters/art. Never claim a generic catalogue asset is the child's custom drawing. Reuse a supplied compatible companion when extending it, but keep the requested game behavior intact. Use a few concrete, visible actions so the child can direct what happens next. Maximum 16 actors, 48 programs, 300 total blocks, nesting depth 6, repeat count 0..50, action durations 0..10000ms, speech 160 characters, size16..240, positions within800x450. All IDs are unique plain identifiers beginning with a letter or number. Each actor has at most one program per trigger/event name. Declare score and counter variables; any set/change/variable condition must use one of those names. The service records all supplied blocks as AI-assisted. Do not include source code, URLs, image data, credentials, private information or invented source-provenance claims in the manifest.`;
+export const creationManifestInstructions=`Optional editable companion: creationManifest is a separate editable scene when a short animation fits, else null. Deliver the requested playable game in source. Use visible actions and schema asset IDs. Pick an illustrated world for a new scene; preserve compatible saved scenes on edits. Never substitute catalogue art for a child's drawing. Limits: 16 actors, 48 programs, 300 blocks, depth 6, repeats 0..50, durations 0..10000ms, speech 160 characters, size 16..240, stage 800x450. Unique IDs start with a letter or number. One program per actor/trigger/event. Declare score and counter; only use these in variable blocks. All supplied blocks are AI-assisted. Exclude source code, URLs, image data, credentials, private information and invented provenance.`;

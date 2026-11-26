@@ -1,5 +1,9 @@
 # Jems current architecture
 
+## Connected Creative Studio renderer and animation
+
+The trusted stage resolves versioned public world plates, aligned middle and foreground layers, reusable transparent props and owner-checked private art. Scene placements use the existing 2D coordinate system. Stored world choices, actor roles, visible layers and movement programs belong to the kept scene. The legacy background IDs keep their established rendering. My Art stores an authored path with its immutable assembly and drawing pin. The scene adapter makes the movement visible as editable blocks. The generated companion uses that trusted scene editor. A separate offline fixture tests a bounded host-rendered sprite slot for one reviewed generated module. It has no production delivery route. [World rendering and evidence](docs/creation-studio/evidence/worlds/README.md) · [Private game qualification](docs/game-intelligence/creative-assets/README.md)
+
 ## Owner-scoped creative assets
 
 My Art owns exact raster bytes, including the bounded editable source of native crayon drawings. Its logical catalogue uses existing original IDs, derivative parents, movement assemblies and content hashes. Studio scene actors retain individual version pins and optional contextual roles. Mixed use of Jems-supplied art and private pictures is resolved inside the trusted host. Scene-only portability selects the required closure while the full library backup includes the owner's drafts. Optional family intake restricts admissible reviewed PNGs to preserve both exact bytes and its metadata-minimization contract. [My Art](docs/drawings/ART_STUDIO.md) · [Creative Asset & World Design Standard](docs/creative-universe/STANDARD.md)

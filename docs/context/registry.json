@@ -151,8 +151,8 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:17:07.447Z",
-      "sourceDigest": "47bf407644b7d904717ac5ca8561ccad1997b2b18968fa4dff84e1d560e88ff2",
+      "reviewedAt": "2026-11-26T03:23:59.847Z",
+      "sourceDigest": "05af7fe580ca0059c0e1624b6fc8bfb580e88b81f1fb860c62ad139eb4fe92e9",
       "reviewOutcome": "unchanged",
       "reviewReason": "The accepted authentic artwork doctrine covers the resulting drawing and revision behavior, including optional descriptive metadata and explicit version selection.",
       "reviewHistory": [
@@ -315,8 +315,8 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:17:07.808Z",
-      "sourceDigest": "e6de5fab14c4670bdcadd9543b9d10bd52b95ec290868f29ed1c75a22effcbf8",
+      "reviewedAt": "2026-11-26T03:21:23.044Z",
+      "sourceDigest": "16e8b4724d0c4f3477750994e99eae0f36789dc83d2db0f861c4c9cddc5c28f0",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed actor and backdrop selection, immutable drawing replay, scene history and owner changes against the source. The architecture describes these trusted host paths.",
       "reviewHistory": [
@@ -418,10 +418,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "e6b1a879e4958dcc192967f9a2e7df650bf8cb6c37be775381bd7980ac5b9dfa",
-      "reviewedAt": "2026-11-26T03:17:09.148Z",
+      "sourceDigest": "580d11d3319ffa5f34f1fa358494d25d520b72d73e3e1a839d377dc70cdb9aea",
+      "reviewedAt": "2026-11-26T03:56:04.471Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented world rendering, asset selection and scene ownership in the Creative Studio and architecture records with pinned references, failed loads and retained histories.",
+      "reviewReason": "Recorded the graphical Jump control spacing requirement and refreshed the actual phone, tablet and desktop inspection evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -739,13 +739,14 @@
         "docs/game-intelligence/*.md",
         "tools/premium-*",
         "docs/game-intelligence/premium-benchmark/*.md",
-        "tools/premium-art/**"
+        "tools/premium-art/**",
+        "tools/creative-game-review/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:55.850Z",
-      "sourceDigest": "3c42ed09d4394afe0c109b5a6fa6d9d87f119c2474a5101fb24cafd81bf20c81",
+      "reviewedAt": "2026-11-26T03:21:23.475Z",
+      "sourceDigest": "abb0f6d8030d5839267352e70b110d2b4a6747bd002e39cedcaa89ef3173ce7c",
       "reviewOutcome": "updated",
-      "reviewReason": "Scene authoring uses active Pal IDs. The ADR and scene rendering contract cover reading saved generated versions through the historical asset resolver.",
+      "reviewReason": "The premium generation contract and local qualification record document the trusted scene adapter and separate fixed synthetic module slot. Live generated programs cannot access private assets.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -899,10 +900,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:17:40.335Z",
-      "sourceDigest": "60e912b478eeb8793cd5aec0c13ce70a9a8b2cd1411e5e3f77171ee26b703bef",
-      "reviewOutcome": "updated",
-      "reviewReason": "The delivery entry identifies local drawing, scene and synthetic game evidence along with physical-device, provider and hosted qualification limits.",
+      "reviewedAt": "2026-11-26T03:56:04.601Z",
+      "sourceDigest": "8593cb5b622ee560468d825caa6d1d0ce05250af72a3413f2cd2d42366f8c065",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The existing learner layout suite adds one geometry assertion for Jump. Its existing viewport, execution and release coverage remain applicable.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1143,8 +1144,8 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:17:09.521Z",
-      "sourceDigest": "908e4c2a9d81ce045a93685fcf3ade3ea7f9bf1c8140c5f7a026292a4f9c1df9",
+      "reviewedAt": "2026-11-26T03:25:18.487Z",
+      "sourceDigest": "6d9a0966438f55ba668e86cbf4319cbc1d2f0bd15a518b82bd9f03b74160b2d3",
       "reviewOutcome": "updated",
       "reviewReason": "Recorded source dependencies, private worktree qualification and current household release separately. No change to production traffic or provider activation was made.",
       "reviewHistory": [
@@ -1401,10 +1402,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:12:03.174Z",
-      "sourceDigest": "7a051079928b455c2ce3057ed43f727e5774c1c79cf8889bca2fd94e78dc13f0",
+      "reviewedAt": "2026-11-26T03:21:23.728Z",
+      "sourceDigest": "36216899cb8ad83b618d1c61f87431554ed621b626bbdd8c37713dd93f489bea",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The current governance requires a single canonical creative standard. The catalogue and provenance now participate in existing creation documentation checks.",
+      "reviewReason": "The existing shared documentation process and reviewed area ownership accommodate the creative source paths and updated CI inventory.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1626,8 +1627,8 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "7b4bd147eaf571e0b0f833d0497def45cd187be3cfcad15afeb50ebac6f97094",
-      "reviewedAt": "2026-11-26T03:17:09.909Z",
+      "sourceDigest": "d50f5ad634ba0f18552cd121eaf6b3b2d8f1fc2ab71956b72d2da0333f0cd4ad",
+      "reviewedAt": "2026-11-26T03:23:59.999Z",
       "reviewOutcome": "updated",
       "reviewReason": "Updated the My Art contract for editable source bytes, recovery, selection and retained version behavior. Stale owner and version failures preserve the current drawing.",
       "reviewHistory": [
@@ -1671,10 +1672,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "ada2accbff6a1c4c26061297e83a2ab48bdb799664d38749f63d7cf76e56d403",
-      "reviewedAt": "2026-11-26T01:23:10.842Z",
+      "sourceDigest": "be0b8202af9ac9121efae99be7597909475312e434dcc8ab5ce51bec1288a7aa",
+      "reviewedAt": "2026-11-26T03:21:23.873Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The reload regression verifies the retained owner, active Navi and timestamp before and after the visible maker welcome. Starter rules, menu behavior and approved artwork are unchanged.",
+      "reviewReason": "Only the new scene starter selects a versioned environment. Pal ownership, progression, approved forms, image sampling and earned artwork contracts retain their prior behavior.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",

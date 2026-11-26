@@ -77,7 +77,7 @@ async function entryBrowser(browser:Browser,engine:string,tls:ServerOptions,out:
     p.on('request', request => { if(request.url() === local+'/entry/review-art') reviews.push(request.postDataJSON()); });
     await pass.fill(parent);
     await artwork.setInputFiles({name:'private-fixture-name.png',mimeType:'image/png',buffer:Buffer.concat([reviewed,Buffer.from('metadata')])});
-    await p.getByText('Ask a grown-up for a reviewed RGB or RGBA PNG saved without extra file information.').waitFor();
+    await p.getByText('Ask a grown-up for a reviewed PNG saved without extra file information.').waitFor();
     assert.deepEqual(reviews,[]);
     // Interrupt the real intake before unlock and during the unlock response.
     // Both must leave a subsequent profile's status and library untouched.

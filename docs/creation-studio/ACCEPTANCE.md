@@ -1,5 +1,11 @@
 # Creation Studio acceptance evidence
 
+In graphical First steps, the Jump character and upward arrow need a visible gap in the palette and in the saved sequence. The learner browser suite measures their separation at each viewport. [Rendered control](evidence/worlds/jump-control.png)
+
+## Illustrated environments and world building · November 26, 2026
+
+The integrated editor keeps versioned illustrated world layers, selected objects and private backdrops with each scene revision. Desktop, tablet and phone Chromium captures cover actual fitted canvases and editing controls. [Qualification and screenshots](evidence/worlds/README.md) · [World art manifest](world-art-manifest.json)
+
 ## Responsive coding workspace · November 25, 2026
 
 **Reproduction.** The merged PR134 layout on main `13260750b7771beb024cc6a94bf823ee5a4e29ff` allocated a 255px lower dock on both desktop sizes and the landscape tablet. The fixed-height heading, cast and event rows left 77px for two independently scrolling columns. Smaller screens put the palette below the initial scroll position. A DOM-visible button satisfied the former test even when its center or edges were clipped. The table records initial access without moving a scrollbar.

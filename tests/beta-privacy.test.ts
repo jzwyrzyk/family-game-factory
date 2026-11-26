@@ -94,6 +94,6 @@ test('reviewed private uploads require the complete metadata-free pixel stream',
   const damaged = Buffer.from(clean);
   damaged[damaged.length - 1] ^= 1;
   for (const invalid of [animatedPNG(), twoColorPNG(6, 6), damaged, clean.subarray(0, 33), Buffer.concat([clean, Buffer.from('extra')])]) {
-    await assert.rejects(checkReviewedPng(array(invalid)), /reviewed RGB/);
+    await assert.rejects(checkReviewedPng(array(invalid)), /reviewed PNG/);
   }
 });
