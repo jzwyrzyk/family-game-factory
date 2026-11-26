@@ -2,6 +2,7 @@
 !package.json
 !package-lock.json
 !index.html
+!tsconfig.json
 !src/
 !src/**
 !public/

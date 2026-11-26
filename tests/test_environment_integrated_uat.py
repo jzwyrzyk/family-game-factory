@@ -22,6 +22,13 @@ class TestIntegratedUat(unittest.TestCase):
                 "signerSha":"b"*40,"sandboxSourceSha":"d"*40}
         self.c["images"]={k:target.REGION+"-docker.pkg.dev/"+target.PROJECT+"/test/"+("gateway" if k=="household" else k)+"@sha256:"+"e"*64 for k in target.ROLES}
 
+    def test_private_application_build_includes_the_same_typescript_settings_as_the_checkout(self):
+        root=Path(__file__).resolve().parents[1]
+        recipe=(root/"infra/nonproduction/family-beta/Dockerfile").read_text().split("RUN node scripts/beta/build.mjs")[0]
+        imports=[line.split()[1:-1] for line in recipe.splitlines() if line.startswith("COPY ")]
+        self.assertTrue(any("tsconfig.json" in group for group in imports))
+        self.assertIn("!tsconfig.json",(root/"infra/nonproduction/family-beta/Dockerfile.dockerignore").read_text().splitlines())
+
     def fake(self,kind,name):
         if kind=="services":
             return {"metadata":{},"status":{"traffic":[{"percent":100,"revisionName":name+"-serving"},{"percent":0,"revisionName":name+"-idle"}]}}

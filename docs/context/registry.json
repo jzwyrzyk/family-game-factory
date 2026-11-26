@@ -929,10 +929,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:34:53.809Z",
-      "sourceDigest": "c30538f498b4f9aad3b90834609a2334e6f6d4df2d5bd48e1ce0dedab4361146",
+      "reviewedAt": "2026-11-26T23:43:11.400Z",
+      "sourceDigest": "86f05b5e3b407b2fb66228a8cefd29725e5535e59a292f14fdc64eca9b6fd6c2",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented actual household, enrolled family, worker attestation, paid trial, partial fixture qualification and exact reuse contracts.",
+      "reviewReason": "Regression covers actual private build context and Docker builder inputs to preserve the hash compared by TEST UAT.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1175,10 +1175,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T23:34:54.479Z",
-      "sourceDigest": "6f44c2562794c135510ffe3fe71e3c0ec52478723ff2f92be628fb78a8150e7c",
+      "reviewedAt": "2026-11-26T23:43:10.895Z",
+      "sourceDigest": "1711fa8fca0e860140cfc8e80a8af2103c387db1d2be46f443caa090f5d6c1b2",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented source-pinned existing workflow operations, isolated setup and emergency stops for both TEST configurations.",
+      "reviewReason": "Documented exact TypeScript compiler settings for matching protected checkout and packaged frontend bytes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
