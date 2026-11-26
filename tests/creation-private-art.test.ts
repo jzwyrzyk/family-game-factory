@@ -90,3 +90,56 @@ test('private art does not grant profile access, challenge credit, or an interpr
   const invalid=sceneWith();(invalid.actors[0] as any).url='https://example.invalid/private.png';
   assert.throws(()=>store.create('player1',invalid),/Unknown field/);
 });
+
+test('a pinned animation runs on the editable scene clock and stays local', () => {
+  const project = sceneWith(rig);
+  const motion = {move:'spin',durationMs:1600,world:'night',sprite:'original'} as const;
+  project.programs[0].actions = [{id:'kept-spin',type:'animation',motion,origin:'starter'}];
+  const engine = new SceneEngine(project);
+  engine.start();
+  const pose = engine.advance(400).actors[0];
+  assert.equal(pose.rotation,90);
+  engine.pause();
+  assert.deepEqual(engine.advance(400).actors[0],pose);
+  engine.resume();
+  assert.equal(engine.advance(400).actors[0].rotation,180);
+  assert.equal(engine.advance(800).actors[0].rotation,0);
+  assert.equal(engine.snapshot().status,'completed');
+  assert.deepEqual(validateEditableProject(project),project);
+  const remote = structuredClone(project);
+  remote.actors[0].assetId='robot';
+  assert.throws(()=>validateGeneratedCreationManifest(remote),/Private saved movement/);
+});
+test('a path is relative to the chosen placement and can lead into the next coded action', () => {
+  const project = sceneWith(rig);
+  const motion = {move:'path',durationMs:1000,world:'sky',sprite:'original',
+    points:[{x:.1,y:.2},{x:.3,y:.8},{x:.7,y:.5}]} as const;
+  const {x,y} = project.actors[0];
+  project.programs[0].actions = [
+    {id:'kept-path',type:'animation',motion:{...motion,points:[...motion.points]},origin:'child'},
+    {id:'after-path',type:'say',text:'There!',durationMs:500,origin:'child'},
+  ];
+  const engine = new SceneEngine(project); engine.start();
+  const mid = engine.advance(500).actors[0];
+  assert.ok(Math.abs(mid.x - (x+.2*project.width)) < 1e-8);
+  assert.ok(Math.abs(mid.y - (y+.6*project.height)) < 1e-8);
+  assert.equal(engine.advance(500).actors[0].speech,'There!');
+  assert.deepEqual(engine.reset().actors[0].x,x);
+});
+
+test('role metadata survives local scenes without assigning physics or widening generated manifests',()=>{
+  const scene=sceneWith();
+  scene.id='inert-role';
+  const before=new SceneEngine(scene);
+  before.start();before.advance(400);
+  scene.actors[0].creativeRole='obstacle';
+  const restored=validateEditableProject(scene);
+  assert.equal(restored.actors[0].creativeRole,'obstacle');
+  const after=new SceneEngine(restored);
+  after.start();after.advance(400);
+  assert.deepEqual(after.snapshot().actors.map(({creativeRole: _role, ...state})=>state),before.snapshot().actors);
+  assert.throws(()=>validateEditableProject({...scene,actors:[{...scene.actors[0],creativeRole:'invented'}]}));
+  const bundled=createStarterProject('blank');
+  bundled.actors[0].creativeRole='decoration';
+  assert.throws(()=>validateGeneratedCreationManifest(bundled),/roles/);
+});

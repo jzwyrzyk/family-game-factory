@@ -1,4 +1,8 @@
 /** The local, serializable Creation Lab language. It contains data, never source code. */
+import { SCENERY_LIMIT, SCENERY_ART, WORLD_PLATES, type SceneWorldId } from './worlds';
+
+import { validateDrawingMotion, type DrawingMotion } from '../drawing/animation-path';
+
 export const CREATION_SCHEMA = 'jems.creation.v1' as const;
 export const CREATION_TICK_MS = 10;
 export const CREATION_LIMITS = {
@@ -8,7 +12,17 @@ export const CREATION_LIMITS = {
 } as const;
 
 export type CreationOrigin = 'child' | 'starter' | 'assisted';
-export type SceneBackground = 'meadow' | 'night' | 'workshop' | 'sky';
+export type SceneBackground = SceneWorldId;
+export interface WorldDecoration {
+  id: string; assetId: string; label: string;
+  x: number; y: number; size: number; layer: 'behind' | 'in-front';
+}
+export interface SceneWorld {
+  edition: 'jems.world.v1';
+  backdrop?: string;
+  framing?: 'fit' | 'fill';
+  scenery?: WorldDecoration[];
+}
 export type ComparisonOperator = 'eq' | 'neq' | 'lt' | 'lte' | 'gt' | 'gte';
 export type SceneCondition =
   | {type: 'variable'; variable: string; operator: ComparisonOperator; value: number}
@@ -17,6 +31,7 @@ export type SceneCondition =
 type BlockBase = {id: string; origin?: CreationOrigin};
 export type CreationBlock = BlockBase & (
   | {type: 'move'; x?: number; y?: number; dx?: number; dy?: number; durationMs?: number}
+  | {type: 'animation'; motion: DrawingMotion}
   | {type: 'wait'; durationMs: number}
   | {type: 'say'; text: string; durationMs: number}
   | {type: 'dance'; durationMs: number}
@@ -29,7 +44,10 @@ export type CreationBlock = BlockBase & (
   | {type: 'emit'; name: string}
 );
 export type SceneTrigger = {type: 'start' | 'tap'} | {type: 'event'; name: string};
+export const CREATIVE_ROLES = ['character','decoration','scenery','obstacle','collectible'] as const;
+export type CreativeRole = typeof CREATIVE_ROLES[number];
 export interface SceneActor {
+  creativeRole?: CreativeRole;
   id: string; name: string; assetId: string; x: number; y: number;
   size?: number; visible?: boolean;
 }
@@ -44,7 +62,7 @@ export interface CreationProvenance {
 }
 export interface CreationProject {
   schema: typeof CREATION_SCHEMA;
-  id: string; title: string; width: number; height: number; background: SceneBackground;
+  id: string; title: string; width: number; height: number; background: SceneBackground; world?: SceneWorld;
   actors: SceneActor[]; programs: SceneProgram[]; variables: Record<string, number>;
   provenance?: CreationProvenance;
 }
@@ -87,19 +105,42 @@ const origins = ['child', 'starter', 'assisted'];
 const operators = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte'];
 
 /** Strictly validates before cloning: unsupported executable/asset payloads are never retained. */
-export function validateCreationProject(input: unknown): CreationProject {
-  const p = record(input, ['schema','id','title','width','height','background','actors','programs','variables','provenance'], 'project');
+export function validateCreationProject(input: unknown, options: {allowSavedMotion?: boolean} = {}): CreationProject {
+  const p = record(input, ['schema','id','title','width','height','background','world','actors','programs','variables','provenance'], 'project');
   if (p.schema !== CREATION_SCHEMA) fail('Unsupported saved project version.');
   id(p.id, 'project ID'); text(p.title, 80, 'project title');
   number(p.width, 200, 1600, 'stage width', true); number(p.height, 160, 1200, 'stage height', true);
-  if (!['meadow','night','workshop','sky'].includes(p.background as string)) fail('Choose a supported background.');
+  if (typeof p.background !== 'string' || !Object.hasOwn(WORLD_PLATES, p.background) || (!p.world && !['meadow','sky','night','workshop'].includes(p.background))) fail('Choose a supported background.');
+  if (p.world !== undefined) {
+    const world = record(p.world, ['edition', 'backdrop', 'framing', 'scenery'], 'world');
+    if (world.edition !== 'jems.world.v1') fail('Choose an available world edition.');
+    if (world.backdrop !== undefined && !parsePrivateArtId(world.backdrop)) fail('Choose your own saved backdrop.');
+    if (world.framing !== undefined && !['fit','fill'].includes(world.framing as string)) fail('Choose how your backdrop fits.');
+    if (world.scenery !== undefined) {
+      list(world.scenery, SCENERY_LIMIT, 'decorations');
+      const ids = new Set<string>();
+      for (const raw of world.scenery) {
+        const piece = record(raw, ['id','assetId','label','x','y','size','layer'], 'decoration');
+        id(piece.id, 'decoration ID');
+        if (ids.has(piece.id)) fail('Each decoration needs its own ID.');
+        ids.add(piece.id);
+        if (!SCENERY_ART.some(asset => asset.id === piece.assetId) && !parsePrivateArtId(piece.assetId)) fail('Choose available scenery.');
+        text(piece.label, 60, 'decoration name');
+        number(piece.x, 0, p.width, 'decoration x');
+        number(piece.y, 0, p.height, 'decoration y');
+        number(piece.size, 16, 400, 'decoration size');
+        if (piece.layer !== 'behind' && piece.layer !== 'in-front') fail('Choose a decoration layer.');
+      }
+    }
+  }
   list(p.actors, CREATION_LIMITS.actors, 'characters');
   if (!p.actors.length) fail('Add at least one character.');
   const actorIds = new Set<string>();
   for (const raw of p.actors) {
-    const a = record(raw, ['id','name','assetId','x','y','size','visible'], 'character');
+    const a = record(raw, ['id','name','assetId','x','y','size','visible','creativeRole'], 'character');
     id(a.id, 'character ID');
     if(!isCreationId(a.assetId)&&!parsePrivateArtId(a.assetId))fail('Invalid asset reference.');
+    if (a.creativeRole !== undefined && !CREATIVE_ROLES.includes(a.creativeRole as CreativeRole)) fail('Choose a supported role for this scene.');
     text(a.name, 60, 'character name');
     if (actorIds.has(a.id)) fail('Character IDs must be unique.');
     actorIds.add(a.id);
@@ -139,7 +180,7 @@ export function validateCreationProject(input: unknown): CreationProject {
     list(raw, CREATION_LIMITS.blocks, 'blocks');
     for (const value of raw) {
       if (++blockCount > CREATION_LIMITS.blocks) fail('This project has too many blocks.');
-      const b = record(value, ['id','origin','type','x','y','dx','dy','durationMs','text','height','count','actions','condition','then','else','variable','value','amount','name','pathName'], 'block');
+      const b = record(value, ['id','origin','type','x','y','dx','dy','durationMs','text','height','count','actions','condition','then','else','variable','value','amount','name','motion','pathName'], 'block');
       id(b.id, 'block ID');
       if (blockIds.has(b.id)) fail('Block IDs must be unique throughout a project.');
       blockIds.add(b.id);
@@ -157,11 +198,24 @@ export function validateCreationProject(input: unknown): CreationProject {
           for (const field of ['x','y','dx','dy']) if (b[field] !== undefined) number(b[field], -4096, 4096, 'move distance');
           duration(true); break;
         }
+        case 'animation':
+          fields(['motion']);
+          if (options.allowSavedMotion === false) fail('Private saved movement belongs in the local editor.');
+          validateDrawingMotion(b.motion);
+          break;
         case 'wait': case 'dance': fields(['durationMs']); duration(); break;
         case 'say': fields(['text','durationMs']); text(b.text, 160, 'speech', true); duration(); break;
         case 'jump': fields(['height','durationMs']); number(b.height, 0, 300, 'jump height'); duration(); break;
         case 'show': case 'hide': fields([]); break;
-        case 'repeat': fields(['count','actions','pathName']); if (b.pathName !== undefined) text(b.pathName, 40, 'path name'); number(b.count, 0, CREATION_LIMITS.repeat, 'repeat count', true); blocks(b.actions, depth + 1); break;
+        case 'repeat':
+          fields(['count','actions','pathName']);
+          if (b.pathName !== undefined) {
+            if (options.allowSavedMotion === false) fail('Private path names belong in the local editor.');
+            text(b.pathName, 40, 'path name');
+          }
+          number(b.count, 0, CREATION_LIMITS.repeat, 'repeat count', true);
+          blocks(b.actions, depth + 1);
+          break;
         case 'if': fields(['condition','then','else']); condition(b.condition); blocks(b.then, depth + 1); if (b.else !== undefined) blocks(b.else, depth + 1); break;
         case 'set': fields(['variable','value']); variable(b.variable); number(b.value, -1000000, 1000000, 'variable value'); break;
         case 'change': fields(['variable','amount']); variable(b.variable); number(b.amount, -1000000, 1000000, 'variable change'); break;

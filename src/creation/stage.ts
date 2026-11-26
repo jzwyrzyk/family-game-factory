@@ -1,4 +1,5 @@
-import type { CreationProject } from './model';
+import { WORLD_PLATES, SCENERY_ART, worldOverlay } from './worlds';
+import type { CreationProject, WorldDecoration } from './model';
 import type { ActorSnapshot, SceneSnapshot } from './engine';
 import { creationAsset, drawCreationVector, parsePrivateArtId, type CreationAsset } from './projects';
 import type { PrivateArtResolver } from './private-art';
@@ -40,6 +41,7 @@ export class CreationStage {
     assertCurrent();
     const assets = [...new Set(project.actors.map(actor => actor.assetId))]
       .map(id => creationAsset(id)).filter((asset): asset is CreationAsset => !!asset?.url);
+    assets.push(...this.worldImages(project));
     await Promise.all(assets.map(asset => this.loadImage(asset).ready));
     assertCurrent();
   }
@@ -69,7 +71,7 @@ export class CreationStage {
       if (!active() || settled) return;
       const message = `${asset.label}'s picture could not load${timedOut ? ' in time' : ''}. Reopen this scene to try again.`;
       entry.failed = true; this.failedArt.add(asset.id); settle(Error(message));
-      if (this.scene?.actors.some(actor => actor.assetId === asset.id)) this.artError?.(message);
+      if (this.scene && (this.scene.actors.some(actor => actor.assetId === asset.id) || this.worldImages(this.scene).some(image => image.id === asset.id))) this.artError?.(message);
       repaint();
     };
     const finish = () => {
@@ -95,13 +97,19 @@ export class CreationStage {
     // Approved portraits are large. Retain only this scene's pinned pictures,
     // not every Pal/form visited across the whole collection.
     const assets = new Set(scene.actors.map(actor => actor.assetId));
+    for (const asset of this.worldImages(scene)) assets.add(asset.id);
     for (const [id, entry] of this.images) if (!assets.has(id)) { entry.cancel(); this.images.delete(id); this.failedArt.delete(id); }
     if (this.canvas.width !== scene.width) this.canvas.width = scene.width;
     if (this.canvas.height !== scene.height) this.canvas.height = scene.height;
     const c = this.context, w = scene.width, h = scene.height;
     c.clearRect(0, 0, w, h);
-    this.background(scene);
+    if (scene.world) this.illustratedBackground(scene);
+    else this.background(scene);
+    this.drawWorldOverlay(scene, 'middle');
+    for (const piece of scene.world?.scenery ?? []) if (piece.layer === 'behind') this.decoration(piece);
     for (const actor of snapshot.actors) if (actor.visible) this.actor(actor, actor.id === selected);
+    this.drawWorldOverlay(scene, 'foreground');
+    for (const piece of scene.world?.scenery ?? []) if (piece.layer === 'in-front') this.decoration(piece);
     for (const actor of snapshot.actors) if (actor.visible && actor.speech) this.bubble(actor);
     let badgeX = 12;
     for (const [name, value] of Object.entries(snapshot.variables).slice(0, 6)) {
@@ -121,6 +129,72 @@ export class CreationStage {
     const bounds = this.canvas.getBoundingClientRect();
     return { x: Math.round((event.clientX - bounds.left) / bounds.width * this.canvas.width),
       y: Math.round((event.clientY - bounds.top) / bounds.height * this.canvas.height) };
+  }
+  private worldImages(scene: CreationProject): CreationAsset[] {
+    if (!scene.world) return [];
+    const assets: CreationAsset[] = scene.world.backdrop ? [] : [WORLD_PLATES[scene.background]];
+    if (!scene.world.backdrop) {
+      for (const layer of ['middle', 'foreground'] as const) {
+        const overlay = worldOverlay(WORLD_PLATES[scene.background], layer);
+        if (overlay) assets.push(overlay);
+      }
+    }
+    for (const piece of scene.world.scenery ?? []) {
+      const asset = SCENERY_ART.find(item => item.id === piece.assetId);
+      if (asset) assets.push(asset);
+    }
+    return assets;
+  }
+  private privateImage(id: string) {
+    const resolved = this.privateArt?.get(id);
+    if (resolved || !this.privateArt || this.requestedArt.has(id) || this.failedArt.has(id)) return resolved?.image;
+    this.requestedArt.add(id);
+    const epoch = this.artEpoch;
+    void this.privateArt.load(id).catch(error => {
+      if (epoch !== this.artEpoch) return;
+      this.failedArt.add(id);
+      this.artError?.('Some artwork is unavailable in this profile. Open My Art to restore it. ' + (error as Error).message);
+    }).finally(() => {
+      if (epoch !== this.artEpoch) return;
+      this.requestedArt.delete(id);
+      if (this.scene && this.snapshot) this.render(this.scene, this.snapshot, this.selected);
+    });
+    return undefined;
+  }
+  private illustratedBackground(scene: CreationProject) {
+    const world = scene.world!, plate = WORLD_PLATES[scene.background];
+    const c = this.context;
+    c.fillStyle = '#efeaf4';
+    c.fillRect(0, 0, scene.width, scene.height);
+    const picture = world.backdrop ? this.privateImage(world.backdrop) : this.loadImage(plate);
+    const image = picture && ('loaded' in picture ? (picture.loaded ? picture.image : null) : picture);
+    if (!image) {
+      c.font = '600 20px system-ui'; c.fillStyle = '#4c3c61'; c.textAlign = 'center';
+      c.fillText(this.failedArt.has(world.backdrop ?? plate.id) ? 'World picture unavailable' : 'Opening world…', scene.width/2, scene.height/2);
+      return;
+    }
+    const w = image.width, h = image.height;
+    const zoom = (world.backdrop && world.framing !== 'fill' ? Math.min : Math.max)(scene.width/w, scene.height/h);
+    c.drawImage(image, (scene.width-w*zoom)/2, (scene.height-h*zoom)/2, w*zoom, h*zoom);
+  }
+  private drawWorldOverlay(scene: CreationProject, layer: 'middle' | 'foreground') {
+    if (!scene.world || scene.world.backdrop) return;
+    const asset = worldOverlay(WORLD_PLATES[scene.background], layer);
+    if (!asset) return;
+    const entry = this.loadImage(asset);
+    if (!entry.loaded) return;
+    const zoom = Math.max(scene.width / entry.image.width, scene.height / entry.image.height);
+    const w = entry.image.width * zoom, h = entry.image.height * zoom;
+    this.context.drawImage(entry.image, (scene.width-w)/2, (scene.height-h)/2, w, h);
+  }
+  private decoration(piece: WorldDecoration) {
+    const asset = SCENERY_ART.find(item => item.id === piece.assetId);
+    const bundled = asset && this.loadImage(asset);
+    const image = bundled ? (bundled.loaded ? bundled.image : null) : this.privateImage(piece.assetId);
+    if (!image) return;
+    const zoom = piece.size / Math.max(image.width, image.height);
+    const w = image.width * zoom, h = image.height * zoom;
+    this.context.drawImage(image, piece.x - w/2, piece.y - h/2, w, h);
   }
   private background(scene: CreationProject) {
     const c = this.context, w = scene.width, h = scene.height;
@@ -176,23 +250,11 @@ export class CreationStage {
       c.beginPath(); c.roundRect(-s * .58, -s * .57, s * 1.16, s * 1.16, 15); c.stroke(); c.setLineDash([]);
     }
     if(parsePrivateArtId(actor.assetId)){
-      const resolved=this.privateArt?.get(actor.assetId);
-      if(resolved){
-        const scale=s/Math.max(resolved.image.width,resolved.image.height);
-        c.drawImage(resolved.image,-resolved.image.width*scale/2,-resolved.image.height*scale/2,resolved.image.width*scale,resolved.image.height*scale);
-      }else{
-        if(this.privateArt&&!this.requestedArt.has(actor.assetId)&&!this.failedArt.has(actor.assetId)){
-          this.requestedArt.add(actor.assetId);const epoch=this.artEpoch;
-          void this.privateArt.load(actor.assetId).then(()=>{
-            if(epoch!==this.artEpoch)return;this.requestedArt.delete(actor.assetId);
-            if(this.scene&&this.snapshot)this.render(this.scene,this.snapshot,this.selected);
-          }).catch(error=>{
-            if(epoch!==this.artEpoch)return;
-            this.requestedArt.delete(actor.assetId);
-            this.failedArt.add(actor.assetId);this.artError?.('Some artwork is unavailable in this profile. Open Art Studio to restore its art bundle. '+(error as Error).message);
-            if(this.scene&&this.snapshot)this.render(this.scene,this.snapshot,this.selected);
-          });
-        }
+      const image = this.privateImage(actor.assetId);
+      if (image) {
+        const scale = s / Math.max(image.width, image.height);
+        c.drawImage(image, -image.width*scale/2, -image.height*scale/2, image.width*scale, image.height*scale);
+      } else {
         c.fillStyle='#F5F1FA';c.strokeStyle='#786489';c.lineWidth=2;c.setLineDash([4,4]);
         c.beginPath();c.roundRect(-s*.46,-s*.4,s*.92,s*.8,10);c.fill();c.stroke();c.setLineDash([]);
         c.fillStyle='#4C3C61';c.font='600 '+Math.max(10,Math.min(14,s*.12))+'px system-ui';c.textAlign='center';c.textBaseline='middle';

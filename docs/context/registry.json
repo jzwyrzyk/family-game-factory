@@ -152,10 +152,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:13:42.771Z",
-      "sourceDigest": "ff9c02d667b54ac95443882ff6269ecf8d27444f45635284e0f055eacb1974d2",
+      "reviewedAt": "2026-11-26T03:38:28.855Z",
+      "sourceDigest": "6567185f45b3e657f35252005e88657e6d99c0895c24cb7ea650ca3d607f28a8",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Coded paths and editable crayon sources follow the canonical child artwork, explicit Keep and version pinning decisions in the reconciled standard.",
+      "reviewReason": "Confirmed original-byte preservation, reversible preparation and optional scene roles against the permanent authenticity and 2D doctrine. The library bridge and joint viewer use those established rules.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -316,10 +316,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:16:21.329Z",
-      "sourceDigest": "879a3ff172bd4e85db495b78e71238eeec47198589ed524ec6caa7e1d090ac0e",
+      "reviewedAt": "2026-11-26T03:38:28.971Z",
+      "sourceDigest": "b23d35c4fa7bcf9613323071b3dd9dccf4b96ce757d3806be948b595d48981c4",
       "reviewOutcome": "updated",
-      "reviewReason": "The reviewed family PNG entry now enforces exact bounded raster structure before consent admission, retaining the input bytes only after validation.",
+      "reviewReason": "Reviewed child-facing immediate motion, touch and keyboard cancellation, the portrait stage, readable practice checkpoint and explicit return from the joint viewer.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -421,10 +421,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "923c7f34435ddd149c27453009fc5adeb37d185235156c4609ce318971bea52a",
-      "reviewedAt": "2026-11-26T03:35:35.213Z",
+      "sourceDigest": "880031cce64ca9c825a48f7154b0e3c0ec63b1515cd18c99e76e28839562e740",
+      "reviewedAt": "2026-11-26T03:38:29.773Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The scene contract records portrait playback spacing and the active learning question’s own foreground color.",
+      "reviewReason": "Documented exact rig preview alongside composite actor playback, editable coding paths, inert roles, pinned scene versions and preserved programs.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -692,10 +692,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T00:23:35.574Z",
-      "sourceDigest": "ca7b341e9de009c700ec5b750b52d88705543bbb56fe2f4833bd1dc2dfd64a33",
+      "reviewedAt": "2026-11-26T03:38:29.965Z",
+      "sourceDigest": "05b159a0f1f0c6e00857b5e836526de214c73ab451ea69862ebeb3493a94643a",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified the protected worker main and tag, scoped production observation, and preserved the historical scene JSON package for all three readers.",
+      "reviewReason": "Verified the exact scene validation module import closure for gateway, preview and family gateway against the service packaging contract. Host-only private artwork stays outside these modules.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -903,10 +903,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:43:22.238Z",
-      "sourceDigest": "9755f1f29e52dbb4a755627954365061622a186d2d360a90cc80daccdd6c7ce0",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The offline smoke test checks the existing build against all 48 independent world-manifest hashes, decodes the three Moon Adventure stage layers offline and preserves private-route, quota and Pal canaries. The shipped caching and release contracts already describe these boundaries.",
+      "reviewedAt": "2026-11-26T03:44:04.033Z",
+      "sourceDigest": "6250f981436ceaa3a5cade8b53a75f54a098c4b896ae8b8fc4a1c201b1520e42",
+      "reviewOutcome": "updated",
+      "reviewReason": "Verified the 48 pinned public world assets and three offline-decoded scene layers alongside existing private endpoint, practice, storage and recovery checks; recorded results in the delivery record.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1147,10 +1147,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:15:06.970Z",
-      "sourceDigest": "afc3429a3eff1716069b1f4e978036c86f244c2ed5ae56a4b6ed2b7cde46f0a6",
+      "reviewedAt": "2026-11-26T03:44:04.231Z",
+      "sourceDigest": "7b9569db3b02a67e355fd5e1118879981ac71338d629a7262a0e2effe42b7120",
       "reviewOutcome": "updated",
-      "reviewReason": "The delivery record distinguishes these candidate crayon, path and catalogue capabilities from deployed activity rendering and owner artwork acceptance.",
+      "reviewReason": "Recorded the final integrated input head, offline playback evidence and current parallel workstreams; protected and hosted release gates retain separate authority.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1634,10 +1634,10 @@
         "tests/crayon-revision-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "180a66e42bea5c5f7982bd316476525280fbdb0897b7867dff392942737ac4a6",
-      "reviewedAt": "2026-11-26T03:13:44.713Z",
+      "sourceDigest": "068f916b141f612702a53707371cb9f85d4a86e74252dbda646ae1946a57c6d7",
+      "reviewedAt": "2026-11-26T03:38:30.451Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The My Art contract describes a new crayon revision from saved editable strokes and compatibility with original and prior drawing bytes.",
+      "reviewReason": "Documented verified older editable strokes, optional semantic labels, immutable originals, saved movement versions and pinned joint simulation opened from Studio.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1717,10 +1717,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3b669cf847b1ba4c4642c8130894505a04e7b12f3707b8ffd273b74370ed92df",
-      "reviewedAt": "2026-11-26T03:08:54.218Z",
+      "sourceDigest": "8102ea087841753d9e7d9d4a7dae48283132e40dff1b39d6ca9706f8782aa561",
+      "reviewedAt": "2026-11-26T03:19:46.542Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Architecture records reads of the active owner’s kept scene revision in both original and indexed scene storage. Copying motion writes a new group of block IDs through existing autosave, keep and backup."
+      "reviewReason": "The storage contract covers hash verification and reference remapping for private actors, backdrops and scenery on parent recovery and cross-owner copy."
     }
   ]
 }

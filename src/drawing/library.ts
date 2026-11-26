@@ -10,6 +10,8 @@ export const ART_DB_VERSION = 3;
 export const ART_LIMITS = Object.freeze({ imageBytes: 5 * 1024 * 1024, imagePixels: 4096, storageBytes: 20 * 1024 * 1024, drawingsPerOwner: 100, rigsPerOwner: 200, designBytes: 8 * 1024 * 1024, bundleBytes: 64 * 1024 * 1024 });
 export type ArtGuard = () => boolean;
 export type ArtStoreName = 'drawings' | 'rigs' | 'active' | 'drafts' | 'usage' | 'meta' | 'drawingMetadata';
+import { sceneAssetIds } from '../creation/worlds';
+
 export type ArtUsage = { id: string; owner: string; targetId: string; targetKind: 'scene' | 'game'; drawingId: string; rigId?: string };
 const names: ArtStoreName[] = ['drawings', 'rigs', 'active', 'drafts', 'usage', 'meta', 'drawingMetadata'];
 
@@ -178,9 +180,9 @@ export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'own
         if (!owned.has(revision.projectId)) continue;
         if (kind === 'scene') {
           if (!revision.scene || !Array.isArray(revision.scene.actors)) { complete = false; continue; }
-          for (const actor of revision.scene.actors) {
-            if (typeof actor?.assetId !== 'string') { complete = false; continue; }
-            const match = /^art:(image|rig):([A-Za-z0-9_-]{1,100}):([a-f0-9]{64})$/.exec(actor.assetId);
+          for (const assetId of sceneAssetIds(revision.scene)) {
+            if (typeof assetId !== 'string') { complete = false; continue; }
+            const match = /^art:(image|rig):([A-Za-z0-9_-]{1,100}):([a-f0-9]{64})$/.exec(assetId);
             if (!match) continue;
             if (match[1] === 'image') { const image = images.get(match[2]); if (image?.sha256 === match[3]) add(revision.projectId, kind, image.id); }
             else { const rig = versions.get(match[2]); if (rig && images.get(rig.assembly.sourceId)?.sha256 === rig.assembly.sourceSha256) add(revision.projectId, kind, rig.assembly.sourceId, rig.id); }

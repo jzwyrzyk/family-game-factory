@@ -66,11 +66,41 @@
 @media(pointer:coarse){.drawing-lab button{min-height:48px}.dl-stage-actions [data-go],.dl-stage-actions [data-jump]{min-width:116px;min-height:60px;font-size:15px;touch-action:none}}
 @media(prefers-reduced-motion:reduce){.drawing-lab::backdrop{backdrop-filter:none}.drawing-lab *{scroll-behavior:auto}}
 
-.drawing-paint .dp-tools label,.drawing-paint .dp-tools button,.drawing-paint .dl-canvas-help,
-.drawing-paint .dl-header p,.drawing-paint .dl-header button,.drawing-paint [data-message]{
-  font-size:var(--jems-child-label,18px);
+.drawing-paint [data-paper].clear-paper {
+  background-color: white;
+  background-image: conic-gradient(#e8e6ed 25%, white 0 50%, #e8e6ed 0 75%, white 0);
+  background-size: 20px 20px;
 }
-.drawing-paint .dp-tools .dp-paper-toggle{display:flex;flex-direction:row;align-items:center;gap:10px;min-height:44px}
-.drawing-paint .dp-paper-toggle input{width:24px;min-height:24px;height:24px;accent-color:#7952c9}
-.drawing-paint [data-eraser][aria-pressed=true]{border:2px solid #7952c9;background:#eee7fa}
-.drawing-paint [data-paper].dp-transparent{background-color:white;background-image:repeating-conic-gradient(#e6e2ef 0 25%,transparent 0 50%);background-size:20px 20px}
+.drawing-paint .dp-tools label,
+.drawing-paint .dp-tools [data-message],
+.drawing-paint .dl-canvas-help { font-size: var(--jems-child-label,18px); }
+.drawing-paint .dp-tools select {
+  min-height: 44px;
+  border: 1px solid #c5b7d6;
+  border-radius: 10px;
+  background: white;
+  color: #34405b;
+  padding: 8px;
+  font: inherit;
+}
+
+.drawing-lab:has(.dl-canvas) .dl-header p,
+.drawing-lab:has(.dl-canvas) .dl-note { font-size: var(--jems-child-body,20px); }
+.drawing-lab:has(.dl-canvas) :is(button,input,select,summary,.dl-canvas-help,.dl-tools label,.dl-guidance,.dl-footer,.dl-steps [data-draft-status],figcaption) {
+  font-size: var(--jems-child-label,18px);
+}
+.drawing-lab .dl-steps:not(:has([data-draft-status]:not(:empty))) { display: none; }
+.drawing-lab .dl-steps [data-draft-status] { margin-left: 0; max-width: 100%; }
+.drawing-lab .dl-piece-list button { min-width: 0; }
+@media(max-width:480px){
+ .drawing-lab:has(.dl-canvas) .dl-footer>span:last-child { display:none; }
+ .drawing-lab:has(.dl-canvas) .dl-header { align-items:center; }
+}
+.drawing-paint [data-eraser][aria-pressed="true"] { outline: 3px solid #7952c9; }
+.drawing-paint .dl-header > button, .drawing-paint .dp-tools button:not([aria-label]) {
+  min-height: 48px;
+  font-size: var(--jems-child-label,18px);
+}
+
+.drawing-lab.dl-rig-preview { width:min(850px,96vw); }
+.dl-rig-preview .dl-main { grid-template-columns:minmax(0,1fr); }

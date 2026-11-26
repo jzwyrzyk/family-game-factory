@@ -1,0 +1,56 @@
+{
+  "browser": "156.0.8078.79",
+  "frontend": {
+    "index-Cdr0YOv8.css": "e2c0568397b95afd7bcf83fb52f539817abfe9155b5b0517720bde213918247c",
+    "index-DxIqf-ue.js": "a80db1f01ef2867234e47ba77d6e5b276930f996f728a34e6093bdc78732241a"
+  },
+  "desktop": {
+    "width": 1280,
+    "height": 900
+  },
+  "touchViewports": [
+    "390x844",
+    "820x1180"
+  ],
+  "externalRequests": [],
+  "pageErrors": [],
+  "checks": [
+    "Saved a crayon drawing, reopened its editable source, added a gem and found the revision by its semantic name. Original bytes retained their calculated SHA-256.",
+    "dragon: uploaded transparent bytes, observed changing preview frames for Float, saved the movement and rechecked byte fidelity.",
+    "car: uploaded transparent bytes, observed changing preview frames for Right, saved the movement and rechecked byte fidelity.",
+    "rocket: uploaded transparent bytes, observed changing preview frames for Jump, saved the movement and rechecked byte fidelity.",
+    "robot: uploaded transparent bytes, observed changing preview frames for Dance, saved the movement and rechecked byte fidelity.",
+    "butterfly: uploaded transparent bytes, observed changing preview frames for Spin, saved the movement and rechecked byte fidelity.",
+    "imaginary: uploaded transparent bytes, observed changing preview frames for Shake, saved the movement and rechecked byte fidelity.",
+    "Saved scene reopened with its first movement pin after a second version was created.",
+    "Changed illustrated world, added a rocket and used an exact private image as a fitted backdrop. Actor and decoration are independently represented.",
+    "Portable scene export contains the selected picture, movement revision and world references.",
+    "Replaced a scene actor with the searched revision. Actor identity, position and existing programs survived Keep.",
+    "Copied the kept custom world into a second scene while keeping its own actors and their programs.",
+    "Second profile has an empty art shelf after all seven subjects and the scene were saved by the first profile.",
+    "phone 390×844: tapped a path, corrected one spot, paused, kept, canceled another move and reopened the exact saved path after reload.",
+    "tablet 820×1180: tapped a path, corrected one spot, paused, kept, canceled another move and reopened the exact saved path after reload."
+  ],
+  "screenshots": [
+    "a-draw-pebble.png",
+    "d-asset-details.png",
+    "c-bounce-preview.png",
+    "c-float-preview.png",
+    "c-right-preview.png",
+    "c-jump-preview.png",
+    "c-dance-preview.png",
+    "c-spin-preview.png",
+    "c-shake-preview.png",
+    "c-motion-frame-paused.png",
+    "c-motion-frame-rest.png",
+    "b-moon-stage.png",
+    "f-private-backdrop.png",
+    "d-picker.png",
+    "e-host-actor.png",
+    "c-path-phone.png",
+    "c-path-tablet.png"
+  ],
+  "recordings": [
+    "c-pebble-scene.webm"
+  ]
+}

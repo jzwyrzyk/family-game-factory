@@ -22,6 +22,10 @@ test('a named drawing path runs at the same coordinates on either clock cadence'
   assert.deepEqual([one.snapshot().actors[0].x,one.snapshot().actors[0].y],[420,205]);
   assert.equal(one.snapshot().actors[0].assetId,drawing);
   assert.throws(()=>validateGeneratedCreationManifest(scene));
+  const bundled = structuredClone(scene);
+  bundled.actors[0].assetId = 'gem';
+  assert.doesNotThrow(()=>validateEditableProject(bundled));
+  assert.throws(()=>validateGeneratedCreationManifest(bundled),/Private path names/);
   assert.throws(()=>pathFromPoints('Empty',[{x:0,y:0}],100));
   const tooLong=structuredClone(scene);Object.assign(tooLong.programs[0].actions[0],{pathName:'x'.repeat(41)});
   assert.throws(()=>validateEditableProject(tooLong));

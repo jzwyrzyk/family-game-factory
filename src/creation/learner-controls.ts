@@ -29,6 +29,7 @@ export function firstStepsSummary(block: CreationBlock): string {
     case 'jump': return block.height < 50 ? 'A little hop' : block.height > 90 ? 'A big hop' : 'A happy hop';
     case 'repeat': return block.pathName || `${block.count} times`;
     case 'wait': return `${block.durationMs / 1000} seconds`;
+    case 'animation': return 'My saved ' + block.motion.move;
     case 'dance': return 'Do a little dance';
     case 'show': return 'Appear in the scene';
     case 'hide': return 'Hide from the scene';

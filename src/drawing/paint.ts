@@ -1,4 +1,5 @@
 import {saveDrawing,type Drawing} from '../assets/private-drawings';
+import {pointerPoint} from './pointer-input';
 import {iconMarkup} from '../brand/icons';
 import {assertRewardSourceWritable,rewardSourceWritable} from '../rewards/write-guard';
 import {crayons as colors, paperWidth, paperHeight, maxStrokes, maxStrokePoints, renderStrokes, includeCrayonSource, verifiedCrayonSource, snapCoordinate, type Stroke} from './crayon-source';
@@ -18,16 +19,16 @@ export async function drawOnTablet(owner:string,onSaved:(drawing:Drawing)=>Promi
  const returnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
  const originPage=document.querySelector<HTMLElement>('.page:not(.hidden)')?.id.replace(/^page-/,'');
  const dialog=document.createElement('dialog');dialog.className='drawing-lab drawing-paint';
- dialog.setAttribute('aria-label',source?'Keep drawing':'Draw something new');
- dialog.innerHTML=`<div class="dl-shell"><header class="dl-header"><div><h2>${source?'Keep drawing':'Draw your idea!'}</h2><p>${source?'Keep a new version when you’re ready.':'Choose a crayon and draw on the page.'}</p></div><button type="button" data-exit aria-label="Close drawing page">${iconMarkup('close')} Close</button></header><div class="dp-work"><div><canvas data-paper aria-label="Drawing canvas. Draw with a finger or mouse. Keyboard: arrows move the crayon, hold Space while moving to draw, Enter makes a dot." tabindex="0"></canvas><p class="dl-canvas-help">Finger, mouse or keyboard. Arrows move the crayon; hold Space to draw.</p></div><div class="dp-tools"><h3>Your crayons</h3><div data-colors role="group" aria-label="Choose a crayon color"></div><button type="button" data-eraser aria-pressed="false">Eraser</button><label>Brush size<input data-size type="range" min="3" max="24" value="8"></label><label class="dp-paper-toggle"><input type="checkbox" data-transparent> Clear background</label><label>My drawing is called<input data-title maxlength="60" value="My new invention"></label><div class="dl-edit-row"><button type="button" data-undo>${iconMarkup('undo')} Undo a stroke</button><button type="button" data-redo>${iconMarkup('retry')} Redo</button></div><button type="button" data-clear>${iconMarkup('trash')} Start over</button><button type="button" data-save>${iconMarkup('save')} Keep my drawing</button><p role="status" data-message></p></div></div></div>`;
+ dialog.setAttribute('aria-label',source?'Continue drawing':'Draw something new');
+ dialog.innerHTML=`<div class="dl-shell"><header class="dl-header"><div><h2>${source?'Continue drawing':'Draw your idea!'}</h2><p>${source?'Keep a new version when you’re ready.':'Choose a crayon and draw on the page.'}</p></div><button type="button" data-exit aria-label="Close drawing page">${iconMarkup('close')} Close</button></header><div class="dp-work"><div><canvas data-paper aria-label="Drawing canvas. Draw with a finger or mouse. Keyboard: arrows move the crayon, hold Space while moving to draw, Enter makes a dot." tabindex="0"></canvas><p class="dl-canvas-help">Finger, mouse or keyboard. Arrows move the crayon; hold Space to draw.</p></div><div class="dp-tools"><h3>Your crayons</h3><div data-colors role="group" aria-label="Choose a crayon color"></div><button type="button" data-eraser aria-pressed="false">Eraser</button><label>Brush size<input data-size type="range" min="3" max="24" value="8"></label><label>Paper<select data-paper-kind aria-label="Paper"><option value="white">White paper</option><option value="transparent">Clear paper</option></select></label><label>My drawing is called<input data-title maxlength="60" value="My new invention"></label><div class="dl-edit-row"><button type="button" data-undo>${iconMarkup('undo')} Undo a stroke</button><button type="button" data-redo>${iconMarkup('retry')} Redo</button></div><button type="button" data-clear>${iconMarkup('trash')} Start over</button><button type="button" data-save>${iconMarkup('save')} Keep my drawing</button><p role="status" data-message></p></div></div></div>`;
  document.body.append(dialog);const canvas=dialog.querySelector<HTMLCanvasElement>('[data-paper]')!;
  const ctx=canvas.getContext('2d')!,colorsPanel=dialog.querySelector<HTMLElement>('[data-colors]')!;
  const status=dialog.querySelector<HTMLElement>('[data-message]')!;
  let color:string=colors[0],size=8,strokes:Stroke[]=reopened?.strokes??[],redo:Stroke[]=[],active:Stroke|null=null,disposed=false,saving=false,dirty=false,keyboardDrawing=false,keyboardCursor=false,pageCurrent=true;
  let transparent=reopened?.transparent??false,committed=false;
  const eraser=dialog.querySelector<HTMLButtonElement>('[data-eraser]')!;
- const paperToggle=dialog.querySelector<HTMLInputElement>('[data-transparent]')!;
- paperToggle.checked=transparent;
+ const paperToggle=dialog.querySelector<HTMLSelectElement>('[data-paper-kind]')!;
+ paperToggle.value=transparent?'transparent':'white';
  if(source)dialog.querySelector<HTMLInputElement>('[data-title]')!.value=source.name;
  const cursor={x:450,y:280};
  const alive=()=>!disposed&&checkOwner()&&pageCurrent&&isCurrent();
@@ -35,18 +36,17 @@ export async function drawOnTablet(owner:string,onSaved:(drawing:Drawing)=>Promi
  const cw=paperWidth,ch=paperHeight;canvas.width=cw;canvas.height=ch;
  const draw=(showCursor=true)=>{
   renderStrokes(ctx,active?[...strokes,active]:strokes,transparent);
-  canvas.classList.toggle('dp-transparent',transparent);
+  canvas.classList.toggle('clear-paper',transparent);
   if(showCursor&&keyboardCursor){ctx.save();ctx.strokeStyle='#7160a8';ctx.lineWidth=2;ctx.setLineDash([5,4]);ctx.beginPath();ctx.arc(cursor.x,cursor.y,Math.max(10,size),0,Math.PI*2);ctx.stroke();ctx.restore();}
   dialog.querySelector<HTMLButtonElement>('[data-undo]')!.disabled=saving||committed||!strokes.length;
   dialog.querySelector<HTMLButtonElement>('[data-redo]')!.disabled=saving||committed||!redo.length;
   dialog.querySelector<HTMLButtonElement>('[data-save]')!.disabled=saving||committed||!!active||!strokes.length||!dirty;
   dialog.querySelector<HTMLButtonElement>('[data-clear]')!.disabled=saving||committed||!strokes.length;
-  for(const control of dialog.querySelectorAll<HTMLInputElement|HTMLButtonElement>('[data-colors] button,input,[data-eraser]'))control.disabled=saving||committed;
+  for(const control of dialog.querySelectorAll<HTMLInputElement|HTMLButtonElement>('[data-colors] button,input,select,[data-eraser]'))control.disabled=saving||committed;
  };
  const point=(e:PointerEvent)=>{
-  const r=canvas.getBoundingClientRect();
-  return {x:snapCoordinate(clamp((e.clientX-r.left)*cw/Math.max(1,r.width),0,cw)),
-    y:snapCoordinate(clamp((e.clientY-r.top)*ch/Math.max(1,r.height),0,ch))};
+  const {x,y}=pointerPoint(canvas,e,'position');
+  return {x:snapCoordinate(x),y:snapCoordinate(y)};
  };
  canvas.addEventListener('pointerdown',e=>{
   if(!canEdit()||e.button>0||active)return;keyboardCursor=false;
@@ -88,7 +88,7 @@ export async function drawOnTablet(owner:string,onSaved:(drawing:Drawing)=>Promi
   colorsPanel.append(b);
  }
  eraser.onclick=()=>{if(!canEdit())return;color='erase';eraser.setAttribute('aria-pressed','true');colorsPanel.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed','false'));};
- paperToggle.onchange=()=>{if(!canEdit())return;transparent=paperToggle.checked;dirty=true;draw();};
+ paperToggle.onchange=()=>{if(!canEdit())return;transparent=paperToggle.value==='transparent';dirty=true;draw();};
  dialog.querySelector<HTMLInputElement>('[data-size]')!.oninput=e=>{size=Number((e.target as HTMLInputElement).value)};
  dialog.querySelector<HTMLButtonElement>('[data-undo]')!.onclick=()=>{if(!canEdit())return;const stroke=strokes.pop();if(stroke){redo.push(stroke);dirty=true;}draw();};
  dialog.querySelector<HTMLButtonElement>('[data-redo]')!.onclick=()=>{if(!canEdit())return;const stroke=redo.pop();if(stroke){strokes.push(stroke);dirty=true;}draw();};

@@ -4,6 +4,8 @@ import {
   type CreationOrigin, type SceneActor, type SceneCondition, type SceneProgram,
 } from './model';
 
+import { motionPose } from '../drawing/animation-path';
+
 export type SceneStatus = 'idle' | 'running' | 'paused' | 'completed' | 'limit';
 export interface ActorSnapshot extends SceneActor {
   size: number; visible: boolean; rotation: number; jumpOffset: number; speech: string | null;
@@ -24,7 +26,7 @@ export interface SceneSnapshot {
 export interface SceneEngineOptions {
   maxInstructions?: number; maxEvents?: number; maxDurationMs?: number;
 }
-type TimedBlock = Extract<CreationBlock, {type: 'move' | 'wait' | 'say' | 'dance' | 'jump'}>;
+type TimedBlock = Extract<CreationBlock, {type: 'move' | 'animation' | 'wait' | 'say' | 'dance' | 'jump'}>;
 interface ActiveAction {
   block: TimedBlock; startedAt: number; duration: number;
   fromX: number; fromY: number; toX: number; toY: number;
@@ -232,8 +234,8 @@ export class SceneEngine {
       this.recordBlock('action', thread, block);
       const actor = this.actor(thread.program.actorId);
       switch (block.type) {
-        case 'move': case 'wait': case 'say': case 'dance': case 'jump': {
-          const duration = block.type === 'move' ? block.durationMs ?? 500 : block.durationMs;
+        case 'animation': case 'move': case 'wait': case 'say': case 'dance': case 'jump': {
+          const duration = block.type === 'animation' ? block.motion.durationMs : block.durationMs ?? 500;
           const toX = block.type === 'move' ? block.x ?? actor.x + (block.dx ?? 0) : actor.x;
           const toY = block.type === 'move' ? block.y ?? actor.y + (block.dy ?? 0) : actor.y;
           if (![toX,toY].every(value => Number.isFinite(value) && Math.abs(value) <= 1000000)) {
@@ -278,6 +280,19 @@ export class SceneEngine {
     const actor = this.actor(thread.program.actorId);
     const progress = action.duration === 0 ? 1 : Math.min(1, (this.timeMs - action.startedAt) / action.duration);
     switch (action.block.type) {
+      case 'animation': {
+        const start = motionPose(action.block.motion, 0);
+        const pose = motionPose(action.block.motion, progress);
+        actor.x = action.fromX + (pose.x - start.x) * this.definition.width;
+        actor.y = action.fromY + (pose.y - start.y) * this.definition.height;
+        if (Math.abs(actor.x) > 1000000 || Math.abs(actor.y) > 1000000) {
+          actor.x = action.fromX; actor.y = action.fromY;
+          this.stopAtLimit('A character moved beyond the supported range.');
+          return;
+        }
+        actor.rotation = pose.rotation;
+        break;
+      }
       case 'move':
         actor.x = action.fromX + (action.toX - action.fromX) * progress;
         actor.y = action.fromY + (action.toY - action.fromY) * progress; break;
@@ -295,7 +310,7 @@ export class SceneEngine {
   private clearEffects(thread: Thread): void {
     const actor = this.actor(thread.program.actorId);
     if (thread.active?.block.type === 'say') actor.speech = null;
-    if (thread.active?.block.type === 'dance') actor.rotation = 0;
+    if (thread.active?.block.type === 'dance' || thread.active?.block.type === 'animation') actor.rotation = 0;
     if (thread.active?.block.type === 'jump') actor.jumpOffset = 0;
   }
 

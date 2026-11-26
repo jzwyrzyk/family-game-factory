@@ -29,6 +29,26 @@ The image itself is never sufficient to prove an object's physical function. We 
 - Studio exposes My Drawings; the owner explicitly approves a saved car rig for Rally.
 - Tests: pure schema/physics checks and desktop/tablet end-to-end synthetic drawing journeys. Tests do not establish real child enjoyment, model recognition quality, or battery performance.
 
+## Whole-picture animation
+
+After drawing or importing a picture, choose **Make it move**. Tap Jump, Bounce, Spin, Dance, Left, Right, Float or Shake to play that movement immediately on the selected artwork. Each choice pairs a static movement cue with its label. Opening the editor, focusing a control or changing the pace while stopped keeps the drawing still, including when the device requests reduced motion. Path accepts a drawn stroke, individual taps or keyboard-operated spot buttons. A canceled stroke restores the previous path. Undo removes the most recent path change. Pace and World change the preview. Pause holds the current pose and Resume continues from it. **Bring its parts to life** opens the separate parts editor.
+
+**Save animation** adds an immutable movement version to that picture. The version records the selected movement, duration, illustrated world, original or cutout representation and up to 32 path points. A second save links back to the selected parent. The same version travels with an art-library export and a scene-and-art export. A scene can change its own world, timing and blocks independently. The archived original remains available to earlier scenes.
+
+The trusted scene engine and the animation editor sample the same position and rotation function. Whole-picture translation and rotation preserve the image proportions and alpha. Settings and path coordinates never rewrite the artwork. The editor opens the representation named in the shelf’s Movement version selector. Its preview uses an owner-checked, hash-verified local decode.
+
+Local Chromium checks cover synthetic artwork on phone and desktop viewports. They exercise preview, pause/resume, pointer cancellation, path undo, exact-version recovery, export and the original-byte hash. Physical-device and child acceptance remain separate. [Desktop capture](evidence/connected-animation-desktop.png) · [Phone capture](evidence/connected-animation-phone.png)
+
+## Moving individual parts
+
+**Bring its parts to life** starts with the selected drawing. For a new selected-parts rig, the original paper and alpha remain visible until the child prepares the picture or changes a mask. Each visible mark belongs to one moving layer. Later pieces are picked first where pieces overlap. Erasing a pixel from the wing mask makes that pixel available to the body beneath it. Older saved rigs retain their existing extraction behavior.
+
+During a parts test, wings, limbs and propellers use Planck motors. Wheels use suspension. Fixed parts follow their parent, and the child can pause and resume the simulation. A scene uses a single composite sprite in the saved pose. Whole-picture motion can move that sprite around the scene. For a selected articulated actor, **Scene settings → Try the saved parts** rechecks both hashes and opens live Drawing Lab physics. Reduced motion starts the preview paused. Back to scene restores focus without saving a revision or changing the actor’s script. [Butterfly test capture](../creative-universe/evidence/c-articulated-butterfly.png) · [Motion recording](../creative-universe/evidence/c-articulated-butterfly.webm)
+
+## Artwork authorship
+
+Jems preserves the child's hand, including asymmetry, unfinished outlines, unusual colors and imagined objects. Crop, turn, flip, scale and explicitly chosen paper removal can prepare a separate representation. Keep the original bytes and every referenced edition recoverable. Private images never go to a generative model for alteration, and a saved scene or game always resolves the edition its author selected. Professional environment art and an unaltered child drawing can share the same frame.
+
 ## Fidelity ladder: when a drawing is hard
 
 **A. Automatic inference where justified:** Detect high-contrast shapes, isolated parts, and simple geometry. Disclose confidence qualitatively and show every layer.

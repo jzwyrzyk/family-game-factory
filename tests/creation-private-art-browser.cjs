@@ -38,12 +38,38 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
    try{
     await page.goto('http://127.0.0.1:'+server.address().port+'/arcade/');await ready(page);await exploreWelcome(page);await pacing(page);
     await page.locator('#studioSavedIdeas').click();
-    const png=await page.evaluate(()=>{const canvas=document.createElement('canvas');canvas.width=180;canvas.height=160;const c=canvas.getContext('2d');c.fillStyle='#ffffff';c.fillRect(0,0,180,160);c.fillStyle='#8b3ed1';c.fillRect(35,32,110,100);c.fillStyle='#f5c43e';c.fillRect(55,52,20,18);c.fillRect(105,52,20,18);return canvas.toDataURL().split(',')[1];});
-    await page.setInputFiles('#drawingUpload',{name:'Fixture purple friend.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')});
+    const png=await page.evaluate(()=>{
+      const canvas=document.createElement('canvas');canvas.width=180;canvas.height=160;
+      const c=canvas.getContext('2d');c.strokeStyle='#49374e';c.lineWidth=4;c.lineJoin='round';c.lineCap='round';
+      for(const [outline,color] of [
+        ['M38 102 Q17 70 45 45 Q52 32 72 40 Q102 37 112 68 Q119 106 90 121 Q56 132 38 102Z','#b58ad2'],
+        ['M106 72 Q122 47 160 26 Q174 27 163 44 L141 72 Q157 61 159 67 Q152 90 110 96Z','#f3a4b8'],
+        ['M39 74 L14 82 L39 88Z','#f3ba5c']
+      ]){
+        const shape=new Path2D(outline);c.fillStyle=color;c.fill(shape);c.stroke(shape);
+      }
+      for(const line of ['M50 59 L49 66','M64 59 L63 66','M58 116 L54 132 L45 132','M82 120 L84 134 L96 135','M127 70 L151 48'])c.stroke(new Path2D(line));
+      return canvas.toDataURL().split(',')[1];
+    });
+    await page.setInputFiles('#drawingUpload',{name:'Plum bird.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')});
     await page.waitForFunction(()=>document.querySelectorAll('#drawingList article').length===1);
     const source=(await records(page,'drawings','player1'))[0];assert.ok(source.sha256);
     await page.locator('#drawingList article').first().getByRole('button',{name:/Bring to life/}).click();
     await page.locator('.drawing-lab [data-kind]').selectOption('character');
+    const lab=page.locator('.drawing-lab');
+    await lab.locator('.dl-advanced summary').click();
+    const region=async(x,y,w,h)=>{
+      for(const [key,value] of Object.entries({w,h,x,y})){
+        const input=lab.locator('[data-region="'+key+'"]');await input.fill(String(value));await input.press('Tab');
+      }
+    };
+    await region(6,20,54,67);
+    await page.locator('.drawing-lab [data-add]').click();
+    await page.locator('.dl-canvas').press('Enter');
+    await page.locator('.drawing-lab [data-piece-name]').fill('Pink wing');
+    await page.locator('.drawing-lab [data-piece-name]').press('Tab');
+    await page.locator('.drawing-lab [data-role]').selectOption('wing');
+    await region(60,14,36,47);
     await page.locator('.drawing-lab [data-save]').click();
     await page.waitForFunction(()=>document.querySelectorAll('.drawing-lab [data-history] option').length>1);
     const rig=(await records(page,'rigs','player1'))[0];assert.ok(rig);
@@ -74,6 +100,47 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     const second=await page.evaluate(()=>FG.creation.scene());
     assert.equal(second.actors[1].assetId,first.actors[0].assetId);assert.notEqual(second.id,firstId);
     await page.locator('[data-add-block="say"]').click();await page.locator('#creationKeep').click();
+    // The actor inspector opens the exact selected joints without replacing the scene.
+    const options=page.locator('#creationSceneOptions');
+    if(!await options.evaluate(el=>el.open))await options.locator(':scope > summary').click();
+    const sceneState=()=>page.evaluate(()=>({scene:FG.creation.scene(),saved:FG.creation.export(),
+      actor:document.querySelector('#creationActors [aria-pressed="true"]').dataset.actor,
+      script:document.getElementById('creationScript').value}));
+    const kept=await sceneState(),tryParts=page.locator('#creationTryParts');
+    const preview=page.getByRole('dialog',{name:'Try the saved parts'}),partField=preview.locator('.dl-canvas');
+    await tryParts.click();await preview.waitFor();
+    const play=preview.locator('[data-pause]');
+    assert.equal(await play.textContent(),'Play','reduced-motion preferences start the explicit preview paused');
+    await play.click();await page.waitForTimeout(120);await play.click();
+    const pausedFrame=await partField.evaluate(canvas=>canvas.toDataURL());
+    await page.waitForTimeout(120);assert.equal(await partField.evaluate(canvas=>canvas.toDataURL()),pausedFrame);
+    await play.click();await page.waitForFunction(old=>document.querySelector('.dl-rig-preview .dl-canvas').toDataURL()!==old,pausedFrame);
+    await preview.screenshot({path:'test-results/scene-saved-joints-'+device+'.png'});
+    if(device==='tablet'){
+      const video=await partField.evaluate(async canvas=>{
+        const stream=canvas.captureStream(24),recorder=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp8',videoBitsPerSecond:400000});
+        const chunks=[];recorder.ondataavailable=event=>chunks.push(event.data);
+        const stopped=new Promise(resolve=>recorder.onstop=resolve);recorder.start();
+        await new Promise(resolve=>setTimeout(resolve,1500));recorder.stop();await stopped;
+        stream.getTracks().forEach(track=>track.stop());
+        return new Promise(resolve=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result.split(',')[1]);reader.readAsDataURL(new Blob(chunks));});
+      });
+      fs.writeFileSync('test-results/scene-saved-joints.webm',Buffer.from(video,'base64'));
+    }
+    await preview.getByRole('button',{name:'Back to scene'}).click();await preview.waitFor({state:'detached'});
+    assert.deepEqual(await sceneState(),kept,'preview never edits scene revisions, cast selection, script or art');
+    await tryParts.click();await preview.waitFor();await preview.getByRole('button',{name:'Back to scene'}).click();
+    await preview.waitFor({state:'detached'});
+    const setRigNotes=notes=>page.evaluate(async ({id,notes})=>{
+      const db=await new Promise((resolve,reject)=>{const request=indexedDB.open('family-private-drawings-v1');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
+      try{await new Promise((resolve,reject)=>{const tx=db.transaction('rigs','readwrite');const store=tx.objectStore('rigs'),read=store.get(id);read.onsuccess=()=>store.put({...read.result,assembly:{...read.result.assembly,notes}});tx.oncomplete=resolve;tx.onabort=()=>reject(tx.error);});}
+      finally{db.close();}
+    },{id:rig.id,notes});
+    await setRigNotes('Synthetic mismatched revision');
+    await tryParts.click();await page.waitForFunction(()=>document.getElementById('creationStatus').textContent.includes('exact version'));
+    assert.equal(await preview.count(),0,'a cached sprite cannot authorize a modified rig');
+    await setRigNotes(rig.assembly.notes);assert.deepEqual(await sceneState(),kept);
+    if(await options.evaluate(el=>el.open))await options.locator(':scope > summary').click();
     const retained=await page.evaluate(id=>FG.creation.export().revisions.filter(revision=>revision.projectId===id),firstId);
     assert.equal(retained[0].scene.actors.length,1);assert.equal(retained[0].scene.actors[0].assetId,first.actors[0].assetId);
     if(!await page.locator('#creationMore').evaluate(element=>element.open))await page.locator('#creationMore summary').click();
@@ -130,7 +197,13 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     await page.locator('[data-scene="'+imported.id+'"]').click();await page.waitForFunction(()=>document.querySelectorAll('#creationActors canvas').length===1);
     assert.equal((await records(page,'drawings','player1'))[0].sha256,source.sha256);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
-    await profile(page,0);
+    await page.locator('#creationActors [data-actor]').nth(1).click();
+    const settings=page.locator('#creationSceneOptions');
+    if(!await settings.evaluate(el=>el.open))await settings.locator(':scope > summary').click();
+    await page.locator('#creationTryParts').click();await preview.waitFor();
+    // A host profile change can arrive from elsewhere while the modal is paused.
+    await page.evaluate(()=>{FG.store.choose('player1');window.dispatchEvent(new Event('factory-profile'));});
+    await preview.waitFor({state:'detached'});
     // A failed scene save must not reserve artwork for a nonexistent project.
     const beforeFailedSave=await page.evaluate(()=>FG.creation.export().projects.length);
     await page.evaluate(async selection=>{

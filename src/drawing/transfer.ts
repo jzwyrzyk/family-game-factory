@@ -2,6 +2,8 @@ import {assertRewardSourceLockHeld} from '../rewards/write-guard';
 /** Portable private art: validate all bytes and references before one additive transaction. */
 import { type Drawing, DRAWING_CATEGORIES, prepareDrawing } from '../assets/private-drawings';
 import { type SavedRig, type DrawingDraft } from './store';
+import {semanticWord,setSemanticWord} from './semantic-identity';
+import {originalOf} from './creative-assets';
 import { validateAssembly, type DrawingAssembly } from './model';
 import { ART_LIMITS, artOwner, artRequest, saveDrawingMetadata, assertArtWrite, checkArtCapacity, withArtTransaction, type ArtGuard } from './library';
 
@@ -58,7 +60,8 @@ function validateLinks(drawings: Drawing[], rigs: PortableRig[], drafts: Portabl
 async function validateAndPrepare(input: unknown, owner: string) {
   const bundle = parse(input), originals: Drawing[] = [], ids = new Set<string>();
   for (const item of bundle.drawings) {
-    if (!object(item, ['id', 'name', 'mime', 'sha256', 'createdAt', 'sourceId', 'sourceSha256', 'category', 'archived', 'updatedAt', 'data']) || !identifier(item.id) || ids.has(item.id) || typeof item.name !== 'string' || !item.name.trim() || item.name.length > 60 || !['image/png', 'image/jpeg'].includes(item.mime) || !hash(item.sha256) || !date(item.createdAt) || item.sourceId !== undefined && !identifier(item.sourceId) || item.sourceSha256 !== undefined && !hash(item.sourceSha256) || item.category !== undefined && !DRAWING_CATEGORIES.includes(item.category) || item.archived !== undefined && typeof item.archived !== 'boolean' || item.updatedAt !== undefined && !date(item.updatedAt)) fail();
+    if (!object(item, ['id', 'name', 'mime', 'sha256', 'createdAt', 'sourceId', 'sourceSha256', 'category', 'archived', 'updatedAt', 'data', 'semanticName', 'semanticIdentity']) || !identifier(item.id) || ids.has(item.id) || typeof item.name !== 'string' || !item.name.trim() || item.name.length > 60 || !['image/png', 'image/jpeg'].includes(item.mime) || !hash(item.sha256) || !date(item.createdAt) || item.sourceId !== undefined && !identifier(item.sourceId) || item.sourceSha256 !== undefined && !hash(item.sourceSha256) || item.category !== undefined && !DRAWING_CATEGORIES.includes(item.category) || item.archived !== undefined && typeof item.archived !== 'boolean' || item.updatedAt !== undefined && !date(item.updatedAt)) fail();
+    setSemanticWord(item, semanticWord(item));
     ids.add(item.id); const prepared = await prepareDrawing(owner, item.name, new Blob([decode(item.data)], { type: item.mime }));
     if (prepared.sha256 !== item.sha256) throw Error('An image in this backup does not match its saved fingerprint. Nothing was imported.');
     const { data: _data, ...metadata } = item; originals.push({ ...prepared, ...metadata });
@@ -101,7 +104,10 @@ export async function exportArtBundle(owner: string, selection?: { drawingIds?: 
     for (const item of snapshot.originals) if (selectedOriginals.has(item.id) && item.sourceId) selectedOriginals.add(item.sourceId);
     changed = before !== selectedRigs.size + selectedOriginals.size;
   }
-  const drawings = snapshot.originals.filter(item => selectedOriginals.has(item.id)).map(({ owner: _owner, bytes, preview: _preview, ...metadata }) => ({ ...metadata, data: encode(bytes) }));
+  const drawings = snapshot.originals.filter(item => selectedOriginals.has(item.id)).map(({ owner: _owner, bytes, preview: _preview, ...metadata }) => {
+    setSemanticWord(metadata, semanticWord(metadata));
+    return {...metadata, data: encode(bytes)};
+  });
   const rigs = snapshot.rigs.filter(item => selectedRigs.has(item.id)).map(({ owner: _owner, ...metadata }) => metadata);
   const drafts = snapshot.drafts.filter(item => selectedOriginals.has(item.sourceId)).map(({ owner: _owner, id: _id, ...metadata }) => metadata);
   const bundle: ArtBundle = { schema: 'jems.art-bundle.v1', exportedAt: new Date().toISOString(), drawings, rigs, ...(drafts.length ? { drafts } : {}) };
@@ -110,6 +116,14 @@ export async function exportArtBundle(owner: string, selection?: { drawingIds?: 
   return bundle;
 }
 
+// Recovery can add an old edition to an artwork whose child-chosen word
+// changed since the backup. Refresh only the new rows from the retained root.
+function inheritSemanticNames(additions: Drawing[], all: ReadonlyMap<string, Drawing>) {
+  for (const edition of additions) {
+    if (!edition.sourceId) continue;
+    setSemanticWord(edition, semanticWord(originalOf(edition, all)));
+  }
+}
 function sameValue(a: unknown, b: unknown): boolean {
   const canonical = (value: any): any => Array.isArray(value) ? value.map(canonical) : value && typeof value === 'object' ? Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical(value[key])])) : value;
   return JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
@@ -148,6 +162,7 @@ async function transferArt(owner: string, input: unknown, guard: ArtGuard | unde
     }
     // Restoring references must not replace a newer local recovery draft.
     for (const item of drafts) if (!draftMap.has(item.id)) newDrafts.push(item);
+    inheritSemanticNames(newDrawings, new Map([...existingDrawings, ...newDrawings].map(item => [item.id, item])));
     checkArtCapacity([...existingDrawings, ...newDrawings], [...existingRigs, ...newRigs]);
     if (new TextEncoder().encode(JSON.stringify([...existingDrafts, ...newDrafts])).byteLength > ART_LIMITS.designBytes) throw Error('There is not enough room for all the imported drafts. Nothing was imported.');
     assertArtWrite(owner, guard);
@@ -181,6 +196,7 @@ export async function restoreFamilyArtBundles(bundles:{owner:string;bundle:ArtBu
       for(const item of source.rigs){const rig={...item,owner:source.owner},prior=versions.get(rig.id);if(prior&&(prior.owner!==rig.owner||prior.parentId!==rig.parentId||!sameValue(prior.assembly,rig.assembly)))throw Error('A saved movement version conflicts with this recovery point.');if(!prior){versions.set(rig.id,rig);addVersions.push(rig);}}
       for(const item of source.drafts){const draft={...item,owner:source.owner,id:JSON.stringify([source.owner,item.sourceId])};if(!draftIds.has(draft.id)){draftIds.add(draft.id);addDrafts.push(draft);}}
     }
+    inheritSemanticNames(addImages, images);
     checkArtCapacity([...drawings,...addImages],[...rigs,...addVersions]);if(new TextEncoder().encode(JSON.stringify([...drafts,...addDrafts])).byteLength>ART_LIMITS.designBytes)throw Error('There is not enough room for the recovered artwork drafts.');
     assertRewardSourceLockHeld();assertAuthorized();for(const item of addImages){tx.objectStore('drawings').add(item);saveDrawingMetadata(tx,item);}for(const item of addVersions)tx.objectStore('rigs').add(item);for(const item of addDrafts)tx.objectStore('drafts').add(item);for(const source of prepared){if(source.activeRigId===null)tx.objectStore('active').delete(source.owner);else if(source.activeRigId!==undefined)tx.objectStore('active').put({owner:source.owner,id:source.activeRigId});}
   });

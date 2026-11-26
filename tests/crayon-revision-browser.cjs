@@ -50,7 +50,7 @@ async function main() {
     const pixel = (x, y) => canvas.evaluate((paper, [x, y]) =>
       Array.from(paper.getContext('2d').getImageData(x, y, 1, 1).data), [x, y]);
     const pick = (name) => dialog.getByRole('button', {name: 'Use ' + name + ' crayon'}).click();
-    await dialog.getByLabel('Clear background').check();
+    await dialog.getByLabel('Paper',{exact:true}).selectOption('transparent');
     await dialog.locator('[data-title]').fill('Pebble with boots');
     await pick('Lilac');
     await stroke([[260,330],[240,310],[260,260],[300,215],[345,195],[420,180],[480,200],[545,245],[570,290],[550,330],[495,350],[395,365],[330,353],[260,330]]);
@@ -74,7 +74,7 @@ async function main() {
     const [original] = await records(page);
     await page.reload();
     await page.getByRole('button', {name: /Pebble with boots/}).click();
-    await page.getByRole('button', {name:'Keep drawing', exact: true}).click();
+    await page.getByRole('button', {name:'Continue drawing', exact: true}).click();
     await dialog.waitFor();
     assert.equal(await picture(), originalRaster, 'kept strokes reproduce the saved raster');
     await dialog.locator('[data-undo]').click();
@@ -107,7 +107,7 @@ async function main() {
     await restored.waitForFunction(() => document.querySelector('#artStatus')?.textContent.includes('Original art versions restored'));
     assert.deepEqual(await records(restored), all);
     await restored.getByRole('button', {name: /Pebble with boots/}).click();
-    await restored.getByRole('button', {name: 'Keep drawing', exact: true}).click();
+    await restored.getByRole('button', {name: 'Continue drawing', exact: true}).click();
     const recovered = restored.locator('dialog.drawing-paint [data-paper]');
     assert.equal(await recovered.evaluate(paper => paper.toDataURL()), originalRaster);
     assert.equal(await restored.locator('dialog.drawing-paint').evaluate(node => node.scrollWidth <= node.clientWidth + 1), true);
@@ -128,7 +128,7 @@ async function main() {
     const mismatched = Buffer.concat([foreign.subarray(0, -12), sourceChunk, foreign.subarray(-12)]);
     await page.locator('#artUpload').setInputFiles({name:'Other picture.png',mimeType:'image/png',buffer:mismatched});
     await page.waitForFunction(() => document.querySelector('#artDetailTitle')?.textContent === 'Other picture');
-    await page.getByRole('button',{name:'Keep drawing',exact:true}).click();
+    await page.getByRole('button',{name:'Continue drawing',exact:true}).click();
     await page.waitForFunction(() => document.querySelector('#artStatus')?.textContent.includes('could not reopen exactly'));
     assert.equal(await dialog.count(), 0);
     assert.deepEqual(errors, []);

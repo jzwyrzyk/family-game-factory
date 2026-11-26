@@ -1,7 +1,7 @@
 import {activeRig,rigById} from './store';
-import {drawing,drawingBlob} from '../assets/private-drawings';
+import {drawing,drawingBlob,drawingHash} from '../assets/private-drawings';
 import {vehicleGeometry,vehicleParts,type DrawingAssembly,type VehicleDrawingGeometry,type VehicleDrawingParts,type Region} from './model';
-import {layerCanvas} from './segmentation';
+import {assemblyLayers} from './segmentation';
 
 /** Private, reviewed, reconstituted art/physics. Never reads another profile's source. */
 export interface CarArtwork {
@@ -15,9 +15,7 @@ export interface DrawnCar extends CarArtwork {rigId:string}
 
 /** Union the selected original pixels; overlapping translucent decorations never darken. */
 export function createCarArtwork(assembly:DrawingAssembly,source:HTMLCanvasElement,sourceAspect=source.width/source.height):CarArtwork {
- const geometry=vehicleGeometry(assembly,sourceAspect),pieces=vehicleParts(assembly),layers=new Map<string,HTMLCanvasElement>();
- for(const piece of [pieces.body,...pieces.wheels,...pieces.decorations])
-   layers.set(piece.id,layerCanvas(source,source.width,source.height,piece,assembly.pieces));
+ const geometry=vehicleGeometry(assembly,sourceAspect),pieces=vehicleParts(assembly),layers=assemblyLayers(source,assembly);
  const body=pieces.body;
  if(!pieces.decorations.length)return {geometry,sourceAspect,pieces,layers,chassis:{canvas:layers.get(body.id)!,region:body.region}};
  const fixed=[body,...pieces.decorations],W=source.width,H=source.height;
@@ -60,7 +58,7 @@ export async function loadDrawnCar(owner:string,rigId:string):Promise<DrawnCar>{
  if(!owner||!rigId)throw Error('Choose a saved car from this profile.');
  const saved=await rigById(owner,rigId);if(saved.assembly.kind!=='car')throw Error('This saved drawing is not a car.');
  const source=await drawing(owner,saved.assembly.sourceId);
- if(source.sha256!==saved.assembly.sourceSha256)throw Error('The original drawing changed. Your ride is safe.');
+ if(source.sha256!==saved.assembly.sourceSha256 || await drawingHash(source.bytes)!==source.sha256)throw Error('The original drawing changed. Your ride is safe.');
  const bitmap=await createImageBitmap(drawingBlob(source));
  try{
   const scale=Math.min(1,768/Math.max(bitmap.width,bitmap.height));
