@@ -86,7 +86,9 @@
     "docs/decisions/2026-11-23-dev-test-prod.md",
     "docs/ui-review/README.md",
     "docs/creative-universe/STANDARD.md",
-    "docs/decisions/2026-11-26-connected-creative-universe.md"
+    "docs/decisions/2026-11-26-connected-creative-universe.md",
+    "docs/creation-studio/WORLD_ART.md",
+    "docs/creation-studio/world-art-manifest.json"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -313,10 +315,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:37:55.191Z",
-      "sourceDigest": "9fc46a601c3012b0fd13afe7231ff32b111837e443a734f47bfa672e1a5056ce",
-      "reviewOutcome": "updated",
-      "reviewReason": "The first-creation contract records the per-idea Build gesture guard across async storage and review. Shared headings and navigation still use the guarded host routes.",
+      "reviewedAt": "2026-11-26T03:12:00.058Z",
+      "sourceDigest": "ba3d8d381cc13596fc5c1f4ea0f721398f46956285bff57bbb074bb55a7fe07c",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Four newly illustrated product environments have separate origin and version records. The accepted standard already covers child authorship and immutable uses.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -410,13 +412,16 @@
       "sources": [
         "src/creation/**",
         "server/agent/creation-schema.ts",
-        "tests/creation-*"
+        "tests/creation-*",
+        "public/art/creative-worlds/**",
+        "docs/creation-studio/world-art-manifest.json",
+        "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fee0252694b94e3f1254485510ef5c6da2cbd6ca19ac18af19c0ec8e8e26b54d",
-      "reviewedAt": "2026-11-25T23:20:54.040Z",
+      "sourceDigest": "a8bb53d3aa90d9c1e7af9d7752cc1ee6727276a145a0ab9a399c5f9a10909404",
+      "reviewedAt": "2026-11-26T03:12:02.230Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The scene rendering contract distinguishes legacy pinned tokens and neutral bytes from new active actor choices.",
+      "reviewReason": "Registered the four original environments and their layer, prop and preview files in the creative world artwork manifest.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -894,10 +899,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:23:11.824Z",
-      "sourceDigest": "5f7b1ef674e2b84dd647d329848d15cf1839bc2b621d5472752fe3445bcdc3d3",
+      "reviewedAt": "2026-11-26T03:12:02.488Z",
+      "sourceDigest": "83c23ae7f11c5e9a126b91d2cd247e3751ec0f01e85def1206f1090964231b99",
       "reviewOutcome": "updated",
-      "reviewReason": "Delivery state records the failed hosted Pal reload and the visible onboarding path. The exact same regression commands, assertions, rendering code and timeouts remain in force, with two new pre-navigation persistence assertions.",
+      "reviewReason": "Recorded the manifest checks for content identity, scale and mapped files in the delivery entry for this source candidate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1138,10 +1143,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T01:23:12.305Z",
-      "sourceDigest": "3a5ab9bfd335677e581d5e32600605a1c3cf253d9a45b9e0e271b77ea454684f",
+      "reviewedAt": "2026-11-26T03:12:03.342Z",
+      "sourceDigest": "d6691c0e7097678f19c4b2277e4782b32634074014cb41f4b11b9bc94c906b82",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the passing protected-main suite and the subsequent failed documentation-candidate Pal shard with its retained evidence and correction.",
+      "reviewReason": "Recorded the consulted protected baseline and current household embedded release independently of local art readiness.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1396,10 +1401,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:05:50.558Z",
-      "sourceDigest": "3519bd3b6a3b81b4fcd3a4628c1b50c54065abb8da7b3fca64a3097169ec380a",
-      "reviewOutcome": "updated",
-      "reviewReason": "Registered the shared standard and decision and updated the PR template and maintenance ownership.",
+      "reviewedAt": "2026-11-26T03:12:03.174Z",
+      "sourceDigest": "7a051079928b455c2ce3057ed43f727e5774c1c79cf8889bca2fd94e78dc13f0",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The current governance requires a single canonical creative standard. The catalogue and provenance now participate in existing creation documentation checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
