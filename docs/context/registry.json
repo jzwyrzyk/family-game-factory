@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T17:49:15.404Z",
-      "sourceDigest": "001d0cbdff085013be9b83c6f799bc873a2fe8d12508f61d3aec9b41a2a79110",
+      "reviewedAt": "2026-11-26T17:51:28.915Z",
+      "sourceDigest": "6b5a8aeeef9d3421df019284f845f74754f8a218c3fd10f0543c545b8b70daa0",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed exact recovery implementation and negative tests: two-resource/no-op-import allowlist, original and successor preservation, pinned ADC identity/inputs/plan, durable one-shot marker and post-apply lineage/no-drift checks. Updated provider requirements, missing-state approval blocker and actual broker COVERAGE_UNVERIFIED/scope-mismatch evidence; no activation claim.",
+      "reviewReason": "Reviewed pinned one-file nonproduction handoff against tested ea97198 and exact launcher checksum; read-only default and separate exact-plan approval, with missing-state and broker-coverage blockers stated. No runtime or infrastructure scope added.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
