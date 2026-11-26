@@ -1,17 +1,19 @@
+import {activeArtView} from '../assets/art-lineage';
+import {usesOriginalSprite} from '../drawing/motion';
 /** Trusted local-art adapter. Private pixels never become a URL or a model input. */
-import { drawing, drawingPage, drawingBlob } from '../assets/private-drawings';
-import { rigById, listRigs } from '../drawing/store';
-import { validateAssembly, type DrawingAssembly } from '../drawing/model';
-import { layerCanvas } from '../drawing/segmentation';
+import { drawing, drawingBlob, drawingHash } from '../assets/private-drawings';
+import { rigById } from '../drawing/store';
+import { assemblyHash } from '../assets/creative-library';
+export { assemblyHash, listCreativeAssetChoices as listArtChoices } from '../assets/creative-library';
+import { assemblyLayers } from '../drawing/segmentation';
 import { parsePrivateArtId, privateArtId, validateEditableProject } from './projects';
-import type { CreationProject } from './model';
+import { sceneAssetSlots, type CreationProject } from './model';
 import {exportArtBundle,validateArtBundle,importArtBundle,type ArtBundle} from '../drawing/transfer';
 
 export interface ArtSelection {drawingId:string;rigId?:string}
 export interface ArtChoice extends ArtSelection {assetId:string;label:string;detail:string}
-export interface ResolvedPrivateArt extends ArtChoice {image:HTMLCanvasElement}
+export interface ResolvedPrivateArt extends ArtChoice {image:HTMLCanvasElement;articulated:boolean;motion?:import('../drawing/motion').DrawingMotion}
 const stale=()=>Error('The player or page changed. Reopen your artwork in your own profile.');
-const hex=(bytes:ArrayBuffer)=>Array.from(new Uint8Array(bytes),byte=>byte.toString(16).padStart(2,'0')).join('');
 /** Union cutout masks without repeatedly blending the original's translucent
  * pixels. RGB always comes from the original; alpha cannot exceed its alpha. */
 export function unionOriginalArtPixels(original:Uint8ClampedArray,mask:Uint8ClampedArray,accumulated?:Uint8ClampedArray):Uint8ClampedArray {
@@ -23,10 +25,8 @@ export function unionOriginalArtPixels(original:Uint8ClampedArray,mask:Uint8Clam
   }
   return result;
 }
-export async function assemblyHash(input:DrawingAssembly):Promise<string> {
-  return hex(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(validateAssembly(input)))));
-}
 export async function artChoice(owner:string,selection:ArtSelection,current:()=>boolean=()=>true):Promise<ArtChoice> {
+  current = activeArtView(owner,current);
   if(!current())throw stale();
   const source=await drawing(owner,selection.drawingId);
   if(!current())throw stale();
@@ -36,24 +36,12 @@ export async function artChoice(owner:string,selection:ArtSelection,current:()=>
     if(rig.assembly.sourceId!==source.id||rig.assembly.sourceSha256!==source.sha256)throw Error('This design no longer matches its original drawing.');
     const sha256=await assemblyHash(rig.assembly);
     if(!current())throw stale();
-    return {drawingId:source.id,rigId:rig.id,assetId:privateArtId({kind:'rig',id:rig.id,sha256}),label:source.name,detail:'Saved cutout design'};
+    return {drawingId:source.id,rigId:rig.id,assetId:privateArtId({kind:'rig',id:rig.id,sha256}),label:source.name,detail:rig.assembly.motion?'Animation path':'Saved cutout design'};
   }
   return {drawingId:source.id,assetId:privateArtId({kind:'image',id:source.id,sha256:source.sha256}),label:source.name,detail:'Original artwork'};
 }
-export async function listArtChoices(owner:string,current:()=>boolean=()=>true):Promise<ArtChoice[]> {
-  const [sources,rigs]=await Promise.all([drawingPage(owner,{limit:100,archived:false}),listRigs(owner)]);
-  if(!current())throw stale();
-  const choices:ArtChoice[]=[];
-  for(const source of sources.items){
-    choices.push({drawingId:source.id,assetId:privateArtId({kind:'image',id:source.id,sha256:source.sha256}),label:source.name,detail:'Original artwork'});
-    const latest=rigs.find(rig=>rig.assembly.sourceId===source.id&&rig.assembly.sourceSha256===source.sha256);
-    if(latest)choices.push({drawingId:source.id,rigId:latest.id,assetId:privateArtId({kind:'rig',id:latest.id,sha256:await assemblyHash(latest.assembly)}),label:source.name,detail:'Latest saved cutout design'});
-    if(!current())throw stale();
-  }
-  return choices;
-}
 export function privateArtReferences(project:CreationProject):string[] {
-  return [...new Set(project.actors.map(actor=>actor.assetId).filter(id=>parsePrivateArtId(id)))];
+  return [...new Set(sceneAssetSlots(project).map(slot=>slot.assetId).filter(id=>parsePrivateArtId(id)))];
 }
 export interface SceneArtBundle {schema:'jems.scene-art.v1';scene:CreationProject;art:ArtBundle}
 /** A download includes immutable originals and the exact cutout versions used. */
@@ -97,19 +85,25 @@ export async function importSceneArt(owner:string,input:unknown,current:()=>bool
   }
   if(!current())throw stale();
   const scene=bundle.scene;
-  for(const actor of scene.actors)actor.assetId=references.get(actor.assetId)||actor.assetId;
-  if(scene.provenance?.sourceKind==='art'){
-    const source=scene.provenance;
-    if(source.sourceProjectId)source.sourceProjectId=imported.drawingIds[source.sourceProjectId]||source.sourceProjectId;
-    if(source.sourceRevisionId)source.sourceRevisionId=imported.rigIds[source.sourceRevisionId]||source.sourceRevisionId;
-  }
+  for(const slot of sceneAssetSlots(scene))slot.assetId=references.get(slot.assetId)||slot.assetId;
+  remapArtOrigin(scene, id=>imported.drawingIds[id], id=>imported.rigIds[id]);
   return validateEditableProject(scene);
+}
+
+/** Imported assets receive new owner-local IDs. Original picture revisions
+ * use their immutable content hash, which remains valid across a transfer. */
+export function remapArtOrigin(scene:CreationProject, picture:(id:string)=>string|undefined, rig:(id:string)=>string|undefined) {
+  const origin=scene.provenance;
+  if(origin?.sourceKind!=='art')return;
+  if(origin.sourceProjectId)origin.sourceProjectId=picture(origin.sourceProjectId)??origin.sourceProjectId;
+  if(origin.sourceRevisionId)origin.sourceRevisionId=rig(origin.sourceRevisionId)??origin.sourceRevisionId;
 }
 
 /** Decoding is bounded and checked again after each asynchronous operation.
  * A rig is composited in its saved pose; the scene's blocks move the resulting
  * actor. Independent joints remain in the Drawing Lab and physical games. */
-export async function resolvePrivateArt(owner:string,assetId:string,current:()=>boolean=()=>true):Promise<ResolvedPrivateArt> {
+export async function loadPinnedArtSource(owner:string,assetId:string,current:()=>boolean) {
+  current = activeArtView(owner,current);
   const ref=parsePrivateArtId(assetId);
   if(!ref||!owner)throw Error('Choose available artwork from your own Art Studio.');
   if(!current())throw stale();
@@ -120,30 +114,43 @@ export async function resolvePrivateArt(owner:string,assetId:string,current:()=>
   const source=await drawing(owner,rig?rig.assembly.sourceId:ref.id);
   if(!current())throw stale();
   const expected=rig?rig.assembly.sourceSha256:ref.sha256;
-  if(source.sha256!==expected||hex(await crypto.subtle.digest('SHA-256',source.bytes))!==expected)throw Error('The original drawing does not match this saved version.');
+  if(source.sha256!==expected||await drawingHash(source.bytes)!==expected)throw Error('The original drawing does not match this saved version.');
+  if(!current())throw stale();
+  return {rig,source};
+}
+
+/** Decoding is bounded and checked again after each asynchronous operation.
+ * A rig is composited in its saved pose; the scene's blocks move the resulting
+ * actor. Independent joints remain in the Drawing Lab and physical games. */
+export async function resolvePrivateArt(owner:string,assetId:string,current:()=>boolean=()=>true,limit:512|1600=512):Promise<ResolvedPrivateArt> {
+  current = activeArtView(owner,current);
+  const {source,rig} = await loadPinnedArtSource(owner,assetId,current);
   if(!current())throw stale();
   const bitmap=await createImageBitmap(drawingBlob(source));
   try{
     if(!current())throw stale();
     if(bitmap.width<1||bitmap.height<1||bitmap.width>4096||bitmap.height>4096)throw Error('This drawing has unsupported dimensions.');
-    const scale=Math.min(1,512/Math.max(bitmap.width,bitmap.height));
+    const scale=Math.min(1,limit/Math.max(bitmap.width,bitmap.height));
     const original=document.createElement('canvas');original.width=Math.max(1,Math.round(bitmap.width*scale));original.height=Math.max(1,Math.round(bitmap.height*scale));
     original.getContext('2d')!.drawImage(bitmap,0,0,original.width,original.height);
     let image=original;
-    if(rig){
+    if(rig && !usesOriginalSprite(rig.assembly.motion)){
       image=document.createElement('canvas');image.width=original.width;image.height=original.height;
       const context=image.getContext('2d')!,sourcePixels=original.getContext('2d')!.getImageData(0,0,original.width,original.height);
       const mask=document.createElement('canvas');mask.width=original.width;mask.height=original.height;
       const maskContext=mask.getContext('2d',{willReadFrequently:true})!;let pixels:Uint8ClampedArray|undefined;
+      const layers = assemblyLayers(original, rig.assembly);
       for(const piece of rig.assembly.pieces){
-        const region=piece.region,layer=layerCanvas(original,original.width,original.height,piece,rig.assembly.pieces);
+        const region=piece.region,layer=layers.get(piece.id)!;
         maskContext.clearRect(0,0,mask.width,mask.height);
         maskContext.drawImage(layer,region.x*image.width,region.y*image.height,region.w*image.width,region.h*image.height);
         pixels=unionOriginalArtPixels(sourcePixels.data,maskContext.getImageData(0,0,mask.width,mask.height).data,pixels);
       }
       const output=context.createImageData(image.width,image.height);if(pixels)output.data.set(pixels);context.putImageData(output,0,0);
     }
-    return {assetId,drawingId:source.id,...(rig?{rigId:rig.id}:{}),label:source.name,detail:rig?'Saved cutout design':'Original artwork',image};
+    const articulated=!!rig && !usesOriginalSprite(rig.assembly.motion) && rig.assembly.pieces.some(
+      piece=>piece.physical && piece.parentId!==null && ['wheel','wing','limb','propeller'].includes(piece.role));
+    return {assetId,drawingId:source.id,articulated,...(rig?{rigId:rig.id,motion:rig.assembly.motion}:{}),label:source.name,detail:rig?.assembly.motion?'Animation path':rig?'Saved cutout design':'Original artwork',image};
   }finally{bitmap.close();}
 }
 
@@ -153,7 +160,8 @@ export class PrivateArtResolver {
   private epoch=0;
   private cache=new Map<string,ResolvedPrivateArt>();
   private pending=new Map<string,Promise<ResolvedPrivateArt>>();
-  constructor(private currentOwner:()=>string){}
+  constructor(private currentOwner:()=>string, private limit:512|1600=512){}
+  backdropResolver(){return new PrivateArtResolver(this.currentOwner,1600);}
   private sync(){if(this.owner!==this.currentOwner()){this.clear();this.owner=this.currentOwner();}}
   clear(){this.epoch++;this.cache.clear();this.pending.clear();this.owner='';}
   get(id:string){this.sync();return this.cache.get(id);}
@@ -162,9 +170,9 @@ export class PrivateArtResolver {
     const loaded=this.cache.get(id);if(loaded)return Promise.resolve(loaded);
     const existing=this.pending.get(id);if(existing)return existing;
     const owner=this.owner,epoch=this.epoch,current=()=>epoch===this.epoch&&owner===this.currentOwner();
-    const pending=resolvePrivateArt(owner,id,current).then(result=>{
+    const pending=resolvePrivateArt(owner,id,current,this.limit).then(result=>{
       if(!current())throw stale();
-      if(this.cache.size>=32)this.cache.delete(this.cache.keys().next().value!);
+      if(this.cache.size>=(this.limit===1600 ? 1 : 32))this.cache.delete(this.cache.keys().next().value!);
       this.cache.set(id,result);return result;
     }).finally(()=>{if(current())this.pending.delete(id);});
     this.pending.set(id,pending);return pending;

@@ -58,6 +58,9 @@ jobs:
         id: browsers
         if: steps.beta.outputs.selected == 'true'
         run: npx playwright install --with-deps chromium webkit
+      - name: Exact original bytes in the reviewed workshop import
+        if: steps.beta.outputs.selected == 'true'
+        run: node tests/beta-reviewed-art-browser.cjs
       - name: Chromium and WebKit private entry and responsive acceptance
         if: steps.beta.outputs.selected == 'true'
         run: node --import tsx tests/beta-browser.ts

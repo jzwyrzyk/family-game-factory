@@ -5,6 +5,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {once}=require('node:events');
 const {start}=require('./browser-server.cjs');
+const {assertTextContrast}=require('./helpers/text-contrast.cjs');
 
 (async()=>{
   const server=start();
@@ -420,6 +421,7 @@ const {start}=require('./browser-server.cjs');
         await page.waitForFunction(()=>FG.learning.active);
         assert.equal(await page.locator('#creationReadingTools').isVisible(),false,'scene narration stays behind the active learning activity');
         assert.equal(await page.locator('#creationLearning [data-action="read-aloud"]').isVisible(),true,'the learning activity has its own visible read control');
+        await assertTextContrast(page,'#creationLearning .math-activity h2','Scene checkpoint question');
         const guarded=await page.evaluate(()=>({id:FG.learning.activeAttemptId,time:FG.creation.snapshot().timeMs}));
         assert.ok(guarded.id);
         assert.equal(await page.locator('#creationLearning').evaluate(dialog=>dialog.matches(':modal')),true,'the whole editor stays behind the learning dialog');

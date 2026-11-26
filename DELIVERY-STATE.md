@@ -30,6 +30,19 @@ A synthetic Chromium 156 measurement at 1024×768 created a fresh subject activi
 
 Release acceptance remains open for real-device touch and audio, literacy-specialist review of new authored examples, owner visual/interactive acceptance and exact-source hosted TEST. The ordinary early-grade selection gate, external household participation hold and existing paid-service controls still apply. No workspace production deployment or live household verification is recorded.
 
+## November 26 · Connected drawing workspace candidate
+
+[Draft #213](https://github.com/jzwyrzyk/family-game-factory/pull/213) integrates My Art, the scene picker, illustrated worlds and child-authored motion. Application source `e9b4332432e90359deb9cd4f5f7d030a7a2a3f35`. The generated-game adapter is independently reviewable in [#206](https://github.com/jzwyrzyk/family-game-factory/pull/206). The [workstream receipt](docs/creative-universe/DRAWING_WORKSPACE_ACCEPTANCE.md) identifies source heads, synthetic local checks, screenshots, overlapping work and the separate hosted and release gates. This candidate has no production or family activation.
+
+
+## November 26, 2026 — connected creative universe development
+
+The standard and exact-byte reviewed-family PNG admission are source candidates based on protected main `bc602f1ede502f398308ad56f973c4bf7997ff08`. GitHub recorded a successful household production deployment for that base at 01:37 UTC on November 26. This baseline receipt precedes the creative work. No candidate deployment or external family activation has been observed. The open learning stack #192–195 is a parallel integration. Its scratchpad and supported interaction contracts remain separate from permanent artwork. [Creative standard](docs/creative-universe/STANDARD.md) · [Baseline deployment](https://api.github.com/repos/jzwyrzyk/family-game-factory/deployments/8074075203/statuses)
+
+## November 26, 2026 — Workstream E local source review
+
+Application base `bc602f1ede502f398308ad56f973c4bf7997ff08` and private worker main `dddf53dbc76796be19782c1bb5bbb99b86e99909` were refreshed from GitHub. Household Pages reported `aa56b60abe152e750f9f0b5e8949bdb44be53196`. The feature is stacked on #213 at `e1b08cc4e7f9c6c0642332bceef754041f9c2b38`, adopting its D catalog, canonical standard and #206 renderer. #202 and #212 provide separate playback studies. New source adds local picture selection, pinned review tests and synthetic playable fixtures. Worker #22, sandbox #169 and learning #192–195 retain their separate review scopes. Hosted private-art generation, independent security review, deployment and external family activation remain pending. [Workstream E evidence](docs/game-art/README.md)
+
 ## Current source and next integration
 
 The frozen application candidate is `bc602f1ede502f398308ad56f973c4bf7997ff08`. Its protected-main full regression passed on attempt one with 122 commands. The earlier accepted offline UI candidate is `d5c2cfaff8e3941667fdc6d4d5426c341ab009ad`. Engineering changes after the freeze have a separate source identity. Resolve current engineering main with `git ls-remote origin refs/heads/main`. [Freeze PR](https://github.com/jzwyrzyk/family-game-factory/pull/182) · [Frozen full run](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45736843451)

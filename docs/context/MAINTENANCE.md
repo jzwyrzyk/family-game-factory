@@ -24,6 +24,8 @@ The [DEV → TEST → PROD contract](../development/DEV-TEST-PROD.md) governs pr
 
 After setup, two-preview acceptance, complete TEST acceptance, production promotion or recovery, record the actual observation and remaining definition-of-done gaps. Do not mark the method complete merely because source or infrastructure exists.
 
+Creative asset PRs identify the workstream responsible for the shared interface, affected consumers, and the exact base of each dependent PR. Review reference remapping, archive behavior and parent backups when adding a new destination. The [Creative Asset & World Design Standard](../creative-universe/STANDARD.md) defines the shared contract.
+
 ## 2. Use the review registry
 
 The problem-solving feature has a dedicated review area for its evidence schema, deterministic practice, reports and tests. Its standards/claim contract is linked from product and experience reviews, while source hooks remain in their existing subject, Creation and Studio areas.

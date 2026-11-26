@@ -8,6 +8,10 @@ These records explain durable choices without turning chat history into another 
 
 - [Unified learning workspace](2026-11-26-unified-learning-workspace.md) — shared Math and English presentation with host-owned attempts and curriculum-specific interactions.
 
+- [November 26 — authentic artwork, reusable creative assets and illustrated 2D worlds](2026-11-26-connected-creative-universe.md)
+
+- [Preserve original child artwork in generated games](2026-11-26-private-game-art.md)
+
 - [Journey cards, starter eligibility and permanent retirements](2026-11-25-journey-cards-and-starter-pals.md)
 
 - [November 25: one child-facing Jems world](2026-11-25-child-experience-modernization.md) — owner-approved navigation, landing-page reference, purpose-driven scenes and unified Send/Build concept. Supersedes earlier menu and retained-game placement only.

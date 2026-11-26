@@ -14,7 +14,7 @@ concurrency:
 jobs:
   offline-review:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 22
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,8 +34,15 @@ jobs:
         run: echo "UI_REVIEW_BASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - run: npm run review:build
         env:
+          UI_REVIEW_SOURCE_KIND: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'merged main' || 'candidate branch' }}
           UI_REVIEW_EXACT_ASSETS: '1'
-          UI_REVIEW_SOURCE_KIND: ${{ github.event_name == 'pull_request' && 'candidate branch' || github.ref == 'refs/heads/main' && 'merged main' || 'candidate branch' }}
+      - name: Build focused My Art download
+        run: node tools/ui-review/build.mjs --drawing
+        env:
+          UI_REVIEW_SOURCE_KIND: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'merged main' || 'candidate branch' }}
+          UI_REVIEW_EXACT_ASSETS: '1'
+      - name: Compare every bundled public resource with the checked out source
+        run: python tools/ui-review/verify-exact-assets.py . dist-review/exact-source-artifact.json
       - name: Upload the standalone download
         id: download
         uses: actions/upload-artifact@v4
@@ -61,6 +68,14 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
       - run: npx playwright install --with-deps chromium
       - run: npm run review:test
+      - name: Check retained picker, legacy worlds, landscape pixels and recorded output
+        run: |
+          node tools/ui-review/creative-picker.cjs
+          node tools/ui-review/notebook-game.cjs
+          node tools/ui-review/world-compatibility.cjs
+          node tools/ui-review/connected-learning.cjs
+      - name: Open the drawing download, save, reload and keep a new version
+        run: node tools/ui-review/drawing-smoke.cjs
       - name: Capture complete candidate journeys
         run: npm run build && npm run test:child-modernization && npm run test:pals-fidelity && node tests/pals-fidelity-browser.cjs --offline
       - uses: actions/upload-artifact@v4

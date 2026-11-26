@@ -1,0 +1,16 @@
+# Learning and creative rehearsal
+
+This review joins the independently qualified Learning and Connected Creative Universe branches. Its Learning parent is 7d5979378a050ee3d80519c82929e69dbc58be7e and its Creative parent is 7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0. Both include the engineering baseline from #219. The existing frozen cloud release retains its own source and validation receipts. [Learning review](https://github.com/jzwyrzyk/family-game-factory/pull/218) · [Creative review](https://github.com/jzwyrzyk/family-game-factory/pull/220)
+
+Creative Studio owns its cast, game rules, immutable world, placement transforms, artwork references and current playback. A host learning interruption opens the shared learning dialog and captures the existing project and revision. The appropriate subject engine owns its question, assistance, answer and evidence. Returning closes the dialog and resumes the same scene. Drawing and scratch paper use the same intrinsic-coordinate conversion. Scratch marks belong to the current activity. My Art keeps only explicitly saved work.
+
+## Owner journeys
+
+1. Open the full standalone HTML. Choose **My World · kept forest scene** or the kept-world copy in **Destination**. Run the scene and complete a learning interruption through its own controls. Check that the personal artwork, placements and code still belong to the same scene.
+2. Choose **My Rock · original drawing**. Keep drawing, save a new revision and compare it with the earlier one. Open the local picture hunt or notebook flight to inspect the selected version and role.
+3. Open the animation and parts entries for My Dragon. Compare whole-picture motion with a movable part and then open the kept forest world.
+4. Inspect the four illustrated destinations, individual props and world editor. The source pictures, transparent regions, world layers and previews are embedded in the full file.
+5. Choose a learning sample to try a Math model or an English construction. The selected grade, assistance and authored response contract determine how the evidence is recorded. The review toolbar contains 36 learning samples and 11 fixture scenarios.
+6. Choose the mixed-grade family to switch between the two learners. Check My Art and the parent report for the active child. Use the application's recovery tools to download a synthetic backup and restore it in a fresh review target.
+
+The full review's **Standalone UI review** workflow checks the source of every public embedded asset and uploads the download and a separate evidence archive. Its joined scene test runs an English and a Math interruption, exercises scratch paper, and checks that the private artwork IDs and hashes survive the return. Local notebook flight uses only the four authorized synthetic fixture PNGs and the two reviewed programs. The release gate for general remote private-art delivery remains disabled. Real authentication, physical-device acceptance, live provider calls and household migration require their respective independent qualifications. [Learning contract](../learning/LEARNING_WORKSPACE_STANDARD.md) · [Creative compatibility](CONSOLIDATION.md) · [Offline review](../ui-review/README.md)

@@ -1,0 +1,37 @@
+.motion-path {
+  width: min(55rem, calc(100% - 1.5rem));
+  max-height: 94dvh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: clamp(.85rem, 3vw, 1.6rem);
+  border: 2px solid #d4c5e6;
+  border-radius: 22px;
+  background: #fffaf5;
+  color: #342b45;
+  font-size: var(--jems-child-body, 20px);
+}
+.motion-path::backdrop { background: #19132ab8; }
+.motion-path header, .motion-path-controls, .motion-path-controls label {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+}
+.motion-path header { justify-content: space-between; }
+.motion-path h2, .motion-path p { color: #342b45; margin: 0; }
+.motion-path h2 { font-size: clamp(24px, 4vw, 38px); }
+.motion-path p { margin-block: .6rem; }
+.motion-path canvas {
+  background: #cbe5ee url('/art/mind-your-jems/scene-sky.webp') center / cover;
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  touch-action: none;
+  cursor: crosshair;
+}
+.motion-path canvas:focus-visible { outline: 3px solid #684592; outline-offset: 2px; }
+.motion-path-controls { margin-top: .85rem; }
+.motion-path-controls select { background: #fff; color: #342b45; font: inherit; min-height: 48px; border-radius: 8px; }
+.motion-path .art-button { min-height: 48px; font-size: 18px; }
+.motion-path .motion-path-keys { color: #53475f; font-size: 18px; }

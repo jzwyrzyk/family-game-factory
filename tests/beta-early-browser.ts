@@ -1,3 +1,4 @@
+import {exploreWelcome} from './studio-entry.cjs';
 import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
 import {createServer,type ServerOptions} from 'node:https';
@@ -174,12 +175,11 @@ export async function earlyBetaBrowser(tls:ServerOptions,engine:'chromium'|'webk
    releaseConfig();pendingConfig=undefined;
    await page.locator('#builderConnection').waitFor();
    assert.equal(await page.locator('#parentGuidanceStart').count(),1,'Completing remote setup must not duplicate or replace guidance.');
-   await page.locator('#homeBtn').click();await page.locator('#studioNew').click();await page.locator('#studioPrompt').waitFor({state:'visible'});
+   await page.locator('#homeBtn').click();await exploreWelcome(page);await page.locator('#studioNew').click();await page.locator('#studioPrompt').waitFor({state:'visible'});
    assert.equal(await page.locator('#earlyCreationHandoff[open]').count(),0);assert.equal(await page.locator('#guidedCreationTogether').isVisible(),true);
    await page.screenshot({path:'test-results/family-beta/'+engine+'-beta-parent-guided-creation.png',fullPage:true});
    await page.evaluate(profileId=>{const FG=(window as any).FG;FG.store.choose(profileId);window.dispatchEvent(new Event('factory-profile'));},profiles[1]);
-   await page.waitForFunction(()=>document.getElementById('page-studio-library')?.getAttribute('aria-busy')==='false');
-   if(await page.locator('#studioWelcome').isVisible()){await page.locator('[data-welcome-character="spark"]').click();await page.waitForFunction(()=>(document.getElementById('studioWelcomeMake') as HTMLButtonElement)?.disabled===false);await page.locator('#homeBtn').click();}
+   await exploreWelcome(page);
    await page.locator('#studioNew').click();await page.locator('#earlyCreationHandoff[open]').waitFor();await page.locator('#earlyCreationHandoff').getByRole('button',{name:'Play games'}).click();
    assert.equal((await d.repository(family.id).snapshot()).jobs.length,0,'Opening supervised tools does not start a paid build.');
    await d.withFamily(family.id,async(tx,f)=>{f.guardian.participationVersion='old-participation';f.guardian.noticeVersion='old-privacy';tx.set(d.path(f.id),f);});

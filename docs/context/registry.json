@@ -89,7 +89,14 @@
     "docs/history/2026-11-26/ARCHITECTURE-CURRENT.md",
     "docs/history/2026-11-26/DELIVERY-STATE.md",
     "docs/learning/LEARNING_WORKSPACE_STANDARD.md",
-    "docs/decisions/2026-11-26-unified-learning-workspace.md"
+    "docs/decisions/2026-11-26-unified-learning-workspace.md",
+    "docs/creative-universe/STANDARD.md",
+    "docs/decisions/2026-11-26-connected-creative-universe.md",
+    "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md",
+    "docs/creative-universe/DRAWING_WORKSPACE_ACCEPTANCE.md",
+    "docs/game-art/README.md",
+    "docs/game-art/evidence/README.md",
+    "docs/decisions/2026-11-26-private-game-art.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -134,7 +141,8 @@
     "docs/history/2026-11-26/*.md",
     "docs/evidence/DEVELOPMENT-VELOCITY.md",
     "docs/learning/*.md",
-    "docs/evidence/learning-workspace/*.md"
+    "docs/evidence/learning-workspace/*.md",
+    "docs/creative-universe/*.md"
   ],
   "areas": [
     {
@@ -142,7 +150,8 @@
       "documents": [
         "PRODUCT-DOCTRINE.md",
         "docs/decisions/*.md",
-        "docs/pals/art/README.md"
+        "docs/pals/art/README.md",
+        "docs/creative-universe/STANDARD.md"
       ],
       "sources": [
         "docs/design-coach/GOLD_STANDARD.md",
@@ -152,13 +161,14 @@
         "docs/rewards/*.md",
         "docs/problem-solving/*.md",
         "docs/pals/*.md",
-        "docs/drawings/*.md"
+        "docs/drawings/*.md",
+        "docs/creative-universe/STANDARD.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:30:14.023Z",
-      "sourceDigest": "716e4828f229a34d4fbf5148fae3070a545977ceadd777f3366280ea5bf71f03",
+      "reviewedAt": "2026-11-26T07:32:33.541Z",
+      "sourceDigest": "a5e26723144b0c44400ea8ec5bf4a6eea13f76a5a5d60f073122ca64a55b2d43",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the current doctrine and links to preserved Phase 2 historical records without changing learning ownership or release source.",
+      "reviewReason": "Joined the approved learning evidence rules and persistent creative ownership in the rehearsal contract.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -319,10 +329,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:19:03.495Z",
-      "sourceDigest": "7404c3e1f120de98c7dfdba62bcd0e2c91265fb8be217897b6c02c473b880006",
+      "reviewedAt": "2026-11-26T07:32:33.960Z",
+      "sourceDigest": "8cfa0f3fd2b6b4ef2c0587afd490699c1aaa45e63f2dc829208bea5bde86eb91",
       "reviewOutcome": "updated",
-      "reviewReason": "My Powers resets before focusing and leaves contextual English reading content alongside the question.",
+      "reviewReason": "Reviewed the single full-screen learning dialog, personal world return, responsive drawing and stage controls and the joined owner journeys.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -411,18 +421,22 @@
         "docs/creation-studio/*.md",
         "docs/decisions/0007-creation-and-rebuild-practice.md",
         "docs/rewards/*.md",
-        "docs/pals/*.md"
+        "docs/pals/*.md",
+        "docs/creative-universe/STANDARD.md",
+        "docs/decisions/2026-11-26-connected-creative-universe.md"
       ],
       "sources": [
         "src/creation/**",
         "server/agent/creation-schema.ts",
-        "tests/creation-*"
+        "tests/creation-*",
+        "public/art/creative-worlds/**",
+        "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "308e1dfdead1043d2e7a7ccfad1a278b664ccaab58f35a80f984cd641f8020c8",
-      "reviewedAt": "2026-11-26T01:57:54.336Z",
+      "sourceDigest": "2980e4e9c369a03bf76bf6719d6caadb8a9de15d44dcca859663fbe04babd3cd",
+      "reviewedAt": "2026-11-26T07:32:34.816Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The fitted editor now opens learning over the whole workspace and restores focus and play through the guarded host return. Updated the Creation Studio contract.",
+      "reviewReason": "Checked both source stage editors, the kept-world and version picker dialogs, drag ownership and the exact paused-scene callback.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -695,10 +709,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T00:23:35.574Z",
-      "sourceDigest": "ca7b341e9de009c700ec5b750b52d88705543bbb56fe2f4833bd1dc2dfd64a33",
+      "reviewedAt": "2026-11-26T06:19:59.740Z",
+      "sourceDigest": "8aec10f384d09c1592dc6758e68333d58d254f0da000b4131c63ef65b4a6fdd0",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified the protected worker main and tag, scoped production observation, and preserved the historical scene JSON package for all three readers.",
+      "reviewReason": "Reviewed exact validator and restricted family build dependencies.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -733,7 +747,9 @@
         "docs/assignment-006/*.md",
         "docs/adult-pilot/*.md",
         "docs/privacy/*.md",
-        "docs/game-intelligence/premium-benchmark/*.md"
+        "docs/game-intelligence/premium-benchmark/*.md",
+        "docs/game-art/*.md",
+        "docs/game-art/evidence/*.md"
       ],
       "sources": [
         "server/actions/**",
@@ -745,13 +761,17 @@
         "docs/game-intelligence/*.md",
         "tools/premium-*",
         "docs/game-intelligence/premium-benchmark/*.md",
-        "tools/premium-art/**"
+        "tools/premium-art/**",
+        "tools/creative-game-art/**",
+        "tests/creative-game-art-browser.ts",
+        "src/game-art/**",
+        "tools/game-art-review/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:55.850Z",
-      "sourceDigest": "3c42ed09d4394afe0c109b5a6fa6d9d87f119c2474a5101fb24cafd81bf20c81",
+      "reviewedAt": "2026-11-26T06:31:05.691Z",
+      "sourceDigest": "bbc14bf55c40022eb6d37c0b3d2a278ca446f04f4837a91148eb92aafcc86424",
       "reviewOutcome": "updated",
-      "reviewReason": "Scene authoring uses active Pal IDs. The ADR and scene rendering contract cover reading saved generated versions through the historical asset resolver.",
+      "reviewReason": "Reviewed linked domain documentation for this candidate and its tested private-art boundary.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -903,13 +923,14 @@
         "scripts/verify-brand-assets.mjs",
         "scripts/tests/verify-pal-assets.test.mjs",
         "scripts/ci/**",
-        "scripts/environments/ci_evidence.py"
+        "scripts/environments/ci_evidence.py",
+        "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T07:11:18.239Z",
-      "sourceDigest": "2f128ddf48e5d6c85592d9085a5fb2d4ada541f74ae7ffe2f140973850a14e68",
+      "reviewedAt": "2026-11-26T07:32:35.187Z",
+      "sourceDigest": "4811f4fc0c73d0f76f129edd657a9100050434d3e7aa76cc0c39ca49754db26b",
       "reviewOutcome": "updated",
-      "reviewReason": "Verify the retained storage journeys and the full offline Pal review using trusted physical input and the exact standalone file.",
+      "reviewReason": "Reviewed the union of original leaf commands, direct-file and managed browser paths, original-asset hash verifier and two cross-subject creative owner journeys.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1151,10 +1172,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T06:30:14.769Z",
-      "sourceDigest": "39d99dd2494d3866d73a3f08937f82eaa2e999a2119ef05556660c321450057d",
+      "reviewedAt": "2026-11-26T07:32:35.636Z",
+      "sourceDigest": "b3f7ba896adbfafa722c201ee0c51553b31cb477976815693a392fe981060cfd",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented both the earlier immutable application release and the new Phase 2 engineering comparison base.",
+      "reviewReason": "Recorded the independently qualified review parents and the existing frozen cloud release boundary.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1409,10 +1430,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:30:15.353Z",
-      "sourceDigest": "4580ddf8813059abbc8ab609cdfb51b711d5c20c7e592379c7c0324964e0d608",
+      "reviewedAt": "2026-11-26T07:32:36.013Z",
+      "sourceDigest": "9731d6cad7b13be78ce693ab983f34234997d8007f9e9f1c213db734a57601e3",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled current source routing, prior source histories and canonical document pointers.",
+      "reviewReason": "The register retains both subject and creative source/document routes and their historical reviews.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1622,7 +1643,13 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/drawings/*.md",
         "docs/creation-studio/*.md",
-        "docs/decisions/2026-11-19-private-art-studio.md"
+        "docs/decisions/2026-11-19-private-art-studio.md",
+        "docs/creative-universe/STANDARD.md",
+        "docs/decisions/2026-11-26-connected-creative-universe.md",
+        "docs/creative-universe/*.md",
+        "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md",
+        "docs/game-art/*.md",
+        "docs/decisions/2026-11-26-private-game-art.md"
       ],
       "sources": [
         "src/drawing/**",
@@ -1630,13 +1657,22 @@
         "tests/art-*",
         "tests/drawing-*",
         "tests/creation-private-art*",
-        "tests/picture-tools-browser.cjs"
+        "tests/picture-tools-browser.cjs",
+        "tests/sketch-*.cjs",
+        "tests/crayon-revision-browser.cjs",
+        "tests/creative-motion-browser.cjs",
+        "tests/fixtures/my-art/**",
+        "tools/ui-review/drawing-*.ts",
+        "tools/ui-review/drawing-smoke.cjs",
+        "src/game-art/**",
+        "tests/game-art*",
+        "tests/game-art/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "607032417cac0b831646536e04ab00411eaeeda411f6d5875155889425a7d1cd",
-      "reviewedAt": "2026-11-26T03:11:58.131Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The shared coordinate helper has no drawing-store or rendering imports. This learning branch uses only coordinates from the transient scratchpad.",
+      "sourceDigest": "b2e64f71390f1e7147cde7c53bf0bd047d18318ce1363310d0e3a50796aaf212",
+      "reviewedAt": "2026-11-26T06:53:07.717Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed supported editors, legacy data readers and exact PNG admission.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1678,10 +1714,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "576b5e280eee433f1e56224c5e0e8b40fe20d10f098549991ac643fe1ec24207",
-      "reviewedAt": "2026-11-26T07:11:19.341Z",
+      "sourceDigest": "2619fc4d1521d49e3ae08fb016e980ca2fb2bdb3c3d1051b244af6bf1194a60b",
+      "reviewedAt": "2026-11-26T07:32:36.572Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The full Pal review retains exact images, owner, progression and layout assertions through the shared single-file transport documented in the owner review.",
+      "reviewReason": "The renderer, original Pal variants and earned owner checks are preserved in the shared standalone Pal capture.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1716,10 +1752,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "db7ab1ea47142e27dafb6b6f810cc96a1f8e1f92ec842342ce905012422b4a84",
-      "reviewedAt": "2026-11-26T07:11:19.958Z",
+      "sourceDigest": "fd13e01d23d4398e1a1ff78632fe1662399c9981965d7cc2003b863e500cc6e0",
+      "reviewedAt": "2026-11-26T07:32:37.407Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The native Rally fixture verifies the actual fitted control, nested scroll, and protected indexed and legacy notebook histories on the same saved revision.",
+      "reviewReason": "Existing private and native storage authorities retain the exact artwork and scene revisions while scratchpaper stays transient.",
       "reviewHistory": []
     }
   ]

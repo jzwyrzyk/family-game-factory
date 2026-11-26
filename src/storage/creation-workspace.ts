@@ -1,3 +1,4 @@
+import type {SceneCopyOptions} from '../creation/storage';
 import {IndexedCreationStore} from './indexed-creation';
 import {CreationStore,CREATION_KEY,type CreationStoragePort} from '../creation/storage';
 import type {CreationProject} from '../creation/model';
@@ -19,6 +20,7 @@ export class CreationWorkspace {
  async listByActivity(owner:string){this.check(owner);if(this.indexed)return (await this.indexed.list()).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));const data=this.legacy!.read(),projects=data.projects.filter(p=>p.owner===owner),recent=new Map(projects.map(p=>[p.id,Date.parse(p.updatedAt)]));for(const draft of data.drafts)if(recent.has(draft.projectId))recent.set(draft.projectId,Math.max(recent.get(draft.projectId)!,Date.parse(draft.updatedAt)));for(const attempt of data.attempts)if(recent.has(attempt.projectId))recent.set(attempt.projectId,Math.max(recent.get(attempt.projectId)!,Date.parse(attempt.checkedAt)));return projects.sort((a,b)=>recent.get(b.id)!-recent.get(a.id)!);}
  async get(id:string,owner:string){this.check(owner);return this.indexed?this.indexed.get(id):this.legacy!.get(id,owner);}
  async load(id:string,owner:string){this.check(owner);return this.indexed?this.indexed.load(id):this.legacy!.load(id,owner);}
+ async keptRevision(id:string,owner:string){this.check(owner);return this.indexed?this.indexed.keptRevision(id):this.legacy!.keptRevision(id,owner);}
  async history(id:string,owner:string){this.check(owner);return this.indexed?this.indexed.history(id):this.legacy!.history(id,owner);}
  async historyPage(id:string,owner:string,after:string|null=null,limit=24){this.check(owner);if(this.indexed)return this.indexed.historyPage(id,after,limit);const rows=this.legacy!.history(id,owner),start=after===null?0:rows.findIndex(r=>r.id===after)+1;return {items:rows.slice(start,start+limit),next:start+limit<rows.length?rows[start+limit-1].id:null};}
  async attempts(id:string,owner:string){this.check(owner);return this.indexed?this.indexed.attempts(id):this.legacy!.attempts(id,owner);}
@@ -28,7 +30,7 @@ export class CreationWorkspace {
  async autosave(id:string,owner:string,scene:CreationProject,head:string){this.check(owner);return this.indexed?this.indexed.autosave(id,scene,head):this.legacy!.autosave(id,owner,scene,head);}
  async discardDraft(id:string,owner:string){this.check(owner);return this.indexed?this.indexed.discardDraft(id):this.legacy!.discardDraft(id,owner);}
  async checkout(id:string,owner:string,revision:string,head?:string){this.check(owner);return this.indexed?this.indexed.checkout(id,revision,head):this.legacy!.checkout(id,owner,revision,head);}
- async copy(id:string,owner:string,title?:string,options:{detachChallenge?:boolean}={}){this.check(owner);return this.indexed?this.indexed.copy(id,title,options):this.legacy!.copy(id,owner,title,options);}
+ async copy(id:string,owner:string,title?:string,options:SceneCopyOptions={}){this.check(owner);return this.indexed?this.indexed.copy(id,title,options):this.legacy!.copy(id,owner,title,options);}
  async markHintUsed(id:string,owner:string){this.check(owner);return this.indexed?this.indexed.markHintUsed(id):this.legacy!.markHintUsed(id,owner);}
  async recordAttempt(id:string,owner:string,head:string,result:{challengeId:string;passed:boolean;hintUsed:boolean;prediction?:MovementPrediction}){this.check(owner);return this.indexed?this.indexed.recordAttempt(id,head,result):this.legacy!.recordAttempt(id,owner,head,result);}
  async remove(id:string,owner:string){this.check(owner);return this.indexed?this.indexed.remove(id):this.legacy!.remove(id,owner);}
