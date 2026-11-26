@@ -1,5 +1,7 @@
 # jems documentation map
 
+For current release status and the evidence for each gate, start with [delivery state](../DELIVERY-STATE.md). The [November 24 cutover](operations/PRODUCTION_ACTIVATION.md) records the prior household release. Private preview, integrated TEST and production follow the [environment contract](development/DEV-TEST-PROD.md).
+
 Private family operating procedures are in the [owner guide](family-beta/OWNER.md) and the [consolidated activation and rollback checklist](family-beta/ACTIVATION.md).
 
 [Private family beta architecture and trust boundaries](family-beta/ARCHITECTURE.md) covers the household baseline, independent family accounts, protected browser delivery, approved entry artwork and the synthetic browser acceptance contract.

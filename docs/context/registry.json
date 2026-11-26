@@ -891,10 +891,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:37:56.486Z",
-      "sourceDigest": "a57592eb6fa2f44a34805323cd171aec8de5a81040406a49a9299de4de6e8b80",
+      "reviewedAt": "2026-11-26T01:23:11.824Z",
+      "sourceDigest": "5f7b1ef674e2b84dd647d329848d15cf1839bc2b621d5472752fe3445bcdc3d3",
       "reviewOutcome": "updated",
-      "reviewReason": "The indexed storage fixture waits for its own shelf. Intentional attempts to leave active learning continue to verify denial; the guided fixture sends rapid Build gestures.",
+      "reviewReason": "Delivery state records the failed hosted Pal reload and the visible onboarding path. The exact same regression commands, assertions, rendering code and timeouts remain in force, with two new pre-navigation persistence assertions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1135,10 +1135,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T00:23:36.401Z",
-      "sourceDigest": "9cd989c6d501a60f5e94b6610ebde260ec37b062dfcfe003182ec76001d6eb3e",
+      "reviewedAt": "2026-11-26T01:23:12.305Z",
+      "sourceDigest": "3a5ab9bfd335677e581d5e32600605a1c3cf253d9a45b9e0e271b77ea454684f",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the protected documentation merge, worker holds, integrated UI review, current serving observation, environment access and legacy PR dispositions.",
+      "reviewReason": "Recorded the passing protected-main suite and the subsequent failed documentation-candidate Pal shard with its retained evidence and correction.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1662,10 +1662,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3d1d93cbf5304439f38ed80460b5c3fa6dd4640ad1e4de48df9151ff2941e2f9",
-      "reviewedAt": "2026-11-25T23:28:30.573Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Both original starter illustrations and selection buttons fit in two compact rows on the phone; the two-form inventory and migration contract still apply.",
+      "sourceDigest": "ada2accbff6a1c4c26061297e83a2ab48bdb799664d38749f63d7cf76e56d403",
+      "reviewedAt": "2026-11-26T01:23:10.842Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The reload regression verifies the retained owner, active Navi and timestamp before and after the visible maker welcome. Starter rules, menu behavior and approved artwork are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
