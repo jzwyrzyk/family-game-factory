@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T16:42:29.984Z",
-      "sourceDigest": "b3a544d062622803235185da2d088d149447096bfba2b3b72be8895977ec2512",
+      "reviewedAt": "2026-11-26T16:51:53.847Z",
+      "sourceDigest": "b8ee022749293a2aef1a01c663c5d31ae9bcee324906f0ae618dd64cf93f9aea",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final staged filter-equivalence tests and all changed delivery sources: depth-one filter, original-image mismatch guard, grouped replacement build references, registered recovery-worktree discovery and source-bound build approval; reconciled current setup instructions and dated ledger.",
+      "reviewReason": "Reviewed single approved-build continuation with durable submission intent, fixed approved source/hash, read-only resume/provenance qualification and independent recovery plans; documented owner build-only approval and new launcher checksum without changing broker runtime or Terraform inputs.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

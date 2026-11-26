@@ -1,5 +1,23 @@
 # Permanent cloud operations delivery ledger
 
+## November 26, 2026 — replacement build approved; guarded continuation prepared
+
+The owner explicitly approved one corrected broker build from
+`476c2b9793060d30623b16130daeb5e9776640ff`, with its exact reviewed build-plan hash.
+The 600-second E2_MEDIUM build uses the existing build lane; published compute is
+up to $0.03 before allowances, with storage/logging/network additional. Approval
+does not include remaining infrastructure apply, archival/deletion or another build.
+
+The continuation keeps that source/hash fixed independently of newer tooling.
+An exclusive durable intent precedes submission. A recorded build ID resumes reads
+only; an uncertain intent cannot automatically resubmit. Bounded status reads and
+full provenance qualification precede fresh remaining-actions planning. Independent
+cleanup/capacity dry runs and saved Terraform integrity reads proceed even if build
+qualification stops. No actual submission or provider acceptance is claimed by this
+engineering record. Validation adds seven regression cases for one-time submission,
+wrong approval, unknown outcome, recorded-ID resume, pending/failed status, receipt
+mismatch and private-error suppression; **348 operations tests passed**.
+
 ## November 26, 2026 — provider depth failure identified
 
 Administrator recovery from source `2628bd3c29ce5e91c49dbb5fef8b31d71a9c0a43`

@@ -35,6 +35,10 @@ preserves the original build and unapplied Terraform plan. The new shallow filte
 changes the embedded runtime contract, so one separately approved replacement build
 is now required; the earlier artifacts-mirror correction itself needed no rebuild.
 
+The owner has now approved exactly one corrected build from `476c2b9793060d30623b16130daeb5e9776640ff`.
+Use the [single-build continuation](OPERATIONS_RECOVERY.md#approved-single-build-continuation)
+with its fixed build source/hash; newer tooling does not rebind that approval.
+
 ## One verified launcher
 
 Use an existing administrator Cloud Shell session with `gcloud`, `gh`, Python 3 and
@@ -43,7 +47,7 @@ The reviewed handoff supplies the full `OPS_SHA` for this candidate. Download on
 
 ```sh
 curl -fsSL "https://raw.githubusercontent.com/jzwyrzyk/family-game-factory/$OPS_SHA/scripts/ops/handoffs/operations-bootstrap.sh" -o /tmp/jems-operations.sh
-printf '%s  %s\n' aa1d0daae1b7d0a86a38a6e84e8147f44b84070d680e9f5224c11b98701921c3 /tmp/jems-operations.sh | sha256sum -c -
+printf '%s  %s\n' 7395f76a9aa822b2f41fdada93166dba0ed65802fedafbfceed9c081e4c08d46 /tmp/jems-operations.sh | sha256sum -c -
 bash /tmp/jems-operations.sh "$OPS_SHA" github --check
 bash /tmp/jems-operations.sh "$OPS_SHA" broker-build --check
 bash /tmp/jems-operations.sh "$OPS_SHA" nonprod --inventory

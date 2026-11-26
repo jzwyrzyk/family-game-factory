@@ -24,6 +24,8 @@ recovery read at `057daa4` verified all six existing resources/bindings and left
 four actions. Audit evidence at `2628bd3` now identifies a filter nesting-depth limit of 1. The
 corrected flat expression retains every restriction but requires a separately
 approved new image build; the historical image and plan must not be reused with it.
+The owner approved one build from `476c2b9`; a guarded continuation is prepared,
+with no actual submission/deployment receipt yet.
 View-IAM POST and Cloud Run metadata corrections retain narrow permissions.
 
 Expanded cleanup at `2628bd3` found 893,938,345 source bytes but no exact-pack

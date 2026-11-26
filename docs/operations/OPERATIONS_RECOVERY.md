@@ -3,6 +3,41 @@
 November 26, 2026. This supplements [permanent setup](PERMANENT_CLOUD_SETUP.md).
 It does not approve deletion or regenerate any saved Terraform plan.
 
+## Approved single-build continuation
+
+The owner approved **one** replacement build from immutable source
+`476c2b9793060d30623b16130daeb5e9776640ff`, build-plan hash
+`c26aff114c7d689671fee7860dcf4f82832dc390eb2556351d76205f3d045d0f`.
+This is build approval only. Its archive SHA-256 is
+`2f450c0d49fb975326dd0c78c93b8edc20fb36fb4d832a7a73da677b1ffdf4f2`.
+The continuation tooling may have a newer SHA; **do not change the approved build
+source or hash to the tooling SHA**.
+
+After downloading/checksumming the current launcher from the reviewed handoff:
+
+```sh
+bash "$p" "$r" broker-continue \
+  --build-source-sha 476c2b9793060d30623b16130daeb5e9776640ff \
+  --approve-plan-sha256 c26aff114c7d689671fee7860dcf4f82832dc390eb2556351d76205f3d045d0f \
+  --home-dir "$HOME" --receipt-dir "$HOME/work/jems-recovery-review"
+```
+
+This inventories build prerequisites, verifies the approved plan, records an
+exclusive durable intent, and submits at most once. It polls only the recorded
+build ID for up to 15 minutes and verifies source/build/archive/registry provenance
+on success. The final read-only recovery inventory prepares remaining broker
+operations, new source/capacity dry runs and original DEV/TEST plan integrity.
+Build failure/pending state does not prevent those independent recovery reads.
+It never applies broker infrastructure, changes IAM, deletes or archives files,
+runs Terraform, merges code, replays paid requests or broadens logging access.
+
+Rerunning with an intact recorded submission resumes reads of that exact build;
+it cannot submit another. An intent without a verified returned ID is uncertain
+and stops submission. Preserve it, find the existing build ID through authorized
+Cloud Build evidence, and use `--build-id EXACT_EXISTING_ID` instead of the approval
+flag for read-only continuation. Never delete an intent to retry. All private
+journals and receipts remain in Cloud Shell; return only the sanitized final JSON.
+
 ## Confirmed nesting-depth failure and corrected source
 
 Administrator execution at `2628bd3c29ce5e91c49dbb5fef8b31d71a9c0a43` recovered
@@ -32,23 +67,26 @@ as `BUILD_SOURCE_BROKER_FILES_DIFFER`. Do not bypass that predicate. The recover
 lane accepts a new qualified image/build/source tuple only when all three arguments
 are provided; its historical audit correlation still identifies the original filter.
 
-Execution order for the immutable corrected source supplied in the handoff:
+The continuation above implements this manual sequence. Keep `BUILD_SOURCE_SHA`
+fixed to the approved source, independently of tooling `$r`:
 
 ```sh
 # Read-only build prerequisites and exact source-bound plan; no submission.
-bash "$p" "$r" broker-build --check
+bash "$p" "$BUILD_SOURCE_SHA" broker-build --check
 # Only after explicit approval of this additional build and its exact hash:
-bash "$p" "$r" broker-build --submit --approve-plan-sha256 "$APPROVED_BUILD_PLAN_SHA256"
+bash "$p" "$BUILD_SOURCE_SHA" broker-build --submit --approve-plan-sha256 "$APPROVED_BUILD_PLAN_SHA256"
 # Use the returned new build ID after completion; never repeat --submit.
-bash "$p" "$r" broker-build --build-id "$NEW_BUILD_ID"
+bash "$p" "$BUILD_SOURCE_SHA" broker-build --build-id "$NEW_BUILD_ID"
 # The resulting verified immutable digest is required before inventory/apply.
-bash "$p" "$r" broker-setup --image "$NEW_VERIFIED_IMAGE" --build-id "$NEW_BUILD_ID" --check
+bash "$p" "$r" broker-setup --image "$NEW_VERIFIED_IMAGE" --build-id "$NEW_BUILD_ID" \
+  --build-source-sha "$BUILD_SOURCE_SHA" --check
 ```
 
 One additional build has a 600-second timeout using the existing builder, source
 bucket and registry. The [published default-pool us-east5 E2_MEDIUM rate](https://cloud.google.com/build/pricing-update)
 is $0.003/minute: up to $0.03 compute for that timeout before allowances.
-Storage, logging and network charges are additional; this is not an all-in cap. No spending or submission is authorized merely by this correction.
+Storage, logging and network charges are additional; this is not an all-in cap. The owner subsequently approved the one source-bound build above; no additional
+build, deployment or IAM operation is authorized merely by this correction.
 No IAM change or application deployment is part of the build. After qualification,
 fresh inventory must reverify the six existing resources and approve only remaining
 view/IAM/broker/invoker actions. Actual view creation/readback, finite effective
