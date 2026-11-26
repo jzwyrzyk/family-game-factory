@@ -413,10 +413,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "85c2cb423be8d914e7c156ff35069f127a261f094a3d6716e41687ced2d46e80",
-      "reviewedAt": "2026-11-26T03:08:53.760Z",
+      "sourceDigest": "71dcf4ff42672f3ca738503e1893f28f1c18a67d21da1ce6e2cac9cb3d0791f7",
+      "reviewedAt": "2026-11-26T03:15:30.846Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Creative Studio documents the path pad, optional name on Repeat groups, 24 relative moves, local private actor pins and reuse from an explicit Keep.",
+      "reviewReason": "The first-steps Step shortcut is confined to the selected private actor under reduced motion. The drawn path guide specifies that scope, exact Keep reuse and scene-owned timing.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
