@@ -151,8 +151,8 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:21:22.964Z",
-      "sourceDigest": "40eedbca65b51a0583f534068a8c5360eab11cc7e2edeba6cb6dd431fbd1b975",
+      "reviewedAt": "2026-11-26T03:23:59.847Z",
+      "sourceDigest": "05af7fe580ca0059c0e1624b6fc8bfb580e88b81f1fb860c62ad139eb4fe92e9",
       "reviewOutcome": "unchanged",
       "reviewReason": "The accepted authentic artwork doctrine covers the resulting drawing and revision behavior, including optional descriptive metadata and explicit version selection.",
       "reviewHistory": [
@@ -1144,8 +1144,8 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:21:23.627Z",
-      "sourceDigest": "93b92e162ec83b1408c80c54ab8a470e131acc3a2644485ba1fc509aa21b8b78",
+      "reviewedAt": "2026-11-26T03:23:59.912Z",
+      "sourceDigest": "e658d1c450cdb7c1eea8e0d2aefe2bcae60c1ce9ec4076447ce7161023939b27",
       "reviewOutcome": "updated",
       "reviewReason": "Recorded source dependencies, private worktree qualification and current household release separately. No change to production traffic or provider activation was made.",
       "reviewHistory": [
@@ -1627,8 +1627,8 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "af5690791eb2f05ac5e89e1005a94c78b5e7b45c8bf66908b06155982b9c8c10",
-      "reviewedAt": "2026-11-26T03:21:23.792Z",
+      "sourceDigest": "d50f5ad634ba0f18552cd121eaf6b3b2d8f1fc2ab71956b72d2da0333f0cd4ad",
+      "reviewedAt": "2026-11-26T03:23:59.999Z",
       "reviewOutcome": "updated",
       "reviewReason": "Updated the My Art contract for editable source bytes, recovery, selection and retained version behavior. Stale owner and version failures preserve the current drawing.",
       "reviewHistory": [
