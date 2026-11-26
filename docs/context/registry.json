@@ -150,10 +150,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:09:46.422Z",
-      "sourceDigest": "c5ff9ed2fdc9e2eee322a0d699b3d7fc1de9a2754074f929934386104d3bbfe6",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reconciled both simultaneous standard proposals into one permanent authentic-art reference for drawing, movement, worlds and context-owned game roles.",
+      "reviewedAt": "2026-11-26T03:13:42.771Z",
+      "sourceDigest": "ff9c02d667b54ac95443882ff6269ecf8d27444f45635284e0f055eacb1974d2",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Coded paths and editable crayon sources follow the canonical child artwork, explicit Keep and version pinning decisions in the reconciled standard.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -417,10 +417,10 @@
         "public/art/creative-worlds/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "4bfdf27858ae0a63fe083cc59cbe7775d6e2454ef761f8bc7d567c1db66e37f1",
-      "reviewedAt": "2026-11-26T03:06:15.823Z",
+      "sourceDigest": "459ce51aa8724e9d12c3c1758f00dfd3f819075f05a88d16739101ce5b802393",
+      "reviewedAt": "2026-11-26T03:13:43.265Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Creative Studio now has a canonical standard for versioned world scenery and the separation between contextual roles and private artwork identity.",
+      "reviewReason": "DRAWN_PATHS documents the authored path editor, bounded motion coordinates, transactional drafts and editable move blocks used by scene playback.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -899,10 +899,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:06:15.971Z",
-      "sourceDigest": "d3ee69b44d711cd709ce46c2855a7454a1b54e18e4655859b4881d1888f6443d",
+      "reviewedAt": "2026-11-26T03:13:43.651Z",
+      "sourceDigest": "b98452577fa2417360f989477d26f07b810cd19877d7af6fe21c6ae0363613a1",
       "reviewOutcome": "updated",
-      "reviewReason": "The new synthetic browser and container checks verify exact byte admission, metadata rejection, owner changes and digest-only authorization.",
+      "reviewReason": "The crayon and scene path regression suites cover the real editor, history, archived versions, pointer cancellation and local playback.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1143,10 +1143,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:06:16.162Z",
-      "sourceDigest": "d1a2a0bdbf766f8b99256225ed6b5feae3af6991caa35a0b3a828f8b4127c5f7",
-      "reviewOutcome": "updated",
-      "reviewReason": "The family security workflow exercises original-byte admission and the release record distinguishes the production baseline from the proposed development.",
+      "reviewedAt": "2026-11-26T03:13:44.066Z",
+      "sourceDigest": "c8ddc6e8fbe83007e19bee2bbd9c40b521859c62c1df33d481b2f0e93fa7c6ea",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The new crayon and scene checks extend existing package entry points and do not change service deployment, worker credentials or activation gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1401,10 +1401,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:09:46.541Z",
-      "sourceDigest": "bd7a3c55e5817607328a7345dde6b20c938ff17bfd42d7d942a1f7be9130ac44",
+      "reviewedAt": "2026-11-26T03:13:44.414Z",
+      "sourceDigest": "f3d0a8aaa2883560534a3eba689c193c763b04798d64bc2e2560346d6adc4bae",
       "reviewOutcome": "updated",
-      "reviewReason": "The maintenance guide, registry and review template now share one standard while preserving both concurrent PR documentation paths.",
+      "reviewReason": "Integrated the upstream crayon revision browser route while retaining the canonical creative universe standard and prior registry ownership.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1626,13 +1626,14 @@
         "tests/art-*",
         "tests/drawing-*",
         "tests/creation-private-art*",
-        "tests/picture-tools-browser.cjs"
+        "tests/picture-tools-browser.cjs",
+        "tests/crayon-revision-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "a04e0449fc863d945b55d4a7d2b401d189d5c401e7d629e62d3a0cd79b2c5015",
-      "reviewedAt": "2026-11-26T03:09:46.666Z",
+      "sourceDigest": "180a66e42bea5c5f7982bd316476525280fbdb0897b7867dff392942737ac4a6",
+      "reviewedAt": "2026-11-26T03:13:44.713Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The drawing standard follows the shared canonical world reference and protects exact original and revision identities on archive and recovery.",
+      "reviewReason": "The My Art contract describes a new crayon revision from saved editable strokes and compatibility with original and prior drawing bytes.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1712,10 +1713,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "381260b659e8d8ed26b7fdddb3c2182a49d2f8f9cffd808e7d167695f25bfb3a",
-      "reviewedAt": "2026-11-26T00:23:36.006Z",
+      "sourceDigest": "3b669cf847b1ba4c4642c8130894505a04e7b12f3707b8ffd273b74370ed92df",
+      "reviewedAt": "2026-11-26T03:08:54.218Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled merged F06 rollback limits with the owner-scoped Pal migration, retained readers and repeat restore contract."
+      "reviewReason": "Architecture records reads of the active owner’s kept scene revision in both original and indexed scene storage. Copying motion writes a new group of block IDs through existing autosave, keep and backup."
     }
   ]
 }

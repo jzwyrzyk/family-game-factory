@@ -1,0 +1,12 @@
+.creation-dialog.creation-path-editor { width:min(570px,calc(100% - 24px)); }
+.creation-path-editor .creation-shelf-heading { align-items:center; }
+.creation-path-editor p { margin:8px 0 12px; }
+.creation-path-editor canvas { display:block;width:100%;height:auto;margin-inline:auto;background:#f5f2ea;border-radius:12px;outline:1px solid #867b91;touch-action:none;cursor:crosshair; }
+.creation-path-editor .path-controls,.creation-path-editor .path-fields,.creation-path-editor [data-paths] { display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0; }
+.creation-path-editor button,.creation-path-editor input,.creation-path-editor select { font:inherit; }
+.creation-path-editor .path-controls button { min-width:44px;min-height:44px;border:1px solid #9e91b4;background:white;border-radius:10px;color:#36284b;font-weight:700; }
+.creation-path-editor label { display:grid;gap:3px;min-width:0;font-weight:650; }
+.creation-path-editor .path-fields label:first-child { flex:1; }
+.creation-path-editor input,.creation-path-editor select { width:100%;min-height:44px;padding:4px 8px;border:1px solid #91859c;border-radius:8px;background:white;color:#292438; }
+.creation-path-editor summary { cursor:pointer;min-height:44px;padding:10px 0; }
+.creation-path-editor [data-status] { min-height:1.5em; }

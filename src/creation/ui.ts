@@ -10,6 +10,8 @@ import {CreationWorkspace,prepareIndexedCreation} from '../storage/creation-work
 import { challengesForGrade, getCreationChallenge, createChallengeStarter, createChallengeTarget, evaluateChallenge, predictActor, firstMovement, movementChoices, type MovementChoice } from './challenges';
 import { profileStorage } from '../adult-pilot/storage';
 import { CreationStage } from './stage';
+import {openMotionEditor} from './motion-editor';
+import {pathBlock, reusablePaths} from './motion-path';
 import type { StudioSession } from '../studio/notebook';
 import { publishSourceEvidence } from '../problem-solving/signals';
 import { createIcon, iconMarkup, setIconLabel, type IconName } from '../brand/icons';
@@ -119,6 +121,10 @@ export function installCreationStudio(host: Host) {
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => page.querySelector<T>('#' + id)!;
   const introduction=createStudioIntroduction(host.guidance,()=>shelf('landing'));
   $('creationShelf').before(introduction.element);
+  let closeMotionEditor: (() => void) | undefined;
+  const pathButton=iconNode('button','creation-button','edit','Draw a path');
+  pathButton.id='creationDrawPath';pathButton.hidden=true;
+  $('creationAddActor').after(pathButton);
   const privateArt=new PrivateArtResolver(owner);
   const stage = new CreationStage($<HTMLCanvasElement>('creationCanvas'),privateArt,message=>status(message,true));
   const palShelf = node('section', 'creation-pal-shelf'); palShelf.id = 'creationPals';
@@ -298,6 +304,7 @@ export function installCreationStudio(host: Host) {
     prediction=null;
     const loaded = await (await store()).load(id, owner());
     viewEpoch++;
+    closeMotionEditor?.();closeMotionEditor=undefined;
     privateArt.clear();stage.clear();
     status(''); $<HTMLDetailsElement>('creationMore').open = false;
     stop(); scene = loaded.scene; entryId = id; revisionId = loaded.revision.id; sceneOwner = owner();
@@ -321,7 +328,7 @@ export function installCreationStudio(host: Host) {
   async function open(id?: string) { await act(async () => { if (!await enter()) return; if (id) await loadScene(id); else {await shelf();if(introduction.needed()){ $('creationShelf').hidden=true;introduction.show();}} }); }
   async function openChallenges() { await act(async () => { if (!await enter()) return; await shelf('challenge'); }); }
   async function shelf(mode: 'landing' | 'free' | 'challenge' = 'landing') {
-    if (locked()) return; await saveVersion(); stop(); viewEpoch++; scene = null; entryId = ''; sceneOwner = owner(); sourceSessionId = ''; recoveryPending = false;
+    if (locked()) return; await saveVersion(); stop(); closeMotionEditor?.();closeMotionEditor=undefined;viewEpoch++; scene = null; entryId = ''; sceneOwner = owner(); sourceSessionId = ''; recoveryPending = false;
     privateArt.clear();stage.clear(); setExpandedView(false); page.classList.remove('has-scene'); document.body.classList.remove('creation-editing');
     $('creationWorkspace').hidden = true; $('creationShelf').hidden = false;
     introduction.hide();$('creationWelcome').hidden=mode!=='landing';$('creationLandingBack').hidden=mode==='landing';
@@ -595,7 +602,7 @@ export function installCreationStudio(host: Host) {
     page.dataset.graphical=String(!fullTools&&withinGrade(profileGrade(FG.store.current()),1));
     $('creationSimpleMode').setAttribute('aria-pressed', String(!fullTools));
     $('creationFullMode').setAttribute('aria-pressed', String(fullTools));
-    $('creationStep').hidden = !fullTools;
+    $('creationStep').hidden = !fullTools && !matchMedia('(prefers-reduced-motion: reduce)').matches;
     $('creationActorSettings').hidden = !fullTools;
     $('creationVariables').hidden = !fullTools;
     $('creationSimpleEvents').hidden = fullTools;
@@ -628,8 +635,44 @@ export function installCreationStudio(host: Host) {
     options.forEach(([key, text]) => { const option = node('option', '', text); option.value = key; select.append(option); }); select.value = value;
     select.onchange = async () => await act(() => { try { change(select.value); } catch (error) { select.value = value; throw error; } }); wrap.append(select); return wrap;
   }
+  pathButton.onclick=()=>act(async()=>{
+    assertEditing();stop();paint();
+    const actor=scene!.actors.find(actor=>actor.id===selectedActor);
+    if(!actor || !parsePrivateArtId(actor.assetId) || challengeId)return;
+    const view=viewEpoch, profile=owner(), actorId=actor.id, programId=selectedProgram, project=scene!;
+    const current=()=>isCurrent() && view===viewEpoch && owner()===profile && scene===project && selectedActor===actorId && !FG.learning.active;
+    const art=await privateArt.load(actor.assetId);
+    if(!current())return;
+    closeMotionEditor?.();
+    closeMotionEditor=openMotionEditor(page,{
+      scene:project, actor, image:art.image, current,
+      listScenes:async()=>(await (await store()).list(profile)).filter(entry=>entry.keptId),
+      loadPaths:async id=>{
+        const revision=await (await store()).keptRevision(id,profile);
+        return revision?reusablePaths(revision.scene):[];
+      },
+      apply:async path=>{
+        let saved=false;
+        await act(async()=>{
+          assertEditing();if(!current())throw Error('Reopen this path in your scene.');
+          await mutation(next=>{
+            let program=next.programs.find(item=>item.actorId===actorId && item.id===programId);
+            if(!program){
+              program=next.programs.find(item=>item.actorId===actorId && item.trigger.type==='start');
+              if(!program){program={id:uid(),actorId,trigger:{type:'start'},actions:[]};next.programs.push(program);}
+            }
+            selectedProgram=program.id;
+            program.actions.push(pathBlock(path));
+          });
+          saved=true;status('Path added. Keep your scene to use this path again.');
+        });
+        if(!saved)throw Error($('creationStatus').textContent || 'Could not add this path.');
+      }
+    });
+  });
   function renderActorSettings() {
     const box = $('creationActorSettings'); box.replaceChildren(); const actor = scene!.actors.find(a => a.id === selectedActor); if (!actor) return;
+    pathButton.hidden = !!challengeId || !parsePrivateArtId(actor.assetId);
     const set = async (key: string, value: string | number) => await mutation(project => Object.assign(project.actors.find(a => a.id === actor.id)!, { [key]: value }));
     box.append(input('Name', actor.name, async value => await set('name', value.trim() || 'My character'), { maxLength: 40 }), input('Start x', actor.x, async value => await set('x', +value), { min: 0, max: scene!.width }), input('Start y', actor.y, async value => await set('y', +value), { min: 0, max: scene!.height }), input('Size', actor.size || 100, async value => await set('size', +value), { min: 20, max: 240 }));
     const remove = iconNode('button', 'creation-text-button', 'trash', 'Remove'); remove.setAttribute('aria-label', 'Remove ' + actor.name); remove.disabled = !!challengeId || scene!.actors.length < 2;
@@ -859,7 +902,7 @@ export function installCreationStudio(host: Host) {
     page.dataset.nativeFullscreen = String(document.fullscreenElement === page);
   });
   function leave() {
-    if (!visible) return; stop(); clearInterval(checkpointTimer); visible = false; viewEpoch++;
+    if (!visible) return; closeMotionEditor?.();closeMotionEditor=undefined;stop(); clearInterval(checkpointTimer); visible = false; viewEpoch++;
     stopReading(); setExpandedView(false); page.classList.remove('has-scene'); document.body.classList.remove('creation-editing'); fullTools = false; expandedBlockId = '';
     privateArt.clear();stage.clear();
     $<HTMLDialogElement>('creationActorDialog').close(); $('creationLearning').hidden = true;
@@ -1052,7 +1095,7 @@ export function installCreationStudio(host: Host) {
   });
   window.addEventListener('beforeunload', event => { if (visible&&pendingActions&&rewardSourceWritable()){event.preventDefault();event.returnValue='';} });
   window.addEventListener('pagehide', () => stop());
-  window.addEventListener('factory-learning-active', event => { if (visible && (event as CustomEvent).detail) { stop(); } });
+  window.addEventListener('factory-learning-active', event => { if (visible && (event as CustomEvent).detail) { closeMotionEditor?.();closeMotionEditor=undefined;stop(); } });
   document.addEventListener('visibilitychange', () => { if (document.hidden && visible) { stop(); paint(); } });
   const api = {
     open, openChallenges, close:leave,
