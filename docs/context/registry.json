@@ -316,10 +316,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:15:06.005Z",
-      "sourceDigest": "f4f47cfee71b78977686f3e95aa720f603aa1fcd182b76ced56bd987284fa2a9",
+      "reviewedAt": "2026-11-26T03:16:21.329Z",
+      "sourceDigest": "879a3ff172bd4e85db495b78e71238eeec47198589ed524ec6caa7e1d090ac0e",
       "reviewOutcome": "updated",
-      "reviewReason": "The four Jems-owned plates, overlays and props are documented with their approval state and separate provenance in the world art contract.",
+      "reviewReason": "The reviewed family PNG entry now enforces exact bounded raster structure before consent admission, retaining the input bytes only after validation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -903,10 +903,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:15:06.762Z",
-      "sourceDigest": "6796bc5ed8c8f78599f6392a9efd10a6eefee89d452f0e1f158afcde0d3f8abd",
+      "reviewedAt": "2026-11-26T03:16:21.879Z",
+      "sourceDigest": "dedced7ca1216427fb9dcd7dab0dfe66155e6e247badac489bfa291d715f1f82",
       "reviewOutcome": "updated",
-      "reviewReason": "The world art suite checks all forty-eight WebP byte identities, dimensions, alpha declarations, catalogue coverage and the bundle size ceiling.",
+      "reviewReason": "The real PNG fixtures exercise legal transparency, palette bounds, compressed raster lengths, metadata rejection and exact bytes through the reviewed family importer.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
