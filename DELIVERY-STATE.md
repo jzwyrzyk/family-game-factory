@@ -1,5 +1,22 @@
 # jems delivery state
 
+## Connected Creative Universe — integrated source and local evidence
+
+The tested application source is `37679c14c45418ab52597a850f48da83325cdaed`. The stack consumes the standard from #196, versioned catalogue from #200 and My Art and picker from #208. The earlier household release remains the deployment baseline. Local Chromium used only synthetic family and child records.
+
+| Workstream | Source responsibility and acceptance evidence |
+| --- | --- |
+| A — Drawing | Private drawing originals, crayon replay, visible-only export and exact recovery are in #208. [Editable artwork](docs/drawings/ART_STUDIO.md) |
+| B — Illustrated worlds | The stage, world picker, thumbnails, playback, fullscreen and export use exact world revisions. Three viewport pairs compare the protected baseline and candidate. [Rendered activity and before/after](docs/creation-studio/evidence/worlds/README.md) |
+| C — Animation | A child keeps a movement path, reopens the draft and chooses a pinned version for a scene. The host creates editable movement blocks. [Animation evidence](docs/drawings/evidence/animation-path-scene.png) |
+| D — Shared library | The picker lists actual private images and cutouts, searches semantic identity, and supports explicit actor version updates. [Picker receipt](docs/drawings/evidence/creative-picker-receipt.json) |
+| E — 2D game reuse | Trusted generated companions can change an actor while retaining its blocks, input and versions. One fixed generated module also passed offline host-slot qualification. [Scope and screenshots](docs/game-intelligence/creative-assets/README.md) |
+| F — World building | Children place, layer, hide and reuse objects and private backgrounds. Keep, restore, export and reopen preserve the old world's pins. [Scene composition checks](docs/creation-studio/evidence/worlds/README.md) |
+
+The renderer and shared schema own backward compatibility for the original four backgrounds. The private drawing authority owns migrations and exact image restoration. The family beta admits a narrower reviewed PNG representation with strict metadata and byte checks. Rendering and animation add no score, consent or progression authority. This integration adds four leaf commands to the protected-main inventory. The separate #195 learning-workspace branch also adds a required case. Combine their test inventory and the scene disposal guards before integrating the separate learner stack.
+
+The parallel #201 and #207 work includes in-scene motion authoring. This stack makes paths from My Art available across activities and compiles them into editable scene moves. #207 already consumes #200's identical product illustrations. Reconcile shared scene UI, private PNG intake (#198 and #204) and learning scratchpad inputs (#203) before merging overlapping feature stacks. Each rollout requires its exact reviewed source. Hosted DEV, integrated TEST, owner art and physical-device acceptance, production and external family activation remain distinct outstanding gates.
+
 ## Connected Creative Universe — private drawing and picker review
 
 My Art retains the authored stroke source in the exact kept PNG and opens it after a pixel-verified replay. The picker resolves versions for the active profile, accepts imaginative semantic names, and keeps contextual role on the scene actor. Scene-only exports include the selected version and its sources. The optional family workshop intake preserves the exact admitted metadata-free reviewed image. Earlier beta images retain their stored pixels. This source depends on the shared creative standard and catalogue in #196 and #200. The proposed #199 crayon version was compared for round-trip compatibility. #198 overlaps the reviewed intake. Do not apply overlapping writers as independent migrations. Local browser evidence is in the [My Art contract](docs/drawings/ART_STUDIO.md); external family activation awaits the existing family release process.
