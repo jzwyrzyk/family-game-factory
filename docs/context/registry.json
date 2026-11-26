@@ -312,10 +312,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:09:20.072Z",
-      "sourceDigest": "1a5b656592cc9c8a7d861d4eca61a9e7746f1c275bdbec4f53e57e6ca67e44f7",
+      "reviewedAt": "2026-11-26T05:15:15.539Z",
+      "sourceDigest": "0f3bd18bce7fc39fb551e811d1e4b263070b5b137aa1e312ca97f10abc6aa2f8",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the extracted header, destination, Journey cards, navigation focus loop and exact token substitutions against the existing child interface and current owner-directed reference. Documented six real template consumers and remaining specialist controls.",
+      "reviewReason": "Completed destination-style extraction by removing residual identical phone and reduced-motion selectors from the feature stylesheet; all production selectors now have one shared owner, preserving the same composed layout.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -893,10 +893,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:09:20.747Z",
-      "sourceDigest": "4cd0489667a77ad2c6d956e572e2b233703fd4563e73274d908c0000a0e47189",
+      "reviewedAt": "2026-11-26T05:15:16.208Z",
+      "sourceDigest": "a241bbdff38fbcba3de9e1213b2dcdbdb7ee487eb80b7e5aaa43e3ba16570b24",
       "reviewOutcome": "updated",
-      "reviewReason": "Added focused source negative tests and production gallery checks to the existing standalone chain. Retained full product tests and documented four-view coverage, keyboard, contrast and exact-source limits without claiming pipeline-wide enforcement.",
+      "reviewReason": "The shared source guard now rejects residual feature copies of destination styles, and gallery screenshots use one-to-one review scale. Existing contrast, target, keyboard, no-network and propagation assertions remain intact.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1395,10 +1395,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:09:20.996Z",
-      "sourceDigest": "90fb888816066be30ebddc71bc48351cce00896eca74e0b62a3aabfab4817692",
+      "reviewedAt": "2026-11-26T05:15:16.320Z",
+      "sourceDigest": "534ac1eee944d19d26a034da73cdbdf15db980b68ab47505108a02387e800175",
       "reviewOutcome": "updated",
-      "reviewReason": "Added canonical guide and inventory retrieval to AGENTS and the documentation registry, plus PR reuse evidence guidance. Existing review fingerprints and policy authority remain enforced.",
+      "reviewReason": "The design-system documentation route now includes nested evidence pages so source identities, screenshot limits and acceptance receipts are link-checked with the canonical guide.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1710,7 +1710,7 @@
     {
       "id": "design-system",
       "documents": [
-        "docs/design-system/*.md",
+        "docs/design-system/**/*.md",
         "AGENTS.md",
         "PRODUCT-DOCTRINE.md",
         "ARCHITECTURE-CURRENT.md",
@@ -1724,10 +1724,10 @@
         "docs/design-system/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "f469c7c661c020e8eb3e35be668691a13ba751d3230458431097231d87df0531",
-      "reviewedAt": "2026-11-26T05:09:21.994Z",
+      "sourceDigest": "d2931807ef5bee3fc3d562c935e35c56899796e190f3ae24ed16e5d00f2ce0c5",
+      "reviewedAt": "2026-11-26T05:15:16.098Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented narrow production interfaces, actual six-page adoption, gallery reuse, strict shared-source checks and scoped exceptions; retained explicit pending Learning/Creative integration, seven further archetypes and owner/device acceptance."
+      "reviewReason": "Added a regression contract against residual destination selectors in Studio and captured review iframe evidence at its actual CSS size. Source-bound evidence retains its original represented SHA and explicit remaining integration gates."
     }
   ]
 }

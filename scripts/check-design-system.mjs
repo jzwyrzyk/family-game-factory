@@ -31,6 +31,7 @@ export function check(root=process.cwd()) {
   for(const [file,symbol] of [['src/brand/page-header.ts','createCollectionHeader'],['src/brand/dashboard-card.ts','export *']])if(!read(file).includes(symbol)||read(file).includes('document.createElement'))issues.push({file,rule:'duplicate-component',match:'compatibility wrapper must delegate'});
   for(const file of ['src/brand/jems.css','src/brand/art-library.css','src/studio/modernization.css'])if(/:root\s*\{/.test(read(file)))issues.push({file,rule:'duplicate-foundations',match:':root'});
   for(const file of ['src/brand/journey.ts','src/pals/ui.ts','src/rewards/ui.ts','src/studio/ui.ts','src/studio/world-navigation.ts','src/studio/notifications-view.ts'])if(!read(file).includes('design-system/templates/collection'))issues.push({file,rule:'collection-template',match:'missing canonical import'});
+  if(/\.jems-destination(?:s)?\b/.test(read('src/studio/modernization.css')))issues.push({file:'src/studio/modernization.css',rule:'duplicate-component',match:'destination styles belong to the shared component'});
   for(const [file,width] of [['components/page-header.css',580],['components/destination-card.css',640],['components/destination-card.css',1000],['components/dashboard-card.css',680]])if(!new RegExp('max-width:\\s*'+width+'px').test(read('src/design-system/'+file)))issues.push({file,rule:'breakpoint',match:String(width)});
   return {files:files.length,tokens:tokens.size,issues};
 }

@@ -59,3 +59,5 @@ Run `npm run dev`, then open `/tools/design-system/` for fast component iteratio
 `exceptions.json` accepts exact `{file, rule, match, reason, owner}` records; explain the legitimate gameplay, learning, creative or accessibility need. Stale exceptions fail. Current exceptions are empty. Legacy feature styles are outside strict shared-component enforcement until migrated, rather than hidden behind thousands of automatic waivers. No new regression pipeline or runtime dependency is introduced: the existing standalone workflow runs the fast contracts and gallery browser checks and uploads their evidence.
 
 `design:browser` verifies the shared gallery at four sizes, touch targets, composed text contrast, keyboard focus, dialog containment/restoration, token propagation through six real routes and no external HTTP requests. `UI_REVIEW_INLINE_HARNESS=1` is the existing managed-browser workaround; it does not establish actual file opening. Owner, physical device, audio, hosted DEV/TEST and feature acceptance retain their original gates.
+
+[Source-bound evidence, before/after captures and standalone download](evidence/README.md).
