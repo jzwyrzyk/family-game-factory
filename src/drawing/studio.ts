@@ -17,7 +17,7 @@ import {drawOnTablet} from './paint';
 import {hasCrayonSource} from './crayon-source';
 import {editLegacyCrayons} from './legacy-crayon-editor';
 import {readSketch,verifySketchPixels} from './sketch';
-import {editPicture} from './picture';
+import {editPicture, visiblePicturePng} from './picture';
 import {createIcon,iconMarkup,setIconLabel,type IconName} from '../brand/icons';
 import {assertRewardSourceWritable} from '../rewards/write-guard';
 import './studio.css';
@@ -162,7 +162,21 @@ export function installArtStudio(host:Host){
     const hint=node('p','art-small','This choice is copied into the new game or scene. Earlier adventures keep their chosen version.');pane.append(hint);
     const tools=node('details','art-detail-tools'),summary=node('summary','','Picture & storage tools');tools.append(summary);
     tools.append(button('Trim, turn & clean up','edit',async()=>{await editPicture(captured,item,async result=>{if(!current(captured,run))return;selected=result.id;if(!await refresh())return;status('New picture saved. Your original is still in My art.');notify(captured);focusSelectedArtwork(result.id,captured,run);},()=>current(captured,run));}));
-    tools.append(button('Download original picture','download',()=>download(drawingBlob(item),'my-drawing.'+(item.mime==='image/png'?'png':'jpg'))));
+    const canDownload=()=>current(captured,run) && selected===item.id;
+    tools.append(button('Download original picture','download',async()=>{
+      const lineage=await selectedCreativeImage(captured,item.id);
+      if(!canDownload())return;
+      const original=lineage.originalId===item.id ? item : await drawing(captured,lineage.originalId);
+      if(original.sha256!==lineage.originalSha256)throw Error('Restore the exact original picture from your art backup.');
+      if(canDownload())download(drawingBlob(original),'my-original.'+(original.mime==='image/png'?'png':'jpg'));
+    }));
+    if(item.sourceId)tools.append(button('Download this picture version','download',()=>{
+      if(canDownload())download(drawingBlob(item),'my-drawing.'+(item.mime==='image/png'?'png':'jpg'));
+    }));
+    tools.append(button('Download visible picture','download',async()=>{
+      const visible=await visiblePicturePng(item);
+      if(canDownload())download(visible,'my-picture.png');
+    }));
     tools.append(button(item.archived?'Restore to My art':'Archive picture','clock',async()=>{await updateDrawing(captured,id,{archived:!item.archived},()=>current(captured,run));if(!current(captured,run))return;selected='';if(!await refresh())return;status(item.archived?'Picture returned to My art.':'Picture archived. Saved games and scenes can still use it.');notify(captured);}));
     tools.append(button('Delete unused picture','trash',async()=>{if(!confirm('Delete this picture and its movement versions from this device? Download your art library first to keep a copy. Pictures used by saved work cannot be deleted.'))return;await deleteArtwork(captured,id,()=>current(captured,run));if(!current(captured,run))return;selected='';if(!await refresh())return;status('Unused picture deleted.');notify(captured);}));
     if(item.sourceId)tools.append(node('p','art-small','This is an edited copy. The original picture remains saved separately.'));
@@ -272,7 +286,7 @@ export function installArtStudio(host:Host){
     finally{input.value='';controls.forEach(b=>b.disabled=false);}
   };
   for(const id of ['artUpload','artCamera'])$<HTMLInputElement>(id).onchange=()=>void action(()=>upload($<HTMLInputElement>(id)));
-  $('artDrawButton').onclick=()=>void action(()=>{const id=owner(),run=epoch;return drawOnTablet(id,saved=>showKeptDrawing(saved,id,run),()=>current(id,run));});
+  $('artDrawButton').onclick=()=>void action(async()=>{const id=owner(),run=epoch;await drawOnTablet(id,saved=>showKeptDrawing(saved,id,run),()=>current(id,run));});
   $('artSearch').oninput=()=>{void action(async()=>{await refresh();});};
   $('artFilters').onclick=e=>{const target=(e.target as HTMLElement).closest<HTMLButtonElement>('[data-category]');if(!target)return;category=target.dataset.category!;void action(async()=>{await refresh();});};
   $('artShowArchive').onclick=()=>{archive=!archive;selected='';$('artDetails').hidden=true;void action(async()=>{await refresh();});};

@@ -34,6 +34,19 @@ export function softenCutoutCorners(image: ImageData): void {
   }
 }
 
+/** Export visible pixels without private strokes or imported source metadata. */
+export async function visiblePicturePng(source:Drawing):Promise<Blob>{
+  const bitmap=await createImageBitmap(drawingBlob(source));
+  const canvas=document.createElement('canvas');
+  try{
+    canvas.width=bitmap.width;canvas.height=bitmap.height;
+    const ctx=canvas.getContext('2d');
+    if(!ctx)throw Error('This picture could not be downloaded.');
+    ctx.drawImage(bitmap,0,0);
+    return await new Promise<Blob>((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(Error('This picture could not be downloaded.')),'image/png'));
+  }finally{bitmap.close();canvas.width=canvas.height=1;}
+}
+
 /** Every picture edit creates a new local original derivative; never overwrites. */
 export async function editPicture(owner:string,source:Drawing,onSaved:(drawing:Drawing)=>Promise<void>,isCurrent:()=>boolean=()=>true){
   const FG=(window as any).FG,valid=()=>String(FG.store.current().id)===owner&&isCurrent();

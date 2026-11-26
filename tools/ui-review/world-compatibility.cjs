@@ -3,14 +3,11 @@ const assert = require('node:assert/strict');
 const { createHash } = require('node:crypto');
 const fs = require('node:fs/promises');
 const path = require('node:path');
-const { pathToFileURL } = require('node:url');
+const {standaloneInput} = require('./standalone-input.cjs');
 const { chromium } = require('playwright');
 
 const output = 'test-results/ui-review/world-compatibility';
 const artifact = path.resolve(process.env.UI_REVIEW_FILE || 'dist-review/jems-ui-review.html');
-const inline = process.env.UI_REVIEW_INLINE_HARNESS === '1';
-const reviewURL = inline ? 'http://localhost:43199/' : pathToFileURL(artifact).href;
-
 async function verifyRock(frame, assetId) {
   await frame.waitForFunction(id => {
     const actor = FG.creation.scene()?.actors.find(a => a.assetId === id);
@@ -146,6 +143,8 @@ async function verifyLandscape(page, frame) {
 
 async function run() {
   const browser = await chromium.launch({executablePath: process.env.CHROMIUM_PATH, headless: true});
+  const input = await standaloneInput(artifact);
+  const reviewURL = input.url;
   try {
     await fs.mkdir(output, {recursive: true});
     const page = await browser.newPage({viewport: {width: 1500, height: 1080}, acceptDownloads: true});
@@ -154,8 +153,7 @@ async function run() {
     page.on('request', req => {
       if (/^https?:/.test(req.url()) && req.url() !== reviewURL) requests.push(req.url());
     });
-    if (inline) await page.route(reviewURL, route => route.fulfill({path: artifact, contentType: 'text/html'}));
-    await page.goto(reviewURL, {timeout: 120000});
+    await page.goto(reviewURL, {waitUntil:'domcontentloaded',timeout:120000});
     await page.waitForFunction(() => document.querySelector('#loading').hidden);
     await page.selectOption('#device', 'desktop');
     await page.selectOption('#destination', 'art');
@@ -247,6 +245,7 @@ async function run() {
     console.log('PASS retained scene worlds, Canvas artwork color, immutable pin, undo/redo, byte-exact export, reopening, stage-resolution landscape crop and decoded video fidelity');
   } finally {
     await browser.close();
+    await input.close();
   }
 }
 

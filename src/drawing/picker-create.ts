@@ -31,7 +31,10 @@ export function createPickerArtwork(owner:string, current:()=>boolean):Promise<D
     dialog.oncancel=e=>{if(writing)e.preventDefault();};
     find('[data-draw]').onclick=async()=>{
       try{
-        await drawOnTablet(owner,item=>{if(alive()){saved=item;dialog.close();}},alive);
+        const editor=await drawOnTablet(owner,item=>{if(alive())saved=item;},alive);
+        const finish=()=>{if(saved && alive())dialog.close();};
+        if(editor?.open)editor.addEventListener('close',finish,{once:true});
+        else finish();
       }catch(e){if(alive())status.textContent=(e as Error).message;}
     };
     const beta=document.documentElement.dataset.privateBeta==='true';

@@ -85,7 +85,11 @@ export function sceneryPlacements(scene: CreationProject) {
 export function editWorldPicture(project:CreationProject, picture:PinnedWorld | undefined, background?:SceneBackground) {
   const placements = sceneryPlacements(project);
   if (background) project.background = background;
-  if (!placements.length) { project.world = picture; return; }
+  if (!placements.length) {
+    if (picture) project.world = picture;
+    else delete project.world;
+    return;
+  }
   if (!picture && project.background === 'blank') {
     project.world = {edition:'jems.world.v1',scenery:placements.map(p=>({
       id:p.id,assetId:p.assetId,label:p.name,x:p.x,y:p.y,size:p.size,layer:p.front?'in-front':'behind',

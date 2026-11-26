@@ -424,8 +424,8 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "193347140fc7f56607239517b5da4d413cfacdce8bc14458c02f4fb0934d6a47",
-      "reviewedAt": "2026-11-26T05:43:28.974Z",
+      "sourceDigest": "171e028d45abf0c2270ef35dc41e0187632f7082c0a3aae232cc02d3f445fa29",
+      "reviewedAt": "2026-11-26T05:47:07.984Z",
       "reviewOutcome": "updated",
       "reviewReason": "Verified world edition readers, placement behavior and scoped authored movement blocks against CAD and storage documentation.",
       "reviewHistory": [
@@ -912,8 +912,8 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:43:30.142Z",
-      "sourceDigest": "210c5eeabf7b0ef803e763892dfc72eaf5ecfb6d23faa4c559b831a73dd69f15",
+      "reviewedAt": "2026-11-26T05:47:08.596Z",
+      "sourceDigest": "0bed6ca3312718480466b9b71002da63763547f64ad9d135a5bca75e261ae8a8",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed integrated CI leaves and source assertions for original admissions, game binding, movement and recovery.",
       "reviewHistory": [
@@ -1653,8 +1653,8 @@
         "tests/game-art/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "30781c216748de610b0be254d8eb77df9139bd23c63ee7c11ba6d1c182bf05cb",
-      "reviewedAt": "2026-11-26T05:43:31.348Z",
+      "sourceDigest": "0982955584308d65035105a9f51914910f4dd76e1f903ba0fea213d81809b669",
+      "reviewedAt": "2026-11-26T05:47:08.976Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed supported editors, legacy data readers and exact PNG admission.",
       "reviewHistory": [

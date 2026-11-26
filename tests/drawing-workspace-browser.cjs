@@ -112,7 +112,31 @@ async function run() {
     const motion=page.locator('dialog[open]'); await motion.waitFor(); await page.keyboard.press('Escape');
     if(await motion.count())await motion.waitFor({state:'detached'});
     await page.getByRole('button',{name:'Keep drawing',exact:true}).click();
+    const beforeUndo=await raster(paper);
+    await editor.locator('[data-undo]').click();
+    assert.notEqual(await raster(paper),beforeUndo,'a reopened retained mark remains independently undoable');
+    await editor.locator('[data-redo]').click();
+    assert.equal(await raster(paper),beforeUndo,'redo restores exact reopened pixels');
     await paper.press('Enter'); await editor.locator('[data-save]').click(); await editor.waitFor({state:'detached'});
+    await reveal(pictureTools);
+    async function downloadVersion(name) {
+      const pending=page.waitForEvent('download');
+      await pictureTools.getByRole('button',{name,exact:true}).click();
+      return fs.readFileSync(await (await pending).path());
+    }
+    assert.deepEqual(await downloadVersion('Download original picture'),png);
+    const revision=await downloadVersion('Download this picture version');
+    const visible=await downloadVersion('Download visible picture');
+    assert.notDeepEqual(revision,png);
+    assert.equal(revision.toString('ascii',37,41),'jeMS');
+    assert.ok(!visible.includes(Buffer.from('jeMS')));
+    const colors=await page.evaluate(async files=>Promise.all(files.map(async data=>{
+      const bitmap=await createImageBitmap(await (await fetch('data:image/png;base64,'+data)).blob());
+      const canvas=document.createElement('canvas');canvas.width=bitmap.width;canvas.height=bitmap.height;
+      const ctx=canvas.getContext('2d');ctx.drawImage(bitmap,0,0);bitmap.close();
+      return [canvas.width,canvas.height,...new Uint8Array(await crypto.subtle.digest('SHA-256',ctx.getImageData(0,0,canvas.width,canvas.height).data))];
+    })),[revision,visible].map(buffer=>buffer.toString('base64')));
+    assert.deepEqual(colors[0],colors[1],'visible export matches every pixel at the selected revision’s dimensions');
     await saved.getByRole('button',{name:'Make a scene',exact:true}).click();
     await page.locator('#page-creation').waitFor({state:'visible'});
 

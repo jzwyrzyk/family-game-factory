@@ -70,7 +70,7 @@ export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Prom
   const originPage = document.querySelector<HTMLElement>('.page:not(.hidden)')?.id.replace(/^page-/,'');
   const openingCurrent = () => checkOwner() && isCurrent() && (!originPage || document.getElementById('page-'+originPage)?.classList.contains('hidden')===false);
   let source=previous?.item, initial=previous?.sketch, token:string=crypto.randomUUID();
-  let initialName=source?.name??'', initialCategory:DrawingCategory='other', recovered=false;
+  let initialName=source?.name??'', initialCategory:DrawingCategory=source?.category ?? 'other', recovered=false;
   const pending=await readSketchKeep(owner);
   if(!openingCurrent() || hasEditor())return;
   if(pending){
@@ -397,4 +397,5 @@ export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Prom
     if(needsStamps){dialog.close();throw Error('The gem stamps could not open. Try again to edit your saved drawing.');}
     status.textContent='Gem stamps are unavailable. You can still draw.';updateControls();
   }}
+  return dialog;
 }
