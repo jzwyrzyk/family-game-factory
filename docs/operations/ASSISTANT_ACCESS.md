@@ -11,18 +11,40 @@ destructive and impersonation checks passed across the tested resources. Exact p
 resource list, source SHA and sanitized receipt were not supplied here; this is
 owner-reported finite acceptance, not a universal privilege audit or this task's run.
 
-Use `scripts/ops/diagnose_sdk.py` as the canonical client from this reviewed operations
-source. It selects the version-1 managed connection by actual alias or unique/default
-GCP entry, loads its `credentials_file` external-account configuration in memory,
-requires impersonation of the existing diagnostic account, and verifies the effective
-account through Google's authenticated userinfo before and after metadata reads.
-An in-memory token fingerprint rejects mid-audit refresh so permission comparisons
-use the same authenticated token; retry safely with a fresh session if it changes.
-It reuses the existing Cloud Run v1 redaction/health reader over the supported Google
-Auth SDK. The legacy reader is checksum-pinned by an activation approval and remains
-byte-identical; SDK selection lives in `managed_diagnostic_identity.py`. No ambient ADC fallback, gcloud invocation, credential copy, token cache,
-key creation, managed-file write or permission expansion is used. Unsupported
-credential configuration and unavailable connections fail with fixed safe codes.
+The corrective candidate supports only the installed managed HTTPS proxy profile:
+exact federation audience, diagnostic impersonation account, proxy port/routes,
+GCP subject selector, JSON subject format and identity guard-header name. It reads
+credentials in place and preserves proxy and CA settings. Authentication and API
+redirects are rejected. Owner ADC, executable/file subject sources, arbitrary
+endpoints and plaintext proxy routes are not accepted.
+
+Effective identity uses Google's documented access-token inspection endpoint
+`https://oauth2.googleapis.com/tokeninfo`, with the same in-memory token, followed
+by matching the provider subject to the diagnostic account's IAM `uniqueId`.
+See [service-account token interpretation](https://cloud.google.com/docs/authentication/token-types#access-tokens).
+The shared finite verifier accepts that verified identity and does not repeat userinfo.
+Token changes fail the audit. No token or token fingerprint is emitted.
+
+**Live blocker observed in the attached corrective task:** the installed managed
+helper documents opaque identity handles: the trusted proxy owns the Google token.
+Gateway metadata GET succeeds, but userinfo returns HTTP 403
+`identity_unsupported_request`. Tokeninfo with the managed handle returns HTTP 403
+`identity_handle_denied`; a form POST returned HTTP 400 Invalid Value. Neither
+configured impersonation nor successful metadata access proves effective identity.
+The candidate therefore fails closed until the approved managed provider supports
+authoritative introspection. Do not export real tokens, widen IAM or bypass the proxy.
+IAM account metadata must also be readable for the unique-ID comparison; no new grant
+is implied. The installed `/run/codex-environment/outbound-identity/gcp/cloud_sql.py`
+and Cloud Environment networking instructions informed the exact supported routing.
+
+Finite permission evidence now requires resource GET inventory before permission
+POSTs. It covers three services, project-level write/data/log permissions, four
+production secret references, and diagnostic/release/runtime accounts. The expected
+absent `jems-request-broker` is reported separately and never counted as denied.
+A 404 can conceal access and is qualified accordingly; 403, unsupported inventory,
+and unexpected grants leave acceptance incomplete. These checks read no secret
+versions, application records or logs. Metadata inventory access is not silently
+granted when unavailable.
 
 Install dependencies **outside the source/managed credential directory**, for example
 in a task-owned `work/diagnostic-venv`, using

@@ -148,12 +148,15 @@ class BootstrapTests(unittest.TestCase):
                 calls.append((self.origin, self.assert_token, method, path))
                 if path == 'oauth2/v2/userinfo':
                     return {'email': access.ACCOUNT, 'verified_email': True}
-                return {'permissions': ['run.services.get', 'run.services.getIamPolicy']
+                if method == 'GET':
+                    return {'_inventory_http_status': 404} if 'jems-request-broker@' in path else {'name': path}
+                return {'permissions': ['run.services.get', 'run.services.getIamPolicy', 'run.revisions.get', 'run.revisions.list']
                         if self.origin == 'https://run.googleapis.com' else []}
         result = access.verify('opaque-token', Client)
         self.assertEqual(result['status'], 'FINITE_CHECKS_PASSED')
         self.assertTrue(all(c[1] == 'opaque-token' for c in calls))
-        self.assertTrue(all(c[3].endswith(':testIamPermissions') for c in calls[1:]))
+        self.assertTrue(all(c[2] == 'GET' or c[3].endswith(':testIamPermissions') for c in calls[1:]))
+        self.assertFalse(any(c[2] == 'POST' and 'jems-request-broker@' in c[3] for c in calls))
         self.assertNotIn('opaque-token', json.dumps(result))
 
 

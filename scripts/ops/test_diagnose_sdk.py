@@ -29,12 +29,18 @@ class Session:
         self.account, self.status = account, status
         self.calls, self.closed = [], False
         self.credentials = SimpleNamespace(token='synthetic-token-in-memory')
+    def get(self, url, **kwargs):
+        return self.request('GET', url, **kwargs)
     def request(self, method, url, **kwargs):
         self.calls.append((method, url, kwargs))
-        if url == sdk.USERINFO:
-            return Response({'id': '1054529152893', 'email': self.account, 'verified_email': True})
+        if url == sdk.TOKENINFO:
+            return Response({'sub': '123456789012345678901', 'email': self.account, 'email_verified': True, 'expires_in': '3600'})
+        if method == 'GET' and 'iam.googleapis.com/' in url:
+            if 'jems-request-broker@' in url: return Response({}, 404)
+            return Response({'name': url, 'email': self.account, 'uniqueId': '123456789012345678901'})
+        if method == 'GET' and not url.startswith(sdk.RUN_BASE): return Response({'name': url})
         if method == 'POST':
-            return Response({'permissions': ['run.services.get', 'run.services.getIamPolicy']
+            return Response({'permissions': ['run.services.get', 'run.services.getIamPolicy', 'run.revisions.get', 'run.revisions.list']
                              if url.startswith('https://run.googleapis.com/') else []})
         kind, name = url.rsplit('/', 2)[1:]
         return Response(service(name) if kind == 'services' else revision(name), self.status)
@@ -48,10 +54,13 @@ class SDKTests(unittest.TestCase):
         self.folder = Path(tmp.name)
         self.manifest, self.credentials = self.folder / 'manifest.json', self.folder / 'credentials.json'
         self.credentials.write_text(json.dumps({
-            'type': 'external_account', 'token_url': 'https://sts.googleapis.com/v1/token',
-            'service_account_impersonation_url': 'https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/' +
+            'type': 'external_account', 'audience': sdk.AUDIENCE, 'subject_token_type': 'urn:ietf:params:oauth:token-type:jwt',
+            'token_url': 'https://proxy:8446/identity/gcp/token',
+            'service_account_impersonation_url': 'https://proxy:8446/identity/gcp/v1/projects/-/serviceAccounts/' +
                                                 diagnose.DIAGNOSTICS_ACCOUNT + ':generateAccessToken',
-            'credential_source': {'file': '/managed/subject-token'}}))
+            'credential_source': {'url': 'https://proxy:8446/identity/gcp/subject?alias=GCP',
+                                  'headers': {'X-Identity-Header': 'synthetic-guard'},
+                                  'format': {'type': 'json', 'subject_token_field_name': 'subject_token'}}}))
         self.connections([{'provider_kind': 'gcp', 'alias': 'GCP', 'credentials_file': str(self.credentials)}])
         self.env = {'OIC_MANIFEST_PATH': str(self.manifest), 'PATH': '',
                     'HTTPS_PROXY': 'https://approved.invalid', 'GUARD_BINDING': LEAK}
@@ -133,7 +142,7 @@ class SDKTests(unittest.TestCase):
         for kind, name in (('services', 'other'), ('secrets', 'factory-gateway'), ('revisions', '../secrets')):
             with self.assertRaisesRegex(diagnose.DiagnosticError, 'RESOURCE_OUTSIDE_SCOPE'):
                 reader.describe(kind, name)
-        self.assertEqual(len(session.calls), 1)
+        self.assertEqual(len(session.calls), 2)
 
     def test_sdk_selector_preserves_proxy_and_managed_guard(self):
         env = managed.identity_environment('GCP', self.env, require_cli=False)
@@ -142,6 +151,49 @@ class SDKTests(unittest.TestCase):
         self.assertNotIn('CLOUDSDK_CONFIG', env)
         with self.assertRaisesRegex(diagnose.DiagnosticError, 'IDENTITY_OVERRIDE_UNVERIFIED'):
             managed.identity_environment('GCP', {**self.env, 'CLOUDSDK_AUTH_ACCESS_TOKEN': LEAK}, require_cli=False)
+
+    def test_exact_proxy_fixture_and_rejected_endpoint_variations(self):
+        base = json.loads(self.credentials.read_text())
+        self.assertEqual(sdk.credential_info(self.credentials), base)
+        for key, bad in [('audience', sdk.AUDIENCE + '-other'),
+                         ('token_url', 'http://proxy:8086/identity/gcp/token'),
+                         ('token_url', 'https://proxy:8446/identity/gcp/token?redirect=evil'),
+                         ('universe_domain', 'evil.invalid')]:
+            self.credentials.write_text(json.dumps({**base, key: bad}))
+            with self.assertRaises(diagnose.DiagnosticError): sdk.credential_info(self.credentials)
+        for url in ['https://evil.invalid/token', 'file:///tmp/token',
+                    'https://proxy:8446/identity/gcp/subject?alias=owner']:
+            self.credentials.write_text(json.dumps({**base, 'credential_source': {**base['credential_source'], 'url': url}}))
+            with self.assertRaises(diagnose.DiagnosticError): sdk.credential_info(self.credentials)
+
+    def test_tokeninfo_denial_fails_closed_before_metadata(self):
+        session = Session()
+        session.get = Mock(return_value=Response({}, 403))
+        with self.assertRaisesRegex(diagnose.DiagnosticError, 'TOKENINFO_UNAVAILABLE'):
+            sdk.report('GCP', environ=self.env, session_factory=lambda _: session)
+        self.assertEqual(session.calls, [])
+
+    def test_wrong_unique_account_id_rejected(self):
+        session = Session()
+        original = session.request
+        def changed(method, url, **kwargs):
+            if 'iam.googleapis.com/' in url:
+                return Response({'email': session.account, 'uniqueId': '999'})
+            return original(method, url, **kwargs)
+        session.request = changed
+        with self.assertRaisesRegex(diagnose.DiagnosticError, 'EFFECTIVE_IDENTITY_MISMATCH'):
+            sdk.report('GCP', environ=self.env, session_factory=lambda _: session)
+
+    def test_token_change_during_introspection_rejected(self):
+        session = Session()
+        original = session.get
+        def changed(*args, **kwargs):
+            response = original(*args, **kwargs)
+            session.credentials.token = LEAK
+            return response
+        session.get = changed
+        with self.assertRaisesRegex(diagnose.DiagnosticError, 'SDK_TOKEN_CHANGED'):
+            sdk.report('GCP', environ=self.env, session_factory=lambda _: session)
 
 
 class PreflightTests(unittest.TestCase):

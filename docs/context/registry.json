@@ -1135,10 +1135,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T05:22:49.355Z",
-      "sourceDigest": "8967106ed650512a54801eddc5fe7f196163b0d1d86301a9f8ef439c638a0f0b",
+      "reviewedAt": "2026-11-26T05:39:26.306Z",
+      "sourceDigest": "ecdc02e720b97ff6a3f137774ea2a420796fd938c2f613350b6fd3955a66d5bd",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed final SDK token consistency guard and 263 operations tests; documented same-token read-only audit retry, retained separate live evidence scopes, frozen legacy sources and unchanged production grants/controllers.",
+      "reviewReason": "Documented strict managed proxy authentication, authoritative identity blocker, and existence-qualified finite permission coverage in assistant access and delivery state.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -2,7 +2,7 @@
 """Canonical managed GCP SDK diagnostics. No gcloud, credential copy or cache writes.
 
 Explicitly selects a documented managed connection; never discovers ambient ADC.
-Only the exact diagnostic account is accepted by authenticated Google userinfo.
+Only provider tokeninfo plus IAM unique identity can verify the diagnostic account.
 The existing sanitized metadata reader is reused. Transport/auth failures emit
 fixed codes, never credential files, tokens, raw configuration or SDK exceptions.
 """
@@ -18,41 +18,58 @@ from admin_api import SetupError
 import verify_diagnostic_access as access
 
 SCOPES = ['https://www.googleapis.com/auth/cloud-platform', 'https://www.googleapis.com/auth/userinfo.email']
-USERINFO = 'https://www.googleapis.com/oauth2/v2/userinfo'
 RUN_BASE = f'https://{diagnose.REGION}-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/{diagnose.PROJECT}'
 MAX_BYTES = 256 * 1024
 
 
+AUDIENCE = '//iam.googleapis.com/projects/1054529152893/locations/global/workloadIdentityPools/jems-codex-diagnostics/providers/codex-environment'
+TOKENINFO = 'https://oauth2.googleapis.com/tokeninfo'
+
+
 def credential_info(path):
+    """Accept only the exact managed HTTPS profile; never rewrite routing."""
     try:
         value = json.loads(Path(path).read_text())
-        if not isinstance(value, dict) or value.get('type') != 'external_account':
-            raise ValueError()
-        # Supported managed WIF only. Never run an executable credential source,
-        # consume a service-account key, or silently fall back to owner ADC.
-        source = value.get('credential_source')
-        if not isinstance(source, dict) or source.get('executable'):
-            raise ValueError()
-        expected = ('https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/' +
-                    diagnose.DIAGNOSTICS_ACCOUNT + ':generateAccessToken')
-        if value.get('service_account_impersonation_url') != expected:
-            raise ValueError()
-        if value.get('token_url') != 'https://sts.googleapis.com/v1/token':
+        source = value['credential_source']
+        target = '/v1/projects/-/serviceAccounts/' + diagnose.DIAGNOSTICS_ACCOUNT + ':generateAccessToken'
+        if (value.get('type') != 'external_account' or value.get('audience') != AUDIENCE
+                or value.get('subject_token_type') != 'urn:ietf:params:oauth:token-type:jwt'
+                or value.get('token_url') != 'https://proxy:8446/identity/gcp/token'
+                or value.get('service_account_impersonation_url') != 'https://proxy:8446/identity/gcp' + target
+                or set(source) != {'url', 'headers', 'format'}
+                or source['url'] != 'https://proxy:8446/identity/gcp/subject?alias=GCP'
+                or source['format'] != {'type': 'json', 'subject_token_field_name': 'subject_token'}
+                or set(source['headers']) != {'X-Identity-Header'}
+                or not isinstance(source['headers']['X-Identity-Header'], str)
+                or not source['headers']['X-Identity-Header']
+                or set(value) - {'type', 'audience', 'subject_token_type', 'token_url',
+                    'service_account_impersonation_url', 'credential_source', 'universe_domain'}
+                or value.get('universe_domain', 'googleapis.com') != 'googleapis.com'):
             raise ValueError()
         return value
-    except (OSError, ValueError, TypeError):
-        raise diagnose.DiagnosticError('SDK_CREDENTIAL_CONFIGURATION_UNSUPPORTED: Expected the existing managed diagnostic WIF connection.') from None
+    except (OSError, ValueError, TypeError, KeyError):
+        raise diagnose.DiagnosticError('SDK_CREDENTIAL_CONFIGURATION_UNSUPPORTED: Expected the exact managed HTTPS diagnostic WIF profile.') from None
 
 
 def managed_session(env):
     info = credential_info(env['GOOGLE_APPLICATION_CREDENTIALS'])
     try:
         from google.auth import identity_pool
-        from google.auth.transport.requests import AuthorizedSession
+        from google.auth.transport.requests import AuthorizedSession, Request
+        import requests
         # No project discovery or ADC fallback. Google SDK reads its configured
         # subject-token source and refreshes only in memory; no CLI token database.
         credentials = identity_pool.Credentials.from_info(info, scopes=SCOPES)
-        return AuthorizedSession(credentials)
+        class NoRedirectSession(requests.Session):
+            def request(self, *args, **kwargs):
+                kwargs['allow_redirects'] = False
+                response = super().request(*args, **kwargs)
+                if 300 <= response.status_code < 400:
+                    response.close()
+                    raise ValueError('Identity redirect rejected')
+                return response
+        transport = NoRedirectSession()
+        return AuthorizedSession(credentials, auth_request=Request(session=transport))
     except ImportError:
         raise diagnose.DiagnosticError('SDK_NOT_INSTALLED: Install scripts/ops/diagnostic-requirements.txt into a task virtual environment.') from None
     except Exception:
@@ -68,12 +85,14 @@ class Reader:
     def close(self):
         self.session.close()
 
-    def request(self, method, url, body=None):
+    def request(self, method, url, body=None, *, inventory=False):
         # Routes are constructed solely by identity/describe/permission methods.
         try:
             response = self.session.request(method, url, json=body, timeout=15,
                                             max_allowed_time=45, allow_redirects=False, stream=True)
             try:
+                if inventory and response.status_code in (403, 404):
+                    return {'_inventory_http_status': response.status_code}
                 if response.status_code in (401, 403):
                     raise diagnose.DiagnosticError('ACCESS_DENIED: SDK authentication or permission check failed.')
                 if response.status_code != 200:
@@ -103,13 +122,50 @@ class Reader:
             raise diagnose.DiagnosticError('SDK_READ_FAILED: Connection, authentication or response validation failed; raw details suppressed.') from None
 
     def identity(self):
-        info = self.request('GET', USERINFO)
-        if (info.get('email') != diagnose.DIAGNOSTICS_ACCOUNT or info.get('verified_email') is not True
-                or not isinstance(info.get('id'), str) or not info['id'].isdigit()):
-            self.verified = False
-            raise diagnose.DiagnosticError('EFFECTIVE_IDENTITY_MISMATCH: Google did not verify the diagnostic account.')
-        self.verified = True
-        return {'effective_account': diagnose.DIAGNOSTICS_ACCOUNT, 'verification': 'google_userinfo'}
+        # Refresh in memory only. A managed handle is never treated as a Google
+        # token merely because metadata access succeeded. The approved proxy must
+        # support this documented endpoint or qualification fails closed.
+        try:
+            credentials = self.session.credentials
+            if not credentials.token:
+                credentials.refresh(self.session._auth_request)
+            token = credentials.token
+            fingerprint = hashlib.sha256(token.encode()).digest()
+            if self.token_fingerprint is not None and fingerprint != self.token_fingerprint:
+                raise diagnose.DiagnosticError('SDK_TOKEN_CHANGED: Retry with a fresh session.')
+            self.token_fingerprint = fingerprint
+            response = self.session.get(TOKENINFO, params={'access_token': token},
+                                        timeout=15, allow_redirects=False, stream=True)
+            try:
+                if response.status_code != 200:
+                    raise diagnose.DiagnosticError('TOKENINFO_UNAVAILABLE: Approved managed token introspection path did not return HTTP 200; no identity inferred.')
+                chunks, size = [], 0
+                for chunk in response.iter_content(8192):
+                    size += len(chunk)
+                    if size > MAX_BYTES: raise ValueError()
+                    chunks.append(chunk)
+                info = json.loads(b''.join(chunks))
+            finally:
+                response.close()
+            if hashlib.sha256(credentials.token.encode()).digest() != fingerprint:
+                raise diagnose.DiagnosticError('SDK_TOKEN_CHANGED: Retry with a fresh session.')
+            subject = info.get('sub', info.get('user_id'))
+            if (info.get('email') != diagnose.DIAGNOSTICS_ACCOUNT
+                    or info.get('email_verified', info.get('verified_email')) not in (True, 'true')
+                    or not isinstance(subject, str) or not subject.isdigit()
+                    or int(info.get('expires_in', 0)) <= 0):
+                raise diagnose.DiagnosticError('EFFECTIVE_IDENTITY_MISMATCH: Provider token identity differs from diagnostics account.')
+            account = self.request('GET', 'https://iam.googleapis.com/v1/projects/' + diagnose.PROJECT +
+                                   '/serviceAccounts/' + diagnose.DIAGNOSTICS_ACCOUNT)
+            if account.get('email') != diagnose.DIAGNOSTICS_ACCOUNT or account.get('uniqueId') != subject:
+                raise diagnose.DiagnosticError('EFFECTIVE_IDENTITY_MISMATCH: Provider unique account identity differs.')
+            self.verified = True
+            return {'effective_account': diagnose.DIAGNOSTICS_ACCOUNT,
+                    'effective_account_unique_id': subject, 'verification': 'google_tokeninfo_and_iam'}
+        except diagnose.DiagnosticError:
+            raise
+        except Exception:
+            raise diagnose.DiagnosticError('TOKENINFO_UNAVAILABLE: Authoritative identity verification unavailable; raw details suppressed.') from None
 
     def describe(self, kind, name, _env=None):
         if not self.verified:
@@ -129,12 +185,12 @@ class Reader:
             def __init__(self, origin, _token):
                 self.origin = origin
             def call(self, method, path, body=None):
-                if method == 'GET' and self.origin + '/' + path == USERINFO:
-                    return reader.request(method, USERINFO)
+                if method == 'GET':
+                    return reader.request(method, self.origin + '/' + path, inventory=True)
                 if method != 'POST' or not path.endswith(':testIamPermissions'):
                     raise SetupError('Permission transport rejected operation')
                 return reader.request(method, self.origin + '/' + path, body)
-        return access.verify(None, Adapter)
+        return access.verify(None, Adapter, verified_identity=self.identity())
 
 
 def report(alias=None, self_check=False, verify_permissions=False, environ=None, session_factory=managed_session):
@@ -157,9 +213,9 @@ def report(alias=None, self_check=False, verify_permissions=False, environ=None,
                 result['services'].append({'service': name, 'error': str(error)})
         if verify_permissions:
             result['permission_checks'] = reader.permissions()
-            result['identity_privilege_ceiling'] = 'finite_checks_passed_not_universal'
+            result['identity_privilege_ceiling'] = ('finite_checks_passed_not_universal' if result['permission_checks']['status'] == 'FINITE_CHECKS_PASSED' else 'not_verified')
         reader.identity()  # Verify effective account again after any SDK refresh.
-        result['exit_code'] = (2 if any('error' in s for s in result['services']) else
+        result['exit_code'] = (2 if any('error' in s for s in result['services']) or (verify_permissions and result['permission_checks']['status'] != 'FINITE_CHECKS_PASSED') else
                                0 if self_check or all(s['metadata_checks_passed'] for s in result['services']) else 1)
         return result
     finally:

@@ -2068,3 +2068,8 @@ For each changed claim, record **what**, **which repository/commit/image/service
 Use separate terms: **planned**, **implemented on a branch**, **merged**, **deployed to a named environment**, **activated for a named scope**, and **verified for a named criterion**. A green check is evidence only for the check it ran. See [PR template](.github/PULL_REQUEST_TEMPLATE.md) and [maintenance](docs/context/MAINTENANCE.md).
 
 The independent beta review reconciles protected main’s owner-only premium development ceiling with the ordinary generation limit. Review combines F06 storage, the five application PRs and the private worker source. Hosted acceptance of this combination, operator review, cloud readback and real-device acceptance are separate gates. New tests exercise two family HTTPS origins in one Chromium browser partition and the pending-deletion lifecycle.
+
+
+### PR222 managed-auth corrective qualification (November 26, 2026)
+
+Independent attached-environment work found that the original exact endpoint validator rejects the managed HTTPS proxy profile. The corrective branch pins that profile and uses provider tokeninfo plus IAM unique identity, with inventory-qualified broader finite permission checks. Live gateway metadata remains reachable, but the managed proxy rejects userinfo and tokeninfo identity inspection. Effective identity and corrected full diagnostics remain unqualified; no cloud mutations or privilege changes were made. See [assistant access](docs/operations/ASSISTANT_ACCESS.md) for the fail-closed boundary and prerequisites.
