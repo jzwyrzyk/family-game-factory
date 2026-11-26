@@ -2,6 +2,8 @@
 
 ## Nonnegotiable policies
 
+The [workspace standard](../learning/LEARNING_WORKSPACE_STANDARD.md) maps literacy skills to response interactions, passage presentation and assistance rules.
+
 A child's local profile has a learningSubject of math or language, with absent legacy values defaulting to math. The parent interface and state mutation reject Off/none/invalid subjects. Every game uses the host-owned checkpoint. The existing 1–8 question rolling budget persists **across both subjects** and every game version; switching the subject must not restart or bypass it. Game-design prompts may change the three permitted presentation modes (checkpoint, interaction, both) but cannot disable learning or change the parent's subject choice.
 
 ## Shared profile level
@@ -30,7 +32,7 @@ Immutable runtime archives must not be rewritten in place. A future subject-neut
 
 ## Accessibility and limitations
 
-A target question is visible and focused before a keyboard appears. Optional speech synthesis reads the task/passage on supported browsers and **marks the attempt as assisted**, never proving independent decoding. The browser's voice is not a validated instructional phonics voice; automatic pronunciation and reading-fluency grading remain unimplemented. Controlled local items are checked exactly; creative writing is stored as exploration with optional human review instead of invented AI mastery.
+A target question is visible and focused before a keyboard appears. The shared direction reader supplies an access instruction. The separate Read with me action may read assessed text, recording listening support on actual playback. Early instruction and declared grown-up delivery retain their existing policy. The browser's voice is not a validated instructional phonics voice; automatic pronunciation and reading-fluency grading remain unimplemented. Controlled local items are checked exactly; creative writing is stored as exploration with optional human review instead of invented AI mastery.
 
 ## Reviewed task revisions and backward compatibility
 

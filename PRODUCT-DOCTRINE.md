@@ -95,6 +95,8 @@ Continuous listening, automatic send, voice-triggered builds and automatic favor
 
 ## 6. Learning belongs to the trusted host and needs honest evidence
 
+The child can explore a model or passage, try an answer, revise it and resume play in one shared Math and English workspace. Match the presentation to the child's configured grade and the tools to the selected skill. Preserve the distinction between solving a task using its normal representation and receiving a scaffold that teaches a solution. [Learning workspace standard](docs/learning/LEARNING_WORKSPACE_STANDARD.md)
+
 The parent-selected subject, grade boundary and learning settings travel with the child across games and versions. Game difficulty is separate from learning difficulty. The selected Math or Language Arts host controls activities, answers, assistance and progress; generated code cannot grade the child, bypass checkpoints or award proficiency. Additional practice while waiting is optional and does not replace ordinary required checkpoints.
 
 Make the current profile's grade and learning difficulty explicit. An unconfigured child starts conservatively; age or game progress must not infer a higher grade. Stretch varies challenge within the chosen ceiling. Preserve intentionally saved settings and prior learning evidence when introducing a clearer setup flow.

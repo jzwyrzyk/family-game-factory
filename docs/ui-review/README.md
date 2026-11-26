@@ -4,6 +4,8 @@ The review build packages the selected Jems source into one downloadable `jems-u
 
 The toolbar selects an experience, supported learning grade, effective iframe viewport, page/journey state and synthetic scenario. Fit display scales the live frame; the frame's CSS viewport still matches the selected dimensions and uses the product's responsive rules. Choose 100% to inspect physical text size, or hide the toolbar. Flag concerns after clicking an affected control, edit/delete findings, mark pages reviewed, and export Markdown or JSON. Findings use a separate browser-local key with an in-memory fallback. Export before closing if persistence is unavailable.
 
+The **Math workspace**, **English workspace**, and **Learning feedback and recovery** groups open deterministic curriculum samples through My Powers. The grade and game-context controls let reviewers compare presentations. Choose **Populated** to include an owned starter Pal. [Learning gallery walkthrough, screenshots and browser receipts](../evidence/learning-workspace/README.md)
+
 ## Regenerate
 
 From a clean checkout with Node 24+, Python 3 and Pillow:
