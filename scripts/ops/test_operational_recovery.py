@@ -1,4 +1,6 @@
 import json
+import contextlib
+import io
 from pathlib import Path
 import tempfile
 import unittest
@@ -9,18 +11,59 @@ import bootstrap_request_diagnostics as setup
 
 
 class RecoveryTests(unittest.TestCase):
+    def test_partial_replacement_build_tuple_fails_before_source_or_cloud_reads(self):
+        for args in (['--broker-image', 'anything'], ['--broker-build-id', 'anything'],
+                     ['--broker-build-source-sha', 'a' * 40]):
+            with patch.object(recovery.broker, 'source') as source, patch.object(recovery, 'command') as command:
+                with self.assertRaisesRegex(setup.BrokerValidationError, 'COMPLETE_REPLACEMENT_BUILD_REFERENCE_REQUIRED'):
+                    recovery.main(['--source-sha', 'b' * 40, '--home-dir', '/unused', '--receipt-dir', '/unused', *args])
+                source.assert_not_called(); command.assert_not_called()
+
+    def test_recovery_keeps_new_build_tuple_together_and_reports_old_image_mismatch(self):
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp)
+            supplied = ['--broker-image', 'new-image', '--broker-build-id', 'new-build', '--broker-build-source-sha', 'a' * 40]
+            for extra in ([], supplied):
+                def inventory(*args):
+                    print(json.dumps({'status': 'STOPPED', 'code': 'BUILD_SOURCE_BROKER_FILES_DIFFER'})); return 2
+                with patch.object(recovery.broker, 'source'), patch.object(recovery, 'command'), \
+                     patch.object(recovery, 'audit_evidence', return_value={}), patch.object(recovery, 'local_cli_evidence', return_value={}), \
+                     patch.object(recovery.broker, 'main', side_effect=inventory) as read, \
+                     patch.object(recovery.cleanup, 'main', side_effect=lambda _: print('{}')), \
+                     patch.object(recovery.capacity, 'main', side_effect=lambda _: print('{}')), \
+                     patch.object(recovery, 'saved_nonprod', return_value={}), contextlib.redirect_stdout(io.StringIO()) as output:
+                    recovery.main(['--source-sha', 'b' * 40, '--home-dir', str(home), '--receipt-dir', str(home / 'receipts'), *extra])
+                report = json.loads(output.getvalue())
+                self.assertIn('DO_NOT_RESUBMIT_HISTORICAL_BUILD', report['broker']['next_action'])
+                args = read.call_args.args[0]
+                self.assertEqual(args[args.index('--image') + 1], 'new-image' if extra else recovery.IMAGE)
+                self.assertEqual(args[args.index('--build-id') + 1], 'new-build' if extra else recovery.BUILD)
+                self.assertEqual(args[args.index('--build-source-sha') + 1], 'a' * 40 if extra else recovery.BUILD_SOURCE)
+
+    def test_depth_limit_is_a_fixed_code_and_only_exact_diagnostic_exposes_small_integer(self):
+        for suffix in ('', '.'):
+            message = 'Filter exceeds the view filter nesting depth limit of 1' + suffix
+            self.assertEqual(recovery.failure_details(message), {
+                'provider_code': 'VIEW_FILTER_NESTING_DEPTH_EXCEEDED', 'nesting_depth_limit': 1})
+            self.assertIn('VIEW_FILTER_NESTING_DEPTH_EXCEEDED', recovery.hints(message))
+            self.assertIn('nesting depth limit', recovery.redacted_message(message))
+        for message in ('PRIVATE 12345', 'Filter exceeds the view filter nesting depth limit of PRIVATE',
+                        'Filter exceeds the view filter nesting depth limit of 123456789'):
+            self.assertEqual(recovery.failure_details(message), {})
+            self.assertNotIn('PRIVATE', recovery.redacted_message(message))
+
     def test_projected_admin_audit_captures_exact_failure_privately_only(self):
         with tempfile.TemporaryDirectory() as temp:
             folder = Path(temp)
             api = Mock()
             api.call.return_value = {'entries': [{'timestamp': '2026-11-26T16:00:00Z', 'protoPayload': {
                 'methodName': recovery.METHOD, 'resourceName': setup.VIEW,
-                'request': {'view': {'filter': setup.broker.VIEW_FILTER}},
+                'request': {'view': {'filter': recovery.FAILED_BUILD_VIEW_FILTER}},
                 'status': {'code': 3, 'message': 'OR clauses not supported PRIVATE-SENTINEL'}}}]}
             result = recovery.audit_evidence(api, folder)
             self.assertEqual(result['status'], 'MATCHED_FAILURES')
             self.assertIn('MENTIONS_OR', result['failures'][0]['hints'])
-            self.assertTrue(result['failures'][0]['filter_matches_image_contract'])
+            self.assertTrue(result['failures'][0]['filter_matches_failed_build_contract'])
             self.assertNotIn('PRIVATE-SENTINEL', json.dumps(result))
             private = next(folder.glob('provider-audit-*.json'))
             self.assertIn('PRIVATE-SENTINEL', private.read_text())

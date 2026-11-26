@@ -215,5 +215,20 @@ class CapacityTests(unittest.TestCase):
         with patch.dict(os.environ, {'GIT_DIR': str(self.b / '.git'), 'GIT_WORK_TREE': str(self.b)}):
             self.assertEqual(old.git(self.a, 'rev-parse', '--show-toplevel').decode().strip(), str(self.a))
 
+    def test_registered_recovery_named_worktree_is_found_without_scanning_arbitrary_recovery_records(self):
+        linked = self.home / 'jems-releases/pr115/tool-recovery-fixture'
+        linked.parent.mkdir(parents=True)
+        self.git(self.a, 'worktree', 'add', '--detach', str(linked), 'HEAD')
+        (linked / 'journal.json').write_text('unique recovery record')
+        unknown = linked.parent / 'recovery-private/unregistered'
+        shutil.copytree(self.b, unknown)
+        found = list(old.discover(self.home))
+        self.assertEqual(found.count(linked), 1)
+        self.assertNotIn(unknown, found)
+        plan = old.repo_plan(linked, self.home, proof=lambda sha: None)
+        self.assertIn('source.py', [f['path'] for f in plan['files']])
+        self.assertNotIn('journal.json', [f['path'] for f in plan['files']])
+        self.assertEqual((linked / 'journal.json').read_text(), 'unique recovery record')
+
 
 if __name__ == '__main__': unittest.main()

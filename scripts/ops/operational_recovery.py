@@ -27,6 +27,13 @@ IMAGE = broker.publication.IMAGE + '@sha256:4373d65ae39fdf0ea10f2f3a4afe5ce57ab9
 NONPROD_APPROVAL = '821d722ee140ffdef4c8ae4ba4e1fed89307e6c997153b3a8597f726a8caaad6'
 BUCKET = broker.VIEW.rsplit('/views/', 1)[0]
 METHOD = 'google.logging.v2.ConfigServiceV2.CreateView'
+# Historical audit correlation only: never accepted by the corrected runtime.
+FAILED_BUILD_VIEW_FILTER = (
+    'source("projects/family-game-factory-jzw") AND resource.type="cloud_run_revision" '
+    'AND log_id("run.googleapis.com/requests") AND resource.labels.location="us-east5" '
+    'AND (resource.labels.service_name="factory-gateway" OR resource.labels.service_name="factory-preview" '
+    'OR resource.labels.service_name="factory-coach-private")'
+)
 
 
 def hints(message):
@@ -36,6 +43,7 @@ def hints(message):
         'MENTIONS_FLEXIBLE_FILTER': r'flexible', 'MENTIONS_UNSUPPORTED_FILTER': r'not supported|unsupported|only.*supported',
         'MENTIONS_PARSER_ERROR': r'parse|syntax|unexpected token',
         'MENTIONS_LOCATION': r'location|region', 'MENTIONS_FILTER_LENGTH': r'length|too long',
+        'VIEW_FILTER_NESTING_DEPTH_EXCEEDED': r'Filter exceeds the view filter nesting depth limit',
         'MENTIONS_INVALID_ARGUMENT': r'invalid.argument'}
     return [name for name, pattern in tests.items() if re.search(pattern, message, re.I if name != 'MENTIONS_OR' else 0)]
 
@@ -49,9 +57,16 @@ def redacted_message(message):
                    'conjunction conjunctions disjunction disjunctions operator operators comparison comparisons '
                    'field fields expression expressions syntax parse parser parseable unparseable failed error '
                    'unexpected token tokens expected missing function functions restriction restrictions '
-                   'with without in on for of to at value values').split())
+                   'with without in on for of to at value values exceeds exceeded nesting depth limit limits '
+                   'maximum minimum total size length byte bytes character characters count counts number term terms complexity').split())
     return ' '.join(t if t.lower() in allowed or t in '():,.=<>![]' else '[redacted]'
                     for t in re.findall(r'[A-Za-z0-9_.-]+|[^\w\s]', message)[:120])
+
+
+def failure_details(message):
+    # An integer is safe only in this exact provider diagnostic, never arbitrary IDs.
+    matched = re.fullmatch(r'Filter exceeds the view filter nesting depth limit of ([0-9]{1,3})\.?', message)
+    return {'provider_code': 'VIEW_FILTER_NESTING_DEPTH_EXCEEDED', 'nesting_depth_limit': int(matched[1])} if matched else {}
 
 
 def audit_evidence(api, folder):
@@ -78,13 +93,14 @@ def audit_evidence(api, folder):
             if status.get('code') != 3: continue
             message = str(status.get('message', ''))[:4096]
             rows.append({'time': entry.get('timestamp'), 'status_code': 3,
-                         'message': message, 'filter_matches_image_contract': request.get('view', {}).get('filter') == broker.broker.VIEW_FILTER})
+                         'message': message, 'filter_matches_failed_build_contract': request.get('view', {}).get('filter') == FAILED_BUILD_VIEW_FILTER})
         token = result.get('nextPageToken')
         if not token: break
     receipt = {'kind': 'PRIVATE_CREATE_VIEW_FAILURE', 'rows': rows, 'complete': not bool(token)}
     capacity.write_json(folder / ('provider-audit-' + cleanup.digest(receipt) + '.json'), receipt)
     return {'status': 'MATCHED_FAILURES' if rows else 'NO_MATCHING_FAILURE_OBSERVED',
-        'complete': not bool(token), 'failures': [{k: r[k] for k in ('time', 'status_code', 'filter_matches_image_contract')} |
+        'complete': not bool(token), 'failures': [{k: r[k] for k in ('time', 'status_code', 'filter_matches_failed_build_contract')} |
+            failure_details(r['message']) |
             {'message_sha256': hashlib.sha256(r['message'].encode()).hexdigest(), 'hints': hints(r['message']), 'provider_message_redacted': redacted_message(r['message'])} for r in rows],
         'exact_provider_message': 'RETAINED_PRIVATELY_NOT_PRINTED'}
 
@@ -144,7 +160,10 @@ def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--source-sha', required=True); p.add_argument('--home-dir', type=Path, required=True)
     p.add_argument('--receipt-dir', type=Path, required=True); p.add_argument('--nonprod-state-dir', type=Path)
+    p.add_argument('--broker-image'); p.add_argument('--broker-build-id'); p.add_argument('--broker-build-source-sha')
     a = p.parse_args(argv)
+    supplied = (a.broker_image, a.broker_build_id, a.broker_build_source_sha)
+    broker.require(all(supplied) or not any(supplied), 'COMPLETE_REPLACEMENT_BUILD_REFERENCE_REQUIRED')
     broker.source(a.source_sha)
     home = cleanup.safe_path(a.home_dir); folder = cleanup.private_dir(a.receipt_dir, home)
     report = {'status': 'READ_ONLY_RECOVERY_REPORT_NOT_ACTIVATION', 'source_sha': a.source_sha, 'cloud_mutations': 0, 'deletions': 0, 'archive_uploads': 0}
@@ -156,16 +175,20 @@ def main(argv=None):
     try: report['local_provider_evidence'] = local_cli_evidence(home, folder)
     except Exception: report['local_provider_evidence'] = {'status': 'LOCAL_EVIDENCE_UNAVAILABLE'}
     with contextlib.redirect_stdout(io.StringIO()) as captured:
-        code = broker.main(['--source-sha', a.source_sha, '--image', IMAGE, '--build-id', BUILD,
-                            '--build-source-sha', BUILD_SOURCE, '--check'])
+        code = broker.main(['--source-sha', a.source_sha, '--image', a.broker_image or IMAGE,
+                            '--build-id', a.broker_build_id or BUILD,
+                            '--build-source-sha', a.broker_build_source_sha or BUILD_SOURCE, '--check'])
     inventory = json.loads(captured.getvalue())
     if code == 0:
         plan = inventory['plan']; capacity.write_json(folder / ('broker-remaining-' + cleanup.digest(plan) + '.json'), plan)
         report['broker'] = {'status': 'REMAINING_ACTIONS_REVIEW_ONLY', 'actions': plan['actions'],
             'remaining_actions_sha256': inventory['approve_plan_sha256'],
-            'existing_resources_checked': True, 'apply_blocker': 'PREVIOUS_CREATE_VIEW_INVALID_ARGUMENT_REQUIRES_RESOLUTION',
-            'image': IMAGE, 'build_source_sha': BUILD_SOURCE}
-    else: report['broker'] = inventory
+            'existing_resources_checked': True, 'apply_blocker': 'FRESH_EXACT_PLAN_APPROVAL_AND_PROVIDER_FILTER_ACCEPTANCE_REQUIRED',
+            'image': a.broker_image or IMAGE, 'build_source_sha': a.broker_build_source_sha or BUILD_SOURCE}
+    else:
+        report['broker'] = inventory
+        if inventory.get('code') == 'BUILD_SOURCE_BROKER_FILES_DIFFER':
+            report['broker']['next_action'] = 'REVIEW_NEW_FILTER_SOURCE_AND_BUILD_PLAN; DO_NOT_RESUBMIT_HISTORICAL_BUILD'
     try:
         with contextlib.redirect_stdout(io.StringIO()) as captured:
             cleanup.main(['--home-dir', str(home), '--receipt-dir', str(folder / 'source-cleanup')])

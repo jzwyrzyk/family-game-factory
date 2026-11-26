@@ -1,5 +1,49 @@
 # Permanent cloud operations delivery ledger
 
+## November 26, 2026 — provider depth failure identified
+
+Administrator recovery from source `2628bd3c29ce5e91c49dbb5fef8b31d71a9c0a43`
+matched the failed CreateView audit entry against the original image's exact filter.
+A local-only sanitized decoder identified **Filter exceeds the view filter nesting
+depth limit of 1**. The fixed diagnostic text matches the supplied audit-message
+SHA-256 fingerprint exactly, resolving the initially redacted numeric limit without
+publishing a private receipt. This supersedes
+the earlier unresolved provider failure; it does not establish that OR or labels
+are unsupported. All six existing resources/bindings were rechecked and four actions
+remained; no mutations, deletion or archival occurred. Private provider receipts
+remain in Cloud Shell.
+
+The correction uses a flat conjunction and an exact anchored RE2 service-name
+comparison, retaining all five access restrictions. The existing qualified image
+embeds the old literal filter and cannot accept the new one. Preserve the original
+build/image; new source requires one separately approved build, full immutable
+source/build/archive/digest qualification and a fresh remaining-actions review.
+Neither the corrected filter nor a new image has live-provider acceptance. No build
+was submitted and no logging, IAM, production service or credential boundary widened.
+
+Source cleanup now found **893,938,345 bytes** across four repositories, with two
+blocked roots. Exact-pack dedup savings remain zero. Then-eligible Git objects are
+894,881,792 allocated bytes and dependency candidates 103,985,152 allocated bytes.
+The locked repository accounts for 732,725,248 Git bytes; the unreadable-HEAD root
+accounts for 294,797,312 Git bytes plus 190,636,032 other bytes. Those blocked size
+observations are **not verified recoverability**. Discovery now follows the already
+registered recovery-named worktree while protecting records per file. No Git lock
+is removed, no damaged HEAD is rewritten and no private archive target is approved.
+The 2 GiB target remains unverified; do not add alternative plan estimates.
+
+The original 28-resource DEV/TEST plan and binding passed integrity checks again.
+No apply-started record was found; Terraform was not invoked and state was not
+modified. Its existing source/approval boundary remains independent of the broker.
+
+Correction validation: **341 operations tests** passed, including 891 finite
+semantic combinations for unchanged project/log/type/region/service scope, near-match
+service denial, old/broader filter rejection, grouped replacement build references
+and discovery of registered recovery-named worktrees. These fixtures do not assert
+actual provider regex acceptance. The original image/source mismatch remains an
+enforced deployment blocker. **122 CI contract tests**, **18 documentation tests**
+and the documentation review check also passed. The broader application-browser
+timeouts recorded earlier retain their separate scope.
+
 ## November 26, 2026 — administrator recovery readback and remaining blockers
 
 Administrator execution of source `057daa43ab9c2f4da5510f6987b0c3743e8cce98`

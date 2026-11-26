@@ -18,8 +18,9 @@ original source `446a245e624f44c36e1e3847ae7779477272d899` and approval hash
 Do not regenerate, migrate or rebind it to a newer recovery-tool commit. An approval
 hash identifies the reviewed plan; it is not evidence that apply occurred.
 
-Existing broker build `7fcac19a-8444-4c17-955a-1a381006069e` is reported SUCCESS,
-but source/image/provenance verification is not yet accepted. **Never resubmit it.**
+Existing broker build `7fcac19a-8444-4c17-955a-1a381006069e` passed source/image/
+provenance verification. **Never resubmit it.** Its embedded view expression later
+failed the provider nesting-depth limit; that is a distinct configuration blocker.
 The verifier now names each failed predicate and can run a bounded `--diagnose`
 against an existing build. Use `--build-source-sha 446a245e624f44c36e1e3847ae7779477272d899`
 with a newer verifier to retain the actual image's original source, labels and archive.
@@ -30,7 +31,9 @@ The administrator probe identified only `BUILD_ARTIFACTS_UNEXPECTED`: an exact
 provider mirror of the approved images list. The verifier now accepts only that
 mirror and still rejects every additional artifact field or destination. The administrator subsequently completed build/registry
 verification as `BUILD_VERIFIED_NOT_DEPLOYED`; the exact digest is in the recovery handoff. [Recovery and guarded cleanup](OPERATIONS_RECOVERY.md)
-preserves the original build and unapplied Terraform plan; no rebuild is required.
+preserves the original build and unapplied Terraform plan. The new shallow filter
+changes the embedded runtime contract, so one separately approved replacement build
+is now required; the earlier artifacts-mirror correction itself needed no rebuild.
 
 ## One verified launcher
 
@@ -40,15 +43,15 @@ The reviewed handoff supplies the full `OPS_SHA` for this candidate. Download on
 
 ```sh
 curl -fsSL "https://raw.githubusercontent.com/jzwyrzyk/family-game-factory/$OPS_SHA/scripts/ops/handoffs/operations-bootstrap.sh" -o /tmp/jems-operations.sh
-printf '%s  %s\n' fdfefd869abeb1876102e9086ceba26998725ef0cc9a856a43adc7900fb6ddb4 /tmp/jems-operations.sh | sha256sum -c -
+printf '%s  %s\n' aa1d0daae1b7d0a86a38a6e84e8147f44b84070d680e9f5224c11b98701921c3 /tmp/jems-operations.sh | sha256sum -c -
 bash /tmp/jems-operations.sh "$OPS_SHA" github --check
 bash /tmp/jems-operations.sh "$OPS_SHA" broker-build --check
 bash /tmp/jems-operations.sh "$OPS_SHA" nonprod --inventory
 ```
 
 These three checks make no cloud or GitHub changes. The launcher fetches exactly
-the selected commit into a temporary clean checkout and accepts only four named
-operations. Keep inventories, billing IDs, Terraform plans/state and operational
+the selected commit into a temporary clean checkout and accepts only the documented named
+operations (including the guarded cleanup/capacity/recovery lanes). Keep inventories, billing IDs, Terraform plans/state and operational
 receipts private, outside the checkout. No direct Codex credential is a prerequisite.
 The older request-only launcher remains available; the consolidated launcher is
 preferred. A checksum verifies the downloaded launcher against the reviewed handoff;
@@ -59,7 +62,7 @@ it does not itself approve the source SHA or a provisioning plan.
 | Lane | Proposed change | Cost and security effect |
 | --- | --- | --- |
 | GitHub | Set selected-branch policies and add only branch `main` on `jems-production-diagnostics`, `jems-nonproduction`, `jems-nonproduction-uat`: six REST changes in the observed inventory | No new credential, OIDC template, release setting, schedule or application change. Restricts diagnostic environment; creates the two missing nonproduction environments. |
-| Broker publication | One <=600-second Cloud Build using existing `factory-service-builder`, source bucket `family-game-factory-jzw-service-builds-us-east5`, repository `factory-services`, image `request-broker` | No new builder, bucket, registry or IAM. One build plus image/source/log storage; at an illustrative $0.006/minute, <=$0.06 compute before allowances. Verify actual account/SKU pricing; this is not a quote. |
+| Broker publication | One <=600-second Cloud Build using existing `factory-service-builder`, source bucket `family-game-factory-jzw-service-builds-us-east5`, repository `factory-services`, image `request-broker` | No new builder, bucket, registry or IAM. One build plus image/source/log storage; published us-east5 E2_MEDIUM rate $0.003/minute gives <=$0.03 compute for 600s before allowances; storage/logging/network are additional, not an all-in cap. [Pricing](https://cloud.google.com/build/pricing-update) |
 | PR153 broker infrastructure | Dedicated `jems-github-diagnostics/github-main` pool/provider; `jems-github-log-reader` and `jems-request-broker` keyless accounts; `jemsRequestViewReader` custom role; `global/_Default/views/jems-production-requests`; `jems-request-evidence` Cloud Run service; three exact resource bindings | Caller can impersonate only its account and invoke only broker; broker gets `logging.views.get/access` on only the filtered view. No project log role or secret/data/deploy grants. Min 0, max 1, concurrency 1, 256 MiB, 1 vCPU, 60s. Indicative $1–5/month for sparse manual reads, separate from nonproduction budget; not an approved cap. |
 | Nonproduction project | Reserve `jems-jzw-nonprod` only after availability review; link the verified existing billing account | No production data/credential copy. No silent adoption of a hidden or colliding project. Account/parent authority remains an administrator prerequisite. |
 | Nonproduction Terraform | 28 expected create instances for an empty project: eight API enables, four keyless SAs, four runtime account bindings, one registry and writer binding, two custom roles and controller binding, IAP service identity and agent binding, disabled pool/provider and two exact federation bindings, one project-filtered $15 monthly budget | Existing architecture; DEV `jems-static-runtime` and TEST `jems-test-runtime` are distinct and have zero application roles. Deployer acts as those two only; UAT has no project role. Federation disabled, registry deletion dry-run, no application deployment, data service, secret, NAT, VM or AI. Initial plans reject updates/replacement/deletion. |
@@ -79,16 +82,17 @@ executable steps/options, source archive SHA256 from provider provenance, resolv
 source generation and registry digest. This is source-bound provider evidence, not
 an independently signed SLSA attestation. The Docker builder follows the existing
 lane's image; record its provider-reported builder digest in the private build
-record. The administrator has now qualified the existing broker build and immutable
-registry digest; reuse the exact identities in [recovery](OPERATIONS_RECOVERY.md).
+record. The administrator qualified the existing build/image, which is retained as
+historical evidence. The subsequent view-filter depth rejection now requires changed
+runtime source and a separately approved replacement image; see the exact
+[correction and execution order](OPERATIONS_RECOVERY.md#confirmed-nesting-depth-failure-and-corrected-source).
 
-For the current activation, **do not submit another build**. Use existing build
-`7fcac19a-8444-4c17-955a-1a381006069e`, original source
-`446a245e624f44c36e1e3847ae7779477272d899` and the verified image from the
-[read-only broker inventory command](OPERATIONS_RECOVERY.md#next-broker-inventory-read-only).
-Only after reviewing that actual inventory plan, run the same command with `--apply
---approve-plan-sha256 BROKER_PLAN_HASH` instead of `--check`. Keep its original
-`--build-source-sha` and the qualified tooling source fixed.
+Do not resubmit the historical build or combine its old image with the corrected
+filter. First review the corrected source's build plan and additional build cost.
+After an explicitly approved submission, qualify the new build by its returned ID,
+then use its immutable digest in fresh broker inventory. Review the resulting
+remaining-actions hash before apply. All six existing resources/bindings must match
+before any remaining action is executed.
 
 `BROKER_IMAGE` is the verified `factory-services/request-broker@sha256:...` result.
 Check/apply independently reverify Cloud Build provenance. They never accept a tag,

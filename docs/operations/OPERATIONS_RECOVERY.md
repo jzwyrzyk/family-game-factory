@@ -3,6 +3,72 @@
 November 26, 2026. This supplements [permanent setup](PERMANENT_CLOUD_SETUP.md).
 It does not approve deletion or regenerate any saved Terraform plan.
 
+## Confirmed nesting-depth failure and corrected source
+
+Administrator execution at `2628bd3c29ce5e91c49dbb5fef8b31d71a9c0a43` recovered
+CreateView Admin Activity evidence for the failed image's exact filter. A bounded
+local decoder identified **Filter exceeds the view filter nesting depth limit**.
+The numeric limit **1** was independently confirmed by matching the fixed
+diagnostic sentence against the supplied audit-message SHA-256 fingerprint. No
+private receipt was published. This confirms the failure class and limit, not
+provider acceptance of a replacement.
+
+The corrected source replaces only the nested service disjunction with:
+
+```text
+resource.labels.service_name=~"^(factory-gateway|factory-preview|factory-coach-private)$"
+```
+
+This makes the filter a conjunction of five leaf predicates. It retains the exact
+source project, Cloud Run revision type, request log, region and three service
+names. Google's [flexible-filter guide](https://docs.cloud.google.com/logging/docs/logs-views#filters)
+supports the regex comparison; the [query-language reference](https://docs.cloud.google.com/logging/docs/view/logging-query-language#regular-expressions)
+defines RE2 matching. Local equivalence/negative fixtures do not prove provider
+view acceptance. No trial view, wider view, extra sink or log grant was created.
+
+The old image is preserved but cannot accept this changed exact expression. The
+setup verifier must reject mixing its original build source with new runtime bytes
+as `BUILD_SOURCE_BROKER_FILES_DIFFER`. Do not bypass that predicate. The recovery
+lane accepts a new qualified image/build/source tuple only when all three arguments
+are provided; its historical audit correlation still identifies the original filter.
+
+Execution order for the immutable corrected source supplied in the handoff:
+
+```sh
+# Read-only build prerequisites and exact source-bound plan; no submission.
+bash "$p" "$r" broker-build --check
+# Only after explicit approval of this additional build and its exact hash:
+bash "$p" "$r" broker-build --submit --approve-plan-sha256 "$APPROVED_BUILD_PLAN_SHA256"
+# Use the returned new build ID after completion; never repeat --submit.
+bash "$p" "$r" broker-build --build-id "$NEW_BUILD_ID"
+# The resulting verified immutable digest is required before inventory/apply.
+bash "$p" "$r" broker-setup --image "$NEW_VERIFIED_IMAGE" --build-id "$NEW_BUILD_ID" --check
+```
+
+One additional build has a 600-second timeout using the existing builder, source
+bucket and registry. The [published default-pool us-east5 E2_MEDIUM rate](https://cloud.google.com/build/pricing-update)
+is $0.003/minute: up to $0.03 compute for that timeout before allowances.
+Storage, logging and network charges are additional; this is not an all-in cap. No spending or submission is authorized merely by this correction.
+No IAM change or application deployment is part of the build. After qualification,
+fresh inventory must reverify the six existing resources and approve only remaining
+view/IAM/broker/invoker actions. Actual view creation/readback, finite effective
+permissions and authenticated GitHub evidence remain activation gates. The old
+remaining-actions hash is not transferable to the new source/image/filter.
+
+The latest source cleanup plan identifies **893,938,345 bytes** in four repositories,
+with two blocked roots. Exact-pack deduplication still finds zero savings. Eligible
+Git objects total 894,881,792 allocated bytes and dependency archive candidates total
+103,985,152 allocated bytes; these are not reclaimed space or an approved archive.
+The updated discovery follows an additional recovery-named worktree only through
+its verified Git registration. It does not scan arbitrary recovery directories or
+remove locks. A locked repository and an unreadable HEAD remain preserved. No
+private archive destination is approved and the 2 GiB target remains unestablished.
+Source restoration requires local Git objects: if separately approved object
+archival/deletion is used later, restore those objects **before** source hydration.
+
+The original DEV/TEST plan again passed integrity verification; no Terraform apply
+or state change was observed. Its original-source continuation remains independent.
+
 ## Consolidated partial-activation and disk recovery
 
 Use the current reviewed immutable tooling SHA and its launcher checksum from the
@@ -14,8 +80,8 @@ writes. It independently collects:
   vocabulary, hints and hashes, never whole logs, credentials or request payloads.
 - Fresh source/build/registry and infrastructure checks. Successful inventory reuses
   only exact accounts/role/pool/provider/binding configurations and prepares the
-  remaining actions. The prior INVALID_ARGUMENT remains an explicit apply blocker;
-  a new plan hash alone is not permission to repeat creation.
+  remaining actions. The old filter failed the nesting-depth check;
+  a new plan hash alone is not permission to repeat its creation.
 - The existing source-file cleanup dry-run, now including bounded suffixed checkout
   names; and a separate capacity plan for Git packs/dependencies.
 - Integrity of the original nonproduction binding, saved binary plan and approval
@@ -32,14 +98,15 @@ first six resources/bindings and left four remaining actions. Preserve all parti
 resources. Audit reading was unavailable and local evidence did not identify the
 provider rejection. The revised reader selects the protobuf Any payload at its
 LogEntry boundary, reports sanitized HTTP failures, and also examines bounded SDK
-JSON errors. This is a diagnostic correction, not a confirmed failure diagnosis. Google
+JSON errors. The next read at `2628bd3` identified the depth failure documented
+above. Google
 [flexible-filter documentation](https://docs.cloud.google.com/logging/docs/logs-views#filters)
 and the older [REST filter description](https://docs.cloud.google.com/logging/docs/reference/v2/rest/v2/projects.locations.buckets.views)
 differ. Do not infer that dropping OR, labels or service restrictions is permitted.
-No log view, bucket or sink is created as a syntax experiment. Keep the original
-image unless actual provider evidence establishes that its embedded exact-filter
-contract must change; such a change needs a reviewed source diff, new build
-approval and complete new immutable-image qualification.
+No log view, bucket or sink is created as a syntax experiment. Preserve the original
+image as historical evidence. The confirmed depth correction changes its embedded
+exact-filter contract and requires new build approval and complete immutable-image
+qualification before the remaining-actions plan can be applied.
 
 Log-view [getIamPolicy](https://docs.cloud.google.com/logging/docs/reference/v2/rest/v2/projects.locations.buckets.views/getIamPolicy)
 is POST with a JSON options body, not GET. setIamPolicy remains POST with fresh
@@ -159,6 +226,11 @@ four original broker files byte-for-byte against current source before accepting
 older build. Changing an image's source label to a newer tool SHA is forbidden.
 
 ## Next broker inventory (read-only)
+
+**Historical recipe:** this inventories the original image with compatible tooling.
+It does not qualify the corrected filter. For current activation, follow the
+replacement-build sequence at the top of this document instead.
+
 
 The first inventory at `7867b4e…` hid the failed read. Instrumented source
 `9e598d7…` identified `BROKER_SERVICE` / `CANNOT_FIND_SERVICE_MESSAGE` with no

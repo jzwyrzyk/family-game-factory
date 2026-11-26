@@ -177,6 +177,7 @@ def repo_plan(root, home, proof=remote_proof):
 
 
 def discover(home):
+    seen = set()
     for name in sorted(p.name for p in home.iterdir() if allowed_name(p.name)):
         base = home / name
         if base.is_symlink():
@@ -187,7 +188,16 @@ def discover(home):
         for folder, dirs, _ in os.walk(base, followlinks=False):
             path = Path(folder)
             if (path / '.git').exists():
-                yield path
+                if path not in seen:
+                    seen.add(path); yield path
+                # Follow only Git's verified registrations, not arbitrary recovery
+                # directories. Unique journals/receipts remain protected per file.
+                try: related = worktree_layout(path, home)['worktrees']
+                except (CleanupError, OSError): related = []
+                for item in related:
+                    member = Path(item)
+                    if member not in seen:
+                        seen.add(member); yield member
                 dirs[:] = []; continue
             dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ('node_modules', 'vendor')
                        and not protected(d) and not (path / d).is_symlink()]
