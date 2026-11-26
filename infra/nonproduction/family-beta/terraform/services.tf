@@ -17,8 +17,8 @@ resource "google_service_account" "runtime" {
 }
 
 resource "google_firestore_database" "test" {
-  count   = local.on ? 1 : 0
-  project = local.project
+  count                             = local.on ? 1 : 0
+  project                           = local.project
   name                              = "jems-test"
   location_id                       = local.region
   type                              = "FIRESTORE_NATIVE"

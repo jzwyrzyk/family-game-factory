@@ -8,10 +8,11 @@ locals {
 }
 
 data "google_dns_managed_zone" "test" {
-  count      = length(local.hosts) > 0 ? 1 : 0
-  project    = local.project
-  name       = var.edge.dns_zone
-  depends_on = [google_project_service.test]
+  count   = length(local.hosts) > 0 ? 1 : 0
+  project = local.project
+  name    = var.edge.dns_zone
+  # The delegated zone must already exist. Read it during planning so a wrong
+  # zone or missing permission fails before any foundation resource is created.
   lifecycle {
     postcondition {
       condition     = self.visibility == "public" && can(regex("^(test|jems-test)\\.", self.dns_name)) && alltrue([for host in values(local.hosts) : endswith("${host}.", ".${self.dns_name}")])

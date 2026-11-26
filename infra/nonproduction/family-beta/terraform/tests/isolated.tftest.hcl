@@ -217,3 +217,13 @@ run "actual_provider_edge_plan" {
     error_message = "Provider-planned service and edge boundaries must match the protected controller."
   }
 }
+
+run "reject_wrong_existing_dns_zone" {
+  command = plan
+  variables { stage = "foundation" }
+  override_data {
+    target = data.google_dns_managed_zone.test
+    values = { name = "test-zone", dns_name = "unrelated.example.net.", visibility = "public" }
+  }
+  expect_failures = [data.google_dns_managed_zone.test]
+}
