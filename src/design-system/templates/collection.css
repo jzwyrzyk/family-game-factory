@@ -1,0 +1,7 @@
+@import '../tokens.css';
+/* This content edge is shared with contextual navigation and the live page body. */
+body .page.jems-secondary-page[id], .page[data-jems-template=collection] {
+  box-sizing: border-box; width: 100%; max-width: var(--jems-content-width);
+  margin: 0 auto; padding: 0 0 var(--jems-space-7);
+}
+.jems-secondary-page .jems-world-nav { margin: 0 0 var(--jems-space-2); }

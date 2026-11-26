@@ -19,7 +19,7 @@ DIGEST = re.compile(r"[0-9a-f]{64}")
 KEYS = {"version", "enabled", "projectId", "projectNumber", "region",
         "runtimeServiceAccount", "deployServiceAccount", "wifProvider", "registry",
         "ownerIapMembers", "previewTtlHours", "maxPreviews", "minInstances", "maxInstances"}
-OPTIONAL_KEYS = {"uatServiceAccount", "iapAudience", "directoryIssue"}
+OPTIONAL_KEYS = {"uatServiceAccount", "testRuntimeServiceAccount", "iapAudience", "directoryIssue"}
 
 
 class EnvironmentError(Exception):
@@ -48,7 +48,7 @@ def validate_config(config, *, require_enabled=True):
     if not config["enabled"] and not require_enabled:
         require(all(config[k] is None for k in ("projectId", "projectNumber", "runtimeServiceAccount",
                 "deployServiceAccount", "wifProvider", "registry")) and config["ownerIapMembers"] == [] and
-                all(config.get(k) is None for k in ("uatServiceAccount", "iapAudience")),
+                all(config.get(k) is None for k in ("uatServiceAccount", "testRuntimeServiceAccount", "iapAudience")),
                 "DISABLED_TEMPLATE_MUST_BE_UNBOUND")
         return config
     require(config["enabled"], "NONPRODUCTION_NOT_ENABLED")
@@ -57,11 +57,11 @@ def validate_config(config, *, require_enabled=True):
             and project != PRODUCTION_PROJECT, "ISOLATED_PROJECT_REQUIRED")
     require(re.fullmatch(r"[1-9][0-9]{5,19}", number) and number != PRODUCTION_NUMBER,
             "ISOLATED_PROJECT_NUMBER_REQUIRED")
-    for key in ("runtimeServiceAccount", "deployServiceAccount", "uatServiceAccount"):
+    for key in ("runtimeServiceAccount", "testRuntimeServiceAccount", "deployServiceAccount", "uatServiceAccount"):
         require(isinstance(config.get(key), str) and re.fullmatch(
             rf"[a-z][a-z0-9-]{{4,28}}@{re.escape(project)}\.iam\.gserviceaccount\.com", config[key]),
             "PROJECT_BOUND_SERVICE_ACCOUNT_REQUIRED")
-    require(len({config[k] for k in ("runtimeServiceAccount", "deployServiceAccount", "uatServiceAccount")}) == 3,
+    require(len({config[k] for k in ("runtimeServiceAccount", "testRuntimeServiceAccount", "deployServiceAccount", "uatServiceAccount")}) == 4,
             "SEPARATE_RUNTIME_REQUIRED")
     require(isinstance(config.get("iapAudience"), str) and re.fullmatch(
         r"[0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com", config["iapAudience"]), "IAP_OAUTH_AUDIENCE_REQUIRED")
@@ -98,6 +98,11 @@ class Cloud:
             raise EnvironmentError("CLOUD_RESPONSE_INVALID") from None
 
 
+def runtime_account(config, kind):
+    require(kind in ("dev", "test"), "ENVIRONMENT_INVALID")
+    return config["testRuntimeServiceAccount" if kind == "test" else "runtimeServiceAccount"]
+
+
 def account_member(config):
     return "serviceAccount:" + config["runtimeServiceAccount"]
 
@@ -112,7 +117,8 @@ def no_runtime_grants(policy, config):
         members = binding.get("members", [])
         require(isinstance(members, list) and all(isinstance(member, str) for member in members),
                 "IAM_MEMBERS_UNREADABLE")
-        require(account_member(config) not in members, "RUNTIME_MUST_HAVE_NO_ROLES")
+        require(not {"serviceAccount:" + runtime_account(config, kind) for kind in ("dev", "test")}.intersection(members),
+                "RUNTIME_MUST_HAVE_NO_ROLES")
         # Unknown membership cannot establish a role-free runtime or a private
         # audience. Require an effective-policy review rather than guessing.
         require(not any(member in ("allUsers", "allAuthenticatedUsers") or
@@ -138,12 +144,12 @@ def preflight(config, cloud):
     for ancestor in ancestors:
         if ancestor.get("type") in ("folder", "organization"):
             no_runtime_grants(cloud.run(ancestor["type"] + "s", "get-iam-policy", ancestor["id"]), config)
-    account = cloud.run("iam", "service-accounts", "describe", config["runtimeServiceAccount"])
-    require(account.get("email") == config["runtimeServiceAccount"] and not account.get("disabled"),
-            "RUNTIME_IDENTITY_DRIFT")
-    require(cloud.run("iam", "service-accounts", "keys", "list",
-                     "--iam-account=" + config["runtimeServiceAccount"], "--managed-by=user") == [],
-            "RUNTIME_KEY_FORBIDDEN")
+    for kind in ("dev", "test"):
+        email = runtime_account(config, kind)
+        account = cloud.run("iam", "service-accounts", "describe", email)
+        require(account.get("email") == email and not account.get("disabled"), "RUNTIME_IDENTITY_DRIFT")
+        require(cloud.run("iam", "service-accounts", "keys", "list",
+                         "--iam-account=" + email, "--managed-by=user") == [], "RUNTIME_KEY_FORBIDDEN")
     registry = cloud.run("artifacts", "repositories", "describe", "jems-environments",
                          "--location=" + config["region"])
     require(registry.get("format") == "DOCKER", "REGISTRY_FORMAT_INVALID")
@@ -196,7 +202,7 @@ def inspect(config, cloud, *, kind, pr, source_sha, bundle_sha256, image):
             "INVOKER_IAM_CHECK_REQUIRED")
     template = service.get("spec", {}).get("template", {})
     spec, scaling = template.get("spec", {}), template.get("metadata", {}).get("annotations", {})
-    require(spec.get("serviceAccountName") == config["runtimeServiceAccount"], "RUNTIME_IDENTITY_DRIFT")
+    require(spec.get("serviceAccountName") == runtime_account(config, kind), "RUNTIME_IDENTITY_DRIFT")
     require(scaling.get("autoscaling.knative.dev/minScale", "0") == "0" and
             scaling.get("autoscaling.knative.dev/maxScale") == "1", "SCALING_DRIFT")
     containers = spec.get("containers", [])
@@ -268,7 +274,7 @@ def deploy(config, *, kind, source_sha, bundle_sha256, image, pr=None, cloud=Non
         labels += f",jems-expires={expires}"
     environment = f"JEMS_ENVIRONMENT={kind},JEMS_SOURCE_SHA={source_sha},JEMS_BUNDLE_SHA256={bundle_sha256},JEMS_PR_NUMBER={pr or ''}"
     cloud.run("run", "deploy", name, "--region=" + config["region"], "--image=" + image,
-              "--service-account=" + config["runtimeServiceAccount"], "--iap", "--no-allow-unauthenticated",
+              "--service-account=" + runtime_account(config, kind), "--iap", "--no-allow-unauthenticated",
               "--min-instances=0", "--max-instances=1", "--cpu=1", "--memory=512Mi", "--concurrency=20",
               "--timeout=60", "--cpu-throttling", "--no-cpu-boost", "--ingress=all", "--port=8080",
               "--clear-secrets", "--clear-volumes", "--set-env-vars=" + environment, "--labels=" + labels)

@@ -1,5 +1,6 @@
-import { createPageHeader } from '../brand/page-header';
-import { createDashboardCard } from '../brand/dashboard-card';
+import {createAction} from '../design-system/components/action';
+import { createCollectionHeader as createPageHeader } from '../design-system/templates/collection';
+import { createDashboardCard } from '../design-system/components/dashboard-card';
 import { createJourneyGem, createJourneyRankThumbnail, type JourneyState } from '../brand/journey';
 import { GEM_MILESTONE_START, REWARD_AMOUNTS, type RewardGrant, type RewardsSummary } from './model';
 import { createGuideCard, type GuideHost } from '../studio/guide-card';
@@ -36,10 +37,7 @@ const node = <K extends keyof HTMLElementTagNameMap>(tag: K, className = '', tex
   return element;
 };
 const button = (className: string, text: string, action: () => void) => {
-  const element = node('button', className, text);
-  element.type = 'button';
-  element.addEventListener('click', action);
-  return element;
+  return createAction({label: text, className, onPress: action});
 };
 const image = (path: string, className = '') => {
   const element = node('img', className);

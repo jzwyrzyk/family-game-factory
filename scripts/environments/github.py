@@ -465,7 +465,7 @@ def directory(api: GitHub, issue_number: int) -> dict:
         lines.append(f"| {row['environment']} | {link} | {state} |")
     if not data["environments"]:
         lines.append("| DEV / TEST | Not deployed | Setup pending |")
-    lines += ["", "[Production website](https://jzwyrzyk.github.io/arcade/) — production release status is not inferred from merges or nonproduction deployments.",
+    lines += ["", "[Production website](https://jzwyrzyk.github.io/family-game-factory/) — production release status is not inferred from merges or nonproduction deployments.",
               "[Current release evidence](https://github.com/jzwyrzyk/family-game-factory/blob/main/DELIVERY-STATE.md)",
               "", "Complete TEST journeys, live-provider acceptance and exact-release production approval are separate gates."]
     api.request(f"{PREFIX}/issues/{issue_number}", "PATCH", {"body": "\n".join(lines) + "\n"})

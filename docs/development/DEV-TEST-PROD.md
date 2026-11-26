@@ -1,5 +1,13 @@
 # Jems DEV → TEST → PROD
 
+The November 26 setup candidate separates the DEV and TEST static runtime identities,
+adds a disabled, saved-plan provisioning handoff for `jems-jzw-nonprod`, and a
+nonproduction-only $15 monthly alert budget. See [setup](SETUP.md). This first slice
+shares its trusted control plane and aggregate nonproduction budget; it does not
+claim independent hard dollar caps or a complete TEST backend. Direct managed Codex
+identity qualification is not a prerequisite for these independent operations.
+
+
 The private family beta candidate adds dedicated service definitions for authenticated hub and per-family origins, an independently protected household and an isolated preview. The existing static PR preview alone cannot exercise first-party invitation, IAP or callback routing. Its synthetic evidence, a deployed DEV/TEST receipt and real-device owner acceptance are recorded separately. [Private family activation](../family-beta/ACTIVATION.md) The manual family candidate lane reuses protected main, full CI receipts and the existing federated principal. It can verify prepared infrastructure or stage reviewed revisions at zero traffic on three named nonproduction services.
 
 **Authority:** the owner's November 23, 2026 (America/New_York) assignment, “Jems — Automated DEV / TEST / PROD Architecture,” authorizes assessment and implementation through reviewed PRs. [The decision](../decisions/2026-11-23-dev-test-prod.md) records the method and supersession. This is the authoritative development and release contract; its requirements are not a claim of completed deployment.
@@ -104,6 +112,8 @@ After the active cutover, connect this prerequisite to the existing release-inte
 The owner can bookmark [the environment directory](https://github.com/jzwyrzyk/family-game-factory/issues/156). Its current entries correctly show nonproduction setup pending; automation begins only after activation.
 
 A failed verification stops further promotion. Traffic rollback may use an already retained, verified compatible baseline through the existing controller. A previous frontend may not understand newer saved data; automatic recovery must check reader/schema/runtime compatibility, in-flight jobs and artifact retention. If compatibility is unknown, halt for the documented recovery decision or roll forward; never restore bytes blindly or delete user work. The current source foundation does not yet automate the complete functional-verification/recovery sequence.
+
+The [environment directory](https://github.com/jzwyrzyk/family-game-factory/issues/156) links to the [current household website](https://jzwyrzyk.github.io/family-game-factory/). On November 26 its release marker returned `aa56b60abe152e750f9f0b5e8949bdb44be53196`. The earlier arcade URL returned HTTP 404. DEV and TEST await authenticated deployment receipts.
 
 The owner directory provides one bookmarked location containing active DEV links, TEST and PROD, human-readable included/pending developments, review actions and deployment receipts. The initial controller maintains sanitized GitHub issue/PR metadata from deployment evidence. This repository is public: the directory itself is not an authenticated site, while its DEV/TEST destinations require IAP. Do not publish secrets, family data, signed access URLs or restricted operational evidence there. If the inventory itself needs to be private, serve the same small directory behind TEST IAP instead of adding an administration platform. A generated directory is useful only once its links, statuses and destination authentication are observed working.
 

@@ -67,6 +67,12 @@ class RequestEvidenceWorkflowTests(unittest.TestCase):
             self.assertIn(field + "\n", self.steps)
         self.assertNotIn("continue-on-error:", self.steps)
 
+    def test_empty_revision_dispatch_remains_service_wide(self):
+        # GitHub applies the workflow default even to an explicitly empty string.
+        # A historical nonempty default silently narrowed the accepted API dispatch.
+        revision = self.trigger.split("      revision:\n")[1].split("      start_utc:\n")[0]
+        self.assertIn("        default: ''\n", revision)
+
     def test_wif_condition_is_a_conjunction_of_signed_github_claims(self):
         condition = (ROOT / "ops/request-diagnostics-provider.cel").read_text().strip()
         subject = (f"repo:jzwyrzyk@{oidc_claims.OWNER}/family-game-factory@{oidc_claims.REPO_ID}"

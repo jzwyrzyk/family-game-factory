@@ -2,7 +2,6 @@ import {World,Vec2,Box,Circle,RevoluteJoint,WeldJoint,WheelJoint,type Body,type 
 import {validateDrawingRig,type DrawingRig} from '../quality/parts';
 import type {DrawingAssembly} from './model';
 import {assemblyRig} from './model';
-const LIMIT=18;
 export interface PlayPart {id:string;x:number;y:number;angle:number;w:number;h:number;physical:boolean}
 export interface PlayScene {time:number;parts:PlayPart[];contacts:number;origin:{x:number;y:number};
   joints:{a:string;b:string;x:number;y:number;kind:string}[] }
@@ -16,6 +15,13 @@ export function createDrawingPlayground(input:DrawingAssembly,sourceAspect?:numb
  const floor=world.createBody({position:Vec2(0,10.8)});
  floor.createFixture(Box(24,.3),{friction:.9});
  const bodies=new Map<string,Body>(),order=rig.components,joints:{a:string;b:string;kind:string;joint:Joint}[]=[];
+ const wheels:WheelJoint[]=[];
+ function physicalAncestor(id:string|null) {
+  while(id){
+   if(bodies.has(id))return order.find(component=>component.id===id);
+   id=order.find(component=>component.id===id)?.parentId??null;
+  }
+ }
  const moving:{role:'wing'|'limb';joint:RevoluteJoint;phase:number}[]=[];
  let contactCount=0,time=0,disposed=false,jumpLatch=false;
  world.on('begin-contact',()=>{contactCount++;});
@@ -32,7 +38,8 @@ export function createDrawingPlayground(input:DrawingAssembly,sourceAspect?:numb
  }
  // A nonphysical decoration is rendered relative to the parent's moving body.
  for(const bind of rig.bindings){
-  const a=bodies.get(bind.a),b=bodies.get(bind.b);
+  const attached=physicalAncestor(bind.a);
+  const a=attached&&bodies.get(attached.id),b=bodies.get(bind.b);
   if(!a||!b)continue;
   const child=input.pieces.find(p=>p.id===bind.b)!;
   const component=order.find(c=>c.id===bind.b)!;
@@ -42,7 +49,11 @@ export function createDrawingPlayground(input:DrawingAssembly,sourceAspect?:numb
   const p=b.getWorldPoint(Vec2(anchor.x,anchor.y));
   let joint:Joint|null;
   if(bind.kind==='fixed')joint=world.createJoint(new WeldJoint({collideConnected:false,frequencyHz:0,dampingRatio:.7},a,b,p));
-  else if(bind.kind==='suspension')joint=world.createJoint(new WheelJoint({motorSpeed:0,maxMotorTorque:12,enableMotor:true,frequencyHz:4,dampingRatio:.75,collideConnected:false},a,b,p,Vec2(0,1)));
+  else if(bind.kind==='suspension'){
+   const wheel=new WheelJoint({motorSpeed:0,maxMotorTorque:12,enableMotor:true,frequencyHz:4,dampingRatio:.75,collideConnected:false},a,b,p,Vec2(0,1));
+   joint=world.createJoint(wheel);
+   if(joint&&input.cutoutMode==='selected-parts')wheels.push(wheel);
+  }
   else {
    const wing=child.role==='wing',limb=child.role==='limb',propeller=child.role==='propeller';
    const hinge=new RevoluteJoint({
@@ -66,10 +77,11 @@ export function createDrawingPlayground(input:DrawingAssembly,sourceAspect?:numb
    const iterations=Math.min(5,Math.max(0,Math.round(dt*60)));
    for(let i=0;i<iterations;i++){
     if(main?.isDynamic()){
-      if(controls.go)main.applyForce(Vec2(27,0),main.getWorldCenter(),true);
+      if(controls.go&&!wheels.length)main.applyForce(Vec2(27,0),main.getWorldCenter(),true);
       if(controls.jump&&!jumpLatch)main.applyLinearImpulse(Vec2(0,-Math.min(9,main.getMass()*4)),main.getWorldCenter(),true);
     }
     jumpLatch=!!controls.jump;
+    for(const wheel of wheels)wheel.setMotorSpeed(controls.go?7:0);
     // The selected wing/limb roles imply an authored, bounded movement preset.
     // These motor impulses affect the same physical bodies and contact forces
     // used by the rest of the playground; no sprite-only fake flapping.
@@ -84,10 +96,9 @@ export function createDrawingPlayground(input:DrawingAssembly,sourceAspect?:numb
   },
   snapshot():PlayScene{
    const parts=order.map(c=>{
-    let body=bodies.get(c.id);
-    if(!body&&c.parentId)body=bodies.get(c.parentId);
+    const parent=c.physical?undefined:physicalAncestor(c.parentId);
+    const body=bodies.get(c.id)??(parent&&bodies.get(parent.id));
     const p=body?.getPosition()||Vec2(8+c.offset.x,6+c.offset.y);
-    const parent=order.find(k=>k.id===c.parentId);
     const dx=!c.physical&&parent?c.offset.x-parent.offset.x:0;
     const dy=!c.physical&&parent?c.offset.y-parent.offset.y:0;
     const angle=body?.getAngle()||0;

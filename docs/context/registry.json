@@ -87,7 +87,18 @@
     "docs/ui-review/README.md",
     "docs/history/2026-11-26/PRODUCT-DOCTRINE.md",
     "docs/history/2026-11-26/ARCHITECTURE-CURRENT.md",
-    "docs/history/2026-11-26/DELIVERY-STATE.md"
+    "docs/history/2026-11-26/DELIVERY-STATE.md",
+    "docs/learning/LEARNING_WORKSPACE_STANDARD.md",
+    "docs/decisions/2026-11-26-unified-learning-workspace.md",
+    "docs/creative-universe/STANDARD.md",
+    "docs/decisions/2026-11-26-connected-creative-universe.md",
+    "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md",
+    "docs/creative-universe/DRAWING_WORKSPACE_ACCEPTANCE.md",
+    "docs/game-art/README.md",
+    "docs/game-art/evidence/README.md",
+    "docs/decisions/2026-11-26-private-game-art.md",
+    "docs/design-system/README.md",
+    "docs/design-system/INVENTORY.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -130,7 +141,10 @@
     "docs/development/evidence/*.md",
     "docs/storage/*.md",
     "docs/history/2026-11-26/*.md",
-    "docs/evidence/DEVELOPMENT-VELOCITY.md"
+    "docs/evidence/DEVELOPMENT-VELOCITY.md",
+    "docs/learning/*.md",
+    "docs/evidence/learning-workspace/*.md",
+    "docs/creative-universe/*.md"
   ],
   "areas": [
     {
@@ -138,7 +152,8 @@
       "documents": [
         "PRODUCT-DOCTRINE.md",
         "docs/decisions/*.md",
-        "docs/pals/art/README.md"
+        "docs/pals/art/README.md",
+        "docs/creative-universe/STANDARD.md"
       ],
       "sources": [
         "docs/design-coach/GOLD_STANDARD.md",
@@ -148,13 +163,14 @@
         "docs/rewards/*.md",
         "docs/problem-solving/*.md",
         "docs/pals/*.md",
-        "docs/drawings/*.md"
+        "docs/drawings/*.md",
+        "docs/creative-universe/STANDARD.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:43:54.338Z",
-      "sourceDigest": "07fc21610f861620f19ab0faadd68800d67ab76ad7f79566f164df2cf5d3d037",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The Gem Factory guide now points reviewers to the Arcade capture archive for PRs. The game's pattern, cutter, physics, learning, accessibility and acceptance requirements retain their reviewed behavior.",
+      "reviewedAt": "2026-11-26T22:12:16.152Z",
+      "sourceDigest": "4c7a1db83673a81b4d7e5ac0192ad982e3d684643b4be3af1f33fc31e441ed03",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented shared presentation and retained creator choice in the consolidated release.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -315,10 +331,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:37:55.191Z",
-      "sourceDigest": "9fc46a601c3012b0fd13afe7231ff32b111837e443a734f47bfa672e1a5056ce",
+      "reviewedAt": "2026-11-26T22:12:16.318Z",
+      "sourceDigest": "5993bf02b11990959cf73d7e4cbd5218fa296d91b015d2aa2ad6b95e127e75d9",
       "reviewOutcome": "updated",
-      "reviewReason": "The first-creation contract records the per-idea Build gesture guard across async storage and review. Shared headings and navigation still use the guarded host routes.",
+      "reviewReason": "Inspected component imports, destination callbacks, context navigation and specialist host styles.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -407,18 +423,22 @@
         "docs/creation-studio/*.md",
         "docs/decisions/0007-creation-and-rebuild-practice.md",
         "docs/rewards/*.md",
-        "docs/pals/*.md"
+        "docs/pals/*.md",
+        "docs/creative-universe/STANDARD.md",
+        "docs/decisions/2026-11-26-connected-creative-universe.md"
       ],
       "sources": [
         "src/creation/**",
         "server/agent/creation-schema.ts",
-        "tests/creation-*"
+        "tests/creation-*",
+        "public/art/creative-worlds/**",
+        "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fee0252694b94e3f1254485510ef5c6da2cbd6ca19ac18af19c0ec8e8e26b54d",
-      "reviewedAt": "2026-11-25T23:20:54.040Z",
+      "sourceDigest": "47a8d0911954e9fbe6367ff63ae3413b6a1b1b4b86483cec5a9cde97ab1737ab",
+      "reviewedAt": "2026-11-26T22:12:17.359Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The scene rendering contract distinguishes legacy pinned tokens and neutral bytes from new active actor choices.",
+      "reviewReason": "Checked Creative canvas and state ownership against the joined branch. Only host presentation is migrated.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -502,10 +522,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "e44b2afc02a371f2c0a63299a8fb7d062b5048a1f6519daa31c05b5dd2056fad",
-      "reviewedAt": "2026-11-25T23:20:54.641Z",
+      "sourceDigest": "49d3def63835c53a12190dc6acf96fdad46fd50da8985a96c9a30dd50847be27",
+      "reviewedAt": "2026-11-26T22:12:17.481Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed grant and Pal acquisition code. Original unlocks never spent lifetime gems, so policy conversion issues no refund or grant.",
+      "reviewReason": "Reviewed shared buttons and collection headers. Reward eligibility and receipts remain owned by Rewards.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -641,19 +661,24 @@
         "docs/adaptive-math/*.md",
         "docs/adaptive-language/*.md",
         "docs/rewards/*.md",
-        "docs/brand/CHILD_INTERFACE.md"
+        "docs/brand/CHILD_INTERFACE.md",
+        "docs/learning/*.md"
       ],
       "sources": [
         "src/learning/**",
         "src/language/**",
         "docs/adaptive-math/*.md",
-        "docs/adaptive-language/*.md"
+        "docs/adaptive-language/*.md",
+        "docs/learning/*.md",
+        "public/learning-counters/**",
+        "src/family-beta/learning.ts",
+        "tests/theme-workspace.test.ts"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T02:09:44.693Z",
-      "sourceDigest": "8dfd020d7abadd0b6d39efa2a39e264d8fd8091d4d3a074b62136c2b2b392fec",
+      "reviewedAt": "2026-11-26T06:19:03.101Z",
+      "sourceDigest": "134e9976913f85d02341be13dc708122eb49b6e680a1ba4566198a90f17ffe60",
       "reviewOutcome": "updated",
-      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
+      "reviewReason": "The active question and the start of English content are visible on normal My Powers entry; reviewed both real subject journeys and their grade-dependent question contracts.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -686,10 +711,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T00:23:35.574Z",
-      "sourceDigest": "ca7b341e9de009c700ec5b750b52d88705543bbb56fe2f4833bd1dc2dfd64a33",
+      "reviewedAt": "2026-11-26T06:19:59.740Z",
+      "sourceDigest": "8aec10f384d09c1592dc6758e68333d58d254f0da000b4131c63ef65b4a6fdd0",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified the protected worker main and tag, scoped production observation, and preserved the historical scene JSON package for all three readers.",
+      "reviewReason": "Reviewed exact validator and restricted family build dependencies.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -724,7 +749,9 @@
         "docs/assignment-006/*.md",
         "docs/adult-pilot/*.md",
         "docs/privacy/*.md",
-        "docs/game-intelligence/premium-benchmark/*.md"
+        "docs/game-intelligence/premium-benchmark/*.md",
+        "docs/game-art/*.md",
+        "docs/game-art/evidence/*.md"
       ],
       "sources": [
         "server/actions/**",
@@ -736,13 +763,17 @@
         "docs/game-intelligence/*.md",
         "tools/premium-*",
         "docs/game-intelligence/premium-benchmark/*.md",
-        "tools/premium-art/**"
+        "tools/premium-art/**",
+        "tools/creative-game-art/**",
+        "tests/creative-game-art-browser.ts",
+        "src/game-art/**",
+        "tools/game-art-review/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:55.850Z",
-      "sourceDigest": "3c42ed09d4394afe0c109b5a6fa6d9d87f119c2474a5101fb24cafd81bf20c81",
+      "reviewedAt": "2026-11-26T06:31:05.691Z",
+      "sourceDigest": "bbc14bf55c40022eb6d37c0b3d2a278ca446f04f4837a91148eb92aafcc86424",
       "reviewOutcome": "updated",
-      "reviewReason": "Scene authoring uses active Pal IDs. The ADR and scene rendering contract cover reading saved generated versions through the historical asset resolver.",
+      "reviewReason": "Reviewed linked domain documentation for this candidate and its tested private-art boundary.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -894,13 +925,14 @@
         "scripts/verify-brand-assets.mjs",
         "scripts/tests/verify-pal-assets.test.mjs",
         "scripts/ci/**",
-        "scripts/environments/ci_evidence.py"
+        "scripts/environments/ci_evidence.py",
+        "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:28:44.076Z",
-      "sourceDigest": "e91783b6abf2d59e1fc0f77b7a9d277e1a7143fc10223a2f251599b2adf80614",
+      "reviewedAt": "2026-11-26T22:35:32.999Z",
+      "sourceDigest": "62a93630c83508e452c3c6bc433b38f0fcab5a826f922457d5ee660d5c025ba2",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded first-attempt hosted contrast failure, synchronous DOM measurement, initial runner evidence and source-bound startup byte counts in the execution guide.",
+      "reviewReason": "The standalone review guide records the full-size notebook pointer journey and the navigation budget used to open the exact download.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1142,10 +1174,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T05:28:44.476Z",
-      "sourceDigest": "2a3f91df028a7a8f3038f80e187a1c4b9ade3c706824ffdfd0e1b9b320b27e98",
+      "reviewedAt": "2026-11-26T22:35:33.293Z",
+      "sourceDigest": "c33452d055868eeec7b810391f107d1aaab7ed0e6f0c90934aa70720734d4e85",
       "reviewOutcome": "updated",
-      "reviewReason": "Linked the concurrent review-only Creative Universe integration and retained separate Learning, engineering and frozen application sources.",
+      "reviewReason": "The delivery record now directs owners to the combined draft and current household revision observation while preserving each historic receipt.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1400,10 +1432,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:43:54.709Z",
-      "sourceDigest": "6a82d9e760b2acf553296077219283a0611744977077ef029b48a4dadba0fce0",
+      "reviewedAt": "2026-11-26T22:12:18.243Z",
+      "sourceDigest": "1ae25cf8cd452064d5919af9f1d6f46ad643dac946ec4bd29776f22ab3fb0492",
       "reviewOutcome": "updated",
-      "reviewReason": "The maintenance instructions now explain comparison with the preceding independently committed source so future additions remain protected without manual count maintenance.",
+      "reviewReason": "Combined registry source and document routes from the selected branches without replacing canonical history.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1504,10 +1536,10 @@
         "tests/parent-dashboard*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "6eec1383215c1abfc6281933bfd4372a504d5690ffdefb790d290486b8ab4f3f",
-      "reviewedAt": "2026-11-25T16:41:38.340Z",
+      "sourceDigest": "14eb7a52bfb7480a84f51d3ff6fb148a90c4a921ce023227abccbf0081dd00a2",
+      "reviewedAt": "2026-11-26T22:12:18.373Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented lazy Parent snapshots from the active scene authority, late-result owner/request fences and unavailable prepared-source errors; reporting remains read-only with existing learning interpretation.",
+      "reviewReason": "Reviewed native action delegation and semantic style substitutions in the existing adult dashboard.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-19T17:17:56.552Z",
@@ -1585,10 +1617,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "b2c55a9dc03986bb12d1396de7e56859273c25b444b57611e930bc3e6004534c",
-      "reviewedAt": "2026-11-25T23:20:59.505Z",
+      "sourceDigest": "93d372ec168d22127c306f8a1ac5a4285447b0b9cdc6c3e59c8a568b747be233",
+      "reviewedAt": "2026-11-26T22:12:18.465Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Character inventory marks Luma and Zippa as historical and records active profile counts. Nook and Navi retain their existing approved Base and Grown artwork.",
+      "reviewReason": "Original images and Pal variants match the rehearsal. Header and action consumers now share the design system.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1613,7 +1645,13 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/drawings/*.md",
         "docs/creation-studio/*.md",
-        "docs/decisions/2026-11-19-private-art-studio.md"
+        "docs/decisions/2026-11-19-private-art-studio.md",
+        "docs/creative-universe/STANDARD.md",
+        "docs/decisions/2026-11-26-connected-creative-universe.md",
+        "docs/creative-universe/*.md",
+        "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md",
+        "docs/game-art/*.md",
+        "docs/decisions/2026-11-26-private-game-art.md"
       ],
       "sources": [
         "src/drawing/**",
@@ -1621,13 +1659,22 @@
         "tests/art-*",
         "tests/drawing-*",
         "tests/creation-private-art*",
-        "tests/picture-tools-browser.cjs"
+        "tests/picture-tools-browser.cjs",
+        "tests/sketch-*.cjs",
+        "tests/crayon-revision-browser.cjs",
+        "tests/creative-motion-browser.cjs",
+        "tests/fixtures/my-art/**",
+        "tools/ui-review/drawing-*.ts",
+        "tools/ui-review/drawing-smoke.cjs",
+        "src/game-art/**",
+        "tests/game-art*",
+        "tests/game-art/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "467544c05466d8d0c1045244fa942dbfccf7b81e1e04635e8f5ecae1c0b62afc",
-      "reviewedAt": "2026-11-25T23:21:00.320Z",
+      "sourceDigest": "75da86ee38ffd413983144a65841797ae3cad93bdfb260fc95862a556ce3eb29",
+      "reviewedAt": "2026-11-26T22:35:33.549Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "My Creations uses the shared header and retains the My Art action. The drawing library, private assets and editor use the inherited My Art contract.",
+      "reviewReason": "Verified that the drawing smoke still saves and reloads original art with identical privacy, artwork and revision contracts after adjusting the full-size download timeout.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1669,10 +1716,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "08d6c2637ec033c45775d4d86c087d3767314bff224eae63cee81a079beeb84f",
-      "reviewedAt": "2026-11-26T05:28:44.940Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The browser test selects and measures live rendered labels in one browser task. Required selectors, all-match 4.5 contrast threshold, approved art, interaction and persistence assertions are preserved.",
+      "sourceDigest": "ac4fecb27cfb0593643695633a16aef5b052514969276efe0efbb890b6eafaf2",
+      "reviewedAt": "2026-11-26T22:12:19.056Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Shared controls preserve the existing Pal eligibility, artwork choice and click callbacks.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1707,10 +1754,33 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "381260b659e8d8ed26b7fdddb3c2182a49d2f8f9cffd808e7d167695f25bfb3a",
-      "reviewedAt": "2026-11-26T00:23:36.006Z",
+      "sourceDigest": "fd13e01d23d4398e1a1ff78632fe1662399c9981965d7cc2003b863e500cc6e0",
+      "reviewedAt": "2026-11-26T07:32:37.407Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled merged F06 rollback limits with the owner-scoped Pal migration, retained readers and repeat restore contract."
+      "reviewReason": "Existing private and native storage authorities retain the exact artwork and scene revisions while scratchpaper stays transient.",
+      "reviewHistory": []
+    },
+    {
+      "id": "design-system",
+      "documents": [
+        "docs/design-system/**/*.md",
+        "AGENTS.md",
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/ui-review/README.md"
+      ],
+      "sources": [
+        "src/design-system/**",
+        "tools/design-system/**",
+        "scripts/check-design-system.mjs",
+        "scripts/tests/check-design-system.test.mjs",
+        "docs/design-system/**"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "24c504229b55fea76793800475979e6fa914fb599a8351aa7d617cbce7882c77",
+      "reviewedAt": "2026-11-26T22:35:33.762Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Only the time allowed to load the original source assets changed. The collection views, composed contrast, focus and touch assertions keep their documented behavior."
     }
   ]
 }

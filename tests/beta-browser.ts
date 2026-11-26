@@ -1,3 +1,4 @@
+import {reviewedArtworkBrowser} from './beta-artwork-browser';
 import {operatorBrowser} from './beta-operator-browser';
 import {earlyBetaBrowser} from './beta-early-browser';
 import {browserIsolation} from './beta-browser-isolation';
@@ -57,7 +58,7 @@ async function entryBrowser(browser:Browser,engine:string,tls:ServerOptions,out:
      await p.locator('[name=passphrase]').fill(parent);await p.getByRole('checkbox').check();await p.getByRole('button',{name:'Pair this device'}).click();await p.locator('#paired output').waitFor();
      const pair=await p.locator('#paired output').innerText();await mutate('verify',family.id,{pairingCode:pair,receipt:'synthetic-browser-'+engine+'-'+phase});
     }
-    await mutate('policy',family.id,{capabilities:defaultCapabilities(),monthlyCents:0,paused:true,generationPaused:true});
+    await mutate('policy',family.id,{capabilities:{...defaultCapabilities(),artwork:true},monthlyCents:0,paused:true,generationPaused:true});
     await p.goto(local+'/grown-ups');await p.getByLabel('Parent passphrase').fill(parent);await p.getByRole('button',{name:'Unlock family controls'}).click();
     await p.getByRole('button',{name:'Add an explorer'}).click();await p.getByText(/explorer profiles\./).waitFor();
     const publicBeforePlay=p.url();assert.equal(publicBeforePlay,local+'/grown-ups');
@@ -66,6 +67,7 @@ async function entryBrowser(browser:Browser,engine:string,tls:ServerOptions,out:
     await p.getByRole('button',{name:'Enter Jems'}).click();await p.waitForURL('**/play/');
     await p.waitForFunction(()=>Boolean((window as any).FG?.store?.current()?.id));await p.locator('#studioLibraryTitle, #studioWelcomeTitle').first().waitFor({state:'attached'});
     assert.equal(await p.evaluate(async()=>(await navigator.serviceWorker.getRegistrations()).length),0);
+    await reviewedArtworkBrowser(p, digest => mutate('approve-art',family.id,{digest}));
     // Hold the real login status response. End play is not ready for a Back
     // action while that intermediate document can still redirect elsewhere.
     let releaseLogin!:()=>void;loginStatusGate=new Promise<void>(resolve=>{releaseLogin=resolve;});

@@ -19,8 +19,9 @@ LOG = f"projects/{PROJECT}/logs/run.googleapis.com%2Frequests"
 VIEW_FILTER = (
     'source("projects/family-game-factory-jzw") AND resource.type="cloud_run_revision" '
     'AND log_id("run.googleapis.com/requests") AND resource.labels.location="us-east5" '
-    'AND (resource.labels.service_name="factory-gateway" OR resource.labels.service_name="factory-preview" '
-    'OR resource.labels.service_name="factory-coach-private")'
+    # Exact anchored alternatives keep the three-service restriction as one leaf.
+    # The provider rejects Boolean nesting deeper than one level for this view.
+    'AND resource.labels.service_name=~"^(factory-gateway|factory-preview|factory-coach-private)$"'
 )
 # Cloud Run's resource.labels protobuf map is needed to independently verify
 # the project, location, service and revision. It never leaves this function.

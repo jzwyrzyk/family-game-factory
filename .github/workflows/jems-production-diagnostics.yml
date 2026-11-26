@@ -11,7 +11,7 @@ on:
       revision:
         description: Exact revision, or clear for a service-wide query
         type: string
-        default: factory-gateway-r-eaf5effa06d031818f52
+        default: ''
       start_utc:
         description: Inclusive UTC start (YYYY-MM-DDTHH:MM:SSZ)
         type: string

@@ -30,6 +30,17 @@ For a substantive project answer, consult the applicable references before reaso
 
 For diagnostics, merges or releases, use the authenticated execution tools already available before asking the owner to relay terminal commands. Follow [Direct diagnostic access](docs/operations/ASSISTANT_ACCESS.md) for connection setup and limits. Within the owner's authorized scope, investigate routine failures, prepare permitted fixes and verify the outcome. For a larger in-scope change, give a brief heads-up and continue; do not turn each command into a new approval request. A request to prepare or review work does not authorize a merge, deployment or expanded access; preserve explicit holds. Engage the owner for initial authentication or an actual decision about expanded authority/trust, spending, destructive production data, sensitive-data exposure or product direction. Bring a diagnosis and recommended action when escalating. A configured/merged script is not evidence of a working cloud connection.
 
+For a new diagnostic/development session, use the canonical SDK/source preflight in
+[Assistant access](docs/operations/ASSISTANT_ACCESS.md#canonical-sdk-preflight--november-26-2026).
+Direct managed identity qualification is currently blocked and is not a prerequisite
+for the independent GitHub operations or nonproduction setup lanes. Use source-only
+preflight (`diagnostic_preflight.py --expected-source FULL_REVIEWED_SHA --source-only`)
+while that blocker persists; do not retry denied authentication endpoints.
+Select the actual managed GCP alias (`GCP` in the verified connection), verify the
+reviewed checkout and effective account, and keep unavailable access distinct from
+permission denial. Never copy credentials, make managed directories writable or use
+an owner ADC/CLI fallback to bypass a missing connection.
+
 ## DEV → TEST → PROD
 
 Read [the environment contract](docs/development/DEV-TEST-PROD.md) for development, previews, integration, UAT and release work. It supersedes earlier standalone DEV/staging proposals while preserving useful source and historical evidence. Applicable application PRs need an interactive private DEV preview; changes to visible behavior need owner visual/interactive acceptance. Documentation-only work does not require a preview. Approved integration enters permanent TEST after CI. Production approval binds the exact tested source, frontend/backend artifacts, worker/runtime identities and applicable configuration; deployment verification is separate from merge and CI.
@@ -65,3 +76,7 @@ After merge, deployment, activation, rollback or observed acceptance, refresh th
 ## What these instructions can and cannot do
 
 Repository-aware assistants can load this file as their entry point. Ordinary chats do not necessarily read GitHub automatically. [ChatGPT Project instructions](docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md) provide the matching retrieval rule. The checks establish reference coverage and recorded review, not automatic semantic correctness or production readiness.
+
+## Shared frontend presentation
+
+Before changing host UI, read [the design-system guide](docs/design-system/README.md) and [migration inventory](docs/design-system/INVENTORY.md). Identify the feature owner and current archetype; reuse production templates, components and semantic tokens. Apply general owner feedback in the shared layer before patching individual pages. Preserve guarded callbacks, original artwork and existing specialist controls. Run focused design contracts and inspect the actual rendered product; the gallery alone does not establish integration or owner acceptance.

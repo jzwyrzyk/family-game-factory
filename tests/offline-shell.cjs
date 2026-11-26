@@ -3,6 +3,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const {once}=require('node:events');
 const fs=require('node:fs'),path=require('node:path');
 const vm=require('node:vm');
+const {createHash}=require('node:crypto');
 // The cache/game smoke test starts after a recent question; math stays enabled.
 (async()=>{
  const root=path.resolve(__dirname,'..');
@@ -13,6 +14,17 @@ const vm=require('node:vm');
  const swLists=sw.match(/^const paths=(.*),precachePaths=(.*),version=[^\n]+;/);
  assert.ok(swLists,'built service worker exposes its exact public-path and precache allowlists');
  const allowedPaths=JSON.parse(swLists[1]),precachePaths=JSON.parse(swLists[2]);
+ const worldArt=require('../docs/creation-studio/world-art-manifest.json').assets;
+ const worldFiles=new Set(worldArt.map(asset=>asset.file));
+ assert.equal(worldFiles.size,48,'the reviewed collection has 48 unique public files');
+ for(const asset of worldArt){
+  assert.match(asset.file,/^art\/creative-worlds\/v1\/[a-z0-9-]+\.webp$/);
+  const bytes=fs.readFileSync(path.join(root,'dist',asset.file));
+  assert.equal(createHash('sha256').update(bytes).digest('hex'),asset.sha256,asset.file);
+ }
+ assert.deepEqual(allowedPaths.filter(file=>file.split('/').includes('v1')).sort(),[...worldFiles].sort(),
+  'only the manifest-pinned world files may use a v1 path in the public fetch allowlist');
+ assert.ok(!allowedPaths.some(file=>/factory-config|(?:^|\/)preview/.test(file)),'config and preview routes stay outside the fetch allowlist');
  const historicalArt=require('../src/pals/historical-scene-art.json');
  assert.equal(historicalArt.length,4);
  for(const asset of [...palAssets,...historicalArt])assert.ok(allowedPaths.includes(asset.url),asset.url+' remains available for on-demand offline caching');
@@ -39,6 +51,9 @@ const vm=require('node:vm');
  for(const request of [
   {method:'POST',mode:'cors',url:new URL(palAssets[0].url,workerScope).href},
   {method:'GET',mode:'cors',url:new URL('v1/jobs',workerScope).href},
+  {method:'GET',mode:'cors',url:new URL('art/creative-worlds/v1/unreviewed.webp',workerScope).href},
+  {method:'GET',mode:'cors',url:new URL('factory-config.json',workerScope).href},
+  {method:'GET',mode:'cors',url:new URL('preview/private',workerScope).href},
   {method:'GET',mode:'cors',url:'https://another-origin.test/arcade/'+palAssets[0].url},
  ])fetchHandler({request,respondWith(){assert.fail('quota recovery must not intercept private, state-changing or foreign requests');}});
  assert.equal(networkRequests,1,'only the allowlisted public image reaches the worker network/cache path');
@@ -51,7 +66,10 @@ const vm=require('node:vm');
   await page.evaluate(()=>{FG.store.changeProfile({rate:1});FG.store.current().mathWindow=[Date.now()];FG.store.save()});
   const cached=await page.evaluate(async()=>{const c=await caches.open((await caches.keys())[0]);return (await c.keys()).map(r=>r.url)});
   assert.ok(cached.some(x=>x.endsWith('queen.png')));
-  assert.ok(!cached.some(x=>/factory-config|\/v1\/|\/preview/.test(x)));
+  const worldUrls=new Set([...worldFiles].map(file=>new URL(file,base).href));
+  assert.deepEqual(cached.filter(url=>url.includes('/v1/')).sort(),[...worldUrls].sort(),
+   'only the exact reviewed world URLs are installed under versioned paths');
+  assert.ok(!cached.some(url=>/factory-config|\/preview/.test(url)));
   const activeArt=['hero_workshop','spot_first_idea','character_spark_wave','character_spark_think','character_spark_rest','character_spark_celebrate','character_spark_recover','spot_work_in_progress','spot_reconnect','spot_safe_storage'].map(id=>'jems-art/'+id+'.webp');
   const activeBrand=['jems-art/icons/jems-icons.svg',...activeArt];
   for(const asset of activeBrand)assert.ok(cached.includes(new URL(asset,base).href),asset+' is installed before a child first needs it offline');
@@ -74,6 +92,21 @@ const vm=require('node:vm');
   assert.ok(optional,'an explicitly requested known static cover is cached for subsequent offline use');
   const info=await page.evaluate(()=>fetch('./build-info.json').then(r=>r.json()));assert.match(info.sha,/^[a-f0-9]{40}$/);
   await context.setOffline(true);
+  const lunarLayers=worldArt.filter(asset=>asset.worlds.includes('world-moon-v1')&&['back','middle','foreground'].includes(asset.layer));
+  assert.equal(lunarLayers.length,3,'the selected world has three stage layers');
+  for(const layer of lunarLayers){
+   const decoded=await page.evaluate(async file=>{
+    const response=await fetch(new URL(file,document.baseURI));
+    if(!response.ok)throw Error('Offline world picture unavailable');
+    const blob=await response.blob(),bitmap=await createImageBitmap(blob);
+    try{
+     const digest=await crypto.subtle.digest('SHA-256',await blob.arrayBuffer());
+     const sha=Array.from(new Uint8Array(digest),v=>v.toString(16).padStart(2,'0')).join('');
+     return {dimensions:[bitmap.width,bitmap.height],sha};
+    }finally{bitmap.close();}
+   },layer.file);
+   assert.deepEqual(decoded,{dimensions:layer.dimensions,sha:layer.sha256},layer.name+' decodes from its exact cached bytes offline');
+  }
   const offlinePalManifest=await page.evaluate(()=>fetch(new URL('jems-pals/manifest.json',document.baseURI)).then(response=>response.json()));
   assert.deepEqual(offlinePalManifest,palManifest,'offline lookup returns the complete exact manifest without a query-string exception');
   const offlinePal=await page.evaluate(async asset=>{
@@ -119,7 +152,7 @@ const vm=require('node:vm');
   assert.equal(await page.locator('[data-helper-pose="wave"]').isVisible(),true,'the idle helper also renders after an offline navigation');
   await page.evaluate(async()=>{await Promise.all([...document.querySelectorAll('#studioCreationHero > img,.jems-helper-mark')].map(img=>img.decode()));await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});
   await page.screenshot({path:'test-results/offline-branded-studio.png',fullPage:false});
-  console.log('PASS offline: native game, base-path SVG icons, active state art, on-demand Pal pixels and manifest, cache-quota recovery, excluded private endpoints and build identity');
+  console.log('PASS offline: reviewed three-layer Moon Adventure, native game, base-path SVG icons, active state art, on-demand Pal pixels and manifest, cache-quota recovery, excluded private endpoints and build identity');
   await context.close();
  }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(e=>{console.error(e);process.exitCode=1});

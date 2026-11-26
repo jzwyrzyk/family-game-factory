@@ -1,3 +1,4 @@
+import {WORKSPACE_LANGUAGE_BANK} from './workspace-content';
 import {EARLY_LANGUAGE_BANK} from './early';
 import {hasPicture} from '../learning/early/pictures';
 import {withinGrade} from '../learning/grades';
@@ -29,8 +30,13 @@ export const LANGUAGE_BANK_V1:Readonly<Record<string,LanguageTemplateBank>> = de
   ...LANGUAGE_G1, ...LANGUAGE_G2, ...LANGUAGE_G3, ...LANGUAGE_G4,
 });
 export const LANGUAGE_PACKS:Readonly<Record<string,Readonly<Record<string,LanguageTemplateBank>>>> =
-  Object.freeze({v1:LANGUAGE_BANK_V1,v2:deeplyFreeze(EARLY_LANGUAGE_BANK)});
-export const LANGUAGE_BANK = Object.freeze({...LANGUAGE_BANK_V1,...LANGUAGE_PACKS.v2});
+  Object.freeze({v1:LANGUAGE_BANK_V1,v2:deeplyFreeze(EARLY_LANGUAGE_BANK),v3:deeplyFreeze(WORKSPACE_LANGUAGE_BANK)});
+export const LANGUAGE_BANK = Object.freeze(Object.fromEntries(
+  [...new Set(Object.values(LANGUAGE_PACKS).flatMap(pack => Object.keys(pack)))].map(id => {
+    const banks = Object.values(LANGUAGE_PACKS).map(pack => pack[id]).filter(Boolean);
+    return [id, banks.length === 1 ? banks[0] : deeplyFreeze({h:banks[0].h, items:banks.flatMap(bank => bank.items)})];
+  })
+) as Record<string, LanguageTemplateBank>);
 const unit=(random:()=>number):number=>{
   const n=random(); return Number.isFinite(n)?Math.max(0,Math.min(0.999999,n)):0;
 };
@@ -45,16 +51,17 @@ export interface LanguageItemOptions {
 /** Reviewed templates only. Generated game code never authors or grades these items. */
 export function generateLanguageItem(skillId:string,options:LanguageItemOptions={}):LanguageItem {
   const skill=getLanguageSkill(skillId);
-  const pack=Object.hasOwn(LANGUAGE_PACKS.v2,skillId)?'v2':ACTIVE_LANGUAGE_PACK;
-  const bank=LANGUAGE_PACKS[pack][skillId];
-  if(!bank?.items.length)throw Error('Language skill has no reviewed examples: '+skillId);
+  const candidates = Object.entries(LANGUAGE_PACKS).flatMap(([pack, banks]) =>
+    (banks[skillId]?.items ?? []).map((item, index) => ({item, index, pack})));
+  if (!candidates.length) throw Error('Language skill has no reviewed examples: ' + skillId);
   const random=options.random||Math.random;
   const tier=Math.max(0,Math.min(2,Math.floor(options.tier??0))) as LanguageLevel;
-  const nearest=Math.min(...bank.items.map(x=>Math.abs(x.t-tier)));
-  const matches=bank.items.map((item,index)=>({item,index})).filter(x=>Math.abs(x.item.t-tier)===nearest);
-  const notRecent=matches.filter(x=>!options.excludeIds?.includes(skillId+':'+pack+':'+x.index));
+  const nearest=Math.min(...candidates.map(x => Math.abs(x.item.t-tier)));
+  const matches=candidates.filter(x=>Math.abs(x.item.t-tier)===nearest);
+  const notRecent=matches.filter(x=>!options.excludeIds?.includes(skillId+':'+x.pack+':'+x.index));
   const eligible=notRecent.length?notRecent:matches;
   const chosen=eligible[Math.floor(unit(random)*eligible.length)];
+  const pack=chosen.pack, bank=LANGUAGE_PACKS[pack][skillId];
   const draft=chosen.item;
   const kind=draft.kind;
   const form:LanguageForm=kind==='picture-order'?'comprehension':kind==='word-tiles'?'encoding':kind==='sentence-tiles'||kind==='edit'?'syntax':
@@ -62,6 +69,11 @@ export function generateLanguageItem(skillId:string,options:LanguageItemOptions=
   const choices=kind==='choice' ? shuffle([draft.a,...(draft.d||[])].map(value=>({value,label:value})),random) : undefined;
   const tiles=(kind==='word-tiles'?shuffle(draft.a.split(''),random):
     (kind==='picture-order'||kind==='sentence-tiles')?shuffle(draft.a.split(/\s+/),random):undefined);
+  // Keep a shuffled supply from accidentally displaying the whole model answer in order.
+  if (tiles && tiles.join(kind==='word-tiles' ? '' : ' ') === draft.a) {
+    const different = tiles.findIndex(token => token !== tiles[0]);
+    if (different > 0) [tiles[0], tiles[different]] = [tiles[different], tiles[0]];
+  }
   return {
     id:skillId+':'+pack+':'+chosen.index,contentPack:pack,...(draft.stimulus?{stimulus:draft.stimulus}:{}),
     skillId,title:skill.title,grade:skill.grade,domain:skill.domain,

@@ -1,0 +1,6 @@
+.art-game-review {width:min(760px,94vw); color:#183f42; background:#fffaf0}
+.art-game-review header, .art-game-controls {display:flex; align-items:center; gap:.6rem; flex-wrap:wrap}
+.art-game-review header {justify-content:space-between}
+.art-game-review h2, .art-game-review p {margin:.4rem 0 .8rem}
+.art-game-review canvas {display:block; width:100%; border-radius:1rem}
+.art-game-controls button {min-height:48px}

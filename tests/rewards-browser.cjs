@@ -57,13 +57,12 @@ async function openRewards(page) {
   await page.locator('#page-jems-rewards').waitFor({ state: 'visible' });
   await page.waitForFunction(() => document.getElementById('page-jems-rewards').getAttribute('aria-busy') === 'false');
 }
+const {answerLanguageChoice} = require('./language-choice-fixture.cjs');
 async function answerLanguage(page) {
   const item = await page.evaluate(() => FG.learning.activeItem);
   const activity = page.locator('.language-activity:visible');
   if (item.kind === 'choice') {
-    const values = await activity.locator('.language-choice').evaluateAll(elements => elements.map(element => element.dataset.value));
-    const index = values.indexOf(String(item.answer));
-    assert.ok(index >= 0); await activity.locator('.language-choice').nth(index).click();
+    await answerLanguageChoice(activity, item.answer);
   } else if (item.kind === 'edit') {
     await activity.locator('.language-edit-input').fill(String(item.answer));
     await activity.locator('.language-edit-form button[type="submit"]').click();
@@ -71,7 +70,7 @@ async function answerLanguage(page) {
     await activity.locator('.language-creative-input').fill('My imaginary rocket carries a garden to the moon.');
     await activity.locator('.language-creative-form button[type="submit"]').click();
   } else {
-    const joiner = item.kind === 'sentence-tiles' ? ' ' : '';
+    const joiner = item.kind === 'word-tiles' ? '' : ' ';
     const find = (chosen, remaining) => {
       const value = chosen.map(index => item.tiles[index]).join(joiner);
       if (value === item.answer) return chosen;

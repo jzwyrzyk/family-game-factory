@@ -1,7 +1,22 @@
 # Nonproduction setup and privilege review
 
-This is an **unapplied setup proposal** for the static DEV and TEST delivery
-lane. It is not evidence of a live project, authenticated preview, full TEST
+**November 26 executable update:** use [the consolidated handoff](../../docs/operations/PERMANENT_CLOUD_SETUP.md)
+and `scripts/ops/setup_nonproduction.py` for the owner's selected `jems-jzw-nonprod`
+project in `us-east5`. Initial source-bound plans are create-only, saved privately,
+and require an approved hash. The owner requested an exact plan before execution.
+The baseline adds a second zero-role static runtime `jems-test-runtime` distinct
+from DEV `jems-static-runtime`, and a project-filtered $15 monthly notification
+budget using the verified existing billing account. Federation stays disabled and
+registry cleanup defaults to **dry-run** until a separately reviewed activation.
+`enable_registry_cleanup=true` activates the retention policy described below;
+it is not enabled by initial setup. One-time Cloud Shell is authorized; subsequent
+routine operations remain in the existing controller. IAP owner details remain
+private. No project creation, billing link or complete TEST backend is implicit.
+
+
+The original static DEV/TEST setup was partially applied: the owner reports 25 of
+28 planned instances in state. The [guarded recovery](../../docs/operations/NONPRODUCTION_RECOVERY.md)
+corrects the two remaining creations and retires the uncreated project IAP binding. It is not evidence of a live project, authenticated preview, full TEST
 backend, provider acceptance or production release. `ops/environments.json`
 remains disabled and unbound until actual setup is approved and verified.
 
@@ -27,7 +42,7 @@ secrets, production permissions, backend state or continuously running service.
 | `jems-static-runtime` | No project/application roles. Serves verified static bytes only. No model key, GCS, Firestore, secret, dispatch or deploy access. |
 | `jems-nonprod-deploy` | The listed custom Cloud Run controller permissions in the dedicated project; exact runtime `actAs` and identity/key metadata read; Artifact Registry writer on only `jems-environments`; exact-service IAP policy management. Builds never execute with this identity. |
 | `jems-nonprod-uat` | Per-service IAP accessor, granted by the trusted controller. No deployment, IAM, storage, provider or production rights. Browser UAT receives an audience-bound ID token, not deploy credentials. |
-| IAP managed service agent | Standard `roles/iap.serviceAgent` in this project, with per-service `run.invoker` granted on deployment. No public invoker grant. |
+| IAP managed service agent | Direct Cloud Run IAP uses per-service `roles/run.invoker`, granted and verified by the controller. No project-wide IAP agent role or public invoker grant. |
 | GitHub federation | One dedicated pool/provider, disabled by default; immutable repository/owner IDs; protected `main`; exactly `jems-environments.yml`; GitHub-hosted runners; only `workflow_run`, `workflow_dispatch`, `schedule`. Exact distinct environment subjects bind deployment and UAT to their respective accounts. |
 | Registry | Regional static-site images addressed by digest. CI versions expire after 30 days; two moving `keep-test-current`/`keep-test-previous` tags protect current TEST and one recovery version. No production registry use or cleanup. |
 
@@ -35,7 +50,7 @@ The deployer necessarily creates and deletes services and manages their IAP
 policies inside this isolated project. This is broader than the existing
 production account's permissions on three existing services, and is the new
 privileged scope requiring review. It cannot modify project IAM, create keys,
-grant itself roles, assume runtime identities other than the static account, or
+grant itself roles, assume runtime identities other than the two static accounts, or
 access production through any binding in this plan. Do not bind production
 accounts or move unrelated resources into this project.
 
@@ -145,3 +160,13 @@ Official references checked November 23, 2026 (America/New_York):
 [IAP pricing](https://cloud.google.com/iap/pricing),
 [Cloud Run pricing](https://cloud.google.com/run/pricing),
 [Artifact Registry pricing](https://cloud.google.com/artifact-registry/pricing).
+
+## Partial-apply recovery
+
+Use `scripts/ops/recover_nonproduction.py` through the `nonprod-recover` launcher
+lane. The initial setup helper deliberately cannot replay an apply-started plan.
+The recovery uses the existing private state directory, preserves every original
+plan/receipt/marker, and prepares a private successor state. Budget user ADC quota
+is explicitly `jems-jzw-nonprod` on an alias used only by the budget. No existing
+resource update, replacement, deletion, project IAM grant or federation activation
+is permitted. See [provider requirements and exact guards](../../docs/operations/NONPRODUCTION_RECOVERY.md).
