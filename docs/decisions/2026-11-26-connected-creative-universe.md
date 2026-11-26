@@ -1,9 +1,9 @@
-# Authentic child artwork in a connected 2D universe
+# Children keep and reuse their original artwork
 
-On November 26 the product owner authorized the Connected Creative Universe directive and its Drawing Workspace acceptance criteria. The same private picture must remain recognizable and recoverable across drawing, animation, scenes and games. The owner selected deterministic preparation and an explicit choice of immutable artwork revision. Generative redrawing or style matching would replace the very work the child chose to keep.
+The owner adopted a permanent authentic-artwork doctrine and standardized new game work on 2D experiences on November 26, 2026.
 
-New games use 2D sprites and illustrated environments. Retained engines and existing game histories keep their compatibility paths. A new requirement for essential three-axis interaction goes back for clarification. This refines the rendering choice in the earlier game-form decision for new development. Its independent interaction, simulation and intent checks still apply.
+A drawing keeps its owner-scoped identity through preparation, movement design and reuse. The child selects an exact revision for each saved adventure. The trusted scene or game supplies the role and its mechanics. An edited drawing creates a new revision. Existing adventures continue to use their selected version.
 
-The existing private-art store owns artwork and movement. Projects own contextual roles, references and behavior. Shared drawing primitives can serve a temporary learning surface without persisting its work. General generated-game delivery requires separate security and release qualification, with no implicit production or private-family activation.
+This extends the existing private drawing, rig and scene authorities. A second asset store would split ownership and recovery. Sending private images to a generative provider would replace the child's creative judgment and violate the product commitment. Preserve legacy games and review any future generated-game adapter independently.
 
-[Creative Asset & World Design Standard](../drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md) · [Earlier game-form decision](0002-intent-faithful-game-forms.md)
+The [Creative Asset & World Design Standard](../creative-universe/STANDARD.md) specifies the boundaries and acceptance evidence. Source and deployment status belong in [delivery state](../../DELIVERY-STATE.md).

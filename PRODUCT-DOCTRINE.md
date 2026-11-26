@@ -57,15 +57,15 @@ The owner's [November 22 Bubble Gum correction](docs/decisions/2026-11-22-bubble
 
 The premium builder plans the artwork and its playable roles together. Side, top-down, isometric and guided perspective use a bounded 2D canvas. Preserve the chosen view, action and payoff. Ask the creator about an indispensable spatial action the runtime cannot represent. [Artwork-first pilot](docs/game-intelligence/premium-benchmark/ARTWORK-PILOT.md)
 
-Choose a game's form from its actions and consequences. New games use 2D sprites, layered environments and compatible physics. Choose input, simulation, visual style and goal or free-play mode independently within that architecture. Retain compatibility with existing games and their runtimes. A robot does not imply 3D; a launch animation does not imply physical simulation.
+Choose a game's form from its actions and consequences. Rendering (2D or true 3D), input, simulation, visual style and goal/free-play mode are independent decisions. A robot does not imply 3D; a launch animation does not imply physical simulation.
 
 Use actual physics when weight, contact, balance, momentum, suspension or another physical cause materially determines the requested experience, or when it is an explicit requirement. Preserve verified existing mechanics when editing a saved game. If an essential requirement exceeds the runtime's capabilities, explain the gap or resolve the choice; do not silently substitute an easier experience and claim completion. Reusable game families should support invention rather than confine every idea to the same game.
 
-See [the game-form decision](docs/decisions/0002-intent-faithful-game-forms.md). The [Connected Creative Universe decision](docs/decisions/2026-11-26-connected-creative-universe.md) records the 2D direction for new development.
+See [the game-form decision](docs/decisions/0002-intent-faithful-game-forms.md). The current runtime capability is an architecture fact, not a permanent limit on the product's ambition.
 
 ### Original drawings belong to the child across creations
 
-A child’s drawing is finished art. Jems permanently prohibits generative alteration of private artwork, including redrawing, beautification and automatic style matching. Keep the exact admitted original, editable source and immutable derived versions. Let the child explicitly choose how their art is used. [Creative Asset & World Design Standard](docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md)
+A child's drawing is the finished artistic creation. Keeping or importing it preserves the exact original bytes. Never send private art or its rendered captures to a generative model, redraw it, beautify it, synthesize a substitute or change its appearance to match a game. Explicit deterministic preparation saves a traceable derivative. New games use 2D sprites and environments. The same original can play different roles in different adventures, each pinned to the version the child chose. [Creative Asset & World Design Standard](docs/creative-universe/STANDARD.md)
 
 The [Art Studio](docs/drawings/ART_STUDIO.md) is a dedicated place to import or draw pictures, prepare separate derivatives, develop meaningful parts and motion, and reuse chosen versions in games and scenes. Preserve original pixels and the child’s decisions. A saved use pins the chosen image or movement revision; later library edits cannot silently change an earlier adventure. Keep local storage, export/restore and missing-asset recovery explicit. Supported physical and block-scene adapters do not imply arbitrary generated-game compatibility, universal recognition or cloud synchronization. [The accepted decision](docs/decisions/2026-11-19-private-art-studio.md) records this extension.
 

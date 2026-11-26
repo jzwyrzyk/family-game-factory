@@ -14,7 +14,7 @@ export async function reviewedArtworkBrowser(page: Page, approve: (digest: strin
   const chunk = Buffer.alloc(text.length + 12);
   chunk.writeUInt32BE(text.length); chunk.write('tEXt', 4); text.copy(chunk, 8);
   chunk.writeUInt32BE(crc32(chunk, 4, chunk.length - 4), chunk.length - 4);
-  const reviewed = Buffer.concat([image.subarray(0, -12), chunk, image.subarray(-12)]);
+  const withMetadata = Buffer.concat([image.subarray(0, -12), chunk, image.subarray(-12)]);
 
   async function select(buffer: Buffer) {
     await page.locator('#reviewedArtPassphrase').fill(parent);
@@ -24,6 +24,10 @@ export async function reviewedArtworkBrowser(page: Page, approve: (digest: strin
   page.on('request', request => {
     if (new URL(request.url()).pathname === '/entry/review-art') requests.push(request.postDataJSON());
   });
+  const reviewed = image;
+  await select(withMetadata);
+  await page.getByText('Ask a grown-up for a reviewed PNG without embedded file details.').waitFor();
+  assert.deepEqual(requests, []);
   await select(reviewed);
   await page.getByText('Ask the operator to review and approve this exact PNG for your family.').waitFor();
   assert.equal(await page.getByRole('link', {name:'Download prepared PNG'}).count(), 0);
