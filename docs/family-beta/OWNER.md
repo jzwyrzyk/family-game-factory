@@ -20,7 +20,7 @@ For optional processing, send the direct notice privately. Have the grown-up cho
 
 Review the family and global allowances, release the appropriate pause, and check provider readiness. Lowering a limit below outstanding use stops new admissions. Review **Usage and pending reservations** for this month and the preceding twelve months. A reservation can cover a provider call whose result has not returned. Use the original job's read-only status lookup after a network loss. Never initiate another paid job merely to discover its status.
 
-For artwork, review the exact non-identifying PNG privately and record its SHA-256 in **Approve exact artwork** for that family. Enable **Reviewed adult artwork**. The grown-up unlocks family management and uses the reviewed artwork input in play. Only the file digest is sent for authorization. The browser validates size and dimensions and re-encodes pixels before local storage. An altered file needs a new review.
+For artwork, review the exact non-identifying PNG privately and record its SHA-256 in **Approve exact artwork** for that family. Enable **Reviewed adult artwork**. The grown-up unlocks family management and uses the reviewed artwork input in play. Only the file digest is sent for authorization. The beta input accepts bounded, non-interlaced 8-bit RGB or RGBA PNGs with only image chunks and an optional standard sRGB intent. Export that version locally before the operator reviews its exact digest. Other PNG encodings or files with extra metadata are declined. The private library stores the approved bytes and drops the filename. Earlier raster reconstructions remain recoverable as stored. An altered file needs a new review.
 
 ## Stop access or respond to a privacy request
 
