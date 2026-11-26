@@ -327,7 +327,13 @@ async function installReceiptFixture(page) {
     assert.equal(await gems(page), 0, 'The free starter spends and awards no gems');
     assert.deepEqual(await page.evaluate(() => Object.keys(FG.pals).sort()), ['open', 'version', 'view'], 'No public collection or grant mutation API');
     const joinedAt = (await view(page)).owned[0].joinedAt;
-    await page.reload(); await ready(page); await openPals(page);
+    await page.reload(); await ready(page);
+    assert.equal((await view(page)).activeId, 'navi', 'The equipped Pal survives reload before any welcome action');
+    assert.equal((await view(page)).owned[0].joinedAt, joinedAt);
+    // The art-store read can offer ordinary Home on the first visit and the
+    // maker choice on reload. Use that visible choice before opening My Journey.
+    await exploreWelcome(page);
+    await openPals(page);
     await selectedNav(page, 'studioNavPals');
     await readablePalText(page, '.pals-growth > strong');
     assert.equal((await view(page)).owned[0].joinedAt, joinedAt);
