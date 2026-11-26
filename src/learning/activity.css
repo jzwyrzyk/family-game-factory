@@ -1,5 +1,6 @@
 @import './workspace/shell.css';
 @import './workspace/support.css';
+@import './workspace/math.css';
 
 .learning-preview-cover {
   position: absolute; inset: 0; z-index: 35; display: flex; align-items: flex-start;
@@ -30,3 +31,8 @@
 
 .math-answer-form > .learning-keypad { width: 100%; text-align: center; }
 .math-answer-form .learning-keypad-keys { margin-inline: auto; }
+.math-activity .math-visual svg { max-height: clamp(170px,28vh,285px); }
+.math-activity[data-band="early"] .math-answer-form { flex-direction: column; gap: 16px; }
+.math-activity[data-band="early"] .early-counter button { min-width: var(--workspace-target); min-height: var(--workspace-target); }
+.math-activity[data-band="early"] .early-choices { gap: clamp(8px, 1.5vw, 16px); }
+.math-activity[data-band="early"] .early-check { background: var(--workspace-action); color: #fff; border-color: var(--workspace-action); }

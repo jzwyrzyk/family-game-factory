@@ -126,14 +126,15 @@ test('three errors provide a worked example and a supportive way back to play',a
 });
 
 test('interaction mode constructs a quantity without pre-filling the answer',async()=>{
-  const page=await mount(multiply(),'interaction');try{
+  const item=generateItem('g2-hundreds',{random:()=>0});
+  const page=await mount(item,'interaction');try{
     assert.equal(await page.locator('.math-built-number').textContent(),'0');
     assert.equal(await page.locator('#math-answer').isVisible(),false);
-    for(let i=0;i<5;i++)await page.locator('button[data-place="10"][data-delta="1"]').click();
-    for(let i=0;i<6;i++)await page.locator('button[data-place="1"][data-delta="1"]').click();
-    assert.equal(await page.locator('.math-built-number').textContent(),'56');
+    await page.locator('button[data-place="100"][data-delta="1"]').click();
+    await page.locator('button[data-place="10"][data-delta="1"]').click();
+    assert.equal(await page.locator('.math-built-number').textContent(),String(item.answer));
     await page.locator('[data-action=check-interaction]').click();await page.waitForFunction(()=>(window as any).results.length===1);
-    const e=await evidence(page);assert.equal(e.results[0].independent,true);assert.equal(e.profile.learning.attempts[0].item.representation,'visual');assert.equal(e.profile.learning.attempts[0].answers[0].normalized,'56/1');
+    const e=await evidence(page);assert.equal(e.results[0].independent,true);assert.equal(e.profile.learning.attempts[0].item.representation,'visual');assert.equal(e.profile.learning.attempts[0].answers[0].normalized,item.answer+'/1');
   }finally{await page.close();}
 });
 

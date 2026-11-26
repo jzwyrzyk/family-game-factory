@@ -645,10 +645,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:47:03.820Z",
-      "sourceDigest": "937d42c456c7e0d6e76e8ba0a5c14c5c72caa1a61b63eaa53b1e3726019b18c0",
+      "reviewedAt": "2026-11-26T01:50:07.454Z",
+      "sourceDigest": "de2171054c43d016b8b558c18b890a7a91b25c56745f99435f7800963f38dfa6",
       "reviewOutcome": "updated",
-      "reviewReason": "Math preserves the active response and centers it on explicit return from hints. The integration contract documents the shared question and working tools.",
+      "reviewReason": "The integration contract now distinguishes answer construction, visual exploration, and help-gated models for independently symbolic checkpoints.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -891,10 +891,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:45:22.890Z",
-      "sourceDigest": "8dff7c9676a45c1e4dd0da30e459973c0e01855b8c3cb5d1598a085d0c167156",
+      "reviewedAt": "2026-11-26T01:50:07.515Z",
+      "sourceDigest": "321faff4b11c1c7749b9f0d2c5890f01b4334521b583f32fb5c74630d94c9269",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The learning UI suite includes pointer and input regression cases under the same existing command and shard. The CI and release evidence requirements still apply.",
+      "reviewReason": "The same learning UI shard now verifies the geometry, bounded constructors, equivalent numeric responses, pointer input and diagram accessibility.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1135,10 +1135,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T01:45:23.244Z",
-      "sourceDigest": "89d01be4965b0dd852a8ab6cf2f75824fcfd09bbc248e5908a42bc10eaf1c3dd",
+      "reviewedAt": "2026-11-26T01:50:07.685Z",
+      "sourceDigest": "407ba629bd4f34955f20a5e6c69735d1a2b95e1cf6510accae9f3f1d6c53b927",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The feature branch adds local Math presentation and browser fixtures. It changes no release manifest, operational environment, worker version or production authorization.",
+      "reviewReason": "Adding deterministic local Math model and geometry tests to the existing learning command changes neither deployment routing nor the approved release source.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
