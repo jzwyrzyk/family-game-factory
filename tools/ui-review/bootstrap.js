@@ -95,7 +95,7 @@ window.__reviewNavigate=async action=>{
   window.addEventListener('factory-page',opened);click('studioMenuParent');
  });
  FG.learning?.dispose();for(const d of document.querySelectorAll('dialog[open]'))d.close();
- if(action==='design-system'){FG.studio.home();window.__reviewDesignSystem();}
+ if(action==='design-system'){await FG.studio.home();window.__reviewDesignSystem();}
  else if(action==='home')FG.studio.home();
  else if(action==='create')click('studioNavCreate');
  else if(action==='creations'){FG.studio.home();click('studioSavedIdeas');}
