@@ -54,4 +54,6 @@ Catalogue each released illustration by immutable ID, dimensions, digest, straig
 | C | Movement editor owns the design and pose evaluator. Scene interpreter owns fixed-clock playback. Drawing Lab owns segmentation, masks, constraints and supported real mechanics. | Immediate motion, scene continuation, pause/resume and cancel, manual correction, version selection, representative synthetic drawing playback. |
 | E | Game host owns explicit adapters and trust checks. Security and release owners independently qualify any future change to general delivery. | A named playable example, preserved game behavior, an isolated generated realm, and confirmation of disabled production delivery. |
 
+The owner introducing a new reference kind updates its validator, renderer, authoritative usage checks, transfer and recovery remapping, and the destination compatibility matrix together.
+
 For each change record its PR and dependencies, exact head, reproducible tests, screenshots and motion capture where relevant. Record what passed locally, hosted checks and private preview identity, TEST acceptance, production state and external family activation separately. Use synthetic work in public artifacts. Existing parent reports, learning evidence, reward receipts, earned Pals and prior histories retain their own authorities. [Delivery governance](../development/DEV-TEST-PROD.md)
