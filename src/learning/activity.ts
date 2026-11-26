@@ -118,7 +118,7 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     node.focus({preventScroll:true});return document.activeElement===node;
   }
   function focusQuestion() {
-    if(done||!reveal(title,'nearest'))return false;
+    if(done||!reveal(title,'start'))return false;
     title.focus({preventScroll:true});return document.activeElement===title;
   }
   function returnToAnswer() {

@@ -645,10 +645,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:45:22.788Z",
-      "sourceDigest": "db440fabaed036c25ffafd95684752e28c2edc3de37c6e27fb75c76224237698",
+      "reviewedAt": "2026-11-26T01:46:41.685Z",
+      "sourceDigest": "5db27b832aa54145a98fa7e2f3287b4219c86660b4b6944ba1a1aecbf926e1a0",
       "reviewOutcome": "updated",
-      "reviewReason": "The Math integration contract now describes the shared profile-based layout, session-only scratchpad and existing answer submission path for the number pad.",
+      "reviewReason": "Math focuses and reveals the question heading before input while the new integration contract describes session-only working tools.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",

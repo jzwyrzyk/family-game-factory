@@ -67,6 +67,7 @@
 .learning-workspace :is(button,input,textarea,summary,select):focus-visible,.learning-workspace .workspace-help h3:focus-visible {
   outline: 3px solid var(--jems-action-blue, #195fd0); outline-offset: 3px;
 }
+.learning-workspace .workspace-question { scroll-margin-block: 12px; }
 .learning-workspace .workspace-question:focus { outline: none; }
 .learning-workspace .workspace-feedback { margin: 14px 0 0; font-size: 20px; font-weight: 700; }
 .workspace-feedback[data-state="correct"] { color: var(--jems-success-ink, #0b634c); }
@@ -102,4 +103,3 @@
 #page-lab .two-column:has(.learning-workspace) { grid-template-columns: minmax(0,1fr); }
 #page-lab .panel:has(#lab-question .learning-workspace) { min-width: 0; padding: clamp(6px,1.5vw,16px); }
 #lab-question .learning-workspace { margin-inline: auto; }
-.learning-workspace [hidden] { display: none !important; }
