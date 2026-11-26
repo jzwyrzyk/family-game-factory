@@ -38,7 +38,7 @@ interface BuilderReadiness {
 export interface ArtifactGate { test(game:PlayableGame,context?:{signal?:AbortSignal;independentIntentPlan?:FunctionalGameContract;captureQuality?:boolean}):Promise<QualityTestedGame|void> }
 export class JobService {
  private controllers=new Map<string,AbortController>();
- constructor(private repo:Repository,private agent:AgentAdapter,private gate:ArtifactGate,private options:{allowMock:boolean;maxUnits:number;premiumMaxJobMicroUsd?:number;timeoutMs:number;maxRetries:number;maxRepairAttempts?:number;requireVerifiedParentPrivacy?:boolean;adultPilotMode?:boolean;premiumPilot?:PremiumPilot;premiumConfigured?:boolean;premiumUnavailable?:boolean}={allowMock:false,maxUnits:10,timeoutMs:30000,maxRetries:2}){
+ constructor(private repo:Repository,private agent:AgentAdapter,private gate:ArtifactGate,private options:{allowMock:boolean;syntheticFixture?:boolean;testExecution?:Job['testExecution'];maxUnits:number;premiumMaxJobMicroUsd?:number;timeoutMs:number;maxRetries:number;maxRepairAttempts?:number;requireVerifiedParentPrivacy?:boolean;adultPilotMode?:boolean;premiumPilot?:PremiumPilot;premiumConfigured?:boolean;premiumUnavailable?:boolean}={allowMock:false,maxUnits:10,timeoutMs:30000,maxRetries:2}){
   if(options.premiumPilot&&(!options.adultPilotMode||agent.kind!=='metered-api'||agent.testFixture))throw Error('ADULT_PILOT_ACCESS_REQUIRED');
  }
  private async authorized(session:VerifiedSession,id:string){const state=await this.repo.snapshot(),job=state.jobs.find(j=>j.id===id);if(!job)throw Error('NOT_FOUND');requireResourceAudience(state,session,job);return job;}
@@ -112,6 +112,7 @@ export class JobService {
  }
  async submit(session:VerifiedSession,input:unknown){
   requireFamily(session,{id:'submission',familyId:session.familyId});const r=validateBuildRequest(input);
+  if(this.options.testExecution&&Date.now()>=this.options.testExecution.expiresAt)throw Error('BUILDER_UNAVAILABLE');
   if(this.agent.testFixture&&!this.options.allowMock)throw Error('TEST_FIXTURE_FORBIDDEN');
   if(!this.agent.available||this.agent.kind==='codex-subscription'||this.agent.kind==='local-rule'||(this.agent.kind==='mock'&&!this.options.allowMock))throw Error('BUILDER_UNAVAILABLE');
   return this.repo.transaction(s=>{
@@ -135,6 +136,9 @@ export class JobService {
    }
    const base=r.baseRevisionId?s.revisions.find(x=>x.id===r.baseRevisionId):undefined;
    if(r.baseRevisionId){if(!base)throw Error('NOT_FOUND');requireResourceAudience(s,session,base);}else if(r.gameId!=='new')throw Error('INVALID_REQUEST');
+   if(this.options.syntheticFixture&&!(this.agent.testFixture&&(
+    !base&&r.gameId==='new'&&r.prompt==='Build Moon Hopper'||r.gameId==='generated-module'&&base?.adapter==='mock'&&base.game?.kind==='generated-module-v1'&&r.prompt==='Change Moon Hopper to four hops'
+   )))throw Error('INVALID_REQUEST');
    // A mapped recovery receives new IDs but no new premium allowance. It is
    // playable evidence, never a fresh paid lineage. Reject before any reserve.
    if(base?.recoveryProvenance?.playbackOnly)throw Error('RECOVERY_PLAYBACK_ONLY');
@@ -174,7 +178,7 @@ export class JobService {
    }
    if(maxUnits&&(!ledger.paidEnabled||ledger.used+ledger.reserved+maxUnits>ledger.allowance))throw Error('SPENDING_CUTOFF');
    const qualityRequired=this.agent.kind==='metered-api'&&!this.agent.testFixture&&needsCurrentQuality(base?.game)?'game-quality-v1' as const:undefined;
-   ledger.reserved+=maxUnits;const job:Job={...r,...(premiumPolicy?{premiumPolicy}:{}),...(premiumEditCeilingMicroUsd?{premiumEditCeilingMicroUsd}:{}),...(qualityRequired?{qualityRequired}:{}),...(this.options.adultPilotMode?{adultPilotDeviceId:session.deviceId,adultPilotSessionId:session.adultSessionId,adultPilotProfileId:session.adultProfileId}:{}),id:uuid(),familyId:session.familyId,status:'draft',adapter:this.agent.testFixture?'mock':this.agent.kind,maxUnits,usedUnits:0,retryCount};s.jobs.push(job);audit(s,job,'queued');return {jobId:job.id,status:'queued' as JobStatus,adapter:job.adapter};
+   ledger.reserved+=maxUnits;const job:Job={...r,...(this.options.testExecution?{testExecution:this.options.testExecution}:{}),...(premiumPolicy?{premiumPolicy}:{}),...(premiumEditCeilingMicroUsd?{premiumEditCeilingMicroUsd}:{}),...(qualityRequired?{qualityRequired}:{}),...(this.options.adultPilotMode?{adultPilotDeviceId:session.deviceId,adultPilotSessionId:session.adultSessionId,adultPilotProfileId:session.adultProfileId}:{}),id:uuid(),familyId:session.familyId,status:'draft',adapter:this.agent.testFixture?'mock':this.agent.kind,maxUnits,usedUnits:0,retryCount};s.jobs.push(job);audit(s,job,'queued');return {jobId:job.id,status:'queued' as JobStatus,adapter:job.adapter};
   });
  }
  private jobView(state:PipelineState,session:VerifiedSession,j:Job){

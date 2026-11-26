@@ -30,6 +30,7 @@ export interface AgentAdapter {
 }
 export interface BuildRequest { gameId:string; baseRevisionId:string|null; prompt:string; clientRequestId:string; retryOf?:string }
 export interface Job extends BuildRequest {
+ testExecution?:import('../actions/test-execution').TestExecution & {workerSha:string};
  /** Beta-only server attribution; client BuildRequest cannot supply these fields. */
  learnerId?:string;
  guidedCreation?:GuidedProvenance;

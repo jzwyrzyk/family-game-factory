@@ -184,3 +184,34 @@ test('private coach: unread narration cannot monopolize or release an active tex
  const narration=startNarration(chunks(body));await narration.done;
  assert.equal(narration.response.statusCode,200);assert.equal(narrationCalls,1);
 });
+
+import {generateKeyPair,SignJWT} from 'jose';
+import {googleCallerVerifier} from '../server/coach/private-executor';
+import {testCoachOrigin,testGatewayPrincipal,testHouseholdPrincipal} from '../server/coach/test-identity';
+import {syntheticCoachReply,syntheticCoachContext,requireSyntheticContext} from '../server/coach/synthetic-scenario';
+
+test('TEST authenticated synthetic coach cannot invoke the funded handler or receive family content',async()=>{
+ const {publicKey,privateKey}=await generateKeyPair('RS256');
+ const env={K_SERVICE:'jems-test-coach',JEMS_TEST_PROJECT_NUMBER:'1092405124984',JEMS_TEST_FUNDED_HOUSEHOLD:'true',
+  JEMS_TEST_TRIAL_AUTHORIZATION_SHA256:'a'.repeat(64),JEMS_TEST_TRIAL_EXPIRES_AT:new Date(Date.now()+50000).toISOString()};
+ const audience=testCoachOrigin(env),verified=(account:string,scope=env)=>googleCallerVerifier(audience,account,scope,async()=>publicKey);
+ const sign=(account:string,aud=audience)=>new SignJWT({email:account,email_verified:true}).setProtectedHeader({alg:'RS256'}).setIssuer('https://accounts.google.com').setAudience(aud).setIssuedAt().setExpirationTime('5m').sign(privateKey);
+ const token=await sign(testGatewayPrincipal),paidToken=await sign(testHouseholdPrincipal);
+ let calls=0;
+ const handler=privateCoachHandler(runtime({verifyCaller:verified(testHouseholdPrincipal),syntheticCaller:verified(testGatewayPrincipal),provider:{complete:async()=>{calls++;return result;}}}));
+ const hit=async(path:string,body:unknown,bearer:string)=>{
+  const response=new ResponseRecorder();
+  await handler(streamedRequest(path,chunks(Buffer.from(JSON.stringify(body))),{...headers,authorization:'Bearer '+bearer}),response.response());
+  return response;
+ };
+ const scenario={version:1,scenario:'moon-hopper'},path='/v1/private-coach/synthetic';
+ assert.deepEqual((await hit(path,scenario,token)).json(),{reply:syntheticCoachReply,usedMicroUsd:0});
+ assert.notEqual((await hit(path,{...scenario,context},token)).statusCode,200);
+ assert.notEqual((await hit(path,scenario,paidToken)).statusCode,200);
+ assert.notEqual((await hit(path,scenario,await sign(testGatewayPrincipal,'https://other.example'))).statusCode,200);
+ assert.notEqual((await hit('/v1/private-coach/complete',{version:1,context},token)).statusCode,200);
+ assert.equal(calls,0);
+ assert.ok(!await verified(testHouseholdPrincipal,{...env,JEMS_TEST_TRIAL_EXPIRES_AT:new Date(Date.now()-1000).toISOString()})(paidToken));
+ requireSyntheticContext(syntheticCoachContext);
+ assert.throws(()=>requireSyntheticContext({...syntheticCoachContext,conversation:[{role:'child',text:'Private'}]}),/INVALID_REQUEST/);
+});

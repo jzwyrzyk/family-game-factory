@@ -1,3 +1,5 @@
+import {resetSyntheticProject} from './beta/test-reset';
+import {fixtureRunEvidence,requireTestCallback,testExecution,type TestExecution} from './actions/test-execution';
 import {generatedRecoveryHttp,runGeneratedCloudRecovery} from './beta/generated-recovery';
 import {cloudBackupSchedule,runFamilyCloudRecovery,familyBackupLedger} from './beta/recovery';
 import {reconcileFamilies} from './beta/reconcile';
@@ -41,9 +43,10 @@ import {validateApproval,type AgentApproval} from './agent/openai';
 import {isPremiumApproval,validatePremiumApproval,type PremiumApproval} from './agent/model-policy';
 import type {PremiumPilot} from './pipeline/premium-policy';
 import {sessionHandler} from './sessions';
-import {trustedDeviceHandler} from './trusted-devices';
+import {verifyBrowserSession,trustedDeviceHandler} from './trusted-devices';
 import {adultPilotConfigured,adultPilotFlags} from './adult-pilot';
 export interface GatewayConfig {
+ testExecution?:TestExecution;
  platformMode?:'HOUSEHOLD'|'PRIVATE_FAMILY_BETA'|'PUBLIC'; beta?:BetaConfig;householdPrivateHost?:HouseholdHost;householdBudgetBinding?:HouseholdBinding;
  active:boolean;appOrigin:string;gatewayOrigin:string;previewOrigin:string;sessionKey:string;previewKey:string;familyId:string;
  repository:string;repositoryId:string;workflow:string;approvedSha:string;
@@ -67,6 +70,8 @@ export function approvedPremiumPilot(config:GatewayConfig,requested:boolean,adul
  return {approval:config.premiumApproval,workerSha:config.premiumWorkerApprovedSha};
 }
 export async function createGateway(config:GatewayConfig,tenantRepo?:Repository){
+ const policy=testExecution(config);
+ const fixture=policy?.providerMode==='fixture'&&config.familyId===config.beta?.testReset?.familyId;
  const encoding=artifactEncoding(config);
  if(config.householdRecovery&&(typeof config.householdRecovery.enabled!=='boolean'||config.householdRecovery.enabled&&(tenantRepo||platformMode(config.platformMode)!=='HOUSEHOLD'||!config.householdPrivateHost||!config.projectId||!config.artifactBucket||config.localFile||config.appOrigin!==config.gatewayOrigin)))throw Error('HOUSEHOLD_RECOVERY_CONFIG_REQUIRED');
  if((platformMode(config.platformMode)==='PRIVATE_FAMILY_BETA')!==!!tenantRepo)throw Error('BETA_GATEWAY_REQUIRED');
@@ -85,7 +90,8 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
  // unlocked adult profile may use the temporary pilot's paid API routes.
  if(adult.enabled&&!adultPilotConfigured(adult))
   throw Error('ADULT_PILOT_PROFILE_ACCESS_REQUIRED');
- const paidEnabled=paidExecutionAllowed(config.active,process.env.FACTORY_ACTIONS_APPROVED);
+ const paidEnabled=paidExecutionAllowed(config.active,process.env.FACTORY_ACTIONS_APPROVED)&&
+  (policy?.providerMode!=='funded'||environment.FACTORY_PREMIUM_BUILDER_APPROVED==='true'&&adultPilotConfigured(adult));
  if(!config.approval||isPremiumApproval(config.approval))throw Error('LEGACY_APPROVAL_REQUIRED');
  if(config.active)validateApproval(config.approval);if(!Number.isInteger(config.maxJobMicroUsd)||config.maxJobMicroUsd<1||config.maxJobMicroUsd>1000000)throw Error('JOB_BUDGET_REQUIRED');
  if(process.env.K_SERVICE&&config.localFile)throw Error('CLOUD_RUN_REQUIRES_DURABLE_FIRESTORE');
@@ -101,18 +107,20 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
  }
  const repo=tenantRepo??mapped??(config.localFile?await FileRepository.open(config.localFile):new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace,config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,config.workspace):undefined,encoding));
  await reconcilePaidReceipts(repo);
- const agent={kind:'metered-api' as const,available:paidEnabled,generate:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}};
- const service=new JobService(repo,agent,{test:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}},{allowMock:false,maxUnits:config.maxJobMicroUsd,premiumMaxJobMicroUsd:config.premiumMaxJobMicroUsd,timeoutMs:900000,maxRetries:2,requireVerifiedParentPrivacy:!adult.enabled,adultPilotMode:adult.enabled,premiumPilot,premiumConfigured:!!config.premiumApproval,premiumUnavailable});
+ const jobPolicy=policy?{...policy,workerSha:config.workerApprovedSha!}:undefined;
+ const agent={kind:'metered-api' as const,testFixture:fixture,get available(){return (!policy||Date.now()<policy.expiresAt)&&(paidEnabled||fixture);},generate:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}};
+ if(policy?.providerMode==='funded'&&!premiumPilot)premiumUnavailable=true;
+ const service=new JobService(repo,agent,{test:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}},{allowMock:fixture,syntheticFixture:fixture,testExecution:jobPolicy,maxUnits:config.maxJobMicroUsd,premiumMaxJobMicroUsd:config.premiumMaxJobMicroUsd,timeoutMs:900000,maxRetries:2,requireVerifiedParentPrivacy:!adult.enabled,adultPilotMode:adult.enabled,premiumPilot,premiumConfigured:!!config.premiumApproval,premiumUnavailable});
  const privateWorker=Boolean(config.workerRepository||config.workerRepositoryId||config.workerWorkflow||config.workerApprovedSha);
- if(privateWorker&&(!config.workerRepository||!config.workerRepositoryId||!config.workerWorkflow||!config.workerApprovedSha||config.workerRepository===config.repository||config.repository!=='jzwyrzyk/family-game-factory'||config.repositoryId!=='1458033181'||config.approvedSha!=='dcb887e6a51ba000fda1ccc42b9d198f8b9895f9'||config.workerRepositoryId!=='1458899834'||!Number.isSafeInteger(Number(config.workerRepositoryId))||Number(config.workerRepositoryId)<1||config.workerRepository!=='family-game-factory-lab/family-game-factory-worker'||config.workerWorkflow!=='factory-private.yml'||config.workerApprovedSha.length!==40||![...config.workerApprovedSha].every(c=>'0123456789abcdef'.includes(c))))throw Error('PRIVATE_WORKER_CONFIG_REQUIRED');
+ if(privateWorker&&!policy&&(!config.workerRepository||!config.workerRepositoryId||!config.workerWorkflow||!config.workerApprovedSha||config.workerRepository===config.repository||config.repository!=='jzwyrzyk/family-game-factory'||config.repositoryId!=='1458033181'||config.approvedSha!=='dcb887e6a51ba000fda1ccc42b9d198f8b9895f9'||config.workerRepositoryId!=='1458899834'||!Number.isSafeInteger(Number(config.workerRepositoryId))||Number(config.workerRepositoryId)<1||config.workerRepository!=='family-game-factory-lab/family-game-factory-worker'||config.workerWorkflow!=='factory-private.yml'||config.workerApprovedSha.length!==40||![...config.workerApprovedSha].every(c=>'0123456789abcdef'.includes(c))))throw Error('PRIVATE_WORKER_CONFIG_REQUIRED');
  if(config.active&&!privateWorker)throw Error('PRIVATE_WORKER_REQUIRED_FOR_ACTIVATION');
  const target={repository:config.workerRepository||config.repository,repositoryId:config.workerRepositoryId||config.repositoryId,workflow:config.workerWorkflow||config.workflow,approvedSha:config.workerApprovedSha||config.approvedSha,privateWorker};
  const token=installationTokenProvider({appId:config.githubAppId,installationId:config.githubInstallationId,repositoryId:Number(target.repositoryId)},()=>config.githubPrivateKey);
- const dispatcher=new GitHubDispatcher({enabled:paidEnabled,repository:target.repository,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker,callbackRoute:tenantRepo?config.beta?.workerRoute:undefined},token),coordinator=new ActionCoordinator(repo,dispatcher,{...config.approval,enabled:paidEnabled&&config.approval.enabled},900000,!adult.enabled,adult.enabled,premiumPilot,config.premiumMaxJobMicroUsd);
- const verifier=new GitHubOIDCVerifier({audience:config.gatewayOrigin,repository:target.repository,repositoryId:target.repositoryId,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker});
+ const dispatcher=new GitHubDispatcher({enabled:paidEnabled||fixture,testExecution:policy,repository:target.repository,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker,callbackRoute:policy?'beta-test':tenantRepo?config.beta?.workerRoute:undefined},token),coordinator=new ActionCoordinator(repo,dispatcher,{...config.approval,enabled:fixture||paidEnabled&&config.approval.enabled},900000,!adult.enabled,adult.enabled,premiumPilot,config.premiumMaxJobMicroUsd,jobPolicy);
+ const verifier=new GitHubOIDCVerifier({audience:config.gatewayOrigin,repository:target.repository,repositoryId:target.repositoryId,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker,testExecution:policy});
  const worker=workerHandler(coordinator,verifier),http={protectedHousehold:!!config.householdPrivateHost,sessionKey:config.sessionKey,previewKey:config.previewKey,appOrigin:config.appOrigin,previewOrigin:config.previewOrigin,dispatch:async(id:string)=>{await coordinator.enqueue(id);await coordinator.tick();},poll:()=>coordinator.tick()};
- const coachService=new CoachService(repo,{...coachConfig(environment),requireVerifiedParentPrivacy:!adult.enabled},
-   coachTarget?new PrivateCoachBridge(coachTarget):undefined);
+ const coachService=new CoachService(repo,{...coachConfig(environment),...(fixture?{fixtureExpiresAt:policy!.expiresAt,maxTurnMicroUsd:1}:{}),requireVerifiedParentPrivacy:!adult.enabled},
+   coachTarget?new PrivateCoachBridge(coachTarget,undefined,undefined,fixture):undefined);
  const coach=coachHandler(coachService,{appOrigin:config.appOrigin,sessionKey:config.sessionKey},repo);
  const offlineSpeech:SpeechProvider={readiness:async()=>false,transcribe:async()=>{throw Error('AUDIO_UNAVAILABLE');}};
  const audio=speechHttpHandler(new CoachAudioService(repo,{...speechConfig(environment),requireVerifiedParentPrivacy:!adult.enabled},
@@ -132,10 +140,40 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
  })();
  return {service,repo,coordinator,handler:async(req:Parameters<typeof api>[0],res:Parameters<typeof api>[1])=>{
   const url=new URL(req.url!,config.gatewayOrigin);
+  if(policy?.providerMode==='funded'&&Date.now()>=policy.expiresAt&&
+     (url.pathname==='/v1/coach'||url.pathname==='/v1/coach/status')){
+   res.writeHead(403,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({errorCode:'TEST_EXECUTION_EXPIRED'}));return;
+  }
+  const fixtureJob=url.pathname.match(/^\/v1\/test-fixture\/jobs\/([a-f0-9-]+)$/)?.[1];
+  if(fixtureJob){
+   try{
+    if(!fixture||req.method!=='GET'||!uuid(fixtureJob))throw Error('FORBIDDEN');
+    const session=await verifyBrowserSession(repo,req.headers.cookie,config.sessionKey);
+    const state=await repo.snapshot(),evidence=fixtureRunEvidence(state,session,fixtureJob,config.workerRepositoryId!,config.workerApprovedSha!);
+    res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(evidence));
+   }catch{res.writeHead(403);res.end();}
+   return;
+  }
+  if(url.pathname==='/v1/test-fixture/status'){
+   if(!fixture||req.method!=='GET'||!agent.available){res.writeHead(403);res.end();return;}
+   res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});
+   res.end(JSON.stringify({providerMode:'fixture',paidExecution:false,workerSha:config.workerApprovedSha,publicSourceSha:policy!.publicSourceSha,
+    workerRepositoryId:config.workerRepositoryId,expiresAt:policy!.expiresAt,service:'jems-test-gateway'}));return;
+  }
   if(url.pathname==='/health'){res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','no-store');try{await repo.snapshot();res.end(JSON.stringify({ready:true,paidExecution:paidEnabled}));}catch{res.statusCode=503;res.end(JSON.stringify({ready:false,paidExecution:false}));}return;}
   if(url.pathname.startsWith('/preview/')){res.writeHead(403);res.end('Separate preview origin required');return;}
   if(url.pathname==='/v1/recovery/adult/mappings'||url.pathname.startsWith('/v1/recovery/generated/')){if(householdRecovery)await householdRecovery.handler(req,res);else{res.writeHead(503,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:'GENERATED_RECOVERY_DISABLED'}));}return;}
-  if(url.pathname.startsWith('/v1/worker/')){await worker(req,res);queueMicrotask(()=>{void coordinator.tick().catch(()=>{});});return;}
+  if(url.pathname.startsWith('/v1/worker/')){
+   if(policy){
+    const id=url.pathname.match(/^\/v1\/worker\/jobs\/([a-f0-9-]+)\/(?:claim|report|status)$/)?.[1];
+    if(policy.providerMode!=='funded'||!uuid(id)){res.writeHead(403);res.end();return;}
+    await workerHandler(coordinator,{verify:async(tokenValue:string)=>{
+     requireTestCallback(policy,req.headers);
+     const ident=await verifier.verify(tokenValue);
+     const attempt=await assertRunJob(ident,id,target.repository,token,'beta-test',fetch,'funded');
+     return {...ident,dispatchAttempt:attempt};
+    }})(req,res);
+   }else await worker(req,res);queueMicrotask(()=>{void coordinator.tick().catch(()=>{});});return;}
   if(url.pathname==='/v1/internal/dispatch'){
    try{if(req.method!=='POST'||!config.schedulerEmail)throw Error();const token=req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];if(!token)throw Error();const {payload}=await jwtVerify(token,schedulerKeys,{issuer:['https://accounts.google.com','accounts.google.com'],audience:config.gatewayOrigin,algorithms:['RS256']});if(payload.email!==config.schedulerEmail||payload.email_verified!==true)throw Error();await reconcilePaidReceipts(repo);await coordinator.tick();res.writeHead(204);res.end();}catch{res.writeHead(403);res.end();}return;
   }
@@ -148,7 +186,7 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
  }};
 }
 export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
- const beta=validateBeta(config.beta,config.workspace);
+ const beta=validateBeta(config.beta,config.workspace),policy=testExecution(config);
  if(!Number.isSafeInteger(config.maxJobMicroUsd)||config.maxJobMicroUsd<1||config.maxJobMicroUsd>1000000||
    !/^https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)+$/.test(config.previewOrigin)||config.previewOrigin===beta.hubOrigin)throw Error('BETA_CONFIGURATION_REQUIRED');
  if(platformMode(config.platformMode)!=='PRIVATE_FAMILY_BETA'||config.householdPrivateHost||config.appOrigin!==beta.hubOrigin||
@@ -156,7 +194,8 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
     new URL(config.previewOrigin).hostname.endsWith('.'+new URL(beta.hubOrigin).hostname)||
     (config.active&&!beta.workerRoute)||config.sessionKey.length<32||config.previewKey.length<32||config.sessionKey===config.previewKey)throw Error('BETA_CONFIGURATION_REQUIRED');
  const db=new Firestore({projectId:config.projectId});
- const d=new FamilyDirectory(firestoreStore(db),beta,workspace=>new GcsPrivateArtifacts(config.artifactBucket!,workspace),artifactEncoding(config));
+ const d=new FamilyDirectory(firestoreStore(db),beta,workspace=>new GcsPrivateArtifacts(config.artifactBucket!,workspace),artifactEncoding(config),
+  policy?.providerMode==='fixture'?{familyId:beta.testReset!.familyId,expiresAt:policy.expiresAt}:undefined);
  cloudBackupSchedule(d); // Validate separate, default-off backup configuration.
  const runtimes=new Map<string,ReturnType<typeof createGateway>>();
  const runtime=(id:string)=>{
@@ -170,21 +209,24 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
   return result;
  };
  const verifier=new GitHubOIDCVerifier({audience:config.gatewayOrigin,repository:config.workerRepository??'',repositoryId:config.workerRepositoryId??'',
-  workflow:config.workerWorkflow??'',approvedSha:config.workerApprovedSha??'',privateWorker:true});
+  workflow:config.workerWorkflow??'',approvedSha:config.workerApprovedSha??'',privateWorker:true,testExecution:policy});
  const token=installationTokenProvider({appId:config.githubAppId,installationId:config.githubInstallationId,repositoryId:Number(config.workerRepositoryId)},()=>config.githubPrivateKey);
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
  return betaRouter(d,config.sessionKey,{operatorReadiness:{jobCeilingMicroUsd:config.maxJobMicroUsd,
   generationDispatch:paidExecutionAllowed(config.active,process.env.FACTORY_ACTIONS_APPROVED)&&config.approval?.enabled===true&&!!beta.workerRoute&&!!config.workerApprovedSha,
   coachBridge:!!coachConfig(process.env).enabled&&!!config.coachPrivateOrigin,speechBridge:!!speechConfig(process.env).approved&&!!config.coachPrivateOrigin},preview:{environment:beta.environment,hubOrigin:beta.hubOrigin,previewOrigin:config.previewOrigin,previewKey:config.previewKey},surface:surface??betaHosting('dist-family-beta',beta,config.previewOrigin),runtime:async id=>(await runtime(id)).handler,
+  reset:policy?.providerMode==='fixture'?(sub,input)=>resetSyntheticProject(d,sub,input,policy.expiresAt):undefined,
   generatedRecovery:(id,req,res)=>generatedRecoveryHttp(d,id,req.headers.cookie,config.sessionKey,req,res,profile=>familyBackupLedger(db,d,config.artifactBucket!,id,profile,false)),
   worker:async(req,res)=>{
    const id=req.url?.match(/^\/v1\/worker\/jobs\/([a-f0-9-]+)\/(?:claim|report|status)$/)?.[1];
    const bearer=req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];
    if(!uuid(id)||!bearer)throw Error('FORBIDDEN');
+   if(policy)requireTestCallback(policy,req.headers);
    const workerIdentity=await verifier.verify(bearer);
    if(!beta.workerRoute)throw Error('FORBIDDEN');
-   const dispatchAttempt=await assertRunJob(workerIdentity,id,config.workerRepository!,token,beta.workerRoute);
+   const dispatchAttempt=await assertRunJob(workerIdentity,id,config.workerRepository!,token,beta.workerRoute,fetch,policy?.providerMode);
    const owner=await d.db.run(tx=>tx.get<{familyId:string}>(d.root+'/jobs/'+id));if(!owner)throw Error('NOT_FOUND');
+   if(policy&&owner.familyId!==beta.testReset?.familyId)throw Error('FORBIDDEN');
    const target=await runtime(owner.familyId);
    await workerHandler(target.coordinator,{verify:async()=>({...workerIdentity,dispatchAttempt})})(req,res);
    void target.coordinator.tick().catch(()=>{});

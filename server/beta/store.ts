@@ -11,7 +11,7 @@ import {readWorkspace,writeWorkspace} from '../pipeline/workspace-state';
 export interface Usage {used:number;reserved:number}
 export class FamilyDirectory {
  readonly root:string;
- constructor(readonly db:AtomicStore,readonly config:BetaConfig,private artifacts:(workspace:string)=>PrivateArtifacts|undefined=()=>undefined,private encoding:{splitGamePayloads?:boolean}={}){
+ constructor(readonly db:AtomicStore,readonly config:BetaConfig,private artifacts:(workspace:string)=>PrivateArtifacts|undefined=()=>undefined,private encoding:{splitGamePayloads?:boolean}={},private synthetic?:{familyId:string;expiresAt:number}){
   this.root='factoryBeta/'+config.environment;
  }
  path(id:string){if(!uuid(id))throw Error('INVALID_FAMILY');return this.root+'/families/'+id;}
@@ -47,7 +47,7 @@ export class FamilyDirectory {
   const before={used:previousMonth?previous!.used:0,reserved:previousMonth?previous!.reserved:0};
   const globalPath=this.root+'/usage/'+period;
   s.ledgers[f.id]={...before,month:period,allowance:f.allowance,paidEnabled:!p.stop&&!f.paused&&p.participation&&f.status==='active'};
-  s.betaScopes=Object.fromEntries(remoteScopes.map(scope=>[scope,remoteAllowed(f,p,this.config.providerEvidence,scope,now)])) as PipelineState['betaScopes'];
+  s.betaScopes=Object.fromEntries(remoteScopes.map(scope=>[scope,remoteAllowed(f,p,this.config.providerEvidence,scope,now,this.synthetic)])) as PipelineState['betaScopes'];
   const deviceStatus=()=>(s.devices??[]).map(({id,familyId,expiresAt,lastSeenAt,revokedAt})=>({id,familyId,expiresAt,lastSeenAt,revokedAt:revokedAt??null}));
   const devicesBefore=JSON.stringify(deviceStatus());
   const administration=()=>({pending:pendingReservations(s),devices:(s.devices??[]).map(({id,familyId,name,expiresAt,lastSeenAt,revokedAt})=>({id,familyId,name,expiresAt,lastSeenAt,revokedAt:revokedAt??null})),
