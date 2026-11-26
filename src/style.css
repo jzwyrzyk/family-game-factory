@@ -37,12 +37,12 @@ fieldset{border:0;padding:0;margin:0;min-width:0}legend{font-size:25px;font-weig
 .learning-modal-card:not(:has(.math-activity,.language-activity))>p{color:#e6ecff}
 
 /* The overlay owns scrolling, including short and fullscreen game stages. */
-.stage-overlay:has(.learning-workspace) {
+.stage-overlay:has(.learning-workspace, .language-activity) {
   position: fixed; inset: 0; z-index: 3000; width: 100%; height: 100dvh;
   padding: clamp(6px, 1.8vw, 24px); overflow: auto; overscroll-behavior: contain;
   align-items: flex-start; justify-content: center; background: #f0e9e3;
 }
-.stage-overlay:has(.learning-workspace) > .learning-modal-card {
+.stage-overlay:has(.learning-workspace, .language-activity) > .learning-modal-card {
   width: min(100%, 1080px); max-width: none; margin: auto 0;
   border: 0; padding: 0; background: transparent; box-shadow: none;
 }
