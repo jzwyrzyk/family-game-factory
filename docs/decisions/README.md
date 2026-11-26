@@ -6,7 +6,7 @@ These records explain durable choices without turning chat history into another 
 
 ## Index
 
-- [November 26 · Authentic child artwork, revision-pinned reuse and 2D worlds](2026-11-26-connected-creative-universe.md)
+- [November 26 — authentic artwork, reusable creative assets and illustrated 2D worlds](2026-11-26-connected-creative-universe.md)
 
 - [Journey cards, starter eligibility and permanent retirements](2026-11-25-journey-cards-and-starter-pals.md)
 

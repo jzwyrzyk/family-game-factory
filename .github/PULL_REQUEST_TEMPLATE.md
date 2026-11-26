@@ -6,9 +6,9 @@
 
 <!-- Summarize the approach, important tradeoff and affected components. Identify overlapping/stacked PRs, base/source SHA, compatibility or saved-data implications. Preserve newer merged behavior when reconciling old branches. -->
 
-<!-- Creative asset/world changes: identify the owning store, migration decision, pinned revisions, children’s actual rendered artwork and dependencies across workstreams. Use only synthetic evidence in the PR. -->
-
 ## Evidence
+
+<!-- For creative asset and world changes, list affected workstreams and shared-module owners. Bind each applicable assertion to an exact source, synthetic screenshot or playback capture, integrity/restore test and negative owner or generated-game boundary test. Identify prior-reader rollback compatibility and unresolved independent release gates. -->
 
 | Claim / acceptance criterion | Check or observation | Exact SHA / run / artifact | Result and limits |
 | --- | --- | --- | --- |
@@ -19,6 +19,7 @@
 <!-- Include relevant negative/recovery cases. Distinguish mocks/fixtures, real providers, real devices, visual review and observed play/learning evidence. Unrun checks and remaining gaps belong here. -->
 
 <!-- For child-facing UI, apply docs/brand/CHILD_INTERFACE.md: remove redundant copy, retain 18px labels / 20px task text, verify actual-surface contrast at phone sizes and in help/error states, and preserve explicit friendly narration and cancellation. State observed coverage, not a site-wide claim from one screenshot. -->
+
 
 ## Preview and acceptance
 

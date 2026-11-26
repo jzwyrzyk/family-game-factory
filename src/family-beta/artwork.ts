@@ -1,4 +1,5 @@
 import { drawingHash, inspectDrawingBytes, saveDrawing } from '../assets/private-drawings';
+import { checkReviewedPng } from './reviewed-png';
 import { ART_LIMITS } from '../drawing/library';
 
 async function rasterize(image: Blob, width: number, height: number): Promise<Blob> {
@@ -54,6 +55,7 @@ function installReviewedArtwork(file: HTMLInputElement) {
       if (!current()) return;
       if (!unlocked.ok) throw Error('A grown-up must authorize this upload.');
       const bytes = await image.arrayBuffer();
+      checkReviewedPng(bytes);
       const { width, height } = inspectDrawingBytes(bytes, 'image/png');
       const digest = await drawingHash(bytes);
       if (!current()) return;

@@ -1,6 +1,4 @@
 # Jems current architecture
-The private art library stores pictures and rig versions. Native revision bindings and Creative Studio references select their own versions. Changes to these authorities follow the [Creative Asset & World Design Standard](docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md), including exact-original preservation, owner isolation and the generated-preview boundary.
-
 
 The November 26 application integration combines family beta and F06 storage from #186 with the child experience from #188 and #190. The [environment contract](docs/development/DEV-TEST-PROD.md) governs DEV, TEST and household promotion. Production still serves the earlier household release. The [delivery register](DELIVERY-STATE.md) distinguishes source validation, hosted acceptance and activation for this release.
 
@@ -209,6 +207,8 @@ The four earning rows in **My rewards** are keyboard-accessible actions. Math an
 The [default-navigation regression](tests/navigation-continuity.cjs) covers restored access, shared ideas versus private drawings, failed saves, empty collections, phone layout and legacy return links. Existing Rewards, Journey and Creation browser suites exercise the connected activities and continuation through their real local handlers. These fixtures do not establish production deployment or physical-device acceptance.
 
 ### Drawing, art and saved-version continuity
+
+The owner-scoped drawing, rig, native game and scene authorities implement separate parts of the [creative asset standard](docs/creative-universe/STANDARD.md). A family workshop's reviewed import verifies format, digest approval and the active profile before persisting the exact permitted PNG. Metadata-bearing files require another eligible file and exact operator review. Previously stored workshop reconstructions remain the recoverable copies available for those imports. The private game worker has no library access.
 
 The November 20 entry correction extracts stable Art Studio entrances to `src/studio/art-entry.ts`: a compact home action beside Invent, the retained library shortcut, consistently named Art Studio links, and **Use my picture** available even while a new idea hides its game toolbar. The later guided-chat refinement places that new-idea entrance under **More choices**, retaining the existing game-toolbar entrance. The host retains the navigation/save/learning authority. Local art and scene installation precedes the asynchronous, 10-second-bounded builder-configuration read. Completion refreshes readiness for the current owner without replaying a route or build; placeholder clients created before configuration are disconnected so later explicit actions use the validated configuration. A reconciliation error is reported without tearing down the local tools. The compact navigation adapter described above retains these route handlers.
 
