@@ -262,6 +262,21 @@ test('gap filling previews changes and preserves the answer on retry',async()=>{
   }
 });
 
+test('Grade 2 syllable choices submit the authored word or split', async () => {
+  for (const tier of [0, 1]) {
+    const item = generateLanguageItem('g2-two-syllables', {tier, random: () => 0});
+    const page = await mount(item);
+    try {
+      assert.equal(await page.locator('[data-action=check-beats]').count(), 0);
+      await page.getByRole('button', {name: item.answer!, exact: true}).click();
+      await page.waitForFunction(() => (window as any).results.length === 1);
+      const result = await state(page);
+      assert.equal(result.p.language.attempts[0].answers[0].raw, item.answer);
+      assert.equal(result.results[0].independent, true);
+    } finally { await page.close(); }
+  }
+});
+
 test('tapping beats keeps audio admission, bounds and corrections',async()=>{
   const item=generateLanguageItem('k-ela-segment',{tier:1,random:()=>.1}),page=await mount(item);
   try{

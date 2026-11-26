@@ -6,7 +6,7 @@ export function literacyInteraction(item: LanguageItem) {
   if (item.contentPack === 'v3' && item.passage?.includes('__')) return 'fill-gap';
   if (item.contentPack === 'v3' && item.skillId === 'g2-adjectives') return 'select-word';
   if (item.contentPack === 'v3' && item.passage && item.domain === 'comprehension') return 'evidence';
-  if (item.skillId.endsWith('-syllables') || item.skillId === 'k-ela-segment') return 'sound-taps';
+  if (['pk-ela-syllables', 'k-ela-syllables', 'k-ela-segment'].includes(item.skillId)) return 'sound-taps';
   if (item.skillId === 'g1-punctuation' && item.question.includes(': ')) return 'punctuation';
   return 'choice';
 }

@@ -43,3 +43,9 @@ The existing standalone review smoke program also reached all 16 application pag
 After building the artifact, run `node tools/ui-review/learning-browser.cjs`. Set `CHROMIUM_PATH` to use an installed Chromium binary. The runner opens the offline HTML through a local in-memory route for browsers that disable file URLs. It writes unmodified viewport screenshots and its JSON receipt under `test-results/learning-workspace`. Use `UI_REVIEW_FILE` or `UI_REVIEW_EVIDENCE` to select a different artifact or output location.
 
 These observations cover a synthetic learner in Chromium. Real-device touch and pen ergonomics, acoustic pronunciation, owner visual acceptance, supervised child usability, and deployed gameplay verification each require their own evidence.
+
+## Consolidation regression receipts
+
+At PR 203 the hosted language run found two exit controls after returning from My Powers. The live native checkpoint and the hidden prior activity both retained their own control. The browser journey now checks visibility and availability inside the active checkpoint, clicks that exit on the next interruption, and verifies the original abandonment record. The rewards journey uses the explicit Check action for punctuation and sentence gaps. Both journeys continue to verify independent and assisted evidence, persisted totals and owner boundaries.
+
+During local replay a Grade 2 syllable-splitting question offered a beat counter despite requiring a word or word-part answer. A focused browser regression submits the authored text for that skill. The Pre-K and Kindergarten counting routes keep the tap interaction and their existing delivery rules.
