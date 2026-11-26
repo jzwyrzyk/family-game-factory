@@ -320,8 +320,8 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:35:52.833Z",
-      "sourceDigest": "23cfb4309dbcaadb2bdf002bf65aeff701310a862e5da7717afc69a281490ef0",
+      "reviewedAt": "2026-11-26T05:56:55.066Z",
+      "sourceDigest": "20ec473b391cb7464e59a747cd01e43b349721247ff4df1613bddef1c234b759",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed whole-picture, arrow and articulated editing via the established child-facing surfaces.",
       "reviewHistory": [
@@ -424,8 +424,8 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "171e028d45abf0c2270ef35dc41e0187632f7082c0a3aae232cc02d3f445fa29",
-      "reviewedAt": "2026-11-26T05:47:07.984Z",
+      "sourceDigest": "10ccee64b85d8d0eaf9d39c73e67d201416534a6a5c0b605a4e4f916c7ee05b3",
+      "reviewedAt": "2026-11-26T05:56:55.648Z",
       "reviewOutcome": "updated",
       "reviewReason": "Verified world edition readers, placement behavior and scoped authored movement blocks against CAD and storage documentation.",
       "reviewHistory": [
@@ -912,8 +912,8 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:47:08.596Z",
-      "sourceDigest": "0bed6ca3312718480466b9b71002da63763547f64ad9d135a5bca75e261ae8a8",
+      "reviewedAt": "2026-11-26T05:56:55.990Z",
+      "sourceDigest": "d64c9e9c33c7d7c22f0ea96c0575545ddd63daabc5241c406415aa1ced97b051",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed integrated CI leaves and source assertions for original admissions, game binding, movement and recovery.",
       "reviewHistory": [
@@ -1156,8 +1156,8 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T05:43:30.835Z",
-      "sourceDigest": "45b285064f3fe65a9398676c5c3f01d7c4a6332319bf766cecc5847cf25d6c28",
+      "reviewedAt": "2026-11-26T05:56:57.355Z",
+      "sourceDigest": "ea3ab2cbf8914960e3dc4f7647b3777800de8a25c5953feb964ba767a4efc467",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed unchanged release pins and the disabled general hosted-art boundary.",
       "reviewHistory": [
@@ -1653,8 +1653,8 @@
         "tests/game-art/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "0982955584308d65035105a9f51914910f4dd76e1f903ba0fea213d81809b669",
-      "reviewedAt": "2026-11-26T05:47:08.976Z",
+      "sourceDigest": "78a92c1fdd6aaf9c0ceeabdafac98c9630e86211a1471272477cc6cb48b1de41",
+      "reviewedAt": "2026-11-26T05:56:57.725Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed supported editors, legacy data readers and exact PNG admission.",
       "reviewHistory": [

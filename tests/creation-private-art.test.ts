@@ -123,9 +123,20 @@ test('a derivative traces to its original across exact owner and parent hashes',
 });
 
 test('world illustrations pin approved bytes and legacy scenes retain their saved background',()=>{
-  for(const world of SCENE_WORLDS.filter(world=>!world.middle)){
+  const byFile:Record<string,string>={
+    './jems-journey/background.webp':'1b1460063ff8d1d3c353b0952731f3a73059c500800d3118ba558fd76300be84',
+    './art/mind-your-jems/scene-sky.webp':'9b2446de258abe52782287ea620d65a0ac7abd5bbc210938439b02658d4d132f',
+    './art/creative-worlds/moon-garden-v1.webp':'914d0bf6ca36ec41475aa3239c2c703b09f4eb367202601cf93656aeffcb5754',
+    './gem-factory-workshop.webp':'b6e81f59ab4d1e05475b85817264645ecda30ed105eb7934fcc69b956f065afe',
+  };
+  const manifest=JSON.parse(readFileSync(new URL('../docs/creation-studio/world-art-manifest.json',import.meta.url),'utf8'));
+  for(const {file,sha256} of manifest.assets)byFile['./'+file]=sha256;
+  for(const world of SCENE_WORLDS){
     const bytes=readFileSync(new URL('../public/'+world.url.slice(2),import.meta.url));
-    assert.ok(createHash('sha256').update(bytes).digest('hex').startsWith(world.id.split('-').at(-1)!));
+    const actual=createHash('sha256').update(bytes).digest('hex');
+    assert.equal(actual,byFile[world.url],world.id);
+    const suffix=world.id.match(/-([a-f0-9]{12})$/);
+    if(suffix)assert.ok(actual.startsWith(suffix[1]),world.id);
   }
   const scene=createStarterProject('robot');
   assert.equal(scene.world?.assetId,SCENE_WORLDS[1].id);
@@ -165,7 +176,13 @@ test('a PR201 named drawing path survives Keep and plays its saved relative move
   const engine=new SceneEngine(restored);engine.start();engine.advance(330);
   const end=engine.snapshot().actors[0];
   assert.deepEqual([end.x,end.y,end.assetId],[95,114,rig]);
-  assert.throws(()=>validateGeneratedCreationManifest(restored),/artwork/);
+  assert.throws(()=>validateGeneratedCreationManifest(restored),/Private path names/);
+  const onlyPrivateArt=structuredClone(restored);
+  delete (onlyPrivateArt.programs[0].actions[0] as {pathName?:string}).pathName;
+  assert.throws(()=>validateGeneratedCreationManifest(onlyPrivateArt),/artwork/);
+  const onlyPrivateName=structuredClone(restored);
+  onlyPrivateName.actors[0].assetId='dragon';
+  assert.throws(()=>validateGeneratedCreationManifest(onlyPrivateName),/Private path names/);
   for(const name of ['', ' ', 'x'.repeat(41), '\u0000', 42]){
     const bad=structuredClone(scene);
     Object.assign(bad.programs[0].actions[0],{pathName:name});

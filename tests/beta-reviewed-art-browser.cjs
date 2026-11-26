@@ -13,13 +13,18 @@ const {chromium} = require('playwright');
   try {
     const page = await browser.newPage();
     const origin = 'https://synthetic.test';
-    let approved = '', changeOwner = false, reviewCount = 0;
+    let approved = '', changeOwner = false, swapDuringUnlock = false, reviewCount = 0, unlockCount = 0;
     await page.route('**/*', async route => {
       const request = route.request(), url = new URL(request.url());
       assert.equal(url.origin, origin);
       if (url.pathname === '/') {
         await route.fulfill({contentType:'text/html', body:'<input id="reviewedArtPassphrase"><input type="file" id="betaReviewedArt"><p id="familyExitStatus"></p><script>let owner="player1"; window.FG={store:{current:()=>({id:owner})}};</script>'});
       } else if (url.pathname === '/v1/devices/unlock') {
+        unlockCount++;
+        if (swapDuringUnlock) await page.evaluate(()=>{
+          owner='player2';window.dispatchEvent(new Event('factory-profile'));
+          owner='player1';window.dispatchEvent(new Event('factory-profile'));
+        });
         await route.fulfill({status:200});
       } else {
         assert.equal(url.pathname, '/entry/review-art');
@@ -82,6 +87,27 @@ const {chromium} = require('playwright');
     await choose(cleanCopy);
     await page.getByText('Your reviewed drawing is ready.').waitFor();
     assert.ok((await rows('player1')).some(draw => draw.hash === approved && Buffer.from(draw.bytes).equals(cleanCopy)));
+    assert.equal(unlockCount,4,'metadata and unused palettes stop locally before guardian unlock');
+    const counts={unlock:unlockCount,review:reviewCount};
+    await page.evaluate(()=>{
+      const read=File.prototype.arrayBuffer;
+      window.readResumed=false;
+      File.prototype.arrayBuffer=async function(){
+        File.prototype.arrayBuffer=read;
+        owner='player2';window.dispatchEvent(new Event('factory-profile'));
+        owner='player1';window.dispatchEvent(new Event('factory-profile'));
+        const result=await read.call(this);window.readResumed=true;return result;
+      };
+    });
+    await choose(bytes);
+    await page.waitForFunction(()=>window.readResumed);
+    swapDuringUnlock=true;
+    await choose(bytes);
+    await page.waitForFunction(()=>document.getElementById('betaReviewedArt').disabled===false);
+    swapDuringUnlock=false;
+    assert.equal(unlockCount,counts.unlock+1,'the invalidated file read cannot unlock');
+    assert.equal(reviewCount,counts.review,'a changed-then-restored profile invalidates both pending selections');
+    assert.equal((await rows('player1')).length,2);
     changeOwner = true;
     await choose(bytes);
     await page.waitForFunction(() => owner === 'player2' && document.querySelector('#betaReviewedArt').value === '');

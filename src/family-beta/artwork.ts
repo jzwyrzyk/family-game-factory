@@ -22,6 +22,7 @@ function installReviewedArtwork(file: HTMLInputElement) {
     status.textContent = '';
   }
   window.addEventListener('factory-profile-changing', clearSelection);
+  window.addEventListener('factory-profile', clearSelection);
   window.addEventListener('pagehide', clearSelection);
 
   file.onchange = async () => {
@@ -33,16 +34,16 @@ function installReviewedArtwork(file: HTMLInputElement) {
     try {
       if (!owner || !image || image.type !== 'image/png' || image.size > ART_LIMITS.imageBytes)
         throw Error('Choose a reviewed PNG up to 5 MB.');
+      const bytes = await image.arrayBuffer();
+      await checkReviewedPng(bytes);
+      const digest = await drawingHash(bytes);
+      if (!current()) return;
       const headers = { 'Content-Type': 'application/json', 'X-Factory-Request': '1' };
       const unlocked = await fetch('/v1/devices/unlock', {
         method: 'POST', headers, body: JSON.stringify({ parentPassphrase: passphrase }),
       });
       if (!current()) return;
       if (!unlocked.ok) throw Error('A grown-up must authorize this upload.');
-      const bytes = await image.arrayBuffer();
-      await checkReviewedPng(bytes);
-      const digest = await drawingHash(bytes);
-      if (!current()) return;
       const approval = await fetch('/entry/review-art', {
         method: 'POST', headers, body: JSON.stringify({ digest }),
       });

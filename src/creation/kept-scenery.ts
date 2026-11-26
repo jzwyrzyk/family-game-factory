@@ -6,6 +6,7 @@ import {EARLIER_PROPS, sceneAssetSlots, type CreationProject} from './model';
  * Programmable placements travel separately with the full "Use this world" fork. */
 export function keptScenery(project: CreationProject, host: {
   owner: string;
+  controlPrefix?:string;
   current(): boolean;
   store(): Promise<CreationWorkspace>;
   loadArt(id: string): Promise<unknown>;
@@ -13,11 +14,11 @@ export function keptScenery(project: CreationProject, host: {
   run(fn: () => Promise<void>): unknown;
 }) {
   const details = document.createElement('details');
-  details.id = 'creationUseSavedWorld';
+  details.id = (host.controlPrefix ?? 'creation')+'UseSavedWorld';
   const summary = document.createElement('summary');
   summary.textContent = 'Use scenery from a kept scene';
   const list = document.createElement('div');
-  list.id = 'creationKeptWorlds';
+  list.id = (host.controlPrefix ?? 'creation')+'KeptWorlds';
   details.append(summary, list);
   const current = () => details.isConnected && details.open && host.current();
   details.ontoggle = () => {

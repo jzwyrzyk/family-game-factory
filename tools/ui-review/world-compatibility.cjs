@@ -58,7 +58,7 @@ async function verifyLandscape(page, frame) {
   if (!await settings.isVisible() && await tools.isVisible()) await tools.click();
   await settings.locator(':scope > summary').click();
   await frame.locator('#creationMyBackdrop').click();
-  await frame.locator('dialog[open] [data-private-art]').filter({hasText:'Fixture landscape'}).click();
+  await frame.locator('dialog[open] [data-world-art]').filter({hasText:'Fixture landscape'}).click();
   await frame.waitForFunction(hash => FG.creation.scene()?.actors.some(a => a.layer === 'backdrop' && a.assetId.endsWith(hash)),pin);
   if (!await settings.evaluate(el => el.open)) await settings.locator(':scope > summary').click();
   await frame.getByLabel('Fit drawing').selectOption('cover');

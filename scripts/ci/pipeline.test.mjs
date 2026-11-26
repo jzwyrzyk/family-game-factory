@@ -31,9 +31,19 @@ test('aggregates reject replaced or self-claimed plan bytes before parsing', () 
 });
 
 test('all original Arcade leaf commands occur exactly once in their original required group', () => {
-  assert.deepEqual(verifyCoverage(manifest, pkg), { notifications: 2, browser: 50, learning: 12, creative: 76 });
+  verifyCoverage(manifest, pkg);
+  const retained = readJSON(new URL('./retained-coverage.json', import.meta.url));
+  const all = new Set();
+  for (const [group, baseline] of Object.entries(retained.groups)) {
+    const actual = expandCommands(manifest.legacyGroups[group], pkg.scripts).map(JSON.stringify);
+    for (const command of baseline) assert.ok(actual.includes(JSON.stringify(parseCommand(command))), `Removed from ${group}: ${command}`);
+    for (const command of actual) {
+      assert.ok(!all.has(command), `Duplicate across groups: ${command}`);
+      all.add(command);
+    }
+  }
   const covered = Object.values(manifest.shards).flatMap(shard => expandCommands(shard.commands, pkg.scripts));
-  for (const file of ['tests/game-art-security.cjs', 'tests/game-art-browser.cjs', 'tests/drawing-workspace-browser.cjs']) {
+  for (const file of ['tests/game-art-security.cjs', 'tests/game-art-browser.cjs', 'tests/drawing-workspace-browser.cjs','tests/creative-worlds-browser.cjs','tests/creative-world-browser.cjs','tests/drawing-motion-browser.cjs','scripts/connected-universe-browser.cjs','tests/creative-universe-recovery.cjs']) {
     assert.equal(covered.filter(argv => argv.includes(file)).length, 1, file);
   }
   for (const mutation of [m => m.shards.mining.commands.pop(), m => m.shards.factory.commands.push('node tests/mind-your-jems-browser.cjs')]) {

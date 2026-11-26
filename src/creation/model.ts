@@ -48,7 +48,7 @@ interface Decoration {id:string; assetId:string; x:number; y:number; size:number
 interface StageDecoration extends Decoration {label:string; layer:'behind'|'in-front'}
 interface PercentageDecoration extends Decoration {name:string; plane:'back'|'front'}
 interface StageWorld {edition:'jems.world.v1'; backdrop?:string; framing?:'fit'|'fill'; scenery?:StageDecoration[]; assetId?:never}
-interface PercentageWorld {backdrop:string; fit:'cover'|'contain'; decorations:PercentageDecoration[]; middle?:boolean; foreground?:boolean; assetId?:never}
+export interface PercentageWorld {backdrop:string; fit:'cover'|'contain'; decorations:PercentageDecoration[]; middle?:boolean; foreground?:boolean; assetId?:never}
 export type SceneWorld = PinnedWorld | StageWorld | PercentageWorld;
 
 /** Read the earlier editions without rewriting the saved scene or changing its pins. */
@@ -100,6 +100,51 @@ export function editWorldPicture(project:CreationProject, picture:PinnedWorld | 
   project.world = {...(picture ?? {assetId:classic ?? project.background,framing:'fill'}),scenery:placements.map(p => ({
     id:p.id, assetId:p.assetId, label:p.name, x:p.x, y:p.y, size:p.size, layer:p.front?'in-front':'behind',
   }))};
+}
+/** The visual editor uses percent controls for every supported world edition.
+ * This is an editing view. Native stage coordinates stay exact when untouched. */
+export function worldEditorView(project:CreationProject):PercentageWorld {
+  const {assetId,classic,framing,middle,foreground}=worldView(project);
+  const backdrop=classic ? classicBackgrounds[classic] : assetId && Object.hasOwn(classicBackgrounds,assetId)
+    ? classicBackgrounds[assetId as keyof typeof classicBackgrounds] : assetId ?? 'blank';
+  if(project.world && 'fit' in project.world)return structuredClone({...project.world,middle,foreground});
+  return {backdrop,fit:framing==='fit'?'contain':'cover',middle,foreground,
+    decorations:sceneryPlacements(project).map(p=>({id:p.id,assetId:p.assetId,name:p.name,
+      x:100*p.x/project.width,y:100*p.y/project.height,size:100*p.size/project.height,plane:p.front?'front':'back'}))};
+}
+export function applyWorldEditorView(project:CreationProject, edited:PercentageWorld) {
+  const previous=worldEditorView(project), backdrop=edited.backdrop;
+  const illustrated=ILLUSTRATED_WORLDS.find(world=>world.id===backdrop);
+  const classic=(Object.keys(classicBackgrounds) as (keyof typeof classicBackgrounds)[]).find(key=>classicBackgrounds[key]===backdrop);
+  if (illustrated) project.background=illustrated.id;
+  else if(classic)project.background=classic;
+  else if(backdrop==='blank')project.background='blank';
+  if(backdrop!==previous.backdrop){
+    const actor=project.actors.find(a=>a.layer==='backdrop');
+    if(actor)actor.visible=false;
+  }
+  if(illustrated) project.worldLayers={middle:edited.middle!==false,foreground:edited.foreground!==false};
+  else {delete project.worldLayers;delete edited.middle;delete edited.foreground;}
+  if(project.world && 'decorations' in project.world && backdrop!=='blank'){
+    project.world=edited;
+    return;
+  }
+  const originals=new Map(sceneryPlacements(project).map(item=>[item.id,item]));
+  const oldValues=new Map(previous.decorations.map(item=>[item.id,item]));
+  const scenery=edited.decorations.map(item=>{
+    const prior=originals.get(item.id),view=oldValues.get(item.id);
+    return {id:item.id,assetId:item.assetId,label:item.name,
+      x:prior && view?.x===item.x ? prior.x : item.x*project.width/100,
+      y:prior && view?.y===item.y ? prior.y : item.y*project.height/100,
+      size:prior && view?.size===item.size ? prior.size : item.size*project.height/100,
+      layer:item.plane==='front'?'in-front' as const:'behind' as const};
+  });
+  if(backdrop==='blank'){
+    if(scenery.length)project.world={edition:'jems.world.v1',scenery};
+    else delete project.world;
+  }else{
+    project.world={assetId:backdrop,framing:edited.fit==='contain'?'fit':'fill',...(scenery.length?{scenery}:{})};
+  }
 }
 export function addStaticScenery(project:CreationProject, assetId:string, label:string) {
   const version = worldView(project);

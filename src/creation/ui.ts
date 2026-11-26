@@ -1,5 +1,7 @@
 import {createPickerArtwork} from '../drawing/picker-create';
-import {catalogueChoices,listPickerChoices} from '../drawing/asset-collection';
+import {createWorldEditor} from './world-editor';
+import {worldEditorView,applyWorldEditorView} from './model';
+import {mountCreativeAssetPicker,catalogueChoices,listPickerChoices} from '../drawing/asset-collection';
 import {openMotionEditor} from './motion-editor';
 import {pathBlock, reusablePaths} from './motion-path';
 import {createArtAdventure} from './art-game';
@@ -113,7 +115,7 @@ export function installCreationStudio(host: Host) {
       </div>
       <div class="creation-workspace-grid">
         <div id="creationStagePane" class="creation-stage-column">
-          <section class="creation-stage-card" aria-label="Scene preview"><div class="creation-stage-heading"><span id="creationPreviewLabel">Your stage</span><span id="creationClock">0.0 s</span><button id="creationFullscreen" class="creation-button creation-quiet" aria-pressed="false">${iconMarkup('grid')} Full screen</button></div><div class="creation-canvas-wrap"><canvas id="creationCanvas" width="800" height="450" tabindex="0" aria-label="Your scene. Select a character to edit it. Use the character buttons to trigger taps." role="img"></canvas><div id="creationLearning" class="creation-learning" hidden></div><div id="creationTargetBadge" class="creation-target-badge" hidden>Watching the goal</div><section id="creationFeedback" class="creation-feedback" tabindex="-1" aria-live="polite" hidden></section></div><div id="creationSceneWords" class="creation-scene-words" aria-live="polite" hidden></div><div class="creation-playbar"><button id="creationRun" class="creation-button creation-play">${iconMarkup('play')} Play</button><button id="creationPause" class="creation-button" disabled>${iconMarkup('pause')} Pause</button><button id="creationReset" class="creation-button" aria-label="Reset scene to its beginning">${iconMarkup('retry')} Reset</button><span id="creationTapSlot"></span><button id="creationStep" class="creation-button" aria-label="Advance the scene by one tenth of a second">${iconMarkup('chevron')} Step</button><span id="creationRunStatus">Ready to try</span></div></section>
+          <section class="creation-stage-card" aria-label="Scene preview"><div class="creation-stage-heading"><span id="creationPreviewLabel">Your stage</span><span id="creationClock">0.0 s</span><button id="creationEditWorld" class="creation-button creation-quiet" aria-haspopup="dialog">World</button><button id="creationFullscreen" class="creation-button creation-quiet" aria-pressed="false">${iconMarkup('grid')} Full screen</button></div><div class="creation-canvas-wrap"><canvas id="creationCanvas" width="800" height="450" tabindex="0" aria-label="Your scene. Select a character to edit it. Use the character buttons to trigger taps." role="img"></canvas><div id="creationLearning" class="creation-learning" hidden></div><div id="creationTargetBadge" class="creation-target-badge" hidden>Watching the goal</div><section id="creationFeedback" class="creation-feedback" tabindex="-1" aria-live="polite" hidden></section></div><div id="creationSceneWords" class="creation-scene-words" aria-live="polite" hidden></div><div class="creation-playbar"><button id="creationRun" class="creation-button creation-play">${iconMarkup('play')} Play</button><button id="creationPause" class="creation-button" disabled>${iconMarkup('pause')} Pause</button><button id="creationReset" class="creation-button" aria-label="Reset scene to its beginning">${iconMarkup('retry')} Reset</button><span id="creationTapSlot"></span><button id="creationStep" class="creation-button" aria-label="Advance the scene by one tenth of a second">${iconMarkup('chevron')} Step</button><span id="creationRunStatus">Ready to try</span></div></section>
         </div>
         <section id="creationCodePane" class="creation-code-card" aria-label="Scene blocks">
           <aside class="creation-palette" aria-label="Add a block"><h3>Add an action</h3><div id="creationPalette"></div></aside>
@@ -250,6 +252,49 @@ export function installCreationStudio(host: Host) {
       return applied;
     },
   });
+  const worldEditor=createWorldEditor({
+    scene:()=>scene,privateArt,current:()=>isCurrent()&&!FG.learning.active&&!challengeId&&!recoveryPending,
+    async chooseArt(container,current,use){
+      const captured=owner();
+      const choices=(await listPickerChoices(captured,current)).filter(item=>item.representation==='image');
+      if(!current())return;
+      const error=(e:unknown)=>{if(current())container.querySelector('[role=status]')!.textContent=(e as Error).message;};
+      return mountCreativeAssetPicker(container,choices,{
+        onChoose:item=>{if(current())void use(item.assetId,item.label).catch(error);},
+        onCreate:()=>void (async()=>{
+          const made=await createPickerArtwork(captured,current);
+          if(!made || !current())return;
+          const item=await artChoice(captured,{drawingId:made.id},current);
+          if(current())await use(item.assetId,item.label);
+        })().catch(error),
+      });
+    },
+    keptScenery(){
+      const active=scene!,captured=owner();
+      return keptScenery(active,{owner:captured,controlPrefix:'visual',store,loadArt:id=>privateArt.load(id),mutate:mutation,run:act,
+        current:()=>worldEditor.dialog.open && isCurrent() && scene===active && owner()===captured && !locked()});
+    },
+    async mutate(change){
+      const captured=owner(),epoch=viewEpoch,projectId=entryId;
+      const current=()=>captured===owner() && epoch===viewEpoch && projectId===entryId && isCurrent() && worldEditor.dialog.open && !challengeId && !FG.learning.active;
+      let failure:unknown,applied=false;
+      await act(async()=>{
+        try{
+          assertEditing();if(!current())return;
+          const edited=worldEditorView(scene!);change(edited);
+          const next=clone(scene!);applyWorldEditorView(next,edited);
+          validateEditableProject(next);
+          const refs=await prepareSceneArt(next,current);
+          if(!current())return;
+          await mutation(project=>applyWorldEditorView(project,edited));
+          indexSceneArt(projectId,captured,refs);applied=true;
+        }catch(e){failure=e;}
+      });
+      if(!applied)throw failure ?? Error('Reopen your world to continue.');
+    }
+  });
+  page.append(worldEditor.dialog);
+  $('creationEditWorld').onclick=()=>void act(()=>{assertEditing();if(!challengeId){stop();worldEditor.open();}});
   function indexSceneArt(projectId:string,capturedOwner:string,bindings:ResolvedPrivateArt[]){
     // Retained scene revisions are authoritative for deletion and usage counts.
     // Secondary indexing happens only after a successful scene write, so quota
@@ -350,7 +395,7 @@ export function installCreationStudio(host: Host) {
   async function loadScene(id: string) {
     prediction=null;
     const loaded = await (await store()).load(id, owner());
-    worlds.close(); viewEpoch++;
+    worlds.close(); worldEditor.close(); viewEpoch++;
     closeMotionEditor?.(); closeMotionEditor=undefined; thumbnails?.clear(); privateArt.clear();stage.clear();
     status(''); $<HTMLDetailsElement>('creationMore').open = false;
     stop(); scene = loaded.scene; entryId = id; revisionId = loaded.revision.id; sceneOwner = owner();
@@ -374,7 +419,7 @@ export function installCreationStudio(host: Host) {
   async function open(id?: string) { await act(async () => { if (!await enter()) return; if (id) await loadScene(id); else {await shelf();if(introduction.needed()){ $('creationShelf').hidden=true;introduction.show();}} }); }
   async function openChallenges() { await act(async () => { if (!await enter()) return; await shelf('challenge'); }); }
   async function shelf(mode: 'landing' | 'free' | 'challenge' = 'landing') {
-    if (locked()) return; await saveVersion(); stop(); worlds.close(); viewEpoch++; scene = null; entryId = ''; sceneOwner = owner(); sourceSessionId = ''; recoveryPending = false;
+    if (locked()) return; await saveVersion(); stop(); worlds.close(); worldEditor.close(); viewEpoch++; scene = null; entryId = ''; sceneOwner = owner(); sourceSessionId = ''; recoveryPending = false;
     closeMotionEditor?.(); closeMotionEditor=undefined; thumbnails?.clear(); privateArt.clear();stage.clear(); setExpandedView(false); page.classList.remove('has-scene'); document.body.classList.remove('creation-editing');
     $('creationWorkspace').hidden = true; $('creationShelf').hidden = false;
     introduction.hide();$('creationWelcome').hidden=mode!=='landing';$('creationLandingBack').hidden=mode==='landing';
@@ -680,6 +725,8 @@ export function installCreationStudio(host: Host) {
     renderSource();
     renderPalTools();
     $<HTMLInputElement>('creationTitle').value = scene.title; worlds.render(scene);
+    $('creationEditWorld').hidden=!!challengeId;
+    worldEditor.refresh();
     const cast = $('creationActors'); cast.replaceChildren();
     for (const actor of scene.actors) {
       const button = node('button', 'creation-actor'); button.type = 'button'; button.dataset.actor = actor.id; button.setAttribute('aria-pressed', String(selectedActor === actor.id));
@@ -688,6 +735,12 @@ export function installCreationStudio(host: Host) {
       cast.append(button);
     }
     const worldPanel = $('creationWorldTools');
+    const sameWorld=worldPanel.dataset.projectId===scene.id;
+    const openTools=new Set(sameWorld ? Array.from(worldPanel.querySelectorAll<HTMLDetailsElement>('details[data-world-control][open]'),el=>el.dataset.worldControl) : []);
+    const priorFocus=sameWorld && worldPanel.contains(document.activeElement) ? document.activeElement as HTMLElement : null;
+    const focusId=priorFocus?.closest<HTMLElement>('[data-world-control]')?.dataset.worldControl;
+    const focusLabel=priorFocus?.getAttribute('aria-label') ?? priorFocus?.textContent;
+    worldPanel.dataset.projectId=scene.id;
     worldPanel.replaceChildren();
     worldPanel.hidden = !!challengeId;
     if (!challengeId) worldPanel.append(worldControls(scene, {
@@ -704,6 +757,7 @@ export function installCreationStudio(host: Host) {
       worldPanel.append(keptScenery(active,{owner:capturedOwner,store,loadArt:id=>privateArt.load(id),mutate:mutation,run:act,
         current:()=>isCurrent() && scene === active && capturedOwner === owner() && !locked()}));
       const tools=node('details',''), list=node('select');
+      tools.dataset.worldControl='add-decoration';tools.open=openTools.has(tools.dataset.worldControl);
       tools.append(node('summary','','Decorate the world'));
       list.id='creationSceneryType';list.setAttribute('aria-label','Fixed decoration');
       for (const prop of [...WORLD_PROPS,...EARLIER_PROPS]) list.add(new Option(prop.label,prop.id));
@@ -717,6 +771,7 @@ export function installCreationStudio(host: Host) {
     }
     for (const placed of challengeId ? [] : sceneryPlacements(scene)) {
       const fields = node('details','creation-scene-options');
+      fields.dataset.sceneryId=placed.id;fields.dataset.worldControl=placed.id;fields.open=openTools.has(placed.id);
       fields.append(node('summary','',placed.name));
       const edit = (change:(item:{x:number;y:number;size:number;layer:'behind'|'in-front'})=>void) =>
         mutation(project => {
@@ -728,6 +783,21 @@ export function installCreationStudio(host: Host) {
           if (!item) throw Error('This placement is missing.');
           change(item);
         });
+      const adjustments=[
+        ['Left','x',-30,0,scene.width],['Right','x',30,0,scene.width],
+        ['Up','y',-30,0,scene.height],['Down','y',30,0,scene.height],
+        ['Smaller','size',-20,16,400],['Bigger','size',20,16,400],
+      ] as const;
+      for(const [label,key,delta,min,max] of adjustments){
+        const button=node('button','creation-button',label);button.type='button';
+        button.disabled=delta<0?placed[key]<=min:placed[key]>=max;
+        button.onclick=()=>act(()=>edit(item=>{item[key]=Math.max(min,Math.min(max,item[key]+delta));}));
+        fields.append(button);
+      }
+      const inFront=node('button','creation-button','In front');inFront.type='button';
+      inFront.setAttribute('aria-pressed',String(placed.front));
+      inFront.onclick=()=>act(()=>edit(item=>{item.layer=item.layer==='in-front'?'behind':'in-front';}));
+      fields.append(inFront);
       fields.append(input('Scenery x',placed.x,value=>edit(p=>{p.x=+value;}),{min:0,max:scene.width,step:'any'}),
         input('Scenery y',placed.y,value=>edit(p=>{p.y=+value;}),{min:0,max:scene.height,step:'any'}),
         input('Scenery size',placed.size,value=>edit(p=>{p.size=+value;}),{min:1,max:Math.max(400,scene.height),step:'any'}),
@@ -749,6 +819,11 @@ export function installCreationStudio(host: Host) {
         status('Touch the stage where you want this decoration.');
       };
       fields.append(place,remove);worldPanel.append(fields);
+    }
+    if(focusId && focusLabel && priorFocus && !priorFocus.isConnected && document.activeElement===document.body){
+      const scope=Array.from(worldPanel.querySelectorAll<HTMLElement>('[data-world-control]')).find(el=>el.dataset.worldControl===focusId);
+      const next=scope && Array.from(scope.querySelectorAll<HTMLElement>('button,summary,input,select')).find(el=>(el.getAttribute('aria-label') ?? el.textContent)===focusLabel);
+      next?.focus({preventScroll:true});
     }
     renderActorSettings(); renderPrograms(); renderVariables(); updateUndo();
   }
@@ -1152,7 +1227,7 @@ export function installCreationStudio(host: Host) {
     page.dataset.nativeFullscreen = String(document.fullscreenElement === page);
   });
   function leave() {
-    if (!visible) return; stop(); clearInterval(checkpointTimer); worlds.close(); visible = false; viewEpoch++;
+    if (!visible) return; stop(); clearInterval(checkpointTimer); worlds.close(); worldEditor.close(); visible = false; viewEpoch++;
     stopReading(); setExpandedView(false); page.classList.remove('has-scene'); document.body.classList.remove('creation-editing'); fullTools = false; expandedBlockId = '';
     closeMotionEditor?.(); closeMotionEditor=undefined; thumbnails?.clear(); privateArt.clear();stage.clear();
     $<HTMLDialogElement>('creationActorDialog').close(); $<HTMLDialogElement>('creationVersionPicker').close(); $('creationLearning').hidden = true;

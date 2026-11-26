@@ -90,7 +90,7 @@ export function privateArtId(reference:PrivateArtReference):string {
  * deliberately restricted to the bundled catalogue by its own entry point. */
 export function validateEditableProject(input: unknown,options:{allowPrivateArt?:boolean}={}): CreationProject {
   const project=validateCreationProject(input,{allowSavedMotion:options.allowPrivateArt});
-  if(options.allowPrivateArt===false && sceneAssetSlots(project).some(slot => parsePrivateArtId(slot.assetId))) throw Error('Private artwork and world pictures stay in the local scene editor.');
+  if(options.allowPrivateArt===false && sceneAssetSlots(project).some(slot => parsePrivateArtId(slot.assetId))) throw Error('Private world pictures and other private artwork stay in the local scene editor.');
   if(project.actors.some(actor=>!creationAsset(actor.assetId)&&!(options.allowPrivateArt!==false&&parsePrivateArtId(actor.assetId)))) {
     throw Error('This scene uses artwork that is not available in this version of jems. Your saved work was not replaced.');
   }
