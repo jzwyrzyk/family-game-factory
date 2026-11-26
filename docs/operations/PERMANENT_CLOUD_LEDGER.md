@@ -1,5 +1,28 @@
 # Permanent cloud operations delivery ledger
 
+## Recovery verification and integration checkpoint
+
+The recovery candidate was reconciled with engineering main
+`652bf9e312fc0776e37b7ef7893835e0fd8136d4`, preserving its concise root-reference
+routing and CI foundation. No release workflow, release intent or frozen artifact
+identity differs from that main due to this task. The original nonproduction
+`main.tf`, provider lockfile and `setup_nonproduction.py` remain byte-identical to
+source `446a245e624f44c36e1e3847ae7779477272d899`; the saved plan is not rebound.
+
+The original independently computed archive hash matches the administrator's
+`3b61c3cc67b59f96019796fdd3979870c3f576926f7010cdcc4920bf56cdedb1` exactly.
+The source regression checks cover the observed exact artifact-image mirror and
+reject altered images, additional artifact types/fields, executable changes and
+source mismatches. Registry qualification remains a separate administrator read.
+
+Local checks passed: **301 operations tests**, **113 environment tests**, **122 CI
+contract tests**, **18 documentation tests**, and documentation/reference checks.
+The broad `check:changed` application regression was started separately; its outcome
+must not be conflated with these completed targeted checks. Historical cleanup has
+been exercised only on synthetic repositories, including changed/staged files,
+failed remote proof, Git locks, links, interrupted quarantine recovery and
+no-overwrite restoration. No real Cloud Shell directory was deleted.
+
 ## November 26, 2026 — administrator activation checkpoint; build verification pending
 
 Owner reports all six GitHub restrictions applied. This task independently reread

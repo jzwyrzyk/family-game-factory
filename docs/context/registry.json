@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T14:31:04.046Z",
-      "sourceDigest": "188fc008c27993c2414d5236e22947db12450942668f076aee0f9f25522a4d96",
+      "reviewedAt": "2026-11-26T14:33:52.736Z",
+      "sourceDigest": "ad56c8d1c8e9d5c6cfd0051677eed657fb881b2b920bbed3240a7f34cd4ed26e",
       "reviewOutcome": "updated",
-      "reviewReason": "Merged current engineering main while preserving original Terraform plan/source; retained operations chronology in dedicated ledger and current activation facts in concise root delivery map.",
+      "reviewReason": "Final recovery review preserves original Terraform bytes/source and records matching source archive, 301 operations regressions and independent deployment/cleanup approval boundaries; repeated identical dry-runs reuse only an exact existing private plan.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -267,7 +267,11 @@ def main(argv=None):
                 'repositories': repositories, 'blocked': blocked}
         code = digest(plan)
         path = folder / ('cleanup-plan-' + code + '.json')
-        with path.open('x') as handle: durable(handle, plan)
+        safe_path(path)
+        if path.exists():
+            require(json.loads(path.read_bytes()) == plan, 'EXISTING_PLAN_DIFFERS')
+        else:
+            with path.open('x') as handle: durable(handle, plan)
         print(json.dumps({'status': 'DRY_RUN_NO_DELETIONS', 'private_plan': str(path),
                           'approve_plan_sha256': code, 'recoverable_bytes': sum(r['bytes'] for r in repositories),
                           'repositories': len(repositories), 'blocked_repositories': len(blocked),
