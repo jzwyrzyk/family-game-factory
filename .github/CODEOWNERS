@@ -3,6 +3,7 @@
 /.github/workflows/ @jzwyrzyk
 /ops/ @jzwyrzyk
 /scripts/ops/ @jzwyrzyk
+/scripts/environments/ @jzwyrzyk
 /scripts/deployment/ @jzwyrzyk
 /server/Dockerfile* @jzwyrzyk
 /.dockerignore @jzwyrzyk

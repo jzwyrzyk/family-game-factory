@@ -105,7 +105,7 @@ Seal an immutable release manifest recording exact source, frontend archive/cont
 
 Any relevant source, artifact, worker/runtime or configuration change invalidates approval. Reuse the tested frontend archive and immutable backend images wherever technically appropriate; separately bind environment-specific configuration. Do not rebuild an untracked production bundle and call it the tested artifact. A manifest validator is a gate primitive, not a deployed production integration or a substitute for fetching trusted GitHub approval/evidence records.
 
-After the active cutover, connect this prerequisite to the existing release-intent workflow. Keep the existing backend dependency sequence, canary, provenance, compatibility and data safeguards. Application merges must never write production release intent as a side effect. During this foundation work, `ops/release.json`, `ops/compatibility.json`, `ops/publish-images.txt` and production deployment workflows remain unchanged.
+The operational candidate connects protected owner review to the original image publisher, Cloud Run intent and Pages workflows. The controller verifies the complete Arcade run, all eight Pages regression jobs, signed sandbox, authenticated TEST fixture and funded receipts, independently observed worker pins, production configuration and recovery tuple. It stages one service at a time and requires current canary diagnostics before promotion. It publishes the reviewed Pages archive after all three services reach their approved revisions. [Exact production approval and recovery](../operations/EXACT-MANIFEST-RELEASE.md)
 
 ## Recovery and status
 

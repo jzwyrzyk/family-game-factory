@@ -4,6 +4,15 @@ name: Build reviewed Pages site
 on:
   workflow_dispatch:
     inputs:
+      delivery:
+        description: Prepare a read-only package or publish the exact approved archive
+        type: choice
+        options: [prepare, publish, rollback]
+        default: prepare
+      observation_run:
+        description: Fresh protected three-service observation for publication or recovery
+        type: string
+        required: false
       source_sha:
         description: Exact reviewed 40-character merged Jems source SHA
         required: true
@@ -19,11 +28,11 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: jems-reviewed-pages-release
+  group: ${{ inputs.delivery == 'prepare' && format('jems-pages-prepare-{0}', github.run_id) || 'jems-cloud-run-production' }}
   cancel-in-progress: false
 jobs:
   build:
-    if: github.ref == 'refs/heads/main'
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && inputs.delivery == 'prepare'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -107,9 +116,10 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+          retention-days: 30
   regressions:
     name: regression (${{ matrix.shard }})
-    if: github.ref == 'refs/heads/main'
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && inputs.delivery == 'prepare'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     strategy:
@@ -159,16 +169,85 @@ jobs:
           name: pages-regression-${{ matrix.shard }}
           path: test-results/
           if-no-files-found: ignore
-  deploy:
+  prepare-receipt:
     needs: [build, regressions]
     if: ${{ !cancelled() && needs.build.result == 'success' && needs.regressions.result == 'success' }}
     runs-on: ubuntu-24.04
     permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          REVIEWED_SOURCE_SHA: ${{ inputs.source_sha }}
+        run: python3 scripts/environments/pages_receipt.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pages-preparation-${{ github.run_id }}
+          path: ${{ runner.temp }}/receipt.json
+          retention-days: 30
+          if-no-files-found: error
+  approved-archive:
+    environment: jems-production-evidence
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && (inputs.delivery == 'publish' || inputs.delivery == 'rollback')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
+      attestations: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify reviewed release, exact archived site and live compatibility order
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JEMS_WORKER_REFS_READ_TOKEN: ${{ secrets.JEMS_WORKER_REFS_READ_TOKEN }}
+          CHECK_MODE: ${{ inputs.delivery == 'rollback' && 'website-rollback' || 'website' }}
+          RELEASE_SOURCE: ${{ inputs.source_sha }}
+          SERVING_RUN: ${{ inputs.observation_run }}
+        run: python3 scripts/environments/production_gate.py "$CHECK_MODE" --observation "$SERVING_RUN" --website-source "$RELEASE_SOURCE" --out "$RUNNER_TEMP/artifact.tar"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: approved-website
+          path: ${{ runner.temp }}/artifact.tar
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+  deploy:
+    needs: approved-archive
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
+      attestations: read
       pages: write
       id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Recheck authenticated approval after the Pages environment gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JEMS_WORKER_REFS_READ_TOKEN: ${{ secrets.JEMS_WORKER_REFS_READ_TOKEN }}
+          CHECK_MODE: ${{ inputs.delivery == 'rollback' && 'website-rollback' || 'website' }}
+          RELEASE_SOURCE: ${{ inputs.source_sha }}
+          SERVING_RUN: ${{ inputs.observation_run }}
+        run: python3 scripts/environments/production_gate.py "$CHECK_MODE" --observation "$SERVING_RUN" --website-source "$RELEASE_SOURCE"
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: approved-website
+      - name: Confirm the public origin serves the selected marker
+        env:
+          RELEASE_SOURCE: ${{ inputs.source_sha }}
+        run: python3 scripts/environments/verify_website.py
