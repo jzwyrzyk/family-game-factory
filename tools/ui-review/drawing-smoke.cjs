@@ -19,6 +19,7 @@ async function main() {
     await page.goto(url);
     const app = page.frameLocator('#appFrame');
     const sketch = 'Offline stamp fixture';
+    assert.ok(await app.locator('#artDrawButton strong').evaluate(label => parseFloat(getComputedStyle(label).fontSize) >= 18));
     await app.locator('#artDrawButton').click();
     const editor = app.getByRole('dialog', {name: 'Draw something new'});
     await editor.locator('[data-stamp=blue]').click();

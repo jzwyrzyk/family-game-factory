@@ -1,5 +1,6 @@
 // Focused offline host. The editor, asset shelf, revision writer and embedded
 // sketch reader are the same modules used by the ordinary My Art route.
+import '../../src/studio/modernization.css';
 import {installArtStudio} from '../../src/drawing/studio';
 import {installRewardWriteGuard} from '../../src/rewards/write-guard';
 import '../../src/brand/art-library.css';
