@@ -161,8 +161,8 @@
         "docs/creative-universe/STANDARD.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:31:04.274Z",
-      "sourceDigest": "e97598ae01a06db8bf3c488d938f304c1a9e43578f37f045ec01a2b4dd5dbb70",
+      "reviewedAt": "2026-11-26T06:53:06.479Z",
+      "sourceDigest": "7c7e976293b0ffb28c36e3caa5936d7bbfb7fe710c7a05e61a221297dc370bb3",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed the Creative Universe compatibility and local playback specification.",
       "reviewHistory": [
@@ -429,8 +429,8 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "c26142a1a82c72e9c76143ad111ae45903be09fac991485d227c59a70893d27d",
-      "reviewedAt": "2026-11-26T06:07:06.267Z",
+      "sourceDigest": "170b79680ad8dfed0469c69db80e8fb4e6800434feda4cfad08f61d5e4a436f6",
+      "reviewedAt": "2026-11-26T06:53:06.946Z",
       "reviewOutcome": "updated",
       "reviewReason": "Verified world edition readers, placement behavior and scoped authored movement blocks against CAD and storage documentation.",
       "reviewHistory": [
@@ -918,8 +918,8 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:37:40.676Z",
-      "sourceDigest": "a01ffcd3749bf14726e6e9c282d7523846ef70f6d3e1ded6ef89d89115b94d15",
+      "reviewedAt": "2026-11-26T06:53:07.317Z",
+      "sourceDigest": "8ac314685f50f7b1f998bf57d96e0a0135bac85ec66ba32f572148a6d3085cd1",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed integrated CI leaves and source assertions for original admissions, game binding, movement and recovery.",
       "reviewHistory": [
@@ -1660,8 +1660,8 @@
         "tests/game-art/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "f0d5a35465b752e48be7a414b709e746a4a2f2fa612a95bb141d46c6bd3875dd",
-      "reviewedAt": "2026-11-26T06:31:07.826Z",
+      "sourceDigest": "b2e64f71390f1e7147cde7c53bf0bd047d18318ce1363310d0e3a50796aaf212",
+      "reviewedAt": "2026-11-26T06:53:07.717Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed supported editors, legacy data readers and exact PNG admission.",
       "reviewHistory": [
