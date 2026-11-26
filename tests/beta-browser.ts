@@ -79,6 +79,41 @@ async function entryBrowser(browser:Browser,engine:string,tls:ServerOptions,out:
     await artwork.setInputFiles({name:'private-fixture-name.png',mimeType:'image/png',buffer:Buffer.concat([reviewed,Buffer.from('metadata')])});
     await p.getByText('Ask a grown-up for a reviewed RGB or RGBA PNG saved without extra file information.').waitFor();
     assert.deepEqual(reviews,[]);
+    // Interrupt the real intake before unlock and during the unlock response.
+    // Both must leave a subsequent profile's status and library untouched.
+    for (const phase of ['before-unlock','during-unlock'] as const) {
+      const requests=await p.evaluate(async({phase,bytes,passphrase})=>{
+        const input=document.querySelector<HTMLInputElement>('#betaReviewedArt')!;
+        const status=document.getElementById('familyExitStatus')!;
+        const events:string[]=[];
+        const transfer=new DataTransfer();
+        transfer.items.add(new File([Uint8Array.from(bytes)],'private-fixture-name.png',{type:'image/png'}));
+        input.files=transfer.files;
+        document.querySelector<HTMLInputElement>('#reviewedArtPassphrase')!.value=passphrase;
+        const realFetch=window.fetch;
+        let started!:()=>void,release!:()=>void;
+        const unlockStarted=new Promise<void>(resolve=>{started=resolve;});
+        const hold=new Promise<void>(resolve=>{release=resolve;});
+        window.fetch=async(...args)=>{
+          const path=String(args[0]);
+          if(path==='/v1/devices/unlock') {
+            events.push(path); const result=await realFetch(...args);
+            started(); await hold; return result;
+          }
+          if(path==='/entry/review-art')events.push(path);
+          return realFetch(...args);
+        };
+        try {
+          const settled=input.onchange!(new Event('change'));
+          if(phase==='during-unlock')await unlockStarted;
+          window.dispatchEvent(new Event('factory-profile'));
+          status.textContent='Next explorer';
+          release(); await settled;
+          return {events,status:status.textContent};
+        } finally {release();window.fetch=realFetch;}
+      },{phase,bytes:Array.from(reviewed),passphrase:parent});
+      assert.deepEqual(requests,{events:phase==='during-unlock'?['/v1/devices/unlock']:[],status:'Next explorer'});
+    }
     await pass.fill(parent);
     await artwork.setInputFiles({name:'private-fixture-name.png',mimeType:'image/png',buffer:reviewed});
     await p.getByText('Your reviewed drawing is ready.').waitFor();
