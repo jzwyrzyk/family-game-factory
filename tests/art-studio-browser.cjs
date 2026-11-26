@@ -103,6 +103,15 @@ async function noOverflow(page,label){assert.ok(await page.evaluate(()=>document
   assert.equal(await page.locator('#artDetailTitle').textContent(),'Jellybean close-up','saving a picture returns focus to its new artwork, after the editor closes');
   const after=await count(page);assert.equal(after.length,2);const original=after.find(item=>item.id===before.id),copy=after.find(item=>item.sourceId===before.id);assert.equal(original.sha256,before.sha256,'picture editing preserves original hash');assert.ok(copy&&copy.sha256!==before.sha256,'picture tools save actual transformed bytes as derivative');
   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('family-game-factory-workspace-v2')).revisions.find(r=>r.drawingRigId)?.drawingRigId),originalBinding,'picture edits leave saved ride binding unchanged');
+  await page.getByLabel('What is it?', {exact:false}).fill('Star machine');
+  await page.getByRole('button',{name:'Save details',exact:true}).click();
+  await page.waitForFunction(()=>document.getElementById('artStatus').textContent==='Artwork details saved.');
+  const family=await count(page);
+  assert.deepEqual(family.map(item=>item.semanticIdentity), ['Star machine', 'Star machine']);
+  assert.equal(family.find(item=>item.id===before.id).sha256,before.sha256);
+  await page.locator('#artSearch').fill('star machine');
+  await page.waitForFunction(()=>document.querySelectorAll('.art-card').length===2 && document.getElementById('artGrid').getAttribute('aria-busy')!=='true');
+  await page.locator('#artSearch').fill('');
   await upload(page,'Mochi monster.png','character');await page.getByLabel('Artwork collection',{exact:true}).selectOption('character');await page.getByRole('button',{name:'Save details',exact:true}).click();await page.waitForFunction(()=>document.getElementById('artStatus').textContent==='Artwork details saved.');
   await upload(page,'Moonflower.png','flower');await page.getByLabel('Artwork collection',{exact:true}).selectOption('prop');await page.getByRole('button',{name:'Save details',exact:true}).click();await page.waitForFunction(()=>document.getElementById('artStatus').textContent==='Artwork details saved.');
   await page.getByRole('button',{name:'Close artwork details'}).click();await noOverflow(page,'library desktop');await page.screenshot({path:path.join(output,'art-library-desktop.png'),fullPage:true});

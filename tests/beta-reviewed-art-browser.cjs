@@ -45,7 +45,7 @@ const {chromium} = require('playwright');
     const rows = profile => page.evaluate(async profile =>
       (await reviewedArt.drawings(profile)).map(item => ({name:item.name,hash:item.sha256,bytes:Array.from(new Uint8Array(item.bytes))})),profile);
     await choose(bytes);
-    await page.getByText('Unlock Grown-ups and confirm', {exact:false}).waitFor();
+    await page.getByText('Ask the operator to review and approve', {exact:false}).waitFor();
     assert.equal((await rows('player1')).length,0);
     approved = createHash('sha256').update(bytes).digest('hex');
     await choose(bytes);

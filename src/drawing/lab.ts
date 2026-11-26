@@ -132,6 +132,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
   const before=assembly?structuredClone(assembly):null;
   const p=suggestParts(originalForeground(),next);
   assembly={schemaVersion:1,sourceId:source.id,sourceSha256:source.sha256,kind:next,pieces:p.pieces,notes:before?.notes??'',revision:before?.revision??1};
+  if(before?.motion)assembly.motion={...before.motion,sprite:'cutout'};
   kind=next;
   notice.textContent=p.explanation+' You can change any piece.';
   selected=assembly.pieces[0].id;pendingNew=false;pendingPivot=false;brushMode=null;layerCache.clear();lastStored=null;
@@ -139,7 +140,10 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
   if(before)remember(before);else resetHistory();refresh();
  }
  function resetHistory(){undo.length=0;redo.length=0;}
- function remember(before:DrawingAssembly){undo.push(before);if(undo.length>30)undo.shift();redo.length=0;lastStored=null;queueDraft();q<HTMLButtonElement>(working,'[data-use]').disabled=true;}
+ function remember(before:DrawingAssembly){
+  // Edits in the pieces editor explicitly choose the cutout representation.
+  if(assembly.motion)assembly.motion.sprite='cutout';
+  undo.push(before);if(undo.length>30)undo.shift();redo.length=0;lastStored=null;queueDraft();q<HTMLButtonElement>(working,'[data-use]').disabled=true;}
  function restoreUndo(direction:'undo'|'redo'){
   if(!canEdit()||mode!=='edit')return;
   const from=direction==='undo'?undo:redo,to=direction==='undo'?redo:undo,previous=from.pop();
@@ -304,6 +308,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
     carArtwork=createCarArtwork(assembly,sourceCanvas,sourceAspect);
     car=createVehicle({},'meadow',carArtwork.geometry);carScene=car.snapshot();
    }else{
+    if(assembly.motion && !assembly.pieces.some(piece=>piece.physical))throw Error('Play your path in Creative Studio. Choose a moving part to try physics here.');
     assemblyRig(assembly,sourceAspect);other=createDrawingPlayground(assembly,sourceAspect);otherScene=other.snapshot();
    }
    mode='play';pendingPivot=false;pendingNew=false;brushMode=null;

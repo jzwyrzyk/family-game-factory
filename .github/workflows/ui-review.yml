@@ -35,6 +35,10 @@ jobs:
       - run: npm run review:build
         env:
           UI_REVIEW_SOURCE_KIND: ${{ github.event_name == 'pull_request' && 'candidate branch' || 'merged main' }}
+      - name: Build focused My Art download
+        run: node tools/ui-review/build.mjs --drawing
+        env:
+          UI_REVIEW_SOURCE_KIND: ${{ github.event_name == 'pull_request' && 'candidate branch' || 'merged main' }}
       - name: Upload the standalone download
         uses: actions/upload-artifact@v4
         with:
@@ -45,6 +49,8 @@ jobs:
           compression-level: 6
       - run: npx playwright install --with-deps chromium
       - run: npm run review:test
+      - name: Open the drawing download, save, reload and keep a new version
+        run: node tools/ui-review/drawing-smoke.cjs
       - name: Capture complete candidate journeys
         run: npm run build && npm run test:child-modernization && npm run test:pals-fidelity && node tests/pals-fidelity-browser.cjs --offline
       - uses: actions/upload-artifact@v4

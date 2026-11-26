@@ -1,3 +1,6 @@
+import {artFootprint, checkReservedArtRoom, clearSketchRecord, pendingSketchRecord} from '../drawing/sketch-keep-record';
+import {sceneAssetSlots} from '../creation/model';
+import { originalFor, validSemanticIdentity } from './art-lineage';
 import {assertRewardSourceLockHeld,setRewardSourceMaintenance} from '../rewards/write-guard';
 /** Private immutable image bytes. Metadata and visibility can change; the image cannot. */
 import { ART_LIMITS, artOwner, artRequest, assertArtWrite, checkArtCapacity, deriveArtUsages, withArtTransaction, saveDrawingMetadata, ownerArtRecords, type DrawingMetadata, type ArtGuard, type ArtUsage } from '../drawing/library';
@@ -9,7 +12,7 @@ export const DRAWING_CATEGORIES: readonly DrawingCategory[] = ['character', 'veh
 export interface Drawing {
   id: string; owner: string; name: string; mime: 'image/png' | 'image/jpeg'; bytes: ArrayBuffer; sha256: string; createdAt: string;
   sourceId?: string; sourceSha256?: string; preview?: ArrayBuffer;
-  category?: DrawingCategory; archived?: boolean; updatedAt?: string;
+  category?: DrawingCategory; semanticIdentity?: string; archived?: boolean; updatedAt?: string;
 }
 export const drawingHash = async (bytes: ArrayBuffer) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), byte => byte.toString(16).padStart(2, '0')).join('');
 
@@ -74,32 +77,72 @@ export async function drawings(owner: string): Promise<Drawing[]> {
 }
 export async function drawing(owner: string, id: string): Promise<Drawing> {
   artOwner(owner);
-  return withArtTransaction(['drawings'], 'readonly', async transaction => {
+  const result = await withArtTransaction(['drawings'], 'readonly', async transaction => {
     const item = await artRequest(transaction.objectStore('drawings').get(id)) as Drawing | undefined;
     if (!item || item.owner !== owner) throw Error('Choose a drawing from this profile.'); return item;
   });
+  if (await drawingHash(result.bytes) !== result.sha256) throw Error('The original drawing does not match its saved fingerprint. Open your art backup to recover a copy.');
+  return result;
 }
-export async function saveDrawing(owner: string, name: string, file: Blob, sourceId?: string, guard?: ArtGuard): Promise<Drawing> {
+export async function saveDrawing(owner: string, name: string, file: Blob, sourceId?: string, guard?: ArtGuard, category?: DrawingCategory, keepToken?: string): Promise<Drawing> {
   assertArtWrite(owner, guard); const item = await prepareDrawing(owner, name, file); assertArtWrite(owner, guard);
-  return withArtTransaction(['drawings'], 'readwrite', async transaction => {
+  if (category !== undefined) {
+    if (!DRAWING_CATEGORIES.includes(category)) throw Error('Choose an available art collection.');
+    item.category = category;
+  }
+  return withArtTransaction(['drawings','meta'], 'readwrite', async transaction => {
     const store = transaction.objectStore('drawings'), metadata=await artRequest(transaction.objectStore('drawingMetadata').getAll()) as DrawingMetadata[];
     if (sourceId) {
       const source = metadata.find(original => original.owner === owner && original.id === sourceId);
       if (!source) throw Error('Original drawing not found in this profile.');
       item.sourceId = sourceId; item.sourceSha256 = source.sha256; item.category = source.category || 'other';
+      if (source.semanticIdentity) item.semanticIdentity = source.semanticIdentity;
     }
-    if(metadata.filter(original=>original.owner===owner).length>=ART_LIMITS.drawingsPerOwner||metadata.reduce((bytes,original)=>bytes+original.originalBytes+(original.preview?.byteLength??0),0)+item.bytes.byteLength+(item.preview?.byteLength??0)>ART_LIMITS.storageBytes)throw Error('Your art storage is full. Keep a complete backup before adding more pictures.'); assertArtWrite(owner, guard); store.add(item); saveDrawingMetadata(transaction,item); return item;
+    if (keepToken) {
+      const pending = await pendingSketchRecord(transaction,owner);
+      if (!pending || pending.token !== keepToken || pending.image.sha256 !== item.sha256 ||
+          pending.image.name !== item.name || pending.image.sourceId !== sourceId || pending.image.sourceSha256 !== item.sourceSha256)
+        throw Error('This unfinished save has changed. Open it again from My Art.');
+      item.id = pending.image.id;
+      item.createdAt = pending.image.createdAt;
+      clearSketchRecord(transaction,owner);
+    }
+    await checkReservedArtRoom(transaction,[...metadata.map(artFootprint),artFootprint(item)]);
+    assertArtWrite(owner,guard);
+    store.add(item);
+    saveDrawingMetadata(transaction,item);
+    return item;
   });
 }
-export async function updateDrawing(owner: string, id: string, changes: { name?: string; category?: DrawingCategory; archived?: boolean }, guard?: ArtGuard): Promise<Drawing> {
+export async function updateDrawing(owner: string, id: string, changes: { name?: string; category?: DrawingCategory; semanticIdentity?: string; archived?: boolean }, guard?: ArtGuard): Promise<Drawing> {
   assertArtWrite(owner, guard);
-  if (!changes || Object.keys(changes).some(key => !['name', 'category', 'archived'].includes(key)) ||
+  if (!changes || Object.keys(changes).some(key => !['name', 'category', 'semanticIdentity', 'archived'].includes(key)) ||
     changes.name !== undefined && (typeof changes.name !== 'string' || !changes.name.trim() || changes.name.trim().length > 60) ||
+    changes.semanticIdentity !== undefined && !validSemanticIdentity(changes.semanticIdentity) ||
     changes.category !== undefined && !DRAWING_CATEGORIES.includes(changes.category) || changes.archived !== undefined && typeof changes.archived !== 'boolean') throw Error('Choose a short name and an available art category.');
   return withArtTransaction(['drawings'], 'readwrite', async transaction => {
     const store = transaction.objectStore('drawings'), item = await artRequest(store.get(id)) as Drawing | undefined;
     if (!item || item.owner !== owner) throw Error('Choose artwork from this profile.');
     const updated = { ...item, ...changes, ...(changes.name !== undefined ? { name: changes.name.trim() } : {}), updatedAt: new Date().toISOString() };
+    if (changes.semanticIdentity !== undefined) {
+      const meaning = changes.semanticIdentity.trim();
+      if (meaning) updated.semanticIdentity = meaning;
+      else delete updated.semanticIdentity;
+      if (meaning !== (item.semanticIdentity ?? '')) {
+        const records = await ownerArtRecords<DrawingMetadata>(transaction, 'drawingMetadata', owner);
+        const byId = new Map(records.map(row => [row.id, row]));
+        const root = originalFor(byId.get(id)!, byId);
+        for (const row of records) {
+          if (row.id === id || originalFor(row, byId).id !== root.id) continue;
+          const version = await artRequest(store.get(row.id)) as Drawing;
+          if (meaning) version.semanticIdentity = meaning;
+          else delete version.semanticIdentity;
+          assertArtWrite(owner, guard);
+          store.put(version);
+          saveDrawingMetadata(transaction, version);
+        }
+      }
+    }
     assertArtWrite(owner, guard); store.put(updated); saveDrawingMetadata(transaction,updated); return updated;
   });
 }
@@ -123,7 +166,7 @@ function usedByRetainedScene(owner: string, original: Drawing, rigs: SavedRig[])
   for (const record of [...workspace.revisions, ...workspace.drafts]) {
     if (!ownedProjects.has(record?.projectId)) continue;
     if (!record.scene || !Array.isArray(record.scene.actors)) throw Error('A saved scene needs recovery before its artwork can be erased.');
-    if (record.scene.actors.some((actor: any) => typeof actor?.assetId === 'string' && (refs.has(actor.assetId) || rigPrefixes.some(prefix => actor.assetId.startsWith(prefix))))) return true;
+    if (sceneAssetSlots(record.scene).some((actor: any) => typeof actor?.assetId === 'string' && (refs.has(actor.assetId) || rigPrefixes.some(prefix => actor.assetId.startsWith(prefix))))) return true;
   }
   return false;
 }
@@ -155,13 +198,15 @@ async function removeDrawing(owner: string, id: string, includeRigs: boolean, gu
     const [{IndexedRecords},{nativeScope}]=await Promise.all([import('../storage/indexed-records'),import('../storage/native-workspace')]);
     const records=await IndexedRecords.open(await nativeScope(owner),check);
     try{if(await records.get('native-control','migration')||await records.get('creation-control','migration'))throw Error('This player has a prepared game or scene library. Archive this artwork to keep every retained creation safe. Original erasure is unavailable for prepared libraries.');}finally{records.close();}
-  return await withArtTransaction(['drawings', 'rigs', 'active', 'drafts', 'usage'], 'readwrite', async transaction => {
+  return await withArtTransaction(['drawings', 'rigs', 'active', 'drafts', 'usage', 'meta'], 'readwrite', async transaction => {
     const store = transaction.objectStore('drawings'), all = await artRequest(store.getAll()) as Drawing[];
     const item = all.find(original => original.id === id && original.owner === owner);
     if (!item) throw Error('Choose a drawing from this profile.');
     const rigs = (await artRequest(transaction.objectStore('rigs').getAll()) as SavedRig[]).filter(rig => rig.owner === owner && rig.assembly.sourceId === id);
     const indexed = await artRequest(transaction.objectStore('usage').getAll()) as ArtUsage[];
     const usage = deriveArtUsages(owner, all, rigs, indexed).filter(use => use.drawingId === id);
+    const pending = await pendingSketchRecord(transaction, owner);
+    if (pending?.image.sourceId === id) throw Error('Finish or discard the unfinished save that uses this picture before erasing it.');
     if (all.some(original => original.owner === owner && original.sourceId === id) || usage.length || usedByRetainedScene(owner, item, rigs) || usedByRetainedGame(owner, rigs) || !includeRigs && rigs.length) throw Error('A saved version, game or scene still uses this artwork. Archive it to hide it while keeping those creations safe.');
     check();
     store.delete(id); transaction.objectStore('drawingMetadata').delete(id); for (const use of indexed) if (use.owner === owner && use.drawingId === id) transaction.objectStore('usage').delete(use.id);
@@ -186,7 +231,7 @@ export async function drawingPage(owner:string,query:DrawingPageQuery={}):Promis
   const store=transaction.objectStore('drawingMetadata'),total=await artRequest(store.index('owner').count(IDBKeyRange.only(owner)));
   const range=IDBKeyRange.bound([owner,'',''],[owner,...(query.after??['\uffff','\uffff'])],false,!!query.after);
   const items:DrawingMetadata[]=[],search=(query.search??'').trim().toLowerCase();
-  await new Promise<void>((resolve,reject)=>{const request=store.index('ownerCreated').openCursor(range,'prev');request.onerror=()=>reject(request.error);request.onsuccess=()=>{const cursor=request.result;if(!cursor||items.length>limit){resolve();return;}const item=cursor.value as DrawingMetadata;if((query.archived===undefined||Boolean(item.archived)===query.archived)&&(!query.category||(item.category??'other')===query.category)&&(!search||item.name.toLowerCase().includes(search)))items.push(item);cursor.continue();};});
+  await new Promise<void>((resolve,reject)=>{const request=store.index('ownerCreated').openCursor(range,'prev');request.onerror=()=>reject(request.error);request.onsuccess=()=>{const cursor=request.result;if(!cursor||items.length>limit){resolve();return;}const item=cursor.value as DrawingMetadata;if((query.archived===undefined||Boolean(item.archived)===query.archived)&&(!query.category||(item.category??'other')===query.category)&&(!search||item.name.toLowerCase().includes(search)||item.semanticIdentity?.toLowerCase().includes(search)))items.push(item);cursor.continue();};});
   const hasMore=items.length>limit;if(hasMore)items.pop();const last=items.at(-1);return {items,next:hasMore&&last?[last.createdAt,last.id]:null,total};
  });
 }

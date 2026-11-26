@@ -1,3 +1,5 @@
+import { ILLUSTRATED_WORLDS } from './illustrated-art';
+
 /** The local, serializable Creation Lab language. It contains data, never source code. */
 export const CREATION_SCHEMA = 'jems.creation.v1' as const;
 export const CREATION_TICK_MS = 10;
@@ -9,6 +11,22 @@ export const CREATION_LIMITS = {
 
 export type CreationOrigin = 'child' | 'starter' | 'assisted';
 export type SceneBackground = 'meadow' | 'night' | 'workshop' | 'sky';
+/** A world version pins its bundled plate and any aligned overlays. */
+export interface BundledSceneWorld {
+  id: string; label: string; url: string;
+  middle?: string; foreground?: string; preview?: string; props?: readonly string[];
+}
+export const SCENE_WORLDS: readonly BundledSceneWorld[] = [
+  {id:'world-islands-9b2446de258a', label:'Waterfall islands', url:'./art/mind-your-jems/scene-sky.webp'},
+  {id:'world-workshop-b6e81f59ab4d', label:'Gem Factory', url:'./gem-factory-workshop.webp'},
+  {id:'world-terrace-1b1460063ff8', label:'Garden terrace', url:'./jems-journey/background.webp'},
+  ...ILLUSTRATED_WORLDS.map(world => ({...world, url: world.background})),
+];
+export interface SceneWorld {assetId:string; framing:'fit'|'fill'}
+export function starterWorld(place:'islands'|'workshop'|'terrace'):SceneWorld {
+  const id = {islands:SCENE_WORLDS[0].id, workshop:SCENE_WORLDS[1].id, terrace:SCENE_WORLDS[2].id}[place];
+  return {assetId:id,framing:'fill'};
+}
 export type ComparisonOperator = 'eq' | 'neq' | 'lt' | 'lte' | 'gt' | 'gte';
 export type SceneCondition =
   | {type: 'variable'; variable: string; operator: ComparisonOperator; value: number}
@@ -22,14 +40,18 @@ export type CreationBlock = BlockBase & (
   | {type: 'dance'; durationMs: number}
   | {type: 'jump'; height: number; durationMs: number}
   | {type: 'show' | 'hide'}
-  | {type: 'repeat'; count: number; actions: CreationBlock[]}
+  | {type: 'repeat'; count: number; actions: CreationBlock[]; pathName?: string}
   | {type: 'if'; condition: SceneCondition; then: CreationBlock[]; else?: CreationBlock[]}
   | {type: 'set'; variable: string; value: number}
   | {type: 'change'; variable: string; amount: number}
   | {type: 'emit'; name: string}
 );
 export type SceneTrigger = {type: 'start' | 'tap'} | {type: 'event'; name: string};
+export const SCENE_ROLES = ['character', 'decoration', 'obstacle', 'collectible'] as const;
+export type SceneRole = typeof SCENE_ROLES[number];
 export interface SceneActor {
+  /** The child's description of this appearance in this scene. */
+  role?: SceneRole;
   id: string; name: string; assetId: string; x: number; y: number;
   size?: number; visible?: boolean;
 }
@@ -44,11 +66,16 @@ export interface CreationProvenance {
 }
 export interface CreationProject {
   schema: typeof CREATION_SCHEMA;
-  id: string; title: string; width: number; height: number; background: SceneBackground;
+  id: string; title: string; width: number; height: number; background: SceneBackground; world?: SceneWorld;
   actors: SceneActor[]; programs: SceneProgram[]; variables: Record<string, number>;
   provenance?: CreationProvenance;
 }
 export type SceneProject = CreationProject;
+
+/** The trusted stores, portable files and recovery remappers traverse the same slots. */
+export function sceneAssetSlots(scene:CreationProject): {assetId:string}[] {
+  return scene.world ? [scene.world, ...scene.actors] : scene.actors;
+}
 
 const forbiddenIds = new Set(['__proto__', 'prototype', 'constructor']);
 export const isCreationId = (value: unknown): value is string =>
@@ -88,17 +115,23 @@ const operators = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte'];
 
 /** Strictly validates before cloning: unsupported executable/asset payloads are never retained. */
 export function validateCreationProject(input: unknown): CreationProject {
-  const p = record(input, ['schema','id','title','width','height','background','actors','programs','variables','provenance'], 'project');
+  const p = record(input, ['schema','id','title','width','height','background','world','actors','programs','variables','provenance'], 'project');
   if (p.schema !== CREATION_SCHEMA) fail('Unsupported saved project version.');
   id(p.id, 'project ID'); text(p.title, 80, 'project title');
   number(p.width, 200, 1600, 'stage width', true); number(p.height, 160, 1200, 'stage height', true);
   if (!['meadow','night','workshop','sky'].includes(p.background as string)) fail('Choose a supported background.');
+  if (p.world !== undefined) {
+    const world = record(p.world,['assetId','framing'],'world');
+    if (!SCENE_WORLDS.some(item=>item.id===world.assetId) && parsePrivateArtId(world.assetId)?.kind!=='image') fail('Choose an available world picture.');
+    if (world.framing!=='fit' && world.framing!=='fill') fail('Choose how the world picture fits.');
+  }
   list(p.actors, CREATION_LIMITS.actors, 'characters');
   if (!p.actors.length) fail('Add at least one character.');
   const actorIds = new Set<string>();
   for (const raw of p.actors) {
-    const a = record(raw, ['id','name','assetId','x','y','size','visible'], 'character');
+    const a = record(raw, ['id','name','assetId','x','y','size','visible','role'], 'character');
     id(a.id, 'character ID');
+    if (a.role !== undefined && !SCENE_ROLES.includes(a.role as SceneRole)) fail('Choose a supported scene role.');
     if(!isCreationId(a.assetId)&&!parsePrivateArtId(a.assetId))fail('Invalid asset reference.');
     text(a.name, 60, 'character name');
     if (actorIds.has(a.id)) fail('Character IDs must be unique.');
@@ -139,7 +172,7 @@ export function validateCreationProject(input: unknown): CreationProject {
     list(raw, CREATION_LIMITS.blocks, 'blocks');
     for (const value of raw) {
       if (++blockCount > CREATION_LIMITS.blocks) fail('This project has too many blocks.');
-      const b = record(value, ['id','origin','type','x','y','dx','dy','durationMs','text','height','count','actions','condition','then','else','variable','value','amount','name'], 'block');
+      const b = record(value, ['id','origin','type','x','y','dx','dy','durationMs','text','height','count','actions','condition','then','else','variable','value','amount','name','pathName'], 'block');
       id(b.id, 'block ID');
       if (blockIds.has(b.id)) fail('Block IDs must be unique throughout a project.');
       blockIds.add(b.id);
@@ -161,7 +194,7 @@ export function validateCreationProject(input: unknown): CreationProject {
         case 'say': fields(['text','durationMs']); text(b.text, 160, 'speech', true); duration(); break;
         case 'jump': fields(['height','durationMs']); number(b.height, 0, 300, 'jump height'); duration(); break;
         case 'show': case 'hide': fields([]); break;
-        case 'repeat': fields(['count','actions']); number(b.count, 0, CREATION_LIMITS.repeat, 'repeat count', true); blocks(b.actions, depth + 1); break;
+        case 'repeat': fields(['count','actions','pathName']); if (b.pathName !== undefined) text(b.pathName, 40, 'path name'); number(b.count, 0, CREATION_LIMITS.repeat, 'repeat count', true); blocks(b.actions, depth + 1); break;
         case 'if': fields(['condition','then','else']); condition(b.condition); blocks(b.then, depth + 1); if (b.else !== undefined) blocks(b.else, depth + 1); break;
         case 'set': fields(['variable','value']); variable(b.variable); number(b.value, -1000000, 1000000, 'variable value'); break;
         case 'change': fields(['variable','amount']); variable(b.variable); number(b.amount, -1000000, 1000000, 'variable change'); break;

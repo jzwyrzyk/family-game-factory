@@ -16,6 +16,8 @@ The [standalone UI review](ui-review/README.md) packages the real UI for offline
 
 ## Canonical references
 
+The [Drawing Workspace and connected-activity receipt](creative-universe/DRAWING_WORKSPACE_ACCEPTANCE.md) ties each workstream to its reviewed source, screenshots, offline sandbox and release state.
+
 
 | Reference | Question it answers | Update when |
 | --- | --- | --- |

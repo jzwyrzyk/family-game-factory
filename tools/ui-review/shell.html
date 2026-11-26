@@ -31,18 +31,30 @@ let saved={findings:[],reviewed:[],visited:[]},storageWorks=true;
 const storageKey='jems-ui-review-findings-v1:'+PAYLOAD.sha;
 try{saved=JSON.parse(localStorage.getItem(storageKey))||saved;localStorage.setItem(storageKey,JSON.stringify(saved));}catch{storageWorks=false;}
 const persist=()=>{if(storageWorks)try{localStorage.setItem(storageKey,JSON.stringify(saved));}catch{storageWorks=false;}$('findingCount').textContent=saved.findings.length;$('storageStatus').textContent=storageWorks?'Findings stay in this browser. Export a copy before sharing.':'Browser storage unavailable. Findings are in memory; export before closing.';};
-const routes=[...manifest.pages,...manifest.states],history=[],historyIndex={value:-1};let currentAction='home',editing=null,context=null,ready=false,navigating=false;
+const routes=[...manifest.pages,...manifest.states],history=[],historyIndex={value:-1};let currentAction=manifest.initialAction||'home',editing=null,context=null,ready=false,navigating=false;
 window.__jemsReview={asset,assetKeys,config:{experience:'child',grade:1,scenario:'normal'},storage:{},dbNames:new Set(),dbPrefix:'jems-review:'+crypto.randomUUID()+':',pending:[],activePage:'',lastElement:'',preview:channel=>{
  const data=JSON.stringify({channel,artifactId:'review-artifact'});
  return `<!doctype html><html><head>${csp}<style>body{font:18px system-ui;margin:0;padding:30px;background:#f5f1ff;color:#24304c}button{font:inherit;padding:15px;border-radius:12px;border:2px solid #683cbd;background:white;margin:8px}p{max-width:50ch}#score{font-size:32px}#gem{font-size:64px}</style></head><body><h1>Simulated game preview</h1><p>This embedded transport fixture stands in for generated gameplay. Native games in My Games use their actual represented UI and engines.</p><div id="gem">💎</div><p id="score">0 / 5</p><button id="collect">Collect a gem</button><button id="question">Learning checkpoint</button>${script(`const identity=${data};let n=0;const send=(event,more={})=>parent.postMessage({type:'factory-preview',...identity,event,...more},'*');addEventListener('message',e=>{if(e.data?.type==='factory-learning'&&e.data.channel===identity.channel){if(e.data.action==='connect')send('ready',{height:520,learningProtocol:1});}});document.getElementById('collect').onclick=()=>{n++;document.getElementById('score').textContent=n+' / 5';if(n>=5)send('round-complete',{won:true,score:n,roundId:1});};document.getElementById('question').onclick=()=>send('math-checkpoint',{roundId:1,checkpointId:++n});send('ready',{height:520,learningProtocol:1});` )}</body></html>`;
 }};
 const host=window.__jemsReview;
+const drawingReview=manifest.initialAction==='art';
+const drawingRunKey='jems-offline-drawing-review:'+PAYLOAD.sha+':'+location.pathname;
+if(drawingReview){
+ try{
+  const savedRun=localStorage.getItem(drawingRunKey);
+  if(savedRun&&/^jems-review:[0-9a-f-]{36}:$/.test(savedRun))host.dbPrefix=savedRun;
+  localStorage.setItem(drawingRunKey,host.dbPrefix);
+ }catch{}
+ $('experience').disabled=true;
+ $('finish').parentElement.style.display='none';
+ $('baseline').previousElementSibling.textContent='OFFLINE · DRAWING REVIEW';
+}
 function status(text){$('status').textContent=text;}
 $('baseline').textContent=PAYLOAD.sourceKind+' · '+PAYLOAD.sha.slice(0,12)+' · '+assetKeys.length+' embedded assets';
 for(const [label,list] of [['Pages',manifest.pages],['Journey states',manifest.states]]){const group=document.createElement('optgroup');group.label=label;for(const r of list){const o=document.createElement('option');o.value=r.action;o.textContent=r.label;group.append(o);}$('destination').append(group);}
 for(const name of manifest.scenarios){const o=document.createElement('option');o.value=name;o.textContent=name.replace(/^./,c=>c.toUpperCase());$('scenario').append(o);}
 function size(){const sizes={desktop:[1440,900],landscape:[1180,820],portrait:[820,1180],mobile:[390,844],actual:[innerWidth,innerHeight]};const [w,h]=sizes[$('device').value];frame.width=w;frame.height=h;const available=$('stage').clientWidth-(document.body.classList.contains('toolbar-hidden')?0:36);const scale=$('zoom').value==='fit'?Math.min(1,available/w):1;frame.style.transform='scale('+scale+')';frame.style.transformOrigin='top left';$('viewport').style.width=w*scale+'px';$('viewport').style.height=h*scale+'px';$('dimensions').textContent=w+' × '+h+' CSS pixels · displayed at '+Math.round(scale*100)+'%';}
-function start(reset=false){ready=false;const oldDBs=reset?[...host.dbNames]:[];if(reset){host.dbNames.clear();host.storage={};host.dbPrefix='jems-review:'+crypto.randomUUID()+':';}host.config={experience:$('experience').value,grade:Number($('grade').value),scenario:$('scenario').value};
+function start(reset=false){ready=false;const oldDBs=reset?[...host.dbNames]:[];if(reset){host.dbNames.clear();host.storage={};host.dbPrefix='jems-review:'+crypto.randomUUID()+':';if(drawingReview)try{localStorage.setItem(drawingRunKey,host.dbPrefix);}catch{}}host.config={experience:$('experience').value,grade:Number($('grade').value),scenario:$('scenario').value};
  const css=rewrite(PAYLOAD.css);const sprite=new TextDecoder().decode(dec(PAYLOAD.assets['jems-art/icons/jems-icons.svg'][1]));
  const html=rewrite(PAYLOAD.html).replace('<head>',()=>'<head>'+csp+script(PAYLOAD.bootstrap)+'<style>'+css+'</style>').replace('<body>',()=>'<body><div hidden>'+sprite+'</div>').replace('</body>',()=>script(PAYLOAD.js)+'</body>');
  frame.srcdoc=html;if(reset)setTimeout(()=>{for(const name of oldDBs)indexedDB.deleteDatabase(name);},400);size();status('Opening '+host.config.scenario+' fixture…');

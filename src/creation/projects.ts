@@ -1,13 +1,14 @@
 /** Trusted assets and explicit adapters into the editable scene model.
  * A scene is a new creation pinned to its source. This does not translate game JavaScript.
  */
+import { WORLD_PROPS } from './illustrated-art';
 import historicalArt from '../pals/historical-scene-art.json';
 import { defaults, validateConfig } from '../runtime/manifests';
 import type { Mechanics } from '../runtime/types';
 import type { Revision } from '../factory/workspace';
 import type { StudioSession } from '../studio/notebook';
 import { PAL_CATALOG, palArtworkPath, palSceneAssetId, type PalForm, type PalId } from '../pals/catalog';
-import { validateCreationProject, parsePrivateArtId, type PrivateArtReference, type CreationProject, type CreationBlock } from './model';
+import { starterWorld, SCENE_WORLDS, validateCreationProject, parsePrivateArtId, type PrivateArtReference, type CreationProject, type CreationBlock } from './model';
 export {parsePrivateArtId};
 export type {PrivateArtReference};
 
@@ -64,8 +65,16 @@ const historicalAssets: readonly CreationAsset[] = [
     url: './' + asset.url, palForm: asset.form as PalForm })),
 ];
 
+const worldProps = new Map<string, CreationAsset>(WORLD_PROPS.map(prop => [prop.id, {...prop, kind:'image'}]));
+
+/** Product-owned objects appear in their world's existing actor picker. */
+export function propsForWorld(id?: string): CreationAsset[] {
+  const world = SCENE_WORLDS.find(item => item.id === id);
+  return world?.props?.map(prop => worldProps.get(prop)!) ?? [];
+}
+
 export function creationAsset(id: string): CreationAsset | undefined {
-  return CREATION_ASSETS.find(asset=>asset.id===id) ?? historicalAssets.find(asset=>asset.id===id);
+  return CREATION_ASSETS.find(asset=>asset.id===id) ?? worldProps.get(id) ?? historicalAssets.find(asset=>asset.id===id);
 }
 
 /** Opaque local references are data, never paths or fetchable URLs. The browser
@@ -80,6 +89,7 @@ export function privateArtId(reference:PrivateArtReference):string {
  * deliberately restricted to the bundled catalogue by its own entry point. */
 export function validateEditableProject(input: unknown,options:{allowPrivateArt?:boolean}={}): CreationProject {
   const project=validateCreationProject(input);
+  if(options.allowPrivateArt===false && parsePrivateArtId(project.world?.assetId)) throw Error('Private world pictures stay in the local scene editor.');
   if(project.actors.some(actor=>!creationAsset(actor.assetId)&&!(options.allowPrivateArt!==false&&parsePrivateArtId(actor.assetId)))) {
     throw Error('This scene uses artwork that is not available in this version of jems. Your saved work was not replaced.');
   }
@@ -110,6 +120,7 @@ const uid=()=>crypto.randomUUID();
 const titleFor:Record<CreationStarter,string>={dragon:'My dragon scene',buckets:'My bucket scene',robot:'My robot scene',blank:'My new scene'};
 function starter(kind:CreationStarter,title:string,config?:Mechanics):CreationProject {
   const scene:CreationProject={schema:'jems.creation.v1',id:uid(),title:title.trim().slice(0,60)||titleFor[kind],width:800,height:450,
+    world:starterWorld(kind==='robot'?'workshop':kind==='buckets'?'islands':'terrace'),
     background:kind==='robot'?'workshop':kind==='buckets'?'sky':'meadow',actors:[],programs:[],variables:{},provenance:{createdBy:'starter'}};
   const action=(block:Omit<CreationBlock,'id'>):CreationBlock=>({id:uid(),...block,origin:'starter'} as CreationBlock);
   if(kind==='dragon'){
