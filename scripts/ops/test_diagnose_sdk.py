@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 import tempfile
 import unittest
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 import diagnose
@@ -27,6 +28,7 @@ class Session:
     def __init__(self, account=diagnose.DIAGNOSTICS_ACCOUNT, status=200):
         self.account, self.status = account, status
         self.calls, self.closed = [], False
+        self.credentials = SimpleNamespace(token='synthetic-token-in-memory')
     def request(self, method, url, **kwargs):
         self.calls.append((method, url, kwargs))
         if url == sdk.USERINFO:
@@ -72,6 +74,15 @@ class SDKTests(unittest.TestCase):
         self.assertEqual(set(p.name for p in self.folder.iterdir()), {'manifest.json', 'credentials.json'})
         self.assertNotIn(LEAK, json.dumps(report))
         self.assertTrue(all(call[2]['allow_redirects'] is False for call in session.calls))
+
+    def test_token_refresh_invalidates_permission_comparison_without_leaking(self):
+        session = Session()
+        reader = sdk.Reader({}, lambda _: session)
+        reader.identity()
+        session.credentials.token = LEAK
+        with self.assertRaisesRegex(diagnose.DiagnosticError, 'SDK_TOKEN_CHANGED') as caught:
+            reader.describe('services', 'factory-gateway')
+        self.assertNotIn(LEAK, str(caught.exception))
 
     def test_wrong_effective_identity_stops_before_cloud_run(self):
         session = Session('owner@example.invalid')

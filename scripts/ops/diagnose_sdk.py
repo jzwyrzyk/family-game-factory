@@ -7,6 +7,7 @@ The existing sanitized metadata reader is reused. Transport/auth failures emit
 fixed codes, never credential files, tokens, raw configuration or SDK exceptions.
 """
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -62,6 +63,7 @@ class Reader:
     def __init__(self, env, session_factory=managed_session):
         self.session = session_factory(env)
         self.verified = False
+        self.token_fingerprint = None
 
     def close(self):
         self.session.close()
@@ -82,6 +84,13 @@ class Reader:
                     if size > MAX_BYTES:
                         raise diagnose.DiagnosticError('SDK_RESPONSE_TOO_LARGE: Response exceeds bounded metadata size.')
                     chunks.append(chunk)
+                token = getattr(getattr(self.session, 'credentials', None), 'token', None)
+                if not isinstance(token, str) or not token:
+                    raise diagnose.DiagnosticError('SDK_TOKEN_UNVERIFIED: No authenticated SDK token is available.')
+                fingerprint = hashlib.sha256(token.encode()).digest()
+                if self.token_fingerprint is not None and fingerprint != self.token_fingerprint:
+                    raise diagnose.DiagnosticError('SDK_TOKEN_CHANGED: Retry the read-only audit with a fresh session.')
+                self.token_fingerprint = fingerprint
                 result = json.loads(b''.join(chunks))
                 if not isinstance(result, dict):
                     raise ValueError()

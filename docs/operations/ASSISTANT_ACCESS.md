@@ -16,6 +16,8 @@ source. It selects the version-1 managed connection by actual alias or unique/de
 GCP entry, loads its `credentials_file` external-account configuration in memory,
 requires impersonation of the existing diagnostic account, and verifies the effective
 account through Google's authenticated userinfo before and after metadata reads.
+An in-memory token fingerprint rejects mid-audit refresh so permission comparisons
+use the same authenticated token; retry safely with a fresh session if it changes.
 It reuses the existing Cloud Run v1 redaction/health reader over the supported Google
 Auth SDK. The legacy reader is checksum-pinned by an activation approval and remains
 byte-identical; SDK selection lives in `managed_diagnostic_identity.py`. No ambient ADC fallback, gcloud invocation, credential copy, token cache,

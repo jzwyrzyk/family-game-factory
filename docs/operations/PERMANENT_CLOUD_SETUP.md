@@ -174,7 +174,7 @@ records the available investigation loop and current authentication evidence lim
 
 ## Candidate validation
 
-Local operations suite: 262/262 passed, including 23 added SDK/preflight/bootstrap/
+Local operations suite: 263/263 passed, including 24 added SDK/preflight/bootstrap/
 policy/triage cases. Focused Node 22 authentication suite: 29/29 passed. Actual pinned
 Google Auth 2.43.0 and Requests 2.32.5 initialize a synthetic external-account session
 without network or writes. Shell syntax, whitespace and documentation checks pass.

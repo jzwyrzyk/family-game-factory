@@ -58,7 +58,7 @@ place. Exact administrator inventory, approved broker image/provenance, effectiv
 GitHub environment settings and coverage review are still required before apply and
 end-to-end acceptance. Current DEV/TEST configuration remains disabled and unset.
 
-Focused synthetic authentication tests passed 29/29 on Node 22. The final local operations suite passed 262/262, including 23 new permanent-access,
+Focused synthetic authentication tests passed 29/29 on Node 22. The final local operations suite passed 263/263, including 24 new permanent-access,
 SDK and preflight regression tests. An intermediate full run caught the frozen
 activation checksum on the legacy diagnostic file; the fix preserved its original
 bytes and moved SDK identity selection to an additive module. No release checksum
