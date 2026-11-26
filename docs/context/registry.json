@@ -1147,10 +1147,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:44:39.225Z",
-      "sourceDigest": "9fef99426fde355eaffc36ecf133d105002c23668731ad979ab9919dc9b98cd9",
+      "reviewedAt": "2026-11-26T03:46:13.007Z",
+      "sourceDigest": "a49b88f9281dbc68273d0bb875926ebfa9cef3bcd44450ed09c8be801cc53456",
       "reviewOutcome": "updated",
-      "reviewReason": "The delivery register identifies the reviewed stack, exact application source and independent hosted and family release gates.",
+      "reviewReason": "The delivery register identifies final application source for the bundled world editor and distinguishes local evidence from future deployment and household activation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
