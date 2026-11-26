@@ -150,10 +150,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:38:12.735Z",
-      "sourceDigest": "6925af7797920346bfc5542e781245e8f039124dca019a6962d867f334a2a400",
+      "reviewedAt": "2026-11-26T03:09:46.422Z",
+      "sourceDigest": "c5ff9ed2fdc9e2eee322a0d699b3d7fc1de9a2754074f929934386104d3bbfe6",
       "reviewOutcome": "updated",
-      "reviewReason": "The first-creation contract now records single admission for repeated taps without changing saved-idea ownership or readiness rules.",
+      "reviewReason": "Reconciled both simultaneous standard proposals into one permanent authentic-art reference for drawing, movement, worlds and context-owned game roles.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -1401,10 +1401,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:06:16.414Z",
-      "sourceDigest": "cc54f5e7aea9c14e1054e9e4d61f14e45f598a7aac2de4518aead1eb49566f22",
+      "reviewedAt": "2026-11-26T03:09:46.541Z",
+      "sourceDigest": "bd7a3c55e5817607328a7345dde6b20c938ff17bfd42d7d942a1f7be9130ac44",
       "reviewOutcome": "updated",
-      "reviewReason": "The documentation map and review template route creative changes through the new standard, exact-source visual evidence and workstream ownership.",
+      "reviewReason": "The maintenance guide, registry and review template now share one standard while preserving both concurrent PR documentation paths.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1629,10 +1629,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "004ed9e7f1c0c0683f6d693ec1eb4872c1af2f54db5ef7c35d6562090789cc02",
-      "reviewedAt": "2026-11-26T03:06:16.593Z",
+      "sourceDigest": "a04e0449fc863d945b55d4a7d2b401d189d5c401e7d629e62d3a0cd79b2c5015",
+      "reviewedAt": "2026-11-26T03:09:46.666Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The standard specifies recoverable originals, immutable movement and derivative selections, deterministic preparation and bounded two-dimensional reuse.",
+      "reviewReason": "The drawing standard follows the shared canonical world reference and protects exact original and revision identities on archive and recovery.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",

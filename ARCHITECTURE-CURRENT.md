@@ -1,6 +1,4 @@
 # Jems current architecture
-The private art library stores pictures and rig versions. Native revision bindings and Creative Studio references select their own versions. Changes to these authorities follow the [Creative Asset & World Design Standard](docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md), including exact-original preservation, owner isolation and the generated-preview boundary.
-
 
 The November 26 application integration combines family beta and F06 storage from #186 with the child experience from #188 and #190. The [environment contract](docs/development/DEV-TEST-PROD.md) governs DEV, TEST and household promotion. Production still serves the earlier household release. The [delivery register](DELIVERY-STATE.md) distinguishes source validation, hosted acceptance and activation for this release.
 

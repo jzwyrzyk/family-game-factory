@@ -6,8 +6,6 @@
 
 <!-- Summarize the approach, important tradeoff and affected components. Identify overlapping/stacked PRs, base/source SHA, compatibility or saved-data implications. Preserve newer merged behavior when reconciling old branches. -->
 
-<!-- Creative asset/world changes: identify the owning store, migration decision, pinned revisions, children’s actual rendered artwork and dependencies across workstreams. Use only synthetic evidence in the PR. -->
-
 ## Evidence
 
 <!-- For creative asset and world changes, list affected workstreams and shared-module owners. Bind each applicable assertion to an exact source, synthetic screenshot or playback capture, integrity/restore test and negative owner or generated-game boundary test. Identify prior-reader rollback compatibility and unresolved independent release gates. -->
