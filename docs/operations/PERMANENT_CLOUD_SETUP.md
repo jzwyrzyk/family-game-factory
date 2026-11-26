@@ -24,12 +24,12 @@ The verifier now names each failed predicate and can run a bounded `--diagnose`
 against an existing build. Use `--build-source-sha 446a245e624f44c36e1e3847ae7779477272d899`
 with a newer verifier to retain the actual image's original source, labels and archive.
 The new launcher fetches sparse, blob-filtered operations source to reduce temporary
-disk usage. Current task access has no Google identity or Cloud Build reader; one
-administrator probe is required to identify the actual failed provider predicate.
+disk usage. Current task access has no Google identity or Cloud Build reader; the owner ran
+the consolidated administrator probe to identify the failed provider predicate.
 The administrator probe identified only `BUILD_ARTIFACTS_UNEXPECTED`: an exact
 provider mirror of the approved images list. The verifier now accepts only that
-mirror and still rejects every additional artifact field or destination. Registry
-verification remains pending. [Recovery and guarded cleanup](OPERATIONS_RECOVERY.md)
+mirror and still rejects every additional artifact field or destination. The administrator subsequently completed build/registry
+verification as `BUILD_VERIFIED_NOT_DEPLOYED`; the exact digest is in the recovery handoff. [Recovery and guarded cleanup](OPERATIONS_RECOVERY.md)
 preserves the original build and unapplied Terraform plan; no rebuild is required.
 
 ## One verified launcher
@@ -79,18 +79,16 @@ executable steps/options, source archive SHA256 from provider provenance, resolv
 source generation and registry digest. This is source-bound provider evidence, not
 an independently signed SLSA attestation. The Docker builder follows the existing
 lane's image; record its provider-reported builder digest in the private build
-record. No actual broker build has been accepted yet.
+record. The administrator has now qualified the existing broker build and immutable
+registry digest; reuse the exact identities in [recovery](OPERATIONS_RECOVERY.md).
 
-After approving the printed build plan:
-
-```sh
-bash /tmp/jems-operations.sh "$OPS_SHA" broker-build --submit --approve-plan-sha256 "$BUILD_PLAN_HASH"
-# Use the returned existing build ID; do not repeat --submit after timeout.
-bash /tmp/jems-operations.sh "$OPS_SHA" broker-build --build-id "$BUILD_ID"
-bash /tmp/jems-operations.sh "$OPS_SHA" broker-setup --image "$BROKER_IMAGE" --build-id "$BUILD_ID" --check
-# Only after reviewing that exact additive infrastructure plan:
-bash /tmp/jems-operations.sh "$OPS_SHA" broker-setup --image "$BROKER_IMAGE" --build-id "$BUILD_ID" --apply --approve-plan-sha256 "$BROKER_PLAN_HASH"
-```
+For the current activation, **do not submit another build**. Use existing build
+`7fcac19a-8444-4c17-955a-1a381006069e`, original source
+`446a245e624f44c36e1e3847ae7779477272d899` and the verified image from the
+[read-only broker inventory command](OPERATIONS_RECOVERY.md#next-broker-inventory-read-only).
+Only after reviewing that actual inventory plan, run the same command with `--apply
+--approve-plan-sha256 BROKER_PLAN_HASH` instead of `--check`. Keep its original
+`--build-source-sha` and the qualified tooling source fixed.
 
 `BROKER_IMAGE` is the verified `factory-services/request-broker@sha256:...` result.
 Check/apply independently reverify Cloud Build provenance. They never accept a tag,
@@ -209,6 +207,6 @@ do not install NAT/VMs or share the production default database under the static
 The attached GitHub connection reads workflow/environment metadata and accepted an
 explicit read-only `observe=true` dispatch on frozen main. Its source excludes the
 plan/transition jobs in that mode. See [delivery ledger](../../DELIVERY-STATE.md) for
-run outcome. Request-broker live evidence, administrator cloud inventory, project
-availability/billing, actual broker image build, nonproduction apply and IAP acceptance
-remain separately unverified. No denied managed identity endpoint was retried.
+run outcome. The administrator verified nonproduction project/billing and the existing
+broker build/registry digest. Broker infrastructure inventory/apply, request-evidence
+coverage, nonproduction apply and IAP acceptance remain incomplete. No denied managed identity endpoint was retried.

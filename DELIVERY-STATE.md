@@ -19,7 +19,10 @@ billing verified, and the original 28-resource Terraform plan intact/unapplied.
 Existing successful broker build `7fcac19a-8444-4c17-955a-1a381006069e` failed only the
 old blanket rejection of `artifacts`; the administrator probe confirmed an exact
 `artifacts.images` mirror. The correction accepts only that mirror and retains all
-other checks. Registry qualification still needs administrator read access. No build
+other checks. The administrator subsequently returned `BUILD_VERIFIED_NOT_DEPLOYED`,
+including registry verification of image digest `4373d65a…19659c3e`; the exact source,
+build and full digest are in the linked ledger. All eight candidate workflows passed
+on attempt 1 (30 checks succeeded, one intentional skip) at `7867b4e…`. No build
 was resubmitted. Guarded cleanup, quarantine restoration and durable handoff journals
 are implemented; no historical files or Terraform state were deleted. No resource
 apply, deployment or paid request occurred in this follow-up.

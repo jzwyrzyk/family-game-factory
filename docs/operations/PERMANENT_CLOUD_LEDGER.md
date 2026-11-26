@@ -1,5 +1,38 @@
 # Permanent cloud operations delivery ledger
 
+## November 26, 2026 — existing broker image qualified by administrator
+
+The owner supplied the corrected verifier's **BUILD_VERIFIED_NOT_DEPLOYED** result
+from Cloud Shell, executed from tools source
+`7867b4e44e78adaec2e0d1152b51e3e789664a13`. It qualified existing build
+`7fcac19a-8444-4c17-955a-1a381006069e`, original build source
+`446a245e624f44c36e1e3847ae7779477272d899`, archive SHA256
+`3b61c3cc67b59f96019796fdd3979870c3f576926f7010cdcc4920bf56cdedb1`, and builder
+`factory-service-builder@family-game-factory-jzw.iam.gserviceaccount.com`.
+
+Verified immutable registry image:
+
+`us-east5-docker.pkg.dev/family-game-factory-jzw/factory-services/request-broker@sha256:4373d65ae39fdf0ea10f2f3a4afe5ce57ab9962d97779a56cdde67a919659c3e`
+
+This closes the observed artifact-mirror verification blocker and includes the
+separate registry digest check. The source-bound result is administrator-supplied
+provider evidence, not a direct managed Codex identity qualification or a deployment
+receipt. The private lightweight recovery journal remains in Cloud Shell; its
+contents/path are not copied into this public ledger. No rebuild was performed.
+Next is read-only broker administrator inventory using this exact image, build ID,
+and original source, then approval of the resulting exact infrastructure plan.
+Broker deployment, effective IAM/coverage and GitHub request-evidence acceptance
+remain incomplete. The preserved 28-resource nonproduction Terraform plan and
+cleanup dry-run/deletion approval are separate; this receipt does not apply either.
+
+Hosted validation independently read back for source `7867b4e…`: all eight workflow
+runs completed successfully on attempt 1, with **30 successful checks and one
+intentional skip**, no failures or pending checks. [Operations contracts](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45840304669),
+[environment contracts](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45840304477),
+[Arcade journeys](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45840304744),
+[visual review](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45840304393).
+These source checks are distinct from cloud activation and owner visual acceptance.
+
 ## Recovery verification and integration checkpoint
 
 The recovery candidate was reconciled with engineering main
@@ -13,12 +46,13 @@ The original independently computed archive hash matches the administrator's
 `3b61c3cc67b59f96019796fdd3979870c3f576926f7010cdcc4920bf56cdedb1` exactly.
 The source regression checks cover the observed exact artifact-image mirror and
 reject altered images, additional artifact types/fields, executable changes and
-source mismatches. Registry qualification remains a separate administrator read.
+source mismatches. Registry qualification was subsequently completed by the administrator; see the dated result above.
 
 Local checks passed: **301 operations tests**, **113 environment tests**, **122 CI
 contract tests**, **18 documentation tests**, and documentation/reference checks.
-The broad `check:changed` application regression was started separately; its outcome
-must not be conflated with these completed targeted checks. Historical cleanup has
+The broad local `check:changed` run stopped at a missing Playwright executable;
+the failed desktop/phone browser check then passed with the supported system
+Chromium setting. Hosted candidate workflows subsequently passed as recorded above. Historical cleanup has
 been exercised only on synthetic repositories, including changed/staged files,
 failed remote proof, Git locks, links, interrupted quarantine recovery and
 no-overwrite restoration. No real Cloud Shell directory was deleted.

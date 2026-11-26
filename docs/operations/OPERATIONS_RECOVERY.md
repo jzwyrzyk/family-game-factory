@@ -19,9 +19,14 @@ for effective builder selection, source, executable steps/options, secrets,
 substitutions, resolved source generation, source archive hash and result digest
 remain. The observed archive SHA256 was
 `3b61c3cc67b59f96019796fdd3979870c3f576926f7010cdcc4920bf56cdedb1`.
-Every other build predicate passed in the administrator probe. Registry lookup was
-**not** part of that probe, so image qualification is still pending its separate
-registry digest check. No build has been resubmitted.
+Every other build predicate passed in the initial administrator probe. The owner
+then executed the corrected verifier from `7867b4e44e78adaec2e0d1152b51e3e789664a13`
+and received **BUILD_VERIFIED_NOT_DEPLOYED**, including registry digest verification:
+
+`us-east5-docker.pkg.dev/family-game-factory-jzw/factory-services/request-broker@sha256:4373d65ae39fdf0ea10f2f3a4afe5ce57ab9962d97779a56cdde67a919659c3e`
+
+No build was resubmitted. [The dated ledger](PERMANENT_CLOUD_LEDGER.md) records the
+original source/build/archive/builder identities and the limits of this evidence.
 
 Use the final recovery commit as `RECOVERY_SHA`, fetch its launcher and check the
 checksum supplied in the reviewed handoff. Then:
@@ -39,6 +44,30 @@ Subsequent broker `--check`/approved `--apply` must include the same `--build-id
 `--build-source-sha` plus its verified image. The bootstrap independently checks all
 four original broker files byte-for-byte against current source before accepting an
 older build. Changing an image's source label to a newer tool SHA is forbidden.
+
+## Next broker inventory (read-only)
+
+Keep the executable tooling pinned to the qualified recovery commit for this plan:
+
+```sh
+(
+  set -euo pipefail
+  r=7867b4e44e78adaec2e0d1152b51e3e789664a13
+  p=$(mktemp /tmp/jems-broker-plan.XXXXXXXX)
+  trap 'rm -f -- "$p"' EXIT
+  curl -fsSL "https://raw.githubusercontent.com/jzwyrzyk/family-game-factory/$r/scripts/ops/handoffs/operations-bootstrap.sh" -o "$p"
+  printf '%s  %s\n' fdfefd869abeb1876102e9086ceba26998725ef0cc9a856a43adc7900fb6ddb4 "$p" | sha256sum -c -
+  bash "$p" "$r" broker-setup \
+    --image us-east5-docker.pkg.dev/family-game-factory-jzw/factory-services/request-broker@sha256:4373d65ae39fdf0ea10f2f3a4afe5ce57ab9962d97779a56cdde67a919659c3e \
+    --build-id 7fcac19a-8444-4c17-955a-1a381006069e \
+    --build-source-sha 446a245e624f44c36e1e3847ae7779477272d899 --check
+)
+```
+
+This repeats build/source/registry verification and reads actual administrator
+inventory. It emits the exact proposed infrastructure changes and
+`approve_plan_sha256`, without applying them. Do not substitute the existing
+**nonproduction Terraform** approval hash for this separate **broker** plan.
 
 ## Guarded historical-checkout cleanup
 

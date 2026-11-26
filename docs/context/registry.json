@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T14:33:52.736Z",
-      "sourceDigest": "ad56c8d1c8e9d5c6cfd0051677eed657fb881b2b920bbed3240a7f34cd4ed26e",
+      "reviewedAt": "2026-11-26T15:13:24.763Z",
+      "sourceDigest": "1373f5afe874472d92fd74fa776930e2ef1dc8da9ff13fa71ae59b2a60f0aa1a",
       "reviewOutcome": "updated",
-      "reviewReason": "Final recovery review preserves original Terraform bytes/source and records matching source archive, 301 operations regressions and independent deployment/cleanup approval boundaries; repeated identical dry-runs reuse only an exact existing private plan.",
+      "reviewReason": "Recorded the administrator-qualified existing broker image and exact source/build/archive identities, eight successful hosted candidate workflows, and read-only inventory handoff; deployment, Terraform apply and cleanup remain unexecuted.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
