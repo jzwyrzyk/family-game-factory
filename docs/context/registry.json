@@ -906,10 +906,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:30:14.386Z",
-      "sourceDigest": "e77e2724a9c6235938b20a65c6d29e896839f30f756f0671fb57e6e003bf572b",
+      "reviewedAt": "2026-11-26T06:42:17.220Z",
+      "sourceDigest": "3aa4aa618995dcd30ed349e8dbad5b16da9ba415a41f6f00771077b568c96e11",
       "reviewOutcome": "updated",
-      "reviewReason": "Retained each of the frozen Arcade leaf invocations separately and added the workspace cases to their original domains. The hosted owner download uses exact source assets.",
+      "reviewReason": "Verified direct-file navigation and each original deep assertion, separate streamed zoom gallery, and 347 exact source hashes with both decoding implementations.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

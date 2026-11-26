@@ -22,7 +22,13 @@
 /*__PAYLOAD__*/
 const $=id=>document.getElementById(id),manifest=PAYLOAD.manifest,frame=$('appFrame');
 const nativeURL=URL,cache=new Map(),assetKeys=Object.keys(PAYLOAD.assets).sort((a,b)=>b.length-a.length);
-const dec=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+function dec(encoded) {
+  if (typeof Uint8Array.fromBase64 === 'function') return Uint8Array.fromBase64(encoded);
+  const binary = atob(encoded);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
 function asset(key){if(!cache.has(key)){const [mime,b64]=PAYLOAD.assets[key];cache.set(key,URL.createObjectURL(new Blob([dec(b64)],{type:mime})));}return cache.get(key);}
 const resolve=value=>{for(const key of assetKeys)if(String(value).replace(/^\.\//,'').replace(/^\//,'')===key)return asset(key);return value;};
 const rewrite=text=>text.replace(/((?:src|href)\s*=\s*["'])([^"']+)(["'])/gi,(m,a,v,b)=>a+resolve(v)+b).replace(/url\(\s*(["']?)([^)"']+)\1\s*\)/g,(m,q,v)=>`url("${resolve(v)}")`);

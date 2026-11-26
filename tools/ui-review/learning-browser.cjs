@@ -6,7 +6,7 @@ const {chromium} = require('playwright');
 
 const file = path.resolve(process.env.UI_REVIEW_FILE || 'dist-review/jems-ui-review.html');
 const out = path.resolve(process.env.UI_REVIEW_EVIDENCE || 'test-results/learning-workspace');
-const reviewUrl='http://localhost:43199/';
+const {standaloneInput}=require('./standalone-input.cjs');
 const baseline = process.env.UI_REVIEW_BEFORE === '1';
 const captures = [
   ['phone',390,844,'build-a-word'],
@@ -18,14 +18,13 @@ const captures = [
   ['wide',1600,1000,'g4-add-fraction'],
 ];
 
-async function zoomAndFullscreen() {
+async function zoomAndFullscreen(reviewUrl) {
   const context=await chromium.launchPersistentContext('',{
     channel:'chromium',headless:true,executablePath:process.env.CHROMIUM_PATH,viewport:null,
     args:['--no-sandbox','--window-size=1366,768'],
   });
   try {
     const page=await context.newPage();
-    await page.route(reviewUrl,route=>route.fulfill({contentType:'text/html',path:file}));
     await page.goto(reviewUrl,{waitUntil:'domcontentloaded',timeout:120000});
     await page.waitForFunction(()=>document.querySelector('#loading').hidden,undefined,{timeout:120000});
     await page.selectOption('#destination','learn:build-a-word');
@@ -57,12 +56,13 @@ async function main() {
     headless:true,executablePath:process.env.CHROMIUM_PATH,
     args:['--no-sandbox'],
   });
+  const input=await standaloneInput(file,{loopback:true});
+  const reviewUrl=input.url;
   const page=await browser.newPage({viewport:{width:1366,height:768},reducedMotion:'reduce',hasTouch:true});
   const failures=[],network=[],checks=[],mounts=[];
   page.on('pageerror',e=>failures.push(e.message));
   page.on('request',r=>{if(/^https?:/.test(r.url())&&r.url()!==reviewUrl)network.push(r.url());});
   try {
-    await page.route(reviewUrl,route=>route.fulfill({contentType:'text/html',path:file}));
     await page.goto(reviewUrl,{waitUntil:'domcontentloaded',timeout:120000});
     await page.waitForFunction(()=>document.querySelector('#loading').hidden,undefined,{timeout:120000});
     await page.selectOption('#scenario','populated');
@@ -177,10 +177,10 @@ async function main() {
     }
     assert.deepEqual(failures,[],'No uncaught application errors');
     assert.deepEqual(network,[],'Standalone artifact performs no network requests');
-    const zoom=baseline?null:await zoomAndFullscreen();
+    const zoom=baseline?null:await zoomAndFullscreen(reviewUrl);
     const sha=await page.evaluate(()=>window.__reviewReport().commit);
     fs.writeFileSync(path.join(out,'browser.json'),JSON.stringify({source:sha,browser:browser.version(),samples:baseline?captures.length:samples.length,checks,zoom,mounts,network,failures},null,2)+'\n');
     console.log('PASS',checks.length,'viewport captures and pointer inputs.',baseline?'Baseline comparison.':samples.length+' review samples and local save recovery.');
-  } finally {await browser.close();}
+  } finally {await browser.close();await input.close();}
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

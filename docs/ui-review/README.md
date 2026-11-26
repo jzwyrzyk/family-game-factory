@@ -64,3 +64,5 @@ The modernization candidate includes the consolidated My Journey sections, Make/
 Choose **My Journey** in the destination selector to inspect the three dashboard cards. Check **Empty** for starter selection and **Unlocked** for an equipped companion and earned gems. Follow each card into the corresponding live section, then return through My Journey.
 
 The Journey, Pals, rewards and Powers destinations render the shared production header and cards. Use the empty scenario to review the two starter choices. Compare the same application viewport on each page and use Shift+Tab from the announced heading to check the back action’s visible keyboard focus.
+
+The learning review CI download embeds exact artwork bytes. Its application journeys open the single downloaded file directly in the hosted browser. The gallery uses a loopback server that streams only that same file so a fresh browser context can exercise native zoom and fullscreen. The managed-browser option uses the same single-file server. The shell decodes original assets with native base64 decoding where available, with a byte-for-byte typed-array fallback.
