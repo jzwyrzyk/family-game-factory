@@ -149,3 +149,29 @@ test('a private world uses the same pinned source without adding an actor or gra
   store.save(entry.id,'player1',scene,initial.revision.id);
   assert.equal(store.history(entry.id,'player1').find(r=>r.id===initial.revision.id)?.scene.world?.assetId,image);
 });
+
+test('a PR201 named drawing path survives Keep and plays its saved relative moves with its exact art pin',()=>{
+  const scene=sceneWith(rig), actor=scene.actors[0];
+  actor.x=100;actor.y=100;
+  const path = {type:'repeat' as const,id:'child-path',origin:'child' as const,count:1,pathName:'Moon walk',actions:[
+    {type:'move' as const,id:'a',origin:'child' as const,dx:20,dy:30,durationMs:180},
+    {type:'move' as const,id:'b',origin:'child' as const,dx:-25,dy:-16,durationMs:150},
+  ]};
+  scene.programs[0].actions=[path];
+  const storage=new MemoryStorage(), store=new CreationStore(storage);
+  const entry=store.create('player1',scene);store.keep(entry.id,'player1',entry.headId);
+  const restored=new CreationStore(storage).load(entry.id,'player1').scene;
+  assert.deepEqual(restored.programs[0].actions,[path]);
+  const engine=new SceneEngine(restored);engine.start();engine.advance(330);
+  const end=engine.snapshot().actors[0];
+  assert.deepEqual([end.x,end.y,end.assetId],[95,114,rig]);
+  assert.throws(()=>validateGeneratedCreationManifest(restored),/artwork/);
+  for(const name of ['', ' ', 'x'.repeat(41), '\u0000', 42]){
+    const bad=structuredClone(scene);
+    Object.assign(bad.programs[0].actions[0],{pathName:name});
+    assert.throws(()=>validateEditableProject(bad),/path name/);
+  }
+  const wronglyNamed=sceneWith(rig);
+  Object.assign(wronglyNamed.programs[0].actions[0],{pathName:'On a Move'});
+  assert.throws(()=>validateEditableProject(wronglyNamed),/Unknown field/);
+});

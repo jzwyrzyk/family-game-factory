@@ -47,7 +47,9 @@ The selected-original reader verifies the stored bytes against their SHA-256 bef
 
 ### Scene-local paths under review
 
-The separate Creative Studio composer in PR #201 at `e1b67c17fa3c2ff103b221173cf476ac82d09206` writes a named Repeat group with up to 24 relative Move blocks and per-step durations. Its kept-scene chooser copies that group into an actor’s selected script. The scene engine in this branch executes those relative moves and repeats. Its validator rejects the additional `pathName` property. The PR #201 validators also predate the private rig’s `motion` field and the scene’s `world` field. A combined release needs a reviewed schema change and round-trip coverage for named groups, immutable art references and worlds. Stripping a path name would lose the child’s saved name and the source composer’s reuse eligibility. [PR #201](https://github.com/jzwyrzyk/family-game-factory/pull/201)
+This branch reads a Repeat with the optional 1–40 character `pathName` from PR #201 at `e1b67c17fa3c2ff103b221173cf476ac82d09206`. Keeping, reopening and playing the scene preserves the name, count, relative Move steps, timings and private artwork pin. The scene-local composer, named group authoring and **Paths from my kept scenes** chooser belong to that separate PR. My Art continues to store its normalized paths in immutable drawing revisions.
+
+Qualify and roll out readers for named groups, movement-bearing rigs and illustrated worlds before enabling either pipeline to write those records to shared storage. The older readers can reject the additional fields. Integrating the two authoring interfaces requires a review of their saved-data contracts and cross-version scene and art bundle recovery. [PR #201](https://github.com/jzwyrzyk/family-game-factory/pull/201)
 
 ## Fidelity ladder: when a drawing is hard
 
