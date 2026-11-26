@@ -900,10 +900,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:11:07.874Z",
-      "sourceDigest": "8007006fa159f5018406ea3ec0a6ee7fa116da9473a79d95c2035e769e8378ca",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The documented native storage and recovery suite now checks the stable game entry scroll and visible Keep control in its existing 30-game journey.",
+      "reviewedAt": "2026-11-26T05:51:26.044Z",
+      "sourceDigest": "ec0e1f2736bce49f351e1831bcc4e98aa1303b603c0903e8c2b2811d31e552fa",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed first-painted retained game return with a held physical press across frames, two Chromium versions, original Keep/Fork and 126-version reload assertions and a pre-fix negative control.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
