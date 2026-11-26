@@ -1,11 +1,20 @@
 // Browser entry for the offline synthetic review page. Never import in Jems.
-import {saveDrawing} from '../../src/assets/private-drawings';
+import {drawingHash, drawingPage, saveDrawing} from '../../src/assets/private-drawings';
 import {artChoice} from '../../src/creation/private-art';
 import {openDrawingPlaytest} from './playtest';
 import type {ReviewCapsule} from './capsule';
 
 export async function startReview(capsule: ReviewCapsule) {
-  const owner = 'offline-fixture-' + crypto.randomUUID();
+  // A copied review file may share an origin with another local tool. Route
+  // every IndexedDB operation into this tool's synthetic-only namespace.
+  const prefix = 'jems-offline-game-art-review-v1:';
+  const open = indexedDB.open.bind(indexedDB), remove = indexedDB.deleteDatabase.bind(indexedDB);
+  const inventory = indexedDB.databases?.bind(indexedDB);
+  indexedDB.open = (name, version) => open(prefix + name, version);
+  indexedDB.deleteDatabase = name => remove(prefix + name);
+  if (inventory) indexedDB.databases = async () => (await inventory())
+    .filter(db => db.name?.startsWith(prefix)).map(db => ({...db, name: db.name!.slice(prefix.length)}));
+  const owner = 'offline-fixture-rock';
   const canvas = document.createElement('canvas');
   canvas.width = 160;
   canvas.height = 120;
@@ -31,7 +40,9 @@ export async function startReview(capsule: ReviewCapsule) {
   pen.quadraticCurveTo(82, 87, 100, 70);
   pen.stroke();
   const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(Error('Missing fixture.'))));
-  const drawing = await saveDrawing(owner, 'Synthetic rock fixture', blob);
+  const expected = await drawingHash(await blob.arrayBuffer());
+  const shelf = await drawingPage(owner, {limit: 100});
+  const drawing = shelf.items.find(item => item.sha256 === expected) ?? await saveDrawing(owner, 'Synthetic rock fixture', blob);
   const choice = await artChoice(owner, {drawingId: drawing.id});
   const binding = {revision: capsule.revision, assetPin: choice.assetId, slotId: capsule.slot.assetId};
   let view: AbortController | undefined;
