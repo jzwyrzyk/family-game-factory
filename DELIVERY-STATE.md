@@ -1,5 +1,10 @@
 # jems delivery state
 
+## November 26, 2026 — illustrated world runtime on the converged creative branch
+
+The world renderer extends the reconciled candidate at `4be7c6dd70b588cfbd288cc8d7a68fe94d9ae37c`. The four approved catalogue IDs enter new editable scenes through illustrated tiles. Layer visibility, props and private drawing backdrops remain pinned in kept editions, copies, thumbnails and supported exports. The candidate preserves the earlier branch’s editable crayon and drawn-path workflows. Local Chromium checks cover the four actual canvases, retained legacy art, pointer placement, a saved world opened offline and the pre-existing motion editor. Production deployment and family activation are outside this local qualification. [World runtime evidence](docs/creation-studio/evidence/worlds/README.md) · [Convergence base PR](https://github.com/jzwyrzyk/family-game-factory/pull/207)
+
+
 ## November 26, 2026 — connected creative universe development
 
 The standard and exact-byte reviewed-family PNG admission are source candidates based on protected main `bc602f1ede502f398308ad56f973c4bf7997ff08`. GitHub recorded a successful household production deployment for that base at 01:37 UTC on November 26. This baseline receipt precedes the creative work. No candidate deployment or external family activation has been observed. The open learning stack #192–195 is a parallel integration. Its scratchpad and supported interaction contracts remain separate from permanent artwork. [Creative standard](docs/creative-universe/STANDARD.md) · [Baseline deployment](https://api.github.com/repos/jzwyrzyk/family-game-factory/deployments/8074075203/statuses)

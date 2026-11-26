@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import {
   CREATION_SCHEMA, validateCreationProject, type CreationBlock, type CreationProject,
 } from '../src/creation/model';
+import {ILLUSTRATED_WORLDS, WORLD_PROPS} from '../src/creation/illustrated-art';
+import {createIllustratedStarter, validateEditableProject, validateGeneratedCreationManifest} from '../src/creation/projects';
+import {placeBackdrop, setWorldLayer} from '../src/creation/world-tools';
 import {SceneEngine, runScene} from '../src/creation/engine';
 
 function project(actions: CreationBlock[] = []): CreationProject {
@@ -221,4 +224,50 @@ test('runScene applies scheduled taps reproducibly and rejects impossible observ
   assert.throws(() => runScene(p, {inputs: [{timeMs: 50, type: 'tap', actorId: 'missing'}]}), /observation input/);
   assert.throws(() => runScene(p, {durationMs: 99999999}), /observation window/);
   assert.throws(() => new SceneEngine(p).advance(-1), /playback duration/);
+});
+
+
+test('four versioned worlds share props and preserve actor movement, IDs and classic saves', () => {
+  const labels = ['Enchanted Gem Forest','Inventor’s Workshop','Cloud Kingdom','Moon Adventure'];
+  assert.deepEqual(ILLUSTRATED_WORLDS.map(world => world.label), labels);
+  assert.equal(new Set(WORLD_PROPS.map(prop => prop.id)).size, WORLD_PROPS.length);
+  const classic = project([move('step',35)]);
+  assert.deepEqual(validateEditableProject(classic), classic);
+  for (const world of ILLUSTRATED_WORLDS) {
+    const starter = createIllustratedStarter('blank', world.id);
+    assert.equal(starter.background, world.id);
+    assert.ok(world.props.includes(starter.actors[0].assetId));
+    for (const id of world.props) assert.ok(WORLD_PROPS.some(prop => prop.id === id));
+    const illustrated: CreationProject = {...classic, background: world.id};
+    setWorldLayer(illustrated, 'foreground', false);
+    const run = (scene:CreationProject) => {
+      const engine = new SceneEngine(validateEditableProject(scene));
+      engine.start(); return engine.advance(400);
+    };
+    assert.deepEqual(run(illustrated).actors, run(classic).actors);
+    assert.equal(classic.background, 'meadow');
+  }
+});
+
+test('private backdrops retain exact actor references and layer validation rejects injected resources', () => {
+  const original = project(), scene = structuredClone(original);
+  const first = {assetId: 'art:image:drawA:' + 'a'.repeat(64), label: 'My mountains'};
+  const second = {assetId: 'art:image:drawB:' + 'b'.repeat(64), label: 'My forest'};
+  const backdrop = placeBackdrop(scene, first);
+  assert.equal(backdrop.assetId, first.assetId);
+  assert.equal(backdrop.size, 100);
+  const kept = validateEditableProject(scene);
+  const changed = placeBackdrop(scene, second);
+  assert.equal(changed.id, backdrop.id);
+  assert.equal(scene.actors.length, original.actors.length + 1);
+  assert.equal(kept.actors[1].assetId, first.assetId);
+  assert.deepEqual(scene.programs, original.programs);
+  assert.throws(() => validateGeneratedCreationManifest(scene));
+  for (const invalid of [
+    {...scene, background:'https://example.invalid/world'},
+    {...scene, worldLayers:{foreground:true,middle:false,url:'file:///secret'}},
+    {...scene, actors:[...scene.actors, {...changed,id:'duplicate'}]},
+    {...scene, actors:[{...changed, assetId:'dragon'}]},
+    {...scene, actors:[{...changed, layer:'execute'}]}
+  ]) assert.throws(() => validateEditableProject(invalid));
 });
