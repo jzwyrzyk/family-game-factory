@@ -115,7 +115,7 @@ test('a derivative traces to its original across exact owner and parent hashes',
   const root = {id:'root', owner:'maker', sha256:'a'.repeat(64)};
   const parent = {...root,id:'parent',sha256:'b'.repeat(64),sourceId:root.id,sourceSha256:root.sha256};
   const child = {...parent,id:'child',sourceId:parent.id,sourceSha256:parent.sha256};
-  const images = new Map([root,parent,child].map(image => [image.id,image]));
+  const images = new Map<string, Pick<import('../src/assets/private-drawings').Drawing, 'id'|'owner'|'sha256'|'sourceId'|'sourceSha256'>>([root,parent,child].map(image => [image.id,image]));
   assert.equal(originalFor(child,images).id,root.id);
   assert.throws(() => originalFor({...child,owner:'another'},images));
   assert.throws(() => originalFor({...child,sourceSha256:root.sha256},images));
