@@ -711,7 +711,7 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:41:08.401Z",
+      "reviewedAt": "2026-11-26T23:45:10.561Z",
       "sourceDigest": "793230bdbffd37f58c95745b89a9171471d017e76dc9f1f32ce4bd7ef28204bd",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed dedicated TEST Cloud Run identities, Secret Manager versions, database selection, isolation, verified build provenance and worker transport.",
@@ -770,7 +770,7 @@
         "tools/game-art-review/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:41:08.495Z",
+      "reviewedAt": "2026-11-26T23:45:10.653Z",
       "sourceDigest": "bb7f23f50ceb5ead3f44523c8e0266a313917955fb63daeb432b3d7261a2a33b",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed TEST fixture and separately funded workflow admission, private worker callbacks, signed sandbox selection and preserved cumulative reservations.",
@@ -802,7 +802,7 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:41:08.626Z",
+      "reviewedAt": "2026-11-26T23:45:10.786Z",
       "sourceDigest": "dcaad40e69756a9963d89c8736d769bf76c77b1102885851b2bdf5fd0aa9ffc9",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed the TEST-only synthetic Coach scenario, private identity-token boundary, expiring funded model access and the default unpaid route.",
@@ -867,7 +867,7 @@
       ],
       "reviewAfterDays": 14,
       "sourceDigest": "42bb41aa28afe027b83dc046d34b7c7c8879ccdfbd050033fca60d23d33314af",
-      "reviewedAt": "2026-11-26T23:41:08.693Z",
+      "reviewedAt": "2026-11-26T23:45:10.872Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed private IAP subject binding, synthetic device sessions, administrator separation and rejection of unauthorized household spending or recovery.",
       "reviewHistory": [
@@ -929,8 +929,8 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:41:08.796Z",
-      "sourceDigest": "09853e37d55a29063cf906552b1ef6fa7538769c4f1de06f64f0cf70a0ff2318",
+      "reviewedAt": "2026-11-26T23:45:10.966Z",
+      "sourceDigest": "ee8126004d4588f5934ea5c1541f42f68e8954f569e49f3bae3b3d2e3a303b83",
       "reviewOutcome": "updated",
       "reviewReason": "Verified retained Arcade definitions, deployed TEST proof producers, independent fixture and funded checks, and fail-closed production release evidence.",
       "reviewHistory": [
@@ -1175,8 +1175,8 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T23:41:08.988Z",
-      "sourceDigest": "57655345e45398966bdb843a2fe31ca47d19ec286787fe2b80085d61443eb08f",
+      "reviewedAt": "2026-11-26T23:45:11.135Z",
+      "sourceDigest": "b28d93c8eb14bacff30836bb6bf6fa007c1e3d64796b360f444c4d6bf2234484",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed protected DEV policy compatibility, separate infrastructure ownership, exact approval chronology, image transport, website delivery and ordered rollback.",
       "reviewHistory": [
@@ -1756,7 +1756,7 @@
       ],
       "reviewAfterDays": 30,
       "sourceDigest": "fe45a4e157b029f47352dcf88663fa34956d5de7cae67a3f19b3aac8dd0c5b37",
-      "reviewedAt": "2026-11-26T23:41:09.154Z",
+      "reviewedAt": "2026-11-26T23:45:11.268Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed named TEST database and bucket binding, verified original backup checksums, scoped synthetic restoration and persistent financial ledger integrity.",
       "reviewHistory": []
