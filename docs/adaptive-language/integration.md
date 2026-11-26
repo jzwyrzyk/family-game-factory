@@ -45,3 +45,9 @@ Each host-owned checkpoint gets a shared-budget receipt. If a child leaves a **c
 A grown-up may select **Both — child can switch**. The stored `learningSubject: math | language` remains unchanged for backward compatibility; the additional optional boolean `allowSubjectSwitch` controls whether children may change the active subject between questions. Existing saved profiles/backups without that flag remain single-subject until a grown-up opts in. A child cannot grant permission through a game-design prompt. Active activities cannot be switched away; invalid or failed saves keep the prior subject. The child-facing selector changes only future activities, not completed grades, separate Math/ELA evidence histories, shared mandatory-checkpoint pacing, game code or archived versions. Parent reports show both sets of evidence.
 
 Early picture and letter choices mount in the trusted host. Print stimuli are validated against the saved pack. Hearing the instruction is an access accommodation. Declared grown-up reading is recorded as support. No microphone participates in an answer.
+
+### Workspace response and listening
+
+The English controller uses the same profile-grade layout as Math. A child can build, remove and reorder individual letter, word and story tiles before submitting, including repeated pieces. Authored passage-evidence items let the child choose a line directly and check it while the passage stays visible. Word gaps, punctuation, sound counting, editing and ungraded creative responses retain their appropriate answer formats.
+
+The header's directions describe the action. The separate supported reader delivers assessed material and records assistance when speech starts. Early listening uses the established device or grown-up path. Tapping an answer, revising a tile, moving focus and requesting playback that fails to start do not create listening credit. The local v3 curriculum is versioned alongside the older banks.

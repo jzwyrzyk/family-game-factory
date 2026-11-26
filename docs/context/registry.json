@@ -310,10 +310,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T02:24:59.146Z",
-      "sourceDigest": "30091ef9102ebb53feba6eda4be3ea2064e1d5eb16cb578a5a0a42631bff0efe",
+      "reviewedAt": "2026-11-26T02:26:04.897Z",
+      "sourceDigest": "47252f4893832a8830dfedcd10360acefc30e9cdb3ebd7c5ae12c8d92ccf833d",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The native checkpoint keeps its documented viewport overlay in the original Arcade and fitted-stage overlay in Studio for both the existing Language activity and the shared workspace. Only the selector for the transitional renderer changes; exit, assessment, profile and game lifecycle contracts are unchanged.",
+      "reviewReason": "The production Language renderer now mounts the shared shell in both trusted hosts, including the restricted family-beta route. Its native and fitted-stage overlays use the common selector, so the temporary pre-migration selector is retired with the same viewport and exit contract.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -645,10 +645,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:52:09.804Z",
-      "sourceDigest": "1f17499ea7d2259dcdaf7f57f535ee9a0b7a65bc37d772a2a0f6c4dd004b09cb",
+      "reviewedAt": "2026-11-26T01:53:23.533Z",
+      "sourceDigest": "27365f9674b56033af370fca73478bd7919e4b633a915127e686b60002e10d94",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified editable models use original item semantics, successful saves clear prior warnings, and abandoned counter drags preserve the child’s construction.",
+      "reviewReason": "The English integration and curriculum contracts document v3 authored responses, picture and passage interactions, isolated prompt delivery, and explicit target-reading assistance.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -891,10 +891,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T02:01:21.683Z",
-      "sourceDigest": "1338f8a0de6233a839f80db086c9487f181a31de005c580bb561ad9de958a093",
+      "reviewedAt": "2026-11-26T02:02:21.161Z",
+      "sourceDigest": "5d915acb677c990b41cbc746f0fc02178ce579e8a35fb1822d87b607bea6efae",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Reviewed the foundation's composed light-surface contrast and persisted unused-checkpoint exit tests together with Math's counter bounds, rejected drops, geometric models and tracked construction submissions. The same learning UI and browser commands retain their assigned CI scope.",
+      "reviewReason": "Reviewed the merged contrast and unused-checkpoint exit assertions with Math construction/geometry cases and English token ordering, passage evidence, independent writing and scoring tests. The established CI suites still exercise these behaviors without altering production or learning policy.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -1,8 +1,10 @@
+import {WORKSPACE_SKILLS} from './workspace-content';
 import {EARLY_LANGUAGE} from './early';
 import type {LanguageSkill} from './types';
 /** Reviewed-content planning catalog. Standards references describe alignment targets, not certified coverage. */
 export const LANGUAGE_SKILLS: LanguageSkill[] = [
   ...EARLY_LANGUAGE,
+  ...WORKSPACE_SKILLS,
   {
     "id": "g1-initial-letters",
     "title": "Beginning letters and sounds",

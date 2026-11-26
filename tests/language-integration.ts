@@ -19,11 +19,20 @@ async function answer(page:Page){
     // Text-substring matching can choose the WRONG tile when options share
     // words (for example "run" versus "running"). The reviewed question's
     // answer is a choice VALUE, not a fuzzy human-visible caption.
-    const choices=active(page).locator('.language-choice');
-    const values=await choices.evaluateAll(nodes=>nodes.map(node=>(node as HTMLElement).dataset.value||''));
-    const index=values.indexOf(String(question.answer));
-    assert.ok(index>=0,'reviewed English item must contain an exact matching answer value');
-    await choices.nth(index).click();
+    const activity=active(page);
+    const evidence=activity.locator('[data-action="check-evidence"]');
+    if(await evidence.count()){
+      await activity.getByRole('button',{name:String(question.answer),exact:true}).click();
+      await evidence.click();
+    } else {
+      const choices=activity.locator('.language-choice');
+      const values=await choices.evaluateAll(nodes=>nodes.map(node=>(node as HTMLElement).dataset.value||''));
+      const index=values.indexOf(String(question.answer));
+      assert.ok(index>=0,'reviewed English item must contain an exact matching answer value');
+      await choices.nth(index).click();
+      const check=activity.locator('[data-action="check-gap"]');
+      if(await check.count())await check.click();
+    }
     await page.waitForFunction(()=>!window.FG.learning.active,null,{timeout:8000});
     return;
   }
