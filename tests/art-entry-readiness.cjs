@@ -148,7 +148,7 @@ async function rejectedConfig(browser,base){
   await drawing.waitFor({state:'visible'});
   await drawing.locator('[data-paper]').press('Enter');
   await drawing.locator('[data-title]').fill('My offline dot');
-  await drawing.getByRole('button',{name:'Keep my drawing',exact:true}).click();
+  await drawing.getByRole('button',{name:'Keep my art',exact:true}).click();
   await drawing.waitFor({state:'detached'});await selectedArtOnscreen(page);
   assert.equal(await page.locator('#artDetailTitle').textContent(),'My offline dot','a saved canvas drawing reveals its own details after the modal closes');
   const originals=await artRecords(page);assert.equal(originals.length,2);
