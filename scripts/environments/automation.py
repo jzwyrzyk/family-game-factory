@@ -34,7 +34,7 @@ def run(args):
 
 def read_config():
     config = json.loads(Path("ops/environments.json").read_text())
-    cloud.validate_config(config, require_enabled=False)
+    cloud.validate_config(config, require_enabled=False, public_record=True)
     return config
 
 
@@ -53,7 +53,7 @@ def output(**values):
 
 def configuration():
     config = read_config()
-    cloud.validate_config(config)
+    cloud.validate_config(config, public_record=True)
     output(provider=config["wifProvider"], deployer=config["deployServiceAccount"],
            uat=config["uatServiceAccount"], audience=config["iapAudience"])
 
@@ -99,7 +99,7 @@ def prepare(root, api=None):
 
 def recheck(root, api=None):
     config = read_config()
-    cloud.validate_config(config)
+    cloud.validate_config(config, public_record=True)
     api = api or gh.GitHub()
     candidate = json.loads((root / "jems-candidate.json").read_text())
     policy = gh.required_checks(json.loads(Path("ops/github-main-ruleset.json").read_text()))
@@ -119,6 +119,7 @@ def current_controller(api):
 
 def deploy(root):
     config, candidate = recheck(root)
+    config = cloud.bind_private_members(config, os.environ.get("JEMS_OWNER_IAP_BINDING"))
     client = cloud.Cloud(config)
     cloud.preflight(config, client)
     prior_test_image = None
@@ -168,8 +169,7 @@ def deploy(root):
 
 
 def cleanup(root):
-    config = read_config()
-    cloud.validate_config(config)
+    config = cloud.bind_private_members(read_config(), os.environ.get("JEMS_OWNER_IAP_BINDING"))
     client, api = cloud.Cloud(config), gh.GitHub()
     current_controller(api)
     cloud.preflight(config, client)

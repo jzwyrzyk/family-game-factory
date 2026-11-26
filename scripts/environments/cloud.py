@@ -6,6 +6,7 @@ cloud commands are argument arrays; errors intentionally omit raw CLI output.
 """
 import argparse
 from datetime import datetime, timezone
+import hashlib
 import json
 import re
 import subprocess
@@ -19,7 +20,7 @@ DIGEST = re.compile(r"[0-9a-f]{64}")
 KEYS = {"version", "enabled", "projectId", "projectNumber", "region",
         "runtimeServiceAccount", "deployServiceAccount", "wifProvider", "registry",
         "ownerIapMembers", "previewTtlHours", "maxPreviews", "minInstances", "maxInstances"}
-OPTIONAL_KEYS = {"uatServiceAccount", "iapAudience", "directoryIssue"}
+OPTIONAL_KEYS = {"uatServiceAccount", "testRuntimeServiceAccount", "iapAudience", "directoryIssue", "ownerIapBindingSha256"}
 
 
 class EnvironmentError(Exception):
@@ -31,7 +32,7 @@ def require(condition, message):
         raise EnvironmentError(message)
 
 
-def validate_config(config, *, require_enabled=True):
+def validate_config(config, *, require_enabled=True, public_record=False):
     require(isinstance(config, dict) and KEYS <= set(config) and not set(config) - KEYS - OPTIONAL_KEYS,
             "CONFIG_SCHEMA_INVALID")
     require(config["version"] == 1 and type(config["enabled"]) is bool, "CONFIG_VERSION_INVALID")
@@ -45,10 +46,14 @@ def validate_config(config, *, require_enabled=True):
             config["minInstances"] == 0 and config["maxInstances"] == 1,
             "SCALE_TO_ZERO_REQUIRED")
     require(re.fullmatch(r"[a-z]+-[a-z]+[0-9]", str(config["region"])), "REGION_INVALID")
+    binding = config.get("ownerIapBindingSha256")
+    require(binding is None or isinstance(binding, str) and DIGEST.fullmatch(binding),
+            "IAP_BINDING_DIGEST_INVALID")
     if not config["enabled"] and not require_enabled:
+        require(binding is None, "DISABLED_TEMPLATE_MUST_BE_UNBOUND")
         require(all(config[k] is None for k in ("projectId", "projectNumber", "runtimeServiceAccount",
                 "deployServiceAccount", "wifProvider", "registry")) and config["ownerIapMembers"] == [] and
-                all(config.get(k) is None for k in ("uatServiceAccount", "iapAudience")),
+                all(config.get(k) is None for k in ("uatServiceAccount", "testRuntimeServiceAccount", "iapAudience")),
                 "DISABLED_TEMPLATE_MUST_BE_UNBOUND")
         return config
     require(config["enabled"], "NONPRODUCTION_NOT_ENABLED")
@@ -57,11 +62,11 @@ def validate_config(config, *, require_enabled=True):
             and project != PRODUCTION_PROJECT, "ISOLATED_PROJECT_REQUIRED")
     require(re.fullmatch(r"[1-9][0-9]{5,19}", number) and number != PRODUCTION_NUMBER,
             "ISOLATED_PROJECT_NUMBER_REQUIRED")
-    for key in ("runtimeServiceAccount", "deployServiceAccount", "uatServiceAccount"):
+    for key in ("runtimeServiceAccount", "testRuntimeServiceAccount", "deployServiceAccount", "uatServiceAccount"):
         require(isinstance(config.get(key), str) and re.fullmatch(
             rf"[a-z][a-z0-9-]{{4,28}}@{re.escape(project)}\.iam\.gserviceaccount\.com", config[key]),
             "PROJECT_BOUND_SERVICE_ACCOUNT_REQUIRED")
-    require(len({config[k] for k in ("runtimeServiceAccount", "deployServiceAccount", "uatServiceAccount")}) == 3,
+    require(len({config[k] for k in ("runtimeServiceAccount", "testRuntimeServiceAccount", "deployServiceAccount", "uatServiceAccount")}) == 4,
             "SEPARATE_RUNTIME_REQUIRED")
     require(isinstance(config.get("iapAudience"), str) and re.fullmatch(
         r"[0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com", config["iapAudience"]), "IAP_OAUTH_AUDIENCE_REQUIRED")
@@ -70,6 +75,9 @@ def validate_config(config, *, require_enabled=True):
     require(config["registry"] == f"{region}-docker.pkg.dev/{project}/jems-environments",
             "NONPRODUCTION_REGISTRY_REQUIRED")
     members = config["ownerIapMembers"]
+    if public_record:
+        require(binding and members == [], "PRIVATE_IAP_BINDING_REQUIRED")
+        return config
     require(isinstance(members, list) and all(isinstance(m, str) for m in members) and
             1 <= len(members) <= 10 and len(set(members)) == len(members),
             "IAP_ALLOWLIST_REQUIRED")
@@ -78,6 +86,23 @@ def validate_config(config, *, require_enabled=True):
             r"user:[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", member)),
             "EXACT_IAP_USERS_REQUIRED")
     return config
+
+
+def bind_private_members(config, private_value):
+    """Verify the protected secret before rendering a cloud IAM operation."""
+    validate_config(config, public_record=True)
+    require(isinstance(private_value, str) and 0 < len(private_value) <= 8192,
+            "PRIVATE_IAP_BINDING_REQUIRED")
+    require(hashlib.sha256(private_value.encode()).hexdigest() == config["ownerIapBindingSha256"],
+            "PRIVATE_IAP_BINDING_MISMATCH")
+    try:
+        record = json.loads(private_value)
+    except ValueError:
+        raise EnvironmentError("PRIVATE_IAP_BINDING_INVALID") from None
+    require(isinstance(record, dict) and set(record) == {"nonce", "members"}
+            and isinstance(record["nonce"], str) and DIGEST.fullmatch(record["nonce"]),
+            "PRIVATE_IAP_BINDING_INVALID")
+    return validate_config({**config, "ownerIapMembers": record["members"]})
 
 
 class Cloud:
@@ -98,6 +123,11 @@ class Cloud:
             raise EnvironmentError("CLOUD_RESPONSE_INVALID") from None
 
 
+def runtime_account(config, kind):
+    require(kind in ("dev", "test"), "ENVIRONMENT_INVALID")
+    return config["testRuntimeServiceAccount" if kind == "test" else "runtimeServiceAccount"]
+
+
 def account_member(config):
     return "serviceAccount:" + config["runtimeServiceAccount"]
 
@@ -112,7 +142,8 @@ def no_runtime_grants(policy, config):
         members = binding.get("members", [])
         require(isinstance(members, list) and all(isinstance(member, str) for member in members),
                 "IAM_MEMBERS_UNREADABLE")
-        require(account_member(config) not in members, "RUNTIME_MUST_HAVE_NO_ROLES")
+        require(not {"serviceAccount:" + runtime_account(config, kind) for kind in ("dev", "test")}.intersection(members),
+                "RUNTIME_MUST_HAVE_NO_ROLES")
         # Unknown membership cannot establish a role-free runtime or a private
         # audience. Require an effective-policy review rather than guessing.
         require(not any(member in ("allUsers", "allAuthenticatedUsers") or
@@ -138,12 +169,12 @@ def preflight(config, cloud):
     for ancestor in ancestors:
         if ancestor.get("type") in ("folder", "organization"):
             no_runtime_grants(cloud.run(ancestor["type"] + "s", "get-iam-policy", ancestor["id"]), config)
-    account = cloud.run("iam", "service-accounts", "describe", config["runtimeServiceAccount"])
-    require(account.get("email") == config["runtimeServiceAccount"] and not account.get("disabled"),
-            "RUNTIME_IDENTITY_DRIFT")
-    require(cloud.run("iam", "service-accounts", "keys", "list",
-                     "--iam-account=" + config["runtimeServiceAccount"], "--managed-by=user") == [],
-            "RUNTIME_KEY_FORBIDDEN")
+    for kind in ("dev", "test"):
+        email = runtime_account(config, kind)
+        account = cloud.run("iam", "service-accounts", "describe", email)
+        require(account.get("email") == email and not account.get("disabled"), "RUNTIME_IDENTITY_DRIFT")
+        require(cloud.run("iam", "service-accounts", "keys", "list",
+                         "--iam-account=" + email, "--managed-by=user") == [], "RUNTIME_KEY_FORBIDDEN")
     registry = cloud.run("artifacts", "repositories", "describe", "jems-environments",
                          "--location=" + config["region"])
     require(registry.get("format") == "DOCKER", "REGISTRY_FORMAT_INVALID")
@@ -196,7 +227,7 @@ def inspect(config, cloud, *, kind, pr, source_sha, bundle_sha256, image):
             "INVOKER_IAM_CHECK_REQUIRED")
     template = service.get("spec", {}).get("template", {})
     spec, scaling = template.get("spec", {}), template.get("metadata", {}).get("annotations", {})
-    require(spec.get("serviceAccountName") == config["runtimeServiceAccount"], "RUNTIME_IDENTITY_DRIFT")
+    require(spec.get("serviceAccountName") == runtime_account(config, kind), "RUNTIME_IDENTITY_DRIFT")
     require(scaling.get("autoscaling.knative.dev/minScale", "0") == "0" and
             scaling.get("autoscaling.knative.dev/maxScale") == "1", "SCALING_DRIFT")
     containers = spec.get("containers", [])
@@ -268,7 +299,7 @@ def deploy(config, *, kind, source_sha, bundle_sha256, image, pr=None, cloud=Non
         labels += f",jems-expires={expires}"
     environment = f"JEMS_ENVIRONMENT={kind},JEMS_SOURCE_SHA={source_sha},JEMS_BUNDLE_SHA256={bundle_sha256},JEMS_PR_NUMBER={pr or ''}"
     cloud.run("run", "deploy", name, "--region=" + config["region"], "--image=" + image,
-              "--service-account=" + config["runtimeServiceAccount"], "--iap", "--no-allow-unauthenticated",
+              "--service-account=" + runtime_account(config, kind), "--iap", "--no-allow-unauthenticated",
               "--min-instances=0", "--max-instances=1", "--cpu=1", "--memory=512Mi", "--concurrency=20",
               "--timeout=60", "--cpu-throttling", "--no-cpu-boost", "--ingress=all", "--port=8080",
               "--clear-secrets", "--clear-volumes", "--set-env-vars=" + environment, "--labels=" + labels)
@@ -333,7 +364,7 @@ def main(argv=None):
         with open(args.config, encoding="utf-8") as stream:
             config = json.load(stream)
         if args.command == "plan":
-            validate_config(config, require_enabled=False)
+            validate_config(config, require_enabled=False, public_record=config.get("ownerIapBindingSha256") is not None)
             result = {"status": "disabled" if not config["enabled"] else "configured",
                       "mutations": 0, "projectId": config["projectId"], "region": config["region"],
                       "setup": "infra/nonproduction/README.md", "productionAccess": "forbidden",
