@@ -65,7 +65,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
     await page.reload();await ready();await parent();
   };
   try{
-    await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?creation=1`);await ready();await pacing();
+    await page.goto(`http://127.0.0.1:${server.address().port}/arcade/?creation=1`);await ready();await pacing();if(await page.locator('#creationIntroduction').isVisible())await page.locator('#creationIntroSkip').click();
     // Include actual Studio notebook/workspace state so rollback covers all four keys.
     await page.locator('#creationHome').click();await exploreWelcome(page);await openRetainedGame(page,'dragon');
     await navigate(page,'#studioNavScenes');await page.locator('#creationChallengeMode').click();

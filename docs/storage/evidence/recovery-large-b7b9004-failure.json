@@ -1,0 +1,479 @@
+{
+  "schema": "jems.storage.failure-observation.v1",
+  "source": "b7b9004f5bc739f348dc603106f60929b1ea5fce",
+  "buildDigest": "b82604af348112f9893bc237328789bad9f78cd55406f25cb57a98cf230f71bc",
+  "result": "failed-large-complete-restore-preserved-originals",
+  "interpretation": "Navigation/reload did not establish a completed restore. The complete-restore receipt remained art-restored, while all measured original image hashes, saved-session identity and original native revision survived restart rollback. The application refused to fit the redundant localStorage safety journal. The raw navigation-derived outcome label is preserved below and is not a success claim.",
+  "rawObservation": {
+    "status": "in-progress",
+    "source": "b7b9004f5bc739f348dc603106f60929b1ea5fce",
+    "builtFilesSha256": "b82604af348112f9893bc237328789bad9f78cd55406f25cb57a98cf230f71bc",
+    "authority": "indexed",
+    "samples": 1,
+    "rows": [],
+    "inProgress": {
+      "scenario": "large",
+      "seed": {
+        "owner": "player1",
+        "firstProject": {
+          "id": "0a4dde70-045b-461f-af3d-46510c001d78",
+          "owner": "player1",
+          "game": "buckets",
+          "name": "Synthetic saved game 0",
+          "headId": "b416b1ce-1ed3-47da-9641-15e6b3c647ce",
+          "keptId": "b416b1ce-1ed3-47da-9641-15e6b3c647ce"
+        },
+        "workspaceRevisions": 450,
+        "sessionId": "synthetic-session-0",
+        "artwork": {
+          "originalCount": 8,
+          "pixels": 640,
+          "originalBytes": 9260556,
+          "previewBytes": 1517028,
+          "originalHashes": [
+            "0ca957129dab02abfbbcb29442bdc08d51506e0a8158a996a8276bec120ac634",
+            "5d62d48bd1759c44dd69ff15f7b027aef8a8279ca3406e139a4d21514881f7fe",
+            "614f5053a391cc3ecd4c5f953fb068e89d89dbfcc8dba490c195d4262d8c0a2c",
+            "66aa638f9e8db242fcd6320bd2ed813ca8b0f55507ae15b1a0a88449c8e11bc0",
+            "9d9b2f2580cfd6105b97806bb19ab65fc923172c3bdf993637883c7ae233eae5",
+            "e47a75d8eedc716e57be7fe518b35f6675362a3162e657baaff1e3f70e8fc22f",
+            "e4e08455784ca43bd9316e2928f03ab1a52c529b848da81953f784a7e272c5f5",
+            "eb3b61d802202175ec1c96b1ff2fae86322a3ff7c412913988d25a9575fc6ac0"
+          ]
+        }
+      },
+      "runs": [
+        {
+          "readyMs": 493.88918899999953,
+          "libraryMs": 194.63215300000047,
+          "openMs": 926.4038400000009,
+          "startup": {
+            "counters": {
+              "getCalls": 1149,
+              "getCodeUnits": 1706,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 17,
+              "parseCodeUnits": 378537,
+              "parseMs": 1.400000000372529,
+              "stringifyCalls": 224,
+              "stringifyCodeUnits": 67238,
+              "stringifyMs": 0.39999999944120646,
+              "idbGetCalls": 109,
+              "idbCursorSteps": 140,
+              "idbPutCalls": 1,
+              "idbReadPayloadBytes": 508125,
+              "idbWritePayloadBytes": 238
+            },
+            "heapBytes": 41659103,
+            "domNodes": 2456,
+            "processMetrics": [
+              {
+                "name": "ScriptDuration",
+                "value": 0.041455
+              },
+              {
+                "name": "TaskDuration",
+                "value": 0.459561
+              },
+              {
+                "name": "JSHeapUsedSize",
+                "value": 28419588
+              },
+              {
+                "name": "JSHeapTotalSize",
+                "value": 90443776
+              }
+            ]
+          },
+          "operations": {
+            "openDomainAdapters": {
+              "ms": 42.799999999813735,
+              "counters": {
+                "getCalls": 448,
+                "getCodeUnits": 0,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 6,
+                "parseCodeUnits": 375594,
+                "parseMs": 0.6999999992549419,
+                "stringifyCalls": 45,
+                "stringifyCodeUnits": 51152,
+                "stringifyMs": 0.2999999998137355,
+                "idbGetCalls": 39,
+                "idbCursorSteps": 72,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 457870,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "list": {
+              "ms": 3.7000000001862645,
+              "counters": {
+                "getCalls": 64,
+                "getCodeUnits": 0,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 2,
+                "stringifyCodeUnits": 217,
+                "stringifyMs": 0,
+                "idbGetCalls": 2,
+                "idbCursorSteps": 26,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 8614,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 1.900000000372529,
+              "counters": {
+                "getCalls": 34,
+                "getCodeUnits": 0,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 5,
+                "stringifyCodeUnits": 641,
+                "stringifyMs": 0,
+                "idbGetCalls": 4,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 1263,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 762.5,
+              "counters": {
+                "getCalls": 3022,
+                "getCodeUnits": 0,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 787,
+                "parseCodeUnits": 25609287,
+                "parseMs": 31.499999998137355,
+                "stringifyCalls": 462759,
+                "stringifyCodeUnits": 38403343,
+                "stringifyMs": 205.90000002272427,
+                "idbGetCalls": 377,
+                "idbCursorSteps": 72,
+                "idbPutCalls": 53,
+                "idbReadPayloadBytes": 3937190,
+                "idbWritePayloadBytes": 742836
+              }
+            },
+            "saveRevision": {
+              "ms": 9.700000000186265,
+              "counters": {
+                "getCalls": 124,
+                "getCodeUnits": 0,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 96,
+                "stringifyCodeUnits": 5981,
+                "stringifyMs": 0,
+                "idbGetCalls": 17,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 7,
+                "idbReadPayloadBytes": 4224,
+                "idbWritePayloadBytes": 2489
+              }
+            },
+            "profileSave": {
+              "ms": 0,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 0,
+                "setCalls": 1,
+                "setCodeUnits": 1128,
+                "parseCalls": 0,
+                "parseCodeUnits": 0,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 1128,
+                "stringifyMs": 0,
+                "idbGetCalls": 0,
+                "idbCursorSteps": 0,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 0,
+                "idbWritePayloadBytes": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 507.29999999981374,
+              "counters": {
+                "getCalls": 6920,
+                "getCodeUnits": 0,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 212,
+                "parseCodeUnits": 6283573,
+                "parseMs": 8.399999998509884,
+                "stringifyCalls": 1340,
+                "stringifyCodeUnits": 6633744,
+                "stringifyMs": 50.400000002235174,
+                "idbGetCalls": 743,
+                "idbCursorSteps": 505,
+                "idbPutCalls": 0,
+                "idbReadPayloadBytes": 3807447,
+                "idbWritePayloadBytes": 0
+              },
+              "utf8Bytes": 3315187
+            },
+            "legacyRestoreValidation": {
+              "ms": 1538.5999999996275,
+              "counters": {
+                "getCalls": 13852,
+                "getCodeUnits": 0,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 433,
+                "parseCodeUnits": 16720851,
+                "parseMs": 24.5,
+                "stringifyCalls": 518791,
+                "stringifyCodeUnits": 26487714,
+                "stringifyMs": 175.8999999780208,
+                "idbGetCalls": 1785,
+                "idbCursorSteps": 72,
+                "idbPutCalls": 215,
+                "idbReadPayloadBytes": 8019169,
+                "idbWritePayloadBytes": 148878
+              }
+            },
+            "artExport": {
+              "ms": 1374.1000000005588,
+              "utf8Bytes": 12349426
+            },
+            "artRestore": {
+              "ms": 991
+            },
+            "artwork": {
+              "count": 8,
+              "uniqueHashes": 8,
+              "originalBytes": 9260556
+            },
+            "localStorage": {
+              "keys": 3,
+              "byKey": {
+                "family-game-factory-state-v1": 1134,
+                "family-game-factory-studio-v1": 3136934,
+                "family-game-factory-workspace-v2": 176691
+              },
+              "utf8Bytes": 3314759,
+              "codeUnits": 3314753
+            },
+            "uiSaveDraft": {
+              "ms": 843.6854189999995,
+              "counters": {
+                "getCalls": 3022,
+                "getCodeUnits": 0,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 787,
+                "parseCodeUnits": 25609116,
+                "parseMs": 33.59999999962747,
+                "stringifyCalls": 462759,
+                "stringifyCodeUnits": 38403243,
+                "stringifyMs": 254.90000001899898,
+                "idbGetCalls": 377,
+                "idbCursorSteps": 72,
+                "idbPutCalls": 53,
+                "idbReadPayloadBytes": 3937192,
+                "idbWritePayloadBytes": 742924
+              }
+            },
+            "completeRecovery": {
+              "captureAndSaveMs": 3411.5306469999996,
+              "pointId": "b16393ab-35e0-40c8-b58f-684aacae4487",
+              "readAndVerifyMs": 786.2000000001863,
+              "archiveBytes": 19506535,
+              "parts": 7,
+              "uniqueChunks": 202,
+              "logicalPartBytes": 18979911
+            },
+            "indexedFootprint": {
+              "stores": [
+                {
+                  "database": "family-game-factory-pals-v1",
+                  "store": "workspaces",
+                  "records": 1,
+                  "logicalPayloadBytes": 238
+                },
+                {
+                  "database": "family-game-factory-rewards-v1",
+                  "store": "workspaces",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "active",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drafts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawingMetadata",
+                  "records": 8,
+                  "logicalPayloadBytes": 1519292
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "drawings",
+                  "records": 8,
+                  "logicalPayloadBytes": 10779744
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 63
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "rigs",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "family-private-drawings-v1",
+                  "store": "usage",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "jems-records-preparation-v1",
+                  "store": "history",
+                  "records": 1391,
+                  "logicalPayloadBytes": 4922716
+                },
+                {
+                  "database": "jems-records-preparation-v1",
+                  "store": "meta",
+                  "records": 1,
+                  "logicalPayloadBytes": 1
+                },
+                {
+                  "database": "jems-records-preparation-v1",
+                  "store": "outbox",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "jems-records-preparation-v1",
+                  "store": "pending",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "jems-records-preparation-v1",
+                  "store": "receipts",
+                  "records": 362,
+                  "logicalPayloadBytes": 238204
+                },
+                {
+                  "database": "jems-records-preparation-v1",
+                  "store": "records",
+                  "records": 1357,
+                  "logicalPayloadBytes": 4907081
+                },
+                {
+                  "database": "jems-recovery-vault-v1",
+                  "store": "chunks",
+                  "records": 202,
+                  "logicalPayloadBytes": 19478061
+                },
+                {
+                  "database": "jems-recovery-vault-v1",
+                  "store": "points",
+                  "records": 1,
+                  "logicalPayloadBytes": 14852
+                },
+                {
+                  "database": "jems-recovery-vault-v1",
+                  "store": "preparing",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "jems-recovery-vault-v1",
+                  "store": "receipts",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                },
+                {
+                  "database": "jems-recovery-vault-v1",
+                  "store": "settings",
+                  "records": 0,
+                  "logicalPayloadBytes": 0
+                }
+              ],
+              "logicalPayloadBytes": 41860252,
+              "browserEstimate": {
+                "quota": 10788290728,
+                "usage": 50872488,
+                "usageDetails": {
+                  "caches": 22126377,
+                  "indexedDB": 28725248,
+                  "serviceWorkerRegistrations": 20863
+                }
+              }
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.770157
+            },
+            {
+              "name": "TaskDuration",
+              "value": 11.162503
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 18022468
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 81289216
+            }
+          ]
+        }
+      ],
+      "completeRestore": {
+        "outcome": "restored",
+        "handlerAndReloadMs": 14358.018867000003,
+        "samples": 1,
+        "pointId": "b16393ab-35e0-40c8-b58f-684aacae4487",
+        "verified": {
+          "committedReceipt": false,
+          "receiptPhase": "art-restored",
+          "originalImageHashes": true,
+          "originalCount": 8,
+          "expectedOriginalCount": 8,
+          "sessionId": true,
+          "sessionCount": 70,
+          "originalNativeRevision": true,
+          "revisionCount": 451,
+          "expectedOriginalRevision": "b416b1ce-1ed3-47da-9641-15e6b3c647ce",
+          "pendingJournal": null
+        },
+        "statusBeforeReload": "A safety copy could not be saved. Export your current progress before freeing browser space. Nothing was replaced."
+      }
+    }
+  }
+}

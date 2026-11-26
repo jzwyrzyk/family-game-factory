@@ -1,6 +1,6 @@
 import { validateAssembly, vehicleGeometry, type DrawingAssembly } from './model';
 import type { Drawing } from '../assets/private-drawings';
-import { artOwner, artRequest, assertArtWrite, checkArtCapacity, withArtTransaction, type ArtGuard } from './library';
+import { artOwner, artRequest,ownerArtRecords, assertArtWrite, checkArtCapacity, withArtTransaction, type ArtGuard } from './library';
 export interface SavedRig { id: string; owner: string; parentId: string | null; assembly: DrawingAssembly; savedAt: string }
 export interface DrawingDraft { id: string; owner: string; sourceId: string; parentId: string | null; assembly: DrawingAssembly; updatedAt: string }
 const draftKey = (owner: string, sourceId: string) => JSON.stringify([owner, sourceId]);
@@ -10,7 +10,7 @@ function validSource(original: Drawing | undefined, owner: string, assembly: Dra
   if (!original || original.owner !== owner || original.sha256 !== assembly.sourceSha256) throw Error('This original is unavailable in your profile. Your earlier saved design is safe.');
 }
 export async function listRigs(owner: string): Promise<SavedRig[]> {
-  artOwner(owner); return withArtTransaction(['rigs'], 'readonly', async transaction => (await artRequest(transaction.objectStore('rigs').getAll()) as SavedRig[]).filter(rig => rig.owner === owner).sort((a, b) => b.savedAt.localeCompare(a.savedAt)));
+  artOwner(owner); return withArtTransaction(['rigs'], 'readonly', async transaction => (await ownerArtRecords<SavedRig>(transaction,'rigs',owner)).sort((a, b) => b.savedAt.localeCompare(a.savedAt)));
 }
 export async function rigById(owner: string, id: string): Promise<SavedRig> {
   artOwner(owner);

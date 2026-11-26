@@ -97,7 +97,7 @@ test('scene preparation bounds the transient canvas, leaves RGB intact and prese
   assert.equal((after as Uint8ClampedArray)[3], 0);
 });
 
-test('an unavailable canvas cannot hide or substitute the approved image', t => {
+test('an unavailable canvas reports failure rather than exposing opaque paper or another character', t => {
   const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
   t.after(() => {
     if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument);
@@ -105,5 +105,19 @@ test('an unavailable canvas cannot hide or substitute the approved image', t => 
   });
   const source = { naturalWidth: 800, naturalHeight: 450 } as HTMLImageElement;
   Object.defineProperty(globalThis, 'document', { configurable: true, value: { createElement: () => { throw Error('Canvas unavailable'); } } });
-  assert.equal(preparePalSceneImage(source), source);
+  assert.throws(()=>preparePalSceneImage(source), /could not be prepared/);
+});
+
+test('exact reviewed holes also work inside an already transparent expression without erasing white anatomy', () => {
+  const width = 11, height = 9, data = pixels(width, height, [0, 0, 0, 0]);
+  for (let y = 1; y < 8; y++) for (let x = 1; x < 10; x++) paint(data, width, x, y, [100, 70, 170, 255]);
+  paint(data, width, 3, 4, paper); // enclosed negative space
+  paint(data, width, 7, 4, paper); // equally pale intentional eye
+  const before = data.slice();
+  assert.equal(palPaperMask(data, width, height), null);
+  const mask = palPaperMask(data, width, height, [[3.5 / width, 4.5 / height]])!;
+  assert.equal(mask.alpha[4 * width + 3], 0);
+  assert.equal(mask.alpha[4 * width + 7], 255);
+  assert.equal(mask.alpha[0], 0);
+  assert.deepEqual(data, before);
 });

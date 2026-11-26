@@ -1,6 +1,7 @@
 /** Trusted assets and explicit adapters into the editable scene model.
  * A scene is a new creation pinned to its source. This does not translate game JavaScript.
  */
+import historicalArt from '../pals/historical-scene-art.json';
 import { defaults, validateConfig } from '../runtime/manifests';
 import type { Mechanics } from '../runtime/types';
 import type { Revision } from '../factory/workspace';
@@ -48,16 +49,23 @@ export const CREATION_ASSETS: readonly CreationAsset[] = Object.freeze([
   {id:'star', label:'Route star', kind:'emoji', emoji:'⭐', sourceGame:'robot'},
   // Existing scene token mappings stay stable. Final Base/Grown artwork must
   // use explicit form/version bindings rather than replace saved references.
-  {id:'pal-glim', label:'Glim', kind:'image', url:'./jems-art/gem_blue.webp', palId:'glim'},
   {id:'pal-kip', label:'Kip', kind:'image', url:'./jems-art/gem_mint.webp', palId:'kip'},
   {id:'pal-riff', label:'Riff', kind:'image', url:'./jems-art/gem_coral.webp', palId:'riff'},
   // Newly created actors pin the selected approved character, form and version.
-  // These coexist with the three unchanged historical token references above.
+  // These coexist with the retained historical token references.
   ...PAL_SCENE_ASSETS,
 ].map(asset=>Object.freeze(asset)) as CreationAsset[]);
 
+// Read compatibility for published games and saved revisions. New scenes and
+// generation schemas enumerate CREATION_ASSETS exclusively.
+const historicalAssets: readonly CreationAsset[] = [
+  {id:'pal-glim', label:'Glim', kind:'image', url:'./jems-art/gem_blue.webp'},
+  ...historicalArt.map(asset => ({ id: asset.id, label: asset.label, kind: 'image' as const,
+    url: './' + asset.url, palForm: asset.form as PalForm })),
+];
+
 export function creationAsset(id: string): CreationAsset | undefined {
-  return CREATION_ASSETS.find(asset=>asset.id===id);
+  return CREATION_ASSETS.find(asset=>asset.id===id) ?? historicalAssets.find(asset=>asset.id===id);
 }
 
 /** Opaque local references are data, never paths or fetchable URLs. The browser
@@ -80,6 +88,13 @@ export function validateEditableProject(input: unknown,options:{allowPrivateArt?
 
 /** Model output cannot attest that the child authored its blocks or its provenance. */
 export function validateGeneratedCreationManifest(input:unknown):CreationProject {
+  const scene = validateSavedCreationManifest(input);
+  if (scene.actors.some(actor => !CREATION_ASSETS.some(asset => asset.id === actor.assetId)))
+    throw Error('Choose currently available artwork for a new scene.');
+  return scene;
+}
+
+export function validateSavedCreationManifest(input:unknown):CreationProject {
   const scene=validateEditableProject(input,{allowPrivateArt:false});
   const mark=(blocks:CreationBlock[])=>{for(const block of blocks){block.origin='assisted';if(block.type==='repeat')mark(block.actions);if(block.type==='if'){mark(block.then);if(block.else)mark(block.else);}}};
   for(const program of scene.programs)mark(program.actions);
@@ -147,7 +162,7 @@ export function createProjectFromStudio(
   manifest?:unknown,
 ):CreationProject {
   if(manifest!==undefined){
-    const scene=validateGeneratedCreationManifest(manifest);
+    const scene=validateSavedCreationManifest(manifest);
     return validateEditableProject({...scene,id:uid(),title:`${session.name} scene`.slice(0,60),provenance:{
       createdBy:'assisted',sourceKind:'generated',sourceSessionId:session.id,
       sourceProjectId:session.projectId??session.id,...(session.remoteId?{sourceRevisionId:session.remoteId}:{}),

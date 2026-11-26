@@ -8,7 +8,7 @@ const {exploreWelcome,navigate,openProfiles,openRetainedGame}=require('./studio-
 
 async function records(page,store,owner){
   return page.evaluate(async({store,owner})=>{
-    const db=await new Promise((resolve,reject)=>{const request=indexedDB.open('family-private-drawings-v1',2);request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
+    const db=await new Promise((resolve,reject)=>{const request=indexedDB.open('family-private-drawings-v1');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
     try{return await new Promise((resolve,reject)=>{const request=db.transaction(store).objectStore(store).getAll();request.onsuccess=()=>resolve(request.result.filter(record=>record.owner===owner).map(record=>({...record,bytes:undefined,preview:undefined})));request.onerror=()=>reject(request.error);});}
     finally{db.close();}
   },{store,owner});
@@ -67,7 +67,7 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     assert.ok(fs.statSync(await video.path()).size>1000,'the private-art canvas records a real video');
 
     // A second scene reuses the same immutable version through the visible picker.
-    await page.locator('#creationBack').click();await page.locator('[data-creation-starter="blank"]').click();
+    await page.locator('#creationBack').click();await page.locator('#creationFreeMode').click();await page.locator('[data-creation-starter="blank"]').click();
     await page.locator('#creationAddActor').click();
     await page.locator('#creationPrivateActorChoices [data-private-art]').filter({hasText:'Latest saved cutout design'}).click();
     await page.waitForFunction(()=>FG.creation.scene()?.actors.length===2);
@@ -96,7 +96,7 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     await page.waitForFunction(assetId=>FG.creation.scene().actors.some(actor=>actor.assetId===assetId),first.actors[0].assetId);
     const sourceActions=page.locator('#creationSource');
     if(!await page.locator('#creationMore').evaluate(element=>element.open))await page.locator('#creationMore summary').click();
-    assert.equal(await sourceActions.getByRole('button',{name:'Art Studio',exact:true}).isVisible(),true,'a game-derived scene keeps its private-art action');
+    assert.equal(await sourceActions.getByRole('button',{name:'My Art',exact:true}).isVisible(),true,'a game-derived scene keeps its private-art action');
     const backToGame=sourceActions.getByRole('button',{name:'Back to my game',exact:true});
     assert.equal(await backToGame.isVisible(),true,'adding private art keeps the source-game return action');
     await backToGame.click();await page.locator('#studioGameHost #game-mount').waitFor({state:'visible'});
@@ -106,7 +106,7 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
 
     // Another profile cannot see old pixels; a deliberate portable import creates copies.
     await profile(page,1);await pacing(page);
-    await navigate(page,'#studioNavScenes');await page.locator('[data-creation-starter="blank"]').click();
+    await navigate(page,'#studioNavScenes');await page.locator('#creationFreeMode').click();await page.locator('[data-creation-starter="blank"]').click();
     await page.locator('#creationAddActor').click();
     await page.waitForFunction(()=>document.getElementById('creationActorArtStatus').textContent.includes('Add one'));
     assert.equal(await page.locator('#creationPrivateActorChoices button').count(),0);await page.locator('#creationCloseActor').click();

@@ -17,15 +17,11 @@ export function installArtEntryPoints({homeAction,libraryTools,open}:ArtEntryOpt
     setIconLabel(element,'edit',label);element.onclick=open;
     return element;
   };
-  const home=button('studioArt','Art Studio','studio-button studio-art-entry');
-  homeAction.querySelector('#studioNew')!.after(home);
-  // Preserve the saved-work shortcut and its existing keyboard/test contract.
-  libraryTools.prepend(button('studioArtShortcut','Art Studio'));
-  byId('creationShelfImport').after(button('creationArtStudio','Art Studio','creation-button'));
-  byId('page-creations').querySelector('.page-head')!.append(button('collectionArtStudio','Art Studio'));
+  byId('creationFreeShelf').querySelector('.creation-shelf-heading')!.append(button('creationArtStudio','My Art','creation-button'));
+  byId('page-creations').querySelector('.page-head')!.append(button('collectionArtStudio','My Art'));
 
   const picture=button('studioUseDrawing','Use my picture');
-  picture.setAttribute('aria-label','Use my picture in Art Studio');
+  picture.setAttribute('aria-label','Use my picture in My Art');
   const composer=byId('studioExtraTools'),gameHelp=byId('studioHelp');
   gameHelp.after(picture);
   return {

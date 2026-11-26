@@ -1,3 +1,7 @@
+import {ownerPreview} from './beta/owner-preview';
+import {familyPreview} from './beta/preview';
+import {platformMode} from './beta/model';
+import {firestoreStore} from './beta/documents';
 import {GcsPrivateArtifacts} from './storage/artifacts';
 import {createServer} from 'node:http';
 import {readFile} from 'node:fs/promises';
@@ -23,7 +27,15 @@ export function createPreview(config:PreviewConfig,repo:Pick<FirestoreRepository
 async function main(){
  if(process.env.FACTORY_BOOTSTRAP==='true'){startBootstrap();return;}
  if(!process.env.FACTORY_PRIVATE_CONFIG)throw Error('PRIVATE_PREVIEW_CONFIG_REQUIRED');
- const config=JSON.parse(await readFile(process.env.FACTORY_PRIVATE_CONFIG,'utf8')) as PreviewConfig;
+ const raw=JSON.parse(await readFile(process.env.FACTORY_PRIVATE_CONFIG,'utf8'));
+ if(platformMode(raw.platformMode)==='PRIVATE_FAMILY_BETA'){
+  if(Object.keys(raw).some(k=>!['platformMode','environment','hubOrigin','previewOrigin','previewKey','projectId','artifactBucket','householdViewer'].includes(k))||!raw.projectId||!raw.artifactBucket)throw Error('PREVIEW_CONFIGURATION_REQUIRED');
+  const store=firestoreStore(new Firestore({projectId:raw.projectId})),artifacts=(w:string)=>new GcsPrivateArtifacts(raw.artifactBucket,w);
+  if(raw.householdViewer&&(raw.householdViewer.previewKey===raw.previewKey||raw.householdViewer.appOrigin===raw.hubOrigin))throw Error('HOUSEHOLD_VIEWER_ISOLATION_REQUIRED');
+  const handle=familyPreview(raw,store,artifacts),owner=raw.householdViewer?ownerPreview(raw.householdViewer,raw.previewOrigin,store,artifacts):undefined;
+  createServer((req,res)=>{void (req.url==='/household-preview'&&owner?owner:handle)(req,res);}).listen(Number(process.env.PORT)||8080);return;
+ }
+ const {platformMode:_householdMode,...config}=raw as PreviewConfig&{platformMode?:string};
  const repo=new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace,config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,config.workspace):undefined);
  const handler=createPreview(config,repo);
  createServer((req,res)=>{void handler(req,res).catch(()=>{if(!res.headersSent)res.writeHead(503);res.end('Private preview unavailable');});}).listen(Number(process.env.PORT)||8080);

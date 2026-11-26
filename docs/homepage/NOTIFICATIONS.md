@@ -1,5 +1,9 @@
 # Notifications and the Home continuation card
 
+## Home placement — November 25, 2026
+
+The November 25 Home hierarchy places the existing single continuation **after the three destination tiles and before Ready to Play jems**. Priority, unread badges, acknowledgment tokens, owner filtering and non-interrupting completion remain unchanged. No second continuation or build banner is added. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
+
 The [November 22 decision](../decisions/2026-11-22-unified-game-notifications.md) replaces the dark build shelf with one white Home card and an owner-scoped Notifications page. It extends the existing [homepage](README.md), [play view](PLAY_VIEW.md) and [child continuity](../child-continuity/README.md) contracts.
 
 ## What a child sees
@@ -10,6 +14,7 @@ The [November 22 decision](../decisions/2026-11-22-unified-game-notifications.md
 - An unseen ready result, failed build or uncertain request adds one alert. Repeated polling, queued/building/testing transitions and ordinary draft saves do not create new unread alerts or reorder same-priority rows. Work can remain pending after its alert has been read.
 - Opening Notifications marks the currently unread items as seen. It keeps unresolved work visible. Dismissing a Home reminder neither deletes the project nor cancels a build; a new result/job/state can surface a new reminder.
 - A ready action opens its exact saved result. Failed/uncertain actions open the saved composer and existing recovery choices. Active builds retain explicit **Play while I wait** and **Stop build**. These are choices, not automatic side effects of reading the page.
+- An unconfirmed remote copy produces an owner-scoped check reminder. Opening its game shows **Check my copy**. That action retrieves the saved receipt; it never sends a second copy POST. Missing receipts keep the original and pending identity intact. A failed local completion can be checked again after storage becomes writable.
 
 Background completion changes the card/badges without reopening a handoff, navigating, choosing a favorite, stealing typing focus or interrupting learning. The existing current-project ready button remains in More so its asynchronous preview request can leave the current game playable until an accepted response; a newer edit still wins over a late response. Navigating to the separate Notifications page follows the existing disposal contract. Returning to an action game may begin a new round; no universal frame checkpoint is added.
 

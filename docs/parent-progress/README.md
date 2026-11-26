@@ -56,7 +56,7 @@ The [snapshot adapter](../../src/parent/snapshot.ts) normalizes a copy, so openi
 the report does not initialize or save learner state. The
 [parent model](../../src/parent/model.ts) assembles snapshots after owner
 filtering. Math/Language report snapshots and retained attempts must identify the
-same selected owner. Creation joins only that owner's projects and revisions.
+same selected owner. Creation joins only that owner's projects and revisions. Reports load only when Parent is shown, capture the selected source and discard late results after a profile or filter change. When scenes are explicitly prepared, the asynchronous scene adapter supplies the authoritative snapshot; a failed prepared read is unavailable rather than falling back to stale legacy history. The existing My Powers panel reads only five recent indexed scene checks.
 Repeated checks of the same scene/version/goal remain inspectable in history but
 are collapsed for overview counts; repeated clicks do not become new examples.
 
@@ -158,3 +158,7 @@ baseline/follow-up forms, meaningful transfer probes, actual parent comprehensio
 testing, and research on educational benefit. Account sync, authenticated remote
 parent access, automatic digests, school imports, and normed score linking are
 separate capabilities, not implied by this dashboard.
+
+Early grade labels follow the shared grade table. Historical math and language skills with recorded evidence remain reportable after the parent lowers a ceiling.
+
+Early listening, vocabulary, phonological awareness and printed-word recognition have different skill IDs. A completed instruction recording is a presentation accommodation. Explicit grown-up reading records a supported completion. The dashboard exposes the declared support in the retained activity, excludes it from first-unaided responses, and keeps interrupted work separate from wrong answers. No automatic inference about adult presence is made.

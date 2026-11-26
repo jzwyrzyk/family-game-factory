@@ -1,5 +1,7 @@
 # jems product doctrine
 
+Family beta participation belongs to an invited, authorized adult. Children use supervised local profiles. Each family controls its own work and allowance. Provider approval, verified guardian consent, adult development privileges and play-session acknowledgment are separate decisions. Public release requires a further owner decision.
+
 **Purpose:** canonical summary of existing product intent and principles. These are standards to build toward, not a claim that every capability is implemented or validated.
 **Source review:** original doctrine audit November 18, 2026 (America/New_York), application `493eb9ce2a98de5f3be8f6d17e63dfe2f6a7e3a7`; the owner's subsequent style-diverse quality direction is recorded in [ADR0006](docs/decisions/0006-style-diverse-playable-quality.md), November 19, 2026 (UTC).
 **Scoped addition:** November 18, 2026, 11:52 p.m. America/New_York (`2026-11-19T04:52Z`), [PR #57](https://github.com/jzwyrzyk/family-game-factory/pull/57), source `f650bdac730be9bb6655325b32052a9524880933`: the illustrated making journey described in section 7. Other principles retain their recorded review scope.
@@ -107,6 +109,12 @@ The owner's November 19, 2026 direction adds [formative problem-solving observat
 
 The [parent area](docs/parent-progress/README.md) should help a parent see what happened, inspect the supporting example, and choose a useful next step. Keep Math, Language Arts, Computational Thinking and Problem Solving distinct. Clearly separate recent retained records from accumulated skill history, and observed task performance from standards coverage or validated assessment results. Unknown evidence is not a deficit; recorded help is context for teaching. Explain connections to familiar products and frameworks without converting scores or implying an overall grade level. Recommendations and exports must remain profile-specific and grounded in existing records. See the [parent reporting decision](docs/decisions/2026-11-19-parent-evidence-reporting.md).
 
+## Child destinations and visual standard
+
+The [November 25 modernization decision](docs/decisions/2026-11-25-child-experience-modernization.md) consolidates the child mental model: **My Games → Invent a game → play and improve → My Journey**. **My Art** holds drawings and **Creative Studio** offers Make a scene, Rebuild a scene and Try an experiment. Notifications retains one continuation authority. My Journey gathers Pals, lifetime gems, achievements, maker progression and powers through progressive disclosure; these concepts keep their distinct evidence and economies.
+
+**The existing Art Studio establishes the visual quality standard for Jems landing pages.** Preserve its artwork and composition while sharing navy headings, purple emphasis, soft gradients, readable white action cards and purposeful whitespace. A child's ordinary home keeps one hero action, then My Journey / My Art / Creative Studio, meaningful continuation, Ready to Play jems and My jems. Existing first-character onboarding remains creation-first.
+
 ## 7. The experience must work across devices and retain its identity
 
 Follow [Child interface: clear at six](docs/brand/CHILD_INTERFACE.md): remove redundant reading load, keep visible child labels at least 18px and main instructions at 20px, and check foreground/background contrast in the actual composed task and its help/error states. Question screens lead with the actual question; assessment interpretation belongs in parent reporting. Optional reading uses a deliberately chosen warm female local voice with truthful availability and immediate cancellation. Device audio quality remains a separate acceptance check.
@@ -127,7 +135,7 @@ The shared [Rewards experience](docs/rewards/README.md) adds nonspendable lifeti
 
 ### Companions make progress useful and playful
 
-[Jem Pals](docs/pals/README.md) provide an earned collection, visible growth, short funny reactions and characters children can immediately use in editable scenes. Luma and Nook offer equally useful free starter choices; the approved roster becomes available at transparent lifetime-gem targets. The [approved-collection decision](docs/decisions/2026-11-21-approved-pal-collection.md) preserves legacy saved IDs and binds all 24 characters to exact art. Collecting does not spend gems. Growth follows completed activities while that Pal is taken along, with no reward for tapping a portrait, waiting or keeping the app open. There are exactly two forms, Base and Grown. [The compatibility policy](docs/decisions/0013-two-form-pals-and-current-main.md) preserves the first earned transition at five adventures and all original receipts; it does not infer a numerical threshold from artwork approval.
+[Jem Pals](docs/pals/README.md) provide an earned collection, visible growth, short funny reactions and characters children can immediately use in editable scenes. Navi and Nook offer equally useful free starter choices; the approved roster becomes available at transparent lifetime-gem targets. The [current roster decision](docs/decisions/2026-11-25-journey-cards-and-starter-pals.md) retires Luma and Zippa and preserves the existing art and progression of the 22 active Pals. Collecting does not spend gems. Growth follows completed activities while that Pal is taken along, with no reward for tapping a portrait, waiting or keeping the app open. There are exactly two forms, Base and Grown. [The compatibility policy](docs/decisions/0013-two-form-pals-and-current-main.md) preserves the first earned transition at five adventures and all original receipts; it does not infer a numerical threshold from artwork approval.
 
 Use clear goals, anticipation, expressive personalities and creative utility to encourage return visits. Avoid paid luck, subscription pressure, disappearing companions, care chores, lost-progress threats and guilt about taking breaks. A funny line should respond to something the child did, stay brief, and never ridicule a mistake or claim the Pal needs the child emotionally. Parent controls can hide appearances and encouragement without reducing earned growth.
 
@@ -156,3 +164,9 @@ Routine operations must be automated through GitHub and scoped cloud identities 
 ## Changing this doctrine
 
 Update the affected principle and its linked detailed contract in the same PR as a material behavior change. Record a consequential choice and its source in [a decision record](docs/decisions/README.md). Distinguish an owner decision, a research hypothesis and an implementation observation. Automated maintenance may flag conflicts and stale evidence; it must not silently rewrite product intent or turn a proposal into an accepted decision.
+
+## Pre-K through Grade 4
+
+Parents explicitly select Pre-K, Kindergarten or Grades 1–4. Pre-K and Kindergarten use illustrated, audio-led play and local visual coding. Creating an AI game requires a grown-up handoff and separately authorized family processing. The child's selected grade sets a learning ceiling across subjects and Stretch. Reading access, game difficulty, adult access and provider permissions each retain their own controls.
+
+Secondary collection and progress pages use the left-aligned Choose your Pal header pattern. Preserve the route announcement and visible keyboard cues on actions. Keep contextual shortcuts within the shared My Journey destination. [Child interface standards](docs/brand/CHILD_INTERFACE.md#secondary-page-headers-and-focus)

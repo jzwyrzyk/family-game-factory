@@ -1,5 +1,6 @@
 /** Shared contracts for the host-owned, grades 1–4 learning service. */
-export type Grade = 1 | 2 | 3 | 4;
+import type {Grade} from './grades';
+export type {Grade} from './grades';
 export type LearningMode = 'checkpoint' | 'interaction' | 'both';
 export type Domain = 'operations' | 'place-value' | 'fractions' | 'measurement' | 'geometry' | 'data';
 export type Representation = 'symbolic' | 'visual' | 'story';

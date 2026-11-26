@@ -36,7 +36,7 @@ function savedLegacyGames(){
     const favorites=page.locator('#studioStarters [data-starter]');
     assert.equal(await favorites.count(),4,'four current Ready to Play games');
     assert.deepEqual((await favorites.evaluateAll(nodes=>nodes.map(node=>node.dataset.starter))).sort(),['factory','gum','hill','mining']);
-    assert.deepEqual((await page.locator('#page-creations #studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter))).sort(),['buckets','dragon']);
+    assert.deepEqual((await page.locator('#page-studio-library #studioOriginals [data-starter]').evaluateAll(nodes=>nodes.map(node=>node.dataset.starter))).sort(),['buckets','dragon']);
     assert.equal(await page.locator('[data-starter="moon"], [data-starter="robot"]').count(),0,'retired starters are absent from both curated shelves');
     assert.equal(await page.locator('#studioLibrary [data-session]').count(),2,'meaningful saved legacy games remain accessible');
     assert.equal((await page.locator('#studioStarterTitle').textContent()).trim(),'Ready to Play jems','favorites shelf uses the approved child-facing heading');

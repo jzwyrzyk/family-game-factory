@@ -1,3 +1,5 @@
+import {adultStorageKey} from '../adult-pilot/storage';
+import {LOCAL_JOURNAL_KEY} from '../storage/local-journal';
 /** The legacy source stores are synchronous. Keep one writer per browser origin
  * so an old tab cannot replace a newer attempt and its pending reward receipt. */
 let managed = false;
@@ -9,12 +11,17 @@ let needsReload = false;
 let maintenance = false;
 const paused = new Map<HTMLElement, boolean>();
 
+export function assertRewardSourceLockHeld(): void {
+  if (managed && !writable) throw Error('Jems is open in another tab. Close that tab, then choose Try this tab here.');
+}
+
 export function assertRewardSourceWritable(): void {
+  if (typeof localStorage !== 'undefined' && (localStorage.getItem(adultStorageKey(LOCAL_JOURNAL_KEY)) !== null||localStorage.getItem(adultStorageKey('jems-complete-restore-pending-v1'))!==null)) throw Error('Saved work needs recovery. Reload Jems before saving again.');
   if (maintenance) throw Error('Jems is restoring saved progress. Wait for the page to finish reloading.');
   if (managed && !writable) throw Error('Jems is open in another tab. Close that tab, then choose Try this tab here.');
 }
 
-export function rewardSourceWritable(): boolean { return !maintenance && (!managed || writable); }
+export function rewardSourceWritable(): boolean { try { assertRewardSourceWritable(); return true; } catch { return false; } }
 export function setRewardSourceMaintenance(blocked: boolean): void { maintenance = blocked; }
 
 function showNotice(message: string, retry = true): void {

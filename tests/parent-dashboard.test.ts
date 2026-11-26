@@ -291,3 +291,19 @@ test('snapshot preserves storage and adapter read failures separately from an ab
     else Reflect.deleteProperty(globalThis, 'localStorage');
   }
 });
+
+
+test('prepared scene snapshot reports the durable authority and never falls back to a stale legacy source',()=>{
+ const descriptor=Object.getOwnPropertyDescriptor(globalThis,'localStorage');let legacyReads=0;
+ Object.defineProperty(globalThis,'localStorage',{configurable:true,value:{getItem(){legacyReads++;throw Error('Legacy source must not be used');}}});
+ const p=learner(),before=JSON.stringify(p),FG={store:{current:()=>p}};
+ try{
+  const saved=captureParentSnapshot(FG,30,NOW,{snapshot:workspace()});
+  assert.equal(saved.dashboard.subjects.find(d=>d.id==='creation')!.availability,'available');
+  assert.ok(saved.dashboard.evidence.some(e=>e.subject==='creation'));
+  const failed=captureParentSnapshot(FG,30,NOW,{error:Error('Damaged prepared scene')});
+  assert.equal(failed.dashboard.subjects.find(d=>d.id==='creation')!.availability,'read-error');
+  assert.equal(failed.dashboard.evidence.some(e=>e.subject==='creation'),false);
+  assert.equal(legacyReads,0);assert.equal(JSON.stringify(p),before);
+ }finally{if(descriptor)Object.defineProperty(globalThis,'localStorage',descriptor);else delete (globalThis as any).localStorage;}
+});

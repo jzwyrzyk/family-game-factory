@@ -24,7 +24,7 @@ const replaceActions=(id:string,actions:CreationBlock[])=>{
 };
 
 test('Every published practice target runs and satisfies its stated behavior checks',()=>{
-  assert.equal(CREATION_CHALLENGES.length,5);
+  assert.equal(CREATION_CHALLENGES.length,9);
   for(const challenge of CREATION_CHALLENGES) {
     validateCreationProject(createChallengeStarter(challenge.id));
     validateCreationProject(createChallengeTarget(challenge.id));
@@ -42,7 +42,7 @@ test('Starters have no copied solution; a deliberately wrong debugging starter a
   for(const challenge of CREATION_CHALLENGES) {
     const starter=createChallengeStarter(challenge.id);
     fails(challenge.id,starter);
-    if(challenge.id!=='early-cheer') assert.equal(starter.programs.flatMap(program=>program.actions).length,0);
+    if(challenge.id!=='early-cheer'&&challenge.id!=='fix-direction') assert.equal(starter.programs.flatMap(program=>program.actions).length,0);
   }
   const starter=createChallengeStarter('robot-route');
   const target=createChallengeTarget('robot-route');
@@ -276,4 +276,20 @@ test('Invalid scenes, unknown IDs, and safety limits never produce completion ev
   infinite.programs.push({id:'recursive',actorId:'bucket',trigger:{type:'event',name:'again'},actions:[{id:'repeat-event',type:'emit',name:'again'}]});
   infinite.programs[0].actions.push({id:'start-event-loop',type:'emit',name:'again'});
   fails('early-cheer',infinite,'run-completed');
+});
+
+test('a beginner path accepts equivalent programs and rejects the opposite direction',()=>{
+ const correct=createChallengeTarget('first-step');
+ correct.programs[0].actions=[{id:'one',type:'move',dx:40,durationMs:400},{id:'two',type:'move',dx:40,durationMs:400}];
+ passes('first-step',correct);
+ correct.programs[0].actions=[{id:'left',type:'move',dx:-80,durationMs:800}];
+ fails('first-step',correct,'follow-path');
+});
+
+test('early predictions read actual visible motion independently of the challenge target',async()=>{
+ const {firstMovement,createChallengeStarter,createChallengeTarget}=await import('../src/creation/challenges');
+ assert.equal(firstMovement(createChallengeTarget('first-step'),'first-step'),'right');
+ assert.equal(firstMovement(createChallengeTarget('fix-direction'),'fix-direction'),'left');
+ assert.equal(firstMovement(createChallengeStarter('fix-direction'),'fix-direction'),'right');
+ assert.equal(firstMovement(createChallengeStarter('first-step'),'first-step'),'still');
 });

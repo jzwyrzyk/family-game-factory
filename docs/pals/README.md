@@ -1,10 +1,14 @@
 # My Pals: companions for learning and creation
 
+## Pals inside My Journey — November 25, 2026
+
+Enter through **My Journey → My Pals**, including the overview’s free-starter/equipped-Pal entrance. This supersedes the standalone Home banner and top-level menu entry. Approved portraits, Welcome, Take along, Base/Grown, collection eligibility and Create with my Pal remain on the existing guarded controller. An optional Pal entrance remains inside Make a scene. No artwork or growth rule changes. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
+
 **Scope:** the companion foundation in this checkout. This document describes source behavior, integration contracts and acceptance requirements. It does not establish a merge, deployment, observed child engagement or educational benefit; dated evidence belongs in [delivery state](../../DELIVERY-STATE.md).
 
 The owner requested the complementary companion system, then authorized implementation with funny encouragement, a useful collection, visible progress and easy use in children's games. The owner also asked for a practical balance between engagement and the heavy subscription/addiction patterns of comparable products. Character artwork remains a separate development conversation. [ADR0012](../decisions/0012-pals-from-earned-activity.md) records this scope alongside the existing [shared Rewards contract](../rewards/README.md).
 
-The [Gem Pal artwork reference library](art/README.md) supplies the actual collection under the [November 21 integration decision](../decisions/2026-11-21-approved-pal-collection.md). The 23 original profiles have approved Base/Grown neutral and expression images; Brio joins as the 24th Pal with his two approved neutrals. His six expression candidates remain in review and are not shipped as approved reactions.
+The [Gem Pal artwork reference library](art/README.md) supplies the actual collection under the [November 21 integration decision](../decisions/2026-11-21-approved-pal-collection.md). The active roster has 21 core profiles with two approved forms and three expressions per form, plus Brio with two approved neutrals. His six expression candidates remain in review and are not shipped as approved reactions.
 
 ## Collection and eligibility
 
@@ -12,13 +16,13 @@ The [catalog](../../src/pals/catalog.ts) uses the approved names and exact form 
 
 | Visible Pal / group | Saved identity | Collection rule |
 | --- | --- | --- |
-| **Luma** | `glim` compatibility alias | Free first-Pal choice; otherwise available at **50 lifetime gems** |
+| **Navi** | `navi` | Free first-Pal choice; otherwise available at **50 lifetime gems** |
 | **Nook** | `kip` compatibility alias | Free first-Pal choice; otherwise available at **50 lifetime gems** |
 | **Wink** | `riff` compatibility alias | Available at **150 lifetime gems** |
-| Other 20 original profiles | Their explicit character slug | Manifest order, starting at **200**, increasing by **50**, through **1,150 lifetime gems** |
+| Other 18 core profiles | Their explicit character slug | Fixed individual thresholds from **200** through **1,150 lifetime gems** |
 | **Brio** | `brio` | Available at **1,200 lifetime gems** |
 
-The first choice offers Luma or Nook and makes the selected Pal active. Existing `glim`/`kip`/`riff` inventories show their assigned real character without rewriting receipts or histories. Reaching another Pal's threshold makes it available; **Welcome** adds it to the collection, and **Take along** separately changes the active Pal. Welcoming never silently replaces the active companion. All 24 Pals have equal creative capabilities.
+The first choice offers Nook or Navi and makes the selected Pal active. The [roster migration](../decisions/2026-11-25-journey-cards-and-starter-pals.md) preserves historical activity and saved scenes. Reaching another Pal's threshold makes it available; **Welcome** adds it to the collection, and **Take along** separately changes the active Pal. Welcoming never silently replaces the active companion. All 22 Pals have equal creative capabilities.
 
 These are lifetime earning thresholds, not prices. **No gems are spent.** Collecting, equipping, playing with or creating with a Pal leaves the shared gem total unchanged. Previously earned gems can qualify the other companions when the child first chooses a starter. Thresholds are initial product settings, not research-calibrated claims about motivation or learning.
 
@@ -28,9 +32,9 @@ Ownership and availability are persisted. Ordinary breaks, changing the active P
 
 | Surface | Actual interaction and value |
 | --- | --- |
-| **My Pals** | Choose between two free starters, browse all 24 approved characters, see owned/available/locked states, welcome an eligible Pal, take it along, or create a scene. Optional expression play belongs to the selected owned Pal and its earned form. |
+| **My Pals** | Choose between two free starters, browse all 22 active characters, see owned/available/locked states, welcome an eligible Pal, take it along, or create a scene. Optional expression play belongs to the selected owned Pal and its earned form. |
 | **Pal detail playground** | Tap an owned portrait for a short finite visual reaction and a scripted funny line. Taps are play, with no gems or growth awarded. |
-| **Home entry** | Open the collection or start creating with the active owned Pal. The entry follows the existing playable game shelf and creation entrance. |
+| **My Journey overview** | My Pals opens the collection. Create with an owned Pal from its detail page. |
 | **Studio cameo** | A small trusted-host companion beside the game surface, with collection access and the host's existing Help action. It is not injected into a game's iframe and does not change the game's score, physics or difficulty. |
 | **Learning hint entrance** | When a visible supported Math/Language hint control is available, **Ask [Pal] for a hint** invokes that same host control. Existing hint depth, assistance evidence and answer handling remain authoritative. |
 | **Create & code** | Start an editable Pal playground or add an owned Pal to an existing free scene, with real tap-response behavior and editable blocks. |
@@ -86,7 +90,7 @@ The catalog's `base`/`mature` slots bind exact approved artwork. Five adventures
 
 The shared receipt ID is assigned once. Reopening, retrying synchronization or re-equipping a Pal cannot replay the same work. The store retains ordered active-Pal selection boundaries; a delayed receipt follows the Pal active at its recorded occurrence time, even if another Pal is now active.
 
-Learning remainders remain with their own Pal. For example, four saved learning activities with Luma and four with Nook give each Pal four toward its own next adventure. Returning to Luma and completing one more gives Luma an adventure; Nook's progress stays at four. Switching does not move partial groups or duplicate completed groups.
+Learning remainders remain with their own Pal. For example, four saved learning activities with Navi and four with Nook give each Pal four toward its own next adventure. Returning to Navi and completing one more gives Navi an adventure; Nook's progress stays at four. Switching does not move partial groups or duplicate completed groups.
 
 Before the first starter selection, existing receipts are recorded with no Pal assignment. This includes unusually future-dated receipts already present in the ledger, so choosing a starter does not turn old work into new growth. New receipts whose occurrence precedes the first selection also have no Pal assignment. Earlier gems can unlock collection eligibility, while earlier work does not retrospectively grow a newly chosen companion.
 
@@ -154,8 +158,19 @@ The [component browser checks](../../tests/pals-ui-browser.cjs) use explicit syn
 
 The real collection now uses the approved roster. Articulated rigs, richer animation and companion behavior inside arbitrary generated-game mechanics remain separate. New art must preserve exact existing scene references and receipt ownership. Paid features, trading, cross-device synchronization or a generated-game companion API are outside this feature.
 
-The v1 saved collection accepts all 24 IDs. Older application builds do not understand newly earned IDs or new versioned scene assets; preserve storage during rollback and use a compatible forward repair. The existing three saved aliases and their historical scenes remain readable.
+Policy 2 accepts the active roster. Policy 1 imports validate historical ownership and migrate Luma and Zippa. See the [migration and rollback contract](../decisions/2026-11-25-journey-cards-and-starter-pals.md).
 
 ### Coding scene presentation
 
 The first-learner coding candidate adds [scene-only Pal compositing](../creation-studio/PAL_SCENE_RENDERING.md) for the 48 approved neutral pictures. It removes cream paper at draw time with a bounded active-scene cache. Catalogue portraits, source bytes, ownership and growth, expression approvals, saved asset IDs and original token compatibility remain unchanged. This is not a replacement art pack or a new approval of character designs.
+
+
+### Shared transparent presentation — November 25 correction
+
+The owner’s Android review found the Journey starter portrait bypassed scene-only
+paper isolation. All Pal portraits now use the [shared rendering contract](../creation-studio/PAL_SCENE_RENDERING.md), including starter/locked/owned cards,
+Base/Grown expressions, host cameos, rewards and Creative Studio choices. Exact
+approved source URLs and art bytes remain unchanged. Preparation failure is
+visible and recoverable, never an opaque-paper success. Journey's column card
+resets the horizontal widget's flex basis so phone whitespace follows content.
+[Audit and acceptance evidence](../evidence/child-modernization/pal-fidelity/README.md).

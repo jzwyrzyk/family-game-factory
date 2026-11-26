@@ -1,12 +1,16 @@
 # Creation Studio: make scenes and rebuild behavior
 
+## Creative Studio entrances — November 25, 2026
+
+The landing page follows My Art: **Make it. Make it move.**, approved gem artwork, three action cards and My scenes. **Make a scene** reveals existing worlds and optional characters/Pals/art; **Rebuild a scene** opens existing deterministic challenges; **Try an experiment** opens authored reasoning practice and returns here. Scene files belong beside saved scenes. A first visit offers a skippable arrow-and-Play introduction using the real interpreter, with no project or evidence write. `studio-intro` lives in existing owner-scoped guidance. First steps, More tools, checks, hints, Keep, draft recovery and program semantics are unchanged. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
+
 **Status:** merged in [PR62](https://github.com/jzwyrzyk/family-game-factory/pull/62) as [`c4ce21be410e7fccb16922c4711f4c4172edbc7e`](https://github.com/jzwyrzyk/family-game-factory/commit/c4ce21be410e7fccb16922c4711f4c4172edbc7e), November 19, 2026. This document describes source behavior and its acceptance contract; the merge does not establish deployment, real-device acceptance, or educational efficacy.
 
 **Decision:** [ADR0007 — One creation experience with free scenes and rebuild practice](../decisions/0007-creation-and-rebuild-practice.md). The owner expanded the earlier discussion into an explicit development request during the November 18–19, 2026 session: keep one Jems experience, reuse the child's game characters and ideas, offer editable scenes/actions, and provide a separate practice entrance where children rebuild demonstrated behavior.
 
 **Art Studio support:** merged [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23) adds private original drawings and exact saved cutout versions to local scenes. The section below describes that source behavior; the [acceptance record](ACCEPTANCE.md) and [delivery state](../../DELIVERY-STATE.md) retain its development checks and subsequent merge receipt separately from the earlier PR62 merge. First-creation guidance is now combined with this merged source; delivery evidence distinguishes that integration's local and hosted checks from the earlier receipts.
 
-**First-learner UI candidate:** the owner's [November 22 refinement](../decisions/2026-11-22-first-learner-coding.md) adds the stage-first **First steps** view and optional fuller controls described below. It is stacked on PR125 source `1340d041145ffba4322ccb8262188b7cf2c7b6c4`, preserving shared reading, profile and play-view behavior. This candidate is separate from the historical merges above; current verification and release status belongs in the [acceptance record](ACCEPTANCE.md) and delivery state.
+**First-learner UI candidate:** the owner's [November 22 refinement](../decisions/2026-11-22-first-learner-coding.md) introduced **First steps** and optional fuller controls. The November 25 workspace correction updates their layout. It is stacked on PR125 source `1340d041145ffba4322ccb8262188b7cf2c7b6c4`, preserving shared reading, profile and play-view behavior. This candidate is separate from the historical merges above; current verification and release status belongs in the [acceptance record](ACCEPTANCE.md) and delivery state.
 
 ## Product purpose and boundaries
 
@@ -77,7 +81,7 @@ Missing, changed or foreign art is visibly unavailable. Jems does not replace it
 
 **Open a scene file** validates the whole scene and art bundle, including each reference hash, before importing art. The art store adds all imported originals and rig versions in one transaction, assigning new IDs in the selected profile. The scene importer remaps its references and recomputes rig hashes for those new source identities, then saves a separate scene with assisted import provenance. Other profiles and existing scenes are unchanged. If the subsequent scene save fails, the imported artwork remains available in Art Studio and the message explains that the scene was not saved. Invalid, incomplete or mismatched bundles make no art writes.
 
-Scene files with art use the shared 64 MiB transfer limit; ordinary scene-only JSON retains its 500 KB input limit. Family progress backups retain scene references separately from private image storage. Use the explicit art backup/restore or a scene-with-art download to move private pixels; a progress JSON alone does not promise a complete art transfer.
+Scene files with art use the shared 64 MiB transfer limit; ordinary scene-only JSON retains its 500 KB input limit. Legacy family progress backups retain scene references separately from private image storage. Parent complete recovery copies include original art and the active scene authority; the separate art bundle and scene-with-art downloads remain compatible. A legacy progress JSON alone does not promise a complete art transfer.
 
 ## Interpreter contract
 
@@ -102,7 +106,9 @@ Free creation offers Dragon, Buckets, Robot, and blank starters, actor placement
 
 ### First steps and More tools
 
-**First steps** is the default presentation. The fitted workspace puts a large stage above a compact coding dock. My Games, My scenes, playback, Try tap, Undo, Keep and Full screen remain available; optional tools and long content scroll within their own areas. Fullscreen keeps the exit and trusted learning overlay inside the same workspace. An unavailable or refused browser fullscreen request uses a truthfully labeled expanded view.
+**First steps** is the default presentation. The fitted workspace shares its width equally between stage and code on desktop and landscape tablets. Portrait tablets give the stage 35% and code 65% of the available rows. At widths up to 700 CSS pixels or heights up to 600 CSS pixels, a scene opens in Code. The Code and Play buttons switch views of the same project. The stage’s Play button runs the program. Watch, Check and a due learning activity bring their stage into view.
+
+All six First steps actions appear first in the code pane. Adding a block reveals its selected editor. Children can swipe the whole pane to reach a long sequence, use the reorder and remove buttons, or choose an insertion point to return to the palette. On compact screens, Characters & tools contains character selection, scene settings and the More tools switch. My Games, My scenes, playback, Try tap, Undo, Keep and Full screen remain available. Fullscreen keeps the exit and trusted learning overlay inside the same workspace. An unavailable or refused browser fullscreen request uses a truthfully labeled expanded view.
 
 The initial action palette is **Move, Jump, Say, Dance, Wait and Repeat**; the **Ready for three gems** condition exercise also exposes **If**. The ordered program stays visible, and playback highlights its executing block. Selecting a block reveals its controls rather than expanding every parameter simultaneously. Movement uses **Direction** and numeric **Steps**, preserving exact distances such as the existing 120-step tap exercise. Jump and time choices retain an honest Custom option for saved values that do not match a preset. Opening the simpler view does not snap values or convert absolute, diagonal or nested actions.
 
@@ -154,7 +160,7 @@ After a successful challenge check, the already-authored extension is displayed 
 
 The existing Math/Language learning host retains subject, grade, checkpoint selection, answer handling, and progress. Scene playback and instructional interactions must honor an active host activity; the interpreter cannot mark the activity correct or dismiss it. [Math integration](../adaptive-math/integration.md) and [Language integration](../adaptive-language/integration.md) remain the relevant learning contracts.
 
-The separate local key is `family-game-factory-creation-v1`, schema `jems.creation.workspace.v1`. Storage keeps owner-scoped project entries, immutable revisions, a separately selected kept revision, recoverable drafts, and bounded attempt records. An autosave protects an experiment; it does not choose a favorite. Editing uses an expected base revision to reject stale writes. A saved source reference cannot be rewritten through an ordinary edit.
+The ordinary-build local key is `family-game-factory-creation-v1`, schema `jems.creation.workspace.v1`. The explicitly selected storage-preview can prepare the [indexed scene authority](../../src/storage/indexed-creation.ts) through the actual Creation Studio. Migration retains exact legacy bytes and activates only after verified completion. Library and retained versions page in groups of 24; recent progress reads five indexed checks. Scene edits, autosave, Keep, copy and challenge evidence await committed writes, with immutable revisions, CAS and profile fences. Normal builds do not activate this migration from a saved marker. Storage keeps owner-scoped project entries, immutable revisions, a separately selected kept revision, recoverable drafts, and bounded attempt records. An autosave protects an experiment; it does not choose a favorite. Editing uses an expected base revision to reject stale writes. A saved source reference cannot be rewritten through an ordinary edit.
 
 The [shared Rewards extension](../rewards/README.md) adds an optional `rewardOutbox` to this same schema. A durably saved passing challenge check queues 8 engagement gems once per owner/challenge ID; hints do not reduce the reward. Rechecking, copying or using another revision cannot earn the same challenge grant twice. The record remains a specific formative observation, with no new mastery score. The source write and pending fact commit together; ledger projection and acknowledgement recover independently. Reading/restoring earlier attempts does not backfill rewards. The origin-wide source-writing guard prevents concurrent tabs from overwriting the synchronous source document.
 
@@ -204,3 +210,20 @@ The compact shell keeps Create primary, with Create & code under Menu → Make a
 Creation Studio keeps a speaker control available above the shelf and scene workspace. An explicit tap reads the current directions, the selected rebuild challenge and revealed hint, or visible scene-check feedback. The character picker has its own accessible speaker control while its dialog is open. The next tap stops reading; changing scene, editing, opening a learning checkpoint, leaving or switching players stops pending and active narration. No speech starts automatically, and reading directions does not add a hint or award learning evidence. See the [shared read-aloud contract](../speech/READ_ALOUD.md) for natural/device voice selection and actual-playback evidence boundaries.
 
 The [Pal scene rendering contract](PAL_SCENE_RENDERING.md) records the exact image scope, reviewed negative-space openings, immutable source boundary, and compositing evidence.
+
+## Early graphical coding
+
+First steps gives each direction a tap-to-add arrow. Every arrow inserts an ordinary relative move with the original interpreter's duration, distance and revision semantics. Sequence blocks show their direction. Grade 2 and above keep labels alongside the command symbols. More tools exposes exact values on every profile. The responsive stage and workspace come from #175.
+
+| Grade | Concept / activity | Developmental reference | Support level | Evidence |
+|---|---|---|---|---|
+| Pre-K | One step right, correct the direction | CSTA 2026 EK-PRO-TR-07 | Introduced | A bounded run follows the target direction and stops |
+| Kindergarten | Follow a two-leg path and repeat it in a second scene | Michigan 1A-AP-10, CSTA 2026 EK-PRO-PD-04 | Practiced | Ordered visible movement and stationary landmarks |
+| Kindergarten | Repetition and taps | Michigan 1A-AP-10, CAL ScratchJr event and motion activities | Partially supported | Bounce and tap schedules checked on the saved version |
+| Grade 1 | Longer routes and repair | CSTA 2026 E1-PRO-PD-04 and E1-PRO-TR-07 | Practiced | Saved-version behavior and recorded hint use |
+
+The introductory sequence starts with one step, follows with correcting a direction, and introduces turning before transfer to the meadow. These are suggested prerequisites. Children can also experiment freely. A passing trace cannot establish a prediction the child never supplied. The parent report describes what the version did.
+
+Sources reviewed November 25, 2026 include the [2026 CSTA PK–12 edition](https://csteachers.org/2026-csta-pk-12-computer-science-standards/), [Michigan's adopted K–12 CS standards](https://www.michigan.gov/mde/services/academic-standards/michigan-k-12-computer-science-standards) and [Boston College's Coding as Another Language Kindergarten ScratchJr curriculum](https://sites.bc.edu/codingasanotherlanguage/curricula/scratchjr-curricula/kindergarten-scratchjr/). The CSTA 2026 edition has grade-specific identifiers. Michigan's state framework retains its adopted K–2 identifiers.
+
+On the four early directional challenges, **Predict a move** accepts an optional tap before checking a specific scene. The bounded evaluator samples the first visible displacement. Equal diagonal movement, a hidden actor or an execution limit yields no directional observation. Changing the scene invalidates the pending choice. The saved check can contain a pair of direction labels for the parent. A correct scene or a Run click alone contributes no prediction response.

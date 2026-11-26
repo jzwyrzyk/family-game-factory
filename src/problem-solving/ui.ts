@@ -6,7 +6,7 @@ import { assertPracticeContinuation, evaluatePracticeChoice, getPracticeTask, pr
 import './style.css';
 import {createFriendlyNarrator} from '../speech/friendly-narrator';
 
-type Host = { enter(): boolean; home(): void };
+type Host = { enter(): boolean|Promise<boolean>; home(): void };
 const node = <K extends keyof HTMLElementTagNameMap>(tag: K, className = '', text = '') => {
   const el = document.createElement(tag); el.className = className; el.textContent = text; return el;
 };
@@ -21,7 +21,7 @@ export function installProblemSolvingPractice(host: Host) {
   const owner = () => String(FG.store.current().id);
   const store = () => new ProblemSolvingStore(profileStorage(localStorage), owner);
   const page = node('section', 'page hidden'); page.id = 'page-problem-solving';
-  page.innerHTML = `<header class="ps-heading"><div><span class="ps-eyebrow">THE jems IDEA WORKSHOP</span><h1 id="psHeading" tabindex="-1">Try an idea.</h1><p id="psSubtitle">Wonder a little. Try something. See what changes.</p></div><button type="button" class="ps-button ps-home" id="psHome">${iconMarkup('arrow', 'jems-icon--back')} My Games</button></header><div id="psStatus" class="ps-status" role="status" aria-live="polite"></div><div id="psBody"></div>`;
+  page.innerHTML = `<header class="ps-heading"><div><span class="ps-eyebrow">Creative Studio</span><h1 id="psHeading" tabindex="-1">Try an experiment.</h1><p id="psSubtitle">Wonder a little. Try something. See what changes.</p></div><button type="button" class="ps-button ps-home" id="psHome">${iconMarkup('arrow', 'jems-icon--back')} Creative Studio</button></header><div id="psStatus" class="ps-status" role="status" aria-live="polite"></div><div id="psBody"></div>`;
   document.querySelector('main')!.append(page);
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => page.querySelector<T>('#' + id)!;
   let active: ProblemSolvingDraft | null = null, visible = false, activeOwner = '', revisionRetry = false;
@@ -30,7 +30,10 @@ export function installProblemSolvingPractice(host: Host) {
     && active?.episode.id === readingEpisode && phaseNow() === readingPhase);
   const status = (text: string, error = false) => { $('psStatus').textContent = text; $('psStatus').classList.toggle('is-error', error); };
   const isCurrent = () => visible && activeOwner === owner();
-  const act = (fn: () => void) => { try { fn(); } catch (error) { status((error as Error).message, true); } };
+  const act = (fn: () => void|Promise<void>) => {
+    const capturedOwner=owner(),failed=(error:unknown)=>{if(owner()===capturedOwner)status((error as Error).message,true);};
+    try { const result=fn();if(result)void result.catch(failed); } catch(error) { failed(error); }
+  };
   const stopSpeech = () => narrator.cancel();
   function assertCurrent() {
     if (!isCurrent()) throw Error('Open this idea in your own profile.');
@@ -103,13 +106,13 @@ export function installProblemSolvingPractice(host: Host) {
   }
   function renderShelf() {
     stopSpeech(); active = null; revisionRetry = false; page.dataset.phase = 'shelf'; status('');
-    $('psHeading').textContent = 'Try an idea.'; $('psSubtitle').textContent = 'Wonder a little. Try something. See what changes.';
+    $('psHeading').textContent = 'Try an experiment.'; $('psSubtitle').textContent = 'Wonder a little. Try something. See what changes.';
     const body = $('psBody'); body.replaceChildren();
     const intro = node('div', 'ps-shelf-intro');
     intro.append(image('./jems-art/character_spark_wave.webp', 'ps-companion'), node('p', '', 'A small adventure for your next big idea. Pick one to begin.'));
     body.append(intro);
     const cards = node('div', 'ps-cards');
-    for (const task of practiceTasksForGrade(Number(FG.store.current().grade) || 1)) {
+    for (const task of practiceTasksForGrade(FG.store.current().grade)) {
       const draft = store().draft(owner(), task.id), card = button('', 'ps-card'); card.dataset.psTask = task.id;
       card.append(image(task.thumbnail, 'ps-card-art'));
       const copy = node('span', 'ps-card-copy'), action = node('b', '', draft ? 'Continue my idea ' : 'Let’s try '); action.append(createIcon('arrow'));
@@ -249,11 +252,11 @@ export function installProblemSolvingPractice(host: Host) {
   }
   function close() { stopSpeech(); visible = false; revisionRetry = false; page.classList.add('hidden'); }
   function open(id?: string) {
-    act(() => {
-      if (!host.enter()) return;
+    act(async () => {
+      if (!await host.enter()) return;
       visible = true; activeOwner = owner(); page.classList.remove('hidden');
       if (id) {
-        const task = getPracticeTask(id), allowed = practiceTasksForGrade(Number(FG.store.current().grade) || 1).some(item => item.id === task.id);
+        const task = getPracticeTask(id), allowed = practiceTasksForGrade(FG.store.current().grade).some(item => item.id === task.id);
         if (!allowed) { renderShelf(); return; } start(task);
       } else renderShelf();
     });

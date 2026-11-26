@@ -1,5 +1,9 @@
 # Art Studio: draw it, develop it, reuse it
 
+## My Art navigation and preserved visual reference — November 25, 2026
+
+**My Art** is the canonical destination in Home and Menu → Make. The original **You drew it. Now let’s play.** heading, gem illustration, gradient panel, Upload a drawing / Take a photo / Draw here arrangement and collection remain the visual reference. Readability is improved without replacing the composition or assets. Optional picture controls in a game/scene open the same library and offer an owner-bound return to that activity. Scene links use **Creative Studio**. Original pixels, derivatives, exact references, camera/upload and private storage contracts below are unchanged. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
+
 **Source scope:** Art Studio from merged [PR23](https://github.com/jzwyrzyk/family-game-factory/pull/23), November 19, 2026 (America/New_York). This contract describes source behavior, not production deployment. The accepted direction is recorded in [the Art Studio decision](../decisions/2026-11-19-private-art-studio.md). [Delivery state](../../DELIVERY-STATE.md) records its merge receipt and keeps the subsequent first-creation integration acceptance separate.
 
 ## The experience
@@ -40,13 +44,13 @@ Changing a library picture's metadata or saving a later rig does not rewrite ear
 
 ## Storage and lifecycle
 
-`family-private-drawings-v1` is upgraded in place to database version 2, with stores for originals, rigs, drafts, selected legacy rig, usage and migration metadata. Existing original records remain compatible. The old draft PR's separate rig database is read once for compatible migration; it is not erased.
+`family-private-drawings-v1` is upgraded in place to database version 3, with stores for originals, rigs, drafts, selected legacy rig, usage, migration metadata and the regenerable drawing catalog. Existing original records remain compatible. Metadata and previews page separately from original bytes, which are read when selected or explicitly backed up. While a prepared native or scene authority exists, physical deletion is blocked under the shared maintenance lock because the legacy usage index cannot prove all references; Archive remains available and preserves original bytes. The old draft PR's separate rig database is read once for compatible migration; it is not erased. When native database inventory is available, an absent legacy name is not opened merely to discover absence; inventory failures remain visible. Existing databases and browsers without that inventory API retain their validated legacy reader.
 
 - PNG/JPEG headers, actual decode, maximum byte count and dimensions are checked. Originals retain their hash. Upload decoding is local.
 - Profile identity and the shared source-writer guard are rechecked after asynchronous work and before mutation. The temporary adult profile uses its distinct owner identity. A late decode or save cannot insert art into a newly selected player's view.
 - Quota, ownership, parent/source linkage and related writes share an IndexedDB transaction. A failed import does not leave partially added source/rig records.
 - Drafts persist editable assemblies without promoting a version. Undo/Redo and pointer cancellation preserve meaningful history. Save and close handle pending draft writes; failed saves remain visible.
-- Creating a Rally game stages its native revision and Studio notebook reference together. A synchronous notebook-save failure compensates the native write while it still belongs to that operation; the retry creates one linked game with the chosen immutable rig. Previously retained unlisted Rally games remain recoverable without replacing their IDs or drawing bindings. The supplementary art-usage index cannot hide a saved game. This cross-store compensation is distinct from the drawing database's IndexedDB transactions and is not a crash-safe journal.
+- Creating a Rally game stages its native revision and Studio notebook reference together. A synchronous notebook-save failure compensates the native write while it still belongs to that operation; the retry creates one linked game with the chosen immutable rig. Previously retained unlisted Rally games remain recoverable without replacing their IDs or drawing bindings. The supplementary art-usage index cannot hide a saved game. The PR166 branch adds a durable exact-image undo journal for this native/notebook operation under the shared writer lock, with startup reconciliation; the drawing database retains its separate IndexedDB transactions. See [storage recovery](../storage/README.md) for limits and source status.
 - Archive preserves storage and all references. Permanent removal rejects retained dependencies, including derivative sources, usage records and saved scene/native-game history. A separate original remains exportable.
 - Image previews and decoded private canvases are discarded on profile/view changes. Runtime resolution never fetches an arbitrary external URL.
 
@@ -54,7 +58,7 @@ Limits are explicit in `src/drawing/library.ts`: 5 MiB per image, 4096 pixels pe
 
 ## Backups and transfers
 
-The existing family progress JSON continues to contain learning, game and scene records. Art is a separate downloadable bundle; the parent settings now explain the two-file recovery path. The application does not claim cloud synchronization or a complete image backup inside the progress file.
+The existing family progress JSON continues to contain learning, game and scene records. Art remains a separate compatible downloadable bundle. Parent complete recovery copies additionally capture original bytes, rigs, active prepared records and recovery metadata together, with integrity validation, preview and safety rollback. The legacy progress file alone is not a complete image backup. Separately approved cloud recovery stays disabled by default.
 
 | Action | Result |
 | --- | --- |

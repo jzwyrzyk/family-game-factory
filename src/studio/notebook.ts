@@ -30,6 +30,7 @@ export interface StudioSession {
   design?:DesignRecord; experiments?:Experiment[]; selectedTest?:string|null; playOnly?:boolean;
   pendingExperiment?:{parents:string[];depth:Experiment['depth'];origin:Origin;baseId:string|null;prompt:string}|null;
   pendingSubmission?:PendingBuildSubmission|null;
+  pendingCopy?:{requestId:string;sourceRevisionId:string;name:string;api:string}|null;
   archived?:boolean; resumeDismissed?:boolean;
   keptExperiments?:KeptExperiment[]; verifiedRemoteExperiments?:string[];
   /** Canonical source project, retained through copies and local/remote transitions. */
@@ -64,7 +65,7 @@ function chaptersFor(notebook:Notebook,session:StudioSession):ConversationChapte
 function conversationContext(notebook:Notebook,session:StudioSession):StudioSession {
   return {...session,messages:[...chaptersFor(notebook,session).flatMap(page=>page.messages),...session.messages]};
 }
-export function validateNotebook(input: unknown): Notebook {
+export function validateNotebook(input: unknown,clone=true): Notebook {
   const n = input as Notebook;
   if (!n || n.version !== 1 || !Array.isArray(n.sessions) || n.sessions.length > NOTEBOOK_CAPACITY || !n.active || typeof n.active !== 'object' || Array.isArray(n.active)) throw Error('This studio notebook is not supported. Your saved data was not replaced.');
   if(Object.keys(n).some(k=>!['version','sessions','active','avatars','rewardOutbox','guidance','conversationChapters','notifications'].includes(k)))throw Error('Unknown studio data; not restored.');
@@ -110,6 +111,7 @@ export function validateNotebook(input: unknown): Notebook {
     if((s.archived!==undefined&&typeof s.archived!=='boolean')||(s.resumeDismissed!==undefined&&typeof s.resumeDismissed!=='boolean'))throw Error('Invalid home visibility state.');
     if(s.pendingExperiment&&(!Array.isArray(s.pendingExperiment.parents)||s.pendingExperiment.parents.length>10||!s.pendingExperiment.parents.every(id=>s.experiments?.some(e=>e.id===id))||!['tune','redesign','rethink'].includes(s.pendingExperiment.depth)||!['child','helper'].includes(s.pendingExperiment.origin)||(s.pendingExperiment.baseId!==null&&!ident(s.pendingExperiment.baseId))||!safeText(s.pendingExperiment.prompt,2000)))throw Error('Invalid pending experiment.');
     if (s.job !== null && (!s.job || !ident(s.job.id) || !safeText(s.job.api,500) || s.job.revisionId!==undefined&&!ident(s.job.revisionId) || s.job.phase!==undefined&&(typeof s.job.phase!=='string'||!/^[a-z-]{1,32}$/.test(s.job.phase)) || !['queued','building','testing','ready','failed','cancelled'].includes(s.job.status))) throw Error('Invalid pending build.');
+    if(s.pendingCopy!=null){const p=s.pendingCopy;if(Object.keys(p).some(k=>!['requestId','sourceRevisionId','name','api'].includes(k))||!ident(p.requestId)||!ident(p.sourceRevisionId)||!safeText(p.name,60)||!p.name.trim()||!safeText(p.api,500)||!p.api)throw Error('Invalid pending copy.');}
     if(s.pendingSubmission!==undefined&&s.pendingSubmission!==null){
       const pending=s.pendingSubmission;
       if(Object.keys(pending).some(key=>!['owner','workspace','api','request'].includes(key))||pending.owner!==s.owner||pending.workspace!==s.id||!safeText(pending.api,500)||!pending.api)throw Error('Invalid pending submission.');
@@ -128,33 +130,44 @@ export function validateNotebook(input: unknown): Notebook {
     }
   }
   // Reject accidental capability/secret persistence anywhere in the notebook schema.
-  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment','pendingSubmission','archived','resumeDismissed','keptExperiments','verifiedRemoteExperiments','rewardProjectId','previousConversationId'];
+  const allowed = ['id','owner','name','game','projectId','remoteId','remoteKind','candidate','undone','draft','messages','job','updated','hypothesis','reflection','design','experiments','selectedTest','playOnly','pendingExperiment','pendingSubmission','pendingCopy','archived','resumeDismissed','keptExperiments','verifiedRemoteExperiments','rewardProjectId','previousConversationId'];
   if (n.sessions.some(s=>Object.keys(s).some(k=>!allowed.includes(k)))) throw Error('Unknown studio data; not restored.');
   if(n.rewardOutbox!==undefined){
     const facts=validateRewardOutbox(n.rewardOutbox);
     if(facts.some(fact=>!n.sessions.some(s=>s.owner===fact.owner)||!['maker.milestone','game.developed'].includes(fact.kind)||
       fact.kind==='game.developed'&&!n.sessions.some(s=>s.owner===fact.owner&&(s.rewardProjectId??s.projectId??s.id)===fact.sourceId)))throw Error('Invalid studio reward receipt.');
   }
-  return copy(n);
+  return clone?copy(n):n;
 }
 export class StudioNotebook {
-  constructor(private storage: StoragePort,private onRewardSourceSaved?:(owner:string)=>void) { this.read(); }
-  read(): Notebook { const raw=this.storage.getItem(STUDIO_KEY); return raw===null ? fresh() : validateNotebook(JSON.parse(raw)); }
+  private cachedRaw:string|null|undefined;
+  private cachedNotebook:Notebook|undefined;
+  constructor(private storage: StoragePort,private onRewardSourceSaved?:(owner:string)=>void,private sourceEvidence:typeof publishSourceEvidence=publishSourceEvidence) { this.read(); }
+  private load(): Notebook {
+    const raw=this.storage.getItem(STUDIO_KEY);
+    if(raw!==this.cachedRaw||!this.cachedNotebook){
+      const validated=raw===null?fresh():validateNotebook(JSON.parse(raw));
+      this.cachedRaw=raw;this.cachedNotebook=validated;
+    }
+    return this.cachedNotebook; // Internal read-only view; public results copy only their projection.
+  }
+  read(): Notebook {return copy(this.load());}
   private write<T>(fn:(n:Notebook)=>T):T {
     assertRewardSourceWritable();
     // Re-read on every synchronous transaction: don't overwrite a newer workspace snapshot.
     const n=this.read();
     const previousFacts=new Set((n.rewardOutbox??[]).map(fact=>fact.owner+'|'+rewardFactId(fact)));
-    const previous=new Map([...new Set(n.sessions.map(s=>s.owner))].map(owner=>[owner,builderJourney(n.sessions.map(s=>conversationContext(n,s)),owner).level]));
-    const result=fn(n); validateNotebook(n);
+    const previous=new Map([...new Set(n.sessions.map(s=>s.owner))].map(owner=>[owner,builderJourney(n.sessions,owner).level]));
+    const result=fn(n); validateNotebook(n,false);
     // Only a new saved transition creates a receipt. Reading or restoring an old
     // notebook never retroactively mints its existing maker history.
     for(const owner of new Set(n.sessions.map(s=>s.owner))){
-      const before=previous.get(owner)??0,after=builderJourney(n.sessions.map(s=>conversationContext(n,s)),owner).level;
+      const before=previous.get(owner)??0,after=builderJourney(n.sessions,owner).level;
       for(let level=before+1;level<=after;level++)n.rewardOutbox=enqueueRewardFact(n.rewardOutbox??[],createRewardFact({owner,kind:'maker.milestone',level:level as 1|2|3|4,occurredAt:Date.now()}));
     }
-    validateNotebook(n);
-    try { this.storage.setItem(STUDIO_KEY, JSON.stringify(n)); } catch { throw Error('Could not save this notebook. Your working game is safe. Export a backup before freeing browser space.'); }
+    validateNotebook(n,false);
+    const raw=JSON.stringify(n);
+    try { this.storage.setItem(STUDIO_KEY, raw); this.cachedRaw=raw;this.cachedNotebook=n; } catch { throw Error('Could not save this notebook. Your working game is safe. Export a backup before freeing browser space.'); }
     const changedOwners=new Set((n.rewardOutbox??[]).filter(fact=>!previousFacts.has(fact.owner+'|'+rewardFactId(fact))).map(fact=>fact.owner));
     for(const owner of changedOwners){
       // Notification only, never an award. If projection is unavailable, the
@@ -164,18 +177,19 @@ export class StudioNotebook {
     return copy(result);
   }
   /** Read views include original words from linked pages; read() is the export format. */
-  list(owner:string):StudioSession[] {const n=this.read();return n.sessions.filter(s=>s.owner===owner).map(s=>conversationContext(n,s)).sort((a,b)=>b.updated.localeCompare(a.updated));}
-  capacity(){const n=this.read(),chapters=n.conversationChapters?.length??0;return {limit:NOTEBOOK_CAPACITY,retained:n.sessions.length+chapters,active:n.sessions.filter(s=>!s.archived).length,archived:n.sessions.filter(s=>s.archived).length,chapters,available:NOTEBOOK_CAPACITY-n.sessions.length-chapters};}
-  assertCanCreate(){assertNotebookCapacity(this.read());}
-  conversationPage(id:string,owner:string){const s=this.read().sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');return {count:s.messages.length,available:CONVERSATION_PAGE_CAPACITY-s.messages.length};}
+  list(owner:string):StudioSession[] {const n=this.load();return copy(n.sessions.filter(s=>s.owner===owner).map(s=>conversationContext(n,s)).sort((a,b)=>b.updated.localeCompare(a.updated)));}
+  capacity(){const n=this.load(),chapters=n.conversationChapters?.length??0;return {limit:NOTEBOOK_CAPACITY,retained:n.sessions.length+chapters,active:n.sessions.filter(s=>!s.archived).length,archived:n.sessions.filter(s=>s.archived).length,chapters,available:NOTEBOOK_CAPACITY-n.sessions.length-chapters};}
+  assertCanCreate(){assertNotebookCapacity(this.load());}
+  conversationPage(id:string,owner:string){const s=this.load().sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');return {count:s.messages.length,available:CONVERSATION_PAGE_CAPACITY-s.messages.length};}
   /** Expand a mutable callback's current page for provenance/readiness checks only. */
   withConversation(session:StudioSession):StudioSession {
-    const n=this.read();if(!n.sessions.some(s=>s.id===session.id&&s.owner===session.owner))throw Error('Choose a game in your own profile.');
-    return conversationContext(n,session);
+    const n=this.load();if(!n.sessions.some(s=>s.id===session.id&&s.owner===session.owner))throw Error('Choose a game in your own profile.');
+    // Keep the caller-owned mutable design current while copying cached transcript bytes.
+    return {...session,messages:copy(conversationContext(n,session).messages)};
   }
   assertMessageCapacity(id:string,owner:string,count=1):void {
     if(!Number.isInteger(count)||count<1||count>CONVERSATION_PAGE_CAPACITY)throw Error('Invalid conversation capacity request.');
-    const n=this.read(),s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');
+    const n=this.load(),s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');
     if(s.messages.length+count>CONVERSATION_PAGE_CAPACITY){assertNotebookCapacity(n);throw new ConversationCapacityError();}
   }
   /** Refuse a paid conversation when its existing idea ledger is already full.
@@ -188,7 +202,7 @@ export class StudioNotebook {
   /** Optional hints are profile preferences, not evidence or a completed journey. */
   guidance(owner:string):GuidePreferences {
     if(!ident(owner))throw Error('Invalid player.');
-    return guidanceFor(this.read(),owner);
+    return copy(guidanceFor(this.load(),owner));
   }
   dismissWelcome(owner:string):GuidePreferences {
     if(!ident(owner))throw Error('Invalid player.');
@@ -204,7 +218,7 @@ export class StudioNotebook {
   }
   notificationPreferences(owner:string):StudioNotificationPreferences {
     if(!ident(owner))throw Error('Invalid player.');
-    const preferences=this.read().notifications;
+    const preferences=this.load().notifications;
     return preferences&&Object.hasOwn(preferences,owner)?validateStudioNotificationPreferences(preferences[owner]):freshStudioNotificationPreferences();
   }
   acknowledgeNotifications(owner:string,items:readonly StudioNotificationRef[]):StudioNotificationPreferences {
@@ -226,16 +240,16 @@ export class StudioNotebook {
   }
   avatar(owner:string):BuilderAvatar|null {
     if(!ident(owner))throw Error('Invalid player.');
-    return this.read().avatars?.[owner]??null;
+    return this.load().avatars?.[owner]??null;
   }
   setAvatar(owner:string,choice:BuilderAvatar|null):BuilderAvatar|null {
     if(!ident(owner)||choice!==null&&choice!=='spark'&&choice!=='nova')throw Error('Choose one of the two builder characters.');
     return this.write(n=>{n.avatars={...n.avatars};if(choice===null)delete n.avatars[owner];else n.avatars[owner]=choice;return choice;});
   }
-  get(id:string,owner:string):StudioSession {const n=this.read(),s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');return conversationContext(n,s);}
-  last(owner:string):StudioSession|null {const n=this.read(),s=n.sessions.find(s=>s.id===n.active[owner]&&s.owner===owner);return s&&!s.archived&&!s.resumeDismissed?conversationContext(n,s):null;}
+  get(id:string,owner:string):StudioSession {const n=this.load(),s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');return copy(conversationContext(n,s));}
+  last(owner:string):StudioSession|null {const n=this.load(),s=n.sessions.find(s=>s.id===n.active[owner]&&s.owner===owner);return s&&!s.archived&&!s.resumeDismissed?copy(conversationContext(n,s)):null;}
   dismissResume(id:string,owner:string){return this.update(id,owner,s=>{s.resumeDismissed=true;});}
-  archive(id:string,owner:string){return this.update(id,owner,s=>{if(s.pendingSubmission)throw Error('Check your saved request before putting this jem away.');if(s.job&&['queued','building','testing'].includes(s.job.status))throw Error('Stop the build before putting this jem away.');s.archived=true;s.resumeDismissed=true;});}
+  archive(id:string,owner:string){return this.update(id,owner,s=>{if(s.pendingCopy)throw Error('Finish checking your saved copy before putting this jem away.');if(s.pendingSubmission)throw Error('Check your saved request before putting this jem away.');if(s.job&&['queued','building','testing'].includes(s.job.status))throw Error('Stop the build before putting this jem away.');s.archived=true;s.resumeDismissed=true;});}
   unarchive(id:string,owner:string){return this.update(id,owner,s=>{s.archived=false;s.resumeDismissed=false;});}
   create(owner:string,game:StudioSession['game'],name:string,projectId:string|null=null,initial?:{playOnly?:boolean;message?:string;creationStandard?:2}):StudioSession {
     return this.write(n=>{assertNotebookCapacity(n);const id=crypto.randomUUID(),now=new Date().toISOString(),s:StudioSession={id,owner,game,name:name.trim().slice(0,60)||'My new idea',projectId,rewardProjectId:projectId??id,remoteId:null,candidate:null,draft:'',messages:initial?.message?[{id:crypto.randomUUID(),role:'helper',text:initial.message.slice(0,2200),at:now}]:[],job:null,updated:now,hypothesis:'',reflection:false,design:{...freshDesign(),...(initial?.creationStandard===2?{creationStandard:2 as const}:{})},experiments:[],selectedTest:null,playOnly:initial?.playOnly??false,pendingExperiment:null};n.sessions.push(s);n.active[owner]=s.id;return s;});
@@ -243,8 +257,17 @@ export class StudioNotebook {
   update(id:string,owner:string,fn:(s:StudioSession)=>void):StudioSession {
     let before:StudioSession|undefined;
     const after=this.write(n=>{const s=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!s)throw Error('Choose a game in your own profile.');before=copy(conversationContext(n,s));fn(s);s.updated=new Date().toISOString();return conversationContext(n,s);});
-    if(before)publishSourceEvidence({kind:'studio',before,after});
+    if(before)this.sourceEvidence({kind:'studio',before,after});
     return after;
+  }
+  /** Save reply text, plan/provenance and reward outbox in one atomic key write. */
+  reply(id:string,owner:string,texts:string[],apply:(s:StudioSession)=>void):StudioSession {
+    if(texts.some(text=>typeof text!=='string'||text.length>2200))throw Error('Invalid saved reply.');
+    return this.update(id,owner,s=>{
+      if(s.messages.length+texts.length>CONVERSATION_PAGE_CAPACITY)throw new ConversationCapacityError();
+      apply(s);
+      for(const text of texts)s.messages.push({id:crypto.randomUUID(),role:'helper',text,at:new Date().toISOString()});
+    });
   }
   select(id:string,owner:string) {this.get(id,owner);this.write(n=>{n.active[owner]=id;return true;});}
   message(id:string,owner:string,role:Message['role'],text:string) {
@@ -281,19 +304,21 @@ export class StudioNotebook {
       delete s.keptExperiments;
       s.updated=new Date().toISOString();return s;
     });
-    if(before)publishSourceEvidence({kind:'studio',before,after:result});
-    publishSourceEvidence({kind:'clear-studio',owner,sessionId:id});
+    if(before)this.sourceEvidence({kind:'studio',before,after:result});
+    this.sourceEvidence({kind:'clear-studio',owner,sessionId:id});
     return result;
   }
-  fork(id:string,owner:string,name:string,projectId:string|null,remoteId:string|null):StudioSession {
+  fork(id:string,owner:string,name:string,projectId:string|null,remoteId:string|null,copyRequestId?:string):StudioSession {
     return this.write(n=>{
+    if(copyRequestId){const existing=n.sessions.find(s=>s.id==='copy:'+copyRequestId&&s.owner===owner&&s.remoteId===remoteId);if(existing)return existing;}
     assertNotebookCapacity(n);
     const source=n.sessions.find(s=>s.id===id&&s.owner===owner);if(!source)throw Error('Choose a game in your own profile.');
+    if(copyRequestId&&source.pendingCopy?.requestId!==copyRequestId)throw Error('Copy identity changed.');
     const design=source.design?copy(source.design):undefined;
     // Prior observations remain truthful history. Their old tests are not on the new shelf,
     // so keep the text, author/source, identifiers and dates while detaching those links.
     if(design)design.observations=design.observations.map(observation=>({...observation,experimentId:null}));
-    const s:StudioSession={...source,id:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,rewardProjectId:source.rewardProjectId??source.projectId??source.id,candidate:null,undone:null,job:null,experiments:[],keptExperiments:[],verifiedRemoteExperiments:[],selectedTest:null,playOnly:false,pendingExperiment:null,pendingSubmission:null,reflection:false,archived:false,resumeDismissed:false,design,updated:new Date().toISOString(),messages:copy(source.messages)};n.sessions.push(s);n.active[owner]=s.id;return s;});
+    const s:StudioSession={...source,id:copyRequestId?'copy:'+copyRequestId:crypto.randomUUID(),name:name.trim().slice(0,60)||'My new game',projectId,remoteId,rewardProjectId:source.rewardProjectId??source.projectId??source.id,candidate:null,undone:null,job:null,experiments:[],keptExperiments:[],verifiedRemoteExperiments:[],selectedTest:null,playOnly:false,pendingExperiment:null,pendingSubmission:null,pendingCopy:null,reflection:false,archived:false,resumeDismissed:false,design,updated:new Date().toISOString(),messages:copy(source.messages)};if(copyRequestId)source.pendingCopy=null;n.sessions.push(s);n.active[owner]=s.id;return s;});
   }
   saveExperiment(id:string,owner:string,candidate:Candidate,parents:string[]=[],depth:Experiment['depth']='tune',origin:Origin='child',select=true,verifiedRemote=false):Experiment {
     let result:Experiment;

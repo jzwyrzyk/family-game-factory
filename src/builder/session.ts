@@ -1,3 +1,5 @@
+import {hasParentGuidance,learnerHeaders} from '../family-beta/guidance';
+import {isEarlyGrade} from '../learning/grades';
 /** Session continuity shared by Studio, remote builder and optional coach.
  * Only a 401 triggers rotation. A rejected POST is NEVER replayed automatically.
  * HttpOnly session/device cookies stay with the gateway, not in browser storage.
@@ -35,6 +37,13 @@ const statusProbe=(base:string,signal:AbortSignal,proof?:string)=>fetch(base+'/v
  credentials:'include',cache:'no-store',redirect:'error',signal,...(proof?{headers:{'X-Factory-Adult-Session':proof}}:{})
 }).catch(()=>null);
 export async function familyFetch(base:string,path:string,init:RequestInit={}):Promise<Response>{
+ const currentProfile=()=>typeof window!=='undefined'?(window as any).FG?.store?.current?.():undefined;
+ const owner=currentProfile();
+ const creationMutation=(init.method||'GET').toUpperCase()!=='GET'&&
+   (/^\/v1\/(jobs|job-requests|actions|revisions)(?:\/|$)/.test(path)||/^\/v1\/coach(?:$|\/audio$)/.test(path));
+ const restricted=()=>creationMutation&&isEarlyGrade(currentProfile()?.grade)&&!hasParentGuidance(String(currentProfile()?.id));
+ const handoff=()=>new Response(JSON.stringify({errorCode:'PARENT_GUIDED_CREATION_UNAVAILABLE'}),{status:403});
+ if(restricted())return handoff();
  const generation=adultSessionVersion(),adult=adultRequestSession(base);
  const signal=adult?(init.signal?AbortSignal.any([init.signal,adult.signal]):adult.signal):init.signal;
  const readSignal=sessionDeadline(signal);
@@ -64,9 +73,11 @@ export async function familyFetch(base:string,path:string,init:RequestInit={}):P
  }
  // A child request waiting for session renewal must not inherit a later adult
  // profile switch; an adult request must not run after switching back either.
- if(changed())return profileChanged();
+ if(changed()||(creationMutation&&currentProfile()!==owner))return profileChanged();
+ if(restricted())return handoff();
  // Avoid forwarding child prompts or mutations through unexpected redirects.
  const headers=new Headers(init.headers);
+ learnerHeaders(headers,String(owner?.id??''));
  headers.delete('X-Factory-Adult-Session'); // Only this tab's current memory proof may authorize a request.
  if(adult)headers.set('X-Factory-Adult-Session',adult.sessionToken);
  signal?.throwIfAborted();

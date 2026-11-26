@@ -75,7 +75,8 @@ export class CreationStage {
     const finish = () => {
       if (!active() || settled) return;
       if (!image.naturalWidth || !image.naturalHeight) { fail(); return; }
-      entry.sprite = asset.palForm ? preparePalSceneImage(image, asset.url) : image;
+      try { entry.sprite = asset.palForm ? preparePalSceneImage(image, asset.url) : image; }
+      catch { fail(); return; }
       entry.loaded = true; settle(); repaint();
     };
     image.decoding = 'async';

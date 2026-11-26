@@ -5,7 +5,6 @@ interface StudioNavigationOptions {
   nav: HTMLElement;
   headerTools: HTMLElement;
   helpButton: HTMLButtonElement;
-  rewards: HTMLElement;
   subjects: HTMLElement;
   openArt(): void;
   openParent(): void;
@@ -16,7 +15,7 @@ interface StudioNavigationOptions {
  * The dialog stays inside nav so existing current-route renderers still see it.
  */
 export function installStudioNavigation(options: StudioNavigationOptions) {
-  const { nav, headerTools, helpButton, rewards, subjects } = options;
+  const { nav, headerTools, helpButton, subjects } = options;
   const home = nav.querySelector<HTMLButtonElement>('#studioNavHome');
   const create = nav.querySelector<HTMLButtonElement>('#studioNavCreate');
   if (!home || !create) throw Error('Studio navigation needs its existing home and creation routes.');
@@ -63,10 +62,10 @@ export function installStudioNavigation(options: StudioNavigationOptions) {
   };
   const make = group('studioMenuMake', 'Make');
   const world = group('studioMenuWorld', 'Your world');
-  const learn = group('studioMenuLearn', 'Learn & explore');
+  const learn = group('studioMenuLearn', 'Learning mode');
   const grownups = group('studioMenuGrownups', 'Grown-ups');
   const help = group('studioMenuHelp', 'Help');
-  const createInMenu = button('studioMenuCreate', 'add', 'Create a game');
+  const createInMenu = button('studioMenuCreate', 'add', 'Invent a game');
   createInMenu.onclick = () => create.click();
   destinations.add(createInMenu); make.append(createInMenu);
 
@@ -74,17 +73,15 @@ export function installStudioNavigation(options: StudioNavigationOptions) {
     ['studioNavScenes', make],
     ['studioNavNotifications', world],
     ['studioNavJourney', world],
-    ['studioNavRewards', world],
-    ['studioNavPals', world],
-    ['studioNavPowers', learn],
-    ['studioNavProblemSolving', learn],
   ] as const) {
     const element = nav.querySelector<HTMLButtonElement>('#' + id);
     if (element) move(element, section);
   }
-  const art = button('studioMenuArt', 'edit', 'Art Studio');
+  const art = button('studioMenuArt', 'edit', 'My Art');
   art.onclick = options.openArt; destinations.add(art); make.append(art);
-  move(rewards, world);
+  const compatibility=node('div');compatibility.hidden=true;
+  for(const id of ['studioNavRewards','studioNavPals','studioNavPowers','studioNavProblemSolving']){const control=nav.querySelector<HTMLElement>('#'+id);if(control)move(control,compatibility);}
+  nav.append(compatibility);
   move(subjects, learn, false);
   const parent = button('studioMenuParent', 'parent', 'Parent dashboard');
   parent.onclick = options.openParent; destinations.add(parent);
@@ -155,12 +152,13 @@ export function installStudioNavigation(options: StudioNavigationOptions) {
   });
 
   function currentDestination() {
-    const active = dialog.querySelector<HTMLElement>('[aria-current="page"]');
-    menu.classList.toggle('has-current-destination', !!active);
-    menu.dataset.currentDestination = active?.id ?? '';
+    const active = nav.querySelector<HTMLElement>('[aria-current="page"]');
+    menu.classList.toggle('has-current-destination', !!active&&active.id!=='studioNavHome'&&active.id!=='studioNavCreate');
+    const aliases:Record<string,string>={studioNavPals:'studioNavJourney',studioNavRewards:'studioNavJourney',studioNavPowers:'studioNavJourney',studioNavProblemSolving:'studioNavScenes'};
+    menu.dataset.currentDestination = active ? aliases[active.id]||active.id : '';
   }
   const currentObserver = new MutationObserver(currentDestination);
-  currentObserver.observe(dialog, { subtree: true, attributes: true, attributeFilter: ['aria-current'] });
+  currentObserver.observe(nav, { subtree: true, attributes: true, attributeFilter: ['aria-current'] });
   currentDestination();
   window.addEventListener('factory-page', close);
   window.addEventListener('factory-profile-before-change', close);

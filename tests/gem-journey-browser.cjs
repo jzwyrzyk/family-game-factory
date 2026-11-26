@@ -87,7 +87,7 @@ function visualFixture(){
  };
  const openJourney=async page=>{
   await exploreWelcome(page);
-  await navigate(page,'#studioNavJourney');
+  await navigate(page,'#studioNavJourney');if(!await page.locator('.jems-rank-details').evaluate(e=>e.open))await page.locator('.jems-rank-details>summary').click();
   await page.locator('#page-jems-journey').waitFor({state:'visible'});
   await page.evaluate(async()=>{
    const paths=[...new Set([...document.querySelectorAll('#page-jems-journey [data-sprite-src]')].map(element=>element.dataset.spriteSrc))];

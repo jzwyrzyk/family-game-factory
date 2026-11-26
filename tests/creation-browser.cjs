@@ -1,4 +1,4 @@
-const {exploreWelcome,openProfiles,openRetainedGame}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,openProfiles,openRetainedGame}=require('./studio-entry.cjs');
 /* Real production-dist journeys. All program edits use the public UI; FG.creation is read-only inspection. */
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -40,9 +40,10 @@ const {start}=require('./browser-server.cjs');
       });
       await page.route('**/factory-config.json',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'unavailable'})}));
       const activate=async target=>{
+        if(target==='#creationChallengeMode'&&await page.locator('#creationIntroduction').isVisible())await activate('#creationIntroSkip');
         const locator=typeof target==='string'?page.locator(target):target;
         if(typeof target==='string'&&/^#(?:studioNav(?:Scenes|Journey|Rewards|Pals|Powers|ProblemSolving)|jemsRewardsWidget|studioJourneyHelp)$/.test(target)&&!await locator.isVisible()){
-          await activate('#studioNavMenu');
+          await navigate(page,target);return;
         }
         if(touch)await locator.tap();else await locator.click();
       };
@@ -87,10 +88,11 @@ const {start}=require('./browser-server.cjs');
         assert.equal(await page.locator('#creationRead').isVisible(),true,'Creator keeps its speaker visible on entry');
         await activate('#creationRead');
         await page.waitForFunction(()=>window.__creationSpeech.length>0);
-        assert.match(await page.evaluate(()=>window.__creationSpeech.at(-1)),/Choose a world/);
+        assert.match(await page.evaluate(()=>window.__creationSpeech.at(-1)),/Choose arrows/);
         assert.equal(await page.locator('#creationRead').getAttribute('aria-pressed'),'true');
         await activate('#creationRead');
         assert.equal(await page.evaluate(()=>window.__creationSpeaking),false,'the same speaker stops reading');
+        await activate('#creationIntroSkip');
 
         assert.equal(await page.locator('[data-creation-starter]').count(),4);
         await noOverflow();
@@ -168,6 +170,8 @@ const {start}=require('./browser-server.cjs');
           await page.locator('#page-creation:not(.hidden)').waitFor();
           assert.equal(await scene(),null,`${unsupported}: the child still chooses which scene to create`);
           assert.deepEqual(await page.evaluate(()=>({games:localStorage.getItem('family-game-factory-workspace-v2'),scenes:FG.creation.export()})),nativeBefore,`${unsupported}: source versions and scene storage remain unchanged`);
+          if(await page.locator('#creationIntroduction').isVisible())await activate('#creationIntroSkip');
+          await activate('#creationFreeMode');
           assert.equal(await page.locator('#creationFreeShelf').isVisible(),true,'Independent free creation remains available');
           assert.equal(await page.locator('[data-creation-starter]').count(),4);
         }
@@ -198,7 +202,7 @@ const {start}=require('./browser-server.cjs');
         await activate('#creationBack');
 
         // Build an original scene by touching/clicking actual blocks and fields.
-        await activate('[data-creation-starter="blank"]');
+        await activate('#creationFreeMode');await activate('[data-creation-starter="blank"]');
         await fullTools();
         const start=await scene(),title=`My moving gem ${device}`,projectId=start.id;
         assert.deepEqual(start.programs[0].actions,[]);

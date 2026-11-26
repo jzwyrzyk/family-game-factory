@@ -30,3 +30,6 @@ export function adultRequestSession(base:string){
   if(current&&current.expiresAt<=Date.now())clearAdultSession('expired');
   return current?.base===base?{...current,signal:controller!.signal}:null;
 }
+
+/** Current tab grant only; callers must still verify the live server before restoration. */
+export function currentAdultSession():AdultProfileSession|null {if(current&&current.expiresAt<=Date.now())clearAdultSession('expired');return current?{...current}:null;}

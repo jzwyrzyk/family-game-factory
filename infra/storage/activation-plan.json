@@ -1,0 +1,19 @@
+{
+  "schema": "jems.storage.activation-plan.v1",
+  "enabled": false,
+  "resourcesToCreate": [],
+  "iamChanges": [],
+  "dataMigrationAuthorized": false,
+  "deletionEnabled": false,
+  "cloudShellRequiredForRepositoryWork": false,
+  "services": {"metadata":"existing Firestore Standard database", "artifacts":"existing workspace-scoped private artifact adapter"},
+  "prerequisites": [
+    "Review exact source, compatible gateway-first rollout, all mandatory CI and rollback reader floor",
+    "Bind continuity principals to current verified device, family and profile grants in the gateway",
+    "Implement complete application migration, sync orchestration and graphical recovery",
+    "Verify actual database and private bucket region, ownership, quotas, access and billing",
+    "Merge index exemptions into the actual reviewed index config, never replace unrelated indexes",
+    "Approve backup schedule, recovery objectives and deletion/retention policy separately",
+    "Run emulator, deployed TEST, real-device and explicitly authorized retained-game acceptance"
+  ]
+}

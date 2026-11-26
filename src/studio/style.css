@@ -126,7 +126,9 @@ body.studio-review>.notice{color:#f7f5ff}
 .studio-review .studio-dialog{box-sizing:border-box;max-height:85dvh;overflow:auto}
 .studio-review .studio-dialog input{font-size:16px}
 .studio-review :is(button,summary,select,textarea,input,a):focus-visible{outline:3px solid #515bc0;outline-offset:3px}
-.studio-review :is(h1,h2,#studioPromptLabel):focus{outline:2px solid #515bc0;outline-offset:4px;border-radius:4px}
+/* Route announcements retain DOM focus without painting a control ring. */
+:where(h1,h2,h3,h4,h5,h6):where([tabindex="-1"]:not([role]):not([contenteditable])):focus{outline:none}
+.studio-review #studioPromptLabel:focus-visible{outline:2px solid #515bc0;outline-offset:4px;border-radius:4px}
 .studio-review #studioGameHost:focus{outline:3px solid #515bc0;outline-offset:3px}
 .studio-review :is(h1,h2,button,summary,input,textarea,select){scroll-margin-block:16px}
 @media(max-width:1000px){.studio-library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.studio-actions .studio-button{font-size:14px;padding:10px 12px}}
@@ -452,3 +454,17 @@ body.studio-review #page-creations>.page-head>p{font-size:var(--jems-child-label
 /* Light collection panels need readable copy; the dark idea cards retain their own ink. */
 body.studio-review #page-creations > .panel > p,
 body.studio-review #page-creations #savedRemixes{color:var(--jems-muted)}
+.early-handoff{width:min(420px,92vw);max-height:92dvh;overflow:auto;padding:1.5rem;border:0;border-radius:24px;background:#fff7ed;color:#152640;text-align:center}
+.early-handoff::backdrop{background:#172240bb}
+.early-handoff img,.early-handoff .pals-portrait{width:120px;height:110px;object-fit:contain;margin:auto}
+.early-handoff button{min-height:60px;font-size:1.15rem;margin:.3rem;border:2px solid #554470;border-radius:14px}
+.early-handoff button svg{vertical-align:middle;margin-inline-end:.4rem}
+.early-journey #studioConversation{display:none}
+.early-journey .studio-workspace[data-mobile-panel=game]{grid-template-columns:minmax(0,1fr)}
+.early-journey .studio-menu-link,.early-journey #studioNew{min-height:72px}
+.early-journey .studio-home-intro>p,.early-journey #studioNew small{display:none}
+/* Recovery must remain readable on the actual composed phone surface. */
+.studio-copy-recovery{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:16px;margin:12px 0;background:#fff6d9;color:#493b1c;border:1px solid #c7ab69;border-radius:12px;font-size:var(--jems-child-body,20px)}
+.studio-copy-recovery[hidden]{display:none}
+.studio-copy-recovery p{margin:0;flex:1 1 220px;color:#493b1c;font-size:var(--jems-child-body,20px)}
+#studioCopyRecovery .studio-button{min-height:48px;font-size:var(--jems-child-label,18px);color:#493b1c;background:#fff;border:1px solid #947b40}

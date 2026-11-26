@@ -35,3 +35,5 @@ The natural route accepts at most 2,000 characters and 4,000 UTF-8 bytes in one 
 ## Validation boundary
 
 Narrator units cover explicit start/stop, delayed voice discovery, quality ordering, local-only preview, status-before-text, late/cancelled results, actual media-start evidence, object URL cleanup and no replay after failure. Math/English browser cases cover the rendered controls, ordinary keyboard order and evidence behavior. Production browser/physical-device acceptance and a listening review of the intended natural voice remain separate from synthetic audio tests.
+
+Early activities select device-only prompt narration after browser activation. Replay, stop and mute use the existing lifecycle. Playback completion opens the answer interaction. A grown-up can read the displayed instruction if playback fails and explicitly record support. Early printed target words and answer choices stay out of the narration text.

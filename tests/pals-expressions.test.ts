@@ -60,7 +60,7 @@ test('artwork resolves exact character, form and state without a legacy identity
     assert.equal(result.characterKey, characterKey); assert.equal(result.form, form); assert.equal(result.expression, expression);
     assert.equal(result.asset.form, form); assert.equal(result.asset.expression, expression); assert.equal(result.fallbackReason, null);
   }
-  for (const characterKey of ['glim', 'kip', 'riff', 'brio', 'Fixture 1', 'fixture-a', keys[0].toLowerCase(), 'unknown']) {
+  for (const characterKey of ['navi', 'kip', 'riff', 'brio', 'Fixture 1', 'fixture-a', keys[0].toLowerCase(), 'unknown']) {
     assert.equal(r.resolve({ characterKey, form: 'base', expression: 'neutral' }), null);
   }
   assert.equal(r.resolve({ characterKey: keys[0], form: 'growth' as PalArtworkForm, expression: 'neutral' }), null);
@@ -97,19 +97,19 @@ test('wrong versions, ambiguous identities, swapped state URLs and cross-form re
   assert.ok(Object.isFrozen(r.manifest.characters[0].forms.base.expressions.neutral));
 });
 
-test('the shipped manifest exposes exactly 184 approved assets through the same typed resolver', () => {
+test('the shipped manifest exposes exactly 168 approved assets through the same typed resolver', () => {
   const raw = JSON.parse(readFileSync(new URL('../public/jems-pals/manifest.json', import.meta.url), 'utf8'));
   const r = createPalArtworkResolver(raw);
   assert.ok(r, 'exporter output must satisfy the runtime resolver contract');
-  assert.equal(r.manifest.characters.length, 23); assert.equal(r.manifest.scope.assetCount, 184);
+  assert.equal(r.manifest.characters.length, 21); assert.equal(r.manifest.scope.assetCount, 168);
   const urls = new Set<string>();
   for (const character of r.manifest.characters) for (const form of PAL_ARTWORK_FORMS) for (const expression of PAL_ARTWORK_EXPRESSIONS) {
     const selected: PalArtworkResolution = r.resolve({ characterKey: character.characterKey, form, expression })!;
     assert.equal(selected.fallbackReason, null); assert.equal(selected.expression, expression);
     assert.equal(selected.asset.form, form); urls.add(selected.asset.url);
   }
-  assert.equal(urls.size, 184); assert.ok(r.manifest.characters.every(character => character.slug !== 'brio'));
-  assert.equal(r.resolve({ characterKey: 'glim', form: 'base', expression: 'celebrate' }), null);
+  assert.equal(urls.size, 168); assert.ok(r.manifest.characters.every(character => character.slug !== 'brio'));
+  assert.equal(r.resolve({ characterKey: 'navi', form: 'base', expression: 'celebrate' }), null);
 });
 
 test('latest character/form request wins before or after delayed image decoding', async () => {

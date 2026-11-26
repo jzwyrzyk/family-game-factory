@@ -1,6 +1,7 @@
+import {gradeLabel, gradeRank, type Grade} from '../learning/grades';
 /** Evidence-only, parent-facing summaries. No grades, predictions or child profiling. */
 export interface ParentSkill {
-  id:string;title:string;grade:number;state:string;presentations:number;
+  id:string;title:string;grade:Grade;state:string;presentations:number;
   independent:number;assisted:number;distinctDays:number;
   dueAt:number|null;reviewDue:boolean;readSupport?:number;explored?:number;
   migrated?:boolean;hypotheses?:string[];
@@ -57,7 +58,7 @@ function skillCard(skill:ParentSkill){
   const card=el('article','learning-progress-card pi-skill');
   card.dataset.skillId=skill.id;card.dataset.state=skill.state;
   const top=el('div','pi-skill-top');
-  top.append(el('strong','', 'Grade '+skill.grade+' · '+skill.title));
+  top.append(el('strong','', gradeLabel(skill.grade)+' · '+skill.title));
   const state=skill.state==='remembered-later'?'Remembered after a break':
     skill.state==='independent'?'Independent practice':
     skill.state==='learning-with-support'?'Learning with help':'Exploring';
@@ -150,7 +151,7 @@ export function renderParentInsights(host:HTMLElement,subject:'math'|'language',
   focus.append(focusHead);
   const relevant=report.skills.slice().sort((a,b)=>{
     const rank=(s:ParentSkill)=>s.reviewDue?0:s.state==='learning-with-support'&&s.presentations?1:s.presentations?2:3;
-    return rank(a)-rank(b)||b.presentations-a.presentations||a.grade-b.grade;
+    return rank(a)-rank(b)||b.presentations-a.presentations||gradeRank(a.grade)-gradeRank(b.grade);
   }).slice(0,3);
   const tiles=el('div','pi-opportunities');
   for(const skill of relevant){

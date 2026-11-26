@@ -1,0 +1,64 @@
+/* The same content edge is used by the section navigation, heading and page body. */
+body .page.jems-secondary-page[id] {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1182px;
+  margin: 0 auto;
+  padding: 0 0 28px;
+}
+.jems-secondary-page .jems-world-nav { margin: 0 0 8px; }
+.jems-secondary-page .jems-page-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 16px;
+  text-align: left;
+  margin: 0 0 clamp(18px, 2.5vw, 28px);
+}
+.jems-page-header .jems-page-back {
+  grid-column: 1 / -1;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 4px 0 0;
+  margin: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  box-shadow: none;
+  color: #54288d;
+  font: 800 18px/1.3 var(--jems-round, Nunito, system-ui);
+  cursor: pointer;
+}
+.jems-page-header .jems-page-back:hover { text-decoration: underline; text-underline-offset: 3px; }
+.jems-page-header .jems-page-back:focus-visible { outline: 3px solid #515bc0; outline-offset: 3px; }
+.page.jems-secondary-page .jems-page-header .jems-page-title {
+  grid-area: 2 / 1;
+  align-self: start;
+  color: #0b1e3b;
+  font: 900 clamp(32px, 4vw, 46px)/1.1 var(--jems-round, Nunito, system-ui);
+  letter-spacing: -1px;
+  margin: 0;
+}
+.page.jems-secondary-page .jems-page-header .jems-page-description {
+  grid-area: 3 / 1 / 4 / -1;
+  color: #35445d;
+  font: 500 clamp(18px, 2vw, 20px)/1.45 var(--jems-body, Inter, system-ui);
+  margin: 0;
+  max-width: 66ch;
+}
+.jems-page-header .jems-page-progress {
+  grid-area: 2 / 2;
+  justify-self: end;
+  padding: 4px 10px;
+  border: 1px solid #e1d6f0;
+  border-radius: 99px;
+  background: #f4eefc;
+  color: #57338a;
+  font: 800 18px/1.3 var(--jems-round, Nunito, system-ui);
+}
+@media (max-width: 580px) {
+  .jems-page-header .jems-page-progress { grid-area: 4 / 1 / 5 / -1; justify-self: start; }
+}

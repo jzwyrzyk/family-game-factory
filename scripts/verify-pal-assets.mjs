@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Verify the public original-23 Gem Pal manifest, exact bytes and lossless WebP
+ * Verify the public active-core-21 Gem Pal manifest, exact bytes and lossless WebP
  * framing using Node built-ins. No npm dependency is required.
  *
  * node scripts/verify-pal-assets.mjs
@@ -8,7 +8,7 @@
  * node scripts/verify-pal-assets.mjs --source-kit /path/to/kit --report /outside/public/report.json
  *
  * --pixels freshly decodes every WebP with the exporter's Python/Pillow helper.
- * --source-kit additionally compares all 184 original PNGs, including straight
+ * --source-kit additionally compares all 168 original PNGs, including straight
  * RGB beneath transparent pixels. Default CI verifies committed byte hashes and
  * the recorded source-pixel digests, and does not claim a fresh pixel comparison.
  */
@@ -25,7 +25,7 @@ export const ASSET_VERSION = 'core-2026-11-20';
 export const STATES = ['neutral', 'celebrate', 'thinking', 'encouraging_retry'];
 export const FORMS = ['base', 'mature'];
 const identities = {
-  luma: ['first-round-2026-11-19/A', null], nook: ['first-round-2026-11-19/B', null],
+  nook: ['first-round-2026-11-19/B', null],
   mizzle: ['first-round-2026-11-19/D', null], tumble: ['first-round-2026-11-19/E', null],
   navi: ['first-round-2026-11-19/F1', null], mote: ['first-round-2026-11-19/F2', null],
   sivo: ['first-round-2026-11-19/G', null], furl: ['first-round-2026-11-19/H', null],
@@ -35,7 +35,7 @@ const identities = {
   cache: ['first-round-2026-11-19/P', null], brim: ['first-round-2026-11-19/Q', null],
   wink: ['first-round-2026-11-19/R', null], poff: ['expansion-2026-11-19/S', 'GP-S019'],
   chimi: ['expansion-2026-11-19/T', 'GP-S020'], pleeko: ['expansion-2026-11-19/U', 'GP-S021'],
-  talli: ['expansion-2026-11-19/V', 'GP-S022'], zippa: ['expansion-2026-11-19/W', 'GP-S023'],
+  talli: ['expansion-2026-11-19/V', 'GP-S022'],
   whorl: ['expansion-2026-11-19/X', 'GP-S024'],
 };
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -50,8 +50,8 @@ export function validateManifest(manifest) {
   sameKeys(manifest, ['schemaVersion', 'assetVersion', 'scope', 'characters'], 'manifest');
   requireThat(manifest.schemaVersion === 1 && manifest.assetVersion === ASSET_VERSION, 'Unsupported manifest version');
   sameKeys(manifest.scope, ['id', 'characterCount', 'assetCount'], 'scope');
-  requireThat(manifest.scope.id === 'original-23' && manifest.scope.characterCount === 23 && manifest.scope.assetCount === 184, 'Unexpected roster scope');
-  requireThat(Array.isArray(manifest.characters) && manifest.characters.length === 23, 'Expected 23 original characters');
+  requireThat(manifest.scope.id === 'active-core-21' && manifest.scope.characterCount === 21 && manifest.scope.assetCount === 168, 'Unexpected roster scope');
+  requireThat(Array.isArray(manifest.characters) && manifest.characters.length === 21, 'Expected 21 active characters');
   const slugs = new Set();
   const urls = new Set();
   const assets = [];
@@ -85,7 +85,7 @@ export function validateManifest(manifest) {
       requireThat(formData.neutralSourceSHA256 === formData.expressions.neutral.sourceSHA256, `${character.slug}/${form}: neutral reference hash mismatch`);
     }
   }
-  requireThat(slugs.size === 23 && assets.length === 184, 'Incomplete original roster');
+  requireThat(slugs.size === 21 && assets.length === 168, 'Incomplete original roster');
   return assets;
 }
 
@@ -147,6 +147,13 @@ export async function verifyAssets(options = {}) {
       sourceBytes: asset.sourceBytes, exportedBytes: asset.exportedBytes,
       width: image.width, height: image.height, alpha: image.alpha, lossless: true, byteIntegrity: 'Pass' });
   }
+  // Only the four pinned neutrals remain readable by existing saved scenes.
+  const historical = JSON.parse(await readFile(resolve(root, 'src/pals/historical-scene-art.json'), 'utf8'));
+  for (const asset of historical) {
+    const path = resolve(publicRoot, asset.url);
+    requireThat(path.startsWith(assetRoot + sep) && sha256(await readFile(path)) === asset.sha256, 'Historical scene artwork changed');
+    expected.add(path);
+  }
   const actual = await walkFiles(assetRoot);
   requireThat(actual.length === expected.size && actual.every(path => expected.has(path)), 'Unregistered file in public Gem Pal asset directory');
   const sourceBytes = assets.reduce((sum, asset) => sum + asset.sourceBytes, 0);
@@ -158,12 +165,12 @@ export async function verifyAssets(options = {}) {
     const result = spawnSync(process.env.PAL_ASSET_PYTHON || 'python3', args, { encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 });
     requireThat(!result.error && result.status === 0, `Fresh pixel verification failed: ${result.error?.message ?? result.stderr.trim()}`);
     pixels = JSON.parse(result.stdout);
-    requireThat(pixels.status === 'Pass' && pixels.decodedAssets === 184 && pixels.manifestSHA256 === sha256(manifestBytes), 'Fresh pixel audit is incomplete or bound to another manifest');
+    requireThat(pixels.status === 'Pass' && pixels.decodedAssets === 168 && pixels.manifestSHA256 === sha256(manifestBytes), 'Fresh pixel audit is incomplete or bound to another manifest');
     requireThat(!options.sourceKit || pixels.freshSourcePNGComparison === true, 'Source PNG comparison was not performed');
   }
   const report = {
     schemaVersion: 1, status: 'Pass', assetVersion: ASSET_VERSION, manifestSHA256: sha256(manifestBytes),
-    counts: { characters: 23, forms: 46, neutral: 46, emotions: 138, assets: 184, assetsWithTransparency: assets.filter(asset => asset.alpha).length },
+    counts: { characters: 21, forms: 42, neutral: 42, emotions: 126, assets: 168, assetsWithTransparency: assets.filter(asset => asset.alpha).length },
     bytes: { sourcePNG: sourceBytes, exportedWebP: exportedBytes, manifest: manifestBytes.length,
       totalProduction: exportedBytes + manifestBytes.length, saved: sourceBytes - exportedBytes,
       reductionPercent: (1 - exportedBytes / sourceBytes) * 100 },

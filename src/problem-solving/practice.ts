@@ -1,3 +1,4 @@
+import {isEarlyGrade} from '../learning/grades';
 import type { ProblemSolvingDraft } from './model';
 
 /** Authored, bounded practice. These rules check choices in a known miniature world;
@@ -172,7 +173,7 @@ export const PROBLEM_SOLVING_PRACTICE: readonly PracticeTask[] = freeze(
   (['g1-2', 'g3-4'] as const).flatMap(band => [robotTask(band), deliveryTask(band), gateTask(band)]),
 );
 export const practiceBandForGrade = (grade: number): PracticeBand => grade >= 3 ? 'g3-4' : 'g1-2';
-export const practiceTasksForGrade = (grade: number): readonly PracticeTask[] => PROBLEM_SOLVING_PRACTICE.filter(task => task.band === practiceBandForGrade(grade));
+export const practiceTasksForGrade = (grade: number): readonly PracticeTask[] => isEarlyGrade(grade) ? [] : PROBLEM_SOLVING_PRACTICE.filter(task => task.band === practiceBandForGrade(grade));
 export function getPracticeTask(id: string): PracticeTask {
   const task = PROBLEM_SOLVING_PRACTICE.find(item => item.id === id);
   if (!task) throw Error('This little experiment is not available. Choose another idea.');

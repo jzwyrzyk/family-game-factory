@@ -92,7 +92,7 @@ async function uiHarness() {
     setMode: (key: string, mode: string) => { active.mathModes = { ...active.mathModes, [key]: mode }; }, modeControl() {},
   }, app: { page: (page: string) => emit('factory-page', page) } };
   const window: any = { FG, mounts: [], disposals: 0, addEventListener: (type: string, listener: Function) => listeners.set(type, [...listeners.get(type) || [], listener]) };
-  const document: any = { baseURI: 'https://app.example/', createElement: (name: string) => new Element(name),
+  const document: any = { documentElement:{dataset:{}}, baseURI: 'https://app.example/', createElement: (name: string) => new Element(name),
     createElementNS: (namespace: string, name: string) => new Element(name, namespace), createTextNode: (text: string) => new TextNode(text),
     getElementById: node, querySelector: () => ({ id: 'page-create' }) };
   const fetch = async (input: any) => {

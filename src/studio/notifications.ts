@@ -144,6 +144,12 @@ export function deriveStudioNotifications(
       actionLabel = session.projectId || session.remoteId ? 'Try my change' : 'Play my game';
       action = 'open-ready';
       version = [job!.id, job!.revisionId, ready.id];
+    } else if (session.pendingCopy) {
+      kind = 'unknown';
+      title = 'Your copy needs a check';
+      description = 'Your original game is safe.';
+      actionLabel = 'Open my game';
+      version = ['copy', session.pendingCopy.requestId];
     } else if (unconfirmed || unknown || savedResultMissing || (!job && !!session.pendingExperiment && !sending)) {
       kind = 'unknown';
       title = 'Your idea needs a check';

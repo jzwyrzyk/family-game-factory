@@ -1,3 +1,4 @@
+import { createPageHeader } from './page-header';
 import {createIcon,setIconLabel} from './icons';
 import {createMakerIdentity, MAKER_ARTWORK, setMakerSprite, type MakerAtlas, type MakerCharacter} from './maker-identity';
 
@@ -102,20 +103,18 @@ export function installGemJourney(options: GemJourneyOptions) {
   element.setAttribute('aria-labelledby', 'jemsJourneyTitle');
   element.style.setProperty('--journey-world', `url(${JSON.stringify(assetUrl(artwork.background))})`);
 
-  const toolbar = node('div', 'jems-journey-toolbar');
   const back = button('jems-journey-back', '', 'jemsJourneyBack');
-  setIconLabel(back, 'arrow', 'My jems', 'jems-icon--back');
   back.addEventListener('click', () => options.onBack());
-  const heading = node('h1', '', 'My journey');
+  const heading = node('h1', '', 'My Journey');
   heading.id = 'jemsJourneyTitle';
-  heading.tabIndex = -1;
-  const headingWrap = node('div', 'jems-journey-heading');
   const actualLevelLabel = node('span', 'jems-journey-actual-level');
   actualLevelLabel.id = 'jemsJourneyLevel';
-  headingWrap.append(heading, actualLevelLabel);
   const change = button('jems-journey-change', 'Change character', 'jemsChangeCharacter');
   change.addEventListener('click', () => openCharacterPicker());
-  toolbar.append(back, headingWrap, change);
+  const toolbar = createPageHeader(element, {
+    title: heading, description: node('p', '', 'See what you’ve earned and choose what to try next.'),
+    back, backLabel: 'My Games', progress: actualLevelLabel,
+  });
 
   const hero = node('div', 'jems-journey-hero');
   const heroCopy = node('div', 'jems-journey-copy');
@@ -131,7 +130,7 @@ export function installGemJourney(options: GemJourneyOptions) {
   const nextText = node('p');
   nextText.id = 'jemsJourneyNextAction';
   next.append(nextLabel, nextText);
-  const create = button('jems-journey-primary', 'Make a jem', 'jemsJourneyCreate');
+  const create = button('jems-journey-primary', 'Invent a game', 'jemsJourneyCreate');
   const createArrow = createIcon('arrow', 'jems-journey-arrow');
   create.append(createArrow);
   create.addEventListener('click', () => {
@@ -142,7 +141,7 @@ export function installGemJourney(options: GemJourneyOptions) {
   const returnCurrent = button('jems-journey-current', '', 'jemsJourneyCurrent');
   setIconLabel(returnCurrent, 'arrow', 'Back to my level', 'jems-icon--back');
   returnCurrent.addEventListener('click', () => { previewLevel = Math.max(1, state.level) as 1 | 2 | 3 | 4; renderView(); });
-  heroCopy.append(levelLabel, title, subtitle, next, create, returnCurrent);
+  heroCopy.append(levelLabel, title, subtitle, next, create, change, returnCurrent);
 
   const stage = node('div', 'jems-journey-scene');
   stage.setAttribute('aria-hidden', 'true');
@@ -273,7 +272,7 @@ export function installGemJourney(options: GemJourneyOptions) {
     subtitle.textContent = previewing ? entry.action : state.level === 0 ? 'Every great jem starts with you.' : entry.reward;
     next.hidden = previewing || state.level === 4;
     nextText.textContent = state.nextAction || (state.level === 3 ? `${Math.min(3, state.polishedCount)} of 3 projects polished.` : LEVELS[Math.min(3, state.level)].action);
-    create.firstChild!.textContent = (options.onPrimaryAction && state.primaryActionLabel?.trim()) || (state.level === 4 ? 'Make something new' : 'Make a jem');
+    create.firstChild!.textContent = (options.onPrimaryAction && state.primaryActionLabel?.trim()) || (state.level === 4 ? 'Make something new' : 'Invent a game');
     returnCurrent.hidden = !previewing;
     setIconLabel(change, 'edit', state.character ? 'Change character' : 'Choose character');
 
