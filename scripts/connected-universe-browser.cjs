@@ -58,25 +58,27 @@ async function crayonStroke(page, points) {
 async function makeRock(page) {
   const editor = page.locator('dialog.drawing-paint');
   await page.locator('#artDrawButton').click();
-  await editor.locator('[data-paper-kind]').selectOption('transparent');
-  await editor.getByRole('button', { name: 'Use Sunshine crayon' }).click();
-  await editor.locator('[data-size]').press('End');
+  await openDetails(editor, '[data-options]');
+  await editor.locator('[data-background]').selectOption('clear');
+  await openDetails(editor, '[data-more-tools]');
+  await editor.getByRole('button', { name: 'Sunshine' }).click();
+  await editor.locator('[data-brush-width]').press('End');
   // A continuous zigzag fills the body with the same crayon a child uses.
   const rows = [[.33,.37,.54],[.36,.34,.57],[.39,.31,.60],[.42,.29,.63],
     [.45,.27,.64],[.48,.26,.68],[.51,.25,.70],[.54,.24,.72],
     [.57,.23,.74],[.60,.23,.75],[.63,.22,.76],[.66,.22,.77],[.69,.25,.73],[.71,.33,.67]];
   const zigzag = rows.flatMap(([y,left,right], i) => i % 2 ? [[right,y],[left,y]] : [[left,y],[right,y]]);
   await crayonStroke(page, zigzag);
-  await editor.locator('[data-size]').press('Home');
-  for (let i = 0; i < 5; i++) await editor.locator('[data-size]').press('ArrowRight');
-  await editor.getByRole('button', { name: 'Use Teal crayon' }).click();
+  await editor.locator('[data-brush-width]').press('Home');
+  for (let i = 0; i < 5; i++) await editor.locator('[data-brush-width]').press('ArrowRight');
+  await editor.getByRole('button', { name: 'Teal' }).click();
   await crayonStroke(page, [[.2,.67],[.25,.45],[.36,.32],[.48,.29],[.58,.31],[.65,.42],[.73,.49],[.79,.64],[.76,.71],[.64,.74],[.51,.73],[.39,.76],[.25,.73],[.2,.67]]);
   await crayonStroke(page, [[.25,.45],[.34,.48],[.38,.41],[.45,.43]]);
-  await editor.getByRole('button', { name: 'Use Charcoal crayon' }).click();
+  await editor.getByRole('button', { name: 'Charcoal' }).click();
   await crayonStroke(page, [[.39,.52],[.395,.55]]);
   await crayonStroke(page, [[.60,.50],[.604,.53]]);
   await crayonStroke(page, [[.45,.58],[.47,.61],[.52,.62],[.55,.59]]);
-  await editor.getByRole('button', { name: 'Use Berry crayon' }).click();
+  await editor.getByRole('button', { name: 'Berry' }).click();
   await crayonStroke(page, [[.33,.59],[.37,.59]]);
   await crayonStroke(page, [[.62,.57],[.66,.57]]);
   await editor.locator('[data-title]').fill('Pebble');
@@ -86,8 +88,8 @@ async function makeRock(page) {
   const [original] = await savedDrawings(page);
   assert.equal(original.name, 'Pebble');
   assert.equal(original.declared, original.hash);
-  await page.locator('#artContinueDrawing').click();
-  await editor.getByRole('button', { name: 'Use Sunshine crayon' }).click();
+  await page.getByRole('button', {name:'Keep drawing',exact:true}).click();
+  await editor.getByRole('button', { name: 'Sunshine' }).click();
   await crayonStroke(page, [[.57,.37],[.61,.40],[.57,.44],[.53,.40],[.57,.37]]);
   await editor.locator('[data-title]').fill('Pebble with a gem');
   await editor.locator('[data-save]').click();
@@ -98,7 +100,7 @@ async function makeRock(page) {
   assert.ok(gem, 'continued drawing retains its original parent');
   assert.notEqual(gem.hash, original.hash);
   assert.equal(gem.declared, gem.hash);
-  await page.getByLabel('What is it?', { exact: true }).fill('Moon rock');
+  await page.getByLabel('What is it? (optional)', { exact: true }).fill('Moon rock');
   await page.getByLabel('Artwork collection', { exact: true }).selectOption('prop');
   await page.getByRole('button', { name: 'Save details', exact: true }).click();
   await page.waitForFunction(() => document.getElementById('artStatus').textContent === 'Artwork details saved.');
@@ -243,13 +245,13 @@ async function decorateWorld(page) {
   await page.locator('#creationAddScenery').click();
   await page.waitForFunction(() => FG.creation.scene().world?.scenery?.some(x => x.assetId === 'world-prop-rocket-v1'));
   await capture(page.locator('#creationStagePane .creation-stage-card'), 'b-moon-stage.png');
-  await page.locator('#creationChooseBackdrop').click();
-  const picker = page.locator('#creationWorldArtDialog');
-  await picker.locator('#creationWorldArtSearch').fill('Paper hills');
+  await page.locator('#creationWorldFromArt').click();
+  const picker = page.locator('#creationWorldDialog');
+  await picker.getByRole('searchbox',{name:'Find my art'}).fill('Paper hills');
   await picker.locator('[data-world-art^="art:image:"]').filter({ hasText: 'Paper hills' }).click();
   await picker.waitFor({ state: 'hidden' });
-  await page.locator('#creationBackdropFrame').selectOption('fit');
-  await page.waitForFunction(() => FG.creation.scene().world?.backdrop?.startsWith('art:image:'));
+  await page.locator('#creationWorldFraming').selectOption('fit');
+  await page.waitForFunction(() => FG.creation.scene().world?.assetId?.startsWith('art:image:'));
   const custom = await page.evaluate(() => FG.creation.scene().world);
   await page.locator('#creationKeep').click();
   await capture(page.locator('#creationStagePane .creation-stage-card'), 'f-private-backdrop.png');
@@ -261,9 +263,10 @@ async function replaceWithArt(page, rock) {
   await openDetails(page, '#creationSceneOptions');
   const before = await page.evaluate(() => FG.creation.scene());
   await page.locator('#creationReplaceActorArt').click();
-  await page.locator('#creationArtSearch').fill('Moon rock');
-  await page.locator('#creationArtCategory').selectOption('prop');
-  const picker = page.locator('#creationActorDialog');
+  const picker = page.locator('#creationVersionPicker');
+  await picker.getByRole('combobox',{name:'Pictures to show'}).selectOption('recent');
+  await picker.getByRole('searchbox',{name:'Find my art'}).fill('Moon rock');
+  await picker.getByRole('combobox',{name:'Art collection'}).selectOption('prop');
   const pin = 'art:image:' + rock.id + ':' + rock.hash;
   const choice = picker.locator('[data-private-art="' + pin + '"]');
   await choice.waitFor();
@@ -294,7 +297,7 @@ async function reuseWorld(page, title, keptWorld) {
   await openDetails(page, '#creationSceneOptions');
   await openDetails(page, '#creationUseSavedWorld');
   await page.locator('#creationKeptWorlds').getByRole('button', {name:title, exact:true}).click();
-  await page.waitForFunction(id => FG.creation.scene().world?.backdrop === id, keptWorld.backdrop);
+  await page.waitForFunction(id => FG.creation.scene().world?.assetId === id, keptWorld.assetId);
   const scene = await page.evaluate(() => FG.creation.scene());
   assert.deepEqual(scene.actors, recipient.actors);
   assert.deepEqual(scene.programs, recipient.programs);

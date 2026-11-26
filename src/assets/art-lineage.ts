@@ -21,17 +21,16 @@ export function validSemanticIdentity(value: unknown): value is string {
   return typeof value === 'string' && value.length <= 60 && !/[\u0000-\u001f\u007f]/.test(value);
 }
 
-/** Earlier art libraries called this field semantic. Normalize only metadata,
- * preserving the original bytes, image hash, version IDs and owner. */
-export function normalizeDrawingLabel<T extends {semantic?: string; semanticIdentity?: string}>(row: T): T {
-  const {semantic, semanticIdentity} = row;
-  if (semanticIdentity !== undefined && !validSemanticIdentity(semanticIdentity) ||
-      semantic !== undefined && (!validSemanticIdentity(semantic) || semanticIdentity !== undefined && semantic !== semanticIdentity)) {
+/** Normalize all historical names at the record boundary without rewriting its bytes or pin. */
+export function normalizeDrawingLabel<T extends {semantic?:string;semanticName?:string;semanticIdentity?:string}>(row:T):T {
+  const names = [row.semanticIdentity,row.semantic,row.semanticName].filter(name=>name!==undefined);
+  if (names.some(name=>!validSemanticIdentity(name)) || new Set(names.map(name=>name.trim())).size > 1) {
     throw Error('The saved drawing has an invalid or conflicting description.');
   }
-  if (semantic === undefined) return row;
-  const copy = {...row, semanticIdentity: semantic};
+  if (row.semantic === undefined && row.semanticName === undefined) return row;
+  const copy = {...row, semanticIdentity:names[0]?.trim()};
   delete copy.semantic;
+  delete copy.semanticName;
   return copy;
 }
 

@@ -7,7 +7,7 @@ export function worldSettings(host:HTMLElement, dialog:HTMLDialogElement, action
   owner():string;
   isCurrent():boolean;
   picture(id:string):HTMLElement;
-  choose(world:SceneWorld | undefined, background?:CreationProject['background'], current?:()=>boolean, asPlacement?:boolean):Promise<boolean>;
+  choose(world:SceneWorld | undefined, background?:CreationProject['background'], current?:()=>boolean, use?:'backdrop'|'scenery'):Promise<boolean>;
 }) {
   host.innerHTML = `<label>World <select id="creationBackground" aria-label="World"></select></label>
     <img id="creationWorldPreview" width="112" height="63" alt="" hidden>
@@ -37,7 +37,7 @@ export function worldSettings(host:HTMLElement, dialog:HTMLDialogElement, action
   }
   dialog.querySelector('button')!.onclick = close;
   dialog.addEventListener('close',()=>{controls.replaceChildren(); grid.replaceChildren(); message.textContent='';});
-  async function open(asPlacement = false) {
+  async function open(use?:'backdrop'|'scenery') {
     if (!actions.isCurrent() || !scene) return;
     const token = ++epoch, owner = actions.owner(), projectId = scene.id;
     const current = () => token === epoch && dialog.open && owner === actions.owner() && actions.isCurrent() && scene?.id === projectId;
@@ -55,7 +55,7 @@ export function worldSettings(host:HTMLElement, dialog:HTMLDialogElement, action
         button.append(actions.picture(choice.assetId),label);
         button.onclick=async()=>{
           if(!current()) return;
-          const applied=await actions.choose({assetId:choice.assetId,framing:'fit'},undefined,current,asPlacement);
+          const applied=await actions.choose({assetId:choice.assetId,framing:'fit'},undefined,current,use);
           if(current() && applied) close();
           else if(current()) message.textContent='Could not open that picture. Choose another or restore it in My Art.';
         };

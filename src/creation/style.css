@@ -335,3 +335,20 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
  @keyframes creation-small-hop{50%{transform:translateY(-20%)}}
  @keyframes creation-small-dance{35%{transform:rotate(-12deg)}70%{transform:rotate(12deg)}}
 }
+
+/* Keep the open settings disclosure reachable beside Done, including when
+   the panel extends across its normal position on a short viewport. */
+#creationSceneOptions[open] > summary {
+  position: fixed;
+  z-index: 56;
+  top: 135px;
+  right: 34px;
+  border-radius: 12px;
+  background: white;
+}
+@media (max-width: 760px) {
+  #creationSceneOptions[open] > summary { top: 185px; right: 28px; }
+}
+@media (max-height: 600px) and (min-width: 600px) {
+  #creationSceneOptions[open] > summary { top: 72px; right: 24px; }
+}

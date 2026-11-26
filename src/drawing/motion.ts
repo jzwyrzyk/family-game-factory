@@ -1,4 +1,4 @@
-import {validateDrawingMotion, type DrawingMotion as PresetMotion} from './animation-path';
+import {motionPose, validateDrawingMotion, type DrawingMotion as PresetMotion} from './animation-path';
 import {validateMotion as validateStops, placeDrawingMotion, type DrawingMotion as StopMotion} from './relative-stops';
 import type { CreationProject, SceneActor } from '../creation/model';
 
@@ -33,17 +33,32 @@ export function validateMotion(input: unknown): asserts input is DrawingMotion {
 
 /** Applied once, when the child adds their drawing. The resulting ordinary
  * move blocks stay editable and travel with this exact scene revision. */
-export function applyArtMotion(project: CreationProject, actor: SceneActor, motion: DrawingMotion) {
+export function applyArtMotion(project: CreationProject, actor: SceneActor, motion: DrawingMotion, newScene = false) {
   validateMotion(motion);
   if (project.programs.some(program => program.actorId === actor.id && program.trigger.type === 'start')) {
     throw Error('This character already has a start program.');
   }
   if ('stops' in motion || 'move' in motion) {
+    if ('move' in motion) {
+      const start = motionPose(motion, 0);
+      actor.x = start.x * project.width;
+      actor.y = start.y * project.height;
+      actor.size = Math.min(240, project.width * .225);
+      if (newScene) {
+        project.background = motion.world;
+        if (motion.world.startsWith('world-')) delete project.world;
+        else project.world={edition:'jems.world.v1'};
+      }
+    }
     const actions = 'stops' in motion
       ? placeDrawingMotion(motion, actor, project, () => crypto.randomUUID())
       : [{id: crypto.randomUUID(), type: 'animation' as const, motion: structuredClone(motion),
           origin: motion.move === 'path' ? 'child' as const : 'starter' as const}];
     project.programs.push({id:crypto.randomUUID(), actorId:actor.id, trigger:{type:'start'}, actions});
+    if ('move' in motion && newScene) {
+      project.programs.push({id:crypto.randomUUID(), actorId:actor.id, trigger:{type:'tap'},
+        actions:actions.map(block => ({...structuredClone(block),id:crypto.randomUUID()}))});
+    }
     return;
   }
   const [first, ...rest] = motion.points;

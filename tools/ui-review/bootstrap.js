@@ -99,6 +99,7 @@ window.__reviewNavigate=async action=>{
  else if(action==='create')click('studioNavCreate');
  else if(action==='creations'){FG.studio.home();click('studioSavedIdeas');}
  else if(action==='coding')FG.creation.open();
+ else if(action.startsWith('creative:'))await window.__reviewCreative(action.slice(9));
  else if(action==='art')await FG.artStudio.open();
  else if(action==='art-draw'){await FG.artStudio.open();click('artDrawButton');}
  else if(action==='coding-make'){FG.creation.open();await delay(80);click('creationIntroSkip');click('creationFreeMode');}

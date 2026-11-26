@@ -122,6 +122,7 @@ export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Prom
       <div class="dp-brush-sizes" role="group" aria-label="Choose a size">${[4,10,20].map((s,i)=>`<button type="button" data-size="${s}" aria-label="${['Small','Medium','Large'][i]}" aria-pressed="${i===1}"><i aria-hidden="true" style="width:${s}px;height:${s}px"></i></button>`).join('')}</div>
       <details data-more-tools ${grade>=1?'open':''}><summary>More tools</summary>
         <div class="dp-tool-row" role="group" aria-label="More drawing tools">${toolRow(extras.filter(tool=>!basic.includes(tool)))}</div>
+        <label>Brush width<input type="range" min="3" max="24" value="10" data-brush-width></label>
         <div class="dp-stamps" role="group" aria-label="Jems stamps"><span>Jems stamps</span>${(['gold','mint'] as Stamp[]).map(stamp=>`<button type="button" data-stamp="${stamp}" aria-label="${stamp} gem stamp" aria-pressed="false"><img src="./jems-art/gem_${stamp}.webp" alt=""></button>`).join('')}</div>
       </details>
       <div class="dp-selection" hidden><button data-next-mark type="button">Next mark</button><button data-shrink type="button">Smaller</button><button data-grow type="button">Bigger</button></div>
@@ -171,6 +172,7 @@ export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Prom
     }
     for(const button of dialog.querySelectorAll<HTMLButtonElement>('button[data-color]'))button.setAttribute('aria-pressed',String(button.dataset.color===color));
     for(const button of dialog.querySelectorAll<HTMLButtonElement>('button[data-size]'))button.setAttribute('aria-pressed',String(Number(button.dataset.size)===size));
+    find<HTMLInputElement>('[data-brush-width]').value=String(size);
     paper.value=sheet.transparent?'clear':'white';
     canvas.classList.toggle('dp-transparent',sheet.transparent);
     find('[data-undo]').toggleAttribute('disabled',saving || !history.canUndo);
@@ -299,6 +301,9 @@ export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Prom
     }
   });
   find<HTMLInputElement>('[data-custom]').oninput=event=>{if(canEdit()){color=(event.target as HTMLInputElement).value;updateControls();}};
+  find<HTMLInputElement>('[data-brush-width]').oninput=event=>{
+    if(canEdit()){size=Number((event.target as HTMLInputElement).value);updateControls();}
+  };
   paper.onchange=()=>{if(canEdit())commit({...history.sheet,transparent:paper.value==='clear'});};
   for(const action of ['undo','redo'] as const)find('[data-'+action+']').onclick=()=>{
     if(!canEdit())return;discardGesture();selected=-1;history[action]();dirty=true;refresh();

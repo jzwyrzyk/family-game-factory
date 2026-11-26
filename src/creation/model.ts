@@ -86,10 +86,28 @@ export function editWorldPicture(project:CreationProject, picture:PinnedWorld | 
   const placements = sceneryPlacements(project);
   if (background) project.background = background;
   if (!placements.length) { project.world = picture; return; }
+  if (!picture && project.background === 'blank') {
+    project.world = {edition:'jems.world.v1',scenery:placements.map(p=>({
+      id:p.id,assetId:p.assetId,label:p.name,x:p.x,y:p.y,size:p.size,layer:p.front?'in-front':'behind',
+    }))};
+    return;
+  }
   const classic = classicBackgrounds[project.background as keyof typeof classicBackgrounds];
   project.world = {...(picture ?? {assetId:classic ?? project.background,framing:'fill'}),scenery:placements.map(p => ({
     id:p.id, assetId:p.assetId, label:p.name, x:p.x, y:p.y, size:p.size, layer:p.front?'in-front':'behind',
   }))};
+}
+export function addStaticScenery(project:CreationProject, assetId:string, label:string) {
+  const version = worldView(project);
+  const picture = version.assetId && !['blank','meadow','night','workshop','sky'].includes(version.assetId)
+    ? {assetId:version.assetId,framing:version.framing} : undefined;
+  editWorldPicture(project, picture);
+  const world = project.world ??= {edition:'jems.world.v1'};
+  if ('decorations' in world) throw Error('Choose a world for this decoration.');
+  const scenery = world.scenery ??= [];
+  if (scenery.length >= 8) throw Error('A world can hold eight fixed decorations.');
+  scenery.push({id:crypto.randomUUID(),assetId,label,x:Math.round(project.width/2),
+    y:Math.round(project.height*.65),size:100,layer:'behind'});
 }
 export function starterWorld(place:'islands'|'workshop'|'terrace'):SceneWorld {
   const id = {islands:SCENE_WORLDS[0].id, workshop:SCENE_WORLDS[1].id, terrace:SCENE_WORLDS[2].id}[place];

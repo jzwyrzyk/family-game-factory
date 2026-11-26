@@ -6,7 +6,8 @@ import { WORLD_PROPS } from './illustrated-art';
 import { worldTiles, worldControls, placeBackdrop, setWorldLayer, orderedPlacements, stackPlacement } from './world-tools';
 import { sceneThumbnails } from './scene-thumbnails';
 import { renderCreativePicker } from '../assets/creative-picker';
-import { editWorldPicture, sceneryPlacements, worldView, SCENE_ROLES, type SceneRole, type SceneActor } from './model';
+import { addStaticScenery, EARLIER_PROPS, editWorldPicture, sceneryPlacements, worldView, SCENE_ROLES, type SceneRole, type SceneActor } from './model';
+import {keptScenery} from './kept-scenery';
 import { worldSettings } from './world-settings';
 import { createPalPortrait } from '../pals/ui';
 import {earlySoundMuted} from '../learning/early/audio';
@@ -223,7 +224,7 @@ export function installCreationStudio(host: Host) {
   }
   const worlds = worldSettings($('creationWorldSettings'), $<HTMLDialogElement>('creationWorldDialog'), {
     owner, isCurrent:()=>isCurrent() && !recoveryPending && !FG.learning.active, picture:art,
-    async choose(world, background, current = () => true, asPlacement = false) {
+    async choose(world, background, current = () => true, use) {
       let applied = false;
       await act(async () => {
         assertEditing();
@@ -232,7 +233,8 @@ export function installCreationStudio(host: Host) {
         const picture = world?.assetId && parsePrivateArtId(world.assetId) ? await privateArt.load(world.assetId) : undefined;
         if (!current() || !isCurrent() || scene !== captured || capturedOwner !== owner() || viewEpoch !== view) return;
         await mutation(project => {
-          if (asPlacement && picture) {
+          if (use === 'scenery' && picture) addStaticScenery(project,picture.assetId,picture.label);
+          else if (use === 'backdrop' && picture) {
             selectedActor = placeBackdrop(project, picture).id;
             selectedProgram = ''; insert = null;
           } else if (world && !world.assetId) project.world = world;
@@ -256,6 +258,7 @@ export function installCreationStudio(host: Host) {
   function assertEditing(options: { resolvingRecovery?: boolean } = {}) { if (!isCurrent()) throw Error('Reopen your scene in your own profile.'); if (locked()) throw Error('Your learning activity is still open.'); if (recoveryPending && !options.resolvingRecovery) throw Error(recoveryMessage); }
   function freshEngine() { if (!scene) return; engine = new SceneEngine(scene); targetMode = false; $('creationTargetBadge').hidden = true; $('creationPreviewLabel').textContent = 'Your stage'; paint(); fitStage(); }
   function stop(clearRecording = true) { stopReading(); cancelAnimationFrame(frame); frame = 0; last = 0; engine?.pause(); if (clearRecording) cancelRecording(); $<HTMLButtonElement>('creationPause').disabled = true; }
+  let placeScenery: {scene:CreationProject;view:number;owner:string;id:string} | undefined;
   let cleanPreview = false;
   function paint() {
     if (!scene || !engine) return;
@@ -687,21 +690,36 @@ export function installCreationStudio(host: Host) {
     worldPanel.hidden = !!challengeId;
     if (!challengeId) worldPanel.append(worldControls(scene, {
       layer: (name, visible) => void act(() => mutation(project => setWorldLayer(project, name, visible))),
-      chooseBackdrop: () => void worlds.open(true),
+      chooseBackdrop: () => void worlds.open('backdrop'),
       toggleBackdrop: visible => void act(() => mutation(project => {
         const backdrop = project.actors.find(actor => actor.layer === 'backdrop');
         if (backdrop) backdrop.visible = visible;
       })),
       addProp: id => void act(() => addWorldProp(id)),
     }));
+    if (!challengeId) {
+      const active = scene, capturedOwner = sceneOwner;
+      worldPanel.append(keptScenery(active,{owner:capturedOwner,store,loadArt:id=>privateArt.load(id),mutate:mutation,run:act,
+        current:()=>isCurrent() && scene === active && capturedOwner === owner() && !locked()}));
+      const tools=node('details',''), list=node('select');
+      tools.append(node('summary','','Decorate the world'));
+      list.id='creationSceneryType';list.setAttribute('aria-label','Fixed decoration');
+      for (const prop of [...WORLD_PROPS,...EARLIER_PROPS]) list.add(new Option(prop.label,prop.id));
+      const add=node('button','creation-button','Add decoration');
+      add.id='creationAddScenery';add.onclick=()=>act(()=>mutation(project=>
+        addStaticScenery(project,list.value,list.selectedOptions[0].text)));
+      const own=node('button','creation-button','Decorate with my art');
+      own.onclick=()=>void worlds.open('scenery');
+      tools.append(list,add,own);
+      worldPanel.append(tools);
+    }
     for (const placed of challengeId ? [] : sceneryPlacements(scene)) {
       const fields = node('details','creation-scene-options');
       fields.append(node('summary','',placed.name));
       const edit = (change:(item:{x:number;y:number;size:number;layer:'behind'|'in-front'})=>void) =>
         mutation(project => {
           const picture = worldView(project);
-          if (!picture.assetId) throw Error('Choose a world for this placement.');
-          editWorldPicture(project,{assetId:picture.assetId,framing:picture.framing});
+          if (project.world && 'decorations' in project.world) editWorldPicture(project,{assetId:project.world.backdrop,framing:picture.framing});
           const w = project.world;
           if (!w || !('scenery' in w)) throw Error('This placement is missing.');
           const item = w.scenery?.find(item=>item.id === placed.id);
@@ -713,7 +731,22 @@ export function installCreationStudio(host: Host) {
         input('Scenery size',placed.size,value=>edit(p=>{p.size=+value;}),{min:1,max:Math.max(400,scene.height),step:'any'}),
         choice('Scenery layer',placed.front?'in-front':'behind',[['behind','Behind the actors'],['in-front','In front of actors']],
           value=>edit(p=>{p.layer=value==='in-front'?'in-front':'behind';})));
-      worldPanel.append(fields);
+      const remove=node('button','creation-button','Remove decoration');
+      remove.onclick=()=>act(()=>mutation(project=>{
+        const world=project.world;
+        if (!world) return;
+        if ('decorations' in world) world.decorations=world.decorations.filter(item=>item.id!==placed.id);
+        else world.scenery=world.scenery?.filter(item=>item.id!==placed.id);
+      }));
+      const place=node('button','creation-button','Set position on stage');
+      place.onclick=()=>{
+        if (!scene || locked()) return;
+        placeScenery={scene,view:viewEpoch,owner:owner(),id:placed.id};
+        $<HTMLDetailsElement>('creationSceneOptions').open=false;
+        setWorkspaceView('play');
+        status('Touch the stage where you want this decoration.');
+      };
+      fields.append(place,remove);worldPanel.append(fields);
     }
     renderActorSettings(); renderPrograms(); renderVariables(); updateUndo();
   }
@@ -1343,7 +1376,27 @@ export function installCreationStudio(host: Host) {
   };
   new ResizeObserver(fitStage).observe(canvasWrap);
   canvas.onpointerdown = async event => {
-    if (!event.isPrimary || !isCurrent() || locked() || targetMode) return; const point = stage.point(event), grip = stage.resizeHit(point.x,point.y), id = grip || stage.hit(point.x, point.y); if (!id) return;
+    if (!event.isPrimary || !isCurrent() || locked() || targetMode) return;
+    if (placeScenery) {
+      const selected=placeScenery;
+      placeScenery=undefined;
+      if (selected.scene===scene && selected.view===viewEpoch && selected.owner===owner() && !recoveryPending) {
+        const point=stage.point(event);
+        await act(()=>mutation(project=>{
+          const world=project.world;
+          if (!world) return;
+          if ('decorations' in world) {
+            const item=world.decorations.find(item=>item.id===selected.id);
+            if (item) { item.x=100*point.x/project.width;item.y=100*point.y/project.height; }
+          } else {
+            const item=world.scenery?.find(item=>item.id===selected.id);
+            if (item) { item.x=point.x;item.y=point.y; }
+          }
+        }));
+        return;
+      }
+    }
+    const point = stage.point(event), grip = stage.resizeHit(point.x,point.y), id = grip || stage.hit(point.x, point.y); if (!id) return;
     if (recoveryPending) { status(recoveryMessage, true); return; }
     if (engine?.snapshot().status === 'running' || engine?.snapshot().status === 'completed') { await act(() => learningThen(() => { engine!.resume(); engine!.tap(id); animate(); })); return; }
     cleanPreview = false; selectedActor = id; selectedProgram = scene!.programs.find(p => p.actorId === id)?.id || ''; insert = null; renderEditor(); paint();
@@ -1422,7 +1475,7 @@ export function installCreationStudio(host: Host) {
         const project = createArtAdventure(choice, kind);
         if (kind === 'scene' && resolved.motion) {
           project.programs = [];
-          applyArtMotion(project, project.actors[0], resolved.motion);
+          applyArtMotion(project, project.actors[0], resolved.motion, true);
         }
         const bindings=await prepareSceneArt(project,current);if(!current())return;
         const saved=await (await store()).create(capturedOwner,project);indexSceneArt(saved.id,capturedOwner,bindings);await loadScene(saved.id);

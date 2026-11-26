@@ -140,7 +140,7 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     await tryParts.click();await page.waitForFunction(()=>document.getElementById('creationStatus').textContent.includes('exact version'));
     assert.equal(await preview.count(),0,'a cached sprite cannot authorize a modified rig');
     await setRigNotes(rig.assembly.notes);assert.deepEqual(await sceneState(),kept);
-    if(await options.evaluate(el=>el.open))await options.locator(':scope > summary').click();
+    if(await options.evaluate(el=>el.open))await page.locator('#creationSettingsDone').click();
     const retained=await page.evaluate(id=>FG.creation.export().revisions.filter(revision=>revision.projectId===id),firstId);
     assert.equal(retained[0].scene.actors.length,1);assert.equal(retained[0].scene.actors[0].assetId,first.actors[0].assetId);
     if(!await page.locator('#creationMore').evaluate(element=>element.open))await page.locator('#creationMore summary').click();
