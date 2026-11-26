@@ -1,5 +1,7 @@
 # jems documentation map
 
+[Workstream E game bindings and review evidence](game-art/README.md)
+
 For current release status and the evidence for each gate, start with [delivery state](../DELIVERY-STATE.md). The [November 24 cutover](operations/PRODUCTION_ACTIVATION.md) records the prior household release. Private preview, integrated TEST and production follow the [environment contract](development/DEV-TEST-PROD.md).
 
 Private family operating procedures are in the [owner guide](family-beta/OWNER.md) and the [consolidated activation and rollback checklist](family-beta/ACTIVATION.md).

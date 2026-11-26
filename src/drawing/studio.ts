@@ -1,3 +1,5 @@
+import {selectedCreativeImage} from '../assets/creative-library';
+import {roleLabels,roleQuestion,type GameArtPin,type GameArtRole} from '../game-art/bindings';
 import {drawing,drawingPage,drawingBlob,saveDrawing,updateDrawing,deleteArtwork,type Drawing,type DrawingCategory} from '../assets/private-drawings';
 import {artUsages,ART_LIMITS,type DrawingMetadata} from './library';
 import {listRigs,loadDrawingDraft,type SavedRig} from './store';
@@ -13,7 +15,7 @@ import {createIcon,iconMarkup,setIconLabel,type IconName} from '../brand/icons';
 import {assertRewardSourceWritable} from '../rewards/write-guard';
 import './studio.css';
 
-type Host={enter():boolean|Promise<boolean>;home():void;openCar(rigId:string,current:()=>boolean):Promise<void>;openScene(art:{drawingId:string;rigId?:string}):Promise<void>};
+type Host={planGame(pin:GameArtPin,current:()=>boolean):Promise<void>;enter():boolean|Promise<boolean>;home():void;openCar(rigId:string,current:()=>boolean):Promise<void>;openScene(art:{drawingId:string;rigId?:string}):Promise<void>};
 const categories:Record<DrawingCategory,string>={character:'Characters',vehicle:'Vehicles',prop:'Things',world:'Worlds',other:'Other art'};
 const node=<K extends keyof HTMLElementTagNameMap>(tag:K,className='',text='')=>{const e=document.createElement(tag);e.className=className;e.textContent=text;return e;};
 
@@ -114,6 +116,30 @@ export function installArtStudio(host:Host){
     const scene=button('Use in Creative Studio','grid',async()=>{await host.openScene({drawingId:item.id,...(choice.value?{rigId:choice.value}:{})});});scene.id='artUseScene';
     const car=button('Make a Rally game','arrow',async()=>{const at=epoch;await host.openCar(choice.value,()=>current(captured,at));});car.id='artUseRally';
     const updateCar=()=>{car.hidden=!versions.some(r=>r.id===choice.value&&r.assembly.kind==='car');};choice.onchange=updateCar;updateCar();actions.append(openEditor,path,scene,car);pane.append(actions);
+    if(!item.archived){
+      const roleLabel=node('label','art-version-label','In my game, this picture is a…');
+      const role=node('select');role.id='artGameRole';
+      const prompt=node('option','','Choose a role');prompt.value='';role.append(prompt);
+      for(const [value,label] of Object.entries(roleLabels))role.append(new Option(label,value));
+      roleLabel.append(role);
+      const ideaLabel=node('label','art-version-label'),question=node('span'),idea=node('input');
+      idea.maxLength=160;idea.placeholder='My idea (optional)';ideaLabel.append(question,idea);ideaLabel.hidden=true;
+      const plan=button('Make a game with it','add',async()=>{
+        const isCurrent=()=>current(captured,run)&&selected===id;
+        if(!isCurrent()||!Object.hasOwn(roleLabels,role.value))return;
+        const picture=await selectedCreativeImage(captured,id);
+        if(!isCurrent())return;
+        if(picture.archived||picture.sha256!==item.sha256)throw Error('Choose an available picture from My Art.');
+        const {logicalId,originalSha256,drawingId,sha256,semanticIdentity}=picture;
+        await host.planGame({role:role.value as GameArtRole,logicalId,originalSha256,drawingId,sha256,
+          name:picture.label,...(semanticIdentity?{semanticIdentity}:{}),...(idea.value.trim()?{intent:idea.value.trim()}:{})},isCurrent);
+      });
+      plan.id='artPlanGame';plan.disabled=true;role.onchange=()=>{
+        plan.disabled=!role.value;ideaLabel.hidden=!role.value;question.textContent=roleQuestion[role.value as GameArtRole]??'';
+      };
+      const gamePlan=node('section','art-game-plan');gamePlan.id='artGamePlan';
+      gamePlan.append(roleLabel,ideaLabel,plan);pane.append(gamePlan);
+    }
     const hint=node('p','art-small','This choice is copied into the new game or scene. Earlier adventures keep their chosen version.');pane.append(hint);
     const tools=node('details','art-detail-tools'),summary=node('summary','','Picture & storage tools');tools.append(summary);
     tools.append(button('Trim, turn & clean up','edit',async()=>{await editPicture(captured,item,async result=>{if(!current(captured,run))return;selected=result.id;if(!await refresh())return;status('New picture saved. Your original is still in My art.');notify(captured);focusSelectedArtwork(result.id,captured,run);},()=>current(captured,run));}));
@@ -139,7 +165,10 @@ export function installArtStudio(host:Host){
     setIconLabel($('artEditMovement'),'settings','Edit parts and joints');
     setIconLabel(scene,'grid','Make a scene');
     const game=node('details','art-kept-game'), summary=node('summary','','Make a game with it');
-    game.append(summary,node('p','','Give your picture wheels to drive it in Rally.'),button('Build a Rally car','edit',()=>{
+    const picturePlan=$('artGamePlan');
+    if(picturePlan){setIconLabel($('artPlanGame'),'add','Use this picture in my game idea');game.append(summary,picturePlan);}
+    else game.append(summary);
+    game.append(node('p','','Give your picture wheels to drive it in Rally.'),button('Build a Rally car','edit',()=>{
       if(current(captured,run) && selected===saved.id) $<HTMLButtonElement>('artEditMovement').click();
     }));
     options.append(move,scene,game,button('Keep it in My Art','check',async()=>{

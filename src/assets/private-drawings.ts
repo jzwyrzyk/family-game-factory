@@ -1,6 +1,7 @@
 import {artFootprint, checkReservedArtRoom, clearSketchRecord, pendingSketchRecord} from '../drawing/sketch-keep-record';
 import {sceneAssetSlots} from '../creation/model';
 import { originalFor, validSemanticIdentity } from './art-lineage';
+import {retainedPins} from '../game-art/bindings';
 import {assertRewardSourceLockHeld,setRewardSourceMaintenance} from '../rewards/write-guard';
 /** Private immutable image bytes. Metadata and visibility can change; the image cannot. */
 import { ART_LIMITS, artOwner, artRequest, assertArtWrite, checkArtCapacity, deriveArtUsages, withArtTransaction, saveDrawingMetadata, ownerArtRecords, type DrawingMetadata, type ArtGuard, type ArtUsage } from '../drawing/library';
@@ -197,7 +198,16 @@ async function removeDrawing(owner: string, id: string, includeRigs: boolean, gu
   try{
     const [{IndexedRecords},{nativeScope}]=await Promise.all([import('../storage/indexed-records'),import('../storage/native-workspace')]);
     const records=await IndexedRecords.open(await nativeScope(owner),check);
-    try{if(await records.get('native-control','migration')||await records.get('creation-control','migration'))throw Error('This player has a prepared game or scene library. Archive this artwork to keep every retained creation safe. Original erasure is unavailable for prepared libraries.');}finally{records.close();}
+    try{
+      if(await records.get('notebook-control','head')){
+        const {IndexedNotebook}=await import('../storage/indexed-notebook');
+        const notebook=await IndexedNotebook.open(await nativeScope(owner),check);
+        try{
+          if((await notebook.snapshot()).sessions.some(s=>s.gameArt && retainedPins(s.gameArt).some(p=>p.drawingId===id)))
+            throw Error('A saved game idea uses this picture. Archive it to keep that version safe.');
+        }finally{notebook.close();}
+      }
+      if(await records.get('native-control','migration')||await records.get('creation-control','migration'))throw Error('This player has a prepared game or scene library. Archive this artwork to keep every retained creation safe. Original erasure is unavailable for prepared libraries.');}finally{records.close();}
   return await withArtTransaction(['drawings', 'rigs', 'active', 'drafts', 'usage', 'meta'], 'readwrite', async transaction => {
     const store = transaction.objectStore('drawings'), all = await artRequest(store.getAll()) as Drawing[];
     const item = all.find(original => original.id === id && original.owner === owner);

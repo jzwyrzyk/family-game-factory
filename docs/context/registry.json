@@ -88,7 +88,10 @@
     "docs/creative-universe/STANDARD.md",
     "docs/decisions/2026-11-26-connected-creative-universe.md",
     "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md",
-    "docs/creative-universe/DRAWING_WORKSPACE_ACCEPTANCE.md"
+    "docs/creative-universe/DRAWING_WORKSPACE_ACCEPTANCE.md",
+    "docs/game-art/README.md",
+    "docs/game-art/evidence/README.md",
+    "docs/decisions/2026-11-26-private-game-art.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -153,10 +156,10 @@
         "docs/creative-universe/STANDARD.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:32:06.419Z",
-      "sourceDigest": "de61f34b424d4fc2ea4ee57db00c230b0d52b9c153708ef6714869ed35db083b",
+      "reviewedAt": "2026-11-26T03:35:53.678Z",
+      "sourceDigest": "38f01a9b8e700567483406a7a6adaeb9bf89c0da93ffac8fda750aa026c04416",
       "reviewOutcome": "updated",
-      "reviewReason": "The canonical Creative Asset and World Standard records the approved paper, exact replay, interruption recovery and activity choices and now routes directly to product review.",
+      "reviewReason": "The canonical creative standard now specifies the notebook role owner and exact original and edition binding required for local game play.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -317,10 +320,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:29:13.861Z",
-      "sourceDigest": "c232ba4df485b7d90a8ea79da7c6631874e7f5b2f60b4e92c42a3f068a38824c",
+      "reviewedAt": "2026-11-26T03:35:53.832Z",
+      "sourceDigest": "36dbdb45e6493c96d3f8db5fb000705c3e35bb2ed2471d30012b463cfceebfaf",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the actual My Art shelf, exact-input private entry, fitted phone and tablet paper, quick palette, and explicit game and scene continuations in the architecture and drawing contract.",
+      "reviewReason": "My Art entries and existing game tools now return a role and local action to the same idea. The normal online Build and review sample have distinct availability.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -422,9 +425,9 @@
       ],
       "reviewAfterDays": 30,
       "sourceDigest": "5600267a35c47b7152c90d520cddf419bff4a933f3b9e140e91f3e8372e61d4b",
-      "reviewedAt": "2026-11-26T03:29:14.752Z",
+      "reviewedAt": "2026-11-26T03:35:54.299Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented explicit role and revision selection, actor ordering, editable path playback and the three-layer artwork catalogue in the scene and world contracts.",
+      "reviewReason": "The shared catalog preserves existing scene choices while resolving a single game drawing and its verified private ancestry.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -730,7 +733,9 @@
         "docs/assignment-006/*.md",
         "docs/adult-pilot/*.md",
         "docs/privacy/*.md",
-        "docs/game-intelligence/premium-benchmark/*.md"
+        "docs/game-intelligence/premium-benchmark/*.md",
+        "docs/game-art/*.md",
+        "docs/game-art/evidence/*.md"
       ],
       "sources": [
         "server/actions/**",
@@ -744,13 +749,15 @@
         "docs/game-intelligence/premium-benchmark/*.md",
         "tools/premium-art/**",
         "tools/creative-game-art/**",
-        "tests/creative-game-art-browser.ts"
+        "tests/creative-game-art-browser.ts",
+        "src/game-art/**",
+        "tools/game-art-review/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:29:14.930Z",
-      "sourceDigest": "ca00b4c1508fe9d4b84f3a945da1f8516a2c29232eee52fc5c33405bfe5566eb",
+      "reviewedAt": "2026-11-26T03:35:54.405Z",
+      "sourceDigest": "324068cc363294768bfd356568c277614856c326e6941158c3f61b732b775ce2",
       "reviewOutcome": "updated",
-      "reviewReason": "The offline qualification adapter, tests and review now route to the generation owner; the premium contract records its exact compiled-slot scope and edge sampling.",
+      "reviewReason": "Reviewed the fixed 2D program, archived worker and trusted image projection. The premium contract addresses model-facing screenshots before any hosted promotion.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -905,10 +912,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:29:15.179Z",
-      "sourceDigest": "fbf0951b5fed1a2f635c5cdc9a8a28aa8835b824cf1540dbdcc31889bbf1642e",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The governed art and generation suites retain their existing jobs and now exercise PNG replay, mixed tool input, recovery, scoped slots and painted world composition on synthetic fixtures.",
+      "reviewedAt": "2026-11-26T03:35:54.558Z",
+      "sourceDigest": "547f817e7c28d73bab4f183d26ef6a48a8ff3a532906e32497cf3100b21c6c51",
+      "reviewOutcome": "updated",
+      "reviewReason": "Added exact full-canvas comparison, explicit test Keep, copy, rebuild, negative authorization checks and real notebook selection in Chromium.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1149,10 +1156,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:29:15.345Z",
-      "sourceDigest": "c40da5c0fde8725a834ab7c6d975e7c5b2be49b7224156d2df64c701ce23bac3",
+      "reviewedAt": "2026-11-26T03:35:54.715Z",
+      "sourceDigest": "7804ff23caa74613f8af0d05e48c322d9b5e546b7e4f2bb4a929e076486a2466",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the converged standard and isolated game PR dependencies, protected main observation, exact application source, local acceptance and separate preview, release and activation gates.",
+      "reviewReason": "The delivery register records the refreshed application, worker and household identities, the Workstream E stack, and separate hosted qualification.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1407,10 +1414,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:32:07.107Z",
-      "sourceDigest": "0c3f52df1a9dad75774ebd91df4ae718c319c5c7c88c42f245832f5f5d463238",
+      "reviewedAt": "2026-11-26T03:35:54.855Z",
+      "sourceDigest": "c19481ac6d7282173f01c20b7ef73cbe7ae5905d6a7a72c1807eb2b3a4f745d4",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the workstream acceptance receipt and routed shared creative policy, source, picker, world and isolated game checks to their domain owners.",
+      "reviewReason": "Routed the game-art module, its synthetic fixture tools and evidence to the existing documentation review owners.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1624,7 +1631,9 @@
         "docs/creative-universe/STANDARD.md",
         "docs/decisions/2026-11-26-connected-creative-universe.md",
         "docs/creative-universe/*.md",
-        "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md"
+        "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md",
+        "docs/game-art/*.md",
+        "docs/decisions/2026-11-26-private-game-art.md"
       ],
       "sources": [
         "src/drawing/**",
@@ -1638,13 +1647,16 @@
         "tests/creative-motion-browser.cjs",
         "tests/fixtures/my-art/**",
         "tools/ui-review/drawing-*.ts",
-        "tools/ui-review/drawing-smoke.cjs"
+        "tools/ui-review/drawing-smoke.cjs",
+        "src/game-art/**",
+        "tests/game-art*",
+        "tests/game-art/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "46b29d86b9b4b8ce356f35f206682475bd7f1a5194edc91122ceec98ea9fba58",
-      "reviewedAt": "2026-11-26T03:29:15.692Z",
+      "sourceDigest": "78e3e623d9bf3ac39a538a8a8a40fe053d0283d45ffabf3efba991bacd095333",
+      "reviewedAt": "2026-11-26T03:35:54.972Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The Art Studio contract covers tall editable pages, validated legacy crayon replay, original backup, interruption recovery, source checks and explicit reuse after Keep.",
+      "reviewReason": "Documented the shared catalog, optional role and authored action, guarded selection, original bytes and durable saved test pins.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1724,10 +1736,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "a32aacb0fd1275890758b5e1a2cc06ab15cc2fac95ebce48286b05e29200be73",
-      "reviewedAt": "2026-11-26T03:29:15.896Z",
+      "sourceDigest": "f1522ac0a7fb231e7389d3acf894d8a4f06b8f03ed4d25e7b1c4aee5717bf76a",
+      "reviewedAt": "2026-11-26T03:35:55.163Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The architecture records the owner-bound Keep reservation and exact recovery, the existing private database and whole-library transfer without a second storage authority."
+      "reviewReason": "Documented reference verification and origin-scoped identity remapping for local plans, tests and private recovery. Earlier readers need rollback qualification."
     }
   ]
 }
