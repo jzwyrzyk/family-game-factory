@@ -891,10 +891,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:53:23.830Z",
-      "sourceDigest": "330d74004c66843a246e99c2bc48ea378d2b7a5c6bd309600ee3c27b6b69879a",
+      "reviewedAt": "2026-11-26T02:02:21.161Z",
+      "sourceDigest": "5d915acb677c990b41cbc746f0fc02178ce579e8a35fb1822d87b607bea6efae",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Existing language UI and integration suites now exercise repeated tiles and direct passage evidence within the same offline learning shard and CI structure.",
+      "reviewReason": "Reviewed the merged contrast and unused-checkpoint exit assertions with Math construction/geometry cases and English token ordering, passage evidence, independent writing and scoring tests. The established CI suites still exercise these behaviors without altering production or learning policy.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
