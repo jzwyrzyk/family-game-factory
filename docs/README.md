@@ -16,6 +16,8 @@ The [standalone UI review](ui-review/README.md) packages the real UI for offline
 
 ## Canonical references
 
+Use the [Creative Asset & World Design Standard](drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md) when changing drawing, motion, asset delivery or scene worlds.
+
 | Reference | Question it answers | Update when |
 | --- | --- | --- |
 | [Agent entry point](../AGENTS.md) | What should an assistant read and preserve before answering or developing? | Working method or context-loading rules change |

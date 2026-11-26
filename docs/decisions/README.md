@@ -6,6 +6,8 @@ These records explain durable choices without turning chat history into another 
 
 ## Index
 
+- [November 26 · Authentic child artwork, revision-pinned reuse and 2D worlds](2026-11-26-connected-creative-universe.md)
+
 - [Journey cards, starter eligibility and permanent retirements](2026-11-25-journey-cards-and-starter-pals.md)
 
 - [November 25: one child-facing Jems world](2026-11-25-child-experience-modernization.md) — owner-approved navigation, landing-page reference, purpose-driven scenes and unified Send/Build concept. Supersedes earlier menu and retained-game placement only.

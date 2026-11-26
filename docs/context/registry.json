@@ -84,7 +84,9 @@
     "docs/development/SETUP.md",
     "docs/development/COSTS.md",
     "docs/decisions/2026-11-23-dev-test-prod.md",
-    "docs/ui-review/README.md"
+    "docs/ui-review/README.md",
+    "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md",
+    "docs/decisions/2026-11-26-connected-creative-universe.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -146,10 +148,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:38:12.735Z",
-      "sourceDigest": "6925af7797920346bfc5542e781245e8f039124dca019a6962d867f334a2a400",
+      "reviewedAt": "2026-11-26T03:05:08.036Z",
+      "sourceDigest": "7c1f13333fbd5868198b86ea5dd06e16d434b4ab7eb6079ce2be66d3abd70879",
       "reviewOutcome": "updated",
-      "reviewReason": "The first-creation contract now records single admission for repeated taps without changing saved-idea ownership or readiness rules.",
+      "reviewReason": "Make authentic private artwork a permanent product commitment and apply the 2D standard to every new game.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -1393,10 +1395,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:58.459Z",
-      "sourceDigest": "37c0c3f9ee5432f31d4741e23cb41fe2cc54569af18aec957152e780590aad46",
+      "reviewedAt": "2026-11-26T03:05:09.221Z",
+      "sourceDigest": "e12f1b116628f6366c5937a5521badf03d49764436a4a7f4d4372b5ca3de5f9c",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the roster and Journey decision with companion contracts and updated the documentation index.",
+      "reviewReason": "Register the Creative Asset and World standard and decision, and add their review requirements to the PR template.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1606,7 +1608,8 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/drawings/*.md",
         "docs/creation-studio/*.md",
-        "docs/decisions/2026-11-19-private-art-studio.md"
+        "docs/decisions/2026-11-19-private-art-studio.md",
+        "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md"
       ],
       "sources": [
         "src/drawing/**",
@@ -1617,10 +1620,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "467544c05466d8d0c1045244fa942dbfccf7b81e1e04635e8f5ecae1c0b62afc",
-      "reviewedAt": "2026-11-25T23:21:00.320Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "My Creations uses the shared header and retains the My Art action. The drawing library, private assets and editor use the inherited My Art contract.",
+      "sourceDigest": "9d803b79527bf07c784aa90dc8ab4821e3efd7c2dbd45c4a35003ffb7480c45c",
+      "reviewedAt": "2026-11-26T03:05:08.519Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Route the cross-activity standard through Art Studio, including editable original bytes, pinned reuse and delivery scope.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
