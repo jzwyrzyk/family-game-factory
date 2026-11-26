@@ -99,6 +99,8 @@ window.__reviewNavigate=async action=>{
  else if(action==='create')click('studioNavCreate');
  else if(action==='creations'){FG.studio.home();click('studioSavedIdeas');}
  else if(action==='coding')FG.creation.open();
+ else if(action==='creative-picker'){await FG.artStudio.open();click('artBrowseAssets');}
+ else if(action==='world-builder')await window.__reviewCreative('world-plate-forest');
  else if(action.startsWith('creative:'))await window.__reviewCreative(action.slice(9));
  else if(action==='art')await FG.artStudio.open();
  else if(action==='art-draw'){await FG.artStudio.open();click('artDrawButton');}

@@ -44,12 +44,20 @@ export function parseSheet(value: unknown): Sheet {
   return sheet;
 }
 
-/** Each edit replaces its mark or list. Adjacent snapshots share unmodified marks and point arrays. */
+/** Reopening editable marks restores their original order. Prefix lengths let a
+ * child undo retained marks without duplicating point arrays or every mark list. */
 export class PaperHistory {
-  private steps: Sheet[];
-  private cursor = 0;
-  constructor(sheet: Sheet = { version: 1, transparent: false, marks: [] }) { this.steps = [parseSheet(sheet)]; }
-  get sheet() { return this.steps[this.cursor]; }
+  private readonly original: Sheet;
+  private steps: (Sheet | number)[];
+  private cursor: number;
+  private current: Sheet;
+  constructor(sheet: Sheet = {version:1, transparent:false, marks:[]}) {
+    this.original = this.current = parseSheet(sheet);
+    this.cursor = sheet.marks.length;
+    this.steps = Array.from({length:this.cursor}, (_, index) => index);
+    this.steps.push(this.original);
+  }
+  get sheet() { return this.current; }
   get canUndo() { return this.cursor > 0; }
   get canRedo() { return this.cursor + 1 < this.steps.length; }
   apply(sheet: Sheet) {
@@ -58,9 +66,17 @@ export class PaperHistory {
     this.steps.push(sheet);
     if (this.steps.length > 48) this.steps.shift();
     this.cursor = this.steps.length - 1;
+    this.current = sheet;
   }
-  undo() { if (this.canUndo) this.cursor--; }
-  redo() { if (this.canRedo) this.cursor++; }
+  private move(index: number) {
+    const selected = this.steps[index];
+    this.cursor = index;
+    this.current = typeof selected === 'number'
+      ? {...this.original, marks:this.original.marks.slice(0,selected)}
+      : selected;
+  }
+  undo() { if (this.canUndo) this.move(this.cursor-1); }
+  redo() { if (this.canRedo) this.move(this.cursor+1); }
 }
 
 export { pointerPoint } from './pointer-input';

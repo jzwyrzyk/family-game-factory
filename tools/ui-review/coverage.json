@@ -307,6 +307,16 @@
       "id": "recovery-family",
       "label": "Save or restore a synthetic family recovery copy",
       "action": "review-recovery"
+    },
+    {
+      "id": "creative-picker",
+      "label": "Browse the original four-picture collection",
+      "action": "creative-picker"
+    },
+    {
+      "id": "world-builder",
+      "label": "Build in the Enchanted Gem Forest",
+      "action": "world-builder"
     }
   ],
   "journeys": [

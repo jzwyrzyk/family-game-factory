@@ -175,6 +175,7 @@ export function createIllustratedStarter(kind: CreationStarter, worldId?: string
   const world = ILLUSTRATED_WORLDS.find(item => item.id === (worldId ?? defaults[kind]));
   if (!world) throw Error('Choose an available illustrated world.');
   const project = starter(kind, worldId ? world.label : titleFor[kind]);
+  project.background = world.id;
   project.world = {assetId:world.id,framing:'fill'};
   if (worldId) {
     const prop = creationAsset(world.props[0]);

@@ -1,3 +1,4 @@
+import {ILLUSTRATED_WORLDS} from './illustrated-art';
 import {listCreativeAssetChoices} from '../assets/creative-library';
 import {renderCreativePicker} from '../assets/creative-picker';
 import {SCENE_WORLDS, worldView, type CreationProject, type SceneWorld} from './model';
@@ -66,7 +67,10 @@ export function worldSettings(host:HTMLElement, dialog:HTMLDialogElement, action
   useArt.onclick = () => open();
   select.onchange = async () => {
     const assetId = select.value;
-    if(SCENE_WORLDS.some(world=>world.id===assetId)) await actions.choose({assetId,framing:'fill'});
+    if(SCENE_WORLDS.some(world=>world.id===assetId)) {
+      const illustrated = ILLUSTRATED_WORLDS.find(world=>world.id===assetId);
+      await actions.choose({assetId,framing:'fill'},illustrated?.id);
+    }
     else if(assetId!=='private') await actions.choose(undefined,assetId as CreationProject['background']);
   };
   frame.onchange = async () => {

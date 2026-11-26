@@ -1,3 +1,4 @@
+import {seedCreativeFixtures} from './creative-fixtures';
 import {creativeDestination,seedCreativeReview} from './creative-fixture';
 import '../../src/style.css';
 import {parentDashboardFixture} from '../../tests/parent-dashboard-fixture';
@@ -37,7 +38,8 @@ async function boot(){
   await rewards.project('player1',facts);
   await pals.sync('player1',palSnapshotFromRewards(await rewards.export(),'player1'));
  }
- if(['populated','creative-library','mixed-grades'].includes(config.scenario))await seedCreativeReview('player1');
+ if(['populated','unlocked'].includes(config.scenario))await seedCreativeFixtures();
+ if(['creative-library','mixed-grades'].includes(config.scenario))await seedCreativeReview('player1');
  w.__reviewCreative=creativeDestination;
  await import('../../src/main');
  const timer=setInterval(()=>{if(w.FG?.studio&&w.FG?.creation){clearInterval(timer);parent.postMessage({type:'review-ready'},'*');}},40);

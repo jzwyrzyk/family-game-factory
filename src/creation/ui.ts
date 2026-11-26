@@ -66,7 +66,8 @@ function commandSymbol(type:string,mark:string){
     symbol.classList.add('creation-action-pose','creation-pose-'+type);
     const art=document.createElement('img');art.alt='';art.draggable=false;
     art.src=new URL('jems-art/character_spark_'+(type==='jump'?'celebrate':'wave')+'.webp',document.baseURI).href;
-    symbol.append(art);
+    if(type==='jump') symbol.replaceChildren(art,node('span','creation-jump-arrow',mark));
+    else symbol.append(art);
   }
   return symbol;
 }
