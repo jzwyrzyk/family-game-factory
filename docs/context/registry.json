@@ -906,10 +906,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:42:17.220Z",
-      "sourceDigest": "3aa4aa618995dcd30ed349e8dbad5b16da9ba415a41f6f00771077b568c96e11",
+      "reviewedAt": "2026-11-26T07:11:18.239Z",
+      "sourceDigest": "2f128ddf48e5d6c85592d9085a5fb2d4ada541f74ae7ffe2f140973850a14e68",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified direct-file navigation and each original deep assertion, separate streamed zoom gallery, and 347 exact source hashes with both decoding implementations.",
+      "reviewReason": "Verify the retained storage journeys and the full offline Pal review using trusted physical input and the exact standalone file.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1678,10 +1678,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "05dbaad2e64a5681d23a1b796ed6f91a5ab3c66b3e1d25904cac43e353957e7e",
-      "reviewedAt": "2026-11-26T06:30:15.759Z",
+      "sourceDigest": "576b5e280eee433f1e56224c5e0e8b40fe20d10f098549991ac643fe1ec24207",
+      "reviewedAt": "2026-11-26T07:11:19.341Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the Phase 2 atomic contrast read and retained the owned companion learning surface and original readability assertion.",
+      "reviewReason": "The full Pal review retains exact images, owner, progression and layout assertions through the shared single-file transport documented in the owner review.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1716,10 +1716,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "381260b659e8d8ed26b7fdddb3c2182a49d2f8f9cffd808e7d167695f25bfb3a",
-      "reviewedAt": "2026-11-26T00:23:36.006Z",
+      "sourceDigest": "db7ab1ea47142e27dafb6b6f810cc96a1f8e1f92ec842342ce905012422b4a84",
+      "reviewedAt": "2026-11-26T07:11:19.958Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled merged F06 rollback limits with the owner-scoped Pal migration, retained readers and repeat restore contract.",
+      "reviewReason": "The native Rally fixture verifies the actual fitted control, nested scroll, and protected indexed and legacy notebook histories on the same saved revision.",
       "reviewHistory": []
     }
   ]
