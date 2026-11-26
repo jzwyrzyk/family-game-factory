@@ -92,9 +92,9 @@ export async function environmentRelease(release,controller,options,io=cloud){
  const common=['--project',c.project,'--region',c.region],regionless=['--project',c.project,'--global'];
  if(env==='test'&&c.project==='jems-jzw-nonprod'){
   const b=builds?.gateway;
-  requireState(b&&builds.preview?.id===b.id&&builds.preview?.trigger===b.trigger,'Single reviewed three-service TEST build required.');
+  requireState(b&&['preview','coach'].every(role=>builds[role]?.id===b.id&&builds[role]?.trigger===b.trigger),'Single reviewed three-service TEST build required.');
   const receipt=verifyImages(source,b.trigger,b.id,io);
-  requireState(receipt.images.gateway===c.gatewayImage&&receipt.images.preview===c.previewImage,'Integrated TEST images differ from the verified build.');
+  requireState(receipt.images.gateway===c.gatewayImage&&receipt.images.preview===c.previewImage&&receipt.images.coach===release.coachImage,'Integrated TEST images differ from the verified build.');
  }else for(const role of ['gateway','preview']){
   const b=builds?.[role];requireState(b&&uuid.test(b.id)&&uuid.test(b.trigger),'Missing approved builder identity.');
   verifyBuild(io(['builds','describe',b.id,...common]),b,source,c[role+'Image'],io(['builds','triggers','describe',b.trigger,...common]));

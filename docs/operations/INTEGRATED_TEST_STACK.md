@@ -79,7 +79,17 @@ done
 
 Capture the numeric secret versions and all three exact image digests in `release` in a copy of the foundation inputs, advance to `services`, plan and approve. Only then advance to `edge` and explicitly approve the HTTPS routing resources. Verify exact hosts, wildcard DNS authorization, certificate status, default-domain denial, no CDN caching, separate IAP assertion audiences, secret mounts and serving digests. Verify the management, household, family and preview boundaries through actual requests. Wait for real DNS/TLS readiness; a successful Terraform apply does not establish it.
 
-Before enabling TEST worker federation, verify its real protected branch/tag, repository ID, runner group access, signer policy, no-identity VM, bounded TTL and stop/cleanup controls. Review and apply the exact `edge` plan with `enable_worker_federation=true`. Set the TEST release metadata in the existing protected environment, using `family_descriptor` and the single verified build ID and trigger ID for each service build reference. Verify the existing environment controller in read-only mode first.
+Before enabling TEST worker federation, verify its real protected branch/tag, repository ID, runner group access, signer policy, no-identity VM, bounded TTL and stop/cleanup controls. Review and apply the exact `edge` plan with `enable_worker_federation=true`. Produce the protected family release record after the services or edge readback. This metadata carries no private configuration values.
+
+```bash
+outputs="$(jq -er .outputs "$private_inputs/last-applied.json")"
+jq -n --slurpfile tf "$outputs" --slurpfile b "$private_inputs/service-images.json" '
+  ($b[0] | {id:.build,trigger}) as $id |
+  {source:$b[0].source,descriptor:$tf[0].family_descriptor.value,coachImage:$b[0].images.coach,
+   builds:{gateway:$id,preview:$id,coach:$id}}' > "$private_inputs/test-release.json"
+gh variable set JEMS_FAMILY_TEST_RELEASE --repo jzwyrzyk/family-game-factory --env jems-nonproduction < "$private_inputs/test-release.json"
+```
+ Verify the existing environment controller in read-only mode first.
 
 ## Enroll synthetic TEST identities and qualify the release
 
