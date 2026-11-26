@@ -101,3 +101,5 @@ Acceptance uses synthetic pictures in the real production browser bundle. It che
 Historical editable crayons used two coordinate scales under a single format tag. The reader replays each supported interpretation against the retained original pixel content before opening the marks for editing. An unverified rendition cannot overwrite the retained original.
 
 In **All my art**, movement versions stay in saved order after you play an older path. **Recent** sorts by the time a drawing or movement was last used. Selecting the same picture again returns focus to its details and keeps the role and instructions you have entered. A delayed library read checks which picture is current before updating those controls.
+
+Shared host presentation now consumes the [central design-system foundations](../design-system/README.md). Existing feature controllers, ownership, saves, original artwork, assessment and rewards remain authoritative; the [migration inventory](../design-system/INVENTORY.md) distinguishes adopted components from pending template work.

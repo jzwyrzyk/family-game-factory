@@ -247,3 +247,5 @@ The four illustrated starters share the versioned artwork used by the player and
 Use this world creates an independent project from the exact kept version inside the creation store transaction. The copy keeps its pinned artwork, actor IDs, programs and placement settings. Both the local and IndexedDB authorities check the owner and kept version before copying.
 
 [Creative Universe compatibility and local playback](../creative-universe/CONSOLIDATION.md)
+
+Shared host presentation now consumes the [central design-system foundations](../design-system/README.md). Existing feature controllers, ownership, saves, original artwork, assessment and rewards remain authoritative; the [migration inventory](../design-system/INVENTORY.md) distinguishes adopted components from pending template work.

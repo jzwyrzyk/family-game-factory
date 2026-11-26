@@ -322,6 +322,11 @@
       "id": "creative-notebook-flight",
       "label": "Play the local notebook artwork sample",
       "action": "creative:notebook-flight"
+    },
+    {
+      "id": "design-system",
+      "label": "Design system \u00b7 foundations, components & product archetypes",
+      "action": "design-system"
     }
   ],
   "journeys": [

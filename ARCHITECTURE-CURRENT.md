@@ -57,6 +57,10 @@ The production browser bundle, disconnected DEV/TEST bundle, offline HTML review
 
 Consult the [feature index](docs/README.md) for API, family isolation, learning, drawing, gameplay and operations contracts. The [November 26 architecture record](docs/history/2026-11-26/ARCHITECTURE-CURRENT.md) preserves the full subsystem notes, prior integrations and source identities.
 
+## Shared design-system increment
+
+`src/design-system/` owns semantic foundations, extracted headers/dashboard/destination cards, native actions, Journey contextual navigation, collection layout and the existing Menu focus-containment utility. Six actual secondary pages use the collection template; legacy brand imports delegate for active-branch compatibility. Studio, Creation, Art, Pals, Rewards and Parent CSS consume exact semantic aliases. Feature controllers retain all domain authority. The review-only `tools/design-system/` gallery imports production exports and is embedded by the existing standalone review build; it is not a second deployed frontend. [Guide and interfaces](docs/design-system/README.md) · [remaining archetypes and dependencies](docs/design-system/INVENTORY.md).
+
 <details>
 <summary>Previous section links</summary>
 

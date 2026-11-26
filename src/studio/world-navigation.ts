@@ -1,21 +1,16 @@
-import { createPageHeader } from '../brand/page-header';
-import {createIcon} from '../brand/icons';
+import {hostArtworkPath} from '../design-system/artwork';
+import { createCollectionHeader as createPageHeader } from '../design-system/templates/collection';
+import {createContextNavigation} from '../design-system/components/context-navigation';
 
-/** Presentation only: all destinations invoke the host's existing guarded routes. */
-export function destinationTile(id:string,title:string,description:string,src:string,open:()=>void){
- const button=document.createElement('button');button.type='button';button.id=id;button.className='jems-destination';
- const art=document.createElement('img');art.src=src;art.alt='';art.decoding='async';
- const copy=document.createElement('span'),name=document.createElement('strong'),detail=document.createElement('span');
- name.textContent=title;detail.textContent=description;copy.append(name,detail);button.append(art,copy,createIcon('arrow'));button.onclick=open;return button;
-}
+export {createDestinationCard as destinationTile} from '../design-system/components/destination-card';
+import {createDestinationCard as destinationTile} from '../design-system/components/destination-card';
 
 export function installJourneySections(actions:{overview:()=>void;pals:()=>void;rewards:()=>void;powers:()=>void;scenes:()=>void;experiments:()=>void}){
  const routes=[['page-jems-journey','overview','My Journey'],['page-jems-pals','pals','My Pals'],['page-jems-rewards','rewards','Gems & achievements'],['page-lab','powers','My Powers']] as const;
  for(const [pageId,current] of routes){
   const page=document.getElementById(pageId);if(!page)continue;
   page.classList.add('jems-world-page');
-  const nav=document.createElement('nav');nav.className='jems-world-nav';nav.setAttribute('aria-label','My Journey sections');
-  for(const [,key,label] of routes){const button=document.createElement('button');button.type='button';button.textContent=label;button.dataset.journeySection=key;if(key===current)button.setAttribute('aria-current','page');button.onclick=actions[key];nav.append(button);}
+  const nav=createContextNavigation('My Journey sections', routes.map(([,key,label])=>({key,label,onOpen:actions[key]})), current);
   page.prepend(nav);
  }
  const powers=document.getElementById('page-lab')!;
@@ -25,7 +20,7 @@ export function installJourneySections(actions:{overview:()=>void;pals:()=>void;
  back.onclick=()=>document.getElementById('studioNavHome')?.click();
  const header=createPageHeader(powers, { title:oldHeader.querySelector('h1')!, description:oldHeader.querySelector('p')!, back, backLabel:'My Games' });
  oldHeader.replaceWith(header);
- const practice=document.createElement('section');practice.className='jems-powers-practice';practice.setAttribute('aria-label','Thinking adventures');practice.append(destinationTile('journeyScenePractice','Rebuild a scene','Try your coding powers','./jems-blocks.svg',actions.scenes),destinationTile('journeyExperimentPractice','Try an experiment','Make a guess. Try it out.','./jems-workbench.svg',actions.experiments));header.after(practice);
+ const practice=document.createElement('section');practice.className='jems-powers-practice';practice.setAttribute('aria-label','Thinking adventures');practice.append(destinationTile('journeyScenePractice','Rebuild a scene','Try your coding powers',hostArtworkPath('blocks'),actions.scenes),destinationTile('journeyExperimentPractice','Try an experiment','Make a guess. Try it out.',hostArtworkPath('workbench'),actions.experiments));header.after(practice);
  const overview=document.createElement('section');overview.className='jems-world-overview';overview.setAttribute('aria-label','My gems, Pals and powers');
  const page=document.getElementById('page-jems-journey')!;
  page.querySelector('.jems-journey-hero')?.before(overview);

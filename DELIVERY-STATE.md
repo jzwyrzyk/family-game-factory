@@ -85,6 +85,8 @@ The [dated delivery ledger](docs/history/2026-11-26/DELIVERY-STATE.md) preserves
 
 [Open the historical receipt](docs/history/2026-11-26/DELIVERY-STATE.md#pr65-parent-reporting--merged).
 
+The combined candidate incorporates the six collection migrations from #221. See the [migration inventory](docs/design-system/INVENTORY.md) for the retained specialist surfaces.
+
 <details>
 <summary>Previous section links</summary>
 

@@ -32,6 +32,7 @@ jobs:
       - name: Identify exact represented candidate or main source
         shell: bash
         run: echo "UI_REVIEW_BASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - run: npm run design:check && npm run design:test
       - run: npm run review:build
         env:
           UI_REVIEW_SOURCE_KIND: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'merged main' || 'candidate branch' }}
@@ -84,6 +85,7 @@ jobs:
           name: jems-ui-review-evidence-${{ env.UI_REVIEW_BASE_SHA }}
           path: |
             test-results/ui-review/
+            test-results/design-system/
             test-results/child-modernization/
             test-results/pal-fidelity/
           retention-days: 14

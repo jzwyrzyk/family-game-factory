@@ -1,3 +1,4 @@
+@import '../design-system/tokens.css';
 /* Approved Jems art library v1.2. Artwork stays in supplied files; UI copy stays HTML. */
 @font-face {
   font-family: Nunito;
@@ -12,24 +13,6 @@
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
-}
-:root {
-  --jems-round: Nunito, "Arial Rounded MT Bold", "Trebuchet MS", ui-rounded, system-ui, sans-serif;
-  --jems-body: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
-  --jems-surface: #fff;
-  --jems-surface-lilac: #F2EBFF;
-  --jems-surface-blue: #EDF3FF;
-  --jems-surface-mint: #E2FBF3;
-  --jems-surface-coral: #FFF0F3;
-  --jems-surface-gold: #FFF5DC;
-  --jems-control-line: #74819B;
-  --jems-success: #07684F;
-  --jems-danger: #B4233D;
-  --jems-warning: #704900;
-  --jems-radius-control: 15px;
-  --jems-radius-card: 21px;
-  --jems-target-primary: 48px;
-  --jems-target-secondary: 44px;
 }
 body.studio-review .studio-creation-hero > img {
   width: 210px;

@@ -96,7 +96,9 @@
     "docs/creative-universe/DRAWING_WORKSPACE_ACCEPTANCE.md",
     "docs/game-art/README.md",
     "docs/game-art/evidence/README.md",
-    "docs/decisions/2026-11-26-private-game-art.md"
+    "docs/decisions/2026-11-26-private-game-art.md",
+    "docs/design-system/README.md",
+    "docs/design-system/INVENTORY.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -1757,6 +1759,28 @@
       "reviewOutcome": "updated",
       "reviewReason": "Existing private and native storage authorities retain the exact artwork and scene revisions while scratchpaper stays transient.",
       "reviewHistory": []
+    },
+    {
+      "id": "design-system",
+      "documents": [
+        "docs/design-system/**/*.md",
+        "AGENTS.md",
+        "PRODUCT-DOCTRINE.md",
+        "ARCHITECTURE-CURRENT.md",
+        "docs/ui-review/README.md"
+      ],
+      "sources": [
+        "src/design-system/**",
+        "tools/design-system/**",
+        "scripts/check-design-system.mjs",
+        "scripts/tests/check-design-system.test.mjs",
+        "docs/design-system/**"
+      ],
+      "reviewAfterDays": 30,
+      "sourceDigest": "d3f02dfa9720ae3b2315c14a7340db2b84ee1252b587f96b26bd9bb4da3671c2",
+      "reviewedAt": "2026-11-26T05:17:05.044Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Recorded distinct original capture and final follow-up source identities, canonical destination ownership, and stricter gallery packaging provenance; no owner acceptance or full migration completion is inferred."
     }
   ]
 }

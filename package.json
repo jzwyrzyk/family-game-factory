@@ -83,10 +83,13 @@
     "test:storage-browser": "node tests/storage-browser.cjs && node tests/storage-domains-browser.cjs && node tests/storage-complete-backup-browser.cjs && node tests/storage-indexed-notebook-browser.cjs && node tests/storage-creation-browser.cjs && node tests/storage-authority-browser.cjs && node tests/storage-v1-browser.cjs && node tests/storage-sync-browser.cjs && node tests/studio-native-browser.cjs && node tests/storage-recovery-ui-browser.cjs && node scripts/storage/build-preview.mjs && node tests/storage-native-ui.cjs && node tests/storage-creation-ui.cjs && node tests/studio-native-ui.cjs && node tests/studio-notebook-ui.cjs && node tests/studio-guidance-browser.cjs && node tests/studio-prepare-browser.cjs && node tests/storage-adult-transfer-browser.cjs && node tests/storage-recovery-multiowner-browser.cjs && node --import tsx tests/household-recovery-browser.ts",
     "build:family-beta": "node scripts/beta/build.mjs",
     "review:build": "node tools/ui-review/check-coverage.mjs && node tools/ui-review/build.mjs",
-    "review:test": "node tools/ui-review/smoke.cjs && node tools/ui-review/integration.cjs && node tools/ui-review/learning-browser.cjs",
+    "review:test": "node tools/ui-review/smoke.cjs && node tools/ui-review/integration.cjs && node tools/ui-review/learning-browser.cjs && npm run design:browser",
     "review:coverage": "node tools/ui-review/check-coverage.mjs",
     "test:child-modernization": "node tests/child-modernization.cjs",
-    "test:pals-fidelity": "node tests/pals-fidelity-browser.cjs"
+    "test:pals-fidelity": "node tests/pals-fidelity-browser.cjs",
+    "design:check": "node scripts/check-design-system.mjs",
+    "design:test": "node --test scripts/tests/check-design-system.test.mjs",
+    "design:browser": "node tools/design-system/browser.cjs"
   },
   "devDependencies": {
     "@google-cloud/firestore": "^7.11.6",

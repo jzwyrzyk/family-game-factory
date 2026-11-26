@@ -1,5 +1,7 @@
 import {seedCreativeFixtures} from './creative-fixtures';
 import {creativeDestination,seedCreativeReview} from './creative-fixture';
+
+import {mountDesignSystemGallery} from '../design-system/gallery';
 import '../../src/style.css';
 import {openLearningSample} from './learning';
 
@@ -54,6 +56,7 @@ async function boot(){
  if(['creative-library','mixed-grades'].includes(config.scenario))await seedCreativeReview('player1');
  w.__reviewCreative=creativeDestination;
  await import('../../src/main');
+ w.__reviewDesignSystem=()=>{ for(const page of document.querySelectorAll('.page'))page.classList.add('hidden'); const gallery=mountDesignSystemGallery(document.querySelector('main')!,route=>w.__reviewNavigate(route)); gallery.page.classList.remove('hidden'); gallery.page.querySelector<HTMLElement>('.jems-page-title')?.focus(); };
  const timer=setInterval(()=>{if(w.FG?.studio&&w.FG?.creation){clearInterval(timer);parent.postMessage({type:'review-ready'},'*');}},40);
 }
 void boot();
