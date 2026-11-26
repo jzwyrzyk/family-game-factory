@@ -153,10 +153,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:09:46.422Z",
-      "sourceDigest": "c5ff9ed2fdc9e2eee322a0d699b3d7fc1de9a2754074f929934386104d3bbfe6",
+      "reviewedAt": "2026-11-26T03:19:38.821Z",
+      "sourceDigest": "ff9c02d667b54ac95443882ff6269ecf8d27444f45635284e0f055eacb1974d2",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled both simultaneous standard proposals into one permanent authentic-art reference for drawing, movement, worlds and context-owned game roles.",
+      "reviewReason": "Converged both concurrent art standards on exact originals, explicit 2D game roles, world editions and permanent private artwork boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -317,10 +317,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:12:00.058Z",
-      "sourceDigest": "ba3d8d381cc13596fc5c1f4ea0f721398f46956285bff57bbb074bb55a7fe07c",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Four newly illustrated product environments have separate origin and version records. The accepted standard already covers child authorship and immutable uses.",
+      "reviewedAt": "2026-11-26T03:19:38.980Z",
+      "sourceDigest": "879a3ff172bd4e85db495b78e71238eeec47198589ed524ec6caa7e1d090ac0e",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed the compatible drawing and scene changes with family reviewed uploads, active-profile checks and retained game entrances.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -422,10 +422,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "71dcf4ff42672f3ca738503e1893f28f1c18a67d21da1ce6e2cac9cb3d0791f7",
-      "reviewedAt": "2026-11-26T03:15:30.846Z",
+      "sourceDigest": "d122a456a3e7cc1cfdcf951c51bbf1113eebdb7d6df92a9daf9b20a755f44dca",
+      "reviewedAt": "2026-11-26T03:19:39.415Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The first-steps Step shortcut is confined to the selected private actor under reduced motion. The drawn path guide specifies that scope, exact Keep reuse and scene-owned timing.",
+      "reviewReason": "Reviewed layered catalogue IDs and immutable named motion alongside the reduced-motion learner fix and isolated slot experiment.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -905,10 +905,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:12:02.488Z",
-      "sourceDigest": "83c23ae7f11c5e9a126b91d2cd247e3751ec0f01e85def1206f1090964231b99",
+      "reviewedAt": "2026-11-26T03:19:39.563Z",
+      "sourceDigest": "49589bc1b2df6fb2d5c4e229213be68ce0faaa4af5bb86aa401205a28b2ec19f",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the manifest checks for content identity, scale and mapped files in the delivery entry for this source candidate.",
+      "reviewReason": "Reviewed browser checks for editable sketches, motion, family PNG admission, synthetic slot scope, and all versioned world artwork digests.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1149,10 +1149,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:12:03.342Z",
-      "sourceDigest": "d6691c0e7097678f19c4b2277e4782b32634074014cb41f4b11b9bc94c906b82",
+      "reviewedAt": "2026-11-26T03:19:39.720Z",
+      "sourceDigest": "f09c3c5942a4451ad6855d65ebb0faee1d49592053532089444ceced98594253",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the consulted protected baseline and current household embedded release independently of local art readiness.",
+      "reviewReason": "Combined existing CI registrations and reviewed separate development and deployment gates for all contributing branches.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1407,10 +1407,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:12:03.174Z",
-      "sourceDigest": "7a051079928b455c2ce3057ed43f727e5774c1c79cf8889bca2fd94e78dc13f0",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The current governance requires a single canonical creative standard. The catalogue and provenance now participate in existing creation documentation checks.",
+      "reviewedAt": "2026-11-26T03:19:39.872Z",
+      "sourceDigest": "c5073a8ae7f6bf43501e0346eb88845923859037348e2b1ae0437341f441d5ae",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reconciled linked documentation paths and both concurrent sets of registry routes, including the illustrated art manifest.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1636,10 +1636,10 @@
         "tests/crayon-revision-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "a04e0449fc863d945b55d4a7d2b401d189d5c401e7d629e62d3a0cd79b2c5015",
-      "reviewedAt": "2026-11-26T03:09:46.666Z",
+      "sourceDigest": "180a66e42bea5c5f7982bd316476525280fbdb0897b7867dff392942737ac4a6",
+      "reviewedAt": "2026-11-26T03:19:40.028Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The drawing standard follows the shared canonical world reference and protects exact original and revision identities on archive and recovery.",
+      "reviewReason": "Reviewed lossless embedded source, original-byte ingestion and the private asset catalogue contract across the converged branches.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
