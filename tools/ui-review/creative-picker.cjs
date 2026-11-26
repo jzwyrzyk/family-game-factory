@@ -30,6 +30,14 @@ const {standaloneInput}=require('./standalone-input.cjs');
     const scene=await app.evaluate(()=>FG.creation.scene());
     assert.equal(scene.actors[0].name,'My Rock');assert.equal(scene.actors[0].role,'collectible');
     assert.match(scene.actors[0].assetId,/^art:image:/);
+    await page.selectOption('#scenario','mixed-grades');
+    await page.waitForFunction(()=>document.querySelector('#loading').hidden);
+    const selectedGrades=async()=>page.frameLocator('iframe').first().locator('body').evaluate(()=>
+      FG.store.familyProfiles().map(profile=>[profile.id,profile.grade]));
+    assert.deepEqual(await selectedGrades(),[['player1',1],['player2',4]],'Mixed-grade profiles use two actual curriculum settings');
+    await page.selectOption('#grade','4');
+    await page.waitForFunction(()=>document.querySelector('#loading').hidden);
+    assert.deepEqual(await selectedGrades(),[['player1',4],['player2',1]],'Changing the review grade retains a second supported, distinct grade');
     assert.deepEqual(errors,[]);assert.deepEqual(outbound,[]);
     console.log('PASS standalone picker: four editable fixtures, exact rock pin, local hunt, zero external requests');
   }finally{await browser.close();await input.close();}

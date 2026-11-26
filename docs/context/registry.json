@@ -918,8 +918,8 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:53:07.317Z",
-      "sourceDigest": "8ac314685f50f7b1f998bf57d96e0a0135bac85ec66ba32f572148a6d3085cd1",
+      "reviewedAt": "2026-11-26T07:05:14.896Z",
+      "sourceDigest": "debfd5a72fef7efd0951ca59989071a61392bc5e447892da9bb39f2ea6261275",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed integrated CI leaves and source assertions for original admissions, game binding, movement and recovery.",
       "reviewHistory": [
@@ -1705,8 +1705,8 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "485e6897284d26de14d0b33d057cedd94300c0e8d7af400edbbf045920ced206",
-      "reviewedAt": "2026-11-26T06:31:08.262Z",
+      "sourceDigest": "3ca7fe2f90bfb352630df99992684aad92fd5258597f5017a60b8632fb4ba709",
+      "reviewedAt": "2026-11-26T07:05:15.731Z",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed linked domain documentation for this candidate and its tested private-art boundary.",
       "reviewHistory": [

@@ -1,6 +1,7 @@
 /* Pixel/variant acceptance for approved Pal rendering. No provider or earned-state writes. */
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {build}=require('esbuild'),{chromium}=require('playwright');
+const {standaloneInput}=require('../tools/ui-review/standalone-input.cjs');
 const {start}=require('./browser-server.cjs'),{exploreWelcome}=require('./studio-entry.cjs');
 const out='test-results/pal-fidelity',offline=process.argv.includes('--offline');fs.mkdirSync(out,{recursive:true});
 // Read the mask as pixels rather than treating a successful image load as proof.
@@ -23,7 +24,9 @@ async function pixels(image){return image.evaluate(async img=>{
 async function screenshotPixel(page,buffer,x,y){return page.evaluate(async({src,x,y})=>{const i=new Image();i.src=src;await i.decode();const c=document.createElement('canvas');c.width=i.naturalWidth;c.height=i.naturalHeight;const ctx=c.getContext('2d');ctx.drawImage(i,0,0);return [...ctx.getImageData(x,y,1,1).data];},{src:'data:image/png;base64,'+buffer.toString('base64'),x,y});}
 (async()=>{
  const server=start(),browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),args:['--no-sandbox']});const results=[];
+ let input;
  try{
+  if(offline)input=await standaloneInput(path.resolve(process.env.UI_REVIEW_FILE||'dist-review/jems-ui-review.html'));
   if(!offline&&!process.env.PAL_FIDELITY_JOURNEYS_ONLY){
    const fixture=await build({stdin:{contents:`import {PAL_CATALOG,palArtworkPath} from './src/pals/catalog';import {createPalPortrait} from './src/pals/ui';window.audit={catalog:PAL_CATALOG,create:createPalPortrait,path:palArtworkPath};`,resolveDir:process.cwd(),loader:'ts'},bundle:true,write:false,outfile:'audit.js',format:'iife'});
    const context=await browser.newContext({viewport:{width:1200,height:1000}}),page=await context.newPage();await page.route('**/pal-audit',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><html><head><base href="/arcade/"></head><body></body></html>'}));await page.goto('http://127.0.0.1:'+server.address().port+'/pal-audit');await page.addStyleTag({content:fixture.outputFiles.find(f=>f.path.endsWith('.css')).text+'body{margin:0;background:#fff}#grid{display:grid;grid-template-columns:repeat(6,200px)}.sample{background:#173448;padding:8px;color:white;font:13px sans-serif}.sample .pals-portrait{width:168px;height:160px}.sample:nth-child(even){background:#75bfa8}.sample p{margin:4px 0}'});await page.addScriptTag({content:fixture.outputFiles.find(f=>f.path.endsWith('.js')).text});
@@ -44,7 +47,10 @@ async function screenshotPixel(page,buffer,x,y){return page.evaluate(async({src,
   }
   for(const [name,width,height]of [['desktop',1440,1000],['landscape',1180,820],['portrait',820,1180],['phone',390,844]]){
    const context=await browser.newContext({viewport:{width,height},hasTouch:width<1200,reducedMotion:'reduce'}),page=await context.newPage();const errors=[],posts=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.method()==='POST')posts.push(r.url());});let app=page;
-   if(offline){const artifact=path.resolve(process.env.UI_REVIEW_FILE||'dist-review/jems-ui-review.html');if(process.env.UI_REVIEW_INLINE_HARNESS==='1'){await page.route('http://localhost:43199/',r=>r.fulfill({contentType:'text/html',path:artifact}));await page.goto('http://localhost:43199/',{timeout:120000});}else await page.goto('file://'+artifact,{timeout:120000});await page.waitForFunction(()=>document.querySelector('#loading').hidden);await page.selectOption('#scenario','empty');await page.waitForTimeout(1500);app=page.frames().find(f=>f.parentFrame()===page.mainFrame());await app.waitForFunction(()=>document.getElementById('page-studio-library')?.getAttribute('aria-busy')==='false');await page.selectOption('#destination','journey');await page.waitForTimeout(400);await page.click('#hide');}
+   if(offline){
+    await page.goto(input.url,{waitUntil:'domcontentloaded',timeout:120000});
+    await page.waitForFunction(()=>document.querySelector('#loading').hidden,undefined,{timeout:120000});
+    await page.selectOption('#scenario','empty');await page.waitForTimeout(1500);app=page.frames().find(f=>f.parentFrame()===page.mainFrame());await app.waitForFunction(()=>document.getElementById('page-studio-library')?.getAttribute('aria-busy')==='false');await page.selectOption('#destination','journey');await page.waitForTimeout(400);await page.click('#hide');}
    else{await page.route('**/factory-config.json',r=>r.fulfill({contentType:'application/json',body:'{"version":1,"mode":"unavailable"}'}));await page.goto('http://127.0.0.1:'+server.address().port+'/arcade/');await page.waitForFunction(()=>!!window.FG?.studio);await exploreWelcome(page);await page.locator('#studioJourneyTile').click();}
    const capture=async state=>{const card=app.locator('#studioPalsEntry');await card.scrollIntoViewIfNeeded();await app.waitForFunction(()=>document.querySelector('#studioPalsEntry .pals-portrait')?.dataset.state==='ready');const img=card.locator('img'),r=await pixels(img);assert.ok(r.borderClear>.75,`${name} ${state} transparent border`);assert.equal(r.visibility,'visible');const box=await card.boundingBox();if(width<640)assert.ok(box.height<230,`phone card keeps compact proportions: ${box.height}`);assert.ok((await card.boundingBox()).height>=48);await card.screenshot({path:`${out}/${offline?'offline':'app'}-${name}-${state}-card.png`});await app.locator('.jems-world-overview').screenshot({path:`${out}/${offline?'offline':'app'}-${name}-${state}-overview.png`});return {name,state,...r,height:box.height};};
    await require('./secondary-page-headers.cjs').checkSecondaryHeaders({page,app,out,name,width,height,offline});
@@ -85,5 +91,5 @@ async function screenshotPixel(page,buffer,x,y){return page.evaluate(async({src,
    assert.deepEqual(errors,[]);assert.deepEqual(posts,[]);await context.close();console.log('PASS Pal fidelity '+(offline?'offline ':'app ')+name);
   }
   fs.writeFileSync(`${out}/${offline?'offline':'app'}-results.json`,JSON.stringify(results,null,2));console.log('PASS exact Pal variants, transparent pixels, fail-closed presentation and responsive cards');
- }finally{await browser.close();server.close();}
+ }finally{await browser.close();server.close();await input?.close();}
 })().catch(e=>{console.error(e);process.exitCode=1});
