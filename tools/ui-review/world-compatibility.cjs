@@ -1,4 +1,4 @@
-// Replay a synthetic original in retained v1 scenes using the standalone review UI.
+// Exercise retained and new worlds with synthetic personal art in the standalone product UI.
 const assert = require('node:assert/strict');
 const { createHash } = require('node:crypto');
 const fs = require('node:fs/promises');
@@ -27,11 +27,121 @@ async function chooseBackground(frame, world) {
   if (!await settings.evaluate(el => el.open)) await settings.locator(':scope > summary').click();
   await frame.locator('#creationBackground').selectOption(world);
   await frame.waitForFunction(id => FG.creation.scene()?.background === id, world);
-  await settings.locator(':scope > summary').click();
+  await frame.locator('#creationCloseSettings').click();
 }
 
 async function capture(frame, name) {
   await frame.locator('#creationCanvas').screenshot({path: path.join(output, name + '.png')});
+}
+
+async function verifyLandscape(page, frame) {
+  await page.selectOption('#device','desktop');
+  await page.selectOption('#destination','art');
+  await frame.locator('#artUploadButton').waitFor({state:'visible'});
+  const data = await frame.evaluate(() => {
+    const c = document.createElement('canvas'); c.width = 1200; c.height = 300;
+    const brush = c.getContext('2d');
+    brush.fillStyle = '#ffddae'; brush.fillRect(0,0,c.width,c.height);
+    brush.fillStyle = '#efa196';
+    brush.beginPath(); brush.moveTo(0,230); brush.lineTo(340,80); brush.lineTo(590,211);
+    brush.lineTo(850,97); brush.lineTo(1200,230); brush.lineTo(1200,300); brush.lineTo(0,300); brush.fill();
+    brush.fillStyle = '#487d70'; brush.fillRect(0,230,c.width,70);
+    brush.fillStyle = '#694c7b';
+    for (let x=400; x<800; x+=7) brush.fillRect(x,235,2,45);
+    return c.toDataURL().split(',')[1];
+  });
+  const bytes = Buffer.from(data,'base64');
+  const pin = createHash('sha256').update(bytes).digest('hex');
+  await frame.setInputFiles('#artUpload',{name:'Fixture landscape.png',mimeType:'image/png',buffer:bytes});
+  await frame.waitForFunction(() => document.getElementById('artStatus').textContent.includes('picture is saved'));
+  await page.selectOption('#destination','world-builder');
+  await frame.waitForFunction(() => FG.creation.scene()?.background === 'world-forest-v1');
+  const settings = frame.locator('#creationSceneOptions');
+  const tools = frame.locator('#creationCharacterTools');
+  if (!await settings.isVisible() && await tools.isVisible()) await tools.click();
+  await settings.locator(':scope > summary').click();
+  await frame.locator('#creationMyBackdrop').click();
+  await frame.locator('dialog[open] [data-private-art]').filter({hasText:'Fixture landscape'}).click();
+  await frame.waitForFunction(hash => FG.creation.scene()?.actors.some(a => a.layer === 'backdrop' && a.assetId.endsWith(hash)),pin);
+  if (!await settings.evaluate(el => el.open)) await settings.locator(':scope > summary').click();
+  await frame.getByLabel('Fit drawing').selectOption('cover');
+  await frame.waitForFunction(() => FG.creation.scene().actors.some(a => a.backdropFit === 'cover'));
+  await frame.locator('#creationCloseSettings').click();
+  await frame.evaluate(() => { FG.store.current().mathWindow=[Date.now()]; });
+  await frame.locator('#creationRun').click();
+  await frame.waitForFunction(() => FG.creation.snapshot()?.status === 'completed');
+  const matches = await frame.evaluate(async base64 => {
+    const canvas = document.getElementById('creationCanvas'), {width:w,height:h} = canvas;
+    const img = new Image(); img.src = 'data:image/png;base64,'+base64; await img.decode();
+    const expected = document.createElement('canvas'); expected.width = w; expected.height = h;
+    const ctx = expected.getContext('2d'), scale = Math.max(w/img.width,h/img.height);
+    ctx.drawImage(img,(w-img.width*scale)/2,(h-img.height*scale)/2,img.width*scale,img.height*scale);
+    const actual = canvas.getContext('2d').getImageData(0,0,w,h).data;
+    const reference = ctx.getImageData(0,0,w,h).data;
+    let count=0, exact=0;
+    // The lower band contains two-source-pixel marks and no starter actor.
+    for(let y=Math.ceil(h*.80);y<h*.91;y+=3) for(let x=2;x<w-2;x+=3) {
+      const i=4*(y*w+x); count++;
+      if (Math.max(...[0,1,2].map(k=>Math.abs(actual[i+k]-reference[i+k]))) <= 2) exact++;
+    }
+    return exact/count;
+  },data);
+  assert.ok(matches>.995, 'cropped landscape preserves narrow marks at stage resolution: '+matches);
+  await capture(frame,'private-landscape-cover');
+  await frame.locator('#creationKeep').click();
+  const more = frame.locator('#creationMore');
+  if (!await more.evaluate(el=>el.open)) await more.locator(':scope > summary').click();
+  await frame.locator('#creationVideo').click();
+  await frame.waitForFunction(() => document.getElementById('creationVideo').textContent.includes('Stop & save'));
+  // Allow MediaRecorder to encode multiple frames of the static composition.
+  await new Promise(resolve => setTimeout(resolve, 750));
+  const recording = page.waitForEvent('download');
+  await frame.locator('#creationVideo').click();
+  const video = await recording;
+  const videoBytes = await fs.readFile(await video.path());
+  await fs.writeFile(path.join(output,'private-landscape.webm'),videoBytes);
+  const quality = await frame.evaluate(async encoded => {
+    const video = document.createElement('video');
+    const blob = new Blob([Uint8Array.from(atob(encoded), ch => ch.charCodeAt(0))], {type:'video/webm'});
+    const url = URL.createObjectURL(blob);
+    try {
+      video.muted = true;
+      await new Promise((resolve, reject) => {
+        video.onloadeddata = resolve;
+        video.onerror = () => reject(Error('Recorded landscape did not decode'));
+        video.src = url;
+      });
+      const presented = new Promise(resolve => video.requestVideoFrameCallback(resolve));
+      await video.play();
+      await presented;
+      video.pause();
+      const stage = document.getElementById('creationCanvas');
+      const sample = document.createElement('canvas');
+      sample.width = video.videoWidth; sample.height = video.videoHeight;
+      const ctx = sample.getContext('2d');
+      ctx.drawImage(video,0,0);
+      const framePixels = ctx.getImageData(0,0,sample.width,sample.height).data;
+      const original = stage.getContext('2d').getImageData(0,0,stage.width,stage.height).data;
+      let checked = 0, matched = 0;
+      for (let y=4; y<sample.height; y+=9) for (let x=4; x<sample.width; x+=9) {
+        const index = (y*sample.width+x)*4;
+        if ([0,1,2].every(k => Math.abs(framePixels[index+k]-original[index+k]) < 25)) matched++;
+        checked++;
+      }
+      return {size:[sample.width,sample.height], stage:[stage.width,stage.height], match:matched/checked, first:[...framePixels.slice(0,4)], reference:[...original.slice(0,4)]};
+    } finally {
+      video.removeAttribute('src'); video.load(); URL.revokeObjectURL(url);
+    }
+  }, videoBytes.toString('base64'));
+  assert.deepEqual(quality.size,quality.stage);
+  assert.ok(quality.match>.98, 'encoded video reproduces landscape colors and crop: '+JSON.stringify(quality));
+  const pending = page.waitForEvent('download');
+  await frame.locator('#creationDownload').click();
+  const file = await pending, bundle = JSON.parse(await fs.readFile(await file.path(),'utf8'));
+  const backdrop = bundle.scene.actors.find(a=>a.layer==='backdrop');
+  assert.ok(backdrop.assetId.endsWith(pin));
+  assert.equal(backdrop.backdropFit,'cover');
+  assert.deepEqual(Buffer.from(bundle.art.drawings.find(d=>d.sha256===pin).data,'base64'),bytes);
 }
 
 async function run() {
@@ -129,9 +239,10 @@ async function run() {
       assert.ok(bounds.width > 200 && bounds.left >= 0 && bounds.right <= width + 1, device);
       await page.locator('iframe').first().screenshot({path: path.join(output, device + '-workspace.png')});
     }
+    await verifyLandscape(page,frame);
     assert.deepEqual(requests, []);
     assert.deepEqual(errors, []);
-    console.log('PASS retained scene worlds, Canvas artwork color, immutable pin, undo/redo, byte-exact export and reopening the first scene');
+    console.log('PASS retained scene worlds, Canvas artwork color, immutable pin, undo/redo, byte-exact export, reopening, stage-resolution landscape crop and decoded video fidelity');
   } finally {
     await browser.close();
   }
