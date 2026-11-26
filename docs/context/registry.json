@@ -645,10 +645,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:50:07.454Z",
-      "sourceDigest": "de2171054c43d016b8b558c18b890a7a91b25c56745f99435f7800963f38dfa6",
+      "reviewedAt": "2026-11-26T01:51:04.169Z",
+      "sourceDigest": "7afa55e5ad7906daf47b4affb89509659b8c20706d711196478986f2b42fbfec",
       "reviewOutcome": "updated",
-      "reviewReason": "The integration contract now distinguishes answer construction, visual exploration, and help-gated models for independently symbolic checkpoints.",
+      "reviewReason": "The shared place-value model also covers fallback number construction. The Math integration contract records how visual models and original answers share evidence.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
