@@ -93,7 +93,7 @@ export async function creativeDestination(action:string){
   await fg.artStudio.open();
   const id=action==='revision'?sample.revision:action==='original'?sample.rock:sample.dragon;
   (await element('[data-art-id="'+id+'"]')).click();
-  const version=await element('#artVersion') as HTMLSelectElement;
+  const version=await element('#artDetails[data-drawing-id="'+id+'"] #artVersion') as HTMLSelectElement;
   if(action==='animation'||action==='parts'){
     version.value=action==='parts'?sample.parts:sample.movement;
     version.dispatchEvent(new Event('change'));

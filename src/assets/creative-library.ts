@@ -22,6 +22,9 @@ export interface CreativeAssetChoice {
   detail: string;
   category: DrawingCategory;
   semanticIdentity?: string;
+  preview?: ArrayBuffer;
+  savedAt:string;
+  revisionNumber:number;
 }
 
 export async function assemblyHash(input: DrawingAssembly): Promise<string> {
@@ -32,7 +35,7 @@ function imageChoice(image: DrawingMetadata, root: DrawingMetadata): CreativeAss
   return {
     archived: Boolean(image.archived), logicalId: root.id, originalId: root.id, originalSha256: root.sha256, logicalName: root.name,
     drawingId: image.id, sourceSha256: image.sha256, label: image.name, category: image.category ?? 'other',
-    semanticIdentity: normalizeDrawingLabel(image).semanticIdentity, assetId: privateArtId({kind:'image',id:image.id,sha256:image.sha256}),
+    savedAt:image.createdAt,revisionNumber:1,preview:image.preview,semanticIdentity: normalizeDrawingLabel(image).semanticIdentity, assetId: privateArtId({kind:'image',id:image.id,sha256:image.sha256}),
     sha256: image.sha256, representation:'image',detail:image.sourceId?'Edited picture':'Original artwork',
   };
 }
@@ -67,20 +70,27 @@ export async function listCreativeAssetChoices(owner: string, current: () => boo
   check();
   const byId = new Map(images.map(image => [image.id, image]));
   const result: CreativeAssetChoice[] = [];
+  const indexes=new Map<string,number>();
+  const revisions=new Map<string,number>();
+  for(const image of [...images].sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id))){
+    const root=originalFor(image,byId);
+    revisions.set(root.id,(revisions.get(root.id)??0)+1);
+    indexes.set(image.id,revisions.get(root.id)!);
+  }
   rigs.sort((a, b) => b.savedAt.localeCompare(a.savedAt) || b.id.localeCompare(a.id));
   images.sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id));
   for (const image of images) {
     if (image.archived && !includeArchived) continue;
     const root = originalFor(image, byId);
     const common = imageChoice(image,root);
-    result.push(common);
+    common.revisionNumber=indexes.get(image.id)!;result.push(common);
     const versions = rigs.filter(rig => rig.assembly.sourceId === image.id && rig.assembly.sourceSha256 === image.sha256);
     for (const [index, rig] of versions.entries()) {
       const sha256 = await assemblyHash(rig.assembly);
       check();
       const animated = 'motion' in rig.assembly && Boolean(rig.assembly.motion);
       result.push({
-        ...common, rigId: rig.id, sha256, representation: animated ? 'animation' : 'cutout',
+        ...common, savedAt:rig.savedAt, rigId: rig.id, sha256, representation: animated ? 'animation' : 'cutout',
         assetId: privateArtId({ kind: 'rig', id: rig.id, sha256 }),
         detail: (animated ? 'Animation path' : index === 0 ? 'Latest saved cutout design' : 'Saved cutout design')
           + (versions.length > 1 ? ' · ' + (versions.length - index) : ''),

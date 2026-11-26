@@ -1,5 +1,6 @@
 import type {CreationWorkspace} from '../storage/creation-workspace';
-import {sceneAssetSlots, type CreationProject} from './model';
+import {WORLD_PROPS} from './illustrated-art';
+import {EARLIER_PROPS, sceneAssetSlots, type CreationProject} from './model';
 
 /** Bring only the kept stage into the scene already on the worktable.
  * Programmable placements travel separately with the full "Use this world" fork. */
@@ -41,12 +42,39 @@ export function keptScenery(project: CreationProject, host: {
             if (!current()) return;
             const source = page.items.find(item => item.id === keptId)?.scene;
             if (source) {
-              for (const id of new Set(sceneAssetSlots({...source, actors:[]}).map(slot => slot.assetId))) {
+              const props=new Set([...WORLD_PROPS,...EARLIER_PROPS].map(prop=>prop.id));
+              const fixed=source.actors.filter(actor=>actor.layer==='backdrop' ||
+                (!source.programs.some(program=>program.actorId===actor.id && program.actions.length) &&
+                  (props.has(actor.assetId) || ['scenery','decoration','environment','background'].includes(actor.role ?? actor.creativeRole ?? ''))));
+              for (const id of new Set(sceneAssetSlots({...source,actors:fixed}).map(slot => slot.assetId))) {
                 if (id.startsWith('art:')) await host.loadArt(id);
                 if (!current()) return;
               }
+              const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('Jems kept scenery '+project.id));
+              const namespace='scenery-'+Array.from(new Uint8Array(bytes).subarray(0,6),i=>i.toString(16).padStart(2,'0')).join('')+'-';
+              if(!current())return;
               await host.mutate(target => {
+                // Imports receive namespaced placement IDs in the existing format. A placement
+                // that a child subsequently programs belongs to their cast on the next import.
+                const castPrograms=JSON.stringify(target.programs);
+                target.actors=target.actors.filter(actor=>!actor.id.startsWith(namespace) || castPrograms.includes(JSON.stringify(actor.id)));
+                const sourceBackdrop=fixed.some(actor=>actor.layer==='backdrop');
+                if (!sourceBackdrop) {
+                  const prior=target.actors.find(actor=>actor.layer==='backdrop');
+                  if(prior)prior.visible=false;
+                }
                 target.background = source.background;
+                for (const original of fixed) {
+                  const placed=structuredClone(original);
+                  placed.x=original.x*target.width/source.width;
+                  placed.y=original.y*target.height/source.height;
+                  const backdrop=placed.layer==='backdrop' && target.actors.find(item=>item.layer==='backdrop');
+                  if (backdrop) Object.assign(backdrop,placed,{id:backdrop.id});
+                  else {
+                    placed.id=namespace+crypto.randomUUID();
+                    target.actors.push(placed);
+                  }
+                }
                 if (source.worldLayers) target.worldLayers = structuredClone(source.worldLayers);
                 else delete target.worldLayers;
                 if (!source.world) { delete target.world; return; }

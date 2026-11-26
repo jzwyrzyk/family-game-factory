@@ -2,7 +2,7 @@ import {validateMotion, type DrawingMotion} from './motion';
 import {validateDrawingRig, type DrawingRig, type Material} from '../quality/parts';
 
 /** Normalized 0–1 rectangles refer to the unmodified original image. */
-export type DrawingKind = 'car' | 'character' | 'machine' | 'scene';
+export type DrawingKind = 'picture' | 'car' | 'character' | 'machine' | 'scene';
 export type Role = 'body' | 'wheel' | 'limb' | 'wing' | 'propeller' | 'decoration' | 'platform' | 'obstacle' | 'collectible';
 export type Region = {x:number;y:number;w:number;h:number;shape:'rect'|'ellipse'};
 /** Non-destructive manual alpha correction. Coordinates use the unchanged original. */
@@ -38,7 +38,7 @@ export function validateAssembly(value:unknown):DrawingAssembly {
   const a=value as DrawingAssembly;
   if(!a||typeof a!=='object'||!allowed(a,['schemaVersion','sourceId','sourceSha256','kind','pieces','notes','revision','motion','cutoutMode'])||
     a.schemaVersion!==1||(a.cutoutMode!==undefined&&a.cutoutMode!=='selected-parts')||typeof a.sourceId!=='string'||a.sourceId.length>100||!a.sourceId||
-    !/^[a-f0-9]{64}$/.test(a.sourceSha256)||!['car','character','machine','scene'].includes(a.kind)||
+    !/^[a-f0-9]{64}$/.test(a.sourceSha256)||!['picture','car','character','machine','scene'].includes(a.kind)||
     !Array.isArray(a.pieces)||a.pieces.length<1||a.pieces.length>24||
     typeof a.notes!=='string'||a.notes.length>300||!Number.isInteger(a.revision)||a.revision<1||a.revision>10000)
     throw Error('Unsupported drawing design.');

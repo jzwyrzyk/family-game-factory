@@ -4,7 +4,7 @@ import { artChoice, resolvePrivateArt } from '../creation/private-art';
 import { assertRewardSourceWritable } from '../rewards/write-guard';
 import { defaultAssembly } from './model';
 import { MAX_PATH_POINTS, type AbsolutePath, type PathPoint } from './motion';
-import { rigById, saveRig, type SavedRig } from './store';
+import { rigById, saveRig, saveDrawingDraft, loadDrawingDraft, type SavedRig } from './store';
 import './motion.css';
 
 const unit = (value: number) => Math.max(0, Math.min(1, value));
@@ -17,9 +17,14 @@ export async function editMotionPath(owner: string, source: Drawing, rigId: stri
   if (!sameView() || source.owner !== owner) throw Error('Open a drawing from your own art.');
   const choice = await artChoice(owner, {drawingId: source.id, rigId}, sameView);
   const resolved = await resolvePrivateArt(owner, choice.assetId, sameView);
-  const parent = rigId ? await rigById(owner, rigId) : null;
+  const draft = steps?.create ? await loadDrawingDraft(owner,source.id) : null;
+  if (draft && !('stops' in (draft.assembly.motion ?? {})) && draft.assembly.kind!=='picture') {
+    throw Error('Resume the unfinished parts design in My Art before starting a different path.');
+  }
+  const parentId = draft ? draft.parentId : rigId;
+  const parent = parentId ? await rigById(owner, parentId) : null;
   if (!sameView()) return;
-  const assembly = parent?.assembly ?? defaultAssembly(source, 'character', [{
+  const assembly = draft?.assembly ?? parent?.assembly ?? defaultAssembly(source, steps?.create?'picture':'character', [{
     id:'picture', name:'My picture', role:'decoration', physical:false, parentId:null,
     region:{x:0, y:0, w:1, h:1, shape:'rect'},
   }]);
@@ -29,7 +34,11 @@ export async function editMotionPath(owner: string, source: Drawing, rigId: stri
       const result = await saveRig(owner,{...assembly,motion,revision:parent ? assembly.revision + 1 : 1},
         parent?.id ?? null,sameView);
       if (sameView()) await onSaved(result);
-    },steps?.editParts ?? (()=>{}));
+    },steps?.editParts ?? (()=>{}), async motion=>{
+      const next={...assembly};
+      if(motion)next.motion=motion;else delete next.motion;
+      await saveDrawingDraft(owner,next,parent?.id ?? null,sameView);
+    });
     return;
   }
   const prior = assembly.motion && !('move' in assembly.motion) && !('stops' in assembly.motion) ? assembly.motion : undefined;

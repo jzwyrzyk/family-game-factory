@@ -128,27 +128,38 @@ function createMotionEditor(source: HTMLCanvasElement, name: string, actions: Ed
 }
 
 export function editRelativeSteps(source:HTMLCanvasElement, name:string, previous:DrawingMotion | undefined,
-  current:()=>boolean, keep:(motion:DrawingMotion)=>Promise<void>, editParts:()=>void) {
+  current:()=>boolean, keep:(motion:DrawingMotion)=>Promise<void>, editParts:()=>void, draft:(motion:DrawingMotion|undefined)=>Promise<void>) {
   const dialog = document.createElement('dialog');
   dialog.className = 'motion-path';
   dialog.setAttribute('aria-label','Plot a path with arrows');
   const close = document.createElement('button');
   close.type = 'button'; close.className = 'art-button'; close.textContent = 'Close';
-  close.onclick = () => dialog.close();
+  close.onclick = () => void flushClose();
   const status = document.createElement('p'); status.setAttribute('role','status');
   let motion = previous && structuredClone(previous), busy = false;
+  let writes=Promise.resolve(), failure:Error|undefined;
   const alive = () => current() && dialog.open;
+  async function flushClose() {
+    if (busy) return;
+    await writes;
+    if (!failure && dialog.open) dialog.close();
+  }
+  dialog.oncancel=event=>{event.preventDefault();void flushClose();};
   const editor = createMotionEditor(source,name,{
     read:()=>motion, canEdit:()=>alive() && !busy,
-    change:value=>{ if (alive() && !busy) {motion = value; editor.refresh(false,false);} },
+    change:value=>{ if (alive() && !busy) {motion = value; editor.refresh(false,false);
+      const snapshot=value && structuredClone(value);
+      writes=writes.then(()=>draft(snapshot)).then(()=>{failure=undefined;}).catch(error=>{
+        failure=error;if(alive())status.textContent=(error as Error).message;
+      });} },
     async save() {
       if (!alive() || busy || !motion) return;
       busy = true; editor.refresh(true,false);
-      try { await keep(motion); if (dialog.open) dialog.close(); }
+      try { await writes; await keep(motion); if (dialog.open) dialog.close(); }
       catch (error) {if(alive()) status.textContent = (error as Error).message;}
       finally {busy=false;if(alive()) editor.refresh(false,false);}
     },
-    close:()=>{ if (!alive() || busy) return; dialog.close(); editParts(); },
+    close:()=>{ if (!alive() || busy) return; void flushClose().then(()=>{if(!dialog.open && current())editParts();}); },
   });
   const changedOwner = () => {if(dialog.open) dialog.close();};
   window.addEventListener('factory-profile-changing', changedOwner);

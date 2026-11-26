@@ -245,51 +245,63 @@
     },
     {
       "label": "My Rock · original drawing",
-      "action": "creative:original"
+      "action": "creative:original",
+      "id": "creative-original"
     },
     {
       "label": "My Rock · editable revision",
-      "action": "creative:revision"
+      "action": "creative:revision",
+      "id": "creative-revision"
     },
     {
       "label": "My Dragon · whole-picture movement",
-      "action": "creative:animation"
+      "action": "creative:animation",
+      "id": "creative-animation"
     },
     {
       "label": "My Dragon · movable wing",
-      "action": "creative:parts"
+      "action": "creative:parts",
+      "id": "creative-parts"
     },
     {
       "label": "Choose artwork in a scene",
-      "action": "creative:picker"
+      "action": "creative:picker",
+      "id": "creative-picker"
     },
     {
       "label": "My World · kept forest scene",
-      "action": "creative:kept-world"
+      "action": "creative:kept-world",
+      "id": "creative-kept-world"
     },
     {
       "label": "My World · reuse kept version",
-      "action": "creative:fork-world"
+      "action": "creative:fork-world",
+      "id": "creative-fork-world"
     },
     {
       "label": "Play Find My Rock",
-      "action": "creative:hunt"
+      "action": "creative:hunt",
+      "id": "creative-hunt"
     },
     {
       "label": "Enchanted Gem Forest",
-      "action": "creative:world-plate-forest"
+      "action": "creative:world-plate-forest",
+      "id": "creative-world-plate-forest"
     },
     {
       "label": "Inventor’s Workshop",
-      "action": "creative:world-plate-workshop"
+      "action": "creative:world-plate-workshop",
+      "id": "creative-world-plate-workshop"
     },
     {
       "label": "Cloud Kingdom",
-      "action": "creative:world-plate-cloud"
+      "action": "creative:world-plate-cloud",
+      "id": "creative-world-plate-cloud"
     },
     {
       "label": "Moon Adventure",
-      "action": "creative:world-plate-moon"
+      "action": "creative:world-plate-moon",
+      "id": "creative-world-plate-moon"
     }
   ],
   "journeys": [

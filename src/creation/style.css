@@ -352,3 +352,8 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
 @media (max-height: 600px) and (min-width: 600px) {
   #creationSceneOptions[open] > summary { top: 72px; right: 24px; }
 }
+#creationSceneOptions details > summary {
+  min-block-size: 48px;
+  align-content: center;
+  cursor: pointer;
+}

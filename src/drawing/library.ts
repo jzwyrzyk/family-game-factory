@@ -1,4 +1,4 @@
-import {sceneAssetSlots} from '../creation/model';
+import {sceneAssetSlots,sceneryPlacements,worldView,type CreationBlock,type CreationProject} from '../creation/model';
 import {retainedPins,validateGameArt} from '../game-art/bindings';
 /** One private transaction boundary for original art, physical versions and references. */
 import { assertRewardSourceWritable, rewardSourceWritable } from '../rewards/write-guard';
@@ -14,7 +14,7 @@ export const ART_DB_VERSION = 3;
 export const ART_LIMITS = Object.freeze({ imageBytes: 5 * 1024 * 1024, imagePixels: 4096, storageBytes: 20 * 1024 * 1024, drawingsPerOwner: 100, rigsPerOwner: 200, designBytes: 8 * 1024 * 1024, bundleBytes: 64 * 1024 * 1024 });
 export type ArtGuard = () => boolean;
 export type ArtStoreName = 'drawings' | 'rigs' | 'active' | 'drafts' | 'usage' | 'meta' | 'drawingMetadata';
-export type ArtUsage = { id: string; owner: string; targetId: string; targetKind: 'scene' | 'game'; drawingId: string; rigId?: string };
+export type ArtUsage = { id: string; owner: string; targetId: string; targetKind: 'scene' | 'game'; drawingId: string; rigId?: string; title?:string; contexts?:string[]; usedAt?:string };
 const names: ArtStoreName[] = ['drawings', 'rigs', 'active', 'drafts', 'usage', 'meta', 'drawingMetadata'];
 
 export function artOwner(value: unknown): asserts value is string {
@@ -147,7 +147,7 @@ export async function registerArtUsage(owner: string, input: Omit<ArtUsage, 'id'
       if (!rig || rig.owner !== owner || rig.assembly.sourceId !== original.id || rig.assembly.sourceSha256 !== original.sha256) throw Error('Choose a saved movement version from this artwork.');
     }
     assertArtWrite(owner, guard);
-    const record: ArtUsage = { ...input, owner, id: JSON.stringify([owner, input.targetKind, input.targetId, input.drawingId, input.rigId || '']) };
+    const record: ArtUsage = { ...input, owner, usedAt:new Date().toISOString(), id: JSON.stringify([owner, input.targetKind, input.targetId, input.drawingId, input.rigId || '']) };
     transaction.objectStore('usage').put(record); return record;
   });
 }
@@ -158,6 +158,11 @@ export async function releaseArtUsage(owner: string, targetId: string, guard?: A
     assertArtWrite(owner, guard); for (const item of all) if (item.owner === owner && item.targetId === targetId) store.delete(item.id);
   });
 }
+function hasMotion(blocks: CreationBlock[]): boolean {
+  return blocks.some(block => ['move','jump','dance','animation'].includes(block.type)
+    || (block.type === 'repeat' && hasMotion(block.actions))
+    || (block.type === 'if' && (hasMotion(block.then) || hasMotion(block.else ?? []))));
+}
 /** Read the source histories as authority. A valid workspace can disprove an
  * obsolete index receipt; unavailable/corrupt source evidence cannot do so. */
 type PreparedHistories = {scene?: CreationWorkspace; game?: Workspace};
@@ -165,9 +170,11 @@ export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'own
   const result = new Map<string, ArtUsage>(), known = new Set<ArtUsage['targetKind']>();
   const images = new Map(originals.filter(item => item.owner === owner).map(item => [item.id, item]));
   const versions = new Map(rigs.filter(item => item.owner === owner).map(item => [item.id, item]));
-  const add = (targetId: string, targetKind: ArtUsage['targetKind'], drawingId: string, rigId?: string) => {
+  const add = (targetId: string, targetKind: ArtUsage['targetKind'], drawingId: string, rigId?: string,title?:string,contexts:string[]=[]) => {
     const item: ArtUsage = { id: JSON.stringify([owner, targetKind, targetId, drawingId, rigId || '']), owner, targetId, targetKind, drawingId, ...(rigId ? { rigId } : {}) };
-    result.set(item.id, item);
+    if(title)item.title=title;
+    item.contexts=[...new Set([...(result.get(item.id)?.contexts ?? []),...contexts])];
+    result.set(item.id,item);
   };
   if (typeof localStorage !== 'undefined') for (const [kind, key] of [['scene', 'family-game-factory-creation-v1'], ['game', 'family-game-factory-workspace-v2']] as const) {
     try {
@@ -185,8 +192,15 @@ export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'own
             if (typeof actor?.assetId !== 'string') { complete = false; continue; }
             const match = /^art:(image|rig):([A-Za-z0-9_-]{1,100}):([a-f0-9]{64})$/.exec(actor.assetId);
             if (!match) continue;
-            if (match[1] === 'image') { const image = images.get(match[2]); if (image?.sha256 === match[3]) add(revision.projectId, kind, image.id); }
-            else { const rig = versions.get(match[2]); if (rig && images.get(rig.assembly.sourceId)?.sha256 === rig.assembly.sourceSha256) add(revision.projectId, kind, rig.assembly.sourceId, rig.id); }
+            const scene=revision.scene as CreationProject, contexts=new Set<string>();
+            for(const placed of scene.actors.filter(a=>a.assetId===actor.assetId)){
+              contexts.add(placed.role ?? placed.creativeRole ?? (placed.layer==='backdrop'?'world background':'scene actor'));
+              if(scene.programs?.some(p=>p.actorId===placed.id && hasMotion(p.actions))) contexts.add('animation');
+            }
+            if(worldView(scene).assetId===actor.assetId)contexts.add('world background');
+            if(sceneryPlacements(scene).some(p=>p.assetId===actor.assetId))contexts.add('world decoration');
+            if (match[1] === 'image') { const image = images.get(match[2]); if (image?.sha256 === match[3]) add(revision.projectId, kind, image.id,undefined,scene.title,[...contexts]); }
+            else { const rig = versions.get(match[2]); if (rig && images.get(rig.assembly.sourceId)?.sha256 === rig.assembly.sourceSha256) add(revision.projectId, kind, rig.assembly.sourceId, rig.id,scene.title,[...contexts]); }
           }
         } else if (typeof revision.drawingRigId === 'string') {
           const rig = versions.get(revision.drawingRigId); if (rig && images.get(rig.assembly.sourceId)?.sha256 === rig.assembly.sourceSha256) add(revision.projectId, kind, rig.assembly.sourceId, rig.id);

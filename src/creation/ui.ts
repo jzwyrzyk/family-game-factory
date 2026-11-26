@@ -1,3 +1,5 @@
+import {createPickerArtwork} from '../drawing/picker-create';
+import {catalogueChoices,listPickerChoices} from '../drawing/asset-collection';
 import {openMotionEditor} from './motion-editor';
 import {pathBlock, reusablePaths} from './motion-path';
 import {createArtAdventure} from './art-game';
@@ -1269,7 +1271,7 @@ export function installCreationStudio(host: Host) {
     const message=$(replaceActorId?'creationVersionArtStatus':'creationActorArtStatus');
     controls.replaceChildren();choices.replaceChildren();message.textContent='Opening your art collection…';
     try{
-      let items=await listArtChoices(capturedOwner,current, !!replaceActorId);
+      let items=replaceActorId?await listArtChoices(capturedOwner,current,true):await listPickerChoices(capturedOwner,current);
       if(!current())return;
       if (replaceActorId) {
         const actor = scene?.actors.find(a => a.id === replaceActorId);
@@ -1310,6 +1312,25 @@ export function installCreationStudio(host: Host) {
           }finally{if(current())choice.disabled=false;}
         });
         return choice;
+      },replaceActorId?{}:{
+        catalogue:catalogueChoices(ownedPals().map(id=>({id,form:ownedPalForm(id)}))),
+        cataloguePreview:item=>art(item.assetId),
+        onChooseCatalogue:item=>{
+          if(!current())return;
+          if(creationAsset(item.assetId)?.palId)void act(()=>addOwnedPal(creationAsset(item.assetId)!.palId!));
+          else $('creationActorChoices').querySelector<HTMLButtonElement>('[data-creation-asset="'+CSS.escape(item.assetId)+'"]')?.click();
+        },
+        onCreate:()=>actAsync(async()=>{
+          const made=await createPickerArtwork(capturedOwner,current);
+          if(!made || !current())return;
+          await renderPrivateChoices();
+          if(current()){
+            const exact=await artChoice(capturedOwner,{drawingId:made.id},current);
+            const control=controls.querySelector<HTMLInputElement>('input[type=search]');
+            if(control){control.value=made.name;control.dispatchEvent(new Event('input'));}
+            choices.querySelector<HTMLButtonElement>('[data-private-art="'+CSS.escape(exact.assetId)+'"]')?.click();
+          }
+        }),
       });
     }catch(error){if(current())message.textContent=(error as Error).message;}
   }
@@ -1465,6 +1486,24 @@ export function installCreationStudio(host: Host) {
     prepareIndexedCreation:async()=>{await actionQueue;await saveVersion();await prepareIndexedCreation(profileStorage(localStorage),owner);const old=activeStore;activeStore=null;await old?.then(value=>value.close());await shelf();},
     openMake(){return act(async()=>{if(await enter())await shelf('free');});},
     openIntroduction(){return act(async()=>{if(!await enter())return;await shelf();$('creationShelf').hidden=true;introduction.show();});},
+    openCatalogue(assetId:string) {
+      return act(async () => {
+        const captured = owner();
+        const item = catalogueChoices(ownedPals().map(id => ({id,form:ownedPalForm(id)}))).find(item => item.assetId === assetId);
+        if (!item) throw Error('Choose an available Jems picture or one of your own Pals.');
+        const asset = creationAsset(assetId)!;
+        if (asset.palId) return openWithPal(asset.palId);
+        if (locked()) return;
+        if (visible) await saveVersion();
+        const collection = await store();
+        if (captured !== owner() || !await enter() || captured !== owner()) return;
+        const project = createStarterProject('blank', (item.label + ' scene').slice(0,60));
+        project.actors[0].assetId = item.assetId; project.actors[0].name = item.label;
+        project.provenance = {createdBy:'starter',sourceKind:'curated'};
+        const saved = await collection.create(captured,project);
+        if (captured === owner()) await loadScene(saved.id);
+      });
+    },
     async openArt(selection:ArtSelection, kind:'scene'|'picture-hunt'='scene'){
       if(!await enter())return;
       try{await shelf();}catch(error){status((error as Error).message,true);return;}
