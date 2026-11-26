@@ -1,3 +1,4 @@
+import { originalFor, validSemanticIdentity } from './art-lineage';
 import {assertRewardSourceLockHeld,setRewardSourceMaintenance} from '../rewards/write-guard';
 /** Private immutable image bytes. Metadata and visibility can change; the image cannot. */
 import { ART_LIMITS, artOwner, artRequest, assertArtWrite, checkArtCapacity, deriveArtUsages, withArtTransaction, saveDrawingMetadata, ownerArtRecords, type DrawingMetadata, type ArtGuard, type ArtUsage } from '../drawing/library';
@@ -9,7 +10,7 @@ export const DRAWING_CATEGORIES: readonly DrawingCategory[] = ['character', 'veh
 export interface Drawing {
   id: string; owner: string; name: string; mime: 'image/png' | 'image/jpeg'; bytes: ArrayBuffer; sha256: string; createdAt: string;
   sourceId?: string; sourceSha256?: string; preview?: ArrayBuffer;
-  category?: DrawingCategory; archived?: boolean; updatedAt?: string;
+  category?: DrawingCategory; semanticIdentity?: string; archived?: boolean; updatedAt?: string;
 }
 export const drawingHash = async (bytes: ArrayBuffer) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), byte => byte.toString(16).padStart(2, '0')).join('');
 
@@ -79,27 +80,52 @@ export async function drawing(owner: string, id: string): Promise<Drawing> {
     if (!item || item.owner !== owner) throw Error('Choose a drawing from this profile.'); return item;
   });
 }
-export async function saveDrawing(owner: string, name: string, file: Blob, sourceId?: string, guard?: ArtGuard): Promise<Drawing> {
+export async function saveDrawing(owner: string, name: string, file: Blob, sourceId?: string, guard?: ArtGuard, category?: DrawingCategory): Promise<Drawing> {
   assertArtWrite(owner, guard); const item = await prepareDrawing(owner, name, file); assertArtWrite(owner, guard);
+  if (category !== undefined) {
+    if (!DRAWING_CATEGORIES.includes(category)) throw Error('Choose an available art collection.');
+    item.category = category;
+  }
   return withArtTransaction(['drawings'], 'readwrite', async transaction => {
     const store = transaction.objectStore('drawings'), metadata=await artRequest(transaction.objectStore('drawingMetadata').getAll()) as DrawingMetadata[];
     if (sourceId) {
       const source = metadata.find(original => original.owner === owner && original.id === sourceId);
       if (!source) throw Error('Original drawing not found in this profile.');
       item.sourceId = sourceId; item.sourceSha256 = source.sha256; item.category = source.category || 'other';
+      if (source.semanticIdentity) item.semanticIdentity = source.semanticIdentity;
     }
     if(metadata.filter(original=>original.owner===owner).length>=ART_LIMITS.drawingsPerOwner||metadata.reduce((bytes,original)=>bytes+original.originalBytes+(original.preview?.byteLength??0),0)+item.bytes.byteLength+(item.preview?.byteLength??0)>ART_LIMITS.storageBytes)throw Error('Your art storage is full. Keep a complete backup before adding more pictures.'); assertArtWrite(owner, guard); store.add(item); saveDrawingMetadata(transaction,item); return item;
   });
 }
-export async function updateDrawing(owner: string, id: string, changes: { name?: string; category?: DrawingCategory; archived?: boolean }, guard?: ArtGuard): Promise<Drawing> {
+export async function updateDrawing(owner: string, id: string, changes: { name?: string; category?: DrawingCategory; semanticIdentity?: string; archived?: boolean }, guard?: ArtGuard): Promise<Drawing> {
   assertArtWrite(owner, guard);
-  if (!changes || Object.keys(changes).some(key => !['name', 'category', 'archived'].includes(key)) ||
+  if (!changes || Object.keys(changes).some(key => !['name', 'category', 'semanticIdentity', 'archived'].includes(key)) ||
     changes.name !== undefined && (typeof changes.name !== 'string' || !changes.name.trim() || changes.name.trim().length > 60) ||
+    changes.semanticIdentity !== undefined && !validSemanticIdentity(changes.semanticIdentity) ||
     changes.category !== undefined && !DRAWING_CATEGORIES.includes(changes.category) || changes.archived !== undefined && typeof changes.archived !== 'boolean') throw Error('Choose a short name and an available art category.');
   return withArtTransaction(['drawings'], 'readwrite', async transaction => {
     const store = transaction.objectStore('drawings'), item = await artRequest(store.get(id)) as Drawing | undefined;
     if (!item || item.owner !== owner) throw Error('Choose artwork from this profile.');
     const updated = { ...item, ...changes, ...(changes.name !== undefined ? { name: changes.name.trim() } : {}), updatedAt: new Date().toISOString() };
+    if (changes.semanticIdentity !== undefined) {
+      const meaning = changes.semanticIdentity.trim();
+      if (meaning) updated.semanticIdentity = meaning;
+      else delete updated.semanticIdentity;
+      if (meaning !== (item.semanticIdentity ?? '')) {
+        const records = await ownerArtRecords<DrawingMetadata>(transaction, 'drawingMetadata', owner);
+        const byId = new Map(records.map(row => [row.id, row]));
+        const root = originalFor(byId.get(id)!, byId);
+        for (const row of records) {
+          if (row.id === id || originalFor(row, byId).id !== root.id) continue;
+          const version = await artRequest(store.get(row.id)) as Drawing;
+          if (meaning) version.semanticIdentity = meaning;
+          else delete version.semanticIdentity;
+          assertArtWrite(owner, guard);
+          store.put(version);
+          saveDrawingMetadata(transaction, version);
+        }
+      }
+    }
     assertArtWrite(owner, guard); store.put(updated); saveDrawingMetadata(transaction,updated); return updated;
   });
 }
@@ -186,7 +212,7 @@ export async function drawingPage(owner:string,query:DrawingPageQuery={}):Promis
   const store=transaction.objectStore('drawingMetadata'),total=await artRequest(store.index('owner').count(IDBKeyRange.only(owner)));
   const range=IDBKeyRange.bound([owner,'',''],[owner,...(query.after??['\uffff','\uffff'])],false,!!query.after);
   const items:DrawingMetadata[]=[],search=(query.search??'').trim().toLowerCase();
-  await new Promise<void>((resolve,reject)=>{const request=store.index('ownerCreated').openCursor(range,'prev');request.onerror=()=>reject(request.error);request.onsuccess=()=>{const cursor=request.result;if(!cursor||items.length>limit){resolve();return;}const item=cursor.value as DrawingMetadata;if((query.archived===undefined||Boolean(item.archived)===query.archived)&&(!query.category||(item.category??'other')===query.category)&&(!search||item.name.toLowerCase().includes(search)))items.push(item);cursor.continue();};});
+  await new Promise<void>((resolve,reject)=>{const request=store.index('ownerCreated').openCursor(range,'prev');request.onerror=()=>reject(request.error);request.onsuccess=()=>{const cursor=request.result;if(!cursor||items.length>limit){resolve();return;}const item=cursor.value as DrawingMetadata;if((query.archived===undefined||Boolean(item.archived)===query.archived)&&(!query.category||(item.category??'other')===query.category)&&(!search||item.name.toLowerCase().includes(search)||item.semanticIdentity?.toLowerCase().includes(search)))items.push(item);cursor.continue();};});
   const hasMore=items.length>limit;if(hasMore)items.pop();const last=items.at(-1);return {items,next:hasMore&&last?[last.createdAt,last.id]:null,total};
  });
 }

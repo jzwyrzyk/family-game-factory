@@ -29,7 +29,11 @@ export type CreationBlock = BlockBase & (
   | {type: 'emit'; name: string}
 );
 export type SceneTrigger = {type: 'start' | 'tap'} | {type: 'event'; name: string};
+export const SCENE_ROLES = ['character', 'decoration', 'obstacle', 'collectible'] as const;
+export type SceneRole = typeof SCENE_ROLES[number];
 export interface SceneActor {
+  /** The child's description of this appearance in this scene. */
+  role?: SceneRole;
   id: string; name: string; assetId: string; x: number; y: number;
   size?: number; visible?: boolean;
 }
@@ -97,8 +101,9 @@ export function validateCreationProject(input: unknown): CreationProject {
   if (!p.actors.length) fail('Add at least one character.');
   const actorIds = new Set<string>();
   for (const raw of p.actors) {
-    const a = record(raw, ['id','name','assetId','x','y','size','visible'], 'character');
+    const a = record(raw, ['id','name','assetId','x','y','size','visible','role'], 'character');
     id(a.id, 'character ID');
+    if (a.role !== undefined && !SCENE_ROLES.includes(a.role as SceneRole)) fail('Choose a supported scene role.');
     if(!isCreationId(a.assetId)&&!parsePrivateArtId(a.assetId))fail('Invalid asset reference.');
     text(a.name, 60, 'character name');
     if (actorIds.has(a.id)) fail('Character IDs must be unique.');

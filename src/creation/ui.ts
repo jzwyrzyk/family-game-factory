@@ -1,3 +1,5 @@
+import { renderCreativePicker } from '../assets/creative-picker';
+import { SCENE_ROLES, type SceneRole } from './model';
 import { createPalPortrait } from '../pals/ui';
 import {earlySoundMuted} from '../learning/early/audio';
 import {profileGrade} from '../learning/engine';
@@ -114,7 +116,8 @@ export function installCreationStudio(host: Host) {
       <section id="creationVersions" class="creation-versions" hidden><div class="creation-shelf-heading"><h2>Saved versions</h2><button id="creationCloseHistory" class="creation-button">${iconMarkup('close')} Close</button></div><div id="creationVersionList"></div></section>
     </div>
     <input id="creationImport" type="file" accept="application/json,.json" hidden>
-    <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">${iconMarkup('close')}</button></div><div id="creationPalSlot"></div><section><div class="creation-shelf-heading"><h3>My art</h3><button id="creationOpenArtStudio" class="creation-button">${iconMarkup('edit')} My Art</button></div><p id="creationActorArtStatus" role="status"></p><div id="creationPrivateActorChoices" class="creation-actor-choices"></div></section><h3>Characters & things</h3><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
+    <dialog id="creationVersionPicker" class="creation-dialog" aria-labelledby="creationVersionPickerTitle"><div class="creation-shelf-heading"><h2 id="creationVersionPickerTitle">Choose art version</h2><button id="creationCloseVersionPicker" type="button" class="creation-button" aria-label="Close art versions">${iconMarkup('close')}</button></div><p id="creationVersionArtStatus" role="status"></p><div id="creationVersionArtFilters"></div><div id="creationVersionArtChoices" class="creation-actor-choices"></div></dialog>
+    <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">${iconMarkup('close')}</button></div><div id="creationPalSlot"></div><section><div class="creation-shelf-heading"><h3>My art</h3><button id="creationOpenArtStudio" class="creation-button">${iconMarkup('edit')} My Art</button></div><p id="creationActorArtStatus" role="status"></p><div id="creationActorArtFilters"></div><div id="creationPrivateActorChoices" class="creation-actor-choices"></div></section><h3>Characters & things</h3><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
   document.querySelector('main')!.append(page);
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => page.querySelector<T>('#' + id)!;
   const introduction=createStudioIntroduction(host.guidance,()=>shelf('landing'));
@@ -626,12 +629,30 @@ export function installCreationStudio(host: Host) {
   function choice(label: string, value: string, options: [string, string][], change: (value: string) => void) {
     const wrap = node('label', 'creation-field'), select = node('select'); wrap.append(node('span', '', label)); select.setAttribute('aria-label', label);
     options.forEach(([key, text]) => { const option = node('option', '', text); option.value = key; select.append(option); }); select.value = value;
-    select.onchange = async () => await act(() => { try { change(select.value); } catch (error) { select.value = value; throw error; } }); wrap.append(select); return wrap;
+    select.onchange = async () => await act(async () => { try { await change(select.value); } catch (error) { select.value = value; throw error; } }); wrap.append(select); return wrap;
   }
   function renderActorSettings() {
     const box = $('creationActorSettings'); box.replaceChildren(); const actor = scene!.actors.find(a => a.id === selectedActor); if (!actor) return;
     const set = async (key: string, value: string | number) => await mutation(project => Object.assign(project.actors.find(a => a.id === actor.id)!, { [key]: value }));
     box.append(input('Name', actor.name, async value => await set('name', value.trim() || 'My character'), { maxLength: 40 }), input('Start x', actor.x, async value => await set('x', +value), { min: 0, max: scene!.width }), input('Start y', actor.y, async value => await set('y', +value), { min: 0, max: scene!.height }), input('Size', actor.size || 100, async value => await set('size', +value), { min: 20, max: 240 }));
+    if (!challengeId && parsePrivateArtId(actor.assetId)) {
+      box.append(choice('Role in this scene', actor.role ?? '', [
+        ['', 'Choose a role'], ...SCENE_ROLES.map(role => [role, role[0].toUpperCase() + role.slice(1)] as [string, string]),
+      ], async value => await mutation(project => {
+        const target = project.actors.find(a => a.id === actor.id)!;
+        if (value) target.role = value as SceneRole;
+        else delete target.role;
+      })));
+      const replace = node('button', 'creation-button', 'Choose art version');
+      replace.type = 'button';
+      replace.onclick = () => actAsync(async () => {
+        assertEditing();
+        const dialog = $<HTMLDialogElement>('creationVersionPicker');
+        dialog.showModal();
+        await renderPrivateChoices(actor.id);
+      });
+      box.append(replace);
+    }
     const remove = iconNode('button', 'creation-text-button', 'trash', 'Remove'); remove.setAttribute('aria-label', 'Remove ' + actor.name); remove.disabled = !!challengeId || scene!.actors.length < 2;
     remove.onclick = async () => await act(async () => await mutation(project => { project.actors = project.actors.filter(a => a.id !== actor.id); project.programs = project.programs.filter(p => p.actorId !== actor.id); selectedActor = project.actors[0].id; selectedProgram = project.programs.find(p => p.actorId === selectedActor)?.id || ''; insert = null; })); box.append(remove);
     const tap = iconNode('button', 'creation-button creation-quiet', 'star', 'Try tap'); tap.id = 'creationTapActor'; tap.setAttribute('aria-label', 'Tap ' + actor.name);
@@ -862,7 +883,7 @@ export function installCreationStudio(host: Host) {
     if (!visible) return; stop(); clearInterval(checkpointTimer); visible = false; viewEpoch++;
     stopReading(); setExpandedView(false); page.classList.remove('has-scene'); document.body.classList.remove('creation-editing'); fullTools = false; expandedBlockId = '';
     privateArt.clear();stage.clear();
-    $<HTMLDialogElement>('creationActorDialog').close(); $('creationLearning').hidden = true;
+    $<HTMLDialogElement>('creationActorDialog').close(); $<HTMLDialogElement>('creationVersionPicker').close(); $('creationLearning').hidden = true;
   }
   $('creationHome').onclick = async () => await act(async () => { await saveVersion(); host.home(); });
   $('creationBack').onclick = async () => await act(async () => await shelf());
@@ -963,30 +984,49 @@ export function installCreationStudio(host: Host) {
   $('creationCloseHistory').onclick = () => { $('creationVersions').hidden = true; };
   $('creationResumeDraft').onclick = async () => await act(async () => { assertEditing({ resolvingRecovery: true }); const loaded = await (await store()).load(entryId, sceneOwner); if (!loaded.draft) { await loadScene(entryId); return; } scene = clone(loaded.draft.scene); dirty = true; recoveryPending = false; $('creationRecovery').hidden = true; $('creationSaveState').textContent = 'Recovered draft · ready to keep'; status('Your draft is ready to continue.'); freshEngine(); renderEditor(); renderGuide(challengeId ? 'practice' : 'scene'); });
   $('creationDiscardDraft').onclick = async () => await act(async () => { assertEditing({ resolvingRecovery: true }); await (await store()).discardDraft(entryId, sceneOwner); recoveryPending = false; $('creationRecovery').hidden = true; status('Your saved version is ready to continue.'); freshEngine(); renderEditor(); renderGuide(challengeId ? 'practice' : 'scene'); });
-  async function renderPrivateChoices(){
-    const capturedOwner=owner(),capturedView=viewEpoch,dialog=$<HTMLDialogElement>('creationActorDialog');
+  $<HTMLDialogElement>('creationVersionPicker').addEventListener('close', () => { $('creationVersionArtFilters').replaceChildren(); $('creationVersionArtChoices').replaceChildren(); });
+  $('creationCloseVersionPicker').onclick = () => $<HTMLDialogElement>('creationVersionPicker').close();
+  async function renderPrivateChoices(replaceActorId?: string){
+    const capturedOwner=owner(),capturedView=viewEpoch,dialog=$<HTMLDialogElement>(replaceActorId?'creationVersionPicker':'creationActorDialog');
     const current=()=>capturedOwner===owner()&&capturedView===viewEpoch&&isCurrent()&&dialog.open;
-    const choices=$('creationPrivateActorChoices'),message=$('creationActorArtStatus');choices.replaceChildren();message.textContent='Opening your art collection…';
+    const choices=$(replaceActorId?'creationVersionArtChoices':'creationPrivateActorChoices');
+    const controls=$(replaceActorId?'creationVersionArtFilters':'creationActorArtFilters');
+    const message=$(replaceActorId?'creationVersionArtStatus':'creationActorArtStatus');
+    controls.replaceChildren();choices.replaceChildren();message.textContent='Opening your art collection…';
     try{
-      const items=await listArtChoices(capturedOwner,current);if(!current())return;
-      message.textContent=items.length?'Choose an original or a saved cutout. Its artwork stays linked to this exact version.':'Your drawings can join this scene. Add one in My Art.';
-      for(const item of items){
+      let items=await listArtChoices(capturedOwner,current, !!replaceActorId);
+      if(!current())return;
+      if (replaceActorId) {
+        const actor = scene?.actors.find(a => a.id === replaceActorId);
+        const original = items.find(item => item.assetId === actor?.assetId);
+        items = items.filter(item => item.logicalId === original?.logicalId && !item.archived);
+      }
+      message.textContent = replaceActorId ? 'No versions here. Restore this picture in My Art.' : 'Your drawings can join this scene. Add one in My Art.';
+      renderCreativePicker(controls, choices, message, items, item => {
         const choice=node('button','creation-character-choice');choice.type='button';choice.dataset.privateArt=item.assetId;
         choice.append(art(item.assetId),node('strong','',item.label),node('small','',item.detail));
-        choice.onclick=()=>actAsync(async()=>{
+        choice.onclick=()=>act(async()=>{
+          if (!current()) return;
           assertEditing();choice.disabled=true;
           try{
             const resolved=await privateArt.load(item.assetId);if(!current())return;
             await mutation(project=>{
-              const actor={id:uid(),assetId:item.assetId,name:item.label,x:400,y:300,size:140,visible:true};project.actors.push(actor);
-              const program={id:uid(),actorId:actor.id,trigger:{type:'tap' as const},actions:[]};project.programs.push(program);selectedActor=actor.id;selectedProgram=program.id;insert=null;
+              if (replaceActorId) {
+                const existing = project.actors.find(actor => actor.id === replaceActorId);
+                if (!existing) throw Error('Choose a character in this scene.');
+                existing.assetId = item.assetId;
+                return;
+              }
+              const actor={id:uid(),assetId:item.assetId,name:item.label,x:Math.round(project.width / 2),y:Math.round(project.height * .65),size:140,visible:true};project.actors.push(actor);
+              const program={id:uid(),actorId:actor.id,trigger:{type:'tap' as const},actions:[]};project.programs.push(program);
+              selectedActor=actor.id;selectedProgram=project.programs.find(p=>p.actorId===actor.id&&p.trigger.type==='start')?.id??program.id;insert=null;
             });
             indexSceneArt(entryId,capturedOwner,[resolved]);
-            dialog.close();status('Your own art is in the scene. Add blocks to tell it what to do.');
+            dialog.close();status(replaceActorId?'Art version changed in this scene.':'Your own art is in the scene. Add blocks to tell it what to do.');
           }finally{if(current())choice.disabled=false;}
         });
-        choices.append(choice);
-      }
+        return choice;
+      });
     }catch(error){if(current())message.textContent=(error as Error).message;}
   }
   $('creationAddActor').onclick = async () => await act(async () => { assertEditing(); renderActorChoices(); $<HTMLDialogElement>('creationActorDialog').showModal();void await renderPrivateChoices(); });
@@ -1047,7 +1087,7 @@ export function installCreationStudio(host: Host) {
   window.addEventListener('factory-profile-before-change', event => { if (!visible) return;if(pendingActions){event.preventDefault();status('Your scene is still saving. Try changing players again in a moment.');}else stop(); });
   window.addEventListener('factory-profile', () => {
     leave(); scene = null; entryId = ''; revisionId = ''; sceneOwner = ''; engine = null; undo = []; redo = []; dirty = false; recoveryPending = false; sourceSessionId = ''; stage.clear();
-    for (const id of ['creationBlocks','creationActors','creationSaved','creationFeedback','creationSource','creationGuideSlot','creationPracticeGuideSlot','creationActorSettings','creationVariables','creationTrigger','creationStatus','creationVersionList','creationPrivateActorChoices','creationActorArtStatus','creationPals','creationPalTools','creationActorChoices']) $(id).replaceChildren();
+    for (const id of ['creationBlocks','creationActors','creationSaved','creationFeedback','creationSource','creationGuideSlot','creationPracticeGuideSlot','creationActorSettings','creationVariables','creationTrigger','creationStatus','creationVersionList','creationPrivateActorChoices','creationActorArtStatus','creationActorArtFilters','creationVersionArtFilters','creationVersionArtChoices','creationVersionArtStatus','creationPals','creationPalTools','creationActorChoices']) $(id).replaceChildren();
     $('creationCodeTitle').textContent = 'My character’s blocks'; $<HTMLInputElement>('creationTitle').value = '';
   });
   window.addEventListener('beforeunload', event => { if (visible&&pendingActions&&rewardSourceWritable()){event.preventDefault();event.returnValue='';} });

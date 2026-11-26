@@ -1,7 +1,8 @@
 /** Trusted local-art adapter. Private pixels never become a URL or a model input. */
-import { drawing, drawingPage, drawingBlob } from '../assets/private-drawings';
-import { rigById, listRigs } from '../drawing/store';
-import { validateAssembly, type DrawingAssembly } from '../drawing/model';
+import { drawing, drawingBlob } from '../assets/private-drawings';
+import { rigById } from '../drawing/store';
+import { assemblyHash } from '../assets/creative-library';
+export { assemblyHash, listCreativeAssetChoices as listArtChoices } from '../assets/creative-library';
 import { layerCanvas } from '../drawing/segmentation';
 import { parsePrivateArtId, privateArtId, validateEditableProject } from './projects';
 import type { CreationProject } from './model';
@@ -23,9 +24,6 @@ export function unionOriginalArtPixels(original:Uint8ClampedArray,mask:Uint8Clam
   }
   return result;
 }
-export async function assemblyHash(input:DrawingAssembly):Promise<string> {
-  return hex(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(validateAssembly(input)))));
-}
 export async function artChoice(owner:string,selection:ArtSelection,current:()=>boolean=()=>true):Promise<ArtChoice> {
   if(!current())throw stale();
   const source=await drawing(owner,selection.drawingId);
@@ -39,18 +37,6 @@ export async function artChoice(owner:string,selection:ArtSelection,current:()=>
     return {drawingId:source.id,rigId:rig.id,assetId:privateArtId({kind:'rig',id:rig.id,sha256}),label:source.name,detail:'Saved cutout design'};
   }
   return {drawingId:source.id,assetId:privateArtId({kind:'image',id:source.id,sha256:source.sha256}),label:source.name,detail:'Original artwork'};
-}
-export async function listArtChoices(owner:string,current:()=>boolean=()=>true):Promise<ArtChoice[]> {
-  const [sources,rigs]=await Promise.all([drawingPage(owner,{limit:100,archived:false}),listRigs(owner)]);
-  if(!current())throw stale();
-  const choices:ArtChoice[]=[];
-  for(const source of sources.items){
-    choices.push({drawingId:source.id,assetId:privateArtId({kind:'image',id:source.id,sha256:source.sha256}),label:source.name,detail:'Original artwork'});
-    const latest=rigs.find(rig=>rig.assembly.sourceId===source.id&&rig.assembly.sourceSha256===source.sha256);
-    if(latest)choices.push({drawingId:source.id,rigId:latest.id,assetId:privateArtId({kind:'rig',id:latest.id,sha256:await assemblyHash(latest.assembly)}),label:source.name,detail:'Latest saved cutout design'});
-    if(!current())throw stale();
-  }
-  return choices;
 }
 export function privateArtReferences(project:CreationProject):string[] {
   return [...new Set(project.actors.map(actor=>actor.assetId).filter(id=>parsePrivateArtId(id)))];

@@ -1,5 +1,6 @@
 import {assertRewardSourceLockHeld} from '../rewards/write-guard';
 /** Portable private art: validate all bytes and references before one additive transaction. */
+import { validSemanticIdentity } from '../assets/art-lineage';
 import { type Drawing, DRAWING_CATEGORIES, prepareDrawing } from '../assets/private-drawings';
 import { type SavedRig, type DrawingDraft } from './store';
 import { validateAssembly, type DrawingAssembly } from './model';
@@ -58,7 +59,7 @@ function validateLinks(drawings: Drawing[], rigs: PortableRig[], drafts: Portabl
 async function validateAndPrepare(input: unknown, owner: string) {
   const bundle = parse(input), originals: Drawing[] = [], ids = new Set<string>();
   for (const item of bundle.drawings) {
-    if (!object(item, ['id', 'name', 'mime', 'sha256', 'createdAt', 'sourceId', 'sourceSha256', 'category', 'archived', 'updatedAt', 'data']) || !identifier(item.id) || ids.has(item.id) || typeof item.name !== 'string' || !item.name.trim() || item.name.length > 60 || !['image/png', 'image/jpeg'].includes(item.mime) || !hash(item.sha256) || !date(item.createdAt) || item.sourceId !== undefined && !identifier(item.sourceId) || item.sourceSha256 !== undefined && !hash(item.sourceSha256) || item.category !== undefined && !DRAWING_CATEGORIES.includes(item.category) || item.archived !== undefined && typeof item.archived !== 'boolean' || item.updatedAt !== undefined && !date(item.updatedAt)) fail();
+    if (!object(item, ['id', 'name', 'mime', 'sha256', 'createdAt', 'sourceId', 'sourceSha256', 'category', 'semanticIdentity', 'archived', 'updatedAt', 'data']) || !identifier(item.id) || ids.has(item.id) || typeof item.name !== 'string' || !item.name.trim() || item.name.length > 60 || !['image/png', 'image/jpeg'].includes(item.mime) || !hash(item.sha256) || !date(item.createdAt) || item.sourceId !== undefined && !identifier(item.sourceId) || item.sourceSha256 !== undefined && !hash(item.sourceSha256) || item.semanticIdentity !== undefined && !validSemanticIdentity(item.semanticIdentity) || item.category !== undefined && !DRAWING_CATEGORIES.includes(item.category) || item.archived !== undefined && typeof item.archived !== 'boolean' || item.updatedAt !== undefined && !date(item.updatedAt)) fail();
     ids.add(item.id); const prepared = await prepareDrawing(owner, item.name, new Blob([decode(item.data)], { type: item.mime }));
     if (prepared.sha256 !== item.sha256) throw Error('An image in this backup does not match its saved fingerprint. Nothing was imported.');
     const { data: _data, ...metadata } = item; originals.push({ ...prepared, ...metadata });

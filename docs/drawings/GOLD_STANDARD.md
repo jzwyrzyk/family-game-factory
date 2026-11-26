@@ -16,6 +16,12 @@ The image itself is never sufficient to prove an object's physical function. We 
 6. **Profile privacy:** Every asset belongs to a child profile. Source and derivative data are local by default; switching profiles closes old editing surfaces and excludes old artwork from the new child's preview.
 7. **Engagement:** After one successful action, the child should have a meaningful next choice: try again, move a part, change what it does, save a variant, or stop. No forced review form, lengthy jargon, or constant AI questions.
 
+## Finding and using the same artwork
+
+The trusted host builds its picker from the current player's existing picture catalog and movement revisions. Every derived image traces to the root picture through an owner-checked parent ID and SHA-256. A maker can give the whole family of versions an optional subject such as “rock” or “moon pebble”. The maker can name and categorize individual pictures and search by name or subject.
+
+The picker offers original pictures, edited pictures and each saved design. The selected ID and digest travel with the scene. In Scene settings under More tools, **Choose art version** changes that actor's artwork and preserves its blocks, position and role. Earlier saved revisions retain their existing selection. A role such as decoration, obstacle or collectible describes that particular actor. Its behavior comes from the scene program. Archiving a picture removes it from new selections and leaves saved references usable. Exact restore reconnects compatible references, while an explicit import makes a new owner-scoped copy.
+
 ## First implementation, as built on this branch
 
 - Existing local PNG/JPEG library, including photo capture and a direct touch/mouse sketch canvas.
@@ -26,6 +32,14 @@ The image itself is never sufficient to prove an object's physical function. We 
 - Other drawing types instantiate bounded Planck multi-part bodies and role-derived joints in an interactive playground; full semantic game authoring is not complete.
 - Studio exposes My Drawings; the owner explicitly approves a saved car rig for Rally.
 - Tests: pure schema/physics checks and desktop/tablet end-to-end synthetic drawing journeys. Tests do not establish real child enjoyment, model recognition quality, or battery performance.
+
+## Draw a path
+
+Choose a picture or a saved movement version in **My Art**, then **Draw a path**. Tap stops, drag a route, or aim with the arrow keys and press Enter. The child can undo, choose a speed and preview before saving. The editor accepts 2–16 stops. Whole pictures retain their original pixels, including paper and transparency. A selected cutout uses that exact version’s existing masks.
+
+**Save path** adds an immutable movement revision to the same private art store. Its assembly hash covers the stops, timing, sprite choice and source-image fingerprint. A later path version links to its parent. Art library and combined scene backups use the existing version transfer contracts. My Art and the Creative Studio picker can explicitly select an older version.
+
+Adding the path to a scene places the actor at the first stop and creates ordinary editable Move blocks for the remaining stops. Playback uses the existing scene engine. Changing the scene’s blocks affects that scene alone. Opening the saved design in the pieces editor allows a child to make a new cutout version. Whole-sprite path animation and the existing articulated physics playground have different controls. This flow records no learning result and needs no model service.
 
 ## Fidelity ladder: when a drawing is hard
 
