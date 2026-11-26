@@ -10,6 +10,7 @@ from pathlib import Path
 import re
 import secrets
 import sys
+import time
 import uuid
 
 from recover_nonproduction import Stop, command, digest, need, private_path, read_json, sha, write_new
@@ -179,7 +180,7 @@ def prepare(home, tf, source, args, secret):
     rows, binary = tf_plan(tf, attempt, attempt / 'inputs.tfvars.json', 'review', closing)
     need(state_hash(tf) == state, 'STATE_CHANGED_DURING_PLAN')
     record = {'source': source, 'attempt': attempt.name, 'root': TF_ROOT, 'project': PROJECT,
-              'stage': variables['stage'], 'closeFundedTrial': closing, 'workerFederation': variables.get('enable_worker_federation', False),
+              'reviewedAt': int(time.time()), 'stage': variables['stage'], 'closeFundedTrial': closing, 'workerFederation': variables.get('enable_worker_federation', False),
               'changes': rows, 'historySha256': history_hash(home), 'beforeStateSha256': state, 'planSha256': sha(binary.read_bytes()),
               'inputsSha256': sha((attempt / 'inputs.tfvars.json').read_bytes()),
               'reviewSha256': sha((attempt / 'review.json').read_bytes()),
@@ -201,6 +202,18 @@ def apply(home, tf, source, args, secret):
     need(r['ephemeralBinding'] == hmac.new(private_path(home / 'key').read_bytes(), secret.encode(), hashlib.sha256).hexdigest(),
          'EPHEMERAL_INPUT_CHANGED')
     need(state_hash(tf) == r['beforeStateSha256'] and history_hash(home) == r['historySha256'], 'STATE_ADVANCED')
+    need(0 <= time.time() - r['reviewedAt'] <= 3600, 'PLAN_APPROVAL_EXPIRED')
+    # A saved plan alone does not detect out-of-band changes to IAM or traffic.
+    # Compare a fresh read with the complete effects and starting state approved.
+    fresh_dir = attempt / ('preapply-' + uuid.uuid4().hex)
+    fresh_dir.mkdir(mode=0o700)
+    tf_plan(tf, fresh_dir, attempt / 'inputs.tfvars.json', 'fresh', r['closeFundedTrial'])
+    old_plan = read_json(private_path(attempt / 'review.json'))
+    fresh_plan = read_json(private_path(fresh_dir / 'fresh.json'))
+    fields = ('resource_changes', 'resource_drift', 'output_changes', 'checks', 'prior_state',
+              'deferred_changes', 'planned_values', 'proposed_unknown', 'applyable', 'complete')
+    need(all(old_plan.get(k) == fresh_plan.get(k) for k in fields) and
+         r['beforeStateSha256'] == state_hash(tf), 'LIVE_PLAN_NO_LONGER_MATCHES')
     write_new(attempt / 'started.json', {'approval': digest(r)})
     command(['terraform', 'apply', '-input=false', '-lock-timeout=30s', '-parallelism=1',
              str(attempt / 'review.tfplan')], tf, 'TERRAFORM_APPLY', attempt)

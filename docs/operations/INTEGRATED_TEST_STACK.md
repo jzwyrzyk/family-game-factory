@@ -45,7 +45,7 @@ approved_apply
 outputs="$(jq -er .outputs "$private_inputs/last-applied.json")"
 ```
 
-The operator locks the new directory, archives exact Git module bytes and Terraform lock file, binds the reviewed binary, private inputs, ephemeral secret, state and application history, and requires a clean post-apply plan. An unresolved start marker stops future plans and applies. For an interrupted operation, inspect the retained before and successor states, cloud inventory, exact original plan and provider audit records locally. Preserve backups. The `record-reconciliation --attempt ID --private-inventory FILE` command accepts a private record containing the original approval, actual state hash, sorted verified resource addresses, an empty unresolved list, and explicit administrator verification. Replan and obtain a new approval. Never delete a marker or replay a stale binary.
+The operator locks the new directory, archives exact Git module bytes and Terraform lock file, binds the reviewed binary, private inputs, ephemeral secret, state and application history, and requires a fresh matching pre-apply plan within one hour and a clean post-apply readback. An unresolved start marker stops future plans and applies. For an interrupted operation, inspect the retained before and successor states, cloud inventory, exact original plan and provider audit records locally. Preserve backups. The `record-reconciliation --attempt ID --private-inventory FILE` command accepts a private record containing the original approval, actual state hash, sorted verified resource addresses, an empty unresolved list, and explicit administrator verification. Replan and obtain a new approval. Never delete a marker or replay a stale binary.
 
 ## Build and mount the three image roles
 

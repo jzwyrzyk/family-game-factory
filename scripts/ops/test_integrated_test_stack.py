@@ -39,7 +39,7 @@ class SavedPlanTests(unittest.TestCase):
             path.write_bytes(path.name.encode())
             path.chmod(0o600)
         if args[1] == 'show':
-            plan = self.show if args[-1].endswith('review.tfplan') else program(['no-op'])
+            plan = self.show if not args[-1].endswith('readback.tfplan') else program(['no-op'])
             return json.dumps(plan).encode()
         if args[1] == 'apply':
             if self.uncertain:
@@ -122,3 +122,12 @@ class SavedPlanTests(unittest.TestCase):
             old['role'] = 'roles/owner'
             with self.assertRaises(op.Stop): op.review(plan, True)
         with self.assertRaises(op.Stop): op.review(program(['delete']), True)
+
+    def test_stale_live_plan_stops_before_any_apply_marker(self):
+        with patch.object(op, 'command', self.terraform):
+            args = self.plan()
+            self.show['output_changes'] = {'registry': {'actions':['update'],'after':'different'}}
+            with self.assertRaisesRegex(op.Stop, 'LIVE_PLAN_NO_LONGER_MATCHES'):
+                op.apply(self.home, self.tf, self.source, args, self.secret)
+            self.assertNotIn('apply', self.actions)
+            self.assertEqual(op.unresolved(self.home), [])
