@@ -57,8 +57,8 @@ exact CLI failure with no structured provider error. It reuses the administrator
 token in memory with TLS verification and no redirects. Only HTTP 404 permits a
 creation proposal. Every success/denial/redirect/transport failure stops; response
 bodies are never read. The plan hash binds the explicit REST-404 absence basis.
-Use the corrective immutable SHA from the reviewed handoff for this next read;
-retain the same verified image, original build/source and launcher checksum.
+Use corrective immutable source `9072b7d5fe280eb10ffdfe6c3a5ae414ab47c245` for this
+next read; retain the same verified image, original build/source and launcher checksum.
 
 The error output includes `stage`, `code`, allowlisted `provider_codes`,
 `cli_category`, bounded `http_status` and completed read statuses. `READ_OK` means
@@ -70,7 +70,7 @@ Read-only diagnostic inventory command:
 ```sh
 (
   set -euo pipefail
-  r=9e598d7aa7d7929601b7ba40270ca396348f69f4
+  r=9072b7d5fe280eb10ffdfe6c3a5ae414ab47c245
   p=$(mktemp /tmp/jems-broker-plan.XXXXXXXX)
   trap 'rm -f -- "$p"' EXIT
   curl -fsSL "https://raw.githubusercontent.com/jzwyrzyk/family-game-factory/$r/scripts/ops/handoffs/operations-bootstrap.sh" -o "$p"

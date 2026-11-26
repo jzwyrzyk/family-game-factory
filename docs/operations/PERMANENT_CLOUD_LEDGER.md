@@ -20,10 +20,23 @@ are never read or emitted. The approval evidence records this explicit 404 basis
 all existing source, provenance, IAM, service and approval gates remain enforced.
 No new cloud permission, endpoint bypass or service deployment is introduced.
 
+Correction source: `9072b7d5fe280eb10ffdfe6c3a5ae414ab47c245`.
 **315 operations tests passed**, including exact endpoint/same-token checks,
 HTTP 404 planning, 200/redirect/denial/transient-error refusal and redaction.
-Administrator REST confirmation and the actual additive plan remain pending.
+Source-only preflight passed with identity/live access unchecked. Hosted
+[operations](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45849529811),
+[environment](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45849529834)
+and [documentation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45849529991)
+checks passed at this source. Administrator REST confirmation and the actual
+additive plan remain pending.
 The original verified image and saved nonproduction Terraform plan are unchanged.
+
+Broader local `check:changed` did **not** pass: the unchanged Actions browser test
+stopped waiting for `Score: 1` at `tests/actions-e2e.ts:66`. One isolated retry moved
+past that path but stopped waiting for the V2 game's `data-frames` surface at line
+106. Both used local fixtures and system Chromium, without paid provider requests.
+These browser failures remain separate from the passing operations/environment
+checks; no full local regression or application acceptance is claimed.
 
 
 ## November 26, 2026 — broker inventory stopped before a plan
