@@ -896,10 +896,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:11:30.494Z",
-      "sourceDigest": "fbdc9555545a55850a72a2d4a3c47a3b4294b528d8e2cdc86f38ae4ba9b7fa1a",
+      "reviewedAt": "2026-11-26T03:22:12.097Z",
+      "sourceDigest": "f1089dfb42949aae5bf2a17222a7ddc3abc8ada77cc5b37db7853a21b218484f",
       "reviewOutcome": "updated",
-      "reviewReason": "The generated-art suite now runs a synthetic immutable-sprite slot after its existing desktop, tablet, phone and negative checks. This adds local scope, pin and revocation coverage.",
+      "reviewReason": "The synthetic sprite fixture adds one executable browser leaf, raising its verified count to 44. The current evidence guide and PR inventory identify the command and the retained full-suite policy.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
