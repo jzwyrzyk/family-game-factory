@@ -907,10 +907,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:19:39.563Z",
-      "sourceDigest": "49589bc1b2df6fb2d5c4e229213be68ce0faaa4af5bb86aa401205a28b2ec19f",
+      "reviewedAt": "2026-11-26T03:26:10.642Z",
+      "sourceDigest": "72ed819537605ed580b3b4c7c83e2e6a7ee54e174072500f7ab223f5b5e20bad",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed browser checks for editable sketches, motion, family PNG admission, synthetic slot scope, and all versioned world artwork digests.",
+      "reviewReason": "Verified the combined drawing, movement and selected-slot suites. The exact manifest has 67 creative and 44 browser commands, with all prior required tests retained.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
