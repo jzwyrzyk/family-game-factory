@@ -21,7 +21,7 @@ const freehand: Tool[] = ['pencil','crayon','brush','marker','eraser'];
 const toolRow = (tools: Tool[]) => tools.map(tool =>
   `<button type="button" data-tool="${tool}" aria-pressed="false"><i aria-hidden="true" class="dp-tool-icon dp-icon-${tool}"></i>${toolNames[tool]}</button>`).join('');
 const invitations: Record<string,{category:DrawingCategory;hint:string}> = {
-  Anything:{category:'other',hint:'What will you draw?'},
+  Anything:{category:'other',hint:''},
   Character:{category:'character',hint:'Who will be in your story?'},
   Thing:{category:'prop',hint:'What could someone pick up or play with?'},
   World:{category:'world',hint:'Where will your story happen?'},
@@ -132,7 +132,7 @@ export async function drawOnTablet(owner:string, onSaved:(drawing:Drawing)=>Prom
       </details>
     </aside>
   </div>
-  <footer class="dp-keep"><button type="button" data-tray aria-expanded="false">${iconMarkup('edit')} Tools</button><label>My drawing is called<input data-title maxlength="60" placeholder="My drawing"></label>
+  <footer class="dp-keep"><button type="button" data-tray aria-expanded="false">${iconMarkup('edit')} Tools</button><label>Name<input data-title maxlength="60" placeholder="My drawing"></label>
     <button type="button" data-save>${iconMarkup('save')} Keep my art</button><p role="status" aria-live="polite" data-message></p></footer>`;
   document.body.append(dialog);
   const find = <T extends HTMLElement>(selector:string) => dialog.querySelector<T>(selector)!;
