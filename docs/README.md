@@ -8,6 +8,8 @@ Private family operating procedures are in the [owner guide](family-beta/OWNER.m
 
 [Focused editing, workflow inventory and session handoff](evidence/DEVELOPMENT-VELOCITY.md). CI and validation: [architecture, complete workflow audit, coverage, benchmarks and evidence reuse](evidence/README.md#ci-architecture-and-performance).
 
+For the November 26 combined Learning and Connected Creative Universe owner-review rehearsal, use [draft #223](https://github.com/jzwyrzyk/family-game-factory/pull/223) and its exact-head evidence and branch-only feature/decision references. It is not a protected release; [delivery state](../DELIVERY-STATE.md) distinguishes it from the frozen application. The separate [design-system #221](https://github.com/jzwyrzyk/family-game-factory/pull/221) and [operations #222](https://github.com/jzwyrzyk/family-game-factory/pull/222) candidates remain drafts.
+
 Start with the canonical references below. Feature documents remain the detailed contracts; this index keeps them discoverable without copying all of their content into an engineering handbook.
 
 The current four-experience release is consolidated in [PR134](https://github.com/jzwyrzyk/family-game-factory/pull/134). Its scope combines the Bubble Gum, Mining, Factory and first-learner Coding contracts below with shared navigation, profile settings, reading and Notifications. Source-PR histories are preserved; read delivery state for the current integration gates and release evidence.

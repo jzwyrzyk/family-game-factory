@@ -37,6 +37,8 @@ Speak creates an editable draft. Send requests coaching. Build submits the selec
 
 The production browser bundle, disconnected DEV/TEST bundle, offline HTML reviewer and published Pages artifact have separate source and configuration identities. Required Arcade aggregates verify immutable build and command receipts. Release consumers enforce exact reviewed source, artifacts, configuration and environment. The private environment controller reconciles protected source and validates downloaded data before privileged deployment. [Environment contract](docs/development/DEV-TEST-PROD.md) · [CI evidence](docs/evidence/README.md#ci-architecture-and-performance)
 
+The [combined owner-review draft #223](https://github.com/jzwyrzyk/family-game-factory/pull/223) extends these boundaries with shared learning interruption/return and owner-local pinned original artwork, including exact image or rig revisions. Its source and fixture evidence are not current-main or general remote private-art support; see the [delivery gates](DELIVERY-STATE.md). The existing architecture above remains the merged baseline until integration.
+
 Consult the [feature index](docs/README.md) for API, family isolation, learning, drawing, gameplay and operations contracts. The [November 26 architecture record](docs/history/2026-11-26/ARCHITECTURE-CURRENT.md) preserves the full subsystem notes, prior integrations and source identities.
 
 <details>
