@@ -84,7 +84,9 @@
     "docs/development/SETUP.md",
     "docs/development/COSTS.md",
     "docs/decisions/2026-11-23-dev-test-prod.md",
-    "docs/ui-review/README.md"
+    "docs/ui-review/README.md",
+    "docs/creative-universe/STANDARD.md",
+    "docs/decisions/2026-11-26-connected-creative-universe.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -125,7 +127,8 @@
     "docs/development/*.md",
     "infra/nonproduction/*.md",
     "docs/development/evidence/*.md",
-    "docs/storage/*.md"
+    "docs/storage/*.md",
+    "docs/creative-universe/*.md"
   ],
   "areas": [
     {
@@ -1393,10 +1396,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:58.459Z",
-      "sourceDigest": "37c0c3f9ee5432f31d4741e23cb41fe2cc54569af18aec957152e780590aad46",
+      "reviewedAt": "2026-11-26T03:05:50.558Z",
+      "sourceDigest": "3519bd3b6a3b81b4fcd3a4628c1b50c54065abb8da7b3fca64a3097169ec380a",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the roster and Journey decision with companion contracts and updated the documentation index.",
+      "reviewReason": "Registered the shared standard and decision and updated the PR template and maintenance ownership.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1606,7 +1609,8 @@
         "ARCHITECTURE-CURRENT.md",
         "docs/drawings/*.md",
         "docs/creation-studio/*.md",
-        "docs/decisions/2026-11-19-private-art-studio.md"
+        "docs/decisions/2026-11-19-private-art-studio.md",
+        "docs/creative-universe/*.md"
       ],
       "sources": [
         "src/drawing/**",
@@ -1617,10 +1621,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "467544c05466d8d0c1045244fa942dbfccf7b81e1e04635e8f5ecae1c0b62afc",
-      "reviewedAt": "2026-11-25T23:21:00.320Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "My Creations uses the shared header and retains the My Art action. The drawing library, private assets and editor use the inherited My Art contract.",
+      "sourceDigest": "b0021e16fa3a1ec1088b8ed9d923b951798654608b6d7ef72522c4c9bf76512e",
+      "reviewedAt": "2026-11-26T03:05:50.127Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Routed the shared identity, original-byte, pinning, ownership and lifecycle standard into Art Studio review.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
