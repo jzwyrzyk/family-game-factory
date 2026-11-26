@@ -30,6 +30,12 @@ Offer manual parts, masks and placement corrections when a guess misses. Show in
 
 Give the canvas and its palette priority on the drawing surface. Preserve a failed Keep for retry and honor pointer cancellation on mouse, pen and touch. Reopening a flattened picture must never invent editable marks.
 
+The drawing workspace offers pencil, crayon, paintbrush, marker, eraser, bounded fill, lines, shapes and approved Jems stamps. A child can undo a clear, or select, move and resize a suitable mark. Give a six-year-old immediate access to color, drawing, erasing, a stamp and a basic shape. Reveal additional tools by grade and let children open any tray themselves. A narrow phone can start a tall page. Reopening a saved page preserves its intrinsic dimensions and paper transparency.
+
+Keep the interoperable raster and its bounded, versioned source together. Verify that replay produces the original pixels before opening a document as editable. If the renderer, a supplied stamp or a source chunk differs, offer the exact retained picture. A failed Keep can be retried in the original profile. Resume after interruption requires an explicit choice. Work before Keep stays in the open drawing session.
+
+After Keep, show the actual picture. The child can keep it in My Art, give it motion, take it to a scene or explicitly prepare it for a compatible game. A drawing and a scratchpad may use the same pointer mapping while retaining independent lifetimes, histories and authorities. [Drawing workspace and local acceptance](../drawings/ART_STUDIO.md)
+
 For young children, begin with visible movement choices and a single playback action. Use the current Jems label sizes, focus order, contrast and touch targets. Provide keyboard alternatives to path and part placement. A cancelled pointer must discard the unfinished gesture. Pause, reduced motion, profile change and dismissal must stop unsolicited playback. Use the existing grade and parent supervision policies. Scratchpad marks from Math or English remain transient unless a future, separately designed explicit Keep journey is accepted. [Child interface](../brand/CHILD_INTERFACE.md)
 
 ## Worlds and 2D mechanics

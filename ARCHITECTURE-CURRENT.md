@@ -1,5 +1,12 @@
 # Jems current architecture
 
+## Connected creative workspace
+
+The trusted My Art host stores one exact PNG per kept sketch revision in the existing private drawings database. Its private ancillary chunk carries the ordered, bounded paper document. The raster remains readable without that editor. Explicit Keep recovery uses the same database, owner and capacity controls. Existing image and rig pins remain the unit of saved playback. Drawing input and history can run without a store. [Drawing Workspace](docs/drawings/ART_STUDIO.md)
+
+Creative Studio reads the private library through its owner-scoped picker. The scene owns the actor role, pinned world and framing. A saved path can become editable movement actions. Generated V2 playback has a local synthetic qualification adapter with an explicit actor slot, bounded raster re-encoding and frame revocation. Production workers and generated clients have no route to My Art. [Creative Asset & World Design Standard](docs/creative-universe/STANDARD.md) · [Secure local game qualification](docs/game-intelligence/PREMIUM-BUILDER.md)
+
+
 The November 26 application integration combines family beta and F06 storage from #186 with the child experience from #188 and #190. The [environment contract](docs/development/DEV-TEST-PROD.md) governs DEV, TEST and household promotion. Production still serves the earlier household release. The [delivery register](DELIVERY-STATE.md) distinguishes source validation, hosted acceptance and activation for this release.
 
 **Private family beta and F06 on protected main, November 25.** Application #186 integrated the opt-in family tenancy and storage paths. Existing household deployments use the household route. Prepared workspaces preserve their recoverable originals. Native private copies use per-owner authorization and explicit conflict handling. Other domains use reviewed recovery. The protected worker still runs the earlier pinned public source. Private dispatch checks both its immutable execution tag and the current private main commit against the same approved SHA. An advance of worker main would stop admission under the current pin. [Integration and continuity record](docs/family-beta/COMPLETION.md#protected-main-integration)

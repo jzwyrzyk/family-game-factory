@@ -92,7 +92,23 @@ async function run() {
     await editor.locator('[data-title]').fill('My drawing tools');
     await editor.locator('[data-save]').click(); await editor.waitFor({state:'detached'});
     const saved=page.getByRole('region',{name:'Your saved drawing'});
-    await saved.waitFor(); await saved.getByRole('button',{name:'Make it move'}).click();
+    await saved.waitFor();
+    const pictureTools=page.locator('.art-detail-tools'); await reveal(pictureTools);
+    const download=page.waitForEvent('download');
+    await pictureTools.getByRole('button',{name:'Download original picture'}).click();
+    const png=fs.readFileSync(await (await download).path());
+    assert.equal(png.toString('ascii',12,16),'IHDR');
+    assert.equal(png.toString('ascii',37,41),'jeMS');
+    const source=JSON.parse(png.toString('utf8',41,41+png.readUInt32BE(33)));
+    assert.equal(source.transparent,true);
+    assert.ok(source.marks.some(m=>m.points.some(p=>p.p>0)),'pen pressure survives the downloaded PNG');
+    const exportedAlpha=await page.evaluate(async data=>{
+      const image=new Image(); image.src='data:image/png;base64,'+data; await image.decode();
+      const canvas=document.createElement('canvas'); canvas.width=image.width;canvas.height=image.height;
+      const ctx=canvas.getContext('2d'); ctx.drawImage(image,0,0);return ctx.getImageData(0,0,1,1).data[3];
+    },png.toString('base64'));
+    assert.equal(exportedAlpha,0,'actual downloaded PNG retains a transparent background');
+    await saved.getByRole('button',{name:'Make it move'}).click();
     const motion=page.locator('dialog[open]'); await motion.waitFor(); await page.keyboard.press('Escape');
     if(await motion.count())await motion.waitFor({state:'detached'});
     await page.getByRole('button',{name:'Keep drawing',exact:true}).click();
