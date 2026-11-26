@@ -185,3 +185,7 @@ python3 scripts/environments/cloud.py --config iap-release/environments.json pla
 ```
 
 A mismatched secret stops deployment and cleanup. Keep both files privately for recovery. For rotation, prepare a fresh nonce and new matching pair. Update both under the approved change and verify anonymous, unrelated, adult and UAT access on the actual service.
+
+## Integrated TEST candidate
+
+The separate [family TEST Terraform root](family-beta/terraform) reuses the recovered project's deployer, UAT identity and existing protected environment controllers. Its own state owns a named Firestore database, private bucket, identities, image repository, signed-worker trust and four services. The [phased operating notes](family-beta/TEST.md) describe plan inputs, audience binding, secret handling, isolation, cost, negative controls and recovery. Static TEST and the partial-apply recovery maintain their separate state and receipts.

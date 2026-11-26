@@ -4,7 +4,7 @@
  */
 import {createHash,randomBytes} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
-import {Firestore} from '@google-cloud/firestore';
+import {databaseFor} from './storage/database';
 import {FirestoreRepository} from './pipeline/firestore';
 import {FileRepository} from './pipeline/repository';
 import {GcsPrivateArtifacts} from './storage/artifacts';
@@ -27,7 +27,7 @@ async function main(){
  const cfg=JSON.parse(await readFile(process.env.FACTORY_PRIVATE_CONFIG,'utf8')) as OwnerDeviceConfig;
  if(!/^[A-Za-z0-9_-]{1,100}$/.test(cfg.familyId)||!cfg.workspace)throw Error('OWNER_DEVICE_CONFIG_REQUIRED');
  const repo=cfg.localFile?await FileRepository.open(cfg.localFile):
-  new FirestoreRepository(new Firestore({projectId:cfg.projectId}),cfg.workspace,
+  new FirestoreRepository(databaseFor(cfg),cfg.workspace,
    cfg.artifactBucket?new GcsPrivateArtifacts(cfg.artifactBucket,cfg.workspace):undefined);
  const args=process.argv.slice(2);
  if(args.length===1&&/^--revoke=[a-f0-9-]{36}$/.test(args[0])){
