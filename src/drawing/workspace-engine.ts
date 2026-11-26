@@ -63,13 +63,7 @@ export class PaperHistory {
   redo() { if (this.canRedo) this.cursor++; }
 }
 
-export function pointerPoint(canvas: HTMLCanvasElement, e: PointerEvent): Point {
-  const rect = canvas.getBoundingClientRect();
-  const rounded = (v: number, limit: number) => Math.round(clamp(v, 0, limit) * 4) / 4;
-  return { x: rounded((e.clientX - rect.left) * width / Math.max(1, rect.width), width),
-    y: rounded((e.clientY - rect.top) * height / Math.max(1, rect.height), height),
-    ...(e.pointerType === 'pen' && e.pressure > 0 ? { p: Math.round(e.pressure * 100) / 100 } : {}) };
-}
+export { pointerPoint } from './pointer-input';
 
 const stamps = new Map<Stamp, HTMLImageElement>();
 let loading: Promise<void> | undefined;
