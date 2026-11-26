@@ -711,10 +711,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:19:59.740Z",
-      "sourceDigest": "8aec10f384d09c1592dc6758e68333d58d254f0da000b4131c63ef65b4a6fdd0",
+      "reviewedAt": "2026-11-26T23:34:53.387Z",
+      "sourceDigest": "4de058388fa8c3e15a8ffd3b85b17a280db9cd7466bbda8f5864d99c8d17dbda",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed exact validator and restricted family build dependencies.",
+      "reviewReason": "Documented TEST financial admission and content-free settlement and source-matched household asset handling.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -1157,6 +1157,7 @@
       ],
       "sources": [
         ".github/workflows/**",
+        ".github/actions/integrated-test/**",
         "scripts/deployment/**",
         "scripts/ops/**",
         "ops/**",
@@ -1432,10 +1433,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T22:12:18.243Z",
-      "sourceDigest": "1ae25cf8cd452064d5919af9f1d6f46ad643dac946ec4bd29776f22ab3fb0492",
+      "reviewedAt": "2026-11-26T23:34:52.953Z",
+      "sourceDigest": "c41ca15dbe4e9ffc35e89f7a556bc94de145d25d794af68ecea3d28caa1bfe6c",
       "reviewOutcome": "updated",
-      "reviewReason": "Combined registry source and document routes from the selected branches without replacing canonical history.",
+      "reviewReason": "Registered the protected TEST composite workflow action under delivery operations without changing product scope.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

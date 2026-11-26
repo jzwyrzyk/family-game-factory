@@ -1,5 +1,6 @@
 import {resetSyntheticProject} from './beta/test-reset';
 import {fixtureRunEvidence,requireTestCallback,testExecution,type TestExecution} from './actions/test-execution';
+import {isolatedHousehold,trialContext,trialReadback,type TestTrialAuthorization} from './beta/test-trial';
 import {generatedRecoveryHttp,runGeneratedCloudRecovery} from './beta/generated-recovery';
 import {cloudBackupSchedule,runFamilyCloudRecovery,familyBackupLedger} from './beta/recovery';
 import {reconcileFamilies} from './beta/reconcile';
@@ -47,6 +48,7 @@ import {verifyBrowserSession,trustedDeviceHandler} from './trusted-devices';
 import {adultPilotConfigured,adultPilotFlags} from './adult-pilot';
 export interface GatewayConfig {
  testExecution?:TestExecution;
+ testTrial?:TestTrialAuthorization;
  platformMode?:'HOUSEHOLD'|'PRIVATE_FAMILY_BETA'|'PUBLIC'; beta?:BetaConfig;householdPrivateHost?:HouseholdHost;householdBudgetBinding?:HouseholdBinding;
  active:boolean;appOrigin:string;gatewayOrigin:string;previewOrigin:string;sessionKey:string;previewKey:string;familyId:string;
  repository:string;repositoryId:string;workflow:string;approvedSha:string;
@@ -159,6 +161,14 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
    res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});
    res.end(JSON.stringify({providerMode:'fixture',paidExecution:false,workerSha:config.workerApprovedSha,publicSourceSha:policy!.publicSourceSha,
     workerRepositoryId:config.workerRepositoryId,expiresAt:policy!.expiresAt,service:'jems-test-gateway'}));return;
+  }
+  if(url.pathname.startsWith('/v1/test-trial/')||isolatedHousehold(config)&&req.method==='POST'&&
+     (/^\/v1\/(jobs(?:\/[^/]+\/retry)?|coach(?:\/(?:audio|narration))?)$/.test(url.pathname))){
+   try{
+    if(url.pathname==='/v1/test-trial/preflight'||url.pathname==='/v1/test-trial/settlement'){await trialReadback(config,repo,req,res);return;}
+    if(url.pathname.startsWith('/v1/test-trial/')||['/v1/coach/audio','/v1/coach/narration'].includes(url.pathname))throw Error('TEST_TRIAL_NOT_AUTHORIZED');
+    await trialContext(config,repo,req);
+   }catch{res.writeHead(403,{'Cache-Control':'no-store'});res.end();return;}
   }
   if(url.pathname==='/health'){res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','no-store');try{await repo.snapshot();res.end(JSON.stringify({ready:true,paidExecution:paidEnabled}));}catch{res.statusCode=503;res.end(JSON.stringify({ready:false,paidExecution:false}));}return;}
   if(url.pathname.startsWith('/preview/')){res.writeHead(403);res.end('Separate preview origin required');return;}

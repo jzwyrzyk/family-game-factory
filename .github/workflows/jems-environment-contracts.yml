@@ -2,9 +2,9 @@ name: Jems environment contracts
 on:
   push:
     branches: [main]
-    paths: ['scripts/environments/**', 'tests/test_environment_*.py', 'tests/environments/**', 'infra/nonproduction/**', 'ops/environments.json', '.github/workflows/jems-*', 'package.json']
+    paths: ['scripts/environments/**', '.github/actions/integrated-test/**', 'tests/test_environment_*.py', 'tests/environments/**', 'infra/nonproduction/**', 'ops/environments.json', '.github/workflows/jems-*', 'package.json']
   pull_request:
-    paths: ['scripts/environments/**', 'tests/test_environment_*.py', 'tests/environments/**', 'infra/nonproduction/**', 'ops/environments.json', '.github/workflows/jems-*', 'package.json']
+    paths: ['scripts/environments/**', '.github/actions/integrated-test/**', 'tests/test_environment_*.py', 'tests/environments/**', 'infra/nonproduction/**', 'ops/environments.json', '.github/workflows/jems-*', 'package.json']
 permissions:
   contents: read
 concurrency:
@@ -25,5 +25,7 @@ jobs:
       - run: python3 -m unittest discover -s tests -p 'test_environment_*.py'
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: node --test tests/environments/*.test.cjs
+      - name: Check TEST-only premium admission and ledger settlement
+        run: node --import tsx --test tests/environments/test-trial.test.ts
       - name: Existing complete regression partition remains intact
         run: python3 scripts/deployment/regressions.py --check
