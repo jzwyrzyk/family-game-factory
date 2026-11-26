@@ -86,6 +86,7 @@
     "docs/development/COSTS.md",
     "docs/decisions/2026-11-23-dev-test-prod.md",
     "docs/ui-review/README.md",
+    "docs/creative-universe/EVIDENCE.md",
     "docs/creative-universe/STANDARD.md",
     "docs/decisions/2026-11-26-connected-creative-universe.md",
     "docs/creation-studio/WORLD_ART.md",
@@ -154,10 +155,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:19:38.821Z",
-      "sourceDigest": "ff9c02d667b54ac95443882ff6269ecf8d27444f45635284e0f055eacb1974d2",
+      "reviewedAt": "2026-11-26T03:29:09.299Z",
+      "sourceDigest": "976c1133f85ed91e6bccb0d42052149360bd6f9e77b290961437d48d3dd6f20d",
       "reviewOutcome": "updated",
-      "reviewReason": "Converged both concurrent art standards on exact originals, explicit 2D game roles, world editions and permanent private artwork boundaries.",
+      "reviewReason": "Reviewed the decision for pinned originals, cross-activity roles and explicit updates in the local hunt.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -318,10 +319,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:19:38.980Z",
-      "sourceDigest": "879a3ff172bd4e85db495b78e71238eeec47198589ed524ec6caa7e1d090ac0e",
+      "reviewedAt": "2026-11-26T03:29:09.437Z",
+      "sourceDigest": "8021c4c00a7942a59eaf04d686463f7f06c6ec3a9a13d6ba452cd94785a15538",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the compatible drawing and scene changes with family reviewed uploads, active-profile checks and retained game entrances.",
+      "reviewReason": "Reviewed the private picker, activity return, optional create/upload route and phone journeys against the child interface.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -424,10 +425,10 @@
         "tests/creative-worlds*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "d122a456a3e7cc1cfdcf951c51bbf1113eebdb7d6df92a9daf9b20a755f44dca",
-      "reviewedAt": "2026-11-26T03:19:39.415Z",
+      "sourceDigest": "c4d9ff8d7bd3381e2e94f1cce021b088a8dd04d8c8f42be8282cefea9422eb01",
+      "reviewedAt": "2026-11-26T03:29:09.911Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed layered catalogue IDs and immutable named motion alongside the reduced-motion learner fix and isolated slot experiment.",
+      "reviewReason": "Verified authoritative scene references for backgrounds and decorations, movement groups, undo and explicit local game bindings.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -749,10 +750,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:11:28.263Z",
-      "sourceDigest": "2f438d9162a56e683be1166296809e9b6336fa2cb68e68a5fb80bc5014c22144",
+      "reviewedAt": "2026-11-26T03:29:10.033Z",
+      "sourceDigest": "60e33d281456a15b59265952b92a080f90c94d37a65af3cec918fb8187d1c675",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented exact slot, digest and profile checks in an offline compositor receiving only captured v2 frame commands. Production preview, worker and paid operations remain outside the experiment.",
+      "reviewReason": "Documented the host-owned local game and scoped synthetic worker experiment. General executable private-art delivery remains gated.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -907,10 +908,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:26:10.642Z",
-      "sourceDigest": "72ed819537605ed580b3b4c7c83e2e6a7ee54e174072500f7ab223f5b5e20bad",
+      "reviewedAt": "2026-11-26T03:29:10.168Z",
+      "sourceDigest": "809ba150466fa77ed5c3bc743ca8c0e9f405bfcb0e54f3d5e98f86d837d584c4",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified the combined drawing, movement and selected-slot suites. The exact manifest has 67 creative and 44 browser commands, with all prior required tests retained.",
+      "reviewReason": "Verified the expanded CI contract, offline review fixture, exact originals and four-category fresh-profile recovery tests.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1151,10 +1152,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:19:39.720Z",
-      "sourceDigest": "f09c3c5942a4451ad6855d65ebb0faee1d49592053532089444ceced98594253",
+      "reviewedAt": "2026-11-26T03:29:10.302Z",
+      "sourceDigest": "ed88bea86a916634c99eb6af40f6b1c63ee3c39c2c57b111302aa3562da2a2fd",
       "reviewOutcome": "updated",
-      "reviewReason": "Combined existing CI registrations and reviewed separate development and deployment gates for all contributing branches.",
+      "reviewReason": "Recorded contributor review heads, current application boundaries and separate hosted, physical device and release gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1409,10 +1410,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:19:39.872Z",
-      "sourceDigest": "c5073a8ae7f6bf43501e0346eb88845923859037348e2b1ae0437341f441d5ae",
+      "reviewedAt": "2026-11-26T03:29:10.437Z",
+      "sourceDigest": "b381847eff1e3cc18395ebd5112a2310c7374d824d20772ecb5331f65d5d7fef",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled linked documentation paths and both concurrent sets of registry routes, including the illustrated art manifest.",
+      "reviewReason": "Linked the candidate destination matrix, synthetic acceptance journeys, screenshots and standalone review from the registry and index.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1640,10 +1641,10 @@
         "tests/creative-universe-recovery.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "180a66e42bea5c5f7982bd316476525280fbdb0897b7867dff392942737ac4a6",
-      "reviewedAt": "2026-11-26T03:19:40.028Z",
+      "sourceDigest": "69d65472a62fb52db244b268f07d4083e6a6b0468a7660665a8fc0c7fc685c3a",
+      "reviewedAt": "2026-11-26T03:29:10.712Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed lossless embedded source, original-byte ingestion and the private asset catalogue contract across the converged branches.",
+      "reviewReason": "Reviewed semantic-family editing, original and visible-only downloads, scoped picker origins, archive behavior and compatible aliases.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1685,10 +1686,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "ada2accbff6a1c4c26061297e83a2ab48bdb799664d38749f63d7cf76e56d403",
-      "reviewedAt": "2026-11-26T01:23:10.842Z",
+      "sourceDigest": "bf59f67d0bc9d309c2456125b0b0a00bc169daffdc7a2f20426cb55d54690b0c",
+      "reviewedAt": "2026-11-26T03:29:10.872Z",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The reload regression verifies the retained owner, active Navi and timestamp before and after the visible maker welcome. Starter rules, menu behavior and approved artwork are unchanged.",
+      "reviewReason": "The picker uses existing owned Pal and form authorities. The scene background change leaves earning and growth rules intact.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1723,10 +1724,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "3b669cf847b1ba4c4642c8130894505a04e7b12f3707b8ffd273b74370ed92df",
-      "reviewedAt": "2026-11-26T03:08:54.218Z",
+      "sourceDigest": "e2f7e7c2830f94b76a5963508c71d708c6f586a91cdaba03091ac81cb42ee794",
+      "reviewedAt": "2026-11-26T03:29:11.448Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Architecture records reads of the active owner’s kept scene revision in both original and indexed scene storage. Copying motion writes a new group of block IDs through existing autosave, keep and backup."
+      "reviewReason": "Reviewed exact revision pinning, archive protection, selected dependency closure and complete fresh-profile restoration for all four example types."
     }
   ]
 }
