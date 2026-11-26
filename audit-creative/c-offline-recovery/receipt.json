@@ -1,0 +1,605 @@
+{
+  "exceptions": [],
+  "network": [],
+  "transport": "one local document, then browser network offline",
+  "browserVersion": "156.0.8078.79",
+  "archive": {
+    "schema": "jems.complete-backup.v1",
+    "id": "56dede37-52f0-4352-9b79-3825082daa2d",
+    "scope": {
+      "origin": "https://jems-offline-review.invalid",
+      "audience": "family",
+      "owners": [
+        "player1",
+        "player2"
+      ]
+    },
+    "createdAt": "2026-11-26T07:36:58.682Z",
+    "label": "Saved recovery point",
+    "parts": [
+      {
+        "name": "art-0",
+        "size": 166949,
+        "sha256": "3017db184b3e99977273bfde5c1e1fb2b3517783e12dd5e3973494d4a5aa9e66",
+        "chunks": [
+          "c35df7d5791dfa47780bd4bd2330690ef07ee2b77733bd47c9992c1628f090c5",
+          "556e0df811df1bf4a647e9836a464b65d555998b93414d42e356084bebe81480"
+        ]
+      },
+      {
+        "name": "art-1",
+        "size": 143,
+        "sha256": "89e622a8ca45405b2534e71c129d29320ea46c3abadb60684592d6e15973ec25",
+        "chunks": [
+          "89e622a8ca45405b2534e71c129d29320ea46c3abadb60684592d6e15973ec25"
+        ]
+      },
+      {
+        "name": "prepared-domains",
+        "size": 4,
+        "sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+        "chunks": [
+          "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b"
+        ]
+      },
+      {
+        "name": "progress",
+        "size": 78405,
+        "sha256": "ed89788cab2df5e834d34b1d801ca24afc09c36b4ac870d2e79abff95214f3ee",
+        "chunks": [
+          "ed89788cab2df5e834d34b1d801ca24afc09c36b4ac870d2e79abff95214f3ee"
+        ]
+      }
+    ],
+    "checksum": "e0e0cde4a81b1ead42433eb7c1804f32f6875ab7bca9be2dab95fdc9527d01cd"
+  },
+  "source": {
+    "images": [
+      {
+        "id": "8c6b8e77-532e-44b2-b490-3ec6b17a1eff",
+        "name": "My Rock",
+        "parent": null,
+        "declared": "fa6a402172ecd488519700855611bf3fed32a883d3a3482b8d08f4538a044369",
+        "actual": "fa6a402172ecd488519700855611bf3fed32a883d3a3482b8d08f4538a044369",
+        "editable": true
+      },
+      {
+        "id": "b0c0d53f-96d3-45a0-81a0-e40a31000db7",
+        "name": "My Dragon",
+        "parent": null,
+        "declared": "17e6556c9df73b66e0245bae12edcd2a3142a01321174ed037d51a6a75dd354c",
+        "actual": "17e6556c9df73b66e0245bae12edcd2a3142a01321174ed037d51a6a75dd354c",
+        "editable": true
+      },
+      {
+        "id": "ca98ee1e-c2dd-491c-86a2-651a2eb84e42",
+        "name": "My Rock with a gem",
+        "parent": "8c6b8e77-532e-44b2-b490-3ec6b17a1eff",
+        "declared": "79e2d1701fdc59cf8ad89c15ae577c3cb4ce1d8174ca118bbaaf9ffdf2e0c8e5",
+        "actual": "79e2d1701fdc59cf8ad89c15ae577c3cb4ce1d8174ca118bbaaf9ffdf2e0c8e5",
+        "editable": true
+      }
+    ],
+    "rigs": [
+      {
+        "id": "a0fec396-7db6-42c5-a941-36375f174b15",
+        "source": "b0c0d53f-96d3-45a0-81a0-e40a31000db7",
+        "sourceHash": "17e6556c9df73b66e0245bae12edcd2a3142a01321174ed037d51a6a75dd354c",
+        "pieces": 2
+      },
+      {
+        "id": "cadc829b-bd57-479e-8e31-fc57e4ec77f5",
+        "source": "b0c0d53f-96d3-45a0-81a0-e40a31000db7",
+        "sourceHash": "17e6556c9df73b66e0245bae12edcd2a3142a01321174ed037d51a6a75dd354c",
+        "pieces": 1,
+        "move": "float"
+      }
+    ],
+    "scenes": [
+      {
+        "id": "b85327b7-7a72-4d8c-83b0-acd942de5262",
+        "project": "f6803fb7-9cb4-467b-b124-65f4b3c105aa",
+        "scene": {
+          "schema": "jems.creation.v1",
+          "id": "f6803fb7-9cb4-467b-b124-65f4b3c105aa",
+          "title": "My World · Rock and Dragon",
+          "width": 800,
+          "height": 450,
+          "world": {
+            "assetId": "world-forest-v1",
+            "framing": "fill"
+          },
+          "background": "world-forest-v1",
+          "actors": [
+            {
+              "id": "gem",
+              "name": "Tree",
+              "assetId": "world-prop-tree-v1",
+              "x": 400,
+              "y": 225,
+              "size": 90
+            },
+            {
+              "id": "my-rock",
+              "assetId": "art:image:8c6b8e77-532e-44b2-b490-3ec6b17a1eff:fa6a402172ecd488519700855611bf3fed32a883d3a3482b8d08f4538a044369",
+              "name": "My Rock",
+              "role": "scenery",
+              "x": 205,
+              "y": 333,
+              "size": 148,
+              "angle": 12,
+              "layer": "back"
+            },
+            {
+              "id": "my-dragon",
+              "name": "My Dragon",
+              "assetId": "art:rig:cadc829b-bd57-479e-8e31-fc57e4ec77f5:c7802b1c7892f8df2903a11fa840b6d1ba4b668bd850a87203b2b5a98fdedd1d",
+              "x": 400,
+              "y": 252.00000000000003,
+              "size": 180
+            }
+          ],
+          "programs": [
+            {
+              "id": "70924199-d24b-43be-8670-479c4e27fc5a",
+              "actorId": "gem",
+              "trigger": {
+                "type": "start"
+              },
+              "actions": []
+            },
+            {
+              "id": "6eab7d96-ea30-4e9c-b586-1c5e32719a34",
+              "actorId": "my-dragon",
+              "trigger": {
+                "type": "start"
+              },
+              "actions": [
+                {
+                  "id": "7abbfcb2-d71b-411a-a1d6-a63487479563",
+                  "type": "animation",
+                  "motion": {
+                    "move": "float",
+                    "sprite": "original",
+                    "durationMs": 1200,
+                    "world": "world-forest-v1"
+                  },
+                  "origin": "starter"
+                }
+              ]
+            }
+          ],
+          "variables": {},
+          "provenance": {
+            "createdBy": "starter"
+          }
+        }
+      },
+      {
+        "id": "658f284d-ec9f-42ce-84b1-cb2c025f2b85",
+        "project": "78ffb30a-f71c-45a7-8d1b-e958ea6c3b1b",
+        "scene": {
+          "schema": "jems.creation.v1",
+          "id": "78ffb30a-f71c-45a7-8d1b-e958ea6c3b1b",
+          "title": "Find My Rock",
+          "width": 800,
+          "height": 450,
+          "world": {
+            "assetId": "world-terrace-1b1460063ff8",
+            "framing": "fill"
+          },
+          "background": "meadow",
+          "actors": [
+            {
+              "id": "1f2eb7b9-5c86-46df-8668-f208c6997529",
+              "name": "My Rock",
+              "assetId": "art:image:8c6b8e77-532e-44b2-b490-3ec6b17a1eff:fa6a402172ecd488519700855611bf3fed32a883d3a3482b8d08f4538a044369",
+              "x": 195,
+              "y": 175,
+              "size": 106,
+              "role": "collectible"
+            }
+          ],
+          "programs": [
+            {
+              "id": "dd0a5974-6db4-4697-9bc1-9b4b4f7f2089",
+              "actorId": "1f2eb7b9-5c86-46df-8668-f208c6997529",
+              "trigger": {
+                "type": "start"
+              },
+              "actions": [
+                {
+                  "id": "961dfbed-3692-4064-9c4e-b0d90782565b",
+                  "origin": "starter",
+                  "type": "say",
+                  "text": "Find me three times!",
+                  "durationMs": 2200
+                }
+              ]
+            },
+            {
+              "id": "e6efb3a4-5ca1-4074-986e-6f28af31d137",
+              "actorId": "1f2eb7b9-5c86-46df-8668-f208c6997529",
+              "trigger": {
+                "type": "tap"
+              },
+              "actions": [
+                {
+                  "id": "8620101d-309b-445e-9b3e-9aef581b023a",
+                  "origin": "starter",
+                  "type": "if",
+                  "condition": {
+                    "type": "variable",
+                    "variable": "found",
+                    "operator": "lt",
+                    "value": 3
+                  },
+                  "then": [
+                    {
+                      "id": "48484626-45ef-47c3-9a11-c585a7ac3074",
+                      "origin": "starter",
+                      "type": "change",
+                      "variable": "found",
+                      "amount": 1
+                    },
+                    {
+                      "id": "eeb3dab5-db06-4798-b021-e3ba99253c5f",
+                      "origin": "starter",
+                      "type": "if",
+                      "condition": {
+                        "type": "variable",
+                        "variable": "found",
+                        "operator": "eq",
+                        "value": 1
+                      },
+                      "then": [
+                        {
+                          "id": "015f6218-3df4-4d06-8b1b-1787ba7e3ba8",
+                          "origin": "starter",
+                          "type": "move",
+                          "x": 595,
+                          "y": 300,
+                          "durationMs": 0
+                        },
+                        {
+                          "id": "43c3f41a-68b2-4768-8375-0594c09987bb",
+                          "origin": "starter",
+                          "type": "say",
+                          "text": "Found me! Two to go.",
+                          "durationMs": 2200
+                        }
+                      ],
+                      "else": [
+                        {
+                          "id": "2e6a6281-3f2c-4d19-bd96-534b489572c8",
+                          "origin": "starter",
+                          "type": "if",
+                          "condition": {
+                            "type": "variable",
+                            "variable": "found",
+                            "operator": "eq",
+                            "value": 2
+                          },
+                          "then": [
+                            {
+                              "id": "d95888c3-4d9d-49eb-aaf0-d9cf2d41dfae",
+                              "origin": "starter",
+                              "type": "move",
+                              "x": 340,
+                              "y": 245,
+                              "durationMs": 0
+                            },
+                            {
+                              "id": "1ab5bd50-3f95-4369-bf5e-90f2795c864a",
+                              "origin": "starter",
+                              "type": "say",
+                              "text": "One more!",
+                              "durationMs": 2200
+                            }
+                          ],
+                          "else": [
+                            {
+                              "id": "a0b3a9d2-2486-44e2-998b-1ff528ad00f0",
+                              "origin": "starter",
+                              "type": "say",
+                              "text": "You found all three!",
+                              "durationMs": 2200
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": {
+            "found": 0
+          },
+          "provenance": {
+            "createdBy": "child",
+            "sourceKind": "art",
+            "sourceProjectId": "8c6b8e77-532e-44b2-b490-3ec6b17a1eff",
+            "sourceRevisionId": "fa6a402172ecd488519700855611bf3fed32a883d3a3482b8d08f4538a044369"
+          }
+        }
+      }
+    ]
+  },
+  "damaged": "This recovery point is damaged, belongs to another family or uses an unsupported version.",
+  "freshTarget": {
+    "images": [
+      {
+        "id": "8c6b8e77-532e-44b2-b490-3ec6b17a1eff",
+        "name": "My Rock",
+        "parent": null,
+        "declared": "fa6a402172ecd488519700855611bf3fed32a883d3a3482b8d08f4538a044369",
+        "actual": "fa6a402172ecd488519700855611bf3fed32a883d3a3482b8d08f4538a044369",
+        "editable": true
+      },
+      {
+        "id": "b0c0d53f-96d3-45a0-81a0-e40a31000db7",
+        "name": "My Dragon",
+        "parent": null,
+        "declared": "17e6556c9df73b66e0245bae12edcd2a3142a01321174ed037d51a6a75dd354c",
+        "actual": "17e6556c9df73b66e0245bae12edcd2a3142a01321174ed037d51a6a75dd354c",
+        "editable": true
+      },
+      {
+        "id": "ca98ee1e-c2dd-491c-86a2-651a2eb84e42",
+        "name": "My Rock with a gem",
+        "parent": "8c6b8e77-532e-44b2-b490-3ec6b17a1eff",
+        "declared": "79e2d1701fdc59cf8ad89c15ae577c3cb4ce1d8174ca118bbaaf9ffdf2e0c8e5",
+        "actual": "79e2d1701fdc59cf8ad89c15ae577c3cb4ce1d8174ca118bbaaf9ffdf2e0c8e5",
+        "editable": true
+      }
+    ],
+    "rigs": [
+      {
+        "id": "a0fec396-7db6-42c5-a941-36375f174b15",
+        "source": "b0c0d53f-96d3-45a0-81a0-e40a31000db7",
+        "sourceHash": "17e6556c9df73b66e0245bae12edcd2a3142a01321174ed037d51a6a75dd354c",
+        "pieces": 2
+      },
+      {
+        "id": "cadc829b-bd57-479e-8e31-fc57e4ec77f5",
+        "source": "b0c0d53f-96d3-45a0-81a0-e40a31000db7",
+        "sourceHash": "17e6556c9df73b66e0245bae12edcd2a3142a01321174ed037d51a6a75dd354c",
+        "pieces": 1,
+        "move": "float"
+      }
+    ],
+    "scenes": [
+      {
+        "id": "b85327b7-7a72-4d8c-83b0-acd942de5262",
+        "project": "f6803fb7-9cb4-467b-b124-65f4b3c105aa",
+        "scene": {
+          "schema": "jems.creation.v1",
+          "id": "f6803fb7-9cb4-467b-b124-65f4b3c105aa",
+          "title": "My World · Rock and Dragon",
+          "width": 800,
+          "height": 450,
+          "world": {
+            "assetId": "world-forest-v1",
+            "framing": "fill"
+          },
+          "background": "world-forest-v1",
+          "actors": [
+            {
+              "id": "gem",
+              "name": "Tree",
+              "assetId": "world-prop-tree-v1",
+              "x": 400,
+              "y": 225,
+              "size": 90
+            },
+            {
+              "id": "my-rock",
+              "assetId": "art:image:8c6b8e77-532e-44b2-b490-3ec6b17a1eff:fa6a402172ecd488519700855611bf3fed32a883d3a3482b8d08f4538a044369",
+              "name": "My Rock",
+              "role": "scenery",
+              "x": 205,
+              "y": 333,
+              "size": 148,
+              "angle": 12,
+              "layer": "back"
+            },
+            {
+              "id": "my-dragon",
+              "name": "My Dragon",
+              "assetId": "art:rig:cadc829b-bd57-479e-8e31-fc57e4ec77f5:c7802b1c7892f8df2903a11fa840b6d1ba4b668bd850a87203b2b5a98fdedd1d",
+              "x": 400,
+              "y": 252.00000000000003,
+              "size": 180
+            }
+          ],
+          "programs": [
+            {
+              "id": "70924199-d24b-43be-8670-479c4e27fc5a",
+              "actorId": "gem",
+              "trigger": {
+                "type": "start"
+              },
+              "actions": []
+            },
+            {
+              "id": "6eab7d96-ea30-4e9c-b586-1c5e32719a34",
+              "actorId": "my-dragon",
+              "trigger": {
+                "type": "start"
+              },
+              "actions": [
+                {
+                  "id": "7abbfcb2-d71b-411a-a1d6-a63487479563",
+                  "type": "animation",
+                  "motion": {
+                    "move": "float",
+                    "sprite": "original",
+                    "durationMs": 1200,
+                    "world": "world-forest-v1"
+                  },
+                  "origin": "starter"
+                }
+              ]
+            }
+          ],
+          "variables": {},
+          "provenance": {
+            "createdBy": "starter"
+          }
+        }
+      },
+      {
+        "id": "658f284d-ec9f-42ce-84b1-cb2c025f2b85",
+        "project": "78ffb30a-f71c-45a7-8d1b-e958ea6c3b1b",
+        "scene": {
+          "schema": "jems.creation.v1",
+          "id": "78ffb30a-f71c-45a7-8d1b-e958ea6c3b1b",
+          "title": "Find My Rock",
+          "width": 800,
+          "height": 450,
+          "world": {
+            "assetId": "world-terrace-1b1460063ff8",
+            "framing": "fill"
+          },
+          "background": "meadow",
+          "actors": [
+            {
+              "id": "1f2eb7b9-5c86-46df-8668-f208c6997529",
+              "name": "My Rock",
+              "assetId": "art:image:8c6b8e77-532e-44b2-b490-3ec6b17a1eff:fa6a402172ecd488519700855611bf3fed32a883d3a3482b8d08f4538a044369",
+              "x": 195,
+              "y": 175,
+              "size": 106,
+              "role": "collectible"
+            }
+          ],
+          "programs": [
+            {
+              "id": "dd0a5974-6db4-4697-9bc1-9b4b4f7f2089",
+              "actorId": "1f2eb7b9-5c86-46df-8668-f208c6997529",
+              "trigger": {
+                "type": "start"
+              },
+              "actions": [
+                {
+                  "id": "961dfbed-3692-4064-9c4e-b0d90782565b",
+                  "origin": "starter",
+                  "type": "say",
+                  "text": "Find me three times!",
+                  "durationMs": 2200
+                }
+              ]
+            },
+            {
+              "id": "e6efb3a4-5ca1-4074-986e-6f28af31d137",
+              "actorId": "1f2eb7b9-5c86-46df-8668-f208c6997529",
+              "trigger": {
+                "type": "tap"
+              },
+              "actions": [
+                {
+                  "id": "8620101d-309b-445e-9b3e-9aef581b023a",
+                  "origin": "starter",
+                  "type": "if",
+                  "condition": {
+                    "type": "variable",
+                    "variable": "found",
+                    "operator": "lt",
+                    "value": 3
+                  },
+                  "then": [
+                    {
+                      "id": "48484626-45ef-47c3-9a11-c585a7ac3074",
+                      "origin": "starter",
+                      "type": "change",
+                      "variable": "found",
+                      "amount": 1
+                    },
+                    {
+                      "id": "eeb3dab5-db06-4798-b021-e3ba99253c5f",
+                      "origin": "starter",
+                      "type": "if",
+                      "condition": {
+                        "type": "variable",
+                        "variable": "found",
+                        "operator": "eq",
+                        "value": 1
+                      },
+                      "then": [
+                        {
+                          "id": "015f6218-3df4-4d06-8b1b-1787ba7e3ba8",
+                          "origin": "starter",
+                          "type": "move",
+                          "x": 595,
+                          "y": 300,
+                          "durationMs": 0
+                        },
+                        {
+                          "id": "43c3f41a-68b2-4768-8375-0594c09987bb",
+                          "origin": "starter",
+                          "type": "say",
+                          "text": "Found me! Two to go.",
+                          "durationMs": 2200
+                        }
+                      ],
+                      "else": [
+                        {
+                          "id": "2e6a6281-3f2c-4d19-bd96-534b489572c8",
+                          "origin": "starter",
+                          "type": "if",
+                          "condition": {
+                            "type": "variable",
+                            "variable": "found",
+                            "operator": "eq",
+                            "value": 2
+                          },
+                          "then": [
+                            {
+                              "id": "d95888c3-4d9d-49eb-aaf0-d9cf2d41dfae",
+                              "origin": "starter",
+                              "type": "move",
+                              "x": 340,
+                              "y": 245,
+                              "durationMs": 0
+                            },
+                            {
+                              "id": "1ab5bd50-3f95-4369-bf5e-90f2795c864a",
+                              "origin": "starter",
+                              "type": "say",
+                              "text": "One more!",
+                              "durationMs": 2200
+                            }
+                          ],
+                          "else": [
+                            {
+                              "id": "a0b3a9d2-2486-44e2-998b-1ff528ad00f0",
+                              "origin": "starter",
+                              "type": "say",
+                              "text": "You found all three!",
+                              "durationMs": 2200
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "variables": {
+            "found": 0
+          },
+          "provenance": {
+            "createdBy": "child",
+            "sourceKind": "art",
+            "sourceProjectId": "8c6b8e77-532e-44b2-b490-3ec6b17a1eff",
+            "sourceRevisionId": "fa6a402172ecd488519700855611bf3fed32a883d3a3482b8d08f4538a044369"
+          }
+        }
+      }
+    ]
+  }
+}

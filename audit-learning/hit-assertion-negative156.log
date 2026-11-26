@@ -1,0 +1,15 @@
+AssertionError [ERR_ASSERTION]: the return control stays under the held pointer
++ actual - expected
+
++ undefined
+- 'returnLive'
+
+    at pressReturnTarget (/workspace/jems-consolidation/audit-learning/return-hit-verification/tests/storage-native-ui.cjs:34:10)
+    at async /workspace/jems-consolidation/audit-learning/return-hit-verification/tests/storage-native-ui.cjs:57:4 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: 'returnLive',
+  operator: 'strictEqual',
+  diff: 'simple'
+}

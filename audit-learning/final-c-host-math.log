@@ -1,0 +1,30 @@
+PASS learning desktop: grades, mandatory modes/rate, durable Lab error/help/exit, profile isolation, native pause/resume, shared remix history, fraction construction
+PASS quality learning desktop: actual driving result, short-round checkpoint, host input lock, shared pacing, workshop checkpoint, focus return and manual pause
+PASS declarative preview desktop: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+Generated preview failure state {"name":"desktop","kind":"generated","errors":[],"preview":{"status":"Ready to play!","state":"idle","score":"Score: 0","canvas":{},"hidden":false},"host":{"active":false,"ready":true,"rounds":[],"messages":[{"type":"factory-preview","channel":"math-generated-channel","artifactId":"math-generated-artifact","event":"ready","roundId":0,"learningProtocol":1,"height":0},{"type":"factory-preview","channel":"math-generated-channel","artifactId":"math-generated-artifact","event":"ready","roundId":0,"learningProtocol":1,"height":635},{"type":"factory-preview","channel":"incorrect-channel","artifactId":"math-generated-artifact","event":"round-complete","roundId":1,"won":true,"score":2},{"type":"factory-preview","channel":"math-generated-channel","artifactId":"incorrect-artifact","event":"round-complete","roundId":1,"won":true,"score":2},{"type":"factory-preview","channel":"math-generated-channel","artifactId":"math-generated-artifact","event":"round-complete","roundId":1,"won":true,"score":-1}]}}
+FAIL integration journey: generated preview desktop frame.waitForFunction: Timeout 5000ms exceeded.
+    at acknowledgeScore (/workspace/jems-consolidation/audit-learning/final-c/tests/learning-integration.ts:230:23)
+    at playRound (/workspace/jems-consolidation/audit-learning/final-c/tests/learning-integration.ts:256:15)
+    at async previewJourney (/workspace/jems-consolidation/audit-learning/final-c/tests/learning-integration.ts:262:5)
+    at async run (/workspace/jems-consolidation/audit-learning/final-c/tests/learning-integration.ts:421:11)
+    at async main (/workspace/jems-consolidation/audit-learning/final-c/tests/learning-integration.ts:427:77) {
+  name: 'TimeoutError'
+}
+PASS generated-v2 preview desktop: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+PASS learning mobile: grades, mandatory modes/rate, durable Lab error/help/exit, profile isolation, native pause/resume, shared remix history, fraction construction
+PASS quality learning mobile: actual driving result, short-round checkpoint, host input lock, shared pacing, workshop checkpoint, focus return and manual pause
+PASS declarative preview mobile: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+PASS generated preview mobile: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+PASS generated-v2 preview mobile: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+PASS archived v2 learning: immutable older archive remains blocked until a compatible new revision is reviewed
+PASS learning recovery: visible explanation, no replacement practice, unchanged future record and exact recovery export
+AggregateError: 1 of 12 learning integration journeys failed
+    at main (/workspace/jems-consolidation/audit-learning/final-c/tests/learning-integration.ts:431:30) {
+  [errors]: [
+    Error: generated preview desktop
+        at run (/workspace/jems-consolidation/audit-learning/final-c/tests/learning-integration.ts:422:92)
+        at async main (/workspace/jems-consolidation/audit-learning/final-c/tests/learning-integration.ts:427:77) {
+      [cause]: [TimeoutError]
+    }
+  ]
+}

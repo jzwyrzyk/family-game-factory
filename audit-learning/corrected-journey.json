@@ -1,0 +1,121 @@
+{
+  "sha": "dea2915f17fa9f40dc20ead85b7672c8573b5335",
+  "browser": "156.0.8078.79",
+  "artifactSha256": "d5aad59d31c3fa8db170718b2d7f2c1bedca3930c2568db7c6479c0c2f6390a1",
+  "gradeRoutes": [
+    {
+      "action": "learn:g4-add-fraction",
+      "grade": 4,
+      "enabled": [
+        4
+      ],
+      "skill": "g4-add-fraction"
+    },
+    {
+      "action": "learn:g1-make-ten",
+      "grade": 1,
+      "enabled": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "skill": "g1-make-ten"
+    },
+    {
+      "action": "learn:g1-make-ten",
+      "grade": 4,
+      "enabled": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "skill": "g1-make-ten"
+    },
+    {
+      "action": "learn:pk-touch",
+      "grade": -1,
+      "enabled": [
+        -1,
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "skill": "pk-touch"
+    },
+    {
+      "action": "learn:pk-touch",
+      "grade": 0,
+      "enabled": [
+        -1,
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "skill": "pk-touch"
+    },
+    {
+      "action": "learn:pk-touch",
+      "grade": 0,
+      "enabled": [
+        -1,
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "skill": "pk-touch"
+    },
+    {
+      "action": "learn:g3-groups",
+      "grade": 3,
+      "enabled": [
+        3,
+        4
+      ],
+      "skill": "g3-groups"
+    },
+    {
+      "action": "learn:g3-groups",
+      "grade": 3,
+      "enabled": [
+        3,
+        4
+      ],
+      "skill": "g3-groups"
+    }
+  ],
+  "responses": [
+    {
+      "path": "blocks",
+      "product": 12,
+      "arrayState": "6 rows, 7 columns",
+      "count": 1,
+      "responses": 1,
+      "normalized": "12/1",
+      "outcome": "completed",
+      "independent": true,
+      "representation": "visual"
+    },
+    {
+      "path": "written",
+      "product": 12,
+      "arrayState": "6 rows, 7 columns",
+      "count": 1,
+      "responses": 1,
+      "normalized": "12/1",
+      "outcome": "completed",
+      "independent": true,
+      "representation": "visual"
+    }
+  ],
+  "errors": [],
+  "requests": [],
+  "passed": true
+}

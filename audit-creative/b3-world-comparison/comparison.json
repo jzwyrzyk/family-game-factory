@@ -1,0 +1,292 @@
+{
+  "source": "aea3cead13d164b7ce93fbded5fee6ecd9896eca",
+  "candidate": "3d301245b716c2317a27d402c42d092c25765738",
+  "originals": "same named synthetic Chromium test capture, JPEG quality 86; no resizing when comparing pixels",
+  "items": [
+    {
+      "file": "after-desktop.jpg",
+      "source_dims": [
+        1440,
+        960
+      ],
+      "candidate_dims": [
+        1440,
+        960
+      ],
+      "source_sha256": "00c0f9dc76a15a46a40f692128c29c5f71b67282cc78c88fd408991c4463b4fc",
+      "candidate_sha256": "8260e1766ecfd6205c6dcc5b813bb6c7c711bc7e0aeee5470f1a8cceea4850aa",
+      "pixel_fraction_identical": 0.8251085069444445,
+      "pixel_fraction_within_2": 0.8352980324074074,
+      "mean_absolute_channel_change": 28.996705488040124
+    },
+    {
+      "file": "after-phone.jpg",
+      "source_dims": [
+        390,
+        844
+      ],
+      "candidate_dims": [
+        390,
+        844
+      ],
+      "source_sha256": "cf3cac1c1d98a558c246567b43386d9f606d8abc2aba6d9412d4abe6dc715feb",
+      "candidate_sha256": "6316684de9d2f252e85199e11f8f48cf64906b50ba9a4b597a1d59656feb9273",
+      "pixel_fraction_identical": 0.6316168428727671,
+      "pixel_fraction_within_2": 0.6605085672621218,
+      "mean_absolute_channel_change": 59.48957649775186
+    },
+    {
+      "file": "after-tablet.jpg",
+      "source_dims": [
+        820,
+        1180
+      ],
+      "candidate_dims": [
+        820,
+        1180
+      ],
+      "source_sha256": "3638d15feb35bbb904c79c3b66fff5dde5d1007eba40c1e493b3f6899a6fa79d",
+      "candidate_sha256": "bd1f7df60615c2a15085043422b085de737fcf611cdba0cd23f41e7502d8f467",
+      "pixel_fraction_identical": 0.8947219925589086,
+      "pixel_fraction_within_2": 0.9046000413393964,
+      "mean_absolute_channel_change": 15.074520807496208
+    },
+    {
+      "file": "cloud-nook-and-child-style-pebble.jpg",
+      "source_dims": [
+        698,
+        393
+      ],
+      "candidate_dims": [
+        698,
+        393
+      ],
+      "source_sha256": "ff6fa3bf23455df39d8d34e2d321a1fab46d02608aba71c073f87ae1d75a7d3d",
+      "candidate_sha256": "1b6b4b4519eb6e38aba96927ff861e864f2c2c166f8175b5e7c74adeb3e89bd0",
+      "pixel_fraction_identical": 0.9970508249670086,
+      "pixel_fraction_within_2": 0.9979293801993336,
+      "mean_absolute_channel_change": 0.09529104116693521
+    },
+    {
+      "file": "forest-cross-world-play.jpg",
+      "source_dims": [
+        698,
+        393
+      ],
+      "candidate_dims": [
+        698,
+        393
+      ],
+      "source_sha256": "424dc840e01c747bf6d5cf1fd9c925d25cabb9a59f11fe20946316f00249e4bb",
+      "candidate_sha256": "16c80f1de6b6dc3fdd5f22b7dc1988e0df167e20451d386e76311c85ff8abfe0",
+      "pixel_fraction_identical": 0.9965076518150733,
+      "pixel_fraction_within_2": 0.9973388161012562,
+      "mean_absolute_channel_change": 0.0979218462540495
+    },
+    {
+      "file": "forest-expanded.jpg",
+      "source_dims": [
+        1440,
+        960
+      ],
+      "candidate_dims": [
+        1440,
+        960
+      ],
+      "source_sha256": "0702cc9c08f583eef8283e860a465d7b8486942b352f66594279bea408533ea8",
+      "candidate_sha256": "2fcd75b5409e049f9f5a97a0d64396270ec32271d4433789a6db31c14860b3cf",
+      "pixel_fraction_identical": 0.933697193287037,
+      "pixel_fraction_within_2": 0.9459331597222222,
+      "mean_absolute_channel_change": 8.974867380401234
+    },
+    {
+      "file": "kept-world-preview.jpg",
+      "source_dims": [
+        382,
+        120
+      ],
+      "candidate_dims": [
+        382,
+        120
+      ],
+      "source_sha256": "d63317f505c9bf0690aa9bcf112d7db02ea224aea89ae2fd9e935b34cde8d2b9",
+      "candidate_sha256": "baa5aad7b920026c49f1c1b0779459069f654a5d4eb4e8c3de8c1c3c6d1e3c7d",
+      "pixel_fraction_identical": 0.9987783595113437,
+      "pixel_fraction_within_2": 1.0,
+      "mean_absolute_channel_change": 0.0013089005235602093
+    },
+    {
+      "file": "placement-phone.jpg",
+      "source_dims": [
+        390,
+        844
+      ],
+      "candidate_dims": [
+        390,
+        844
+      ],
+      "source_sha256": "c67968d3e6a4787b9c12d7fea12de7d494916349820cc0f1ab86b14d765dff26",
+      "candidate_sha256": "67147412a4701c07939725de7f5daede9a85095d39dbfde6a8778d550d387cd3",
+      "pixel_fraction_identical": 0.5617602381820391,
+      "pixel_fraction_within_2": 0.6999058208773848,
+      "mean_absolute_channel_change": 14.90551707376352
+    },
+    {
+      "file": "placement-tablet.jpg",
+      "source_dims": [
+        820,
+        1180
+      ],
+      "candidate_dims": [
+        820,
+        1180
+      ],
+      "source_sha256": "f7aa5752132edb95a9fe7e5121bace8d062b284f6b26610391295de0d5da550c",
+      "candidate_sha256": "676baed5a6af6617332d336972cb88c63a700086ad8c96153c92bba0d32dc444",
+      "pixel_fraction_identical": 0.6689158743282348,
+      "pixel_fraction_within_2": 0.7439024390243902,
+      "mean_absolute_channel_change": 17.5171127876533
+    },
+    {
+      "file": "stage-cloud-desktop.jpg",
+      "source_dims": [
+        698,
+        393
+      ],
+      "candidate_dims": [
+        698,
+        393
+      ],
+      "source_sha256": "ca2c4d4ee79b846f5114a59e6e112edae8a914d79667437d8c38bea2403f8e22",
+      "candidate_sha256": "008597cf2ff8bd09f32e0971985190627dd6e94d2c5c07ef40c946ea325b1651",
+      "pixel_fraction_identical": 0.9970544704244042,
+      "pixel_fraction_within_2": 0.997925734741938,
+      "mean_absolute_channel_change": 0.09526430781270127
+    },
+    {
+      "file": "stage-forest-desktop.jpg",
+      "source_dims": [
+        698,
+        393
+      ],
+      "candidate_dims": [
+        698,
+        393
+      ],
+      "source_sha256": "6d3ed413f9094ef06e53d6d1d02b8b2bfe6dcce8e7f2c73bbd17836f2243def6",
+      "candidate_sha256": "d5d7d861adbaba0954af922c922831e1fc7f1c8effce121b3656012b8d2bca11",
+      "pixel_fraction_identical": 0.9965076518150733,
+      "pixel_fraction_within_2": 0.9973388161012562,
+      "mean_absolute_channel_change": 0.0979218462540495
+    },
+    {
+      "file": "stage-moon-desktop.jpg",
+      "source_dims": [
+        698,
+        393
+      ],
+      "candidate_dims": [
+        698,
+        393
+      ],
+      "source_sha256": "ef8c69e9a10117d8529aaa2fd9bd036506fb573231b48112a5a915f21b347a66",
+      "candidate_sha256": "7468340d93e4fd54d3bc1d245190293c3af76ed4b96c66980b77feb89451eef4",
+      "pixel_fraction_identical": 0.9963399607748784,
+      "pixel_fraction_within_2": 0.9977726255313254,
+      "mean_absolute_channel_change": 0.09641262689229618
+    },
+    {
+      "file": "stage-moon-phone.jpg",
+      "source_dims": [
+        370,
+        209
+      ],
+      "candidate_dims": [
+        370,
+        209
+      ],
+      "source_sha256": "363e7fc9a6f5bfe490783e5f43ca84c004751b9a30f94b1b168d8fe736db1136",
+      "candidate_sha256": "5f07bd1aec243efd86f6f6d243262c9c750c7b55eb3a7147328973ac84486661",
+      "pixel_fraction_identical": 0.9186861502650976,
+      "pixel_fraction_within_2": 0.9473813526445105,
+      "mean_absolute_channel_change": 1.3488340014655804
+    },
+    {
+      "file": "stage-workshop-desktop.jpg",
+      "source_dims": [
+        698,
+        393
+      ],
+      "candidate_dims": [
+        698,
+        393
+      ],
+      "source_sha256": "bfd229149482b3994b44d59d30c6a53066b2a81b3bf88aa74aea4de56877cd82",
+      "candidate_sha256": "ca9eca5cc2958f8ef4dbd88a4f1d1083d01672c12de30e99b1087a978e5edf3b",
+      "pixel_fraction_identical": 0.9965295245594464,
+      "pixel_fraction_within_2": 0.9976085799485261,
+      "mean_absolute_channel_change": 0.09673099683817328
+    },
+    {
+      "file": "stage-workshop-tablet.jpg",
+      "source_dims": [
+        448,
+        253
+      ],
+      "candidate_dims": [
+        448,
+        253
+      ],
+      "source_sha256": "db3938498c81ab2d1bd304ba3da53bf7c1e83d5807c3e568c89f14dff2985906",
+      "candidate_sha256": "bca0edf2bb91396fba5b3ce36eb62dabe00206d27172b6824eb470d24fec9ea3",
+      "pixel_fraction_identical": 0.991018492377188,
+      "pixel_fraction_within_2": 0.9926948051948052,
+      "mean_absolute_channel_change": 0.2372776679841897
+    },
+    {
+      "file": "world-picker-desktop.jpg",
+      "source_dims": [
+        1174,
+        211
+      ],
+      "candidate_dims": [
+        1174,
+        211
+      ],
+      "source_sha256": "ae3e80bc59237c43599b45cbd07201dcbd4dd1e048c29caf9fcba3cc9efc61d7",
+      "candidate_sha256": "aae8205f683697613f22412e80addebff004c3514a8b1d10d972098127860515",
+      "pixel_fraction_identical": 0.8732247672719345,
+      "pixel_fraction_within_2": 0.9552064073891665,
+      "mean_absolute_channel_change": 0.1748817857152469
+    },
+    {
+      "file": "world-picker-phone.jpg",
+      "source_dims": [
+        366,
+        317
+      ],
+      "candidate_dims": [
+        366,
+        350
+      ],
+      "source_sha256": "9a294584efc51a875e8c8729231a0a6e6554284d18761ea35077de35b48c0ddb",
+      "candidate_sha256": "036cc5f645d43e02ef3b933971dae8082e0db2c9a3886c643c9d0a692c5ecdf9"
+    },
+    {
+      "file": "world-picker-tablet.jpg",
+      "source_dims": [
+        784,
+        428
+      ],
+      "candidate_dims": [
+        784,
+        428
+      ],
+      "source_sha256": "f18c7b9d0a83670e643c34a0fde2fb898c2dbfced5b45338d0ef55047571193d",
+      "candidate_sha256": "517595e44b471fd658f400d2356dbe9e931e6cae341924ba2fa8351ec996ffee",
+      "pixel_fraction_identical": 0.5357679286667938,
+      "pixel_fraction_within_2": 0.8467182433721152,
+      "mean_absolute_channel_change": 0.8852060684086718
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "name": "desktop",
+  "kind": "generated",
+  "errors": [],
+  "preview": {
+    "status": "Ready to play!",
+    "state": "idle",
+    "score": "Score: 0",
+    "canvas": {},
+    "hidden": false
+  },
+  "host": {
+    "active": false,
+    "ready": true,
+    "rounds": [],
+    "messages": [
+      {
+        "type": "factory-preview",
+        "channel": "math-generated-channel",
+        "artifactId": "math-generated-artifact",
+        "event": "ready",
+        "roundId": 0,
+        "learningProtocol": 1,
+        "height": 0
+      },
+      {
+        "type": "factory-preview",
+        "channel": "math-generated-channel",
+        "artifactId": "math-generated-artifact",
+        "event": "ready",
+        "roundId": 0,
+        "learningProtocol": 1,
+        "height": 635
+      },
+      {
+        "type": "factory-preview",
+        "channel": "incorrect-channel",
+        "artifactId": "math-generated-artifact",
+        "event": "round-complete",
+        "roundId": 1,
+        "won": true,
+        "score": 2
+      },
+      {
+        "type": "factory-preview",
+        "channel": "math-generated-channel",
+        "artifactId": "incorrect-artifact",
+        "event": "round-complete",
+        "roundId": 1,
+        "won": true,
+        "score": 2
+      },
+      {
+        "type": "factory-preview",
+        "channel": "math-generated-channel",
+        "artifactId": "math-generated-artifact",
+        "event": "round-complete",
+        "roundId": 1,
+        "won": true,
+        "score": -1
+      }
+    ]
+  }
+}

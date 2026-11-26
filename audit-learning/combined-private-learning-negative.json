@@ -1,0 +1,30 @@
+{
+  "source": "ba1904fcb4c009563998a987912d86f16b8f19a7",
+  "variant": "negative",
+  "scenarios": [],
+  "failures": [
+    {
+      "subject": "math",
+      "error": "PENDING_TAP_DID_NOT_RESUME_AT_SCORE_2",
+      "where": [
+        "Error: PENDING_TAP_DID_NOT_RESUME_AT_SCORE_2",
+        "    at /workspace/jems-consolidation/audit-learning/combined-private-learning.cjs:55:219",
+        "    at async check (/workspace/jems-consolidation/audit-learning/combined-private-learning.cjs:55:106)",
+        "    at async /workspace/jems-consolidation/audit-learning/combined-private-learning.cjs:68:571"
+      ],
+      "visible": "Creative Studio\nMake a scene\nRead this to me\nMy Games\nMy scenes\nScene title\nUndo\nKeep\nMore\nYour stage\nWorld\nFull screen\nfound: 1\nPlay\nPause\nReset\nTry tap\nStep\nTry a change, or tap a character\nAdd an action\n→\nRight\n←\nLeft\n↑\nUp\n↓\nDown\n↟\nJump\n“ ”\nSay\n♪\nDance\n◷\nWait\n↻\nRepeat\nMy Rock’s blocks\nFirst steps\nMore tools\nMy Rock\nCharacter\nDraw a path\nScene settings\n⚑\nOn Play\n☝\nOn tap\nAdd an action. Try it. Change it.\n1\n“ ”\nSay\n“Find me three times!”\nAdd the next action here"
+    },
+    {
+      "subject": "language",
+      "error": "EVIDENCE_INDEPENDENCE_CLASSIFICATION\n\ntrue !== false\n",
+      "where": [
+        "AssertionError [ERR_ASSERTION]: EVIDENCE_INDEPENDENCE_CLASSIFICATION",
+        "",
+        "true !== false",
+        "",
+        "    at check (/workspace/jems-consolidation/audit-learning/combined-private-learning.cjs:59:10)"
+      ],
+      "visible": "Read this to me\nMy Games\nScene title\nUndo\nKeep\nMore\nCode\nPlay\nWorld\nFull screen\nMy Rock: One more! · found: 2\nPlay\nPause\nReset\nTry tap\nStep"
+    }
+  ]
+}

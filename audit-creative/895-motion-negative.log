@@ -1,0 +1,14 @@
+AssertionError [ERR_ASSERTION]: The newest saved version comes first in All my art
++ actual - expected
+
++ '230fae1b-fde4-43cd-829c-e63df3e322a8'
+- '52efb189-e44f-42e9-a94a-7bacd95ac49f'
+
+    at /workspace/jems-consolidation/audit-creative/candidate-895/tests/creative-motion-browser.cjs:87:12 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: '230fae1b-fde4-43cd-829c-e63df3e322a8',
+  expected: '52efb189-e44f-42e9-a94a-7bacd95ac49f',
+  operator: 'strictEqual',
+  diff: 'simple'
+}

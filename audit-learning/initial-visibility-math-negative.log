@@ -1,0 +1,44 @@
+PASS learning desktop: grades, mandatory modes/rate, durable Lab error/help/exit, profile isolation, native pause/resume, shared remix history, fraction construction
+PASS quality learning desktop: actual driving result, short-round checkpoint, host input lock, shared pacing, workshop checkpoint, focus return and manual pause
+PASS declarative preview desktop: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+PASS generated preview desktop: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+PASS generated-v2 preview desktop: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+FAIL integration journey: application mobile AssertionError [ERR_ASSERTION]: My Powers opens with the question focused and visible: {"focused":true,"visible":false,"top":1081.25,"bottom":1221.640625,"viewport":844}
+    at exports.assertQuestionEntry (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/learning-entry-viewport.cjs:13:10)
+    at async applicationJourney (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/learning-integration.ts:84:5)
+    at async run (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/learning-integration.ts:421:11)
+    at async main (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/learning-integration.ts:425:7) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+PASS quality learning mobile: actual driving result, short-round checkpoint, host input lock, shared pacing, workshop checkpoint, focus return and manual pause
+PASS declarative preview mobile: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+PASS generated preview mobile: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+PASS generated-v2 preview mobile: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+PASS archived v2 learning: immutable older archive remains blocked until a compatible new revision is reviewed
+PASS learning recovery: visible explanation, no replacement practice, unchanged future record and exact recovery export
+AggregateError: 1 of 12 learning integration journeys failed
+    at main (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/learning-integration.ts:431:30) {
+  [errors]: [
+    Error: application mobile
+        at run (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/learning-integration.ts:422:92)
+        at async main (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/learning-integration.ts:425:7) {
+      [cause]: AssertionError [ERR_ASSERTION]: My Powers opens with the question focused and visible: {"focused":true,"visible":false,"top":1081.25,"bottom":1221.640625,"viewport":844}
+          at exports.assertQuestionEntry (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/learning-entry-viewport.cjs:13:10)
+          at async applicationJourney (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/learning-integration.ts:84:5)
+          at async run (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/learning-integration.ts:421:11)
+          at async main (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/learning-integration.ts:425:7) {
+        generatedMessage: false,
+        code: 'ERR_ASSERTION',
+        actual: false,
+        expected: true,
+        operator: '==',
+        diff: 'simple'
+      }
+    }
+  ]
+}

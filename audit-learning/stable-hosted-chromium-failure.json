@@ -1,0 +1,24 @@
+{
+  "head": "f7ff4bb12c13d8fa869dc743af0a86dbaf65bf82",
+  "job": 139711493564,
+  "command": "node tests/storage-native-ui.cjs",
+  "failure": [
+    "2026-11-26T05:43:48.8354251Z CI_SUITE_RESULT {\"command\":[\"node\",\"scripts/storage/build-preview.mjs\"],\"seconds\":3.5,\"exitCode\":0}",
+    "2026-11-26T05:43:48.8355035Z ##[group]node tests/storage-native-ui.cjs",
+    "2026-11-26T05:43:55.0647462Z AssertionError [ERR_ASSERTION]: switching to play finishes the programmatic scroll before a child can tap",
+    "2026-11-26T05:43:55.0647880Z ",
+    "2026-11-26T05:43:55.0648027Z 6 !== 0",
+    "2026-11-26T05:43:55.0648154Z ",
+    "2026-11-26T05:43:55.0648579Z     at /home/runner/work/family-game-factory/family-game-factory/tests/storage-native-ui.cjs:23:11 {",
+    "2026-11-26T05:43:55.0649074Z   generatedMessage: false,",
+    "2026-11-26T05:43:55.0649312Z   code: 'ERR_ASSERTION',",
+    "2026-11-26T05:43:55.0649539Z   actual: 6,",
+    "2026-11-26T05:43:55.0649771Z   expected: 0,",
+    "2026-11-26T05:43:55.0650004Z   operator: 'strictEqual',",
+    "2026-11-26T05:43:55.0650240Z   diff: 'simple'",
+    "2026-11-26T05:43:55.0650464Z }",
+    "2026-11-26T05:43:55.0720292Z ##[endgroup]",
+    "2026-11-26T05:43:55.0720756Z CI_SUITE_RESULT {\"command\":[\"node\",\"tests/storage-native-ui.cjs\"],\"seconds\":6.24,\"exitCode\":1}",
+    "2026-11-26T05:43:55.0721246Z ##[group]node tests/storage-creation-ui.cjs"
+  ]
+}

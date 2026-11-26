@@ -1,0 +1,25 @@
+before-unlock {"events":["/v1/devices/unlock","/entry/review-art"],"status":"Ask the operator to review and approve this exact PNG for your family."}
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
++   events: [
++     '/v1/devices/unlock',
++     '/entry/review-art'
++   ],
++   status: 'Ask the operator to review and approve this exact PNG for your family.'
+-   events: [],
+-   status: 'Next explorer'
+  }
+
+    at /workspace/jems-consolidation/audit-creative/candidate-b7/tests/audit-beta-cancel.cjs:77:14
+    at runNextTicks (node:internal/process/task_queues:64:5)
+    at process.processImmediate (node:internal/timers:452:9)
+    at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [Object],
+  expected: [Object],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

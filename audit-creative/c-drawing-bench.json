@@ -1,0 +1,1378 @@
+{
+  "head": "ba1904fcb4c009563998a987912d86f16b8f19a7",
+  "browser": "156.0.8078.79",
+  "samples": 32,
+  "segmentsPerStroke": 8,
+  "elapsed": [
+    319.0319830000001,
+    293.967885,
+    338.837184,
+    299.6780920000001,
+    288.168099,
+    480.69020100000034,
+    304.03137400000014,
+    293.3642949999994,
+    270.36349299999983,
+    278.9558419999994,
+    273.3315069999999,
+    270.58762899999965,
+    389.304795,
+    284.2372070000001,
+    269.5013429999999,
+    261.6213089999992,
+    285.9494850000001,
+    287.13184099999944,
+    449.15368599999874,
+    330.7319459999999,
+    292.97109699999965,
+    259.88744100000076,
+    256.0157959999997,
+    251.10919099999956,
+    264.98286499999995,
+    459.7919289999991,
+    296.69747199999983,
+    280.8804510000009,
+    282.03298600000016,
+    281.8784820000001,
+    270.1737499999999,
+    427.2563659999996
+  ],
+  "history": {
+    "samples": [
+      2.199999999254942,
+      2.299999998882413,
+      2.299999998882413,
+      2.099999999627471,
+      3.5,
+      2.899999998509884,
+      2.099999999627471,
+      2,
+      2.200000001117587,
+      2.599999999627471,
+      2.5,
+      2.099999999627471,
+      1.900000000372529,
+      2.099999999627471,
+      1.699999999254942,
+      2.200000001117587,
+      1.599999999627471,
+      1.599999999627471,
+      1.900000000372529,
+      1.299999998882413,
+      1.300000000745058,
+      1.5,
+      1.199999999254942,
+      1.400000000372529,
+      1.1000000014901161,
+      1.199999999254942,
+      1.199999999254942,
+      1,
+      1.199999999254942,
+      1,
+      1,
+      1
+    ],
+    "empty": true
+  },
+  "metrics": {
+    "events": {
+      "down": [
+        {
+          "eventToRafMs": 36.29999999888241,
+          "eventToDispatchMs": 0.599999999627471
+        },
+        {
+          "eventToRafMs": 42.19999999925494,
+          "eventToDispatchMs": 0.900000000372529
+        },
+        {
+          "eventToRafMs": 44,
+          "eventToDispatchMs": 0.6999999992549419
+        },
+        {
+          "eventToRafMs": 0.599999999627471,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 30.300000000745058,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 31.799999998882413,
+          "eventToDispatchMs": 0.3999999985098839
+        },
+        {
+          "eventToRafMs": 30.5,
+          "eventToDispatchMs": 0.900000000372529
+        },
+        {
+          "eventToRafMs": 33.90000000037253,
+          "eventToDispatchMs": 0.5
+        },
+        {
+          "eventToRafMs": 30,
+          "eventToDispatchMs": 0.6999999992549419
+        },
+        {
+          "eventToRafMs": 33.09999999962747,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 36.5,
+          "eventToDispatchMs": 0.5
+        },
+        {
+          "eventToRafMs": 31.09999999962747,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 127.89999999850988,
+          "eventToDispatchMs": 0.599999999627471
+        },
+        {
+          "eventToRafMs": 30,
+          "eventToDispatchMs": 0.6999999992549419
+        },
+        {
+          "eventToRafMs": 29.40000000037253,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 30.59999999962747,
+          "eventToDispatchMs": 0.599999999627471
+        },
+        {
+          "eventToRafMs": 30,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 32.90000000037253,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 34.29999999888241,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 45.19999999925494,
+          "eventToDispatchMs": 0.900000000372529
+        },
+        {
+          "eventToRafMs": 32.100000001490116,
+          "eventToDispatchMs": 0.5
+        },
+        {
+          "eventToRafMs": 29.59999999962747,
+          "eventToDispatchMs": 1
+        },
+        {
+          "eventToRafMs": 30.300000000745058,
+          "eventToDispatchMs": 0.5
+        },
+        {
+          "eventToRafMs": 31,
+          "eventToDispatchMs": 0.5
+        },
+        {
+          "eventToRafMs": 30.800000000745058,
+          "eventToDispatchMs": 0.2000000011175871
+        },
+        {
+          "eventToRafMs": 30.800000000745058,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 33.90000000037253,
+          "eventToDispatchMs": 1.200000001117587
+        },
+        {
+          "eventToRafMs": 35,
+          "eventToDispatchMs": 0.599999999627471
+        },
+        {
+          "eventToRafMs": 33.100000001490116,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 33,
+          "eventToDispatchMs": 0.3999999985098839
+        },
+        {
+          "eventToRafMs": 29.59999999962747,
+          "eventToDispatchMs": 0.30000000074505806
+        },
+        {
+          "eventToRafMs": 39.100000001490116,
+          "eventToDispatchMs": 0.40000000037252903
+        }
+      ],
+      "move": [
+        {
+          "eventToRafMs": 31.59999999962747,
+          "eventToDispatchMs": 30.699999999254942
+        },
+        {
+          "eventToRafMs": 31.299999998882413,
+          "eventToDispatchMs": 31.09999999962747
+        },
+        {
+          "eventToRafMs": 33.19999999925494,
+          "eventToDispatchMs": 32.899999998509884
+        },
+        {
+          "eventToRafMs": 27.799999998882413,
+          "eventToDispatchMs": 27.40000000037253
+        },
+        {
+          "eventToRafMs": 45.59999999962747,
+          "eventToDispatchMs": 45.40000000037253
+        },
+        {
+          "eventToRafMs": 35.30000000074506,
+          "eventToDispatchMs": 35
+        },
+        {
+          "eventToRafMs": 35.5,
+          "eventToDispatchMs": 35.30000000074506
+        },
+        {
+          "eventToRafMs": 32,
+          "eventToDispatchMs": 31.699999999254942
+        },
+        {
+          "eventToRafMs": 36.30000000074506,
+          "eventToDispatchMs": 35.70000000111759
+        },
+        {
+          "eventToRafMs": 31.59999999962747,
+          "eventToDispatchMs": 31.40000000037253
+        },
+        {
+          "eventToRafMs": 30,
+          "eventToDispatchMs": 29.799999998882413
+        },
+        {
+          "eventToRafMs": 30.800000000745058,
+          "eventToDispatchMs": 30.59999999962747
+        },
+        {
+          "eventToRafMs": 30.899999998509884,
+          "eventToDispatchMs": 30.59999999962747
+        },
+        {
+          "eventToRafMs": 30.699999999254942,
+          "eventToDispatchMs": 30.59999999962747
+        },
+        {
+          "eventToRafMs": 32.399999998509884,
+          "eventToDispatchMs": 32.19999999925494
+        },
+        {
+          "eventToRafMs": 34.59999999962747,
+          "eventToDispatchMs": 34.40000000037253
+        },
+        {
+          "eventToRafMs": 41.30000000074506,
+          "eventToDispatchMs": 40.90000000037253
+        },
+        {
+          "eventToRafMs": 39.399999998509884,
+          "eventToDispatchMs": 39.19999999925494
+        },
+        {
+          "eventToRafMs": 30.200000001117587,
+          "eventToDispatchMs": 29.90000000037253
+        },
+        {
+          "eventToRafMs": 41.09999999962747,
+          "eventToDispatchMs": 40.90000000037253
+        },
+        {
+          "eventToRafMs": 33.40000000037253,
+          "eventToDispatchMs": 33.20000000111759
+        },
+        {
+          "eventToRafMs": 40.59999999962747,
+          "eventToDispatchMs": 40.29999999888241
+        },
+        {
+          "eventToRafMs": 39.5,
+          "eventToDispatchMs": 39.30000000074506
+        },
+        {
+          "eventToRafMs": 37.19999999925494,
+          "eventToDispatchMs": 37
+        },
+        {
+          "eventToRafMs": 31.09999999962747,
+          "eventToDispatchMs": 30.799999998882413
+        },
+        {
+          "eventToRafMs": 32.5,
+          "eventToDispatchMs": 31.90000000037253
+        },
+        {
+          "eventToRafMs": 32.40000000037253,
+          "eventToDispatchMs": 32.20000000111759
+        },
+        {
+          "eventToRafMs": 32.90000000037253,
+          "eventToDispatchMs": 32.80000000074506
+        },
+        {
+          "eventToRafMs": 34.90000000037253,
+          "eventToDispatchMs": 34.69999999925494
+        },
+        {
+          "eventToRafMs": 35,
+          "eventToDispatchMs": 34.899999998509884
+        },
+        {
+          "eventToRafMs": 32.5,
+          "eventToDispatchMs": 32.20000000111759
+        },
+        {
+          "eventToRafMs": 36.40000000037253,
+          "eventToDispatchMs": 36.19999999925494
+        },
+        {
+          "eventToRafMs": 28.09999999962747,
+          "eventToDispatchMs": 27.699999999254942
+        },
+        {
+          "eventToRafMs": 34,
+          "eventToDispatchMs": 33.69999999925494
+        },
+        {
+          "eventToRafMs": 28.799999998882413,
+          "eventToDispatchMs": 28.59999999962747
+        },
+        {
+          "eventToRafMs": 27.800000000745058,
+          "eventToDispatchMs": 27.600000001490116
+        },
+        {
+          "eventToRafMs": 31.299999998882413,
+          "eventToDispatchMs": 31
+        },
+        {
+          "eventToRafMs": 34.5,
+          "eventToDispatchMs": 34.20000000111759
+        },
+        {
+          "eventToRafMs": 35,
+          "eventToDispatchMs": 34.69999999925494
+        },
+        {
+          "eventToRafMs": 30.59999999962747,
+          "eventToDispatchMs": 29.5
+        },
+        {
+          "eventToRafMs": 29.5,
+          "eventToDispatchMs": 29.199999999254942
+        },
+        {
+          "eventToRafMs": 32.69999999925494,
+          "eventToDispatchMs": 32.399999998509884
+        },
+        {
+          "eventToRafMs": 43.19999999925494,
+          "eventToDispatchMs": 42.90000000037253
+        },
+        {
+          "eventToRafMs": 34.59999999962747,
+          "eventToDispatchMs": 34.30000000074506
+        },
+        {
+          "eventToRafMs": 26.5,
+          "eventToDispatchMs": 26.199999999254942
+        },
+        {
+          "eventToRafMs": 205.2000000011176,
+          "eventToDispatchMs": 203.5
+        },
+        {
+          "eventToRafMs": 31.199999999254942,
+          "eventToDispatchMs": 31
+        },
+        {
+          "eventToRafMs": 27.59999999962747,
+          "eventToDispatchMs": 27.399999998509884
+        },
+        {
+          "eventToRafMs": 26.09999999962747,
+          "eventToDispatchMs": 25.699999999254942
+        },
+        {
+          "eventToRafMs": 29.199999999254942,
+          "eventToDispatchMs": 29
+        },
+        {
+          "eventToRafMs": 34.59999999962747,
+          "eventToDispatchMs": 34.40000000037253
+        },
+        {
+          "eventToRafMs": 27.5,
+          "eventToDispatchMs": 27.40000000037253
+        },
+        {
+          "eventToRafMs": 32.5,
+          "eventToDispatchMs": 32.09999999962747
+        },
+        {
+          "eventToRafMs": 29.299999998882413,
+          "eventToDispatchMs": 29.199999999254942
+        },
+        {
+          "eventToRafMs": 29.199999999254942,
+          "eventToDispatchMs": 29
+        },
+        {
+          "eventToRafMs": 47.59999999962747,
+          "eventToDispatchMs": 47.20000000111759
+        },
+        {
+          "eventToRafMs": 31,
+          "eventToDispatchMs": 30.700000001117587
+        },
+        {
+          "eventToRafMs": 28.300000000745058,
+          "eventToDispatchMs": 28
+        },
+        {
+          "eventToRafMs": 28,
+          "eventToDispatchMs": 27.799999998882413
+        },
+        {
+          "eventToRafMs": 30.199999999254942,
+          "eventToDispatchMs": 30
+        },
+        {
+          "eventToRafMs": 21.700000001117587,
+          "eventToDispatchMs": 21.40000000037253
+        },
+        {
+          "eventToRafMs": 29.5,
+          "eventToDispatchMs": 29.09999999962747
+        },
+        {
+          "eventToRafMs": 35.90000000037253,
+          "eventToDispatchMs": 35.59999999962747
+        },
+        {
+          "eventToRafMs": 29.700000001117587,
+          "eventToDispatchMs": 29.40000000037253
+        },
+        {
+          "eventToRafMs": 26.800000000745058,
+          "eventToDispatchMs": 26.5
+        },
+        {
+          "eventToRafMs": 27.600000001490116,
+          "eventToDispatchMs": 27.40000000037253
+        },
+        {
+          "eventToRafMs": 27.899999998509884,
+          "eventToDispatchMs": 27.59999999962747
+        },
+        {
+          "eventToRafMs": 28.700000001117587,
+          "eventToDispatchMs": 28.40000000037253
+        },
+        {
+          "eventToRafMs": 27.40000000037253,
+          "eventToDispatchMs": 27.199999999254942
+        },
+        {
+          "eventToRafMs": 28.09999999962747,
+          "eventToDispatchMs": 27.799999998882413
+        },
+        {
+          "eventToRafMs": 29.40000000037253,
+          "eventToDispatchMs": 29.09999999962747
+        },
+        {
+          "eventToRafMs": 29.300000000745058,
+          "eventToDispatchMs": 29
+        },
+        {
+          "eventToRafMs": 29,
+          "eventToDispatchMs": 28.59999999962747
+        },
+        {
+          "eventToRafMs": 28.59999999962747,
+          "eventToDispatchMs": 28.299999998882413
+        },
+        {
+          "eventToRafMs": 27.90000000037253,
+          "eventToDispatchMs": 27.699999999254942
+        },
+        {
+          "eventToRafMs": 28.300000000745058,
+          "eventToDispatchMs": 28.199999999254942
+        },
+        {
+          "eventToRafMs": 28.59999999962747,
+          "eventToDispatchMs": 28.300000000745058
+        },
+        {
+          "eventToRafMs": 27.90000000037253,
+          "eventToDispatchMs": 27.59999999962747
+        },
+        {
+          "eventToRafMs": 38.5,
+          "eventToDispatchMs": 38.19999999925494
+        },
+        {
+          "eventToRafMs": 28.40000000037253,
+          "eventToDispatchMs": 28.300000000745058
+        },
+        {
+          "eventToRafMs": 34.09999999962747,
+          "eventToDispatchMs": 33.79999999888241
+        },
+        {
+          "eventToRafMs": 31.59999999962747,
+          "eventToDispatchMs": 31.300000000745058
+        },
+        {
+          "eventToRafMs": 27.199999999254942,
+          "eventToDispatchMs": 26.799999998882413
+        },
+        {
+          "eventToRafMs": 27.199999999254942,
+          "eventToDispatchMs": 26.800000000745058
+        },
+        {
+          "eventToRafMs": 27.699999999254942,
+          "eventToDispatchMs": 27.5
+        },
+        {
+          "eventToRafMs": 26.699999999254942,
+          "eventToDispatchMs": 26.5
+        },
+        {
+          "eventToRafMs": 27.800000000745058,
+          "eventToDispatchMs": 27.5
+        },
+        {
+          "eventToRafMs": 28.59999999962747,
+          "eventToDispatchMs": 28.300000000745058
+        },
+        {
+          "eventToRafMs": 28.399999998509884,
+          "eventToDispatchMs": 28.09999999962747
+        },
+        {
+          "eventToRafMs": 29.5,
+          "eventToDispatchMs": 29.399999998509884
+        },
+        {
+          "eventToRafMs": 28.59999999962747,
+          "eventToDispatchMs": 28.40000000037253
+        },
+        {
+          "eventToRafMs": 28.40000000037253,
+          "eventToDispatchMs": 28.09999999962747
+        },
+        {
+          "eventToRafMs": 29.299999998882413,
+          "eventToDispatchMs": 29
+        },
+        {
+          "eventToRafMs": 28.800000000745058,
+          "eventToDispatchMs": 28.59999999962747
+        },
+        {
+          "eventToRafMs": 27.5,
+          "eventToDispatchMs": 27.199999999254942
+        },
+        {
+          "eventToRafMs": 27.59999999962747,
+          "eventToDispatchMs": 27.300000000745058
+        },
+        {
+          "eventToRafMs": 125.90000000037253,
+          "eventToDispatchMs": 122.59999999962747
+        },
+        {
+          "eventToRafMs": 22.40000000037253,
+          "eventToDispatchMs": 22
+        },
+        {
+          "eventToRafMs": 26.399999998509884,
+          "eventToDispatchMs": 26
+        },
+        {
+          "eventToRafMs": 28.59999999962747,
+          "eventToDispatchMs": 28.5
+        },
+        {
+          "eventToRafMs": 27.40000000037253,
+          "eventToDispatchMs": 27.100000001490116
+        },
+        {
+          "eventToRafMs": 29.5,
+          "eventToDispatchMs": 29.300000000745058
+        },
+        {
+          "eventToRafMs": 28.09999999962747,
+          "eventToDispatchMs": 27.90000000037253
+        },
+        {
+          "eventToRafMs": 29.200000001117587,
+          "eventToDispatchMs": 29
+        },
+        {
+          "eventToRafMs": 26.299999998882413,
+          "eventToDispatchMs": 25.90000000037253
+        },
+        {
+          "eventToRafMs": 25.5,
+          "eventToDispatchMs": 25.200000001117587
+        },
+        {
+          "eventToRafMs": 26.699999999254942,
+          "eventToDispatchMs": 26.5
+        },
+        {
+          "eventToRafMs": 30,
+          "eventToDispatchMs": 29.800000000745058
+        },
+        {
+          "eventToRafMs": 32,
+          "eventToDispatchMs": 31.699999999254942
+        },
+        {
+          "eventToRafMs": 33.59999999962747,
+          "eventToDispatchMs": 33.30000000074506
+        },
+        {
+          "eventToRafMs": 29.40000000037253,
+          "eventToDispatchMs": 29.200000001117587
+        },
+        {
+          "eventToRafMs": 31.5,
+          "eventToDispatchMs": 31.40000000037253
+        },
+        {
+          "eventToRafMs": 27,
+          "eventToDispatchMs": 26.699999999254942
+        },
+        {
+          "eventToRafMs": 28.90000000037253,
+          "eventToDispatchMs": 28.700000001117587
+        },
+        {
+          "eventToRafMs": 26.699999999254942,
+          "eventToDispatchMs": 26.5
+        },
+        {
+          "eventToRafMs": 35.399999998509884,
+          "eventToDispatchMs": 35.29999999888241
+        },
+        {
+          "eventToRafMs": 28.40000000037253,
+          "eventToDispatchMs": 28.300000000745058
+        },
+        {
+          "eventToRafMs": 28.90000000037253,
+          "eventToDispatchMs": 28.699999999254942
+        },
+        {
+          "eventToRafMs": 26.90000000037253,
+          "eventToDispatchMs": 26.800000000745058
+        },
+        {
+          "eventToRafMs": 27.399999998509884,
+          "eventToDispatchMs": 27.199999999254942
+        },
+        {
+          "eventToRafMs": 28.300000000745058,
+          "eventToDispatchMs": 28
+        },
+        {
+          "eventToRafMs": 28.5,
+          "eventToDispatchMs": 28
+        },
+        {
+          "eventToRafMs": 31,
+          "eventToDispatchMs": 30.90000000037253
+        },
+        {
+          "eventToRafMs": 26.800000000745058,
+          "eventToDispatchMs": 26.59999999962747
+        },
+        {
+          "eventToRafMs": 27.59999999962747,
+          "eventToDispatchMs": 27.299999998882413
+        },
+        {
+          "eventToRafMs": 27,
+          "eventToDispatchMs": 26.799999998882413
+        },
+        {
+          "eventToRafMs": 27,
+          "eventToDispatchMs": 26.800000000745058
+        },
+        {
+          "eventToRafMs": 26.799999998882413,
+          "eventToDispatchMs": 26.59999999962747
+        },
+        {
+          "eventToRafMs": 27.300000000745058,
+          "eventToDispatchMs": 27.200000001117587
+        },
+        {
+          "eventToRafMs": 27.699999999254942,
+          "eventToDispatchMs": 27.59999999962747
+        },
+        {
+          "eventToRafMs": 27.199999999254942,
+          "eventToDispatchMs": 27.09999999962747
+        },
+        {
+          "eventToRafMs": 26.799999998882413,
+          "eventToDispatchMs": 26.59999999962747
+        },
+        {
+          "eventToRafMs": 26.09999999962747,
+          "eventToDispatchMs": 26
+        },
+        {
+          "eventToRafMs": 31.699999999254942,
+          "eventToDispatchMs": 31.5
+        },
+        {
+          "eventToRafMs": 23.40000000037253,
+          "eventToDispatchMs": 23.199999999254942
+        },
+        {
+          "eventToRafMs": 25.90000000037253,
+          "eventToDispatchMs": 25.799999998882413
+        },
+        {
+          "eventToRafMs": 30.40000000037253,
+          "eventToDispatchMs": 30.09999999962747
+        },
+        {
+          "eventToRafMs": 26.200000001117587,
+          "eventToDispatchMs": 26
+        },
+        {
+          "eventToRafMs": 34.5,
+          "eventToDispatchMs": 34.29999999888241
+        },
+        {
+          "eventToRafMs": 26,
+          "eventToDispatchMs": 25.699999999254942
+        },
+        {
+          "eventToRafMs": 23.09999999962747,
+          "eventToDispatchMs": 22.799999998882413
+        },
+        {
+          "eventToRafMs": 22.59999999962747,
+          "eventToDispatchMs": 22.399999998509884
+        },
+        {
+          "eventToRafMs": 28.800000000745058,
+          "eventToDispatchMs": 28.59999999962747
+        },
+        {
+          "eventToRafMs": 26.800000000745058,
+          "eventToDispatchMs": 26.59999999962747
+        },
+        {
+          "eventToRafMs": 32.20000000111759,
+          "eventToDispatchMs": 31.90000000037253
+        },
+        {
+          "eventToRafMs": 29.700000001117587,
+          "eventToDispatchMs": 29.40000000037253
+        },
+        {
+          "eventToRafMs": 27.399999998509884,
+          "eventToDispatchMs": 27.199999999254942
+        },
+        {
+          "eventToRafMs": 28.09999999962747,
+          "eventToDispatchMs": 27.90000000037253
+        },
+        {
+          "eventToRafMs": 28.59999999962747,
+          "eventToDispatchMs": 28.200000001117587
+        },
+        {
+          "eventToRafMs": 27.90000000037253,
+          "eventToDispatchMs": 27.699999999254942
+        },
+        {
+          "eventToRafMs": 102.09999999962747,
+          "eventToDispatchMs": 99.5
+        },
+        {
+          "eventToRafMs": 109.69999999925494,
+          "eventToDispatchMs": 107.59999999962747
+        },
+        {
+          "eventToRafMs": 42.70000000111759,
+          "eventToDispatchMs": 42.20000000111759
+        },
+        {
+          "eventToRafMs": 31.40000000037253,
+          "eventToDispatchMs": 31.09999999962747
+        },
+        {
+          "eventToRafMs": 31.700000001117587,
+          "eventToDispatchMs": 31.5
+        },
+        {
+          "eventToRafMs": 39,
+          "eventToDispatchMs": 38.79999999888241
+        },
+        {
+          "eventToRafMs": 34.40000000037253,
+          "eventToDispatchMs": 34.20000000111759
+        },
+        {
+          "eventToRafMs": 30.5,
+          "eventToDispatchMs": 30.300000000745058
+        },
+        {
+          "eventToRafMs": 35.79999999888241,
+          "eventToDispatchMs": 35.29999999888241
+        },
+        {
+          "eventToRafMs": 41.59999999962747,
+          "eventToDispatchMs": 41.40000000037253
+        },
+        {
+          "eventToRafMs": 29.5,
+          "eventToDispatchMs": 29.09999999962747
+        },
+        {
+          "eventToRafMs": 27.700000001117587,
+          "eventToDispatchMs": 27.5
+        },
+        {
+          "eventToRafMs": 23.799999998882413,
+          "eventToDispatchMs": 23.40000000037253
+        },
+        {
+          "eventToRafMs": 31.199999999254942,
+          "eventToDispatchMs": 31
+        },
+        {
+          "eventToRafMs": 30.09999999962747,
+          "eventToDispatchMs": 29.700000001117587
+        },
+        {
+          "eventToRafMs": 30.299999998882413,
+          "eventToDispatchMs": 30
+        },
+        {
+          "eventToRafMs": 29.5,
+          "eventToDispatchMs": 29.300000000745058
+        },
+        {
+          "eventToRafMs": 40.40000000037253,
+          "eventToDispatchMs": 40.19999999925494
+        },
+        {
+          "eventToRafMs": 27,
+          "eventToDispatchMs": 26.59999999962747
+        },
+        {
+          "eventToRafMs": 27.299999998882413,
+          "eventToDispatchMs": 27.199999999254942
+        },
+        {
+          "eventToRafMs": 27.300000000745058,
+          "eventToDispatchMs": 27.09999999962747
+        },
+        {
+          "eventToRafMs": 28,
+          "eventToDispatchMs": 27.700000001117587
+        },
+        {
+          "eventToRafMs": 21.799999998882413,
+          "eventToDispatchMs": 21.59999999962747
+        },
+        {
+          "eventToRafMs": 29.699999999254942,
+          "eventToDispatchMs": 29.5
+        },
+        {
+          "eventToRafMs": 26.5,
+          "eventToDispatchMs": 26.300000000745058
+        },
+        {
+          "eventToRafMs": 28.09999999962747,
+          "eventToDispatchMs": 28
+        },
+        {
+          "eventToRafMs": 28,
+          "eventToDispatchMs": 27.800000000745058
+        },
+        {
+          "eventToRafMs": 27.59999999962747,
+          "eventToDispatchMs": 27.5
+        },
+        {
+          "eventToRafMs": 28.200000001117587,
+          "eventToDispatchMs": 28
+        },
+        {
+          "eventToRafMs": 25.5,
+          "eventToDispatchMs": 25.399999998509884
+        },
+        {
+          "eventToRafMs": 26.399999998509884,
+          "eventToDispatchMs": 26.09999999962747
+        },
+        {
+          "eventToRafMs": 25.100000001490116,
+          "eventToDispatchMs": 25
+        },
+        {
+          "eventToRafMs": 29.5,
+          "eventToDispatchMs": 29.300000000745058
+        },
+        {
+          "eventToRafMs": 28.100000001490116,
+          "eventToDispatchMs": 27.90000000037253
+        },
+        {
+          "eventToRafMs": 29.300000000745058,
+          "eventToDispatchMs": 29
+        },
+        {
+          "eventToRafMs": 27.5,
+          "eventToDispatchMs": 27.40000000037253
+        },
+        {
+          "eventToRafMs": 26.200000001117587,
+          "eventToDispatchMs": 26.09999999962747
+        },
+        {
+          "eventToRafMs": 27.90000000037253,
+          "eventToDispatchMs": 27.800000000745058
+        },
+        {
+          "eventToRafMs": 27.59999999962747,
+          "eventToDispatchMs": 27.300000000745058
+        },
+        {
+          "eventToRafMs": 25.800000000745058,
+          "eventToDispatchMs": 25.5
+        },
+        {
+          "eventToRafMs": 27,
+          "eventToDispatchMs": 26.699999999254942
+        },
+        {
+          "eventToRafMs": 29.299999998882413,
+          "eventToDispatchMs": 29.09999999962747
+        },
+        {
+          "eventToRafMs": 28.699999999254942,
+          "eventToDispatchMs": 28.40000000037253
+        },
+        {
+          "eventToRafMs": 28.399999998509884,
+          "eventToDispatchMs": 28.199999999254942
+        },
+        {
+          "eventToRafMs": 28.399999998509884,
+          "eventToDispatchMs": 28.199999999254942
+        },
+        {
+          "eventToRafMs": 30.59999999962747,
+          "eventToDispatchMs": 30.300000000745058
+        },
+        {
+          "eventToRafMs": 29.300000000745058,
+          "eventToDispatchMs": 29.09999999962747
+        },
+        {
+          "eventToRafMs": 22.59999999962747,
+          "eventToDispatchMs": 22.299999998882413
+        },
+        {
+          "eventToRafMs": 28.5,
+          "eventToDispatchMs": 28.199999999254942
+        },
+        {
+          "eventToRafMs": 26.199999999254942,
+          "eventToDispatchMs": 26
+        },
+        {
+          "eventToRafMs": 28.59999999962747,
+          "eventToDispatchMs": 28
+        },
+        {
+          "eventToRafMs": 40.600000001490116,
+          "eventToDispatchMs": 40.40000000037253
+        },
+        {
+          "eventToRafMs": 39.90000000037253,
+          "eventToDispatchMs": 39.59999999962747
+        },
+        {
+          "eventToRafMs": 152.2000000011176,
+          "eventToDispatchMs": 148.40000000037253
+        },
+        {
+          "eventToRafMs": 40.79999999888241,
+          "eventToDispatchMs": 40.399999998509884
+        },
+        {
+          "eventToRafMs": 29,
+          "eventToDispatchMs": 28.799999998882413
+        },
+        {
+          "eventToRafMs": 32.69999999925494,
+          "eventToDispatchMs": 32.5
+        },
+        {
+          "eventToRafMs": 34.69999999925494,
+          "eventToDispatchMs": 34.5
+        },
+        {
+          "eventToRafMs": 29.899999998509884,
+          "eventToDispatchMs": 29.399999998509884
+        },
+        {
+          "eventToRafMs": 45.79999999888241,
+          "eventToDispatchMs": 45.5
+        },
+        {
+          "eventToRafMs": 28.40000000037253,
+          "eventToDispatchMs": 28.200000001117587
+        },
+        {
+          "eventToRafMs": 32.19999999925494,
+          "eventToDispatchMs": 31.799999998882413
+        },
+        {
+          "eventToRafMs": 31,
+          "eventToDispatchMs": 30.700000001117587
+        },
+        {
+          "eventToRafMs": 30.200000001117587,
+          "eventToDispatchMs": 30.09999999962747
+        },
+        {
+          "eventToRafMs": 30.800000000745058,
+          "eventToDispatchMs": 30.5
+        },
+        {
+          "eventToRafMs": 30.100000001490116,
+          "eventToDispatchMs": 29.90000000037253
+        },
+        {
+          "eventToRafMs": 32.30000000074506,
+          "eventToDispatchMs": 31.90000000037253
+        },
+        {
+          "eventToRafMs": 28.300000000745058,
+          "eventToDispatchMs": 28.09999999962747
+        },
+        {
+          "eventToRafMs": 29.09999999962747,
+          "eventToDispatchMs": 28.90000000037253
+        },
+        {
+          "eventToRafMs": 28.300000000745058,
+          "eventToDispatchMs": 28.199999999254942
+        },
+        {
+          "eventToRafMs": 28.5,
+          "eventToDispatchMs": 28.299999998882413
+        },
+        {
+          "eventToRafMs": 31,
+          "eventToDispatchMs": 30.799999998882413
+        },
+        {
+          "eventToRafMs": 37.30000000074506,
+          "eventToDispatchMs": 37.100000001490116
+        },
+        {
+          "eventToRafMs": 29.200000001117587,
+          "eventToDispatchMs": 29
+        },
+        {
+          "eventToRafMs": 31.09999999962747,
+          "eventToDispatchMs": 30.699999999254942
+        },
+        {
+          "eventToRafMs": 28.5,
+          "eventToDispatchMs": 28.300000000745058
+        },
+        {
+          "eventToRafMs": 28.299999998882413,
+          "eventToDispatchMs": 28
+        },
+        {
+          "eventToRafMs": 30.699999999254942,
+          "eventToDispatchMs": 30.399999998509884
+        },
+        {
+          "eventToRafMs": 29.700000001117587,
+          "eventToDispatchMs": 29.300000000745058
+        },
+        {
+          "eventToRafMs": 28.600000001490116,
+          "eventToDispatchMs": 28.300000000745058
+        },
+        {
+          "eventToRafMs": 31.5,
+          "eventToDispatchMs": 31
+        },
+        {
+          "eventToRafMs": 37.5,
+          "eventToDispatchMs": 37.40000000037253
+        },
+        {
+          "eventToRafMs": 30.90000000037253,
+          "eventToDispatchMs": 30.5
+        },
+        {
+          "eventToRafMs": 27.799999998882413,
+          "eventToDispatchMs": 27.59999999962747
+        },
+        {
+          "eventToRafMs": 31.800000000745058,
+          "eventToDispatchMs": 31.59999999962747
+        },
+        {
+          "eventToRafMs": 28.90000000037253,
+          "eventToDispatchMs": 28.5
+        },
+        {
+          "eventToRafMs": 28.5,
+          "eventToDispatchMs": 28.40000000037253
+        },
+        {
+          "eventToRafMs": 36.79999999888241,
+          "eventToDispatchMs": 36.59999999962747
+        },
+        {
+          "eventToRafMs": 28.5,
+          "eventToDispatchMs": 28.40000000037253
+        },
+        {
+          "eventToRafMs": 28.300000000745058,
+          "eventToDispatchMs": 27.90000000037253
+        },
+        {
+          "eventToRafMs": 27.100000001490116,
+          "eventToDispatchMs": 26.90000000037253
+        },
+        {
+          "eventToRafMs": 29.800000000745058,
+          "eventToDispatchMs": 29.59999999962747
+        },
+        {
+          "eventToRafMs": 31.600000001490116,
+          "eventToDispatchMs": 31.40000000037253
+        },
+        {
+          "eventToRafMs": 30,
+          "eventToDispatchMs": 29.800000000745058
+        },
+        {
+          "eventToRafMs": 27.699999999254942,
+          "eventToDispatchMs": 27.5
+        },
+        {
+          "eventToRafMs": 30.799999998882413,
+          "eventToDispatchMs": 30.5
+        },
+        {
+          "eventToRafMs": 27.59999999962747,
+          "eventToDispatchMs": 27.40000000037253
+        },
+        {
+          "eventToRafMs": 27.200000001117587,
+          "eventToDispatchMs": 27
+        },
+        {
+          "eventToRafMs": 36.40000000037253,
+          "eventToDispatchMs": 36.09999999962747
+        },
+        {
+          "eventToRafMs": 31.699999999254942,
+          "eventToDispatchMs": 31.59999999962747
+        },
+        {
+          "eventToRafMs": 29,
+          "eventToDispatchMs": 28.699999999254942
+        },
+        {
+          "eventToRafMs": 33.40000000037253,
+          "eventToDispatchMs": 33.19999999925494
+        },
+        {
+          "eventToRafMs": 28.199999999254942,
+          "eventToDispatchMs": 28.09999999962747
+        },
+        {
+          "eventToRafMs": 28.40000000037253,
+          "eventToDispatchMs": 28.100000001490116
+        },
+        {
+          "eventToRafMs": 30.399999998509884,
+          "eventToDispatchMs": 30.199999999254942
+        },
+        {
+          "eventToRafMs": 167.5,
+          "eventToDispatchMs": 165.80000000074506
+        }
+      ],
+      "up": [
+        {
+          "eventToRafMs": 32.59999999962747,
+          "eventToDispatchMs": 0.3999999985098839
+        },
+        {
+          "eventToRafMs": 31.700000001117587,
+          "eventToDispatchMs": 0.30000000074505806
+        },
+        {
+          "eventToRafMs": 33.90000000037253,
+          "eventToDispatchMs": 0.30000000074505806
+        },
+        {
+          "eventToRafMs": 34.100000001490116,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 31.399999998509884,
+          "eventToDispatchMs": 0.19999999925494194
+        },
+        {
+          "eventToRafMs": 29.5,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 41.90000000037253,
+          "eventToDispatchMs": 0.8000000007450581
+        },
+        {
+          "eventToRafMs": 33.30000000074506,
+          "eventToDispatchMs": 0.19999999925494194
+        },
+        {
+          "eventToRafMs": 29.899999998509884,
+          "eventToDispatchMs": 0.3999999985098839
+        },
+        {
+          "eventToRafMs": 29.800000000745058,
+          "eventToDispatchMs": 0.19999999925494194
+        },
+        {
+          "eventToRafMs": 29.300000000745058,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 30.300000000745058,
+          "eventToDispatchMs": 0.7000000011175871
+        },
+        {
+          "eventToRafMs": 38.40000000037253,
+          "eventToDispatchMs": 0.5
+        },
+        {
+          "eventToRafMs": 29.40000000037253,
+          "eventToDispatchMs": 0.2000000011175871
+        },
+        {
+          "eventToRafMs": 30.90000000037253,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 30.59999999962747,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 23.90000000037253,
+          "eventToDispatchMs": 0.7000000011175871
+        },
+        {
+          "eventToRafMs": 33.30000000074506,
+          "eventToDispatchMs": 0.40000000037252903
+        },
+        {
+          "eventToRafMs": 56.09999999962747,
+          "eventToDispatchMs": 0.5
+        },
+        {
+          "eventToRafMs": 29.59999999962747,
+          "eventToDispatchMs": 0.30000000074505806
+        },
+        {
+          "eventToRafMs": 30.5,
+          "eventToDispatchMs": 0.30000000074505806
+        },
+        {
+          "eventToRafMs": 28.899999998509884,
+          "eventToDispatchMs": 0.2999999988824129
+        },
+        {
+          "eventToRafMs": 28.199999999254942,
+          "eventToDispatchMs": 0.19999999925494194
+        },
+        {
+          "eventToRafMs": 29.5,
+          "eventToDispatchMs": 0.2000000011175871
+        },
+        {
+          "eventToRafMs": 29,
+          "eventToDispatchMs": 3.699999999254942
+        },
+        {
+          "eventToRafMs": 31.5,
+          "eventToDispatchMs": 0.19999999925494194
+        },
+        {
+          "eventToRafMs": 30.09999999962747,
+          "eventToDispatchMs": 0.19999999925494194
+        },
+        {
+          "eventToRafMs": 30.09999999962747,
+          "eventToDispatchMs": 0.19999999925494194
+        },
+        {
+          "eventToRafMs": 30.399999998509884,
+          "eventToDispatchMs": 0.3999999985098839
+        },
+        {
+          "eventToRafMs": 32.19999999925494,
+          "eventToDispatchMs": 0.2999999988824129
+        },
+        {
+          "eventToRafMs": 28.199999999254942,
+          "eventToDispatchMs": 0.2999999988824129
+        },
+        {
+          "eventToRafMs": 37.70000000111759,
+          "eventToDispatchMs": 0.5
+        }
+      ]
+    },
+    "heap": 18194327
+  },
+  "canvasHashes": {
+    "before": "6533229d16a1cfd19adbfefe1a133c0d42bf4059cb88cbecdad64f06e7d0d466",
+    "after": "76334fa7f2800461dccca0325bef8c4c7e3e8a9d5cc39baf42b1df0b813af9f8",
+    "undone": "6533229d16a1cfd19adbfefe1a133c0d42bf4059cb88cbecdad64f06e7d0d466"
+  },
+  "hostLoad": [
+    2.02,
+    5.35,
+    4.84
+  ]
+}

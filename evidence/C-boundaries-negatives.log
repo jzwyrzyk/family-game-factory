@@ -1,0 +1,341 @@
+TAP version 13
+# Subtest: family review accepts exact truecolor and indexed raster originals
+ok 1 - family review accepts exact truecolor and indexed raster originals
+  ---
+  duration_ms: 33.101773
+  type: 'test'
+  ...
+# Subtest: embedded file details, trailing bytes and incomplete chunks cannot pass review
+ok 2 - embedded file details, trailing bytes and incomplete chunks cannot pass review
+  ---
+  duration_ms: 1.072824
+  type: 'test'
+  ...
+# Subtest: the color model and exact scanline count govern admitted image data
+ok 3 - the color model and exact scanline count govern admitted image data
+  ---
+  duration_ms: 19.742558
+  type: 'test'
+  ...
+# Subtest: formerly accepted file with invalid pixel stream cannot be admitted
+ok 4 - formerly accepted file with invalid pixel stream cannot be admitted
+  ---
+  duration_ms: 0.335979
+  type: 'test'
+  ...
+# Subtest: the optional-palette copy retains every other byte and needs its own digest
+ok 5 - the optional-palette copy retains every other byte and needs its own digest
+  ---
+  duration_ms: 17.823863
+  type: 'test'
+  ...
+# Subtest: a row with an unknown PNG filter is refused even when a suggested palette can be removed
+ok 6 - a row with an unknown PNG filter is refused even when a suggested palette can be removed
+  ---
+  duration_ms: 7.110614
+  type: 'test'
+  ...
+# Subtest: generated companion is optional, data-only, asset-bound and always attributed as assisted
+ok 7 - generated companion is optional, data-only, asset-bound and always attributed as assisted
+  ---
+  duration_ms: 36.302205
+  type: 'test'
+  ...
+# Subtest: local creative roles preserve private draft aliases and historical public readers
+ok 8 - local creative roles preserve private draft aliases and historical public readers
+  ---
+  duration_ms: 10.034992
+  type: 'test'
+  ...
+# Subtest: v2 candidates validate companion, raster assets, production plan and ordinary playthrough together
+ok 9 - v2 candidates validate companion, raster assets, production plan and ordinary playthrough together
+  ---
+  duration_ms: 35.411758
+  type: 'test'
+  ...
+# Subtest: test publication cannot replace or drop a reviewed companion manifest
+ok 10 - test publication cannot replace or drop a reviewed companion manifest
+  ---
+  duration_ms: 1.081477
+  type: 'test'
+  ...
+# Subtest: companion byte limits include normalized attribution and remain stable across repeated validation
+ok 11 - companion byte limits include normalized attribution and remain stable across repeated validation
+  ---
+  duration_ms: 17.239618
+  type: 'test'
+  ...
+# Subtest: sandbox receives source only and trusted publication retains a large companion unchanged
+ok 12 - sandbox receives source only and trusted publication retains a large companion unchanged
+  ---
+  duration_ms: 5.589
+  type: 'test'
+  ...
+# Subtest: sandbox cannot inject a companion or replace source while the host restores trusted scene data
+ok 13 - sandbox cannot inject a companion or replace source while the host restores trusted scene data
+  ---
+  duration_ms: 16.509332
+  type: 'test'
+  ...
+# Subtest: quality capture retains game assets, plan, playthrough and independent probes while the companion stays host-held
+ok 14 - quality capture retains game assets, plan, playthrough and independent probes while the companion stays host-held
+  ---
+  duration_ms: 388.567401
+  type: 'test'
+  ...
+# Subtest: quality capture rejects changed game bindings and stale evidence before restoring the companion
+ok 15 - quality capture rejects changed game bindings and stale evidence before restoring the companion
+  ---
+  duration_ms: 519.542147
+  type: 'test'
+  ...
+# Subtest: mandatory quality review publishes the tested game and its unchanged companion together
+ok 16 - mandatory quality review publishes the tested game and its unchanged companion together
+  ---
+  duration_ms: 237.277104
+  type: 'test'
+  ...
+# Subtest: existing generation pipeline retains the validated companion through immutable publication and fork
+ok 17 - existing generation pipeline retains the validated companion through immutable publication and fork
+  ---
+  duration_ms: 3.394038
+  type: 'test'
+  ...
+# Subtest: authenticated companion retrieval preserves family/adult audience and returns no executable source
+ok 18 - authenticated companion retrieval preserves family/adult audience and returns no executable source
+  ---
+  duration_ms: 91.078584
+  type: 'test'
+  ...
+# Subtest: browser client rejects swapped revisions, unsafe manifests and late results after profile change
+ok 19 - browser client rejects swapped revisions, unsafe manifests and late results after profile change
+  ---
+  duration_ms: 1.185114
+  type: 'test'
+  ...
+# Subtest: provider transport offers a nullable closed companion schema and bounds its full request cost
+ok 20 - provider transport offers a nullable closed companion schema and bounds its full request cost
+  ---
+  duration_ms: 10.217669
+  type: 'test'
+  ...
+# Subtest: ordinary subject, creation, and conversation facts never become problem-solving scores
+ok 21 - ordinary subject, creation, and conversation facts never become problem-solving scores
+  ---
+  duration_ms: 14.205966
+  type: 'test'
+  ...
+# Subtest: a prediction or hint marker does not consume a scored opportunity, and correction does not replace first evidence
+ok 22 - a prediction or hint marker does not consume a scored opportunity, and correction does not replace first evidence
+  ---
+  duration_ms: 0.584074
+  type: 'test'
+  ...
+# Subtest: authorship, solution support, accessibility support and uncertainty remain separate
+ok 23 - authorship, solution support, accessibility support and uncertainty remain separate
+  ---
+  duration_ms: 1.211844
+  type: 'test'
+  ...
+# Subtest: missing evidence, interruptions and runtime defects are not child failures
+ok 24 - missing evidence, interruptions and runtime defects are not child failures
+  ---
+  duration_ms: 0.454919
+  type: 'test'
+  ...
+# Subtest: coverage and repeat exposure are explicit and do not become a pooled growth or aptitude estimate
+ok 25 - coverage and repeat exposure are explicit and do not become a pooled growth or aptitude estimate
+  ---
+  duration_ms: 0.509291
+  type: 'test'
+  ...
+# Subtest: duplicate episodes and accidental cross-profile summaries are rejected
+ok 26 - duplicate episodes and accidental cross-profile summaries are rejected
+  ---
+  duration_ms: 0.327286
+  type: 'test'
+  ...
+# PASS generated v2 trusted engine: deterministic forces, breakable joints, immutable handles, body/audio/operation limits; v1/v2 source caps, forbidden APIs, source/code/runtime attestation binding, CSP. No generated source was executed.
+# Subtest: tests/quality-generated.test.ts
+ok 4 - tests/quality-generated.test.ts
+  ---
+  duration_ms: 3218.793395
+  type: 'test'
+  ...
+# Subtest: whole-family prevalidation uses the real base validator and strips duplicate domain envelopes
+ok 28 - whole-family prevalidation uses the real base validator and strips duplicate domain envelopes
+  ---
+  duration_ms: 464.888245
+  type: 'test'
+  ...
+# Subtest: full-family backup preserves linked chat pages, provenance and the same native game
+ok 29 - full-family backup preserves linked chat pages, provenance and the same native game
+  ---
+  duration_ms: 17.712665
+  type: 'test'
+  ...
+# Subtest: family backup keeps selected chapter evidence, existing games, notifications and exact pending identity through a continued fork
+ok 30 - family backup keeps selected chapter evidence, existing games, notifications and exact pending identity through a continued fork
+  ---
+  duration_ms: 363.403081
+  type: 'test'
+  ...
+# Subtest: invalid family ownership, linked games, namespace and recovery-only files are rejected before any write
+ok 31 - invalid family ownership, linked games, namespace and recovery-only files are rejected before any write
+  ---
+  duration_ms: 21.773763
+  type: 'test'
+  ...
+# Subtest: family restoration carries optional guide preferences without creating work or awarding progress
+ok 32 - family restoration carries optional guide preferences without creating work or awarding progress
+  ---
+  duration_ms: 0.761913
+  type: 'test'
+  ...
+# Subtest: family restoration preserves notification acknowledgements and pending work without replay or rewards
+ok 33 - family restoration preserves notification acknowledgements and pending work without replay or rewards
+  ---
+  duration_ms: 2.410019
+  type: 'test'
+  ...
+# Subtest: backup rollback restores exact prior notification metadata and a legacy replacement remains optional
+ok 34 - backup rollback restores exact prior notification metadata and a legacy replacement remains optional
+  ---
+  duration_ms: 4.281932
+  type: 'test'
+  ...
+# Subtest: native remote sessions and remote copies restore without inventing a local project reference
+ok 35 - native remote sessions and remote copies restore without inventing a local project reference
+  ---
+  duration_ms: 1.587703
+  type: 'test'
+  ...
+# Subtest: successful replacement commits all five sources and the ledger without projecting pending activity or scoring rewards
+ok 36 - successful replacement commits all five sources and the ledger without projecting pending activity or scoring rewards
+  ---
+  duration_ms: 5.174824
+  type: 'test'
+  ...
+# Subtest: a source write failure rolls back exact prior source bytes, absent keys and prior ledger
+ok 37 - a source write failure rolls back exact prior source bytes, absent keys and prior ledger
+  ---
+  duration_ms: 3.188437
+  type: 'test'
+  ...
+# Subtest: a ledger transaction failure restores every source and preserves the original reward total
+ok 38 - a ledger transaction failure restores every source and preserves the original reward total
+  ---
+  duration_ms: 2.535969
+  type: 'test'
+  ...
+# Subtest: an APS source write failure restores original bytes across all domains and the ledger
+ok 39 - an APS source write failure restores original bytes across all domains and the ledger
+  ---
+  duration_ms: 2.695401
+  type: 'test'
+  ...
+# Subtest: interruption after replacement but before commit rolls back once and requires a fresh document
+ok 40 - interruption after replacement but before commit rolls back once and requires a fresh document
+  ---
+  duration_ms: 5.204959
+  type: 'test'
+  ...
+# Subtest: a failed rollback keeps the original safety journal and a later startup can recover
+ok 41 - a failed rollback keeps the original safety journal and a later startup can recover
+  ---
+  duration_ms: 5.809305
+  type: 'test'
+  ...
+# Subtest: legacy four-source pending journals recover only their captured keys without erasing APS history
+ok 42 - legacy four-source pending journals recover only their captured keys without erasing APS history
+  ---
+  duration_ms: 6.051311
+  type: 'test'
+  ...
+# Subtest: no room for a safety journal leaves every original source and reward unchanged
+ok 43 - no room for a safety journal leaves every original source and reward unchanged
+  ---
+  duration_ms: 4.875541
+  type: 'test'
+  ...
+# Subtest: journal validation cannot restore arbitrary source keys or a foreign rewards namespace
+ok 44 - journal validation cannot restore arbitrary source keys or a foreign rewards namespace
+  ---
+  duration_ms: 0.771749
+  type: 'test'
+  ...
+# Subtest: damaged JSON reward values survive rollback, while non-JSON IDB values fail before mutation
+ok 45 - damaged JSON reward values survive rollback, while non-JSON IDB values fail before mutation
+  ---
+  duration_ms: 3.447198
+  type: 'test'
+  ...
+# Subtest: a legacy restore or explicit reset empties missing domains and their unacknowledged outboxes
+ok 46 - a legacy restore or explicit reset empties missing domains and their unacknowledged outboxes
+  ---
+  duration_ms: 6.773574
+  type: 'test'
+  ...
+# Subtest: coordinated restore invalidates an open reasoning view after replacement without generating source events
+ok 47 - coordinated restore invalidates an open reasoning view after replacement without generating source events
+  ---
+  duration_ms: 4.077773
+  type: 'test'
+  ...
+# Subtest: maintenance pauses a late workspace write before changing its cached draft or persisted source
+ok 48 - maintenance pauses a late workspace write before changing its cached draft or persisted source
+  ---
+  duration_ms: 0.34342
+  type: 'test'
+  ...
+# Subtest: complete indexed restore journals only changed legacy sources and retains large originals byte-for-byte
+ok 49 - complete indexed restore journals only changed legacy sources and retains large originals byte-for-byte
+  ---
+  duration_ms: 6.648304
+  type: 'test'
+  ...
+# Subtest: recovery leaves identical source strings in place instead of widening or rewriting them
+ok 50 - recovery leaves identical source strings in place instead of widening or rewriting them
+  ---
+  duration_ms: 2.106839
+  type: 'test'
+  ...
+# Subtest: a native quota retry preserves every Latin-1 code unit and keeps its original journal intact
+ok 51 - a native quota retry preserves every Latin-1 code unit and keeps its original journal intact
+  ---
+  duration_ms: 2.790235
+  type: 'test'
+  ...
+# Subtest: permanent quota and genuinely wide source text fail safely without looping or changing original bytes
+ok 52 - permanent quota and genuinely wide source text fail safely without looping or changing original bytes
+  ---
+  duration_ms: 21.350162
+  type: 'test'
+  ...
+# Subtest: recovery point returns exact Unicode/null/empty originals and is private to its profile
+ok 53 - recovery point returns exact Unicode/null/empty originals and is private to its profile
+  ---
+  duration_ms: 53.71236
+  type: 'test'
+  ...
+# Subtest: interrupted backup is never published; same-plan restart completes without replacing chunks
+ok 54 - interrupted backup is never published; same-plan restart completes without replacing chunks
+  ---
+  duration_ms: 40.543489
+  type: 'test'
+  ...
+# Subtest: missing or corrupted chunk prevents restore and never fabricates empty state
+ok 55 - missing or corrupted chunk prevents restore and never fabricates empty state
+  ---
+  duration_ms: 11.014515
+  type: 'test'
+  ...
+1..55
+# tests 55
+# suites 0
+# pass 55
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5278.039318

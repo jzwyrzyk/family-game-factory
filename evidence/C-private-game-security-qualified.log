@@ -1,0 +1,28 @@
+PASS Exact original bytes reach renderer
+PASS Raster projection excludes identity, fingerprint, intent and name
+PASS Only a game-local handle is present
+PASS Foreign family origin denied
+PASS Cross-game handle denied
+PASS Forged revision denied
+PASS Profile switch invalidates replay
+PASS Earlier projection invalid after profile switch
+PASS Foreign image unavailable even with a matching fingerprint
+PASS Withdrawn host authorization denied
+PASS Earlier projection revoked
+PASS New authorization cannot reactivate a revoked launch
+PASS Unsupported metadata rejected role
+PASS Unsupported metadata rejected url
+PASS Unsupported metadata rejected sha256
+PASS Unbound draw command rejected
+PASS Archived drawing still serves its saved version
+PASS Retained game art protected from erasure
+PASS Explicit replacement is confined to new test
+PASS Copy cannot reuse original launch scope
+PASS Copy resolves retained art in its own game
+PASS Wrong revision fingerprint denied
+PASS Forged logical artwork identity denied
+PASS Incomplete recovery backup rejected
+PASS Missing original stops play
+PASS Idempotent restore reconnects exact bytes
+PASS Fresh digest check detects damaged stored bytes
+PASS second origin cannot resolve a copied plan

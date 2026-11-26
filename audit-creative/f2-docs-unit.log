@@ -1,0 +1,127 @@
+
+> family-game-factory@2.0.0-foundation test:docs
+> node --test scripts/tests/check-docs.test.mjs
+
+TAP version 13
+# Subtest: unchanged reviewed sources pass; precise glob routing has no prefix leak
+ok 1 - unchanged reviewed sources pass; precise glob routing has no prefix leak
+  ---
+  duration_ms: 167.478401
+  type: 'test'
+  ...
+# Subtest: source edits, new files and removals invalidate review without changing dates
+ok 2 - source edits, new files and removals invalidate review without changing dates
+  ---
+  duration_ms: 187.431699
+  type: 'test'
+  ...
+# Subtest: new source outside all known roots fails instead of bypassing context review
+ok 3 - new source outside all known roots fails instead of bypassing context review
+  ---
+  duration_ms: 143.434049
+  type: 'test'
+  ...
+# Subtest: missing canonical documents and broken relative links fail
+ok 4 - missing canonical documents and broken relative links fail
+  ---
+  duration_ms: 164.711273
+  type: 'test'
+  ...
+# Subtest: external links, anchors and code examples do not create false local-link failures
+ok 5 - external links, anchors and code examples do not create false local-link failures
+  ---
+  duration_ms: 160.086109
+  type: 'test'
+  ...
+# Subtest: an updated review needs a changed routed document in the actual PR range
+ok 6 - an updated review needs a changed routed document in the actual PR range
+  ---
+  duration_ms: 436.523629
+  type: 'test'
+  ...
+# Subtest: a specific unchanged review supports changes with no documentation impact
+ok 7 - a specific unchanged review supports changes with no documentation impact
+  ---
+  duration_ms: 322.45812
+  type: 'test'
+  ...
+# Subtest: prospective merge content is checked even when the PR head alone was reviewed
+ok 8 - prospective merge content is checked even when the PR head alone was reviewed
+  ---
+  duration_ms: 296.373005
+  type: 'test'
+  ...
+# Subtest: placeholder reasons and bulk refresh requests are rejected
+ok 9 - placeholder reasons and bulk refresh requests are rejected
+  ---
+  duration_ms: 157.55685
+  type: 'test'
+  ...
+# Subtest: old dates generate review reminders without unrelated merge failures
+ok 10 - old dates generate review reminders without unrelated merge failures
+  ---
+  duration_ms: 135.174064
+  type: 'test'
+  ...
+# Subtest: invalid dates and excessive future review stamps fail
+ok 11 - invalid dates and excessive future review stamps fail
+  ---
+  duration_ms: 184.547663
+  type: 'test'
+  ...
+# Subtest: routing changes invalidate the fingerprint and unknown commit ranges fail closed
+ok 12 - routing changes invalidate the fingerprint and unknown commit ranges fail closed
+  ---
+  duration_ms: 246.613251
+  type: 'test'
+  ...
+# Subtest: removing a component and its complete area still requires context review
+ok 13 - removing a component and its complete area still requires context review
+  ---
+  duration_ms: 251.627377
+  type: 'test'
+  ...
+# Subtest: global coverage, required files, link scope and intervals are reviewed policy
+ok 14 - global coverage, required files, link scope and intervals are reviewed policy
+  ---
+  duration_ms: 92.046562
+  type: 'test'
+  ...
+# Subtest: the mandatory context policy area cannot itself disappear
+ok 15 - the mandatory context policy area cannot itself disappear
+  ---
+  duration_ms: 212.181484
+  type: 'test'
+  ...
+# Subtest: registry review fields cannot create a self-changing context digest
+ok 16 - registry review fields cannot create a self-changing context digest
+  ---
+  duration_ms: 225.611661
+  type: 'test'
+  ...
+# Subtest: other areas cannot route registry bytes into a self-referential fingerprint
+ok 17 - other areas cannot route registry bytes into a self-referential fingerprint
+  ---
+  duration_ms: 203.401359
+  type: 'test'
+  ...
+# Subtest: policy-only changes declaring updated require a changed context document
+ok 18 - policy-only changes declaring updated require a changed context document
+  ---
+  duration_ms: 296.387317
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4191.909197
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

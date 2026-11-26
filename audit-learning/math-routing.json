@@ -1,0 +1,34 @@
+{
+  "skills": 113,
+  "sampled": 51867,
+  "modelFamilies": [
+    "compose",
+    "frames",
+    "numberLine",
+    "counterGroups",
+    "blocks",
+    "ruler",
+    "clock",
+    "chart",
+    "shapes",
+    "arrays",
+    "coins",
+    "fractions",
+    "angles"
+  ],
+  "withSkillSpecificModel": 58,
+  "withFallback": [
+    "g2-skip-count",
+    "g2-word-problems",
+    "g3-two-step",
+    "g3-patterns",
+    "g3-round",
+    "g3-multiply-tens",
+    "g4-round",
+    "g4-multiply",
+    "g4-divide",
+    "g4-patterns",
+    "g4-measurement"
+  ],
+  "unrepresentable": []
+}

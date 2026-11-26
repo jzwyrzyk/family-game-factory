@@ -1,0 +1,48 @@
+
+> family-game-factory@2.0.0-foundation build
+> npm run typecheck && vite build
+
+
+> family-game-factory@2.0.0-foundation typecheck
+> tsc --noEmit
+
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+vite v6.4.1 building for production...
+transforming...
+✓ 292 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/indexed-records.ts is dynamically imported by /workspace/jems-consolidation/audit-creative/candidate-895/src/assets/private-drawings.ts but also statically imported by /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/indexed-creation.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/indexed-native.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/indexed-notebook.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/native-workspace.ts is dynamically imported by /workspace/jems-consolidation/audit-creative/candidate-895/src/assets/private-drawings.ts but also statically imported by /workspace/jems-consolidation/audit-creative/candidate-895/src/factory/ui.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/complete-backup.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/creation-recovery.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/creation-workspace.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/native-recovery.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/notebook-recovery.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/notebook-workspace.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/reward-authorities.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/studio/adapter.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/studio/local-project.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /workspace/jems-consolidation/audit-creative/candidate-895/src/creation/private-art.ts is dynamically imported by /workspace/jems-consolidation/audit-creative/candidate-895/src/drawing/asset-collection.ts but also statically imported by /workspace/jems-consolidation/audit-creative/candidate-895/src/creation/scene-thumbnails.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/creation/ui.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/drawing/animation-editor.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/drawing/motion-editor.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/adult-transfer-recovery.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/complete-backup.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/studio/ui.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/indexed-notebook.ts is dynamically imported by /workspace/jems-consolidation/audit-creative/candidate-895/src/assets/private-drawings.ts but also statically imported by /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/notebook-recovery.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/notebook-workspace.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/storage/reward-authorities.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/studio/local-project.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /workspace/jems-consolidation/audit-creative/candidate-895/src/drawing/lab.ts is dynamically imported by /workspace/jems-consolidation/audit-creative/candidate-895/src/creation/ui.ts but also statically imported by /workspace/jems-consolidation/audit-creative/candidate-895/src/assets/ui.ts, /workspace/jems-consolidation/audit-creative/candidate-895/src/drawing/studio.ts, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist/index.html                    16.84 kB │ gzip:   5.39 kB
+dist/assets/index-Op02E-2L.css    474.32 kB │ gzip:  94.61 kB
+dist/assets/review-DpPGCrqx.js      0.50 kB │ gzip:   0.34 kB
+dist/assets/index-DxA3SUgp.js   2,030.70 kB │ gzip: 631.48 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 9.41s
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

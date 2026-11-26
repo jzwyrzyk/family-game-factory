@@ -1,0 +1,22 @@
+Rows 3672 unique source assertions 3328 class Counter({'identical original assertion line in changed file': 2224, 'identical entire file': 1135, 'unmapped': 293, 'identical line under other path': 20})
+unmapped by path, distinct source lines:
+scripts/ci/pipeline.test.mjs 10 199,201,202,207,209,211,214,215
+tests/art-adventure-browser.cjs 1 215
+tests/art-entry-readiness.cjs 23 208,213,215
+tests/art-studio-browser.cjs 5 210
+tests/beta-browser.ts 4 208,211
+tests/beta-privacy.test.ts 1 208
+tests/beta-reviewed-png.test.ts 4 198
+tests/crayon-revision-browser.cjs 16 199,207,209,210,215
+tests/creation-engine.test.ts 36 210,211,214,217
+tests/creation-private-art-browser.cjs 8 208,215,217
+tests/creation-private-art.test.ts 49 208,210,213,215
+tests/creation-worlds-browser.cjs 1 213
+tests/creation-worlds.cjs 2 211,214,217
+tests/creative-png-compat.cjs 1 210
+tests/creative-worlds-browser.cjs 5 215
+tests/creative-worlds.test.ts 6 215
+tests/drawing-animation.test.ts 1 210
+tests/drawing-engine.test.ts 7 211
+tests/pals-creation.test.ts 3 215
+tests/storage-creation-browser.cjs 1 217

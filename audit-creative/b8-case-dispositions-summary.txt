@@ -1,0 +1,25 @@
+Text-unmatched rows by disposition
+73 Corrected and confirmed in original case
+41 Verified on historical render and reader fixtures; registry test corrections remain separate
+30 Unchanged original case passed on B5
+25 Confirmed preserved with current control or paper format
+20 Confirmed using canonical catalog and role readers
+16 Graphical, saved and historical render cases exercised; stage matte and refusal wording reviewed separately
+14 Confirmed for ordinary picker, local scene, portable archive and isolated owner
+14 Confirmed for tested original byte/reader/behavior contracts
+11 Reconciled under the current exact-once CI manifest
+9 Verified in parts; original complete catalog case needs a single equivalent run
+7 Confirmed through the replacement named-path and original UI cases
+6 Confirmed on the normal synthetic family intake
+6 Partially confirmed; generated legacy-role field unresolved on B7
+5 Confirmed through selected drawing tool and original-pixel reader
+3 Confirmed with separate isolated-cache and illustrated-playground cases
+2 Replaced by verified equivalent using a valid positive fixture
+2 Confirmed with current asynchronous decoder
+2 Corrected and confirmed in both original cancellation windows
+1 Confirmed for reviewed inputs with current rejection wording
+1 Confirmed in original role/lineage case
+1 Confirmed through live bidirectional old/new writer checks
+1 Confirmed in unchanged original unit case
+1 Replaced by exact format-specific asset hash check
+1 Confirmed through distinct recent/family versions and full picker rows

@@ -1,0 +1,280 @@
+{
+  "hostBefore": {
+    "loadAverage": [
+      4.43,
+      3.17,
+      2.29
+    ],
+    "cpuPressure": null,
+    "utc": "2026-11-26T04:46:01.696Z"
+  },
+  "hostAfter": {
+    "loadAverage": [
+      3.82,
+      3.09,
+      2.27
+    ],
+    "cpuPressure": null,
+    "utc": "2026-11-26T04:46:12.820Z"
+  },
+  "head": "e61faded4b15ed9b6cc1eac9a40fd8e8b5bc677f",
+  "tree": "34d886a35d999551b1b76f9a9b860d658fd457a1",
+  "browser": "156.0.8078.79",
+  "fixture": {
+    "items": 60,
+    "roots": 48,
+    "revisions": 12,
+    "width": 768,
+    "height": 512,
+    "sourceBytes": 10748788,
+    "world": "06967435-2f2c-4df3-94c1-5aea9bc1bc3e",
+    "pins": [
+      "art:image:ea0e4a3b-2701-48b2-b604-a6bf55da35a1:09c8be7cd26c92981ce908b3f68ca7cb774cfe8d8ca9c2c844e60721af451043",
+      "art:image:c0536421-6d2c-4589-a4e8-d6102b5a219c:bfe5c40dfd90f384c92faaee471d72906d9d5e316a7fc22a1ab522a225f0ad8c",
+      "art:image:f1669744-10f0-4341-af0f-6153192f3415:74ba3c365487456c93332a6af8c6a9d45e3eae19e0584c6e219bc3805ba73d92",
+      "art:image:bb63329f-10c3-4207-ab88-402f8c01cb1a:d152b484577f7ceeefd6158365a736b51d7f677be68c95fe5cfaf1ac2ff6a423",
+      "art:image:9dc0e6e4-9352-413a-8994-56b071ab7099:4133fbec50d5b055752006200b6d78cb34f5a64178b0386348a4b5ff3976af3f"
+    ]
+  },
+  "viewport": [
+    1280,
+    900
+  ],
+  "serviceWorkers": "blocked",
+  "entryURL": "/arcade/?art=1",
+  "coldEmptyProfileOpenMs": 1090.2791969999998,
+  "medians": {
+    "populatedReloadToShelfMs": 499.97511099999974,
+    "metadataPageMs": 11.300000000046566,
+    "catalogMs": 22.0999999998603,
+    "usedJsHeap": 19345064,
+    "indexedDbBytes": 15876096,
+    "originStorageBytes": 15876096
+  },
+  "samples": [
+    {
+      "populatedReloadToShelfMs": 703.7455319999999,
+      "metadataPageMs": 13.100000000093132,
+      "catalogMs": 37.60000000009313,
+      "pageItems": 24,
+      "catalogItems": 60,
+      "usedJsHeap": 15819089,
+      "indexedDbBytes": 15876096,
+      "originStorageBytes": 15876096,
+      "firstThumbnailWidth": 256,
+      "navigation": {
+        "domContentLoadedMs": 98.69999999995343
+      }
+    },
+    {
+      "populatedReloadToShelfMs": 497.907612,
+      "metadataPageMs": 36.9000000001397,
+      "catalogMs": 22.0999999998603,
+      "pageItems": 24,
+      "catalogItems": 60,
+      "usedJsHeap": 19345064,
+      "indexedDbBytes": 15876096,
+      "originStorageBytes": 15876096,
+      "firstThumbnailWidth": 256,
+      "navigation": {
+        "domContentLoadedMs": 109.9000000001397
+      }
+    },
+    {
+      "populatedReloadToShelfMs": 499.97511099999974,
+      "metadataPageMs": 11,
+      "catalogMs": 26.0999999998603,
+      "pageItems": 24,
+      "catalogItems": 60,
+      "usedJsHeap": 30343820,
+      "indexedDbBytes": 15876096,
+      "originStorageBytes": 15876096,
+      "firstThumbnailWidth": 256,
+      "navigation": {
+        "domContentLoadedMs": 102.5999999998603
+      }
+    },
+    {
+      "populatedReloadToShelfMs": 681.8783449999992,
+      "metadataPageMs": 11.300000000046566,
+      "catalogMs": 16.9000000001397,
+      "pageItems": 24,
+      "catalogItems": 60,
+      "usedJsHeap": 17840036,
+      "indexedDbBytes": 15876096,
+      "originStorageBytes": 15876096,
+      "firstThumbnailWidth": 256,
+      "navigation": {
+        "domContentLoadedMs": 102.69999999995343
+      }
+    },
+    {
+      "populatedReloadToShelfMs": 484.26465199999984,
+      "metadataPageMs": 8.300000000046566,
+      "catalogMs": 13.100000000093132,
+      "pageItems": 24,
+      "catalogItems": 60,
+      "usedJsHeap": 27133354,
+      "indexedDbBytes": 15876096,
+      "originStorageBytes": 15876096,
+      "firstThumbnailWidth": 256,
+      "navigation": {
+        "domContentLoadedMs": 111
+      }
+    }
+  ],
+  "interaction": [
+    {
+      "semanticSearchToTwoResultsMs": 82.2215839999999,
+      "keptOpenToSceneMs": 187.815971,
+      "keptOpenToPlayableMs": 243.1192459999993,
+      "pickerToFirstChoiceMs": 209.7557229999993,
+      "pickerToFirstPaintedThumbMs": 241.46597699999893,
+      "pickerToAllPaintedThumbsMs": 256.1503559999992,
+      "frameIntervalsMs": [
+        16.5,
+        16.700000000000045,
+        16.700000000000045,
+        16.699999999999932,
+        16.600000000000023,
+        16.700000000000045,
+        16.699999999999932,
+        16.600000000000023,
+        16.799999999999955,
+        16.600000000000023,
+        16.600000000000023,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045,
+        16.700000000000045,
+        16.700000000000045,
+        16.699999999999818,
+        16.600000000000136,
+        16.700000000000045,
+        16.699999999999818,
+        16.600000000000136,
+        16.700000000000045,
+        16.699999999999818,
+        16.600000000000136,
+        16.59999999999991,
+        16.700000000000045,
+        16.700000000000045
+      ],
+      "rows": 12,
+      "thumbnailCount": 12,
+      "canvasVisible": true,
+      "stageSize": [
+        800,
+        450
+      ]
+    },
+    {
+      "semanticSearchToTwoResultsMs": 79.75495000000046,
+      "keptOpenToSceneMs": 153.431908999999,
+      "keptOpenToPlayableMs": 208.205496999999,
+      "pickerToFirstChoiceMs": 112.34634200000073,
+      "pickerToFirstPaintedThumbMs": 152.32519300000058,
+      "pickerToAllPaintedThumbsMs": 165.310786,
+      "frameIntervalsMs": [
+        16.600000000000023,
+        16.699999999999932,
+        16.700000000000045,
+        16.600000000000023,
+        16.59999999999991,
+        16.700000000000045,
+        16.799999999999955,
+        16.600000000000023,
+        16.700000000000045,
+        16.600000000000023,
+        16.699999999999932,
+        16.600000000000023,
+        16.700000000000045,
+        16.59999999999991,
+        16.799999999999955,
+        16.600000000000136,
+        16.700000000000045,
+        16.699999999999818,
+        16.600000000000136,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045,
+        16.700000000000045,
+        16.59999999999991,
+        16.799999999999955
+      ],
+      "rows": 12,
+      "thumbnailCount": 12,
+      "canvasVisible": true,
+      "stageSize": [
+        800,
+        450
+      ]
+    },
+    {
+      "semanticSearchToTwoResultsMs": 90.76075599999967,
+      "keptOpenToSceneMs": 112.61876499999926,
+      "keptOpenToPlayableMs": 213.79938499999844,
+      "pickerToFirstChoiceMs": 106.30826700000034,
+      "pickerToFirstPaintedThumbMs": 142.52250400000048,
+      "pickerToAllPaintedThumbsMs": 153.71552800000063,
+      "frameIntervalsMs": [
+        16.700000000000045,
+        16.600000000000023,
+        16.699999999999932,
+        16.699999999999932,
+        16.700000000000045,
+        16.600000000000136,
+        16.699999999999818,
+        16.600000000000136,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045,
+        16.700000000000045,
+        16.699999999999818,
+        16.600000000000136,
+        16.700000000000045,
+        16.59999999999991,
+        16.799999999999955,
+        16.600000000000136,
+        16.699999999999818,
+        16.600000000000136,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045,
+        16.700000000000045,
+        16.699999999999818,
+        16.600000000000136,
+        16.700000000000045,
+        16.59999999999991,
+        16.799999999999955,
+        16.600000000000136
+      ],
+      "rows": 12,
+      "thumbnailCount": 12,
+      "canvasVisible": true,
+      "stageSize": [
+        800,
+        450
+      ]
+    }
+  ],
+  "externalRequests": [],
+  "entryBundles": {
+    "index-2RMaZPf7.css": {
+      "bytes": 461943,
+      "sha256": "08d3351183d5c4cdc48e7bc0a9f5c4456ff633c04dc1f746013c2c1d45a535a4"
+    },
+    "index-CyoX7aKm.js": {
+      "bytes": 1953687,
+      "sha256": "22dd941d57f5653fdfd8144992d42b6bb7040e244ed6f7d0ef7e858def15291b"
+    }
+  }
+}

@@ -1,0 +1,64 @@
+TAP version 13
+# Subtest: picture hunt rules, source version, three input consequences and restart
+ok 1 - picture hunt rules, source version, three input consequences and restart
+  ---
+  duration_ms: 5.36197
+  type: 'test'
+  ...
+# Subtest: context roles never infer mechanics, including saved projects without roles
+ok 2 - context roles never infer mechanics, including saved projects without roles
+  ---
+  duration_ms: 2.550774
+  type: 'test'
+  ...
+# Subtest: family review accepts exact truecolor and indexed raster originals
+ok 3 - family review accepts exact truecolor and indexed raster originals
+  ---
+  duration_ms: 16.104969
+  type: 'test'
+  ...
+# Subtest: embedded file details, trailing bytes and incomplete chunks cannot pass review
+ok 4 - embedded file details, trailing bytes and incomplete chunks cannot pass review
+  ---
+  duration_ms: 0.740816
+  type: 'test'
+  ...
+# Subtest: the color model and exact scanline count govern admitted image data
+ok 5 - the color model and exact scanline count govern admitted image data
+  ---
+  duration_ms: 8.205034
+  type: 'test'
+  ...
+# Subtest: formerly accepted file with invalid pixel stream cannot be admitted
+ok 6 - formerly accepted file with invalid pixel stream cannot be admitted
+  ---
+  duration_ms: 0.22582
+  type: 'test'
+  ...
+# Subtest: the optional-palette copy retains every other byte and needs its own digest
+ok 7 - the optional-palette copy retains every other byte and needs its own digest
+  ---
+  duration_ms: 7.94947
+  type: 'test'
+  ...
+# Subtest: nine motions have bounded independent poses and retain the original image contract
+ok 8 - nine motions have bounded independent poses and retain the original image contract
+  ---
+  duration_ms: 4.138767
+  type: 'test'
+  ...
+# Subtest: old assemblies keep their shape, motion remains bounded on import and assembly validation clones its points
+ok 9 - old assemblies keep their shape, motion remains bounded on import and assembly validation clones its points
+  ---
+  duration_ms: 1.526851
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 709.37547

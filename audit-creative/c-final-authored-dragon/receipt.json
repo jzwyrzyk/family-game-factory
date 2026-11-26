@@ -1,0 +1,42 @@
+{
+  "head": "563de940eacd3f3573bf93236ab5eebd4608043a",
+  "browser": "156.0.8078.79",
+  "origin": {
+    "id": "3d38b442-b726-419c-bca6-a8f981e18861",
+    "sha": "3ea9d8d7d75e644e96c17e5fc7532148b5fe93149c073810c892beb550720b82",
+    "actualSha": "3ea9d8d7d75e644e96c17e5fc7532148b5fe93149c073810c892beb550720b82",
+    "editableMarks": 4,
+    "transparent": true,
+    "whole": "0efa3abb-dedc-42a7-a7be-80ef60a612f1",
+    "articulated": "38f2c684-318a-47dc-9bfc-6b783d387ab8",
+    "wing": {
+      "id": "piece_fca95154",
+      "name": "Original dragon wing",
+      "role": "wing",
+      "region": {
+        "x": 0.35,
+        "y": 0.13,
+        "w": 0.31,
+        "h": 0.4,
+        "shape": "rect"
+      },
+      "parentId": "main_body",
+      "physical": true,
+      "pivot": {
+        "x": 0.52,
+        "y": 0.82
+      }
+    }
+  },
+  "keptWorld": "6f2392a2-4960-45a8-8464-244a3c8712f4",
+  "secondAnimation": "5ed9322f-ce2f-42ef-8647-1b0f9d0e7ad7",
+  "partScene": "215ca140-5016-46d8-bc95-b8908783a24b",
+  "game": "18d03832-fdab-4362-9c6e-865c3960f3ff",
+  "winCount": 3,
+  "originalUnchanged": true,
+  "selectedWholePin": "art:rig:0efa3abb-dedc-42a7-a7be-80ef60a612f1:4b1d97658b05ef5c1dcbaaa50360602c60101dea283375f6198b4ed88c9a9756",
+  "selectedPartPin": "art:rig:38f2c684-318a-47dc-9bfc-6b783d387ab8:6df13e777cc27a94a9963442f491ab2aaa5865dec9faeeebd785e50cef75bbcc",
+  "selectedGamePin": "art:image:3d38b442-b726-419c-bca6-a8f981e18861:3ea9d8d7d75e644e96c17e5fc7532148b5fe93149c073810c892beb550720b82",
+  "externalOrNonGetRequests": [],
+  "authoringScope": "Drawing through the visible paper, whole Bounce through Make it move, separate wing and explicit hinge through the parts editor, native scene playback, kept world, second animation, Try the saved parts and three actual game taps."
+}

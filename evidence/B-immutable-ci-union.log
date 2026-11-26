@@ -1,0 +1,733 @@
+
+> family-game-factory@2.0.0-foundation test:ci
+> node --test scripts/ci/*.test.mjs tests/ci-*.test.mjs tests/browser-scenarios.test.cjs
+
+TAP version 13
+# Subtest: game, UI, learning, coding and conversation observations never authorize narrower execution
+ok 1 - game, UI, learning, coding and conversation observations never authorize narrower execution
+  ---
+  duration_ms: 3.170549
+  type: 'test'
+  ...
+# Subtest: transitive consumers include type dependencies and terminate on cycles
+ok 2 - transitive consumers include type dependencies and terminate on cycles
+  ---
+  duration_ms: 0.428358
+  type: 'test'
+  ...
+# Subtest: runtime imports, missing modules and sensitive paths retain full fallback
+ok 3 - runtime imports, missing modules and sensitive paths retain full fallback
+  ---
+  duration_ms: 0.334586
+  type: 'test'
+  ...
+# ::group::node first
+# ::endgroup::
+# CI_SUITE_RESULT {"command":["node","first"],"seconds":0,"exitCode":9}
+# ::group::node second
+# ::endgroup::
+# CI_SUITE_RESULT {"command":["node","second"],"seconds":0,"exitCode":0}
+# Subtest: aggregates reject replaced or self-claimed plan bytes before parsing
+ok 4 - aggregates reject replaced or self-claimed plan bytes before parsing
+  ---
+  duration_ms: 1.537057
+  type: 'test'
+  ...
+# Subtest: all original Arcade leaf commands occur exactly once in their original required group
+ok 5 - all original Arcade leaf commands occur exactly once in their original required group
+  ---
+  duration_ms: 12.072547
+  type: 'test'
+  ...
+# Subtest: argv parser rejects executable shell expansion; hooks and recursive scripts require review
+ok 6 - argv parser rejects executable shell expansion; hooks and recursive scripts require review
+  ---
+  duration_ms: 0.901565
+  type: 'test'
+  ...
+# Subtest: failed commands remain failures while independent remaining commands still run once
+ok 7 - failed commands remain failures while independent remaining commands still run once
+  ---
+  duration_ms: 0.906192
+  type: 'test'
+  ...
+# Subtest: aggregate accepts complete successful receipts and rejects every false-pass state
+ok 8 - aggregate accepts complete successful receipts and rejects every false-pass state
+  ---
+  duration_ms: 18.180915
+  type: 'test'
+  ...
+# Subtest: PR narrowing requires base policy; non-PR narrowing without protected-main evidence fails
+ok 9 - PR narrowing requires base policy; non-PR narrowing without protected-main evidence fails
+  ---
+  duration_ms: 1.387181
+  type: 'test'
+  ...
+# Subtest: shared build identity invalidates changed source, tree, dependencies and artifact bytes
+ok 10 - shared build identity invalidates changed source, tree, dependencies and artifact bytes
+  ---
+  duration_ms: 0.384372
+  type: 'test'
+  ...
+# Subtest: authenticated TAR still rejects links, traversal, devices and duplicate members before extraction
+ok 11 - authenticated TAR still rejects links, traversal, devices and duplicate members before extraction
+  ---
+  duration_ms: 350.397168
+  type: 'test'
+  ...
+# Subtest: workflow adapter executes base policy, bootstraps full and keeps unopted main full
+ok 12 - workflow adapter executes base policy, bootstraps full and keeps unopted main full
+  ---
+  duration_ms: 1293.257719
+  type: 'test'
+  ...
+# Subtest: main reuse requires literal opt-in, protected main and the exact trusted push predecessor
+ok 13 - main reuse requires literal opt-in, protected main and the exact trusted push predecessor
+  ---
+  duration_ms: 0.673329
+  type: 'test'
+  ...
+# Subtest: main aggregates require authentic reuse even for documentation and never mint new gameplay coverage
+ok 14 - main aggregates require authentic reuse even for documentation and never mint new gameplay coverage
+  ---
+  duration_ms: 9.687456
+  type: 'test'
+  ...
+# Subtest: protected-main adapter authenticates the predecessor policy and falls back on every missing evidence path
+ok 15 - protected-main adapter authenticates the predecessor policy and falls back on every missing evidence path
+  ---
+  duration_ms: 1099.058258
+  type: 'test'
+  ...
+# Subtest: aggregates authenticate exact plan bytes from the preparation output before parsing
+ok 16 - aggregates authenticate exact plan bytes from the preparation output before parsing
+  ---
+  duration_ms: 0.417793
+  type: 'test'
+  ...
+# Subtest: a reuse boolean is insufficient without bounded authenticated source and artifact proof
+ok 17 - a reuse boolean is insufficient without bounded authenticated source and artifact proof
+  ---
+  duration_ms: 0.636474
+  type: 'test'
+  ...
+# Subtest: parallel elapsed differs from cumulative runner minutes and mutable updated_at
+ok 18 - parallel elapsed differs from cumulative runner minutes and mutable updated_at
+  ---
+  duration_ms: 1.959567
+  type: 'test'
+  ...
+# Subtest: failed first attempt stays failed after a successful targeted retry
+ok 19 - failed first attempt stays failed after a successful targeted retry
+  ---
+  duration_ms: 2.287063
+  type: 'test'
+  ...
+# Subtest: cancelled, incomplete, absent and all-skipped jobs do not count as first-attempt passes
+ok 20 - cancelled, incomplete, absent and all-skipped jobs do not count as first-attempt passes
+  ---
+  duration_ms: 0.434688
+  type: 'test'
+  ...
+# Subtest: ongoing workflow and missing or reversed timestamps remain unknown
+ok 21 - ongoing workflow and missing or reversed timestamps remain unknown
+  ---
+  duration_ms: 0.342238
+  type: 'test'
+  ...
+# Subtest: pagination and every attempt are read without silently dropping job 101
+ok 22 - pagination and every attempt are read without silently dropping job 101
+  ---
+  duration_ms: 2.002562
+  type: 'test'
+  ...
+# Subtest: API failures and malformed pagination fail the report instead of inventing zero cost
+ok 23 - API failures and malformed pagination fail the report instead of inventing zero cost
+  ---
+  duration_ms: 0.577805
+  type: 'test'
+  ...
+# Subtest: baseline comparisons reject unrelated repository and preserve estimate warnings
+ok 24 - baseline comparisons reject unrelated repository and preserve estimate warnings
+  ---
+  duration_ms: 0.929808
+  type: 'test'
+  ...
+# Subtest: authoritative cancellation remains separate when fail-closed aggregate jobs fail
+ok 25 - authoritative cancellation remains separate when fail-closed aggregate jobs fail
+  ---
+  duration_ms: 0.31076
+  type: 'test'
+  ...
+# Subtest: complete authenticated equivalent-source fixture evidence is reusable but never release authorization
+ok 26 - complete authenticated equivalent-source fixture evidence is reusable but never release authorization
+  ---
+  duration_ms: 2.20635
+  type: 'test'
+  ...
+# Subtest: reviewed main manual full run can refresh evidence without a dummy source commit
+ok 27 - reviewed main manual full run can refresh evidence without a dummy source commit
+  ---
+  duration_ms: 0.4753
+  type: 'test'
+  ...
+# Subtest: reject arbitrary historical workflow success
+ok 28 - reject arbitrary historical workflow success
+  ---
+  duration_ms: 0.394037
+  type: 'test'
+  ...
+# Subtest: reject repository identity replacement
+ok 29 - reject repository identity replacement
+  ---
+  duration_ms: 0.233143
+  type: 'test'
+  ...
+# Subtest: reject fork source
+ok 30 - reject fork source
+  ---
+  duration_ms: 0.281095
+  type: 'test'
+  ...
+# Subtest: reject manual feature branch cannot seed trusted evidence
+ok 31 - reject manual feature branch cannot seed trusted evidence
+  ---
+  duration_ms: 0.168705
+  type: 'test'
+  ...
+# Subtest: reject manual partial suite cannot seed trusted evidence
+ok 32 - reject manual partial suite cannot seed trusted evidence
+  ---
+  duration_ms: 0.241546
+  type: 'test'
+  ...
+# Subtest: reject manual skipped full job cannot seed trusted evidence
+ok 33 - reject manual skipped full job cannot seed trusted evidence
+  ---
+  duration_ms: 0.175556
+  type: 'test'
+  ...
+# Subtest: reject manual fork cannot seed trusted evidence
+ok 34 - reject manual fork cannot seed trusted evidence
+  ---
+  duration_ms: 0.453947
+  type: 'test'
+  ...
+# Subtest: reject schedule cannot seed trusted evidence
+ok 35 - reject schedule cannot seed trusted evidence
+  ---
+  duration_ms: 0.380286
+  type: 'test'
+  ...
+# Subtest: reject PR run cannot seed trusted evidence
+ok 36 - reject PR run cannot seed trusted evidence
+  ---
+  duration_ms: 0.241746
+  type: 'test'
+  ...
+# Subtest: reject branch run cannot seed trusted evidence
+ok 37 - reject branch run cannot seed trusted evidence
+  ---
+  duration_ms: 0.135275
+  type: 'test'
+  ...
+# Subtest: reject failed workflow
+ok 38 - reject failed workflow
+  ---
+  duration_ms: 0.157999
+  type: 'test'
+  ...
+# Subtest: reject pending workflow
+ok 39 - reject pending workflow
+  ---
+  duration_ms: 0.982878
+  type: 'test'
+  ...
+# Subtest: reject rerun cannot hide first-attempt failure
+ok 40 - reject rerun cannot hide first-attempt failure
+  ---
+  duration_ms: 0.161485
+  type: 'test'
+  ...
+# Subtest: reject wrong source SHA
+ok 41 - reject wrong source SHA
+  ---
+  duration_ms: 0.122485
+  type: 'test'
+  ...
+# Subtest: reject runtime environment mismatch
+ok 42 - reject runtime environment mismatch
+  ---
+  duration_ms: 0.118209
+  type: 'test'
+  ...
+# Subtest: reject expiry
+ok 43 - reject expiry
+  ---
+  duration_ms: 0.184059
+  type: 'test'
+  ...
+# Subtest: reject revocation
+ok 44 - reject revocation
+  ---
+  duration_ms: 0.116326
+  type: 'test'
+  ...
+# Subtest: reject future timestamp
+ok 45 - reject future timestamp
+  ---
+  duration_ms: 0.115905
+  type: 'test'
+  ...
+# Subtest: reject changed source
+ok 46 - reject changed source
+  ---
+  duration_ms: 0.118259
+  type: 'test'
+  ...
+# Subtest: reject changed tests or workflow
+ok 47 - reject changed tests or workflow
+  ---
+  duration_ms: 0.116326
+  type: 'test'
+  ...
+# Subtest: reject changed dependencies
+ok 48 - reject changed dependencies
+  ---
+  duration_ms: 0.115304
+  type: 'test'
+  ...
+# Subtest: reject changed controller
+ok 49 - reject changed controller
+  ---
+  duration_ms: 0.124268
+  type: 'test'
+  ...
+# Subtest: reject receipt source identity forgery
+ok 50 - reject receipt source identity forgery
+  ---
+  duration_ms: 0.141354
+  type: 'test'
+  ...
+# Subtest: reject source-tree mismatch
+ok 51 - reject source-tree mismatch
+  ---
+  duration_ms: 0.11212
+  type: 'test'
+  ...
+# Subtest: reject changed build identity
+ok 52 - reject changed build identity
+  ---
+  duration_ms: 0.122125
+  type: 'test'
+  ...
+# Subtest: reject changed full-suite manifest
+ok 53 - reject changed full-suite manifest
+  ---
+  duration_ms: 0.117057
+  type: 'test'
+  ...
+# Subtest: reject missing required shard
+ok 54 - reject missing required shard
+  ---
+  duration_ms: 0.132961
+  type: 'test'
+  ...
+# Subtest: reject duplicate shard
+ok 55 - reject duplicate shard
+  ---
+  duration_ms: 0.237529
+  type: 'test'
+  ...
+# Subtest: reject cancelled required shard
+ok 56 - reject cancelled required shard
+  ---
+  duration_ms: 0.188285
+  type: 'test'
+  ...
+# Subtest: reject skipped required shard
+ok 57 - reject skipped required shard
+  ---
+  duration_ms: 0.136346
+  type: 'test'
+  ...
+# Subtest: reject deliberately failed command
+ok 58 - reject deliberately failed command
+  ---
+  duration_ms: 0.136407
+  type: 'test'
+  ...
+# Subtest: reject omitted assertion command
+ok 59 - reject omitted assertion command
+  ---
+  duration_ms: 0.14505
+  type: 'test'
+  ...
+# Subtest: reject replaced command
+ok 60 - reject replaced command
+  ---
+  duration_ms: 0.264581
+  type: 'test'
+  ...
+# Subtest: reject missing aggregate job
+ok 61 - reject missing aggregate job
+  ---
+  duration_ms: 0.257139
+  type: 'test'
+  ...
+# Subtest: reject cancelled aggregate job
+ok 62 - reject cancelled aggregate job
+  ---
+  duration_ms: 0.194074
+  type: 'test'
+  ...
+# Subtest: reject unexpectedly skipped aggregate
+ok 63 - reject unexpectedly skipped aggregate
+  ---
+  duration_ms: 0.231451
+  type: 'test'
+  ...
+# Subtest: reject job of different run
+ok 64 - reject job of different run
+  ---
+  duration_ms: 0.228336
+  type: 'test'
+  ...
+# Subtest: reject duplicate aggregate
+ok 65 - reject duplicate aggregate
+  ---
+  duration_ms: 0.207864
+  type: 'test'
+  ...
+# Subtest: reject unapproved runner
+ok 66 - reject unapproved runner
+  ---
+  duration_ms: 0.14587
+  type: 'test'
+  ...
+# Subtest: reject self-hosted runner
+ok 67 - reject self-hosted runner
+  ---
+  duration_ms: 0.132771
+  type: 'test'
+  ...
+# Subtest: reject expired artifact
+ok 68 - reject expired artifact
+  ---
+  duration_ms: 0.127393
+  type: 'test'
+  ...
+# Subtest: reject artifact from different run
+ok 69 - reject artifact from different run
+  ---
+  duration_ms: 0.173623
+  type: 'test'
+  ...
+# Subtest: reject receipt archive tampering
+ok 70 - reject receipt archive tampering
+  ---
+  duration_ms: 0.176517
+  type: 'test'
+  ...
+# Subtest: reject build archive tampering
+ok 71 - reject build archive tampering
+  ---
+  duration_ms: 0.530743
+  type: 'test'
+  ...
+# Subtest: reject build payload tampering
+ok 72 - reject build payload tampering
+  ---
+  duration_ms: 0.194825
+  type: 'test'
+  ...
+# Subtest: reject missing GitHub digest fails closed
+ok 73 - reject missing GitHub digest fails closed
+  ---
+  duration_ms: 0.147733
+  type: 'test'
+  ...
+# Subtest: reject artifact name collision
+ok 74 - reject artifact name collision
+  ---
+  duration_ms: 0.351462
+  type: 'test'
+  ...
+# Subtest: receipt creation rejects partial and rerun evidence before publishing
+ok 75 - receipt creation rejects partial and rerun evidence before publishing
+  ---
+  duration_ms: 0.292843
+  type: 'test'
+  ...
+# Subtest: tree identities ignore only inert text/operation records/review metadata and invalidate all executable inputs
+ok 76 - tree identities ignore only inert text/operation records/review metadata and invalidate all executable inputs
+  ---
+  duration_ms: 1337.456452
+  type: 'test'
+  ...
+# Subtest: missing trusted base cannot approve evidence reuse
+ok 77 - missing trusted base cannot approve evidence reuse
+  ---
+  duration_ms: 2.750244
+  type: 'test'
+  ...
+# Subtest: hosted reader authenticates API metadata and both ZIP payloads end to end without live services
+ok 78 - hosted reader authenticates API metadata and both ZIP payloads end to end without live services
+  ---
+  duration_ms: 186.001649
+  type: 'test'
+  ...
+# Subtest: delivery-only changes may seek authenticated reuse; changed imported base policy cannot
+ok 79 - delivery-only changes may seek authenticated reuse; changed imported base policy cannot
+  ---
+  duration_ms: 114.84601
+  type: 'test'
+  ...
+# Subtest: the one reviewed legacy cutover receipt preserves full coverage without authorizing a release
+ok 80 - the one reviewed legacy cutover receipt preserves full coverage without authorizing a release
+  ---
+  duration_ms: 1.813515
+  type: 'test'
+  ...
+# Subtest: legacy migration receipt expires after seven days and cannot claim future or missing timing
+ok 81 - legacy migration receipt expires after seven days and cannot claim future or missing timing
+  ---
+  duration_ms: 0.669975
+  type: 'test'
+  ...
+# Subtest: arbitrary old successes, changed source and changed workflow cannot use migration policy
+ok 82 - arbitrary old successes, changed source and changed workflow cannot use migration policy
+  ---
+  duration_ms: 1.208179
+  type: 'test'
+  ...
+# Subtest: failed, missing, skipped, cancelled, duplicated and self-hosted legacy jobs fail closed
+ok 83 - failed, missing, skipped, cancelled, duplicated and self-hosted legacy jobs fail closed
+  ---
+  duration_ms: 0.268857
+  type: 'test'
+  ...
+# Subtest: new policy derives every mandatory shard and stable check from the coverage manifest
+ok 84 - new policy derives every mandatory shard and stable check from the coverage manifest
+  ---
+  duration_ms: 3.437203
+  type: 'test'
+  ...
+# Subtest: new source delegates only exact-source full policy and refuses mismatched verifier results
+ok 85 - new source delegates only exact-source full policy and refuses mismatched verifier results
+  ---
+  duration_ms: 15.199262
+  type: 'test'
+  ...
+# Subtest: new source never falls back to any historical workflow success
+ok 86 - new source never falls back to any historical workflow success
+  ---
+  duration_ms: 0.529462
+  type: 'test'
+  ...
+# Subtest: default runs every declared scenario; selected scenarios retain suite order
+ok 87 - default runs every declared scenario; selected scenarios retain suite order
+  ---
+  duration_ms: 1.490257
+  type: 'test'
+  ...
+# Subtest: unknown, mixed, empty and duplicate selections fail before browser execution
+ok 88 - unknown, mixed, empty and duplicate selections fail before browser execution
+  ---
+  duration_ms: 1.215931
+  type: 'test'
+  ...
+# Subtest: duplicate suite declarations cannot conceal missing coverage
+ok 89 - duplicate suite declarations cannot conceal missing coverage
+  ---
+  duration_ms: 0.306765
+  type: 'test'
+  ...
+# Subtest: read-only baseline updates require authenticated operational evidence; schema drift remains full
+ok 90 - read-only baseline updates require authenticated operational evidence; schema drift remains full
+  ---
+  duration_ms: 101.640468
+  type: 'test'
+  ...
+# Subtest: performance baseline rejects arbitrary endpoints, duplicate fields and unbounded IDs
+ok 91 - performance baseline rejects arbitrary endpoints, duplicate fields and unbounded IDs
+  ---
+  duration_ms: 0.358694
+  type: 'test'
+  ...
+# Subtest: the installed reporting baseline satisfies its exact data-only contract
+ok 92 - the installed reporting baseline satisfies its exact data-only contract
+  ---
+  duration_ms: 0.226603
+  type: 'test'
+  ...
+# Subtest: documentation-only change is exact allowlist and keeps integrity + operations checks
+ok 93 - documentation-only change is exact allowlist and keeps integrity + operations checks
+  ---
+  duration_ms: 61.976358
+  type: 'test'
+  ...
+# Subtest: unknown Markdown and executable lookalikes are not broad docs bypasses
+ok 94 - unknown Markdown and executable lookalikes are not broad docs bypasses
+  ---
+  duration_ms: 66.365148
+  type: 'test'
+  ...
+# Subtest: review-only registry metadata is narrow but routing policy changes are full
+ok 95 - review-only registry metadata is narrow but routing policy changes are full
+  ---
+  duration_ms: 733.279918
+  type: 'test'
+  ...
+# Subtest: registry normalization preserves unknown fields and does not hide source routing
+ok 96 - registry normalization preserves unknown fields and does not hide source routing
+  ---
+  duration_ms: 11.259666
+  type: 'test'
+  ...
+# Subtest: operation-only promotion requires separate evidence reuse and operations checks
+ok 97 - operation-only promotion requires separate evidence reuse and operations checks
+  ---
+  duration_ms: 104.804748
+  type: 'test'
+  ...
+# Subtest: a changed release source, image or runtime configuration invalidates narrowing
+ok 98 - a changed release source, image or runtime configuration invalidates narrowing
+  ---
+  duration_ms: 232.810405
+  type: 'test'
+  ...
+# Subtest: changed compatibility evidence cannot borrow operation-only classification
+ok 99 - changed compatibility evidence cannot borrow operation-only classification
+  ---
+  duration_ms: 88.374879
+  type: 'test'
+  ...
+# Subtest: unknown operational keys, duplicate keys and malformed JSON fail closed
+ok 100 - unknown operational keys, duplicate keys and malformed JSON fail closed
+  ---
+  duration_ms: 214.637658
+  type: 'test'
+  ...
+# Subtest: isolated Factory shadow plan includes game, shared player, ownership, learning and core contracts
+ok 101 - isolated Factory shadow plan includes game, shared player, ownership, learning and core contracts
+  ---
+  duration_ms: 55.404739
+  type: 'test'
+  ...
+# Subtest: new indirect or dynamic dependency on a reviewed leaf broadens to full
+ok 102 - new indirect or dynamic dependency on a reviewed leaf broadens to full
+  ---
+  duration_ms: 234.704267
+  type: 'test'
+  ...
+# Subtest: existing reviewed type dependency remains eligible
+ok 103 - existing reviewed type dependency remains eligible
+  ---
+  duration_ms: 57.698155
+  type: 'test'
+  ...
+# Subtest: isolated Language shadow plan retains both learning integrations and child recovery
+ok 104 - isolated Language shadow plan retains both learning integrations and child recovery
+  ---
+  duration_ms: 58.946511
+  type: 'test'
+  ...
+# Subtest: shared UI, coach, shared source and security-sensitive changes remain full
+ok 105 - shared UI, coach, shared source and security-sensitive changes remain full
+  ---
+  duration_ms: 243.873625
+  type: 'test'
+  ...
+# Subtest: tests, dependencies, policy and workflow changes cannot authorize their own skip
+ok 106 - tests, dependencies, policy and workflow changes cannot authorize their own skip
+  ---
+  duration_ms: 227.320683
+  type: 'test'
+  ...
+# Subtest: artwork index under docs is executable build data and remains full
+ok 107 - artwork index under docs is executable build data and remains full
+  ---
+  duration_ms: 50.167676
+  type: 'test'
+  ...
+# Subtest: mixed docs plus executable unknown change remains full
+ok 108 - mixed docs plus executable unknown change remains full
+  ---
+  duration_ms: 54.452152
+  type: 'test'
+  ...
+# Subtest: mixed release intent plus targeted leaf remains full
+ok 109 - mixed release intent plus targeted leaf remains full
+  ---
+  duration_ms: 71.222466
+  type: 'test'
+  ...
+# Subtest: mixed feature domains remain full
+ok 110 - mixed feature domains remain full
+  ---
+  duration_ms: 66.906587
+  type: 'test'
+  ...
+# Subtest: renames, deletions, additions and executable mode changes fail broad
+ok 111 - renames, deletions, additions and executable mode changes fail broad
+  ---
+  duration_ms: 230.953238
+  type: 'test'
+  ...
+# Subtest: a symlink named like an allowed document cannot hide a changed file
+ok 112 - a symlink named like an allowed document cannot hide a changed file
+  ---
+  duration_ms: 634.900283
+  type: 'test'
+  ...
+# Subtest: force full and push events preserve complete production source validation
+ok 113 - force full and push events preserve complete production source validation
+  ---
+  duration_ms: 117.967729
+  type: 'test'
+  ...
+# Subtest: missing base policy bootstraps full rather than running a head-supplied exemption
+ok 114 - missing base policy bootstraps full rather than running a head-supplied exemption
+  ---
+  duration_ms: 93.288683
+  type: 'test'
+  ...
+# Subtest: unknown base, shallow history and non-SHA ref inputs fail full with an explanation
+ok 115 - unknown base, shallow history and non-SHA ref inputs fail full with an explanation
+  ---
+  duration_ms: 48.58568
+  type: 'test'
+  ...
+# Subtest: base-to-prospective-merge comparison includes target branch changes exactly once
+ok 116 - base-to-prospective-merge comparison includes target branch changes exactly once
+  ---
+  duration_ms: 106.019316
+  type: 'test'
+  ...
+# Subtest: empty range is full and cannot synthesize a narrow successful validation
+ok 117 - empty range is full and cannot synthesize a narrow successful validation
+  ---
+  duration_ms: 56.826034
+  type: 'test'
+  ...
+# Subtest: a base outside the proposed merge ancestry fails closed
+ok 118 - a base outside the proposed merge ancestry fails closed
+  ---
+  duration_ms: 74.87031
+  type: 'test'
+  ...
+1..118
+# tests 118
+# suites 0
+# pass 118
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4412.263952
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

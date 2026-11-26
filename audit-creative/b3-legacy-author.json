@@ -1,0 +1,74 @@
+{
+  "head": "3d301245b716c2317a27d402c42d092c25765738",
+  "browser": "156.0.8078.79",
+  "result": {
+    "before": {
+      "backdrop": "world-forest-v1",
+      "fit": "cover",
+      "decorations": [
+        {
+          "id": "tree-one",
+          "assetId": "world-prop-tree-v1",
+          "name": "First tree",
+          "x": 20,
+          "y": 25,
+          "size": 25,
+          "plane": "back"
+        },
+        {
+          "id": "tree-two",
+          "assetId": "world-prop-tree-v1",
+          "name": "Second tree",
+          "x": 70,
+          "y": 70,
+          "size": 35,
+          "plane": "front"
+        }
+      ]
+    },
+    "exposedControls": [
+      "Set position on stage",
+      "Remove decoration"
+    ],
+    "afterStageClick": {
+      "backdrop": "world-forest-v1",
+      "fit": "cover",
+      "decorations": [
+        {
+          "id": "tree-one",
+          "assetId": "world-prop-tree-v1",
+          "name": "First tree",
+          "x": 60.99999982511417,
+          "y": 41.998094754855146,
+          "size": 25,
+          "plane": "back"
+        },
+        {
+          "id": "tree-two",
+          "assetId": "world-prop-tree-v1",
+          "name": "Second tree",
+          "x": 70,
+          "y": 70,
+          "size": 35,
+          "plane": "front"
+        }
+      ]
+    },
+    "after": {
+      "backdrop": "world-forest-v1",
+      "fit": "cover",
+      "decorations": [
+        {
+          "id": "tree-two",
+          "assetId": "world-prop-tree-v1",
+          "name": "Second tree",
+          "x": 70,
+          "y": 70,
+          "size": 35,
+          "plane": "front"
+        }
+      ]
+    },
+    "keptIntact": true
+  }
+}

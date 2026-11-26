@@ -1,0 +1,12 @@
+{
+  "head": "563de940eacd3f3573bf93236ab5eebd4608043a",
+  "game": "gem",
+  "sourceTest": "/workspace/jems-consolidation/rehearsal/tests/creative-art-game-browser.cjs",
+  "samples": [
+    {
+      "layout": "desktop",
+      "elapsedMs": 237.7280340000002
+    }
+  ],
+  "exitCode": 0
+}

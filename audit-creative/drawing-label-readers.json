@@ -1,0 +1,35 @@
+{
+  "browser": "156.0.8078.79",
+  "result": {
+    "original": {
+      "id": "8aaf6d50-1c51-4898-b1a3-9e750b7becd2",
+      "hash": "16b1fcf26ed82813e50823107f35fa4836fc4d4f3e24526ff1c25e2eaa007412",
+      "actualWrittenLabel": "rock"
+    },
+    "oldNativeSearch": [
+      "8aaf6d50-1c51-4898-b1a3-9e750b7becd2"
+    ],
+    "nextNativeSearch": [],
+    "sourceOld": {
+      "status": "accepted",
+      "label": "rock"
+    },
+    "sourceB": {
+      "status": "This art backup is incomplete or unsupported. Your saved artwork has not been changed."
+    },
+    "aliasOld": {
+      "status": "accepted",
+      "label": "rock"
+    },
+    "aliasB": {
+      "status": "accepted",
+      "label": "rock"
+    },
+    "conflictOld": {
+      "status": "This artwork has conflicting or invalid descriptions. Its original has not been changed."
+    },
+    "conflictB": {
+      "status": "This art backup is incomplete or unsupported. Your saved artwork has not been changed."
+    }
+  }
+}

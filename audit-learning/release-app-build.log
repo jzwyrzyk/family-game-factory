@@ -1,0 +1,38 @@
+
+> family-game-factory@2.0.0-foundation build
+> npm run typecheck && vite build
+
+
+> family-game-factory@2.0.0-foundation typecheck
+> tsc --noEmit
+
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+vite v6.4.1 building for production...
+transforming...
+✓ 261 modules transformed.
+[plugin vite:reporter] 
+(!) /workspace/jems-consolidation/audit-learning/release-a/src/storage/indexed-records.ts is dynamically imported by /workspace/jems-consolidation/audit-learning/release-a/src/assets/private-drawings.ts but also statically imported by /workspace/jems-consolidation/audit-learning/release-a/src/storage/indexed-creation.ts, /workspace/jems-consolidation/audit-learning/release-a/src/storage/indexed-native.ts, /workspace/jems-consolidation/audit-learning/release-a/src/storage/indexed-notebook.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /workspace/jems-consolidation/audit-learning/release-a/src/storage/native-workspace.ts is dynamically imported by /workspace/jems-consolidation/audit-learning/release-a/src/assets/private-drawings.ts but also statically imported by /workspace/jems-consolidation/audit-learning/release-a/src/factory/ui.ts, /workspace/jems-consolidation/audit-learning/release-a/src/storage/complete-backup.ts, /workspace/jems-consolidation/audit-learning/release-a/src/storage/creation-recovery.ts, /workspace/jems-consolidation/audit-learning/release-a/src/storage/creation-workspace.ts, /workspace/jems-consolidation/audit-learning/release-a/src/storage/native-recovery.ts, /workspace/jems-consolidation/audit-learning/release-a/src/storage/notebook-recovery.ts, /workspace/jems-consolidation/audit-learning/release-a/src/storage/notebook-workspace.ts, /workspace/jems-consolidation/audit-learning/release-a/src/storage/reward-authorities.ts, /workspace/jems-consolidation/audit-learning/release-a/src/studio/adapter.ts, /workspace/jems-consolidation/audit-learning/release-a/src/studio/local-project.ts, dynamic import will not move module into another chunk.
+
+rendering chunks...
+computing gzip size...
+dist/index.html                    16.84 kB │ gzip:   5.39 kB
+dist/assets/index-DGrWuNEy.css    458.57 kB │ gzip:  91.31 kB
+dist/assets/index-BH5lfmqK.js   1,929.96 kB │ gzip: 598.49 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 5.36s
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

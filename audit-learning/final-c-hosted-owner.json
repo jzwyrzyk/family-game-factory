@@ -1,0 +1,23 @@
+{
+  "source": "563de940eacd3f3573bf93236ab5eebd4608043a",
+  "run": 45777824609,
+  "job": 139765829456,
+  "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45777824609/job/139765829456",
+  "lines": [
+    "2026-11-26T07:49:37.3438048Z PASS UI review {\"artifact\":\"/home/runner/work/family-game-factory/family-game-factory/dist-review/jems-ui-review.html\",\"mode\":\"file://, no server\",\"pages\":[\"studio-library\",\"studio\",\"creations\",\"creation\",\"art-studio\",\"lab\",\"problem-solving\",\"jems-journey\",\"jems-rewards\",\"jems-pals\",\"parent\",\"home\",\"game\",\"create\",\"feedback\",\"studioNotifications\"],\"viewports\":4,\"overflows\":[],\"errors\":[],\"network\":[]}",
+    "2026-11-26T07:50:28.1845975Z PASS drawing: local PNG upload and durable library",
+    "2026-11-26T07:50:35.8098955Z PASS all embedded image assets decode",
+    "2026-11-26T07:52:27.3804035Z PASS 7 viewport captures and pointer inputs. 36 review samples and local save recovery.",
+    "2026-11-26T07:54:19.9889407Z PASS standalone notebook flight: four approved drawings, five exact pins, opaque renderer, scored round, collision and kept game.",
+    "2026-11-26T07:55:19.7728774Z PASS retained scene worlds, Canvas artwork color, immutable pin, undo/redo, byte-exact export, reopening, stage-resolution landscape crop and decoded video fidelity",
+    "2026-11-26T07:56:12.6820777Z PASS math grade 1 returned to the unchanged authored world, private originals and selected profile",
+    "2026-11-26T07:56:14.7639220Z PASS language grade 3 returned to the unchanged authored world, private originals and selected profile",
+    "2026-11-26T07:56:17.1467366Z PASS drawing review, approved stamp, keep, reload, edit, two versions, zero external requests. Direct file navigation. candidate branch · 563de940eacd · 8 embedded assets",
+    "2026-11-26T07:58:00.2470527Z PASS exact Pal variants, transparent pixels, fail-closed presentation and responsive cards",
+    "2026-11-26T07:58:58.5790923Z PASS Pal fidelity offline desktop",
+    "2026-11-26T07:59:56.5471123Z PASS Pal fidelity offline landscape",
+    "2026-11-26T08:00:54.3712340Z PASS Pal fidelity offline portrait",
+    "2026-11-26T08:01:51.7686176Z PASS Pal fidelity offline phone",
+    "2026-11-26T08:01:51.7686968Z PASS exact Pal variants, transparent pixels, fail-closed presentation and responsive cards"
+  ]
+}

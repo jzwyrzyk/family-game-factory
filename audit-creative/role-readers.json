@@ -1,0 +1,40 @@
+{
+  "reader-src/215/src/creation/model.ts": {
+    "sha256": "053c7eba3d36c09b4915d72a82b4715b5e429c64f3b3fc3b0a0ee9a2ffd92ff4",
+    "single": {
+      "role": "environment"
+    },
+    "agree": {
+      "role": "environment"
+    },
+    "conflict": {
+      "error": "Creation Lab: This actor has conflicting roles."
+    }
+  },
+  "reader-src/B/src/creation/model.ts": {
+    "sha256": "6b24597604c6f0d2dbeab0b0afd6105056760fb12d85f5ea6dafa22ee7b86f70",
+    "single": {
+      "creativeRole": "scenery"
+    },
+    "agree": {
+      "role": "environment",
+      "creativeRole": "scenery"
+    },
+    "conflict": {
+      "role": "obstacle",
+      "creativeRole": "scenery"
+    }
+  },
+  "../creative/src/creation/model.ts": {
+    "sha256": "98e4dc5a71bf3b8e725bdd8399257625a3b2602889fd97f6de2a46b4e98d4f8f",
+    "single": {
+      "role": "environment"
+    },
+    "agree": {
+      "role": "environment"
+    },
+    "conflict": {
+      "error": "Creation Lab: This actor has conflicting roles."
+    }
+  }
+}

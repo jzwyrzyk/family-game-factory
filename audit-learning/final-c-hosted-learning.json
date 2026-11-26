@@ -1,0 +1,66 @@
+{
+  "source": "563de940eacd3f3573bf93236ab5eebd4608043a",
+  "tree": "388246f5bb56fb56bd3e463765061d72e6c80216",
+  "jobs": [
+    {
+      "id": 139766091620,
+      "run": 45777824549,
+      "name": "shard (creation-art)",
+      "samples": [
+        "2026-11-26T07:55:50.6045593Z PASS imported scene 844×390: fitted checkpoint, modal focus, supported return and saved evidence",
+        "2026-11-26T07:55:51.6458111Z PASS imported scene 1024×768: fitted checkpoint, modal focus, supported return and saved evidence",
+        "2026-11-26T07:55:55.4729747Z {\"source\":\"222955b0ffa7d57f841268bdd041e93697e49f8e\",\"scenarios\":[{\"subject\":\"math\",\"viewport\":{\"width\":1280,\"height\":900},\"owner\":\"bench\",\"world\":\"world-forest-v1\",\"pin\":\"art:image:ea1c54c2-be73-4329-b260-5d5cb9185005:23a334dd96f3f869ff4f641889bcfae3e0354627cdbf49505ab65ee742282e3e\",\"originalSha\":\"23a334dd96f3f869ff4f641889bcfae3e0354627cdbf49505ab65ee742282e3e\",\"opening\":{\"focused\":true,\"inViewport\":true,\"hit\":true,\"y\":122.125,\"bottom\":168.921875},\"skill\":\"g2-hundreds\",\"outcome\":\"completed\",\"independent\":true,\"context\":{\"sessionId\":\"bbf60dd9-5e1b-44cb-b11e-d26aa5fe66d3\",\"gameId\":\"creation\",\"versionId\":\"6c984cae-9264-4c23-971a-c5bfb0063937\",\"projectId\":\"9ba2f06a-d594-404a-b824-2b1712f7f6e4\",\"mode\":\"checkpoint\"},\"score\":[1,2,3],\"blockedInputs\":true,\"retainedScene\":true,\"retainedOriginal\":true,\"focus\":\"creationCanvas\",\"ink\":80,\"singleAttempt\":1,\"initialGems\":0,\"gems\":2,\"afterLibrary\":[\"OTHER ART\\nMy Rock\\nOriginal picture\"],\"unexpectedRequests\":[],\"pageErrors\":[]},{\"subject\":\"language\",\"viewport\":{\"width\":390,\"height\":844},\"owner\":\"bench\",\"world\":\"world-forest-v1\",\"pin\":\"art:image:e4c95c12-7602-40f7-9eaf-46a5200bc39f:23a334dd96f3f869ff4f641889bcfae3e0354627cdbf49505ab65ee742282e3e\",\"originalSha\":\"23a334dd96f3f869ff4f641889bcfae3e0354627cdbf49505ab65ee742282e3e\",\"opening\":{\"focused\":true,\"inViewport\":true,\"hit\":true,\"y\":224.265625,\"bottom\":252.34375},\"skill\":\"g2-cause-effect\",\"outcome\":\"shown\",\"independent\":false,\"context\":{\"sessionId\":\"5160a78c-26a5-4586-a00e-fc00caa0beea\",\"gameId\":\"creation\",\"projectId\":\"a371075c-e332-4ea3-ba99-3bd656e6dfe0\",\"versionId\":\"d09e9d17-4c64-429b-9681-114b34000d67\",\"mode\":\"checkpoint\"},\"score\":[1,2,3],\"blockedInputs\":true,\"retainedScene\":true,\"retainedOriginal\":true,\"focus\":\"creationCanvas\",\"ink\":0,\"singleAttempt\":1,\"initialGems\":0,\"gems\":0,\"afterLibrary\":[\"OTHER ART\\nMy Rock\\nOriginal picture\"],\"unexpectedRequests\":[],\"pageErrors\":[]}],\"failures\":[]}"
+      ],
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45777824549/job/139766091620"
+    },
+    {
+      "id": 139766091622,
+      "run": 45777824549,
+      "name": "shard (learning-language)",
+      "samples": [
+        "2026-11-26T07:53:54.3798387Z PASS Language Arts desktop: parent selection, required checkpoints, lab, original game, safe pause, shared budget, separate history",
+        "2026-11-26T07:53:58.9525187Z PASS Language Arts mobile: parent selection, required checkpoints, lab, original game, safe pause, shared budget, separate history",
+        "2026-11-26T07:54:00.0884414Z PASS generated preview: isolated worker, channel validation, required ELA, replay release and provenance"
+      ],
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45777824549/job/139766091622"
+    },
+    {
+      "id": 139766091624,
+      "run": 45777824549,
+      "name": "shard (learning-math)",
+      "samples": [
+        "2026-11-26T07:54:18.6860506Z PASS quality learning desktop: actual driving result, short-round checkpoint, host input lock, shared pacing, workshop checkpoint, focus return and manual pause",
+        "2026-11-26T07:54:24.4545254Z PASS generated preview desktop: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling",
+        "2026-11-26T07:55:01.0168302Z PASS quality learning mobile: actual driving result, short-round checkpoint, host input lock, shared pacing, workshop checkpoint, focus return and manual pause",
+        "2026-11-26T07:55:06.1690156Z PASS generated preview mobile: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling",
+        "2026-11-26T07:55:10.4878111Z PASS learning recovery: visible explanation, no replacement practice, unchanged future record and exact recovery export"
+      ],
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45777824549/job/139766091624"
+    },
+    {
+      "id": 139766091687,
+      "run": 45777824549,
+      "name": "shard (pals-rewards)",
+      "samples": [],
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45777824549/job/139766091687"
+    },
+    {
+      "id": 139765694652,
+      "run": 45777824515,
+      "name": "WebKit and storage",
+      "samples": [
+        "2026-11-26T07:51:15.0187091Z PASS 18 real IndexedDB authority checks: absent/incomplete/complete, malformed and tombstoned markers",
+        "2026-11-26T07:52:28.4880416Z PASS desktop: 30-game pagination, 126 retained versions, exact mechanics, Keep, Fork, reload, preserved legacy originals",
+        "2026-11-26T07:52:35.0186931Z PASS tablet: 30-game pagination, 126 retained versions, exact mechanics, Keep, Fork, reload, preserved legacy originals",
+        "2026-11-26T07:52:42.8808420Z PASS desktop: prepared scene authority, 30 paged scenes, 52 versions, autosave, Keep, copy, reload/play, exact retained legacy bytes",
+        "2026-11-26T07:52:50.0907799Z PASS tablet: prepared scene authority, 30 paged scenes, 52 versions, autosave, Keep, copy, reload/play, exact retained legacy bytes",
+        "2026-11-26T07:53:41.0850726Z {\"browser\":\"webkit\",\"viewport\":{\"width\":1400,\"height\":960},\"indexedNotebook\":false,\"checks\":[\"native unwrapped observer/frame control\",\"four actual saved Rally garage/viewport/Change/Back/Home cycles\",\"exact kept mechanic after every remount\"]}",
+        "2026-11-26T07:53:54.9062538Z {\"browser\":\"webkit\",\"viewport\":{\"width\":390,\"height\":844},\"indexedNotebook\":false,\"checks\":[\"native unwrapped observer/frame control\",\"four actual saved Rally garage/viewport/Change/Back/Home cycles\",\"exact kept mechanic after every remount\"]}",
+        "2026-11-26T07:54:15.8896980Z {\"browser\":\"webkit\",\"viewport\":{\"width\":1400,\"height\":960},\"indexedNotebook\":true,\"checks\":[\"native unwrapped observer/frame control\",\"four actual saved Rally garage/viewport/Change/Back/Home cycles\",\"exact kept mechanic after every remount\"]}",
+        "2026-11-26T07:54:30.8986987Z {\"browser\":\"webkit\",\"viewport\":{\"width\":390,\"height\":844},\"indexedNotebook\":true,\"checks\":[\"native unwrapped observer/frame control\",\"four actual saved Rally garage/viewport/Change/Back/Home cycles\",\"exact kept mechanic after every remount\"]}",
+        "2026-11-26T07:54:51.0299997Z 0 WebKit storage commands failed"
+      ],
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45777824515/job/139765694652"
+    }
+  ]
+}

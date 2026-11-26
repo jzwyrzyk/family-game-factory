@@ -1,0 +1,626 @@
+{
+  "time": "2026-11-26T07:29:15.322583+00:00",
+  "source": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+  "runs": [
+    {
+      "id": 45772982935,
+      "name": "Trusted family device security",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982935",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:19:11Z"
+    },
+    {
+      "id": 45772982956,
+      "name": "Standalone UI review",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982956",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:19:43Z"
+    },
+    {
+      "id": 45772982932,
+      "name": "Arcade journeys",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:28:40Z"
+    },
+    {
+      "id": 45772982913,
+      "name": "Mind Your Jems art and gameplay review",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982913",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:13:44Z"
+    },
+    {
+      "id": 45772983063,
+      "name": "Release regression contracts",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772983063",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:07:41Z"
+    },
+    {
+      "id": 45772982988,
+      "name": "Jems operations contracts",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982988",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:07:57Z"
+    },
+    {
+      "id": 45772983078,
+      "name": "Documentation context",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772983078",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:07:59Z"
+    },
+    {
+      "id": 45772983138,
+      "name": "Service image packaging",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772983138",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:08:22Z"
+    },
+    {
+      "id": 45772983146,
+      "name": "Jems preview bundle",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772983146",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:08:07Z"
+    },
+    {
+      "id": 45772983153,
+      "name": "Jems environment contracts",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772983153",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:08:28Z"
+    },
+    {
+      "id": 45772983099,
+      "name": "Parent reporting and dashboard",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772983099",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:08:24Z"
+    },
+    {
+      "id": 45772982922,
+      "name": "Jems Game Intelligence contracts",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982922",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:08:58Z"
+    },
+    {
+      "id": 45772983200,
+      "name": "jems full visual review",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772983200",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:08:57Z"
+    },
+    {
+      "id": 45772982999,
+      "name": "Early learning preview",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982999",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:10:12Z"
+    },
+    {
+      "id": 45772982964,
+      "name": "Coding learner review",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982964",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:11:20Z"
+    },
+    {
+      "id": 45772983193,
+      "name": "Bubble Gum Builders play and visual review",
+      "display_title": "Connected Creative Universe integration and fidelity qualification",
+      "event": "pull_request",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772983193",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:15:53Z"
+    },
+    {
+      "id": 45772976045,
+      "name": "Arcade journeys",
+      "display_title": "Arcade journeys",
+      "event": "workflow_dispatch",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045",
+      "run_attempt": 1,
+      "updated_at": "2026-11-26T07:23:52Z"
+    }
+  ],
+  "arcadeJobs": [
+    {
+      "id": 139750408052,
+      "run_id": 45772982932,
+      "name": "prepare",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139750408052",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751743440,
+      "run_id": 45772982932,
+      "name": "image-isolation",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751743440",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751743639,
+      "run_id": 45772982932,
+      "name": "shard (factory)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751743639",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751743651,
+      "run_id": 45772982932,
+      "name": "shard (mining)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751743651",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751743653,
+      "run_id": 45772982932,
+      "name": "shard (studio-core)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751743653",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751743661,
+      "run_id": 45772982932,
+      "name": "shard (browser-core)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751743661",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751743668,
+      "run_id": 45772982932,
+      "name": "shard (browser-quality)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751743668",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751743679,
+      "run_id": 45772982932,
+      "name": "shard (learning-math)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751743679",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751743693,
+      "run_id": 45772982932,
+      "name": "shard (pals-rewards)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751743693",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751743696,
+      "run_id": 45772982932,
+      "name": "shard (browser-storage)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751743696",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751743701,
+      "run_id": 45772982932,
+      "name": "shard (browser-generated)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751743701",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751743704,
+      "run_id": 45772982932,
+      "name": "shard (physical)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751743704",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751743722,
+      "run_id": 45772982932,
+      "name": "shard (notifications)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751743722",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751743742,
+      "run_id": 45772982932,
+      "name": "shard (child-coach)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751743742",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751743867,
+      "run_id": 45772982932,
+      "name": "shard (creation-art)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751743867",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751743978,
+      "run_id": 45772982932,
+      "name": "shard (learning-language)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751743978",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139751745341,
+      "run_id": 45772982932,
+      "name": "legacy-creative-shadow",
+      "status": "completed",
+      "conclusion": "skipped",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139751745341",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139757951803,
+      "run_id": 45772982932,
+      "name": "learning",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139757951803",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139757951815,
+      "run_id": 45772982932,
+      "name": "browser",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139757951815",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139757951837,
+      "run_id": 45772982932,
+      "name": "private-coach-image",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139757951837",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139757951865,
+      "run_id": 45772982932,
+      "name": "creative",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139757951865",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139757951873,
+      "run_id": 45772982932,
+      "name": "notifications",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139757951873",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139758161669,
+      "run_id": 45772982932,
+      "name": "validation-evidence",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772982932/job/139758161669",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139749776952,
+      "run_id": 45772976045,
+      "name": "prepare",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139749776952",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750208758,
+      "run_id": 45772976045,
+      "name": "image-isolation",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750208758",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750208954,
+      "run_id": 45772976045,
+      "name": "shard (browser-storage)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750208954",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750208958,
+      "run_id": 45772976045,
+      "name": "shard (browser-quality)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750208958",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750208962,
+      "run_id": 45772976045,
+      "name": "shard (browser-generated)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750208962",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750208966,
+      "run_id": 45772976045,
+      "name": "shard (creation-art)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750208966",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750208974,
+      "run_id": 45772976045,
+      "name": "shard (pals-rewards)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750208974",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750208977,
+      "run_id": 45772976045,
+      "name": "shard (factory)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750208977",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750208985,
+      "run_id": 45772976045,
+      "name": "shard (notifications)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750208985",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750208993,
+      "run_id": 45772976045,
+      "name": "shard (physical)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750208993",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750208996,
+      "run_id": 45772976045,
+      "name": "shard (browser-core)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750208996",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750209017,
+      "run_id": 45772976045,
+      "name": "shard (mining)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750209017",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750209021,
+      "run_id": 45772976045,
+      "name": "shard (learning-language)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750209021",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750209068,
+      "run_id": 45772976045,
+      "name": "shard (learning-math)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750209068",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750209090,
+      "run_id": 45772976045,
+      "name": "shard (studio-core)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750209090",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750209224,
+      "run_id": 45772976045,
+      "name": "shard (child-coach)",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750209224",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139750210485,
+      "run_id": 45772976045,
+      "name": "legacy-creative-shadow",
+      "status": "completed",
+      "conclusion": "skipped",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139750210485",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139753699298,
+      "run_id": 45772976045,
+      "name": "notifications",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139753699298",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139753699497,
+      "run_id": 45772976045,
+      "name": "learning",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139753699497",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139753699525,
+      "run_id": 45772976045,
+      "name": "private-coach-image",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139753699525",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139753699606,
+      "run_id": 45772976045,
+      "name": "browser",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139753699606",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139753699638,
+      "run_id": 45772976045,
+      "name": "creative",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139753699638",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    },
+    {
+      "id": 139756122055,
+      "run_id": 45772976045,
+      "name": "validation-evidence",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45772976045/job/139756122055",
+      "head_sha": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0"
+    }
+  ]
+}

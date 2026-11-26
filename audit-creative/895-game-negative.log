@@ -1,0 +1,13 @@
+AssertionError [ERR_ASSERTION]: Reselecting the current picture preserves its role
+
+'' !== 'collectible'
+
+    at choose (/workspace/jems-consolidation/audit-creative/candidate-895/tests/game-art-browser.cjs:38:14)
+    at async main (/workspace/jems-consolidation/audit-creative/candidate-895/tests/game-art-browser.cjs:51:20) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: '',
+  expected: 'collectible',
+  operator: 'strictEqual',
+  diff: 'simple'
+}

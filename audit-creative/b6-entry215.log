@@ -1,0 +1,31 @@
+locator.click: Timeout 10000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('dialog', { name: 'Choose game artwork' }).getByRole('button', { name: 'Start my picture hunt' })[22m
+[2m    - locator resolved to <button type="button" data-confirm="">Start my picture hunt</button>[22m
+[2m  - attempting click action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <canvas width="560" height="800" tabindex="0" data-paper="" aria-label="Drawing page. Arrow keys move. Hold Space and use arrows to draw. Enter makes one mark."></canvas> from <dialog open="" aria-label="Draw something new" class="drawing-lab drawing-paint">…</dialog> subtree intercepts pointer events[22m
+[2m    - retrying click action[22m
+[2m    - waiting 20ms[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <canvas width="560" height="800" tabindex="0" data-paper="" aria-label="Drawing page. Arrow keys move. Hold Space and use arrows to draw. Enter makes one mark."></canvas> from <dialog open="" aria-label="Draw something new" class="drawing-lab drawing-paint">…</dialog> subtree intercepts pointer events[22m
+[2m    - retrying click action[22m
+[2m      - waiting 100ms[22m
+[2m    18 × waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <canvas width="560" height="800" tabindex="0" data-paper="" aria-label="Drawing page. Arrow keys move. Hold Space and use arrows to draw. Enter makes one mark."></canvas> from <dialog open="" aria-label="Draw something new" class="drawing-lab drawing-paint">…</dialog> subtree intercepts pointer events[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+
+    at delayedConfig (/workspace/jems-consolidation/audit-creative/candidate-b6/tests/audit-entry-24a86923b.cjs:121:67)
+    at async /workspace/jems-consolidation/audit-creative/candidate-b6/tests/audit-entry-24a86923b.cjs:280:6 {
+  name: 'TimeoutError'
+}

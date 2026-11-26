@@ -1,0 +1,14 @@
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),crypto=require('node:crypto'),cp=require('node:child_process');
+const {build}=require('./combined-c/node_modules/esbuild');
+const stable=x=>crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex');
+(async()=>{const result={};for(const rootName of ['approved-a','combined-c']){
+  const cwd=path.join(__dirname,rootName),js=await build({stdin:{resolveDir:cwd,contents:`export {SKILLS} from './src/learning/curriculum'; export {generateItem,evaluateAnswer} from './src/learning/content'; export {planMathModel} from './src/learning/workspace/math'; export {LANGUAGE_SKILLS} from './src/language/curriculum'; export {LANGUAGE_PACKS} from './src/language/content';`},format:'cjs',bundle:true,write:false,platform:'node'});
+  const api={exports:{}};new Function('module','exports','require',js.outputFiles[0].text)(api,api.exports,require);const a=api.exports,stage=crypto.createHash('sha256'),kinds=new Set();let trials=0,correct=0;
+  for(const {id} of a.SKILLS)for(const tier of [0,1,2])for(const representation of ['symbolic','visual','story'])for(let n=0;n<51;n++){
+    const item=a.generateItem(id,{tier,representation,random:()=>(n+.5)/51}),plan=a.planMathModel(item),answer=a.evaluateAnswer(item,String(item.answer));if(plan)kinds.add(plan.kind);stage.update(JSON.stringify([item,plan,answer]));trials++;if(answer.correct)correct++;
+  }
+  result[rootName]={source:cp.execFileSync('git',['rev-parse','HEAD'],{cwd,encoding:'utf8'}).trim(),mathSkills:a.SKILLS.length,englishSkills:a.LANGUAGE_SKILLS.length,mathDefinitions:stable(a.SKILLS),englishDefinitions:stable(a.LANGUAGE_SKILLS),englishBanks:stable(a.LANGUAGE_PACKS),trials,correct,mathResultHash:stage.digest('hex'),families:[...kinds].sort(),englishGrades:[...new Set(a.LANGUAGE_SKILLS.map(x=>x.grade))].sort((a,b)=>a-b)};
+ }
+ const {source:as,...A}=result['approved-a'],{source:cs,...C}=result['combined-c'];assert.deepEqual(C,A);assert.equal(C.mathSkills,113);assert.equal(C.englishSkills,77);assert.equal(C.families.length,13);assert.equal(C.trials,51867);
+ const manifests=['signoff-exact-assets.json','../evidence/B-mixed-grade-complete-assets.json','combined-exact-assets.json'].map(n=>JSON.parse(fs.readFileSync(path.join(__dirname,n))));const maps=manifests.map(m=>new Map(m.assets.map(x=>[x.path,x.sha256])));const merged=new Map([...maps[0],...maps[1]]);assert.equal(merged.size,maps[2].size);for(const m of maps.slice(0,2))for(const[k,v]of m)assert.equal(maps[2].get(k),v,k);result.embeddedAssets={a:maps[0].size,b:maps[1].size,c:maps[2].size,union:merged.size,matchingAll:true};fs.writeFileSync(path.join(__dirname,'combined-authorities.json'),JSON.stringify(result,null,2)+'\n');console.log(result);
+})().catch(e=>{console.error(e);process.exitCode=1;});

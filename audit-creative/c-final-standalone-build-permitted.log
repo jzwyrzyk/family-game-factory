@@ -1,0 +1,11 @@
+
+> family-game-factory@2.0.0-foundation review:build
+> node tools/ui-review/check-coverage.mjs && node tools/ui-review/build.mjs
+
+PASS coverage: 16 discovered page IDs, 16 manifest pages; 48 intermediate states.
+Built /workspace/jems-consolidation/audit-creative/candidate-c/dist-review/jems-ui-review.html (396 embedded assets), baseline 563de940eacd3f3573bf93236ab5eebd4608043a
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

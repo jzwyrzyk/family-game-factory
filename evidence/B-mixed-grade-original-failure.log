@@ -1,0 +1,27 @@
+AssertionError [ERR_ASSERTION]: Mixed-grade profiles use two actual curriculum settings
++ actual - expected
+
+  [
+    [
+      'player1',
+      1
+    ],
+    [
+      'player2',
++     1
+-     4
+    ],
++   [
++     'player3',
++     1
++   ]
+  ]
+
+    at /workspace/jems-consolidation/creative/tools/ui-review/creative-picker.cjs:37:12 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [Array],
+  expected: [Array],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

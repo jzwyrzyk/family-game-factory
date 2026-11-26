@@ -1,0 +1,9 @@
+obstacle-input [{"what":"render","t":6452,"visible":true},{"what":"role changed","t":6650,"id":"a8b33d87-aa61-4c4e-9960-dd689ee30838","title":"rocket","role":"player","plan":true,"visible":true},{"what":"render","t":7705,"id":"a8b33d87-aa61-4c4e-9960-dd689ee30838","title":"rocket","role":"player","plan":false,"visible":true},{"what":"render","t":7933,"id":"a8b33d87-aa61-4c4e-9960-dd689ee30838","title":"rocket","role":"","plan":true,"visible":true},{"what":"role changed","t":8039,"id":"16092936-c58e-4cb4-9001-50da4d23d5cf","title":"rock","role":"collectible","plan":true,"visible":true},{"what":"render","t":9642,"id":"16092936-c58e-4cb4-9001-50da4d23d5cf","title":"rock","role":"collectible","plan":false,"visible":true},{"what":"card 16092936-c58e-4cb4-9001-50da4d23d5cf","t":9814,"id":"16092936-c58e-4cb4-9001-50da4d23d5cf","title":"rock","role":"","plan":true,"visible":true},{"what":"role changed","t":9931,"id":"16092936-c58e-4cb4-9001-50da4d23d5cf","title":"rock","role":"obstacle","plan":true,"visible":true}]
+after new read obstacle true
+locator.waitFor: Timeout 10000ms exceeded.
+Call log:
+[2m  - waiting for locator('.game-art-review iframe').contentFrame().getByText('You did it!', { exact: true }) to be visible[22m
+
+    at main (/workspace/jems-consolidation/audit-creative/candidate-895/tests/audit-game-art-race.cjs:94:109) {
+  name: 'TimeoutError'
+}

@@ -1,0 +1,100 @@
+TAP version 13
+# Subtest: strict project validation rejects executable fields, dangling references and ambiguous moves
+ok 1 - strict project validation rejects executable fields, dangling references and ambiguous moves
+  ---
+  duration_ms: 3.698223
+  type: 'test'
+  ...
+# Subtest: duplicate block IDs, overlapping triggers and oversized programs fail before execution
+ok 2 - duplicate block IDs, overlapping triggers and oversized programs fail before execution
+  ---
+  duration_ms: 0.680249
+  type: 'test'
+  ...
+# Subtest: sequences run at the authored logical times and independently of frame partitioning
+ok 3 - sequences run at the authored logical times and independently of frame partitioning
+  ---
+  duration_ms: 18.470073
+  type: 'test'
+  ...
+# Subtest: relative/absolute moves, zero duration and nested repeats have reproducible outcomes
+ok 4 - relative/absolute moves, zero duration and nested repeats have reproducible outcomes
+  ---
+  duration_ms: 1.555322
+  type: 'test'
+  ...
+# Subtest: jump, dance and speech are observable during actions and clean up at completion
+ok 5 - jump, dance and speech are observable during actions and clean up at completion
+  ---
+  duration_ms: 1.986865
+  type: 'test'
+  ...
+# Subtest: actors share reusable asset IDs but run independent concurrent sequences
+ok 6 - actors share reusable asset IDs but run independent concurrent sequences
+  ---
+  duration_ms: 0.527117
+  type: 'test'
+  ...
+# Subtest: tap can restart completed scenes and interrupts one actor without competing motion writers
+ok 7 - tap can restart completed scenes and interrupts one actor without competing motion writers
+  ---
+  duration_ms: 1.025491
+  type: 'test'
+  ...
+# Subtest: events, variable and position conditions, and touching sensors execute real behavior
+ok 8 - events, variable and position conditions, and touching sensors execute real behavior
+  ---
+  duration_ms: 0.724245
+  type: 'test'
+  ...
+# Subtest: hidden characters do not receive taps or satisfy touching sensors
+ok 9 - hidden characters do not receive taps or satisfy touching sensors
+  ---
+  duration_ms: 0.62825
+  type: 'test'
+  ...
+# Subtest: pause drops stale taps; a deliberate step works and remains paused
+ok 10 - pause drops stale taps; a deliberate step works and remains paused
+  ---
+  duration_ms: 0.757766
+  type: 'test'
+  ...
+# Subtest: cyclic messages and zero-time nested programs stop at explicit execution budgets
+ok 11 - cyclic messages and zero-time nested programs stop at explicit execution budgets
+  ---
+  duration_ms: 0.908694
+  type: 'test'
+  ...
+# Subtest: time and arithmetic limits stop execution without leaving transient effects
+ok 12 - time and arithmetic limits stop execution without leaving transient effects
+  ---
+  duration_ms: 0.545435
+  type: 'test'
+  ...
+# Subtest: input project, exposed project and snapshots cannot mutate a running program; reset restores original state
+ok 13 - input project, exposed project and snapshots cannot mutate a running program; reset restores original state
+  ---
+  duration_ms: 0.522921
+  type: 'test'
+  ...
+# Subtest: runScene applies scheduled taps reproducibly and rejects impossible observation inputs
+ok 14 - runScene applies scheduled taps reproducibly and rejects impossible observation inputs
+  ---
+  duration_ms: 2.242491
+  type: 'test'
+  ...
+# Subtest: illustrated worlds retain their edition, scenery has no mechanics, and earlier worlds remain unchanged
+ok 15 - illustrated worlds retain their edition, scenery has no mechanics, and earlier worlds remain unchanged
+  ---
+  duration_ms: 174.595039
+  type: 'test'
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 223.897332

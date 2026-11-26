@@ -1,0 +1,135 @@
+{
+  "head": "563de940eacd3f3573bf93236ab5eebd4608043a",
+  "browser": "156.0.8078.79",
+  "results": {
+    "modern": {
+      "expectedBackdrop": "art:image:95002287-4a13-40de-bc30-39b4ffec663d:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+      "actualBackdrop": "art:image:95002287-4a13-40de-bc30-39b4ffec663d:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+      "expectedTrees": 1,
+      "actualTrees": 1,
+      "exactSelectedScenery": true,
+      "targetProgramsAndCastIntact": true,
+      "sourceWorld": {
+        "assetId": "world-forest-v1",
+        "framing": "fill"
+      },
+      "sourceBackdrop": "art:image:95002287-4a13-40de-bc30-39b4ffec663d:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+      "sourceStaticProp": "world-prop-tree-v1",
+      "selectedWorld": {
+        "assetId": "world-forest-v1",
+        "framing": "fill"
+      },
+      "selectedPrivateBackdrop": "art:image:95002287-4a13-40de-bc30-39b4ffec663d:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+      "selectedStaticProp": "world-prop-tree-v1",
+      "targetProgramsPreserved": true,
+      "targetActorPreserved": true,
+      "sourceSceneryMatches": true
+    },
+    "modernAgain": {
+      "expectedBackdrop": "art:image:95002287-4a13-40de-bc30-39b4ffec663d:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+      "actualBackdrop": "art:image:95002287-4a13-40de-bc30-39b4ffec663d:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+      "expectedTrees": 1,
+      "actualTrees": 1,
+      "exactSelectedScenery": true,
+      "targetProgramsAndCastIntact": true,
+      "sourceWorld": {
+        "assetId": "world-forest-v1",
+        "framing": "fill"
+      },
+      "sourceBackdrop": "art:image:95002287-4a13-40de-bc30-39b4ffec663d:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+      "sourceStaticProp": "world-prop-tree-v1",
+      "selectedWorld": {
+        "assetId": "world-forest-v1",
+        "framing": "fill"
+      },
+      "selectedPrivateBackdrop": "art:image:95002287-4a13-40de-bc30-39b4ffec663d:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+      "selectedStaticProp": "world-prop-tree-v1",
+      "targetProgramsPreserved": true,
+      "targetActorPreserved": true,
+      "sourceSceneryMatches": true
+    },
+    "legacy": {
+      "expectedBackdrop": null,
+      "actualBackdrop": null,
+      "expectedTrees": 0,
+      "actualTrees": 0,
+      "exactSelectedScenery": true,
+      "targetProgramsAndCastIntact": true,
+      "sourceWorld": {
+        "backdrop": "art:image:95002287-4a13-40de-bc30-39b4ffec663d:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+        "fit": "contain",
+        "decorations": [
+          {
+            "id": "first",
+            "assetId": "world-prop-tree-v1",
+            "name": "One tree",
+            "x": 20,
+            "y": 65,
+            "size": 25,
+            "plane": "front"
+          }
+        ]
+      },
+      "selectedWorld": {
+        "backdrop": "art:image:95002287-4a13-40de-bc30-39b4ffec663d:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+        "fit": "contain",
+        "decorations": [
+          {
+            "id": "first",
+            "assetId": "world-prop-tree-v1",
+            "name": "One tree",
+            "x": 20,
+            "y": 65,
+            "size": 25,
+            "plane": "front"
+          }
+        ]
+      },
+      "targetProgramsPreserved": true,
+      "targetActorPreserved": true,
+      "sourceSceneryMatches": true
+    },
+    "plain": {
+      "expectedBackdrop": null,
+      "actualBackdrop": null,
+      "expectedTrees": 0,
+      "actualTrees": 0,
+      "exactSelectedScenery": true,
+      "targetProgramsAndCastIntact": true,
+      "sourceWorld": {
+        "assetId": "world-moon-v1",
+        "framing": "fill"
+      },
+      "selectedWorld": {
+        "assetId": "world-moon-v1",
+        "framing": "fill"
+      },
+      "targetProgramsPreserved": true,
+      "targetActorPreserved": true,
+      "sourceSceneryMatches": true
+    },
+    "modernAfterPlain": {
+      "expectedBackdrop": "art:image:95002287-4a13-40de-bc30-39b4ffec663d:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+      "actualBackdrop": "art:image:95002287-4a13-40de-bc30-39b4ffec663d:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+      "expectedTrees": 1,
+      "actualTrees": 1,
+      "exactSelectedScenery": true,
+      "targetProgramsAndCastIntact": true,
+      "sourceWorld": {
+        "assetId": "world-forest-v1",
+        "framing": "fill"
+      },
+      "sourceBackdrop": "art:image:95002287-4a13-40de-bc30-39b4ffec663d:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+      "sourceStaticProp": "world-prop-tree-v1",
+      "selectedWorld": {
+        "assetId": "world-forest-v1",
+        "framing": "fill"
+      },
+      "selectedPrivateBackdrop": "art:image:95002287-4a13-40de-bc30-39b4ffec663d:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+      "selectedStaticProp": "world-prop-tree-v1",
+      "targetProgramsPreserved": true,
+      "targetActorPreserved": true,
+      "sourceSceneryMatches": true
+    }
+  }
+}

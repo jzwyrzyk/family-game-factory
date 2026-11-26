@@ -1,0 +1,26 @@
+✔ a below-fold question receives visible heading focus without opening a text input (807.493481ms)
+✔ requested hints expose their reasoning and offer a visible way back to the same answer (846.586202ms)
+✔ automatic hints announce the reasoning while keeping the current answer control (580.227527ms)
+✔ worked examples focus the explanation before a keyboard continuation (1169.204631ms)
+✔ focus recovery does not revive a disposed activity or steal navigation focus (510.788027ms)
+✔ help is available before an error and the successful answer remains assisted (1604.317767ms)
+✔ errors survive abandonment and disposing twice does not add another outcome (575.029638ms)
+✔ three errors provide a worked example and a supportive way back to play (750.387218ms)
+✔ a multiplication array and a child-built base-ten answer share the same attempt (1940.142274ms)
+✔ interaction mode constructs a quantity without pre-filling the answer (841.588995ms)
+✔ fraction construction is checked mathematically and keeps a single attempt across views (981.448409ms)
+✔ invalid input is not a mathematical error and choice tiles submit stable values (916.372326ms)
+✔ optional challenge closes a first error but never manufactures a correct response (247.935536ms)
+✔ a disposed activity cannot call back into another game after its success delay (751.290746ms)
+✔ dense number lines keep every exact tick label readable at mobile widths (233.000582ms)
+✔ diagrams are mathematical, mobile-safe and curriculum text is never HTML (237.399354ms)
+✔ Math question and help share explicit read-aloud without reading the answer or adding a hint (338.429331ms)
+✔ given counters retain a visible painted area inside the composed ten-frame (190.303704ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14281.840554

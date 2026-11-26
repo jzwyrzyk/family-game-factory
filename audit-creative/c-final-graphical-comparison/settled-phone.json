@@ -1,0 +1,80 @@
+[
+  {
+    "source": "Original #215",
+    "dimensions": [
+      390,
+      844
+    ],
+    "cardDimensions": [
+      150,
+      240
+    ],
+    "cardRgbSHA256": "ad9a3cbc93f68a271741d8bfbdffcd2a3d809bf55a6b7c1929484a4daaa94004",
+    "layout": {
+      "label": "My purple rockOriginal artwork",
+      "imageNaturalWidth": 130,
+      "cardBounds": {
+        "x": 40,
+        "y": 442.609375,
+        "width": 150,
+        "height": 240.1875,
+        "top": 442.609375,
+        "right": 190,
+        "bottom": 682.796875,
+        "left": 40
+      },
+      "dialogBounds": {
+        "x": 21,
+        "y": 42.203125,
+        "width": 348,
+        "height": 759.59375,
+        "top": 42.203125,
+        "right": 369,
+        "bottom": 801.796875,
+        "left": 21
+      },
+      "buttonVisibleAtCenter": true,
+      "focus": "Add my art",
+      "scroll": 745
+    }
+  },
+  {
+    "source": "Rehearsal 563de940",
+    "dimensions": [
+      390,
+      844
+    ],
+    "cardDimensions": [
+      150,
+      240
+    ],
+    "cardRgbSHA256": "ad9a3cbc93f68a271741d8bfbdffcd2a3d809bf55a6b7c1929484a4daaa94004",
+    "layout": {
+      "label": "My purple rockOriginal artwork",
+      "imageNaturalWidth": 130,
+      "cardBounds": {
+        "x": 40,
+        "y": 337.609375,
+        "width": 150,
+        "height": 240.1875,
+        "top": 337.609375,
+        "right": 190,
+        "bottom": 577.796875,
+        "left": 40
+      },
+      "dialogBounds": {
+        "x": 21,
+        "y": 42.203125,
+        "width": 348,
+        "height": 759.59375,
+        "top": 42.203125,
+        "right": 369,
+        "bottom": 801.796875,
+        "left": 21
+      },
+      "buttonVisibleAtCenter": true,
+      "focus": "Add my art",
+      "scroll": 858
+    }
+  }
+]

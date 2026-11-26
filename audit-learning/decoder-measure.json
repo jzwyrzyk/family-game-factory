@@ -1,0 +1,78 @@
+{
+  "browser": "156.0.8078.79",
+  "localOnly": true,
+  "results": [
+    {
+      "side": "before",
+      "fallback": false,
+      "round": 1,
+      "committed": 34,
+      "dcl": 6595,
+      "ready": 8707,
+      "loaded": 8708,
+      "source": "c572e715b3bff13d8b45cc27ac515a576f02354d",
+      "native": true,
+      "keys": 347
+    },
+    {
+      "side": "after",
+      "fallback": false,
+      "round": 1,
+      "committed": 19,
+      "dcl": 7000,
+      "ready": 7642,
+      "loaded": 7643,
+      "source": "85476a654a716bac7124d7cafc1254d0ca5c1f2c",
+      "native": true,
+      "keys": 347
+    },
+    {
+      "side": "after",
+      "fallback": false,
+      "round": 2,
+      "committed": 20,
+      "dcl": 5957,
+      "ready": 6583,
+      "loaded": 6584,
+      "source": "85476a654a716bac7124d7cafc1254d0ca5c1f2c",
+      "native": true,
+      "keys": 347
+    },
+    {
+      "side": "before",
+      "fallback": false,
+      "round": 2,
+      "committed": 27,
+      "dcl": 6446,
+      "ready": 8125,
+      "loaded": 8125,
+      "source": "c572e715b3bff13d8b45cc27ac515a576f02354d",
+      "native": true,
+      "keys": 347
+    },
+    {
+      "side": "before",
+      "fallback": false,
+      "round": 3,
+      "committed": 84,
+      "dcl": 6659,
+      "ready": 8675,
+      "loaded": 8676,
+      "source": "c572e715b3bff13d8b45cc27ac515a576f02354d",
+      "native": true,
+      "keys": 347
+    },
+    {
+      "side": "after",
+      "fallback": false,
+      "round": 3,
+      "committed": 22,
+      "dcl": 6583,
+      "ready": 7569,
+      "loaded": 7569,
+      "source": "85476a654a716bac7124d7cafc1254d0ca5c1f2c",
+      "native": true,
+      "keys": 347
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "active": "page-game",
+  "keep": false,
+  "editorHidden": false,
+  "grade": 1,
+  "route": "?arcade=1",
+  "events": [
+    {
+      "t": 5587,
+      "type": "click",
+      "page": "page-feedback",
+      "target": "liveMoreVersions",
+      "x": 209,
+      "y": 449,
+      "scroll": 1280,
+      "returnTop": 0
+    },
+    {
+      "t": 5711,
+      "type": "pointerdown",
+      "page": "page-feedback",
+      "target": "liveMoreVersions",
+      "x": 209.13999938964844,
+      "y": 449.3399963378906,
+      "scroll": 1280,
+      "returnTop": 0
+    },
+    {
+      "t": 5711,
+      "type": "pointerup",
+      "page": "page-feedback",
+      "target": "liveMoreVersions",
+      "x": 209.13999938964844,
+      "y": 449.3399963378906,
+      "scroll": 1280,
+      "returnTop": 0
+    },
+    {
+      "t": 5711,
+      "type": "click",
+      "page": "page-feedback",
+      "target": "liveMoreVersions",
+      "x": 209,
+      "y": 449,
+      "scroll": 1280,
+      "returnTop": 0
+    },
+    {
+      "t": 5899,
+      "type": "pointerdown",
+      "page": "page-feedback",
+      "target": "liveMoreVersions",
+      "x": 209.13999938964844,
+      "y": 449.3399963378906,
+      "scroll": 1280,
+      "returnTop": 0
+    },
+    {
+      "t": 5899,
+      "type": "pointerup",
+      "page": "page-feedback",
+      "target": "liveMoreVersions",
+      "x": 209.13999938964844,
+      "y": 449.3399963378906,
+      "scroll": 1280,
+      "returnTop": 0
+    },
+    {
+      "t": 5899,
+      "type": "click",
+      "page": "page-feedback",
+      "target": "liveMoreVersions",
+      "x": 209,
+      "y": 449,
+      "scroll": 1280,
+      "returnTop": 0
+    },
+    {
+      "t": 6130,
+      "type": "pointerdown",
+      "page": "page-feedback",
+      "target": "BUTTON",
+      "x": 160.8800048828125,
+      "y": 129.83999633789062,
+      "scroll": 1280,
+      "returnTop": 0
+    },
+    {
+      "t": 6138,
+      "type": "pointerup",
+      "page": "page-feedback",
+      "target": "BUTTON",
+      "x": 160.8800048828125,
+      "y": 129.83999633789062,
+      "scroll": 1280,
+      "returnTop": 0
+    },
+    {
+      "t": 6138,
+      "type": "click",
+      "page": "page-feedback",
+      "target": "BUTTON",
+      "x": 160,
+      "y": 129,
+      "scroll": 1280,
+      "returnTop": 0
+    },
+    {
+      "t": 6649,
+      "type": "factory-game",
+      "page": "page-feedback",
+      "scroll": 1280,
+      "returnTop": 0,
+      "route": "buckets"
+    },
+    {
+      "t": 6650,
+      "type": "factory-page",
+      "page": "page-feedback",
+      "scroll": 1280,
+      "returnTop": 0,
+      "route": "game"
+    },
+    {
+      "type": "aim",
+      "scroll": 72,
+      "returnTop": 1358.0625,
+      "x": 721.1015625,
+      "y": 1373.5625
+    },
+    {
+      "t": 7221,
+      "type": "pointerdown",
+      "page": "page-game",
+      "target": "HTML",
+      "x": 721.1015625,
+      "y": 1373.5625,
+      "scroll": 14,
+      "returnTop": 1416
+    },
+    {
+      "t": 7359,
+      "type": "pointerup",
+      "page": "page-game",
+      "target": "HTML",
+      "x": 721.1015625,
+      "y": 1373.5625,
+      "scroll": 0,
+      "returnTop": 1430
+    },
+    {
+      "t": 7359,
+      "type": "click",
+      "page": "page-game",
+      "target": "HTML",
+      "x": 721,
+      "y": 1373,
+      "scroll": 0,
+      "returnTop": 1430
+    }
+  ]
+}

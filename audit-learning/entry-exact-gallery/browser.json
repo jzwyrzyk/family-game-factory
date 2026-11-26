@@ -1,0 +1,268 @@
+{
+  "source": "c88969fce3b6052c3b1d1d45e2640b049a8c3ace",
+  "browser": "156.0.8078.79",
+  "samples": 36,
+  "checks": [
+    {
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "name": "build-a-word",
+      "left": 19,
+      "right": 371,
+      "scroll": 390
+    },
+    {
+      "device": "tablet-portrait",
+      "width": 768,
+      "height": 1024,
+      "name": "pk-touch",
+      "left": 30.515625,
+      "right": 737.484375,
+      "scroll": 768
+    },
+    {
+      "device": "tablet-landscape",
+      "width": 1024,
+      "height": 768,
+      "name": "g1-make-ten",
+      "left": 44.359375,
+      "right": 979.640625,
+      "scroll": 1024
+    },
+    {
+      "device": "desktop",
+      "width": 1366,
+      "height": 768,
+      "name": "select-supporting-evidence",
+      "left": 143,
+      "right": 1223,
+      "scroll": 1366
+    },
+    {
+      "device": "small-phone",
+      "width": 320,
+      "height": 667,
+      "name": "g2-hundreds",
+      "left": 19,
+      "right": 301,
+      "scroll": 320
+    },
+    {
+      "device": "short-landscape",
+      "width": 844,
+      "height": 390,
+      "name": "sequence-a-picture-story",
+      "left": 31.65625,
+      "right": 812.34375,
+      "scroll": 844
+    },
+    {
+      "device": "wide",
+      "width": 1600,
+      "height": 1000,
+      "name": "g4-add-fraction",
+      "left": 260,
+      "right": 1340,
+      "scroll": 1600
+    }
+  ],
+  "zoom": {
+    "browserZoom": 1.5,
+    "fullscreen": true,
+    "selectedBefore": 1,
+    "selectedAfter": 2
+  },
+  "mounts": [
+    {
+      "sample": "build-a-word",
+      "ms": 98.1
+    },
+    {
+      "sample": "pk-touch",
+      "ms": 19.1
+    },
+    {
+      "sample": "g1-make-ten",
+      "ms": 17.7
+    },
+    {
+      "sample": "select-supporting-evidence",
+      "ms": 19.5
+    },
+    {
+      "sample": "g2-hundreds",
+      "ms": 48.3
+    },
+    {
+      "sample": "sequence-a-picture-story",
+      "ms": 67.5
+    },
+    {
+      "sample": "g4-add-fraction",
+      "ms": 56.4
+    },
+    {
+      "sample": "pk-touch",
+      "ms": 29.3
+    },
+    {
+      "sample": "k-pattern",
+      "ms": 80
+    },
+    {
+      "sample": "g1-make-ten",
+      "ms": 78.8
+    },
+    {
+      "sample": "g1-subtract-10",
+      "ms": 53
+    },
+    {
+      "sample": "g2-hundreds",
+      "ms": 30.5
+    },
+    {
+      "sample": "g3-groups",
+      "ms": 18.8
+    },
+    {
+      "sample": "g4-add-fraction",
+      "ms": 16
+    },
+    {
+      "sample": "g2-time",
+      "ms": 15.3
+    },
+    {
+      "sample": "g2-length",
+      "ms": 23.6
+    },
+    {
+      "sample": "paper",
+      "ms": 17.5
+    },
+    {
+      "sample": "g4-angles",
+      "ms": 26.3
+    },
+    {
+      "sample": "letter-recognition",
+      "ms": 8.5
+    },
+    {
+      "sample": "find-the-starting-letter",
+      "ms": 25.9
+    },
+    {
+      "sample": "picture-matching",
+      "ms": 16.2
+    },
+    {
+      "sample": "build-a-word",
+      "ms": 17.9
+    },
+    {
+      "sample": "build-a-sentence",
+      "ms": 9.3
+    },
+    {
+      "sample": "sequence-a-picture-story",
+      "ms": 16
+    },
+    {
+      "sample": "punctuation",
+      "ms": 11.9
+    },
+    {
+      "sample": "grammar",
+      "ms": 19.3
+    },
+    {
+      "sample": "read-for-the-main-idea",
+      "ms": 9
+    },
+    {
+      "sample": "select-supporting-evidence",
+      "ms": 30.6
+    },
+    {
+      "sample": "edit-a-sentence",
+      "ms": 10
+    },
+    {
+      "sample": "creative-writing",
+      "ms": 17.8
+    },
+    {
+      "sample": "selected",
+      "ms": 13
+    },
+    {
+      "sample": "incorrect",
+      "ms": 21
+    },
+    {
+      "sample": "hint",
+      "ms": 18.3
+    },
+    {
+      "sample": "worked",
+      "ms": 10.8
+    },
+    {
+      "sample": "correct",
+      "ms": 62.2
+    },
+    {
+      "sample": "voice",
+      "ms": 29.3
+    },
+    {
+      "sample": "save-failure",
+      "ms": 36.3
+    },
+    {
+      "sample": "ending",
+      "ms": 37
+    },
+    {
+      "sample": "segment",
+      "ms": 8.3
+    },
+    {
+      "sample": "coin",
+      "ms": 10.6
+    },
+    {
+      "sample": "compose",
+      "ms": 29.3
+    },
+    {
+      "sample": "data",
+      "ms": 19.6
+    },
+    {
+      "sample": "plot",
+      "ms": 55
+    },
+    {
+      "sample": "g4-add-fraction",
+      "ms": 12.5
+    },
+    {
+      "sample": "g1-make-ten",
+      "ms": 41.4
+    },
+    {
+      "sample": "pk-touch",
+      "ms": 12.4
+    },
+    {
+      "sample": "g1-make-ten",
+      "ms": 24.3
+    }
+  ],
+  "network": [],
+  "failures": []
+}

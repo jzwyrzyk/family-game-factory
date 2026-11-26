@@ -1,0 +1,267 @@
+[
+  {
+    "path": "FIDELITY-REGISTER.csv",
+    "size": 451714,
+    "sha256": "5e5d01efd0cec82183212b864b2cc242d04e492b1b041613ec3d05c9b0fcda59"
+  },
+  {
+    "path": "LEARNING-AUDIT.md",
+    "size": 71476,
+    "sha256": "76ea5578bd7a8541539ca21414c850f8ac5ca2fe6c881066d04b81cf8e30d2a9"
+  },
+  {
+    "path": "audit-learning/combined-answer-routes.json",
+    "size": 388,
+    "sha256": "f2d1828c353c764a60b0a4e1076cdc4a0a833001650a635089c60aa0e8a269fb"
+  },
+  {
+    "path": "audit-learning/combined-authorities.cjs",
+    "size": 2825,
+    "sha256": "b8adafc07be85ba23aaa72a5340fb989b7522c3ba3c05c0abc5da1dd194ae448"
+  },
+  {
+    "path": "audit-learning/combined-authorities.json",
+    "size": 1836,
+    "sha256": "bb0a98f697d84ebe1169d7e13aa4ea68cbc6dd629f566ff727b818601dc344ae"
+  },
+  {
+    "path": "audit-learning/combined-c/dist-review/jems-ui-review.html",
+    "size": 301095482,
+    "sha256": "3bfbf41c32f651e879b69815c6af48a77c9d983aadbdd1c34449a60d2c798656"
+  },
+  {
+    "path": "audit-learning/combined-english-render.json",
+    "size": 613,
+    "sha256": "396613856333445e7ddd1f1fe638952773d676a902761e968a8ddad67f9ce391"
+  },
+  {
+    "path": "audit-learning/combined-exact-assets.json",
+    "size": 69486,
+    "sha256": "22eee67b347491440b19196c3de83c6b8b54f847e2e2363f5330666c372c9b92"
+  },
+  {
+    "path": "audit-learning/combined-host-creation.log",
+    "size": 197,
+    "sha256": "42ccaf3481374e28c39c7a41e8e1571495ba3af110435db83857ff188533ff90"
+  },
+  {
+    "path": "audit-learning/combined-host-english.log",
+    "size": 368,
+    "sha256": "5b505e6a49751c271ff2b529b0baf943320d5e1ecfd114d6d328b0369488b576"
+  },
+  {
+    "path": "audit-learning/combined-host-math.log",
+    "size": 1946,
+    "sha256": "5888379fd72f551ce999d637bb589c09e13dd5d99bd051fd60b3d7fde619a074"
+  },
+  {
+    "path": "audit-learning/combined-hunt-language.png",
+    "size": 222431,
+    "sha256": "74e7a1171ce1d6c84e654994d13a91f2a9761650f419e420ff2817a4344c8981"
+  },
+  {
+    "path": "audit-learning/combined-hunt-math.png",
+    "size": 599407,
+    "sha256": "71f9e858c6cb027f0b979f0a93cfac2645488c91c4c8604517bc7a2bbecfeb99"
+  },
+  {
+    "path": "audit-learning/combined-learning-ui.log",
+    "size": 4727,
+    "sha256": "7aeae3ef032295dc500c267c0bcc545c557796956350c7c0d23c51b8bb0685aa"
+  },
+  {
+    "path": "audit-learning/combined-negative-source.json",
+    "size": 727,
+    "sha256": "792aac5aa368447e8f855426adbece91df6d225f52356c4dc3d7e821e8f2b4ed"
+  },
+  {
+    "path": "audit-learning/combined-private-learning-first.log",
+    "size": 3444,
+    "sha256": "aca4d51a1723402b8fa93dac140f12855413aa977bcf76dc942452ca8dd26c6b"
+  },
+  {
+    "path": "audit-learning/combined-private-learning-negative.json",
+    "size": 1747,
+    "sha256": "a590a5b8ebb172938d2f0eb1f314494bce5250450b02d4bb613a7a0cbbe37718"
+  },
+  {
+    "path": "audit-learning/combined-private-learning.cjs",
+    "size": 9945,
+    "sha256": "5e7dae369c33bb55eed37a65ae411e93009dc02fc5d6b50d49260d493c5b5c68"
+  },
+  {
+    "path": "audit-learning/combined-private-learning.json",
+    "size": 2722,
+    "sha256": "a0c4fe76a6417e9b48d57ff21f713553f68b69ea0ebf1a4ff79afb93cd81513a"
+  },
+  {
+    "path": "audit-learning/combined-visual-digests.json",
+    "size": 3558,
+    "sha256": "20c06cdc8387ac0366c2bebcc94f1e7dfb74829815700a8c5dcbe504dea37c50"
+  },
+  {
+    "path": "audit-learning/final-c-answer-routes.json",
+    "size": 388,
+    "sha256": "ed1b8436617726266cdb0207299b0e9179f4117bfdf42efddb26aa22cc1aca43"
+  },
+  {
+    "path": "audit-learning/final-c-authorities.json",
+    "size": 1833,
+    "sha256": "67431d98dca6f145da20c094d49f677710a9cadef79a6eb0722de862747d7459"
+  },
+  {
+    "path": "audit-learning/final-c-english-render.json",
+    "size": 613,
+    "sha256": "7d649e69475b97929152da2d140587c17a4bd406261573973069276df7496b5e"
+  },
+  {
+    "path": "audit-learning/final-c-exact-assets.json",
+    "size": 69486,
+    "sha256": "08edc14e6e7c8091399827568dfe3543b10b61f5ba920b9b0622cee3b552e6ea"
+  },
+  {
+    "path": "audit-learning/final-c-host-math.log",
+    "size": 3978,
+    "sha256": "b6bdaa32605dd060c88a4a77432dd6e6c7f480f8699c8067445e26306062bea9"
+  },
+  {
+    "path": "audit-learning/final-c-hosted-all.json",
+    "size": 34085,
+    "sha256": "d03ad743b2007dff903dc238e5781712f9493bd8c48df4136894e1c30be5b232"
+  },
+  {
+    "path": "audit-learning/final-c-hosted-learning.json",
+    "size": 7315,
+    "sha256": "4e592e03622a31107ba80e723c89f9ae5cb1c9f3ff140bd79017f162aaa8781e"
+  },
+  {
+    "path": "audit-learning/final-c-hosted-owner.json",
+    "size": 2384,
+    "sha256": "928769a909e284283b39d912b1534df6a6a76b6f0c21405dcfc63f8b24bd400c"
+  },
+  {
+    "path": "audit-learning/final-c-learning-ui.log",
+    "size": 4750,
+    "sha256": "35fc405f44936a21f64fee18a77ffc6c5c10964a1ed271caf0eda563a7b88f96"
+  },
+  {
+    "path": "audit-learning/final-c-merge-tree.json",
+    "size": 199,
+    "sha256": "7238e172295969f78530dea5ccb4beeddeb70c0b36a03fb9a398992d37487601"
+  },
+  {
+    "path": "audit-learning/final-c-negative-source.json",
+    "size": 727,
+    "sha256": "16a3a7d85526e6747c189a09389f8fdb8234f56020d6fb5be8e96f94deea1035"
+  },
+  {
+    "path": "audit-learning/final-c-official-host-creation.log",
+    "size": 197,
+    "sha256": "42ccaf3481374e28c39c7a41e8e1571495ba3af110435db83857ff188533ff90"
+  },
+  {
+    "path": "audit-learning/final-c-official-host-english.log",
+    "size": 368,
+    "sha256": "5b505e6a49751c271ff2b529b0baf943320d5e1ecfd114d6d328b0369488b576"
+  },
+  {
+    "path": "audit-learning/final-c-official-host-math.log",
+    "size": 1946,
+    "sha256": "5888379fd72f551ce999d637bb589c09e13dd5d99bd051fd60b3d7fde619a074"
+  },
+  {
+    "path": "audit-learning/final-c-offline-byte-comparison.json",
+    "size": 1223,
+    "sha256": "5510363c2dbed1754b31cefe46d4120a9e56607728f1f8a673f99b12e04a01d2"
+  },
+  {
+    "path": "audit-learning/final-c-preview-pointer-comparison.json",
+    "size": 16759,
+    "sha256": "b0b012ebfbd54450c417995f77a42ca97dd106f8cab3ef9efef3e00b7ccf737b"
+  },
+  {
+    "path": "audit-learning/final-c-private-learning-negative.json",
+    "size": 1743,
+    "sha256": "88e67692902185f99bc9ee2a1f08a4b4ebd4c0681b9fdabbdf6ec0fc34a54773"
+  },
+  {
+    "path": "audit-learning/final-c-private-learning.json",
+    "size": 2722,
+    "sha256": "c52a2d2dcba3e936aa8e18fc31b67f13bd45a61c240379bbadd52e554dd1227e"
+  },
+  {
+    "path": "audit-learning/final-c-visual-digests.json",
+    "size": 3558,
+    "sha256": "20c06cdc8387ac0366c2bebcc94f1e7dfb74829815700a8c5dcbe504dea37c50"
+  },
+  {
+    "path": "audit-learning/final-c/test-results/creative-learning/private-learning.json",
+    "size": 2697,
+    "sha256": "6ce93c2c2b38f5f8504df38c0756021944bd82a21f0f70e52d4c3d44c2711016"
+  },
+  {
+    "path": "audit-learning/final-c/test-results/math-generated-preview-desktop-failure.json",
+    "size": 1508,
+    "sha256": "0e7e1ccd7ec5f7309a44ea6ab997959b3283a55b5df6985f31caec72929ba962"
+  },
+  {
+    "path": "audit-learning/opening-combined-measurement-summary.json",
+    "size": 5409,
+    "sha256": "a523b582f009c8bdaca6c1f8c4b178b174e083c99c15b831d5ab8ad5fd5adddd"
+  },
+  {
+    "path": "audit-learning/opening-combined-measurement.json",
+    "size": 130830,
+    "sha256": "dfb69e16f4b3deeeadeb4ecf6e449f9be90ca3df8ea56c6ffce5d23be6410f61"
+  },
+  {
+    "path": "audit-learning/opening-final-c-measurement-summary.json",
+    "size": 5411,
+    "sha256": "d018d83b81d2d5c210f7736b00c6e2c7d90cb6a3434ba41921f3eb7d317ef4d7"
+  },
+  {
+    "path": "audit-learning/release-combined-gallery/browser.json",
+    "size": 4333,
+    "sha256": "7d73983c3db58ca2d4a04737ce27f2731a770ebdebab12a1ff3c22778519bf3a"
+  },
+  {
+    "path": "audit-learning/release-final-c-gallery/browser.json",
+    "size": 4290,
+    "sha256": "c4cdb4a9d383ff5e0d34c169a9cd5a6b6d8ce0f540cd1ee9194f597f84fbabeb"
+  },
+  {
+    "path": "evidence/C-boundaries-negatives.log",
+    "size": 14183,
+    "sha256": "46a2ee21bf2694c7e65569839b263ada834974c894188d19f0e06b9df74ed5c6"
+  },
+  {
+    "path": "evidence/C-connected-learning-one-file.log",
+    "size": 202,
+    "sha256": "07a474c214050c5e479a4745fb37888c16a2f23e19626a857063e1f7ea101015"
+  },
+  {
+    "path": "evidence/C-final-owner-connected.log",
+    "size": 202,
+    "sha256": "07a474c214050c5e479a4745fb37888c16a2f23e19626a857063e1f7ea101015"
+  },
+  {
+    "path": "evidence/C-final-owner-recovery.log",
+    "size": 129,
+    "sha256": "8259d75dcd6a01dff2e26b0ef9bcbd2e778c5e9b6b94be84394a4a82d3a5f07b"
+  },
+  {
+    "path": "evidence/C-owner-complete-first.log",
+    "size": 1640,
+    "sha256": "be779777714b5e16b3380756f4bb509b33bfc861034b7d91d44115f0c3160adf"
+  },
+  {
+    "path": "evidence/learning-case-dispositions-7d597937.csv",
+    "size": 521196,
+    "sha256": "ba2769a276c668964fc80bc2bc32728303e4cdc3a3aada939750b7d4965a1cac"
+  },
+  {
+    "path": "rehearsal/dist-review/jems-ui-review.html",
+    "size": 301095482,
+    "sha256": "29564d868a8e5fb8963abf4319b0b39baace7b466bf9c976072d9b9202a26aa9"
+  }
+]

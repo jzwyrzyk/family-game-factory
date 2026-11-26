@@ -1,0 +1,7 @@
+replace just the obstacle
+page.evaluate: Error: Player changed. Reopen this creation in your own profile.
+    at CreationStore.scope (<anonymous>:2168:89)
+    at CreationStore.entry (<anonymous>:2171:12)
+    at eval (eval at evaluate (:290:30), <anonymous>:2:189)
+    at async <anonymous>:316:30
+    at /workspace/jems-consolidation/audit-creative/rock-authored-journey.cjs:24:61

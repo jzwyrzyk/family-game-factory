@@ -1,0 +1,29 @@
+
+> family-game-factory@2.0.0-foundation review:build
+> node tools/ui-review/check-coverage.mjs && node tools/ui-review/build.mjs
+
+PASS coverage: 16 discovered page IDs, 16 manifest pages; 32 intermediate states.
+node:internal/child_process:1191
+    result.error = new ErrnoException(result.error, 'spawnSync ' + options.file);
+                   ^
+
+<ref *1> Error: spawnSync git EPERM
+    at Object.spawnSync (node:internal/child_process:1191:20)
+    at spawnSync (node:child_process:929:24)
+    at execFileSync (node:child_process:972:15)
+    at file:///workspace/jems-consolidation/audit-learning/corrected/tools/ui-review/build.mjs:7:43 {
+  errno: -1,
+  code: 'EPERM',
+  syscall: 'spawnSync git',
+  path: 'git',
+  spawnargs: [ 'rev-parse', 'HEAD' ],
+  error: [Circular *1],
+  status: 0,
+  signal: null,
+  output: [ null, 'dea2915f17fa9f40dc20ead85b7672c8573b5335\n', '' ],
+  pid: 25319,
+  stdout: 'dea2915f17fa9f40dc20ead85b7672c8573b5335\n',
+  stderr: ''
+}
+
+Node.js v24.22.3

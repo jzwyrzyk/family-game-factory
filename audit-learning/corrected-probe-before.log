@@ -1,0 +1,11 @@
+AssertionError [ERR_ASSERTION]: Expected "actual" to be strictly unequal to:
+
+'0 rows, 0 columns'
+    at /workspace/jems-consolidation/audit-learning/corrected-journey.cjs:41:89 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: '0 rows, 0 columns',
+  expected: '0 rows, 0 columns',
+  operator: 'notStrictEqual',
+  diff: 'simple'
+}

@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: family review accepts exact truecolor and indexed raster originals
+ok 1 - family review accepts exact truecolor and indexed raster originals
+  ---
+  duration_ms: 40.790415
+  type: 'test'
+  ...
+# Subtest: embedded file details, trailing bytes and incomplete chunks cannot pass review
+ok 2 - embedded file details, trailing bytes and incomplete chunks cannot pass review
+  ---
+  duration_ms: 0.725048
+  type: 'test'
+  ...
+# Subtest: the color model and exact scanline count govern admitted image data
+ok 3 - the color model and exact scanline count govern admitted image data
+  ---
+  duration_ms: 13.693956
+  type: 'test'
+  ...
+# Subtest: formerly accepted file with invalid pixel stream cannot be admitted
+ok 4 - formerly accepted file with invalid pixel stream cannot be admitted
+  ---
+  duration_ms: 0.227915
+  type: 'test'
+  ...
+# Subtest: the optional-palette copy retains every other byte and needs its own digest
+ok 5 - the optional-palette copy retains every other byte and needs its own digest
+  ---
+  duration_ms: 22.009666
+  type: 'test'
+  ...
+# Subtest: a row with an unknown PNG filter is refused even when a suggested palette can be removed
+ok 6 - a row with an unknown PNG filter is refused even when a suggested palette can be removed
+  ---
+  duration_ms: 2.858609
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 96.470394

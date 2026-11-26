@@ -1,0 +1,106 @@
+From ab88a8e02739395ac8c757b8fb2a258de44b9f84 Mon Sep 17 00:00:00 2001
+From: Jems Integration Audit <jems-audit@users.noreply.github.com>
+Date: Thu, 26 Nov 2026 07:00:55 +0000
+Subject: [PATCH] Verify and physically press reachable controls on the fitted
+ Rally stage
+
+---
+ tests/studio-fitted-input.cjs | 28 ++++++++++++++++++++++++++++
+ tests/studio-native-ui.cjs    | 17 +++++++++--------
+ 2 files changed, 37 insertions(+), 8 deletions(-)
+ create mode 100644 tests/studio-fitted-input.cjs
+
+diff --git a/tests/studio-fitted-input.cjs b/tests/studio-fitted-input.cjs
+new file mode 100644
+index 00000000..2b09900f
+--- /dev/null
++++ b/tests/studio-fitted-input.cjs
+@@ -0,0 +1,28 @@
++const assert = require('node:assert/strict');
++
++async function clickFittedControl(page, selector) {
++  const control = page.locator(selector);
++  const target = await control.evaluate(async element => {
++    const frame = () => new Promise(resolve => requestAnimationFrame(resolve));
++    const point = () => {
++      const box = element.getBoundingClientRect();
++      const x = box.left + box.width / 2, y = box.top + box.height / 2;
++      const hit = document.elementFromPoint(x, y);
++      return {x, y, width: box.width, height: box.height, reachable: Boolean(hit && element.contains(hit))};
++    };
++    const before = point();
++    if (!before.reachable) element.scrollIntoView({block: 'nearest', inline: 'nearest', behavior: 'instant'});
++    await frame();
++    const first = point();
++    await frame();
++    const second = point();
++    return {first, second, enabled: !element.matches(':disabled, [aria-disabled="true"]')};
++  });
++  assert.ok(target.enabled && target.first.reachable && target.second.reachable,
++    'The fitted control must be enabled and under the pointer: ' + selector + ' ' + JSON.stringify(target));
++  assert.ok(Math.abs(target.first.x - target.second.x) < 1 && Math.abs(target.first.y - target.second.y) < 1,
++    'The fitted control moved between frames: ' + selector + ' ' + JSON.stringify(target));
++  await page.mouse.click(target.second.x, target.second.y);
++}
++
++module.exports = {clickFittedControl};
+diff --git a/tests/studio-native-ui.cjs b/tests/studio-native-ui.cjs
+index 7b7b187f..9c5bb779 100644
+--- a/tests/studio-native-ui.cjs
++++ b/tests/studio-native-ui.cjs
+@@ -1,5 +1,6 @@
+ /* Real built storage-preview Studio; synthetic local players, no providers. */
+ const assert=require('node:assert/strict'),{chromium,webkit}=require('playwright');
++const {clickFittedControl}=require('./studio-fitted-input.cjs');
+ const {start}=require('./browser-server.cjs'),{exploreWelcome,openProfiles}=require('./studio-entry.cjs');
+ const {installNativeResizeTrace,installNativeResizeErrorCapture}=require('./native-resize-trace.cjs');
+ async function checkHillResizeTransition(page){
+@@ -63,7 +64,7 @@ async function checkPendingNativeChange(page){
+   assert.equal(after.panel,'talk','the newer Change action wins over delayed local playback');assert.equal(after.fitted,false);assert.equal(after.hill,false);assert.equal(await page.locator('#studioPrompt').isVisible(),true);
+   assert.deepEqual({owner:after.owner,id:after.id,draft:after.draft},before);assert.equal(after.input,before.draft);
+   await page.click('#studioPlay');await page.waitForFunction(()=>document.getElementById('page-studio').classList.contains('studio-play-mode'));assert.equal(await page.evaluate(()=>FG.runtime.snapshot().config.wheelSize),.57,'a later explicit Play still opens the exact kept revision');
+-  await page.click('#studioChange');await page.waitForFunction(()=>!document.querySelector('.quality-hill'));
++  await clickFittedControl(page,'#studioChange');await page.waitForFunction(()=>!document.querySelector('.quality-hill'));
+  }
+ }
+ async function checkUnwrappedNativeLifecycle(context,url,viewport){
+@@ -81,12 +82,12 @@ async function checkUnwrappedNativeLifecycle(context,url,viewport){
+   phase=`unwrapped cycle ${cycle+1}: Home to saved Rally`;
+   await page.locator('#studioLibrary .studio-saved-open').filter({hasText:'Indexed road trip'}).click();await page.waitForSelector('.quality-hill');
+   phase=`unwrapped cycle ${cycle+1}: garage and viewport`;
+-  await page.locator('.quality-hill summary').click();await page.setViewportSize(size);await frames();
++  await clickFittedControl(page,'.quality-hill summary');await page.setViewportSize(size);await frames();
+   const fitted=await page.locator('.quality-hill canvas').evaluate(canvas=>{const rect=canvas.getBoundingClientRect();return {width:canvas.width,height:canvas.height,rect:rect.toJSON()};});
+   assert.ok(fitted.width>0&&fitted.height>0&&Math.abs(fitted.width/fitted.rect.width-fitted.height/fitted.rect.height)<.025,'unwrapped native resize keeps uniform canvas scale');
+-  await page.locator('.quality-hill summary').click();
++  await clickFittedControl(page,'.quality-hill summary');
+   phase=`unwrapped cycle ${cycle+1}: Change and Back`;
+-  await page.click('#studioChange');await page.waitForFunction(()=>!document.querySelector('.quality-hill')&&!document.getElementById('page-studio').classList.contains('studio-play-mode'));
++  await clickFittedControl(page,'#studioChange');await page.waitForFunction(()=>!document.querySelector('.quality-hill')&&!document.getElementById('page-studio').classList.contains('studio-play-mode'));
+   await page.click('#studioPlay');
+   await page.waitForSelector('.quality-hill');await frames();assert.equal(await page.evaluate(()=>FG.runtime.snapshot().config.wheelSize),.57);
+   phase=`unwrapped cycle ${cycle+1}: return Home`;
+@@ -115,16 +116,16 @@ async function checkUnwrappedNativeLifecycle(context,url,viewport){
+    let originalNotebook;
+    if(process.env.STUDIO_NOTEBOOK==='1'){phase='prepare notebook authority and reload';originalNotebook=await page.evaluate(()=>localStorage.getItem('family-game-factory-studio-v1'));assert.deepEqual(await page.evaluate(()=>window.__hillResizeEffects),[],'preparation does not write canvas dimensions during observer delivery');await Promise.all([page.waitForNavigation(),page.evaluate(()=>FG.studio.prepareIndexedNotebook())]);await page.waitForFunction(()=>FG.studio&&FG.factory);}
+    phase='open prepared Rally';await page.click('[data-starter="hill"]');await page.waitForSelector('.quality-hill');
+-   phase='garage mechanic change';await page.locator('.quality-hill summary').click();await page.getByRole('button',{name:'Make the wheels bigger',exact:true}).click();await page.waitForFunction(()=>FG.runtime.snapshot().config.wheelSize===.57);
++   phase='garage mechanic change';await clickFittedControl(page,'.quality-hill summary');await page.getByRole('button',{name:'Make the wheels bigger',exact:true}).click();await page.waitForFunction(()=>FG.runtime.snapshot().config.wheelSize===.57);
+    phase='Keep prepared Rally';await page.click('#studioKeep');await page.waitForFunction(async()=>{const book=await FG.studio.captureNotebook();return !book.sessions.find(s=>s.id===book.active[FG.store.current().id]).candidate;});
+    const kept=await page.evaluate(async()=>{const s=(await FG.studio.captureNotebook()).sessions.find(s=>s.game==='hill'),w=await FG.factory.captureWorkspace();return {session:s.id,head:w.projects.find(p=>p.id===s.projectId).headId,config:w.revisions.find(r=>r.id===w.projects.find(p=>p.id===s.projectId).headId).config};});assert.equal(kept.config.wheelSize,.57);
+-   phase='open change and copy';await page.click('#studioChange');await page.click('#studioMore > summary');await page.click('#studioCopy');await page.fill('#studioCopyName','Indexed road trip');await page.click('#studioCopyForm button[type="submit"]');await page.waitForFunction(()=>document.getElementById('studioTitle')?.textContent==='Indexed road trip').catch(async error=>{console.error(await page.evaluate(()=>({status:document.getElementById('studioStatus')?.textContent,global:document.getElementById('studioGlobalStatus')?.textContent,title:document.getElementById('studioTitle')?.textContent})),errors);throw error;});
++   phase='open change and copy';await clickFittedControl(page,'#studioChange');await page.click('#studioMore > summary');await page.click('#studioCopy');await page.fill('#studioCopyName','Indexed road trip');await page.click('#studioCopyForm button[type="submit"]');await page.waitForFunction(()=>document.getElementById('studioTitle')?.textContent==='Indexed road trip').catch(async error=>{console.error(await page.evaluate(()=>({status:document.getElementById('studioStatus')?.textContent,global:document.getElementById('studioGlobalStatus')?.textContent,title:document.getElementById('studioTitle')?.textContent})),errors);throw error;});
+    assert.equal(await page.evaluate(()=>localStorage.getItem('family-game-factory-workspace-v2')),before,'Studio kept using indexed native authority');
+    if(process.env.STUDIO_NOTEBOOK==='1')assert.equal(await page.evaluate(()=>localStorage.getItem('family-game-factory-studio-v1')),originalNotebook,'Indexed notebook original preserved');
+    assert.deepEqual(await page.evaluate(()=>window.__hillResizeEffects),[],'prepared Keep and copy do not write canvas dimensions during observer delivery');
+    phase='reload kept copy';await page.reload();await page.waitForFunction(()=>FG.studio);await observeEmptyPlayHost(page);await page.locator('#studioLibrary .studio-saved-open').filter({hasText:'Indexed road trip'}).click();await page.waitForSelector('.quality-hill');await page.waitForFunction(()=>document.getElementById('page-studio').classList.contains('studio-play-mode'));await checkPlaySubscriptions(page,true);const emptyHost=await page.evaluate(()=>{window.__stopEmptyPlayHostObservation();return window.__emptyPlayHostSubscriptions;});assert.ok(emptyHost.length,'saved opening exposes its real empty host while the indexed revision loads');assert.ok(emptyHost.every(targets=>targets.length===0),'the revealed empty host has no inactive play subscriptions');assert.equal(await page.evaluate(()=>FG.runtime.snapshot().config.wheelSize),.57);
+-   phase='edit draft and switch away';await page.click('#studioChange');await page.fill('#studioPrompt','Private saved thought');await openProfiles(page);await page.locator('.profile-choice').nth(1).click();await page.waitForFunction(()=>document.getElementById('studioPrompt').value==='');assert.equal(await page.locator('#studioLibrary [data-session]').count(),0);
+-   phase='switch back and reopen saved Rally';await openProfiles(page);await page.locator('.profile-choice').first().click();await page.locator('#studioLibrary .studio-saved-open').filter({hasText:'Indexed road trip'}).click();await page.waitForSelector('.quality-hill');await page.waitForFunction(()=>document.getElementById('page-studio').classList.contains('studio-play-mode'));await page.click('#studioChange');assert.equal(await page.inputValue('#studioPrompt'),'Private saved thought');await page.waitForFunction(()=>!document.querySelector('.quality-hill'));await checkPlaySubscriptions(page,false);assert.deepEqual(await page.evaluate(()=>window.__hillResizeEffects),[],'saved Rally transitions do not write canvas dimensions during observer delivery');assert.deepEqual(errors,[]);
++   phase='edit draft and switch away';await clickFittedControl(page,'#studioChange');await page.fill('#studioPrompt','Private saved thought');await openProfiles(page);await page.locator('.profile-choice').nth(1).click();await page.waitForFunction(()=>document.getElementById('studioPrompt').value==='');assert.equal(await page.locator('#studioLibrary [data-session]').count(),0);
++   phase='switch back and reopen saved Rally';await openProfiles(page);await page.locator('.profile-choice').first().click();await page.locator('#studioLibrary .studio-saved-open').filter({hasText:'Indexed road trip'}).click();await page.waitForSelector('.quality-hill');await page.waitForFunction(()=>document.getElementById('page-studio').classList.contains('studio-play-mode'));await clickFittedControl(page,'#studioChange');assert.equal(await page.inputValue('#studioPrompt'),'Private saved thought');await page.waitForFunction(()=>!document.querySelector('.quality-hill'));await checkPlaySubscriptions(page,false);assert.deepEqual(await page.evaluate(()=>window.__hillResizeEffects),[],'saved Rally transitions do not write canvas dimensions during observer delivery');assert.deepEqual(errors,[]);
+    phase='Change during pending local revision';await checkPendingNativeChange(page);await checkPlaySubscriptions(page,false);assert.deepEqual(errors,[]);
+    console.log(JSON.stringify({browser:process.env.STORAGE_BROWSER??'chromium',viewport,indexedNotebook:process.env.STUDIO_NOTEBOOK==='1',checks:['active-only fitted play observations','unobserved real empty-host revision-loading gap','observer-safe Rally layout transition','same-tab migration selects authority','native Keep','compound copy','reload exact revision','profile switch and draft isolation','Change wins in both pending local read gaps','later explicit Play preserves owner/draft/kept revision']}));await page.close();
+    await checkUnwrappedNativeLifecycle(context,`http://127.0.0.1:${server.address().port}/arcade/?studio=1`,viewport);await context.close();
+-- 
+2.56.1
+

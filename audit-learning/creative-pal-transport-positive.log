@@ -1,0 +1,5 @@
+PASS Pal fidelity offline desktop
+PASS Pal fidelity offline landscape
+PASS Pal fidelity offline portrait
+PASS Pal fidelity offline phone
+PASS exact Pal variants, transparent pixels, fail-closed presentation and responsive cards

@@ -1,0 +1,217 @@
+[
+  {
+    "file": "B/cloud-kingdom.png",
+    "dimensionsOriginal": [
+      702,
+      853
+    ],
+    "dimensionsCandidate": [
+      702,
+      853
+    ],
+    "sourceSHA256": "56166cb8b241362d8dc5d500fce97b228f53a7a10bca38c5802f7da387003440",
+    "candidateSHA256": "f7ebd459f96a8c2d48102738807ff0792bef509961b947ca21e65c8d6ab53e50",
+    "allPixels": {
+      "pixelFractionExact": 0.9994205134885088,
+      "meanAbsoluteChannel": [
+        0.041746408686619704,
+        0.04290371171965545,
+        0.025173428455960694
+      ]
+    },
+    "matteRGB": {
+      "at": [
+        351,
+        130
+      ],
+      "source": [
+        41,
+        41,
+        67
+      ],
+      "candidate": [
+        41,
+        41,
+        67
+      ]
+    },
+    "centerCanvasPixelFractionExact": 0.9987016582854407
+  },
+  {
+    "file": "B/enchanted-gem-forest.png",
+    "dimensionsOriginal": [
+      702,
+      853
+    ],
+    "dimensionsCandidate": [
+      702,
+      853
+    ],
+    "sourceSHA256": "15470f1ce26af0b0fce074435aefd14a5e84b52d6a7e13f83300841be135c932",
+    "candidateSHA256": "4633b2fc460f109e59c45c61e258e43cbc3dd057ea4d18fc6863e284e59695e8",
+    "allPixels": {
+      "pixelFractionExact": 0.9994188434985621,
+      "meanAbsoluteChannel": [
+        0.03765660330724809,
+        0.03875044672231073,
+        0.04688830773238745
+      ]
+    },
+    "matteRGB": {
+      "at": [
+        351,
+        130
+      ],
+      "source": [
+        41,
+        41,
+        67
+      ],
+      "candidate": [
+        41,
+        41,
+        67
+      ]
+    },
+    "centerCanvasPixelFractionExact": 0.9986979166666666
+  },
+  {
+    "file": "B/inventors-workshop.png",
+    "dimensionsOriginal": [
+      702,
+      853
+    ],
+    "dimensionsCandidate": [
+      702,
+      853
+    ],
+    "sourceSHA256": "dde734ed6d4eb7f70bed987ae43f5dcefaa3dc514ee55368f1fda29d7b2ea742",
+    "candidateSHA256": "23f8253eaa8e986816d14242f571065787d449044e7f271e673a00a23257b90c",
+    "allPixels": {
+      "pixelFractionExact": 0.9994188434985621,
+      "meanAbsoluteChannel": [
+        0.04231754524837761,
+        0.03962719144430751,
+        0.0578718316115737
+      ]
+    },
+    "matteRGB": {
+      "at": [
+        351,
+        130
+      ],
+      "source": [
+        41,
+        41,
+        67
+      ],
+      "candidate": [
+        41,
+        41,
+        67
+      ]
+    },
+    "centerCanvasPixelFractionExact": 0.9986979166666666
+  },
+  {
+    "file": "B/moon-adventure.png",
+    "dimensionsOriginal": [
+      702,
+      853
+    ],
+    "dimensionsCandidate": [
+      702,
+      853
+    ],
+    "sourceSHA256": "80eac11744fa513dbbdec840baeabb322ac66e6e18f8523746fd28c47106037d",
+    "candidateSHA256": "520090775fdc45607fed885452b6c55bea389af555a1c80523895ef09cdba8c5",
+    "allPixels": {
+      "pixelFractionExact": 0.9994188434985621,
+      "meanAbsoluteChannel": [
+        0.034946209623818066,
+        0.03785700210084735,
+        0.02387083629756549
+      ]
+    },
+    "matteRGB": {
+      "at": [
+        351,
+        130
+      ],
+      "source": [
+        41,
+        41,
+        67
+      ],
+      "candidate": [
+        41,
+        41,
+        67
+      ]
+    },
+    "centerCanvasPixelFractionExact": 0.9986979166666666
+  },
+  {
+    "file": "F/my-art-backdrop.png",
+    "dimensionsOriginal": [
+      760,
+      900
+    ],
+    "dimensionsCandidate": [
+      760,
+      900
+    ],
+    "sourceSHA256": "79e13374071a53f99284d284e1e898627a629887012744c27f677a5af3cedca1",
+    "candidateSHA256": "08dda8c4439055054976ecb6b72104a6cfd3addc8cbb28c28c9cdcbe618eb19c",
+    "allPixels": {
+      "pixelFractionExact": 0.811,
+      "meanAbsoluteChannel": [
+        6.242292397660819,
+        6.52225730994152,
+        5.4546301169590645
+      ]
+    }
+  },
+  {
+    "file": "F/world-editor.png",
+    "dimensionsOriginal": [
+      760,
+      900
+    ],
+    "dimensionsCandidate": [
+      760,
+      900
+    ],
+    "sourceSHA256": "0152331e09a811ecbb79176633ce746860c0961970169746596753cefd5ecf0b",
+    "candidateSHA256": "d3dc282670d6aee2c1115d6c387efb41942b6861a76e9fc44b3f6c6c4c99f599",
+    "allPixels": {
+      "pixelFractionExact": 0.8727207602339181,
+      "meanAbsoluteChannel": [
+        8.732983918128655,
+        8.808140350877194,
+        7.899656432748538
+      ]
+    }
+  },
+  {
+    "file": "F/world-picker-phone.png",
+    "dimensionsOriginal": [
+      390,
+      844
+    ],
+    "dimensionsCandidate": [
+      390,
+      844
+    ],
+    "sourceSHA256": "fb7500974b1882ef83846036d688eedb4374566ef9de4a40073ee7531d93827c",
+    "candidateSHA256": "1e3e8a5eae69fac03db2a900d73b75ddfeeec2947528a5443c8ffe8026efecd9",
+    "allPixels": {
+      "pixelFractionExact": 0.6473569084943492,
+      "meanAbsoluteChannel": [
+        16.207358123708836,
+        17.086477700814193,
+        12.958846761453396
+      ]
+    }
+  }
+]

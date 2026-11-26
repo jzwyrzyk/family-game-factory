@@ -1,0 +1,19 @@
+{
+  "origin": "563de940eacd3f3573bf93236ab5eebd4608043a",
+  "controls": [
+    {
+      "file": "src/creation/ui.ts",
+      "original": "focusTarget.focus({preventScroll: true});\n      void act(action);",
+      "replacement": "focusTarget.focus({preventScroll: true});\n      if(FG.store.current().learningSubject==='math'){ freshEngine();engine?.start(); }\n      void act(action);"
+    },
+    {
+      "file": "src/language/engine.ts",
+      "original": "attempt.outcome=outcome;attempt.finishedAt=bounded(now);",
+      "replacement": "attempt.outcome=outcome;attempt.finishedAt=bounded(now);if(outcome==='shown')attempt.independent=true;"
+    }
+  ],
+  "matched": [
+    "src/language/engine.ts",
+    "src/creation/ui.ts"
+  ]
+}

@@ -1,0 +1,1378 @@
+{
+  "head": "e61faded4b15ed9b6cc1eac9a40fd8e8b5bc677f",
+  "browser": "156.0.8078.79",
+  "samples": 32,
+  "segmentsPerStroke": 8,
+  "elapsed": [
+    323.7728310000002,
+    334.82398200000034,
+    287.15529400000014,
+    278.43549399999984,
+    356.1444819999997,
+    262.6656730000004,
+    283.460607,
+    274.60444000000007,
+    264.7412180000001,
+    258.80451300000004,
+    257.84932599999956,
+    264.4289339999996,
+    239.95329400000082,
+    234.6846430000005,
+    236.890719,
+    265.107403,
+    251.49765399999978,
+    249.2677789999998,
+    320.5780590000004,
+    234.65272800000093,
+    256.6974360000004,
+    251.12969200000043,
+    250.0297869999995,
+    252.96482099999957,
+    249.7778760000001,
+    250.92432100000042,
+    365.41367999999966,
+    263.675561,
+    269.30788199999915,
+    280.6190549999992,
+    285.2501140000004,
+    265.4877410000008
+  ],
+  "history": {
+    "samples": [
+      3.199999999953434,
+      2.800000000046566,
+      2.800000000046566,
+      2.800000000046566,
+      2.800000000046566,
+      2.699999999953434,
+      2.5999999998603016,
+      2.5,
+      2.699999999953434,
+      14.199999999953434,
+      7.2999999998137355,
+      2.300000000046566,
+      2.199999999953434,
+      2.300000000046566,
+      2.0999999998603016,
+      2.2000000001862645,
+      2,
+      1.8000000000465661,
+      1.7999999998137355,
+      1.9000000001396984,
+      1.6999999999534339,
+      1.8000000000465661,
+      1.8000000000465661,
+      1.6999999999534339,
+      1.7000000001862645,
+      1.5999999998603016,
+      1.3999999999068677,
+      1.1999999999534339,
+      1.3000000000465661,
+      1.1000000000931323,
+      1,
+      1
+    ],
+    "empty": true
+  },
+  "metrics": {
+    "events": {
+      "down": [
+        {
+          "eventToRafMs": 35,
+          "eventToDispatchMs": 0.8999999999068677
+        },
+        {
+          "eventToRafMs": 35.39999999990687,
+          "eventToDispatchMs": 3.1000000000931323
+        },
+        {
+          "eventToRafMs": 0.5999999998603016,
+          "eventToDispatchMs": 0.5
+        },
+        {
+          "eventToRafMs": 27.699999999953434,
+          "eventToDispatchMs": 0.5
+        },
+        {
+          "eventToRafMs": 28.199999999953434,
+          "eventToDispatchMs": 0.8000000000465661
+        },
+        {
+          "eventToRafMs": 30.100000000093132,
+          "eventToDispatchMs": 1
+        },
+        {
+          "eventToRafMs": 43.199999999953434,
+          "eventToDispatchMs": 0.39999999990686774
+        },
+        {
+          "eventToRafMs": 31.199999999953434,
+          "eventToDispatchMs": 0.5
+        },
+        {
+          "eventToRafMs": 31.199999999953434,
+          "eventToDispatchMs": 0.39999999990686774
+        },
+        {
+          "eventToRafMs": 29.800000000046566,
+          "eventToDispatchMs": 0.5
+        },
+        {
+          "eventToRafMs": 35.10000000009313,
+          "eventToDispatchMs": 0.4000000001396984
+        },
+        {
+          "eventToRafMs": 28.9000000001397,
+          "eventToDispatchMs": 0.4000000001396984
+        },
+        {
+          "eventToRafMs": 27.9000000001397,
+          "eventToDispatchMs": 1.1000000000931323
+        },
+        {
+          "eventToRafMs": 26.699999999953434,
+          "eventToDispatchMs": 0.2999999998137355
+        },
+        {
+          "eventToRafMs": 26.5,
+          "eventToDispatchMs": 0.5999999998603016
+        },
+        {
+          "eventToRafMs": 33.39999999990687,
+          "eventToDispatchMs": 2.8999999999068677
+        },
+        {
+          "eventToRafMs": 30.9000000001397,
+          "eventToDispatchMs": 0.5
+        },
+        {
+          "eventToRafMs": 28.9000000001397,
+          "eventToDispatchMs": 0.4000000001396984
+        },
+        {
+          "eventToRafMs": 27.899999999906868,
+          "eventToDispatchMs": 0.39999999990686774
+        },
+        {
+          "eventToRafMs": 27.199999999953434,
+          "eventToDispatchMs": 0.30000000004656613
+        },
+        {
+          "eventToRafMs": 29.100000000093132,
+          "eventToDispatchMs": 0.39999999990686774
+        },
+        {
+          "eventToRafMs": 29.699999999953434,
+          "eventToDispatchMs": 0.5
+        },
+        {
+          "eventToRafMs": 28.800000000046566,
+          "eventToDispatchMs": 0.4000000001396984
+        },
+        {
+          "eventToRafMs": 30.199999999953434,
+          "eventToDispatchMs": 0.39999999990686774
+        },
+        {
+          "eventToRafMs": 30.299999999813735,
+          "eventToDispatchMs": 0.39999999990686774
+        },
+        {
+          "eventToRafMs": 29.399999999906868,
+          "eventToDispatchMs": 0.39999999990686774
+        },
+        {
+          "eventToRafMs": 100.80000000004657,
+          "eventToDispatchMs": 0.5
+        },
+        {
+          "eventToRafMs": 31.600000000093132,
+          "eventToDispatchMs": 0.30000000004656613
+        },
+        {
+          "eventToRafMs": 32,
+          "eventToDispatchMs": 0.6999999999534339
+        },
+        {
+          "eventToRafMs": 33.4000000001397,
+          "eventToDispatchMs": 0.8000000000465661
+        },
+        {
+          "eventToRafMs": 31.600000000093132,
+          "eventToDispatchMs": 0.4000000001396984
+        },
+        {
+          "eventToRafMs": 33,
+          "eventToDispatchMs": 0.39999999990686774
+        }
+      ],
+      "move": [
+        {
+          "eventToRafMs": 23.800000000046566,
+          "eventToDispatchMs": 22.5999999998603
+        },
+        {
+          "eventToRafMs": 37.9000000001397,
+          "eventToDispatchMs": 37.5
+        },
+        {
+          "eventToRafMs": 23.5,
+          "eventToDispatchMs": 23
+        },
+        {
+          "eventToRafMs": 27,
+          "eventToDispatchMs": 26.399999999906868
+        },
+        {
+          "eventToRafMs": 22.800000000046566,
+          "eventToDispatchMs": 22.5
+        },
+        {
+          "eventToRafMs": 23.699999999953434,
+          "eventToDispatchMs": 23.399999999906868
+        },
+        {
+          "eventToRafMs": 35.199999999953434,
+          "eventToDispatchMs": 34.9000000001397
+        },
+        {
+          "eventToRafMs": 30.199999999953434,
+          "eventToDispatchMs": 29.899999999906868
+        },
+        {
+          "eventToRafMs": 18.9000000001397,
+          "eventToDispatchMs": 18.4000000001397
+        },
+        {
+          "eventToRafMs": 28.199999999953434,
+          "eventToDispatchMs": 27.899999999906868
+        },
+        {
+          "eventToRafMs": 23.600000000093132,
+          "eventToDispatchMs": 23.199999999953434
+        },
+        {
+          "eventToRafMs": 34,
+          "eventToDispatchMs": 33.800000000046566
+        },
+        {
+          "eventToRafMs": 30.9000000001397,
+          "eventToDispatchMs": 30.5
+        },
+        {
+          "eventToRafMs": 41.5,
+          "eventToDispatchMs": 41.199999999953434
+        },
+        {
+          "eventToRafMs": 36.10000000009313,
+          "eventToDispatchMs": 35.9000000001397
+        },
+        {
+          "eventToRafMs": 25.199999999953434,
+          "eventToDispatchMs": 24.899999999906868
+        },
+        {
+          "eventToRafMs": 27,
+          "eventToDispatchMs": 26.5999999998603
+        },
+        {
+          "eventToRafMs": 28.399999999906868,
+          "eventToDispatchMs": 28.0999999998603
+        },
+        {
+          "eventToRafMs": 22.800000000046566,
+          "eventToDispatchMs": 22.699999999953434
+        },
+        {
+          "eventToRafMs": 17.9000000001397,
+          "eventToDispatchMs": 17.699999999953434
+        },
+        {
+          "eventToRafMs": 22.5,
+          "eventToDispatchMs": 22.200000000186265
+        },
+        {
+          "eventToRafMs": 27.4000000001397,
+          "eventToDispatchMs": 27
+        },
+        {
+          "eventToRafMs": 23.199999999953434,
+          "eventToDispatchMs": 23
+        },
+        {
+          "eventToRafMs": 33.299999999813735,
+          "eventToDispatchMs": 33.0999999998603
+        },
+        {
+          "eventToRafMs": 25.0999999998603,
+          "eventToDispatchMs": 24.5999999998603
+        },
+        {
+          "eventToRafMs": 29.4000000001397,
+          "eventToDispatchMs": 29.100000000093132
+        },
+        {
+          "eventToRafMs": 27.399999999906868,
+          "eventToDispatchMs": 27.0999999998603
+        },
+        {
+          "eventToRafMs": 30.4000000001397,
+          "eventToDispatchMs": 29.800000000046566
+        },
+        {
+          "eventToRafMs": 29.300000000046566,
+          "eventToDispatchMs": 29.100000000093132
+        },
+        {
+          "eventToRafMs": 29.5,
+          "eventToDispatchMs": 29.199999999953434
+        },
+        {
+          "eventToRafMs": 26.600000000093132,
+          "eventToDispatchMs": 26.300000000046566
+        },
+        {
+          "eventToRafMs": 25.199999999953434,
+          "eventToDispatchMs": 25
+        },
+        {
+          "eventToRafMs": 24.800000000046566,
+          "eventToDispatchMs": 24.5
+        },
+        {
+          "eventToRafMs": 25.5999999998603,
+          "eventToDispatchMs": 25.5
+        },
+        {
+          "eventToRafMs": 17.5,
+          "eventToDispatchMs": 17.4000000001397
+        },
+        {
+          "eventToRafMs": 29.799999999813735,
+          "eventToDispatchMs": 29.399999999906868
+        },
+        {
+          "eventToRafMs": 106.70000000018626,
+          "eventToDispatchMs": 103.10000000009313
+        },
+        {
+          "eventToRafMs": 25.5,
+          "eventToDispatchMs": 25.399999999906868
+        },
+        {
+          "eventToRafMs": 23.9000000001397,
+          "eventToDispatchMs": 23.700000000186265
+        },
+        {
+          "eventToRafMs": 25.899999999906868,
+          "eventToDispatchMs": 25.5999999998603
+        },
+        {
+          "eventToRafMs": 25.899999999906868,
+          "eventToDispatchMs": 25.5
+        },
+        {
+          "eventToRafMs": 27.199999999953434,
+          "eventToDispatchMs": 27
+        },
+        {
+          "eventToRafMs": 26.100000000093132,
+          "eventToDispatchMs": 25.9000000001397
+        },
+        {
+          "eventToRafMs": 26.100000000093132,
+          "eventToDispatchMs": 25.800000000046566
+        },
+        {
+          "eventToRafMs": 29.899999999906868,
+          "eventToDispatchMs": 29.699999999953434
+        },
+        {
+          "eventToRafMs": 26.199999999953434,
+          "eventToDispatchMs": 26
+        },
+        {
+          "eventToRafMs": 26.199999999953434,
+          "eventToDispatchMs": 26
+        },
+        {
+          "eventToRafMs": 28.4000000001397,
+          "eventToDispatchMs": 28.300000000046566
+        },
+        {
+          "eventToRafMs": 40.89999999990687,
+          "eventToDispatchMs": 40.60000000009313
+        },
+        {
+          "eventToRafMs": 31.5999999998603,
+          "eventToDispatchMs": 31.399999999906868
+        },
+        {
+          "eventToRafMs": 27.899999999906868,
+          "eventToDispatchMs": 27.699999999953434
+        },
+        {
+          "eventToRafMs": 27.0999999998603,
+          "eventToDispatchMs": 27
+        },
+        {
+          "eventToRafMs": 26.399999999906868,
+          "eventToDispatchMs": 26.299999999813735
+        },
+        {
+          "eventToRafMs": 27,
+          "eventToDispatchMs": 26.800000000046566
+        },
+        {
+          "eventToRafMs": 27.200000000186265,
+          "eventToDispatchMs": 27
+        },
+        {
+          "eventToRafMs": 26.5999999998603,
+          "eventToDispatchMs": 26.5
+        },
+        {
+          "eventToRafMs": 27.399999999906868,
+          "eventToDispatchMs": 27.199999999953434
+        },
+        {
+          "eventToRafMs": 27.600000000093132,
+          "eventToDispatchMs": 27.300000000046566
+        },
+        {
+          "eventToRafMs": 23.300000000046566,
+          "eventToDispatchMs": 23.100000000093132
+        },
+        {
+          "eventToRafMs": 25.5,
+          "eventToDispatchMs": 25.299999999813735
+        },
+        {
+          "eventToRafMs": 24.300000000046566,
+          "eventToDispatchMs": 24.100000000093132
+        },
+        {
+          "eventToRafMs": 28.9000000001397,
+          "eventToDispatchMs": 28.699999999953434
+        },
+        {
+          "eventToRafMs": 30,
+          "eventToDispatchMs": 29.800000000046566
+        },
+        {
+          "eventToRafMs": 29.600000000093132,
+          "eventToDispatchMs": 29.399999999906868
+        },
+        {
+          "eventToRafMs": 23.899999999906868,
+          "eventToDispatchMs": 23.600000000093132
+        },
+        {
+          "eventToRafMs": 29.399999999906868,
+          "eventToDispatchMs": 29.299999999813735
+        },
+        {
+          "eventToRafMs": 27.800000000046566,
+          "eventToDispatchMs": 27.699999999953434
+        },
+        {
+          "eventToRafMs": 22.800000000046566,
+          "eventToDispatchMs": 22.5999999998603
+        },
+        {
+          "eventToRafMs": 24.300000000046566,
+          "eventToDispatchMs": 24.100000000093132
+        },
+        {
+          "eventToRafMs": 24.800000000046566,
+          "eventToDispatchMs": 24.5
+        },
+        {
+          "eventToRafMs": 23.0999999998603,
+          "eventToDispatchMs": 22.699999999953434
+        },
+        {
+          "eventToRafMs": 17.0999999998603,
+          "eventToDispatchMs": 16.800000000046566
+        },
+        {
+          "eventToRafMs": 27.600000000093132,
+          "eventToDispatchMs": 27.300000000046566
+        },
+        {
+          "eventToRafMs": 25.899999999906868,
+          "eventToDispatchMs": 25.699999999953434
+        },
+        {
+          "eventToRafMs": 27.5,
+          "eventToDispatchMs": 27.299999999813735
+        },
+        {
+          "eventToRafMs": 24.899999999906868,
+          "eventToDispatchMs": 24.699999999953434
+        },
+        {
+          "eventToRafMs": 23.600000000093132,
+          "eventToDispatchMs": 23.399999999906868
+        },
+        {
+          "eventToRafMs": 27.5999999998603,
+          "eventToDispatchMs": 27.399999999906868
+        },
+        {
+          "eventToRafMs": 27.199999999953434,
+          "eventToDispatchMs": 27.100000000093132
+        },
+        {
+          "eventToRafMs": 25.5,
+          "eventToDispatchMs": 25.300000000046566
+        },
+        {
+          "eventToRafMs": 31.0999999998603,
+          "eventToDispatchMs": 30.699999999953434
+        },
+        {
+          "eventToRafMs": 20.800000000046566,
+          "eventToDispatchMs": 20.699999999953434
+        },
+        {
+          "eventToRafMs": 23.299999999813735,
+          "eventToDispatchMs": 23.199999999953434
+        },
+        {
+          "eventToRafMs": 25.600000000093132,
+          "eventToDispatchMs": 25.4000000001397
+        },
+        {
+          "eventToRafMs": 26,
+          "eventToDispatchMs": 25.899999999906868
+        },
+        {
+          "eventToRafMs": 25.800000000046566,
+          "eventToDispatchMs": 25.600000000093132
+        },
+        {
+          "eventToRafMs": 26.4000000001397,
+          "eventToDispatchMs": 26.100000000093132
+        },
+        {
+          "eventToRafMs": 25.5999999998603,
+          "eventToDispatchMs": 25.5
+        },
+        {
+          "eventToRafMs": 26.899999999906868,
+          "eventToDispatchMs": 26.5999999998603
+        },
+        {
+          "eventToRafMs": 25.800000000046566,
+          "eventToDispatchMs": 25.600000000093132
+        },
+        {
+          "eventToRafMs": 43.10000000009313,
+          "eventToDispatchMs": 42.60000000009313
+        },
+        {
+          "eventToRafMs": 23.699999999953434,
+          "eventToDispatchMs": 23.399999999906868
+        },
+        {
+          "eventToRafMs": 26.899999999906868,
+          "eventToDispatchMs": 26.699999999953434
+        },
+        {
+          "eventToRafMs": 24.5,
+          "eventToDispatchMs": 24.300000000046566
+        },
+        {
+          "eventToRafMs": 25.100000000093132,
+          "eventToDispatchMs": 24.699999999953434
+        },
+        {
+          "eventToRafMs": 23.699999999953434,
+          "eventToDispatchMs": 23.4000000001397
+        },
+        {
+          "eventToRafMs": 24.899999999906868,
+          "eventToDispatchMs": 24.699999999953434
+        },
+        {
+          "eventToRafMs": 24.9000000001397,
+          "eventToDispatchMs": 24.800000000046566
+        },
+        {
+          "eventToRafMs": 22.800000000046566,
+          "eventToDispatchMs": 22.600000000093132
+        },
+        {
+          "eventToRafMs": 25.199999999953434,
+          "eventToDispatchMs": 24.899999999906868
+        },
+        {
+          "eventToRafMs": 25.399999999906868,
+          "eventToDispatchMs": 25.199999999953434
+        },
+        {
+          "eventToRafMs": 25.100000000093132,
+          "eventToDispatchMs": 25
+        },
+        {
+          "eventToRafMs": 23.5,
+          "eventToDispatchMs": 23.300000000046566
+        },
+        {
+          "eventToRafMs": 24.9000000001397,
+          "eventToDispatchMs": 24.699999999953434
+        },
+        {
+          "eventToRafMs": 24.699999999953434,
+          "eventToDispatchMs": 24.299999999813735
+        },
+        {
+          "eventToRafMs": 25,
+          "eventToDispatchMs": 24.800000000046566
+        },
+        {
+          "eventToRafMs": 24.700000000186265,
+          "eventToDispatchMs": 24.5
+        },
+        {
+          "eventToRafMs": 24.100000000093132,
+          "eventToDispatchMs": 23.800000000046566
+        },
+        {
+          "eventToRafMs": 20.100000000093132,
+          "eventToDispatchMs": 19.899999999906868
+        },
+        {
+          "eventToRafMs": 24.5,
+          "eventToDispatchMs": 24.199999999953434
+        },
+        {
+          "eventToRafMs": 26.300000000046566,
+          "eventToDispatchMs": 26
+        },
+        {
+          "eventToRafMs": 24.699999999953434,
+          "eventToDispatchMs": 24.5
+        },
+        {
+          "eventToRafMs": 24.300000000046566,
+          "eventToDispatchMs": 24
+        },
+        {
+          "eventToRafMs": 25.199999999953434,
+          "eventToDispatchMs": 24.9000000001397
+        },
+        {
+          "eventToRafMs": 24.699999999953434,
+          "eventToDispatchMs": 24.5
+        },
+        {
+          "eventToRafMs": 25.100000000093132,
+          "eventToDispatchMs": 24.800000000046566
+        },
+        {
+          "eventToRafMs": 25.399999999906868,
+          "eventToDispatchMs": 25.199999999953434
+        },
+        {
+          "eventToRafMs": 24.5,
+          "eventToDispatchMs": 24.4000000001397
+        },
+        {
+          "eventToRafMs": 24.600000000093132,
+          "eventToDispatchMs": 24.399999999906868
+        },
+        {
+          "eventToRafMs": 25.399999999906868,
+          "eventToDispatchMs": 25.199999999953434
+        },
+        {
+          "eventToRafMs": 22.800000000046566,
+          "eventToDispatchMs": 22.399999999906868
+        },
+        {
+          "eventToRafMs": 32.300000000046566,
+          "eventToDispatchMs": 32.10000000009313
+        },
+        {
+          "eventToRafMs": 28.5,
+          "eventToDispatchMs": 28.199999999953434
+        },
+        {
+          "eventToRafMs": 27.800000000046566,
+          "eventToDispatchMs": 27.600000000093132
+        },
+        {
+          "eventToRafMs": 28.100000000093132,
+          "eventToDispatchMs": 27.800000000046566
+        },
+        {
+          "eventToRafMs": 27.5,
+          "eventToDispatchMs": 27.300000000046566
+        },
+        {
+          "eventToRafMs": 27.199999999953434,
+          "eventToDispatchMs": 27
+        },
+        {
+          "eventToRafMs": 28.200000000186265,
+          "eventToDispatchMs": 28
+        },
+        {
+          "eventToRafMs": 28.5,
+          "eventToDispatchMs": 28.100000000093132
+        },
+        {
+          "eventToRafMs": 27,
+          "eventToDispatchMs": 26.699999999953434
+        },
+        {
+          "eventToRafMs": 27.699999999953434,
+          "eventToDispatchMs": 27.5
+        },
+        {
+          "eventToRafMs": 28.5,
+          "eventToDispatchMs": 28.300000000046566
+        },
+        {
+          "eventToRafMs": 27.199999999953434,
+          "eventToDispatchMs": 27
+        },
+        {
+          "eventToRafMs": 27.5,
+          "eventToDispatchMs": 27.300000000046566
+        },
+        {
+          "eventToRafMs": 27.0999999998603,
+          "eventToDispatchMs": 26.899999999906868
+        },
+        {
+          "eventToRafMs": 26.5,
+          "eventToDispatchMs": 26.399999999906868
+        },
+        {
+          "eventToRafMs": 26.800000000046566,
+          "eventToDispatchMs": 26.5
+        },
+        {
+          "eventToRafMs": 26.699999999953434,
+          "eventToDispatchMs": 26.5999999998603
+        },
+        {
+          "eventToRafMs": 27.4000000001397,
+          "eventToDispatchMs": 27.200000000186265
+        },
+        {
+          "eventToRafMs": 27.200000000186265,
+          "eventToDispatchMs": 27.100000000093132
+        },
+        {
+          "eventToRafMs": 27.699999999953434,
+          "eventToDispatchMs": 27.5
+        },
+        {
+          "eventToRafMs": 27.5999999998603,
+          "eventToDispatchMs": 27.399999999906868
+        },
+        {
+          "eventToRafMs": 27.299999999813735,
+          "eventToDispatchMs": 27.0999999998603
+        },
+        {
+          "eventToRafMs": 26.699999999953434,
+          "eventToDispatchMs": 26.5
+        },
+        {
+          "eventToRafMs": 25.899999999906868,
+          "eventToDispatchMs": 25.699999999953434
+        },
+        {
+          "eventToRafMs": 28.100000000093132,
+          "eventToDispatchMs": 27.800000000046566
+        },
+        {
+          "eventToRafMs": 27.300000000046566,
+          "eventToDispatchMs": 27
+        },
+        {
+          "eventToRafMs": 23.699999999953434,
+          "eventToDispatchMs": 23.399999999906868
+        },
+        {
+          "eventToRafMs": 25,
+          "eventToDispatchMs": 24.800000000046566
+        },
+        {
+          "eventToRafMs": 25.699999999953434,
+          "eventToDispatchMs": 25.5
+        },
+        {
+          "eventToRafMs": 92.80000000004657,
+          "eventToDispatchMs": 89.5
+        },
+        {
+          "eventToRafMs": 31.899999999906868,
+          "eventToDispatchMs": 31.800000000046566
+        },
+        {
+          "eventToRafMs": 25.199999999953434,
+          "eventToDispatchMs": 24.899999999906868
+        },
+        {
+          "eventToRafMs": 25.9000000001397,
+          "eventToDispatchMs": 25.800000000046566
+        },
+        {
+          "eventToRafMs": 26.199999999953434,
+          "eventToDispatchMs": 26
+        },
+        {
+          "eventToRafMs": 25.800000000046566,
+          "eventToDispatchMs": 25.5999999998603
+        },
+        {
+          "eventToRafMs": 26.0999999998603,
+          "eventToDispatchMs": 25.899999999906868
+        },
+        {
+          "eventToRafMs": 22.300000000046566,
+          "eventToDispatchMs": 22.100000000093132
+        },
+        {
+          "eventToRafMs": 25.5,
+          "eventToDispatchMs": 25.399999999906868
+        },
+        {
+          "eventToRafMs": 26.0999999998603,
+          "eventToDispatchMs": 26
+        },
+        {
+          "eventToRafMs": 26.800000000046566,
+          "eventToDispatchMs": 26.399999999906868
+        },
+        {
+          "eventToRafMs": 27.600000000093132,
+          "eventToDispatchMs": 27.200000000186265
+        },
+        {
+          "eventToRafMs": 27,
+          "eventToDispatchMs": 26.800000000046566
+        },
+        {
+          "eventToRafMs": 28.699999999953434,
+          "eventToDispatchMs": 28.5
+        },
+        {
+          "eventToRafMs": 30.4000000001397,
+          "eventToDispatchMs": 30.300000000046566
+        },
+        {
+          "eventToRafMs": 27.100000000093132,
+          "eventToDispatchMs": 26.899999999906868
+        },
+        {
+          "eventToRafMs": 25.0999999998603,
+          "eventToDispatchMs": 24.800000000046566
+        },
+        {
+          "eventToRafMs": 29.199999999953434,
+          "eventToDispatchMs": 29
+        },
+        {
+          "eventToRafMs": 26.5999999998603,
+          "eventToDispatchMs": 26.399999999906868
+        },
+        {
+          "eventToRafMs": 28.0999999998603,
+          "eventToDispatchMs": 27.899999999906868
+        },
+        {
+          "eventToRafMs": 27.300000000046566,
+          "eventToDispatchMs": 27.100000000093132
+        },
+        {
+          "eventToRafMs": 26.800000000046566,
+          "eventToDispatchMs": 26.5999999998603
+        },
+        {
+          "eventToRafMs": 27.699999999953434,
+          "eventToDispatchMs": 27.5
+        },
+        {
+          "eventToRafMs": 27.5,
+          "eventToDispatchMs": 27.399999999906868
+        },
+        {
+          "eventToRafMs": 22.700000000186265,
+          "eventToDispatchMs": 22.5
+        },
+        {
+          "eventToRafMs": 26.5,
+          "eventToDispatchMs": 26.4000000001397
+        },
+        {
+          "eventToRafMs": 26.5,
+          "eventToDispatchMs": 26.199999999953434
+        },
+        {
+          "eventToRafMs": 25.5999999998603,
+          "eventToDispatchMs": 25.399999999906868
+        },
+        {
+          "eventToRafMs": 28,
+          "eventToDispatchMs": 27.800000000046566
+        },
+        {
+          "eventToRafMs": 27.399999999906868,
+          "eventToDispatchMs": 27.199999999953434
+        },
+        {
+          "eventToRafMs": 27.9000000001397,
+          "eventToDispatchMs": 27.5
+        },
+        {
+          "eventToRafMs": 25.899999999906868,
+          "eventToDispatchMs": 25.5999999998603
+        },
+        {
+          "eventToRafMs": 26.800000000046566,
+          "eventToDispatchMs": 26.699999999953434
+        },
+        {
+          "eventToRafMs": 27.300000000046566,
+          "eventToDispatchMs": 27.100000000093132
+        },
+        {
+          "eventToRafMs": 25.199999999953434,
+          "eventToDispatchMs": 24.799999999813735
+        },
+        {
+          "eventToRafMs": 29.399999999906868,
+          "eventToDispatchMs": 29.199999999953434
+        },
+        {
+          "eventToRafMs": 28,
+          "eventToDispatchMs": 27.800000000046566
+        },
+        {
+          "eventToRafMs": 28.5,
+          "eventToDispatchMs": 28.299999999813735
+        },
+        {
+          "eventToRafMs": 27.300000000046566,
+          "eventToDispatchMs": 27.100000000093132
+        },
+        {
+          "eventToRafMs": 26.5,
+          "eventToDispatchMs": 26.300000000046566
+        },
+        {
+          "eventToRafMs": 27.199999999953434,
+          "eventToDispatchMs": 26.899999999906868
+        },
+        {
+          "eventToRafMs": 26.300000000046566,
+          "eventToDispatchMs": 26.200000000186265
+        },
+        {
+          "eventToRafMs": 28.200000000186265,
+          "eventToDispatchMs": 27.9000000001397
+        },
+        {
+          "eventToRafMs": 26.899999999906868,
+          "eventToDispatchMs": 26.699999999953434
+        },
+        {
+          "eventToRafMs": 26.5,
+          "eventToDispatchMs": 26.199999999953434
+        },
+        {
+          "eventToRafMs": 26.4000000001397,
+          "eventToDispatchMs": 26.200000000186265
+        },
+        {
+          "eventToRafMs": 26.5,
+          "eventToDispatchMs": 26.399999999906868
+        },
+        {
+          "eventToRafMs": 26.800000000046566,
+          "eventToDispatchMs": 26.5
+        },
+        {
+          "eventToRafMs": 26.699999999953434,
+          "eventToDispatchMs": 26.5
+        },
+        {
+          "eventToRafMs": 27.300000000046566,
+          "eventToDispatchMs": 27.0999999998603
+        },
+        {
+          "eventToRafMs": 27,
+          "eventToDispatchMs": 26.800000000046566
+        },
+        {
+          "eventToRafMs": 27.199999999953434,
+          "eventToDispatchMs": 27
+        },
+        {
+          "eventToRafMs": 27.199999999953434,
+          "eventToDispatchMs": 26.800000000046566
+        },
+        {
+          "eventToRafMs": 26.5,
+          "eventToDispatchMs": 26.300000000046566
+        },
+        {
+          "eventToRafMs": 27.199999999953434,
+          "eventToDispatchMs": 26.9000000001397
+        },
+        {
+          "eventToRafMs": 27,
+          "eventToDispatchMs": 26.800000000046566
+        },
+        {
+          "eventToRafMs": 27.800000000046566,
+          "eventToDispatchMs": 27.600000000093132
+        },
+        {
+          "eventToRafMs": 26.300000000046566,
+          "eventToDispatchMs": 26.0999999998603
+        },
+        {
+          "eventToRafMs": 89.39999999990687,
+          "eventToDispatchMs": 86.80000000004657
+        },
+        {
+          "eventToRafMs": 36.699999999953434,
+          "eventToDispatchMs": 36.5
+        },
+        {
+          "eventToRafMs": 26.5,
+          "eventToDispatchMs": 26.300000000046566
+        },
+        {
+          "eventToRafMs": 27.0999999998603,
+          "eventToDispatchMs": 26.899999999906868
+        },
+        {
+          "eventToRafMs": 28.200000000186265,
+          "eventToDispatchMs": 28
+        },
+        {
+          "eventToRafMs": 33.10000000009313,
+          "eventToDispatchMs": 32.800000000046566
+        },
+        {
+          "eventToRafMs": 29.5,
+          "eventToDispatchMs": 29
+        },
+        {
+          "eventToRafMs": 28,
+          "eventToDispatchMs": 27.800000000046566
+        },
+        {
+          "eventToRafMs": 29.700000000186265,
+          "eventToDispatchMs": 29.5
+        },
+        {
+          "eventToRafMs": 30.5,
+          "eventToDispatchMs": 30.299999999813735
+        },
+        {
+          "eventToRafMs": 29.899999999906868,
+          "eventToDispatchMs": 29.699999999953434
+        },
+        {
+          "eventToRafMs": 27,
+          "eventToDispatchMs": 26.799999999813735
+        },
+        {
+          "eventToRafMs": 32.4000000001397,
+          "eventToDispatchMs": 32.199999999953434
+        },
+        {
+          "eventToRafMs": 28.5,
+          "eventToDispatchMs": 28.300000000046566
+        },
+        {
+          "eventToRafMs": 29.300000000046566,
+          "eventToDispatchMs": 29.200000000186265
+        },
+        {
+          "eventToRafMs": 26.899999999906868,
+          "eventToDispatchMs": 26.800000000046566
+        },
+        {
+          "eventToRafMs": 29.899999999906868,
+          "eventToDispatchMs": 29.600000000093132
+        },
+        {
+          "eventToRafMs": 28.299999999813735,
+          "eventToDispatchMs": 28.199999999953434
+        },
+        {
+          "eventToRafMs": 31,
+          "eventToDispatchMs": 30.899999999906868
+        },
+        {
+          "eventToRafMs": 28.5,
+          "eventToDispatchMs": 28.300000000046566
+        },
+        {
+          "eventToRafMs": 30.100000000093132,
+          "eventToDispatchMs": 29.800000000046566
+        },
+        {
+          "eventToRafMs": 30.5,
+          "eventToDispatchMs": 30.300000000046566
+        },
+        {
+          "eventToRafMs": 28.899999999906868,
+          "eventToDispatchMs": 28.5999999998603
+        },
+        {
+          "eventToRafMs": 28.0999999998603,
+          "eventToDispatchMs": 28
+        },
+        {
+          "eventToRafMs": 30.300000000046566,
+          "eventToDispatchMs": 30
+        },
+        {
+          "eventToRafMs": 27.899999999906868,
+          "eventToDispatchMs": 27.699999999953434
+        },
+        {
+          "eventToRafMs": 30.199999999953434,
+          "eventToDispatchMs": 29.899999999906868
+        },
+        {
+          "eventToRafMs": 33,
+          "eventToDispatchMs": 32.700000000186265
+        },
+        {
+          "eventToRafMs": 29,
+          "eventToDispatchMs": 28.800000000046566
+        },
+        {
+          "eventToRafMs": 32.89999999990687,
+          "eventToDispatchMs": 32.699999999953434
+        },
+        {
+          "eventToRafMs": 31.300000000046566,
+          "eventToDispatchMs": 31.100000000093132
+        },
+        {
+          "eventToRafMs": 30.700000000186265,
+          "eventToDispatchMs": 30.5
+        },
+        {
+          "eventToRafMs": 29.800000000046566,
+          "eventToDispatchMs": 29.5
+        },
+        {
+          "eventToRafMs": 29.399999999906868,
+          "eventToDispatchMs": 29.199999999953434
+        },
+        {
+          "eventToRafMs": 29.100000000093132,
+          "eventToDispatchMs": 28.9000000001397
+        },
+        {
+          "eventToRafMs": 39,
+          "eventToDispatchMs": 38.800000000046566
+        },
+        {
+          "eventToRafMs": 30.600000000093132,
+          "eventToDispatchMs": 30.4000000001397
+        },
+        {
+          "eventToRafMs": 28.699999999953434,
+          "eventToDispatchMs": 28.4000000001397
+        },
+        {
+          "eventToRafMs": 28.300000000046566,
+          "eventToDispatchMs": 28.100000000093132
+        },
+        {
+          "eventToRafMs": 28.5999999998603,
+          "eventToDispatchMs": 28.399999999906868
+        },
+        {
+          "eventToRafMs": 30.699999999953434,
+          "eventToDispatchMs": 30.5
+        },
+        {
+          "eventToRafMs": 29.300000000046566,
+          "eventToDispatchMs": 29.199999999953434
+        },
+        {
+          "eventToRafMs": 29.800000000046566,
+          "eventToDispatchMs": 29.600000000093132
+        },
+        {
+          "eventToRafMs": 27.699999999953434,
+          "eventToDispatchMs": 27.4000000001397
+        },
+        {
+          "eventToRafMs": 29.699999999953434,
+          "eventToDispatchMs": 29.5
+        },
+        {
+          "eventToRafMs": 28.5,
+          "eventToDispatchMs": 28.300000000046566
+        },
+        {
+          "eventToRafMs": 27.399999999906868,
+          "eventToDispatchMs": 27.300000000046566
+        },
+        {
+          "eventToRafMs": 26.600000000093132,
+          "eventToDispatchMs": 26.4000000001397
+        }
+      ],
+      "up": [
+        {
+          "eventToRafMs": 41.300000000046566,
+          "eventToDispatchMs": 0.30000000004656613
+        },
+        {
+          "eventToRafMs": 29.5,
+          "eventToDispatchMs": 0.5999999998603016
+        },
+        {
+          "eventToRafMs": 25.300000000046566,
+          "eventToDispatchMs": 0.30000000004656613
+        },
+        {
+          "eventToRafMs": 28.5,
+          "eventToDispatchMs": 0.19999999995343387
+        },
+        {
+          "eventToRafMs": 29.699999999953434,
+          "eventToDispatchMs": 0.5
+        },
+        {
+          "eventToRafMs": 43.300000000046566,
+          "eventToDispatchMs": 0.4000000001396984
+        },
+        {
+          "eventToRafMs": 31.199999999953434,
+          "eventToDispatchMs": 0.30000000004656613
+        },
+        {
+          "eventToRafMs": 32.5,
+          "eventToDispatchMs": 0.19999999995343387
+        },
+        {
+          "eventToRafMs": 26.5,
+          "eventToDispatchMs": 0.30000000004656613
+        },
+        {
+          "eventToRafMs": 30.699999999953434,
+          "eventToDispatchMs": 0.4000000001396984
+        },
+        {
+          "eventToRafMs": 27.5999999998603,
+          "eventToDispatchMs": 0.39999999990686774
+        },
+        {
+          "eventToRafMs": 26.399999999906868,
+          "eventToDispatchMs": 0.19999999995343387
+        },
+        {
+          "eventToRafMs": 24.899999999906868,
+          "eventToDispatchMs": 0.39999999990686774
+        },
+        {
+          "eventToRafMs": 25.399999999906868,
+          "eventToDispatchMs": 0.2999999998137355
+        },
+        {
+          "eventToRafMs": 27.600000000093132,
+          "eventToDispatchMs": 0.30000000004656613
+        },
+        {
+          "eventToRafMs": 29.300000000046566,
+          "eventToDispatchMs": 0.19999999995343387
+        },
+        {
+          "eventToRafMs": 29.600000000093132,
+          "eventToDispatchMs": 0.10000000009313226
+        },
+        {
+          "eventToRafMs": 28,
+          "eventToDispatchMs": 0.19999999995343387
+        },
+        {
+          "eventToRafMs": 26.800000000046566,
+          "eventToDispatchMs": 0.30000000004656613
+        },
+        {
+          "eventToRafMs": 27.600000000093132,
+          "eventToDispatchMs": 0.19999999995343387
+        },
+        {
+          "eventToRafMs": 29.300000000046566,
+          "eventToDispatchMs": 0.19999999995343387
+        },
+        {
+          "eventToRafMs": 27.800000000046566,
+          "eventToDispatchMs": 0.10000000009313226
+        },
+        {
+          "eventToRafMs": 28.399999999906868,
+          "eventToDispatchMs": 0.19999999995343387
+        },
+        {
+          "eventToRafMs": 31.4000000001397,
+          "eventToDispatchMs": 0.19999999995343387
+        },
+        {
+          "eventToRafMs": 28.9000000001397,
+          "eventToDispatchMs": 0.20000000018626451
+        },
+        {
+          "eventToRafMs": 29.4000000001397,
+          "eventToDispatchMs": 0.19999999995343387
+        },
+        {
+          "eventToRafMs": 40,
+          "eventToDispatchMs": 0.30000000004656613
+        },
+        {
+          "eventToRafMs": 28.800000000046566,
+          "eventToDispatchMs": 0.30000000004656613
+        },
+        {
+          "eventToRafMs": 33.800000000046566,
+          "eventToDispatchMs": 0.10000000009313226
+        },
+        {
+          "eventToRafMs": 32.699999999953434,
+          "eventToDispatchMs": 0.19999999995343387
+        },
+        {
+          "eventToRafMs": 31,
+          "eventToDispatchMs": 0.19999999995343387
+        },
+        {
+          "eventToRafMs": 35.700000000186265,
+          "eventToDispatchMs": 0.20000000018626451
+        }
+      ]
+    },
+    "heap": 17740158
+  },
+  "canvasHashes": {
+    "before": "6533229d16a1cfd19adbfefe1a133c0d42bf4059cb88cbecdad64f06e7d0d466",
+    "after": "76334fa7f2800461dccca0325bef8c4c7e3e8a9d5cc39baf42b1df0b813af9f8",
+    "undone": "6533229d16a1cfd19adbfefe1a133c0d42bf4059cb88cbecdad64f06e7d0d466"
+  },
+  "hostLoad": [
+    4.25,
+    3.51,
+    2.48
+  ]
+}

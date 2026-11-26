@@ -1,0 +1,91 @@
+{
+  "desktop.png": {
+    "approvedImage": "02c72e9ca49f9140ef75f054aa079d0eea406a779e4efbf69f619a60344373b0",
+    "candidateImage": "02c72e9ca49f9140ef75f054aa079d0eea406a779e4efbf69f619a60344373b0",
+    "differentPixels": 0,
+    "maximumChannelDifference": 0,
+    "boundingBox": null
+  },
+  "dragon-counting.png": {
+    "approvedImage": "4712e7cb9e54ad891bfd098ccdc02ecbd38b9a4b370a3ed7f1069ce4c1dfea8d",
+    "candidateImage": "4712e7cb9e54ad891bfd098ccdc02ecbd38b9a4b370a3ed7f1069ce4c1dfea8d",
+    "differentPixels": 0,
+    "maximumChannelDifference": 0,
+    "boundingBox": null
+  },
+  "phone.png": {
+    "approvedImage": "e8f637081a424b745e8d4c0850af27de04846267efe9cca23eff7833791a64b8",
+    "candidateImage": "e8f637081a424b745e8d4c0850af27de04846267efe9cca23eff7833791a64b8",
+    "differentPixels": 0,
+    "maximumChannelDifference": 0,
+    "boundingBox": null
+  },
+  "short-landscape.png": {
+    "approvedImage": "469abaf6caff11c0369a16ac74e481e1a8ca36c65066b532a84a991d1b46cc27",
+    "candidateImage": "469abaf6caff11c0369a16ac74e481e1a8ca36c65066b532a84a991d1b46cc27",
+    "differentPixels": 0,
+    "maximumChannelDifference": 0,
+    "boundingBox": null
+  },
+  "small-phone.png": {
+    "approvedImage": "f112874c11cd0095fa635cadbbb8dc90583e638e41f5a37c6966c55cc7e17853",
+    "candidateImage": "f112874c11cd0095fa635cadbbb8dc90583e638e41f5a37c6966c55cc7e17853",
+    "differentPixels": 0,
+    "maximumChannelDifference": 0,
+    "boundingBox": null
+  },
+  "state-correct.png": {
+    "approvedImage": "0f7946a1b28ba8e701c1c0786ca69787388655127b33a97a97f09423e5f4d70c",
+    "candidateImage": "0f7946a1b28ba8e701c1c0786ca69787388655127b33a97a97f09423e5f4d70c",
+    "differentPixels": 0,
+    "maximumChannelDifference": 0,
+    "boundingBox": null
+  },
+  "state-selected.png": {
+    "approvedImage": "113bcd438a159b05489c4cb1189f87379e441a39b3bd22bea714c53497b24ba1",
+    "candidateImage": "113bcd438a159b05489c4cb1189f87379e441a39b3bd22bea714c53497b24ba1",
+    "differentPixels": 0,
+    "maximumChannelDifference": 0,
+    "boundingBox": null
+  },
+  "state-tools.png": {
+    "approvedImage": "e9f5891452fcf08cbc192f498463fe6ca075e10fa73f4f3dceea9dadaef51784",
+    "candidateImage": "e9f5891452fcf08cbc192f498463fe6ca075e10fa73f4f3dceea9dadaef51784",
+    "differentPixels": 0,
+    "maximumChannelDifference": 0,
+    "boundingBox": null
+  },
+  "state-worked.png": {
+    "approvedImage": "1dd7f2a3005d9d43c50cab7fc812abdb95aba479398ed42270c8a596d8671525",
+    "candidateImage": "1dd7f2a3005d9d43c50cab7fc812abdb95aba479398ed42270c8a596d8671525",
+    "differentPixels": 0,
+    "maximumChannelDifference": 0,
+    "boundingBox": null
+  },
+  "tablet-landscape.png": {
+    "approvedImage": "0076513c6c0b8dbb926a8890c6c52bec868db89c2983409ccd41664c3582dde9",
+    "candidateImage": "a534e651e5d49c08813bb90fa3dcfbb0be3b0e8534b4e303ef90fbd6e0c4729e",
+    "differentPixels": 15400,
+    "maximumChannelDifference": 244,
+    "boundingBox": [
+      203,
+      242,
+      821,
+      286
+    ]
+  },
+  "tablet-portrait.png": {
+    "approvedImage": "542957fa7908eb0e3ec506dadd89d2f9f38c7e77e2ea2479ac2bfe504501ff78",
+    "candidateImage": "542957fa7908eb0e3ec506dadd89d2f9f38c7e77e2ea2479ac2bfe504501ff78",
+    "differentPixels": 0,
+    "maximumChannelDifference": 0,
+    "boundingBox": null
+  },
+  "wide.png": {
+    "approvedImage": "1804486af5abb3b215216c70e814c9e22c0f555967a64d4f2ae8708919d2930d",
+    "candidateImage": "1804486af5abb3b215216c70e814c9e22c0f555967a64d4f2ae8708919d2930d",
+    "differentPixels": 0,
+    "maximumChannelDifference": 0,
+    "boundingBox": null
+  }
+}

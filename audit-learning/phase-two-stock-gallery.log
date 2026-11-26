@@ -1,0 +1,5 @@
+page.goto: Target page, context or browser has been closed
+Call log:
+[2m  - navigating to "http://localhost:43199/", waiting until "domcontentloaded"[22m
+
+    at main (/workspace/jems-consolidation/audit-learning/phase-two-a/tools/ui-review/learning-browser.cjs:66:16)

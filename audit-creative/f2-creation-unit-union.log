@@ -1,0 +1,617 @@
+
+> family-game-factory@2.0.0-foundation test:creation
+> node --import tsx --test tests/creation-engine.test.ts tests/creation-challenges.test.ts tests/creation-storage.test.ts tests/creation-generated.test.ts tests/creation-generation-budget.test.ts tests/creation-learner-controls.test.ts && node --import tsx --test tests/art-adventure.test.ts tests/creation-motion-path.test.ts tests/creative-worlds.test.ts
+
+TAP version 13
+# Subtest: Every published practice target runs and satisfies its stated behavior checks
+ok 1 - Every published practice target runs and satisfies its stated behavior checks
+  ---
+  duration_ms: 57.163745
+  type: 'test'
+  ...
+# Subtest: Starters have no copied solution; a deliberately wrong debugging starter also fails
+ok 2 - Starters have no copied solution; a deliberately wrong debugging starter also fails
+  ---
+  duration_ms: 68.397781
+  type: 'test'
+  ...
+# Subtest: Equivalent relative movement and extra pauses match the route without copying target blocks
+ok 3 - Equivalent relative movement and extra pauses match the route without copying target blocks
+  ---
+  duration_ms: 9.743214
+  type: 'test'
+  ...
+# Subtest: A different path with exactly the target final pose does not pass
+ok 4 - A different path with exactly the target final pose does not pass
+  ---
+  duration_ms: 18.214671
+  type: 'test'
+  ...
+# Subtest: Visiting the right points after an early detour still does not reproduce the route
+ok 5 - Visiting the right points after an early detour still does not reproduce the route
+  ---
+  duration_ms: 28.886713
+  type: 'test'
+  ...
+# Subtest: Instant final-pose jumps and editing the initial actor pose cannot match the route
+ok 6 - Instant final-pose jumps and editing the initial actor pose cannot match the route
+  ---
+  duration_ms: 6.349334
+  type: 'test'
+  ...
+# Subtest: Three separate jump instructions count just like a repeat
+ok 7 - Three separate jump instructions count just like a repeat
+  ---
+  duration_ms: 19.804789
+  type: 'test'
+  ...
+# Subtest: Three visible up/down movements also count as bounces without a jump block
+ok 8 - Three visible up/down movements also count as bounces without a jump block
+  ---
+  duration_ms: 11.000157
+  type: 'test'
+  ...
+# Subtest: Two bounces, four bounces, and three invisible bounces do not count as the target pattern
+ok 9 - Two bounces, four bounces, and three invisible bounces do not count as the target pattern
+  ---
+  duration_ms: 30.018856
+  type: 'test'
+  ...
+# Subtest: A bounce program must finish on the ground rather than merely pass through three peaks
+ok 10 - A bounce program must finish on the ground rather than merely pass through three peaks
+  ---
+  duration_ms: 8.538209
+  type: 'test'
+  ...
+# Subtest: The tap challenge accepts an equivalent event-message implementation
+ok 11 - The tap challenge accepts an equivalent event-message implementation
+  ---
+  duration_ms: 25.652805
+  type: 'test'
+  ...
+# Subtest: Automatic timed movement fails even if it happens to match the preview tap schedule
+ok 12 - Automatic timed movement fails even if it happens to match the preview tap schedule
+  ---
+  duration_ms: 11.976324
+  type: 'test'
+  ...
+# Subtest: The tap challenge checks each response; one absolute destination does not work twice
+ok 13 - The tap challenge checks each response; one absolute destination does not work twice
+  ---
+  duration_ms: 22.801888
+  type: 'test'
+  ...
+# Subtest: An early cheer fails even with the same ending position and the same total duration
+ok 14 - An early cheer fails even with the same ending position and the same total duration
+  ---
+  duration_ms: 6.737212
+  type: 'test'
+  ...
+# Subtest: A split journey and a reasonable pause before cheering preserve the goal
+ok 15 - A split journey and a reasonable pause before cheering preserve the goal
+  ---
+  duration_ms: 2.242576
+  type: 'test'
+  ...
+# Subtest: A fixed answer cannot satisfy the variable rule across input cases
+ok 16 - A fixed answer cannot satisfy the variable rule across input cases
+  ---
+  duration_ms: 23.455587
+  type: 'test'
+  ...
+# Subtest: The condition boundary includes exactly three and values beyond three
+ok 17 - The condition boundary includes exactly three and values beyond three
+  ---
+  duration_ms: 35.578325
+  type: 'test'
+  ...
+# Subtest: An inverted condition with swapped branches is equally valid
+ok 18 - An inverted condition with swapped branches is equally valid
+  ---
+  duration_ms: 7.111489
+  type: 'test'
+  ...
+# Subtest: Changing given state or answering before the tap is detected
+ok 19 - Changing given state or answering before the tap is detected
+  ---
+  duration_ms: 54.953683
+  type: 'test'
+  ...
+# Subtest: Evaluating does not mutate the child project or turn it into its target
+ok 20 - Evaluating does not mutate the child project or turn it into its target
+  ---
+  duration_ms: 90.084321
+  type: 'test'
+  ...
+# Subtest: Moving a landmark during playback cannot turn a different scene into a match
+ok 21 - Moving a landmark during playback cannot turn a different scene into a match
+  ---
+  duration_ms: 17.333237
+  type: 'test'
+  ...
+# Subtest: A correct prefix followed by a very delayed wrong ending is not a finished scene
+ok 22 - A correct prefix followed by a very delayed wrong ending is not a finished scene
+  ---
+  duration_ms: 33.839101
+  type: 'test'
+  ...
+# Subtest: The bucket rule must respond to taps, not a timed automatic answer after both tap times
+ok 23 - The bucket rule must respond to taps, not a timed automatic answer after both tap times
+  ---
+  duration_ms: 46.873879
+  type: 'test'
+  ...
+# Subtest: Malformed imported scene data gives a recoverable invalid result
+ok 24 - Malformed imported scene data gives a recoverable invalid result
+  ---
+  duration_ms: 54.119611
+  type: 'test'
+  ...
+# Subtest: Invalid scenes, unknown IDs, and safety limits never produce completion evidence
+ok 25 - Invalid scenes, unknown IDs, and safety limits never produce completion evidence
+  ---
+  duration_ms: 205.840304
+  type: 'test'
+  ...
+# Subtest: a beginner path accepts equivalent programs and rejects the opposite direction
+ok 26 - a beginner path accepts equivalent programs and rejects the opposite direction
+  ---
+  duration_ms: 4.885428
+  type: 'test'
+  ...
+# Subtest: early predictions read actual visible motion independently of the challenge target
+ok 27 - early predictions read actual visible motion independently of the challenge target
+  ---
+  duration_ms: 154.457098
+  type: 'test'
+  ...
+# Subtest: strict project validation rejects executable fields, dangling references and ambiguous moves
+ok 28 - strict project validation rejects executable fields, dangling references and ambiguous moves
+  ---
+  duration_ms: 29.34783
+  type: 'test'
+  ...
+# Subtest: duplicate block IDs, overlapping triggers and oversized programs fail before execution
+ok 29 - duplicate block IDs, overlapping triggers and oversized programs fail before execution
+  ---
+  duration_ms: 0.781163
+  type: 'test'
+  ...
+# Subtest: sequences run at the authored logical times and independently of frame partitioning
+ok 30 - sequences run at the authored logical times and independently of frame partitioning
+  ---
+  duration_ms: 1.87546
+  type: 'test'
+  ...
+# Subtest: relative/absolute moves, zero duration and nested repeats have reproducible outcomes
+ok 31 - relative/absolute moves, zero duration and nested repeats have reproducible outcomes
+  ---
+  duration_ms: 0.597525
+  type: 'test'
+  ...
+# Subtest: jump, dance and speech are observable during actions and clean up at completion
+ok 32 - jump, dance and speech are observable during actions and clean up at completion
+  ---
+  duration_ms: 0.472005
+  type: 'test'
+  ...
+# Subtest: actors share reusable asset IDs but run independent concurrent sequences
+ok 33 - actors share reusable asset IDs but run independent concurrent sequences
+  ---
+  duration_ms: 13.867154
+  type: 'test'
+  ...
+# Subtest: tap can restart completed scenes and interrupts one actor without competing motion writers
+ok 34 - tap can restart completed scenes and interrupts one actor without competing motion writers
+  ---
+  duration_ms: 4.293311
+  type: 'test'
+  ...
+# Subtest: events, variable and position conditions, and touching sensors execute real behavior
+ok 35 - events, variable and position conditions, and touching sensors execute real behavior
+  ---
+  duration_ms: 1.021717
+  type: 'test'
+  ...
+# Subtest: hidden characters do not receive taps or satisfy touching sensors
+ok 36 - hidden characters do not receive taps or satisfy touching sensors
+  ---
+  duration_ms: 6.651212
+  type: 'test'
+  ...
+# Subtest: pause drops stale taps; a deliberate step works and remains paused
+ok 37 - pause drops stale taps; a deliberate step works and remains paused
+  ---
+  duration_ms: 0.781013
+  type: 'test'
+  ...
+# Subtest: cyclic messages and zero-time nested programs stop at explicit execution budgets
+ok 38 - cyclic messages and zero-time nested programs stop at explicit execution budgets
+  ---
+  duration_ms: 0.947134
+  type: 'test'
+  ...
+# Subtest: time and arithmetic limits stop execution without leaving transient effects
+ok 39 - time and arithmetic limits stop execution without leaving transient effects
+  ---
+  duration_ms: 13.304708
+  type: 'test'
+  ...
+# Subtest: input project, exposed project and snapshots cannot mutate a running program; reset restores original state
+ok 40 - input project, exposed project and snapshots cannot mutate a running program; reset restores original state
+  ---
+  duration_ms: 0.326875
+  type: 'test'
+  ...
+# Subtest: runScene applies scheduled taps reproducibly and rejects impossible observation inputs
+ok 41 - runScene applies scheduled taps reproducibly and rejects impossible observation inputs
+  ---
+  duration_ms: 9.074671
+  type: 'test'
+  ...
+# Subtest: generated companion is optional, data-only, asset-bound and always attributed as assisted
+ok 42 - generated companion is optional, data-only, asset-bound and always attributed as assisted
+  ---
+  duration_ms: 30.030047
+  type: 'test'
+  ...
+# Subtest: local creative roles preserve private draft aliases and historical public readers
+ok 43 - local creative roles preserve private draft aliases and historical public readers
+  ---
+  duration_ms: 15.153663
+  type: 'test'
+  ...
+# Subtest: v2 candidates validate companion, raster assets, production plan and ordinary playthrough together
+ok 44 - v2 candidates validate companion, raster assets, production plan and ordinary playthrough together
+  ---
+  duration_ms: 26.067471
+  type: 'test'
+  ...
+# Subtest: test publication cannot replace or drop a reviewed companion manifest
+ok 45 - test publication cannot replace or drop a reviewed companion manifest
+  ---
+  duration_ms: 3.988434
+  type: 'test'
+  ...
+# Subtest: companion byte limits include normalized attribution and remain stable across repeated validation
+ok 46 - companion byte limits include normalized attribution and remain stable across repeated validation
+  ---
+  duration_ms: 28.267095
+  type: 'test'
+  ...
+# Subtest: sandbox receives source only and trusted publication retains a large companion unchanged
+ok 47 - sandbox receives source only and trusted publication retains a large companion unchanged
+  ---
+  duration_ms: 17.818211
+  type: 'test'
+  ...
+# Subtest: sandbox cannot inject a companion or replace source while the host restores trusted scene data
+ok 48 - sandbox cannot inject a companion or replace source while the host restores trusted scene data
+  ---
+  duration_ms: 8.221098
+  type: 'test'
+  ...
+# Subtest: quality capture retains game assets, plan, playthrough and independent probes while the companion stays host-held
+ok 49 - quality capture retains game assets, plan, playthrough and independent probes while the companion stays host-held
+  ---
+  duration_ms: 332.804988
+  type: 'test'
+  ...
+# Subtest: quality capture rejects changed game bindings and stale evidence before restoring the companion
+ok 50 - quality capture rejects changed game bindings and stale evidence before restoring the companion
+  ---
+  duration_ms: 562.845436
+  type: 'test'
+  ...
+# Subtest: mandatory quality review publishes the tested game and its unchanged companion together
+ok 51 - mandatory quality review publishes the tested game and its unchanged companion together
+  ---
+  duration_ms: 241.402462
+  type: 'test'
+  ...
+# Subtest: existing generation pipeline retains the validated companion through immutable publication and fork
+ok 52 - existing generation pipeline retains the validated companion through immutable publication and fork
+  ---
+  duration_ms: 2.759598
+  type: 'test'
+  ...
+# Subtest: authenticated companion retrieval preserves family/adult audience and returns no executable source
+ok 53 - authenticated companion retrieval preserves family/adult audience and returns no executable source
+  ---
+  duration_ms: 203.512863
+  type: 'test'
+  ...
+# Subtest: browser client rejects swapped revisions, unsafe manifests and late results after profile change
+ok 54 - browser client rejects swapped revisions, unsafe manifests and late results after profile change
+  ---
+  duration_ms: 1.6576
+  type: 'test'
+  ...
+# Subtest: provider transport offers a nullable closed companion schema and bounds its full request cost
+ok 55 - provider transport offers a nullable closed companion schema and bounds its full request cost
+  ---
+  duration_ms: 34.680175
+  type: 'test'
+  ...
+# Subtest: a companion remains available when the complete request fits the existing caps
+ok 56 - a companion remains available when the complete request fits the existing caps
+  ---
+  duration_ms: 184.891751
+  type: 'test'
+  ...
+# Subtest: rule-driven 8k source still generates under the default 24k cap by omitting the optional companion
+ok 57 - rule-driven 8k source still generates under the default 24k cap by omitting the optional companion
+  ---
+  duration_ms: 28.291622
+  type: 'test'
+  ...
+# Subtest: physical 6.5k source still generates under the default 24k cap by omitting the optional companion
+ok 58 - physical 6.5k source still generates under the default 24k cap by omitting the optional companion
+  ---
+  duration_ms: 10.907368
+  type: 'test'
+  ...
+# Subtest: a 7k repair preserves source, original intent, preflight and bounded diagnostics without a stale companion
+ok 59 - a 7k repair preserves source, original intent, preflight and bounded diagnostics without a stale companion
+  ---
+  duration_ms: 8.212496
+  type: 'test'
+  ...
+# Subtest: remaining spending allowance selects the lean request without another provider call or a cap increase
+ok 60 - remaining spending allowance selects the lean request without another provider call or a cap increase
+  ---
+  duration_ms: 37.51611
+  type: 'test'
+  ...
+# Subtest: v2 companion fallback preserves production, approved art and both repair-device captures
+ok 61 - v2 companion fallback preserves production, approved art and both repair-device captures
+  ---
+  duration_ms: 350.478301
+  type: 'test'
+  ...
+# Subtest: an already oversized game still fails the input cap before any secret read or provider call
+ok 62 - an already oversized game still fails the input cap before any secret read or provider call
+  ---
+  duration_ms: 1.232306
+  type: 'test'
+  ...
+# Subtest: an insufficient lean spending allowance still fails closed before any secret read or provider call
+ok 63 - an insufficient lean spending allowance still fails closed before any secret read or provider call
+  ---
+  duration_ms: 0.780141
+  type: 'test'
+  ...
+# Subtest: lean input and spending checks include the schema bytes rather than restoring the former undercount
+ok 64 - lean input and spending checks include the schema bytes rather than restoring the former undercount
+  ---
+  duration_ms: 3.837782
+  type: 'test'
+  ...
+# Subtest: first-learner right controls produce the real right trajectory
+ok 65 - first-learner right controls produce the real right trajectory
+  ---
+  duration_ms: 5.380057
+  type: 'test'
+  ...
+# Subtest: first-learner left controls produce the real left trajectory
+ok 66 - first-learner left controls produce the real left trajectory
+  ---
+  duration_ms: 2.533602
+  type: 'test'
+  ...
+# Subtest: first-learner up controls produce the real up trajectory
+ok 67 - first-learner up controls produce the real up trajectory
+  ---
+  duration_ms: 0.643575
+  type: 'test'
+  ...
+# Subtest: first-learner down controls produce the real down trajectory
+ok 68 - first-learner down controls produce the real down trajectory
+  ---
+  duration_ms: 0.938541
+  type: 'test'
+  ...
+# Subtest: zero movement stays a real no-op for each direction
+ok 69 - zero movement stays a real no-op for each direction
+  ---
+  duration_ms: 16.746758
+  type: 'test'
+  ...
+# Subtest: absolute and diagonal saved paths do not masquerade as simple directional moves
+ok 70 - absolute and diagonal saved paths do not masquerade as simple directional moves
+  ---
+  duration_ms: 0.392335
+  type: 'test'
+  ...
+# Subtest: reading a fractional saved move preserves exact values and metadata
+ok 71 - reading a fractional saved move preserves exact values and metadata
+  ---
+  duration_ms: 0.21778
+  type: 'test'
+  ...
+# Subtest: compact summaries leave nested rules, durations and authored text intact
+ok 72 - compact summaries leave nested rules, durations and authored text intact
+  ---
+  duration_ms: 0.425083
+  type: 'test'
+  ...
+# Subtest: working revisions, explicit Keep and reload preserve distinct pointers
+ok 73 - working revisions, explicit Keep and reload preserve distinct pointers
+  ---
+  duration_ms: 9.79957
+  type: 'test'
+  ...
+# Subtest: autosave protects a separate recovery draft without promoting it
+ok 74 - autosave protects a separate recovery draft without promoting it
+  ---
+  duration_ms: 1.766115
+  type: 'test'
+  ...
+# Subtest: undo, redo and branched experiments never mutate old revisions or a favorite
+ok 75 - undo, redo and branched experiments never mutate old revisions or a favorite
+  ---
+  duration_ms: 14.779409
+  type: 'test'
+  ...
+# Subtest: copy pins its source and keeps actors independent
+ok 76 - copy pins its source and keeps actors independent
+  ---
+  duration_ms: 19.769356
+  type: 'test'
+  ...
+# Subtest: different children cannot read, mutate, copy or delete one another’s creation
+ok 77 - different children cannot read, mutate, copy or delete one another’s creation
+  ---
+  duration_ms: 5.073512
+  type: 'test'
+  ...
+# Subtest: a profile switch invalidates late saves, and adult data uses the existing namespace
+ok 78 - a profile switch invalidates late saves, and adult data uses the existing namespace
+  ---
+  duration_ms: 2.709903
+  type: 'test'
+  ...
+# Subtest: concurrent stores reread and stale writes cannot replace a newer experiment
+ok 79 - concurrent stores reread and stale writes cannot replace a newer experiment
+  ---
+  duration_ms: 1.743751
+  type: 'test'
+  ...
+# Subtest: failed writes leave the stored graph and working pointer intact
+ok 80 - failed writes leave the stored graph and working pointer intact
+  ---
+  duration_ms: 8.699263
+  type: 'test'
+  ...
+# Subtest: corrupt and future schemas remain exportable and are never silently reset
+ok 81 - corrupt and future schemas remain exportable and are never silently reset
+  ---
+  duration_ms: 0.708152
+  type: 'test'
+  ...
+# Subtest: backup validation rejects broken history, source tampering and untrusted assets atomically
+ok 82 - backup validation rejects broken history, source tampering and untrusted assets atomically
+  ---
+  duration_ms: 13.586352
+  type: 'test'
+  ...
+# Subtest: backup round trip retains drafts, kept edition, source and challenge observations
+ok 83 - backup round trip retains drafts, kept edition, source and challenge observations
+  ---
+  duration_ms: 8.341892
+  type: 'test'
+  ...
+# Subtest: removing one owner preserves the other child’s complete history
+ok 84 - removing one owner preserves the other child’s complete history
+  ---
+  duration_ms: 3.554293
+  type: 'test'
+  ...
+# Subtest: revealed challenge support survives reload, checks, and challenge copies
+ok 85 - revealed challenge support survives reload, checks, and challenge copies
+  ---
+  duration_ms: 6.835831
+  type: 'test'
+  ...
+# Subtest: visible observations are owner scoped, bounded and tied to the checked version
+ok 86 - visible observations are owner scoped, bounded and tied to the checked version
+  ---
+  duration_ms: 8.878254
+  type: 'test'
+  ...
+# Subtest: curated adapters retain real assets, exact source revision and usable source settings
+ok 87 - curated adapters retain real assets, exact source revision and usable source settings
+  ---
+  duration_ms: 6.928592
+  type: 'test'
+  ...
+# Subtest: generated game import needs an actual validated manifest, never inferred JavaScript
+ok 88 - generated game import needs an actual validated manifest, never inferred JavaScript
+  ---
+  duration_ms: 0.893082
+  type: 'test'
+  ...
+# Subtest: using a kept world pins the selected revision while later edits and drafts stay with the source
+ok 89 - using a kept world pins the selected revision while later edits and drafts stay with the source
+  ---
+  duration_ms: 6.467564
+  type: 'test'
+  ...
+1..89
+# tests 89
+# suites 0
+# pass 89
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5685.534242
+TAP version 13
+# Subtest: picture hunt rules, source version, three input consequences and restart
+ok 1 - picture hunt rules, source version, three input consequences and restart
+  ---
+  duration_ms: 7.849406
+  type: 'test'
+  ...
+# Subtest: context roles never infer mechanics, including saved projects without roles
+ok 2 - context roles never infer mechanics, including saved projects without roles
+  ---
+  duration_ms: 2.055543
+  type: 'test'
+  ...
+# Subtest: a named drawing path runs at the same coordinates on either clock cadence
+ok 3 - a named drawing path runs at the same coordinates on either clock cadence
+  ---
+  duration_ms: 9.841332
+  type: 'test'
+  ...
+# Subtest: paths are copied from an exact owner-scoped Keep; later edits do not retarget the copy
+ok 4 - paths are copied from an exact owner-scoped Keep; later edits do not retarget the copy
+  ---
+  duration_ms: 60.398467
+  type: 'test'
+  ...
+# Subtest: authorship and scene-specific actions stay with their original programs
+ok 5 - authorship and scene-specific actions stay with their original programs
+  ---
+  duration_ms: 1.119034
+  type: 'test'
+  ...
+# Subtest: versioned studio artwork matches its reviewed files
+ok 6 - versioned studio artwork matches its reviewed files
+  ---
+  duration_ms: 10.052577
+  type: 'test'
+  ...
+# Subtest: private world and scene placements share pin extraction, remapping and the generated boundary
+ok 7 - private world and scene placements share pin extraction, remapping and the generated boundary
+  ---
+  duration_ms: 3.742256
+  type: 'test'
+  ...
+# Subtest: legacy scenes open unchanged and invalid world placements fail closed
+ok 8 - legacy scenes open unchanged and invalid world placements fail closed
+  ---
+  duration_ms: 2.211939
+  type: 'test'
+  ...
+# Subtest: painted worlds keep their immutable layer sequence and bounded per-scene visibility
+ok 9 - painted worlds keep their immutable layer sequence and bounded per-scene visibility
+  ---
+  duration_ms: 0.687932
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1204.633361
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

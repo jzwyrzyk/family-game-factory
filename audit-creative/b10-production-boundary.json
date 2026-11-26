@@ -1,0 +1,12 @@
+{
+  "head": "9e5c9e648364c7f7925c8c8e8109398c04d6690a",
+  "tree": "7963df7fa2184f68c62108b449013d6877e05dad",
+  "browser": "156.0.8078.79",
+  "syntheticConfig": "unavailable",
+  "normalProductionBundle": true,
+  "pinInstructionsRetained": true,
+  "sendDisabled": true,
+  "sampleButtonCount": 0,
+  "sampleFrameCount": 0,
+  "externalOrNonGetRequests": []
+}

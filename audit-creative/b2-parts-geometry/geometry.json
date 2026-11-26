@@ -1,0 +1,59 @@
+{
+  "summary": [
+    1267.6875,
+    584.28125,
+    145.3125,
+    44
+  ],
+  "placements": [
+    863,
+    360.09375,
+    542,
+    269.25
+  ],
+  "open": true,
+  "points": [
+    {
+      "fraction": 0.06,
+      "hit": "DIV",
+      "id": "creationPlacementActions",
+      "summary": false
+    },
+    {
+      "fraction": 0.18,
+      "hit": "DIV",
+      "id": "creationPlacementActions",
+      "summary": false
+    },
+    {
+      "fraction": 0.3,
+      "hit": "DIV",
+      "id": "creationPlacementActions",
+      "summary": false
+    },
+    {
+      "fraction": 0.5,
+      "hit": "DIV",
+      "id": "creationPlacementActions",
+      "summary": false
+    },
+    {
+      "fraction": 0.7,
+      "hit": "DIV",
+      "id": "creationPlacementActions",
+      "summary": false
+    },
+    {
+      "fraction": 0.86,
+      "hit": "DIV",
+      "id": "creationPlacementActions",
+      "summary": false
+    },
+    {
+      "fraction": 0.95,
+      "hit": "DIV",
+      "id": "creationSceneOptions",
+      "summary": false
+    }
+  ]
+}

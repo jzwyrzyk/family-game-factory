@@ -1,0 +1,30 @@
+{
+  "head": "27c2868957d8477326036b36d6138b094a24e6a7",
+  "tree": "124dade5efcd97593c6f60796fd3377956c315a8",
+  "job": 139740265249,
+  "run": 45770055481,
+  "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45770055481/job/139740265249",
+  "observations": [
+    "2026-11-26T06:50:24.8036844Z Downloading Webkit 26.0 (playwright build v2215) from https://cdn.playwright.dev/dbazure/download/playwright/builds/webkit/2215/webkit-ubuntu-24.04.zip",
+    "2026-11-26T06:52:41.4646828Z PASS desktop: 30-game pagination, 126 retained versions, exact mechanics, Keep, Fork, reload, preserved legacy originals",
+    "2026-11-26T06:52:46.0998443Z PASS tablet: 30-game pagination, 126 retained versions, exact mechanics, Keep, Fork, reload, preserved legacy originals",
+    "2026-11-26T06:53:13.4438035Z {\"browser\":\"webkit\",\"viewport\":{\"width\":1400,\"height\":960},\"indexedNotebook\":false,\"checks\":[\"native unwrapped observer/frame control\",\"four actual saved Rally garage/viewport/Change/Back/Home cycles\",\"exact kept mechanic after every remount\"]}",
+    "2026-11-26T06:53:24.2112022Z {\"browser\":\"webkit\",\"viewport\":{\"width\":390,\"height\":844},\"indexedNotebook\":false,\"checks\":[\"native unwrapped observer/frame control\",\"four actual saved Rally garage/viewport/Change/Back/Home cycles\",\"exact kept mechanic after every remount\"]}",
+    "2026-11-26T06:53:41.5730684Z {\"browser\":\"webkit\",\"viewport\":{\"width\":1400,\"height\":960},\"indexedNotebook\":true,\"checks\":[\"native unwrapped observer/frame control\",\"four actual saved Rally garage/viewport/Change/Back/Home cycles\",\"exact kept mechanic after every remount\"]}",
+    "2026-11-26T06:55:35.3668894Z 1 WebKit storage commands failed"
+  ],
+  "failure": [
+    "2026-11-26T06:54:47.5034872Z page.click: Timeout 30000ms exceeded.",
+    "2026-11-26T06:54:47.5035300Z Call log:",
+    "2026-11-26T06:54:47.5035571Z   - waiting for locator('#studioChange')",
+    "2026-11-26T06:54:47.5041684Z     - locator resolved to <button type=\"button\" id=\"studioChange\" class=\"studio-chip\" aria-label=\"Talk or change my game\">Change</button>",
+    "2026-11-26T06:54:47.5042648Z   - attempting click action",
+    "2026-11-26T06:54:47.5042905Z     - waiting for element to be visible, enabled and stable",
+    "2026-11-26T06:54:47.5043176Z     - element is visible, enabled and stable",
+    "2026-11-26T06:54:47.5043412Z     - scrolling into view if needed",
+    "2026-11-26T06:54:47.5043539Z ",
+    "2026-11-26T06:54:47.5043896Z     at /home/runner/work/family-game-factory/family-game-factory/tests/studio-native-ui.cjs:126:50 {",
+    "2026-11-26T06:54:47.5044268Z   name: 'TimeoutError'",
+    "2026-11-26T06:54:47.5044456Z }"
+  ]
+}

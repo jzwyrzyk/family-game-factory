@@ -1,0 +1,22 @@
+{
+  "head": "ca76b5b151d4de61a5da0d66f64093530fdc1f78",
+  "tree": "fbcb6332ae54b75b18eaf31725e9c57dc92bee11",
+  "lock_sha256": "f32a85a87902007ea21891f835db6652e311d10efaa79ddbd90ebfadde00250d",
+  "chromium": "Chromium 156.0.8078.79 built on Debian GNU/Linux 13 (trixie)",
+  "build_command": "npm run build",
+  "picture_hunt_command": "CHROMIUM_PATH=/usr/bin/chromium ART_EVIDENCE_DIR=<local_dir> node tests/art-adventure-browser.cjs",
+  "recovery_command": "CHROMIUM_PATH=/usr/bin/chromium node tests/creative-universe-recovery.cjs",
+  "results": {
+    "build": 0,
+    "picture_hunt": 0,
+    "complete_recovery": 0
+  },
+  "artifacts": {
+    "source-215/dist/assets/index-CeWvRxGe.js": "8f606817bbf680fb0ed64ecfcfd9c76cb8afbb0bef52a2d11e4f0e8992a25583",
+    "source-215/dist/assets/index-D10LzBJi.css": "2d65249d6f6da4832d7f09a3cce5aa3a9429e9f4be8363a24850573e91b3a62b",
+    "source-215-captures/picture-hunt-desktop.png": "1798a71c9e760a4bb367f932ae2e83bc69e36f5cc46b7b7057b594ebbad7cc9b",
+    "source-215-captures/picture-hunt-tablet.png": "09e03c659b56b8a1a8e8e74fc0aa4f3b4fa5d88a831357f80aeb9d0b53b8f904",
+    "source-215-picture-hunt.log": "287de91b146622a49d83aa1e372bea0f9573c7b5f4cc45172f9b14742a3510d0",
+    "source-215-recovery.log": "d8645b2220f608a01d5cd9795e6a28657c22b7eca1b93051ce51cc7d0eb05891"
+  }
+}

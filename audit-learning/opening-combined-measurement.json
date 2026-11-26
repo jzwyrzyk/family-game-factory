@@ -1,0 +1,5290 @@
+{
+  "sources": {
+    "approved": "7d5979378a050ee3d80519c82929e69dbc58be7e",
+    "candidate": "ba1904fcb4c009563998a987912d86f16b8f19a7"
+  },
+  "browser": "141.0.7390.37",
+  "rounds": 12,
+  "results": [
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 1,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 47.7,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 47.7,
+      "focused": 45.8,
+      "visibleAndFocused": 47.7,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 1,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 43.2,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 43.2,
+      "focused": 41.7,
+      "visibleAndFocused": 43.2,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 1,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 23.2,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 23.2,
+      "focused": 21.8,
+      "visibleAndFocused": 23.2,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 1,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 26.1,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 26.1,
+      "focused": 25.2,
+      "visibleAndFocused": 26.1,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 1,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 39,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 39,
+      "focused": 37.5,
+      "visibleAndFocused": 39,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 1,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 26.6,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 26.6,
+      "focused": 25.2,
+      "visibleAndFocused": 26.6,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 1,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 28.8,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 28.8,
+      "focused": 27.6,
+      "visibleAndFocused": 28.8,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 1,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 35.1,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 35.1,
+      "focused": 33.6,
+      "visibleAndFocused": 35.1,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 2,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 35,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 35,
+      "focused": 33.5,
+      "visibleAndFocused": 35,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 2,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 37.2,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 37.2,
+      "focused": 35.8,
+      "visibleAndFocused": 37.2,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 2,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 28.9,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 28.9,
+      "focused": 27.4,
+      "visibleAndFocused": 28.9,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 2,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 24.8,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 24.8,
+      "focused": 23.8,
+      "visibleAndFocused": 24.8,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 2,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 56.2,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 56.2,
+      "focused": 54.5,
+      "visibleAndFocused": 56.2,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 2,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 199.8,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 199.8,
+      "focused": 175.8,
+      "visibleAndFocused": 199.8,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 2,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 28.5,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 28.5,
+      "focused": 27,
+      "visibleAndFocused": 28.5,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 2,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 24.9,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 24.9,
+      "focused": 23.8,
+      "visibleAndFocused": 24.9,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 3,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 32.2,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 32.2,
+      "focused": 30.3,
+      "visibleAndFocused": 32.2,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 3,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 40.1,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 40.1,
+      "focused": 38.4,
+      "visibleAndFocused": 40.1,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 3,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 27.4,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 27.4,
+      "focused": 26,
+      "visibleAndFocused": 27.4,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 3,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 24.6,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 24.6,
+      "focused": 23.4,
+      "visibleAndFocused": 24.6,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 3,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 32.3,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 32.3,
+      "focused": 30.4,
+      "visibleAndFocused": 32.3,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 3,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 37.3,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 37.3,
+      "focused": 35.9,
+      "visibleAndFocused": 37.3,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 3,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 22.4,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 22.4,
+      "focused": 21.3,
+      "visibleAndFocused": 22.4,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 3,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 18.8,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 18.8,
+      "focused": 17.9,
+      "visibleAndFocused": 18.8,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 4,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 31.3,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 31.3,
+      "focused": 28.5,
+      "visibleAndFocused": 31.3,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 4,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 38,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 38,
+      "focused": 36.6,
+      "visibleAndFocused": 38,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 4,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 124.5,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 124.5,
+      "focused": 122.4,
+      "visibleAndFocused": 124.5,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 4,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 41.9,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 41.9,
+      "focused": 40.8,
+      "visibleAndFocused": 41.9,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 4,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 47.2,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 47.2,
+      "focused": 45.6,
+      "visibleAndFocused": 47.2,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 4,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 32.7,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 32.7,
+      "focused": 31.4,
+      "visibleAndFocused": 32.7,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 4,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 30,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 30,
+      "focused": 28.2,
+      "visibleAndFocused": 30,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 4,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 27.8,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 27.8,
+      "focused": 24.3,
+      "visibleAndFocused": 27.8,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 5,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 36.5,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 36.5,
+      "focused": 34.8,
+      "visibleAndFocused": 36.5,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 5,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 41.3,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 41.3,
+      "focused": 39.8,
+      "visibleAndFocused": 41.3,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 5,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 25.9,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 25.9,
+      "focused": 24.8,
+      "visibleAndFocused": 25.9,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 5,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 59.9,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 59.9,
+      "focused": 58.5,
+      "visibleAndFocused": 59.9,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 5,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 33,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 33,
+      "focused": 31.6,
+      "visibleAndFocused": 33,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 5,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 31,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 31,
+      "focused": 29.7,
+      "visibleAndFocused": 31,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 5,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 34.1,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 34.1,
+      "focused": 32.6,
+      "visibleAndFocused": 34.1,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 5,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 29.9,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 29.9,
+      "focused": 28.4,
+      "visibleAndFocused": 29.9,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 6,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 40.6,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 40.6,
+      "focused": 33.8,
+      "visibleAndFocused": 40.6,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 6,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 49.6,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 49.6,
+      "focused": 47.9,
+      "visibleAndFocused": 49.6,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 6,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 24.7,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 24.7,
+      "focused": 23.4,
+      "visibleAndFocused": 24.7,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 6,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 22.1,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 22.1,
+      "focused": 21,
+      "visibleAndFocused": 22.1,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 6,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 38.4,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 38.4,
+      "focused": 36.9,
+      "visibleAndFocused": 38.4,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 6,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 44.8,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 44.8,
+      "focused": 43.4,
+      "visibleAndFocused": 44.8,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 6,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 38.6,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 38.6,
+      "focused": 37.4,
+      "visibleAndFocused": 38.6,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 6,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 30.2,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 30.2,
+      "focused": 28.9,
+      "visibleAndFocused": 30.2,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 7,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 23.9,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 23.9,
+      "focused": 22.6,
+      "visibleAndFocused": 23.9,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 7,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 35.6,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 35.6,
+      "focused": 34.1,
+      "visibleAndFocused": 35.6,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 7,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 26.8,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 26.8,
+      "focused": 25.3,
+      "visibleAndFocused": 26.8,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 7,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 29.7,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 29.7,
+      "focused": 28.5,
+      "visibleAndFocused": 29.7,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 7,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 141.7,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 141.7,
+      "focused": 137,
+      "visibleAndFocused": 141.7,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 7,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 29.4,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 29.4,
+      "focused": 28.2,
+      "visibleAndFocused": 29.4,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 7,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 22.8,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 22.8,
+      "focused": 21.7,
+      "visibleAndFocused": 22.8,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 7,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 20.6,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 20.6,
+      "focused": 19.6,
+      "visibleAndFocused": 20.6,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 8,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 28.7,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 28.7,
+      "focused": 27.1,
+      "visibleAndFocused": 28.7,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 8,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 41.7,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 41.7,
+      "focused": 39.3,
+      "visibleAndFocused": 41.7,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 8,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 21.6,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 21.6,
+      "focused": 20.5,
+      "visibleAndFocused": 21.6,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 8,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 19.3,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 19.3,
+      "focused": 18.3,
+      "visibleAndFocused": 19.3,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 8,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 33.6,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 33.6,
+      "focused": 31.5,
+      "visibleAndFocused": 33.6,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 8,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 33.2,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 33.2,
+      "focused": 31.6,
+      "visibleAndFocused": 33.2,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 8,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 25.5,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 25.5,
+      "focused": 24.2,
+      "visibleAndFocused": 25.5,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 8,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 26,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 26,
+      "focused": 24.5,
+      "visibleAndFocused": 26,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 9,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 34.7,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 34.7,
+      "focused": 33,
+      "visibleAndFocused": 34.7,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 9,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 35.5,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 35.5,
+      "focused": 28.6,
+      "visibleAndFocused": 35.5,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 9,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 20.5,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 20.5,
+      "focused": 19.5,
+      "visibleAndFocused": 20.5,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 9,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 32.4,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 32.4,
+      "focused": 31.2,
+      "visibleAndFocused": 32.4,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 9,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 29.6,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 29.6,
+      "focused": 28.3,
+      "visibleAndFocused": 29.6,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 9,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 31.4,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 31.4,
+      "focused": 29.7,
+      "visibleAndFocused": 31.4,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 9,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 22.8,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 22.8,
+      "focused": 21.2,
+      "visibleAndFocused": 22.8,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 9,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 29.5,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 29.5,
+      "focused": 28.1,
+      "visibleAndFocused": 29.5,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 10,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 34.8,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 34.8,
+      "focused": 33.3,
+      "visibleAndFocused": 34.8,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 10,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 23.5,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 23.5,
+      "focused": 22.6,
+      "visibleAndFocused": 23.5,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 10,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 25.3,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 25.3,
+      "focused": 23.8,
+      "visibleAndFocused": 25.3,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 10,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 22.4,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 22.4,
+      "focused": 21.5,
+      "visibleAndFocused": 22.4,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 10,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 35.8,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 35.8,
+      "focused": 34.3,
+      "visibleAndFocused": 35.8,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 10,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 33.8,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 33.8,
+      "focused": 32.2,
+      "visibleAndFocused": 33.8,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 10,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 25.5,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 25.5,
+      "focused": 24,
+      "visibleAndFocused": 25.5,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 10,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 21.9,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 21.9,
+      "focused": 20.7,
+      "visibleAndFocused": 21.9,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 11,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 26.9,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 26.9,
+      "focused": 25.7,
+      "visibleAndFocused": 26.9,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 11,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 29.2,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 29.2,
+      "focused": 25.1,
+      "visibleAndFocused": 29.2,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 11,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 22.9,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 22.9,
+      "focused": 21.6,
+      "visibleAndFocused": 22.9,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 11,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 29.2,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 29.2,
+      "focused": 27.7,
+      "visibleAndFocused": 29.2,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 11,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 29.2,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 29.2,
+      "focused": 27.6,
+      "visibleAndFocused": 29.2,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 11,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 45.7,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 45.7,
+      "focused": 44.3,
+      "visibleAndFocused": 45.7,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 11,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 23.8,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 23.8,
+      "focused": 22.6,
+      "visibleAndFocused": 23.8,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 11,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 24.1,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 24.1,
+      "focused": 22.9,
+      "visibleAndFocused": 24.1,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 12,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 43.1,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 43.1,
+      "focused": 41.1,
+      "visibleAndFocused": 43.1,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "math",
+      "round": 12,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 28.4,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 115,
+            "bottom": 159,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 28.4,
+      "focused": 27.1,
+      "visibleAndFocused": 28.4,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 115,
+          "bottom": 159,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 12,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 27.3,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 27.3,
+      "focused": 26.3,
+      "visibleAndFocused": 27.3,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "desktop",
+      "width": 1280,
+      "height": 960,
+      "subject": "language",
+      "round": 12,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 18,
+        "geometry": {
+          "y": 12,
+          "bottom": 59,
+          "scrollY": 865,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 115,
+            "bottom": 156,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 170,
+            "bottom": 228,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 18,
+      "focused": 16.9,
+      "visibleAndFocused": 18,
+      "last": {
+        "y": 12,
+        "bottom": 59,
+        "scrollY": 865,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 115,
+          "bottom": 156,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 170,
+          "bottom": 228,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 12,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 28.1,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 28.1,
+      "focused": 27,
+      "visibleAndFocused": 28.1,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "math",
+      "round": 12,
+      "fixtureSha": "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0",
+      "firstRaf": {
+        "ms": 36.1,
+        "geometry": {
+          "y": 12,
+          "bottom": 68,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": null,
+          "firstAnswer": {
+            "top": 92,
+            "bottom": 136,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 36.1,
+      "focused": 34.3,
+      "visibleAndFocused": 36.1,
+      "last": {
+        "y": 12,
+        "bottom": 68,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": null,
+        "firstAnswer": {
+          "top": 92,
+          "bottom": 136,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-hundreds",
+      "question": "4 hundreds, 1 tens and 9 ones make what number?",
+      "complete": true,
+      "grade": 2,
+      "authority": "math"
+    },
+    {
+      "which": "candidate",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 12,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 19.9,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 19.9,
+      "focused": 19,
+      "visibleAndFocused": 19.9,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    },
+    {
+      "which": "approved",
+      "device": "phone",
+      "width": 390,
+      "height": 844,
+      "subject": "language",
+      "round": 12,
+      "fixtureSha": "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f",
+      "firstRaf": {
+        "ms": 26,
+        "geometry": {
+          "y": 12,
+          "bottom": 40,
+          "scrollY": 1069,
+          "inViewport": true,
+          "visible": true,
+          "focused": true,
+          "passage": {
+            "top": 64,
+            "bottom": 163,
+            "fullyVisible": true,
+            "beginsInView": true
+          },
+          "firstAnswer": {
+            "top": 177,
+            "bottom": 235,
+            "fullyVisible": true,
+            "beginsInView": true
+          }
+        }
+      },
+      "firstVisible": 26,
+      "focused": 24.9,
+      "visibleAndFocused": 26,
+      "last": {
+        "y": 12,
+        "bottom": 40,
+        "scrollY": 1069,
+        "inViewport": true,
+        "visible": true,
+        "focused": true,
+        "passage": {
+          "top": 64,
+          "bottom": 163,
+          "fullyVisible": true,
+          "beginsInView": true
+        },
+        "firstAnswer": {
+          "top": 177,
+          "bottom": 235,
+          "fullyVisible": true,
+          "beginsInView": true
+        }
+      },
+      "skill": "g2-cause-effect",
+      "question": "Why did Ava put on boots?",
+      "complete": true,
+      "grade": 2,
+      "authority": "language"
+    }
+  ]
+}

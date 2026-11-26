@@ -1,0 +1,15 @@
+{
+  stage: undefined,
+  pageErrors: [],
+  requests: [],
+  title: 'jems · Create, Solve, Build, Play, Grow'
+}
+locator.selectOption: Timeout 10000ms exceeded.
+Call log:
+[2m  - waiting for locator('dialog.drawing-paint').locator('[data-paper-kind]')[22m
+
+    at makeRock (/workspace/jems-consolidation/audit-creative/candidate-b2/scripts/connected-universe-browser.cjs:61:45)
+    at async journey (/workspace/jems-consolidation/audit-creative/candidate-b2/scripts/connected-universe-browser.cjs:335:29)
+    at async main (/workspace/jems-consolidation/audit-creative/candidate-b2/scripts/connected-universe-browser.cjs:507:7) {
+  name: 'TimeoutError'
+}

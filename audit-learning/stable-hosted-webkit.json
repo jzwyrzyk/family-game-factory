@@ -1,0 +1,167 @@
+{
+  "head": "f7ff4bb12c13d8fa869dc743af0a86dbaf65bf82",
+  "tree": "1a468405116ee24b12b537cd2004404e15a086ad",
+  "merge": "516bc3983211704e2b8371ad4465d32f83106479",
+  "job": 139707278134,
+  "conclusion": "success",
+  "webkitSteps": [
+    {
+      "name": "Chromium and WebKit private entry and responsive acceptance",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 14
+    },
+    {
+      "name": "WebKit transactional storage and complete recovery",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 15
+    }
+  ],
+  "native": [
+    "2026-11-26T05:22:00.1443211Z PASS desktop: 30-game pagination, 126 retained versions, exact mechanics, Keep, Fork, reload, preserved legacy originals",
+    "2026-11-26T05:22:05.7610355Z PASS tablet: 30-game pagination, 126 retained versions, exact mechanics, Keep, Fork, reload, preserved legacy originals",
+    "2026-11-26T05:22:13.2753558Z PASS desktop: prepared scene authority, 30 paged scenes, 52 versions, autosave, Keep, copy, reload/play, exact retained legacy bytes",
+    "2026-11-26T05:22:19.9356164Z PASS tablet: prepared scene authority, 30 paged scenes, 52 versions, autosave, Keep, copy, reload/play, exact retained legacy bytes"
+  ],
+  "hostedMergeEvidence": [
+    "2026-11-26T05:17:26.3474890Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +",
+    "2026-11-26T05:17:35.1144021Z  * [new ref]           516bc3983211704e2b8371ad4465d32f83106479 -> pull/218/merge",
+    "2026-11-26T05:17:36.3292072Z 516bc3983211704e2b8371ad4465d32f83106479",
+    "2026-11-26T05:23:51.0277165Z   name: private-family-synthetic-layouts-516bc3983211704e2b8371ad4465d32f83106479"
+  ],
+  "rally": [
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 1400,
+        "height": 960
+      },
+      "indexedNotebook": false,
+      "checks": [
+        "active-only fitted play observations",
+        "unobserved real empty-host revision-loading gap",
+        "observer-safe Rally layout transition",
+        "same-tab migration selects authority",
+        "native Keep",
+        "compound copy",
+        "reload exact revision",
+        "profile switch and draft isolation",
+        "Change wins in both pending local read gaps",
+        "later explicit Play preserves owner/draft/kept revision"
+      ]
+    },
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 1400,
+        "height": 960
+      },
+      "indexedNotebook": false,
+      "checks": [
+        "native unwrapped observer/frame control",
+        "four actual saved Rally garage/viewport/Change/Back/Home cycles",
+        "exact kept mechanic after every remount"
+      ]
+    },
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "indexedNotebook": false,
+      "checks": [
+        "active-only fitted play observations",
+        "unobserved real empty-host revision-loading gap",
+        "observer-safe Rally layout transition",
+        "same-tab migration selects authority",
+        "native Keep",
+        "compound copy",
+        "reload exact revision",
+        "profile switch and draft isolation",
+        "Change wins in both pending local read gaps",
+        "later explicit Play preserves owner/draft/kept revision"
+      ]
+    },
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "indexedNotebook": false,
+      "checks": [
+        "native unwrapped observer/frame control",
+        "four actual saved Rally garage/viewport/Change/Back/Home cycles",
+        "exact kept mechanic after every remount"
+      ]
+    },
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 1400,
+        "height": 960
+      },
+      "indexedNotebook": true,
+      "checks": [
+        "active-only fitted play observations",
+        "unobserved real empty-host revision-loading gap",
+        "observer-safe Rally layout transition",
+        "same-tab migration selects authority",
+        "native Keep",
+        "compound copy",
+        "reload exact revision",
+        "profile switch and draft isolation",
+        "Change wins in both pending local read gaps",
+        "later explicit Play preserves owner/draft/kept revision"
+      ]
+    },
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 1400,
+        "height": 960
+      },
+      "indexedNotebook": true,
+      "checks": [
+        "native unwrapped observer/frame control",
+        "four actual saved Rally garage/viewport/Change/Back/Home cycles",
+        "exact kept mechanic after every remount"
+      ]
+    },
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "indexedNotebook": true,
+      "checks": [
+        "active-only fitted play observations",
+        "unobserved real empty-host revision-loading gap",
+        "observer-safe Rally layout transition",
+        "same-tab migration selects authority",
+        "native Keep",
+        "compound copy",
+        "reload exact revision",
+        "profile switch and draft isolation",
+        "Change wins in both pending local read gaps",
+        "later explicit Play preserves owner/draft/kept revision"
+      ]
+    },
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "indexedNotebook": true,
+      "checks": [
+        "native unwrapped observer/frame control",
+        "four actual saved Rally garage/viewport/Change/Back/Home cycles",
+        "exact kept mechanic after every remount"
+      ]
+    }
+  ]
+}

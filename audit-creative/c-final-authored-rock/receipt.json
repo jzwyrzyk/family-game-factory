@@ -1,0 +1,58 @@
+{
+  "head": "563de940eacd3f3573bf93236ab5eebd4608043a",
+  "browser": "156.0.8078.79",
+  "asset": {
+    "id": "6d438570-8357-4831-a95f-94b4f4c487ec",
+    "sha256": "dea6848535781623a811bfb2915fd3eb063e502bd187ada65f49775482f0731b",
+    "pin": "art:image:6d438570-8357-4831-a95f-94b4f4c487ec:dea6848535781623a811bfb2915fd3eb063e502bd187ada65f49775482f0731b",
+    "marks": 3,
+    "transparent": true
+  },
+  "created": {
+    "logical": "6d438570-8357-4831-a95f-94b4f4c487ec",
+    "semantic": "rock",
+    "category": "prop",
+    "activities": {
+      "forest": {
+        "id": "12d3a09f-2b6d-43b0-8610-0f15a69e2c1a",
+        "kept": "3e5588cc-e93f-43e2-b682-4867cfec2e1f"
+      },
+      "animation": {
+        "id": "1088e377-578c-436d-9f44-5342ef0d35df",
+        "kept": "1d03c73f-28ac-4da2-b562-b5b7cf5af5ff"
+      },
+      "obstacle": {
+        "id": "12f56829-2ed1-4386-82a3-9d9ea6e233e2",
+        "kept": "b0f6de9d-78a2-45b0-a9e3-ece2166c7268"
+      },
+      "collectible": {
+        "id": "e4fd7051-5e63-482c-8b63-f9a3e060cd36",
+        "kept": "07f83e95-8a9c-4f31-a677-8203aab3b084"
+      }
+    }
+  },
+  "versions": {
+    "original": "dea6848535781623a811bfb2915fd3eb063e502bd187ada65f49775482f0731b",
+    "revised": "art:image:929579c6-da5d-48e0-a0f6-6569ed3c704a:46e173199bdab3f191abcbb7a8d94b08023800f3a4bccaa4b7cff13e0ae2ee2d",
+    "logical": "6d438570-8357-4831-a95f-94b4f4c487ec",
+    "revisionSource": "6d438570-8357-4831-a95f-94b4f4c487ec",
+    "revisionSourceSha": "dea6848535781623a811bfb2915fd3eb063e502bd187ada65f49775482f0731b",
+    "markCount": 4,
+    "before": {
+      "forest": "art:image:6d438570-8357-4831-a95f-94b4f4c487ec:dea6848535781623a811bfb2915fd3eb063e502bd187ada65f49775482f0731b",
+      "animation": "art:image:6d438570-8357-4831-a95f-94b4f4c487ec:dea6848535781623a811bfb2915fd3eb063e502bd187ada65f49775482f0731b",
+      "obstacle": "art:image:6d438570-8357-4831-a95f-94b4f4c487ec:dea6848535781623a811bfb2915fd3eb063e502bd187ada65f49775482f0731b",
+      "collectible": "art:image:6d438570-8357-4831-a95f-94b4f4c487ec:dea6848535781623a811bfb2915fd3eb063e502bd187ada65f49775482f0731b"
+    },
+    "after": {
+      "forest": "art:image:6d438570-8357-4831-a95f-94b4f4c487ec:dea6848535781623a811bfb2915fd3eb063e502bd187ada65f49775482f0731b",
+      "animation": "art:image:6d438570-8357-4831-a95f-94b4f4c487ec:dea6848535781623a811bfb2915fd3eb063e502bd187ada65f49775482f0731b",
+      "obstacle": "art:image:929579c6-da5d-48e0-a0f6-6569ed3c704a:46e173199bdab3f191abcbb7a8d94b08023800f3a4bccaa4b7cff13e0ae2ee2d",
+      "collectible": "art:image:6d438570-8357-4831-a95f-94b4f4c487ec:dea6848535781623a811bfb2915fd3eb063e502bd187ada65f49775482f0731b"
+    },
+    "keptObstacle": "art:image:6d438570-8357-4831-a95f-94b4f4c487ec:dea6848535781623a811bfb2915fd3eb063e502bd187ada65f49775482f0731b"
+  },
+  "actualCollectibleTaps": 3,
+  "scope": "Draw and revise on the visible paper, shelf thumbnail, native scene creations and exact replacement, four normal scene entries and actual three-tap collectible.",
+  "externalRequests": []
+}

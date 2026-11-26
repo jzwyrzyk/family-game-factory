@@ -1,0 +1,100 @@
+TAP version 13
+# ::group::node first
+# ::endgroup::
+# CI_SUITE_RESULT {"command":["node","first"],"seconds":0,"exitCode":9}
+# ::group::node second
+# ::endgroup::
+# CI_SUITE_RESULT {"command":["node","second"],"seconds":0,"exitCode":0}
+# Subtest: aggregates reject replaced or self-claimed plan bytes before parsing
+ok 1 - aggregates reject replaced or self-claimed plan bytes before parsing
+  ---
+  duration_ms: 4.376656
+  type: 'test'
+  ...
+# Subtest: all original Arcade leaf commands occur exactly once in their original required group
+ok 2 - all original Arcade leaf commands occur exactly once in their original required group
+  ---
+  duration_ms: 15.991382
+  type: 'test'
+  ...
+# Subtest: argv parser rejects executable shell expansion; hooks and recursive scripts require review
+ok 3 - argv parser rejects executable shell expansion; hooks and recursive scripts require review
+  ---
+  duration_ms: 0.974336
+  type: 'test'
+  ...
+# Subtest: failed commands remain failures while independent remaining commands still run once
+ok 4 - failed commands remain failures while independent remaining commands still run once
+  ---
+  duration_ms: 4.222254
+  type: 'test'
+  ...
+# Subtest: aggregate accepts complete successful receipts and rejects every false-pass state
+ok 5 - aggregate accepts complete successful receipts and rejects every false-pass state
+  ---
+  duration_ms: 52.803349
+  type: 'test'
+  ...
+# Subtest: PR narrowing requires base policy; non-PR narrowing without protected-main evidence fails
+ok 6 - PR narrowing requires base policy; non-PR narrowing without protected-main evidence fails
+  ---
+  duration_ms: 1.697109
+  type: 'test'
+  ...
+# Subtest: shared build identity invalidates changed source, tree, dependencies and artifact bytes
+ok 7 - shared build identity invalidates changed source, tree, dependencies and artifact bytes
+  ---
+  duration_ms: 0.312904
+  type: 'test'
+  ...
+# Subtest: authenticated TAR still rejects links, traversal, devices and duplicate members before extraction
+ok 8 - authenticated TAR still rejects links, traversal, devices and duplicate members before extraction
+  ---
+  duration_ms: 561.122039
+  type: 'test'
+  ...
+# Subtest: workflow adapter executes base policy, bootstraps full and keeps unopted main full
+ok 9 - workflow adapter executes base policy, bootstraps full and keeps unopted main full
+  ---
+  duration_ms: 905.024133
+  type: 'test'
+  ...
+# Subtest: main reuse requires literal opt-in, protected main and the exact trusted push predecessor
+ok 10 - main reuse requires literal opt-in, protected main and the exact trusted push predecessor
+  ---
+  duration_ms: 1.079234
+  type: 'test'
+  ...
+# Subtest: main aggregates require authentic reuse even for documentation and never mint new gameplay coverage
+ok 11 - main aggregates require authentic reuse even for documentation and never mint new gameplay coverage
+  ---
+  duration_ms: 14.687509
+  type: 'test'
+  ...
+# Subtest: protected-main adapter authenticates the predecessor policy and falls back on every missing evidence path
+ok 12 - protected-main adapter authenticates the predecessor policy and falls back on every missing evidence path
+  ---
+  duration_ms: 2153.223884
+  type: 'test'
+  ...
+# Subtest: aggregates authenticate exact plan bytes from the preparation output before parsing
+ok 13 - aggregates authenticate exact plan bytes from the preparation output before parsing
+  ---
+  duration_ms: 0.5748
+  type: 'test'
+  ...
+# Subtest: a reuse boolean is insufficient without bounded authenticated source and artifact proof
+ok 14 - a reuse boolean is insufficient without bounded authenticated source and artifact proof
+  ---
+  duration_ms: 4.993832
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4015.145197

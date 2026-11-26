@@ -1,0 +1,51 @@
+
+> family-game-factory@2.0.0-foundation test:learning-ui
+> node --import tsx --test tests/learning-activity.test.ts tests/learning-support.test.ts tests/learning-geometry.test.ts tests/math-workspace.test.ts tests/theme-workspace.test.ts
+
+✔ a below-fold question receives visible heading focus without opening a text input (3094.027433ms)
+✔ requested hints expose their reasoning and offer a visible way back to the same answer (1362.40706ms)
+✔ automatic hints announce the reasoning while keeping the current answer control (1505.823164ms)
+✔ worked examples focus the explanation before a keyboard continuation (1860.383618ms)
+✔ focus recovery does not revive a disposed activity or steal navigation focus (977.350112ms)
+✔ help is available before an error and the successful answer remains assisted (3539.005713ms)
+✔ errors survive abandonment and disposing twice does not add another outcome (3276.360416ms)
+✔ three errors provide a worked example and a supportive way back to play (1885.932612ms)
+✔ a multiplication array and a child-built base-ten answer share the same attempt (3148.464037ms)
+✔ interaction mode constructs a quantity without pre-filling the answer (1960.612713ms)
+✔ fraction construction is checked mathematically and keeps a single attempt across views (1799.895917ms)
+✔ invalid input is not a mathematical error and choice tiles submit stable values (2645.220955ms)
+✔ optional challenge closes a first error but never manufactures a correct response (1550.69676ms)
+✔ a disposed activity cannot call back into another game after its success delay (1449.79054ms)
+✔ dense number lines keep every exact tick label readable at mobile widths (1071.701306ms)
+✔ diagrams are mathematical, mobile-safe and curriculum text is never HTML (830.38508ms)
+✔ Math question and help share explicit read-aloud without reading the answer or adding a hint (1176.591173ms)
+✔ given counters retain a visible painted area inside the composed ten-frame (505.58472ms)
+✔ polygon representations have the assessed sides, parallel pairs and reflection axes (33.37021ms)
+✔ shape marks, hidden cube faces and trial folds remain local until the child answers (5273.583928ms)
+✔ scaled paper uses its own bitmap dimensions and precision (692.175178ms)
+✔ number pad preserves selection, native typing, bounded input and deliberate submission (3993.845815ms)
+✔ scratchpad keeps finger, pen, mouse and keyboard work within one activity and supports reversible erasure (3503.834241ms)
+✔ old ink survives the undo limit, and branching after undo removes the abandoned redo path (13656.914163ms)
+✔ every generated construction can represent its answer in all seeded grades and tiers (1383.829231ms)
+✔ frame edits, moves, zero, undo and submit are distinct actions (7917.06407ms)
+✔ grouping ten and splitting one preserve place value (2391.567578ms)
+✔ fraction sectors, improper fractions and mixed-number equivalence (1551.746025ms)
+✔ number line accepts keyboard steps and preserves chosen fraction positions (1200.37448ms)
+✔ array size is directly adjustable without submitting a product (1012.395581ms)
+✔ clock hands, rulers, coins, angle rays, plots and triangle composition respond to pointer input (7154.132306ms)
+✔ moving a counter between groups preserves the given number on an even/odd task (1083.097573ms)
+✔ trusted game IDs resolve local counter artwork and unknown IDs share one fallback (24.441515ms)
+✔ themed counting, unchanged named stimuli and owner-bound Pal reactions in a real browser (7440.47833ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 38109.164432
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

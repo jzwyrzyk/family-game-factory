@@ -1,0 +1,15 @@
+{
+  "head": "9e5c9e648364c7f7925c8c8e8109398c04d6690a",
+  "browser": "156.0.8078.79",
+  "result": {
+    "totalVisible": 1,
+    "visibleFamily": 1,
+    "exactRoot": true,
+    "exactRevision": true,
+    "version": 2,
+    "semantic": "moon rock",
+    "foreignRejected": true,
+    "wrongHashRejected": true,
+    "cycleRejected": true
+  }
+}

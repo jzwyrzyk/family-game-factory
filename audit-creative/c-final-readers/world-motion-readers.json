@@ -1,0 +1,218 @@
+{
+  "positiveRecords": {
+    "sourceWorld": {
+      "212": {
+        "schema": "jems.creation.v1",
+        "id": "world-test",
+        "title": "My test world",
+        "width": 800,
+        "height": 450,
+        "background": "world-forest-v1",
+        "actors": [
+          {
+            "id": "me",
+            "name": "My drawing",
+            "assetId": "star",
+            "x": 400,
+            "y": 225
+          }
+        ],
+        "programs": [],
+        "variables": {},
+        "world": {
+          "edition": "jems.world.v1",
+          "backdrop": "art:image:version-rock:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "framing": "fit",
+          "scenery": [
+            {
+              "id": "d",
+              "assetId": "world-prop-tree-v1",
+              "label": "Tree",
+              "x": 350,
+              "y": 80,
+              "size": 40,
+              "layer": "in-front"
+            }
+          ]
+        }
+      },
+      "215": {
+        "schema": "jems.creation.v1",
+        "id": "world-test",
+        "title": "My test world",
+        "width": 800,
+        "height": 450,
+        "background": "sky",
+        "actors": [
+          {
+            "id": "me",
+            "name": "My drawing",
+            "assetId": "star",
+            "x": 400,
+            "y": 225
+          }
+        ],
+        "programs": [],
+        "variables": {},
+        "world": {
+          "backdrop": "art:image:version-rock:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "fit": "cover",
+          "decorations": [
+            {
+              "id": "d",
+              "assetId": "world-prop-tree-v1",
+              "name": "Tree",
+              "x": 58,
+              "y": 24,
+              "size": 35,
+              "plane": "front"
+            }
+          ]
+        }
+      },
+      "216": {
+        "schema": "jems.creation.v1",
+        "id": "world-test",
+        "title": "My test world",
+        "width": 800,
+        "height": 450,
+        "background": "sky",
+        "actors": [
+          {
+            "id": "me",
+            "name": "My drawing",
+            "assetId": "star",
+            "x": 400,
+            "y": 225
+          }
+        ],
+        "programs": [],
+        "variables": {},
+        "world": {
+          "assetId": "art:image:version-rock:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "framing": "fill"
+        }
+      },
+      "217": {
+        "schema": "jems.creation.v1",
+        "id": "world-test",
+        "title": "My test world",
+        "width": 800,
+        "height": 450,
+        "background": "world-forest-v1",
+        "actors": [
+          {
+            "id": "me",
+            "name": "My drawing",
+            "assetId": "star",
+            "x": 400,
+            "y": 225,
+            "layer": "back",
+            "stackOrder": 0,
+            "angle": 32,
+            "creativeRole": "collectible"
+          }
+        ],
+        "programs": [],
+        "variables": {},
+        "worldLayers": {
+          "middle": false,
+          "foreground": true
+        }
+      }
+    },
+    "motion": {
+      "212": {
+        "move": "jump",
+        "durationMs": 900,
+        "world": "world-forest-v1",
+        "sprite": "original"
+      },
+      "216": {
+        "points": [
+          {
+            "x": 0.2,
+            "y": 0.5
+          },
+          {
+            "x": 0.8,
+            "y": 0.5
+          }
+        ],
+        "stepMs": 600,
+        "sprite": "original"
+      },
+      "217": {
+        "stops": [
+          {
+            "x": 0.75,
+            "y": 0.35
+          }
+        ],
+        "stepMs": 700
+      }
+    }
+  },
+  "readers": {
+    "212": {
+      "worlds": {
+        "212": "accepted",
+        "215": "Creation Lab: Unknown field in world.",
+        "216": "Creation Lab: Unknown field in world.",
+        "217": "Creation Lab: Unknown field in project."
+      },
+      "motion": {
+        "212": "accepted",
+        "216": "Choose a supported animation and pace.",
+        "217": "Choose a supported animation and pace."
+      }
+    },
+    "215": {
+      "worlds": {
+        "212": "Creation Lab: Choose a supported background.",
+        "215": "accepted",
+        "216": "Creation Lab: Unknown field in world.",
+        "217": "Creation Lab: Unknown field in project."
+      }
+    },
+    "216": {
+      "worlds": {
+        "212": "Creation Lab: Choose a supported background.",
+        "215": "Creation Lab: Unknown field in world.",
+        "216": "accepted",
+        "217": "Creation Lab: Unknown field in project."
+      },
+      "motion": {
+        "212": "Choose two to sixteen stops and a speed for your path.",
+        "216": "accepted",
+        "217": "Choose two to sixteen stops and a speed for your path."
+      }
+    },
+    "217": {
+      "worlds": {
+        "212": "Creation Lab: Unknown field in project.",
+        "215": "Creation Lab: Unknown field in project.",
+        "216": "Creation Lab: Unknown field in project.",
+        "217": "accepted"
+      },
+      "motion": {
+        "212": "Choose up to twelve spots inside the animation page.",
+        "216": "Choose up to twelve spots inside the animation page.",
+        "217": "accepted"
+      }
+    },
+    "B": {
+      "worlds": {
+        "212": "accepted",
+        "215": "accepted",
+        "216": "accepted",
+        "217": "accepted"
+      },
+      "motion": {
+        "212": "accepted",
+        "216": "accepted",
+        "217": "accepted"
+      }
+    }
+  }
+}

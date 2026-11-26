@@ -1,0 +1,47 @@
+{
+  "source": "22e8424ceb1146670aa3b5913aa1f98169a5a4f6",
+  "guards": [
+    {
+      "subject": "checkpoint",
+      "available": false
+    },
+    {
+      "subject": "challenge",
+      "available": false
+    }
+  ],
+  "responses": [
+    {
+      "subject": "wrong",
+      "answers": [
+        {
+          "correct": false,
+          "normalized": "1/1"
+        },
+        {
+          "correct": true,
+          "normalized": "6/1"
+        }
+      ],
+      "outcome": "completed",
+      "independent": false,
+      "hints": 0,
+      "callbacks": 1,
+      "attempts": 1
+    },
+    {
+      "subject": "hint",
+      "answers": [
+        {
+          "correct": true,
+          "normalized": "6/1"
+        }
+      ],
+      "outcome": "completed",
+      "independent": false,
+      "hints": 1,
+      "callbacks": 1,
+      "attempts": 1
+    }
+  ]
+}

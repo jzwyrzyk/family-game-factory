@@ -1,0 +1,47 @@
+
+> family-game-factory@2.0.0-foundation docs:check
+> node scripts/check-docs.mjs check
+
+# Documentation context check
+
+Result: PASSED; 0 error(s), 0 review reminder(s).
+
+This checks source fingerprints, review records, routing and local file links. It does not prove prose accuracy, external service state, deployment, learning efficacy or human approval.
+
+| Area | Source review current | Review outcome | Reviewed at (UTC) |
+| --- | --- | --- | --- |
+| product | yes | updated | 2026-11-26T06:53:06.479Z |
+| experience | yes | updated | 2026-11-26T06:31:04.693Z |
+| creation | yes | updated | 2026-11-26T06:53:06.946Z |
+| rewards | yes | updated | 2026-11-25T23:20:54.641Z |
+| games | yes | updated | 2026-11-25T20:35:53.062Z |
+| learning | yes | updated | 2026-11-25T02:09:44.693Z |
+| services | yes | updated | 2026-11-26T06:19:59.740Z |
+| generation | yes | updated | 2026-11-26T06:31:05.691Z |
+| coach | yes | unchanged | 2026-11-25T23:20:56.441Z |
+| adult-privacy | yes | updated | 2026-11-25T17:33:43.991Z |
+| validation | yes | updated | 2026-11-26T06:53:07.317Z |
+| delivery | yes | updated | 2026-11-26T06:31:06.770Z |
+| context | yes | updated | 2026-11-26T06:31:07.253Z |
+| parent-reporting | yes | updated | 2026-11-25T16:41:38.340Z |
+| problem-solving | yes | unchanged | 2026-11-25T23:20:59.029Z |
+| pal-design | yes | updated | 2026-11-25T23:20:59.505Z |
+| art-studio | yes | updated | 2026-11-26T06:53:07.717Z |
+| pals | yes | updated | 2026-11-26T06:31:08.262Z |
+| storage | yes | updated | 2026-11-26T04:58:58.090Z |
+
+## Errors
+
+None.
+
+## Review reminders
+
+None.
+
+Local file links checked in 132 registered documents; external URLs and heading anchors are outside this check.
+
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

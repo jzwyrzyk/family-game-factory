@@ -1,0 +1,86 @@
+From f54e75c39abcdeedb3a261b39bd2d49cd21b715e Mon Sep 17 00:00:00 2001
+From: Jems Integration Audit <jems-audit@users.noreply.github.com>
+Date: Thu, 26 Nov 2026 06:11:31 +0000
+Subject: [PATCH] Keep the focused learning question visible on My Powers entry
+
+---
+ src/legacy/ui.js                  |  5 ++++-
+ tests/language-integration.ts     |  2 ++
+ tests/learning-entry-viewport.cjs | 14 ++++++++++++++
+ tests/learning-integration.ts     |  2 ++
+ 4 files changed, 22 insertions(+), 1 deletion(-)
+ create mode 100644 tests/learning-entry-viewport.cjs
+
+diff --git a/src/legacy/ui.js b/src/legacy/ui.js
+index 96057a02..ce551079 100644
+--- a/src/legacy/ui.js
++++ b/src/legacy/ui.js
+@@ -10,7 +10,10 @@ let activeGame=null,activeGameId=null,question=null,labStreak=0,gameSession=0,le
+ function escapeHtml(str){return String(str).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
+ function page(which){closeGameDirections();if(isEarlyGrade(FG.store.current().grade)&&['create','feedback'].includes(which)){
+  const handled=!window.dispatchEvent(new CustomEvent('factory-early-handoff',{cancelable:true}));if(handled)return;which='parent';
+-}FG.learning?.dispose();dismiss();clearInterval(checkpointTimer);checkpointTimer=null;window.dispatchEvent(new CustomEvent('factory-page',{detail:which}));if(which!=='game'&&activeGame){gameSession++;activeGame.unmount();activeGame=null;activeGameId=null}document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));$('page-'+which).classList.remove('hidden');document.querySelectorAll('.nav').forEach(n=>{const selected=n.dataset.page===which;n.classList.toggle('active',selected);if(selected)n.setAttribute('aria-current','page');else n.removeAttribute('aria-current')});if(which==='lab')loadLab();if(which==='creations')renderFeedback();if(which==='feedback')loadRemix();if(which==='parent')loadParent();window.scrollTo({top:0,behavior:'instant'})}
++}FG.learning?.dispose();dismiss();clearInterval(checkpointTimer);checkpointTimer=null;window.dispatchEvent(new CustomEvent('factory-page',{detail:which}));if(which!=='game'&&activeGame){gameSession++;activeGame.unmount();activeGame=null;activeGameId=null}document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));$('page-'+which).classList.remove('hidden');document.querySelectorAll('.nav').forEach(n=>{const selected=n.dataset.page===which;n.classList.toggle('active',selected);if(selected)n.setAttribute('aria-current','page');else n.removeAttribute('aria-current')});if(which==='creations')renderFeedback();if(which==='feedback')loadRemix();if(which==='parent')loadParent();window.scrollTo({top:0,behavior:'instant'});
++ // A mounted learning activity scrolls its focused question into view.
++ if(which==='lab')loadLab();
++}
+ function profiles(){const box=$('profile-choices');box.replaceChildren();FG.store.familyProfiles().forEach(p=>{const b=document.createElement('button');b.className='profile-choice'+(FG.store.current().id===p.id?' active':'');b.textContent=`${p.icon||'⭐'} ${p.name}`;b.addEventListener('click',()=>{if(!FG.store.choose(p.id))return;profiles();window.dispatchEvent(new Event('factory-profile'));if(!$('page-lab').classList.contains('hidden'))loadLab();if(!$('page-parent').classList.contains('hidden'))loadParent();if(!$('page-feedback').classList.contains('hidden'))loadRemix();if(activeGame)page('home')});box.append(b)});window.dispatchEvent(new Event('factory-profile-choices'));}
+ function gameOpen(id,options={}){if(FG.store.loadError){page('parent');return}FG.learning?.dispose();gameSession++;checkpointCount=0;learningContext={gameId:id,versionId:options.stateKey||'original-'+id,projectId:options.projectId||id};const g=FG.games[id];if(!g)return;window.dispatchEvent(new CustomEvent('factory-game',{detail:{live:!!options.onOutcome,game:id,stateKey:options.stateKey||'original-'+id,config:options.config}}));if(activeGame)activeGame.unmount();activeGameId=id;page('game');$('game-title').textContent=g.name;$('game-type').textContent=g.type;$('game-instructions').textContent=g.instructions;$('game-control-hint').textContent=g.controls;$('game-status').textContent=FG.store.current().icon+' '+FG.store.current().name+(id==='buckets'?' · '+(!isEarlyGrade(FG.store.current().grade)&&FG.store.current().punish?'Original Challenge: wrong math ends the run':'Practice: hints and recovery'):'');$('stage-overlay').classList.add('hidden');activeGame=new g.build($('game-mount'),{difficulty:FG.store.current().remixes?.[id]||'classic',config:options.config,drawingRigId:options.drawingRigId,stateKey:options.stateKey||'original-'+id,finish:result=>{finish(id,result);options.onOutcome?.(result)}});let modeBox=$('gameMathMode');if(!modeBox){modeBox=document.createElement('div');modeBox.id='gameMathMode';$('page-game').querySelector('.game-bottom').append(modeBox);}FG.learning.modeControl(modeBox,learningContext.projectId);startCheckpointClock();openGameDirections(id,options.config,!!options.onOutcome);}
+ // Safe event boundaries and active play share one per-child learning budget.
+diff --git a/tests/language-integration.ts b/tests/language-integration.ts
+index 2a396d3a..3e028f59 100644
+--- a/tests/language-integration.ts
++++ b/tests/language-integration.ts
+@@ -1,3 +1,4 @@
++import {assertQuestionEntry} from './learning-entry-viewport.cjs';
+ import {answerLanguageChoice} from './language-choice-fixture.cjs';
+ import {authorizeLearningParent} from './learning-parent-fixture.cjs';
+ /** Production Family Game Factory ELA journeys; only audited local games and fixtures. */
+@@ -63,6 +64,7 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
+     assert.equal(await page.evaluate(()=>window.FG.learning.subject),'language');
+     await page.getByRole('button',{name:'My Powers',exact:true}).click();
+     await active(page).waitFor({state:'visible'});
++    await assertQuestionEntry(active(page));
+     const item=await page.evaluate(()=>window.FG.learning.activeItem);
+     assert.equal(item.source,'reviewed-local');
+     assert.equal(item.grade<=2,true);
+diff --git a/tests/learning-entry-viewport.cjs b/tests/learning-entry-viewport.cjs
+new file mode 100644
+index 00000000..e93b0cc4
+--- /dev/null
++++ b/tests/learning-entry-viewport.cjs
+@@ -0,0 +1,14 @@
++const assert = require('node:assert/strict');
++
++exports.assertQuestionEntry = async activity => {
++  const entry = await activity.locator('.workspace-question').evaluate(heading => {
++    const rect = heading.getBoundingClientRect();
++    const hit = document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2);
++    return {
++      focused: document.activeElement === heading,
++      visible: rect.height > 0 && rect.top >= 0 && rect.bottom <= innerHeight && heading.contains(hit),
++      top: rect.top, bottom: rect.bottom, viewport: innerHeight
++    };
++  });
++  assert.ok(entry.focused && entry.visible, 'My Powers opens with the question focused and visible: ' + JSON.stringify(entry));
++};
+diff --git a/tests/learning-integration.ts b/tests/learning-integration.ts
+index 72734647..0a122f41 100644
+--- a/tests/learning-integration.ts
++++ b/tests/learning-integration.ts
+@@ -1,3 +1,4 @@
++import {assertQuestionEntry} from './learning-entry-viewport.cjs';
+ import {authorizeLearningParent} from './learning-parent-fixture.cjs';
+ /** Production-shell integration; all game content here is a named local fixture. No model calls. */
+ import assert from 'node:assert/strict';
+@@ -80,6 +81,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
+ 
+     // A real Math Lab item, including a first error, help request, and abandoned activity.
+     await nav(page,'My Powers');await activity(page).waitFor({state:'visible'});
++    await assertQuestionEntry(activity(page));
+     const first=await activeItem(page),firstId=await page.evaluate(()=>window.FG.learning.activeAttemptId),owner=(await profile(page)).id;
+     await submitWritten(page,first,wrongAnswer(first));
+     const savedWrong=await page.evaluate(({key,owner,id})=>JSON.parse(localStorage.getItem(key)!).profiles.find((p:any)=>p.id===owner).learning.attempts.find((a:any)=>a.id===id),{key:STORE,owner,id:firstId});
+-- 
+2.56.1
+

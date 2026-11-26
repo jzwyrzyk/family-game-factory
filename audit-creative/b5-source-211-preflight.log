@@ -1,0 +1,86 @@
+TAP version 13
+# Subtest: O4: canonical private preflight retains O1 literal evidence and O2 form; O3 checks remain NOT TESTED
+ok 1 - O4: canonical private preflight retains O1 literal evidence and O2 form; O3 checks remain NOT TESTED
+  ---
+  duration_ms: 12.055581
+  type: 'test'
+  ...
+# Subtest: O4: planned generation sees real physical instructions only when needed
+ok 2 - O4: planned generation sees real physical instructions only when needed
+  ---
+  duration_ms: 32.316945
+  type: 'test'
+  ...
+# Subtest: O4: explicit unsupported true 3D, conflicting requirements, and uninspected bases stop BEFORE key or paid transport
+not ok 3 - O4: explicit unsupported true 3D, conflicting requirements, and uninspected bases stop BEFORE key or paid transport
+  ---
+  duration_ms: 6.335712
+  type: 'test'
+  location: '/workspace/jems-consolidation/audit-creative/candidate-b5/tests/audit-preflight-source-211.test.ts:2:6400'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /GAME_FORM_UNSUPPORTED/. Input:
+    
+    'Error: PRODUCTION_PLAN_INVALID'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'PRODUCTION_PLAN_INVALID'
+  stack: |-
+    exact (/workspace/jems-consolidation/audit-creative/candidate-b5/server/quality/presentation-plan.ts:43:92)
+    bindGameProductionPlan (/workspace/jems-consolidation/audit-creative/candidate-b5/server/quality/presentation-plan.ts:161:23)
+    OpenAIResponsesAgent.planRequest (/workspace/jems-consolidation/audit-creative/candidate-b5/server/agent/openai.ts:150:14)
+    async OpenAIResponsesAgent.request (/workspace/jems-consolidation/audit-creative/candidate-b5/server/agent/openai.ts:176:19)
+    async OpenAIResponsesAgent.metered (/workspace/jems-consolidation/audit-creative/candidate-b5/server/agent/openai.ts:63:17)
+    async waitForActual (node:assert:644:5)
+    async Function.rejects (node:assert:767:25)
+    async TestContext.<anonymous> (/workspace/jems-consolidation/audit-creative/candidate-b5/tests/audit-preflight-source-211.test.ts:90:2)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (/workspace/jems-consolidation/audit-creative/candidate-b5/tests/audit-preflight-source-211.test.ts:90:2)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: O4: saved v2 physics remains physics on an ordinary edit; physical-to-scripted and scripted-to-physical changes require review
+ok 4 - O4: saved v2 physics remains physics on an ordinary edit; physical-to-scripted and scripted-to-physical changes require review
+  ---
+  duration_ms: 1.518919
+  type: 'test'
+  ...
+# Subtest: O4: native seed provenance preserves hill/gum physics and legacy gum rules without trusting a client-selected shape
+ok 5 - O4: native seed provenance preserves hill/gum physics and legacy gum rules without trusting a client-selected shape
+  ---
+  duration_ms: 1.240759
+  type: 'test'
+  ...
+# Subtest: O4: a failed unrequested physics candidate cannot hijack an ordinary rule-driven repair
+ok 6 - O4: a failed unrequested physics candidate cannot hijack an ordinary rule-driven repair
+  ---
+  duration_ms: 2.286001
+  type: 'test'
+  ...
+# Subtest: O4: existing JobService makes fixture-backed Create → Playable Revision → Revise → Keep → Undo/Fork without losing source
+ok 7 - O4: existing JobService makes fixture-backed Create → Playable Revision → Revise → Keep → Undo/Fork without losing source
+  ---
+  duration_ms: 230.148096
+  type: 'test'
+  ...
+# Subtest: O4: unsupported designs are refused at authenticated submission without queuing or consuming allowance
+ok 8 - O4: unsupported designs are refused at authenticated submission without queuing or consuming allowance
+  ---
+  duration_ms: 1.002477
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 7
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1835.855192

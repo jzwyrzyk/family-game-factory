@@ -1,0 +1,165 @@
+{
+  "sha": "22e8424ceb1146670aa3b5913aa1f98169a5a4f6",
+  "mergeSha": "eec49e55c1c5a5804a12fe43c874626d9085ddd4",
+  "tree": "d8b3c720fbee795c6d608e3b16845b0f6b26f687",
+  "job": 139699004995,
+  "status": "failure",
+  "webkitRally": [
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 1400,
+        "height": 960
+      },
+      "indexedNotebook": false,
+      "checks": [
+        "active-only fitted play observations",
+        "unobserved real empty-host revision-loading gap",
+        "observer-safe Rally layout transition",
+        "same-tab migration selects authority",
+        "native Keep",
+        "compound copy",
+        "reload exact revision",
+        "profile switch and draft isolation",
+        "Change wins in both pending local read gaps",
+        "later explicit Play preserves owner/draft/kept revision"
+      ]
+    },
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 1400,
+        "height": 960
+      },
+      "indexedNotebook": false,
+      "checks": [
+        "native unwrapped observer/frame control",
+        "four actual saved Rally garage/viewport/Change/Back/Home cycles",
+        "exact kept mechanic after every remount"
+      ]
+    },
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "indexedNotebook": false,
+      "checks": [
+        "active-only fitted play observations",
+        "unobserved real empty-host revision-loading gap",
+        "observer-safe Rally layout transition",
+        "same-tab migration selects authority",
+        "native Keep",
+        "compound copy",
+        "reload exact revision",
+        "profile switch and draft isolation",
+        "Change wins in both pending local read gaps",
+        "later explicit Play preserves owner/draft/kept revision"
+      ]
+    },
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "indexedNotebook": false,
+      "checks": [
+        "native unwrapped observer/frame control",
+        "four actual saved Rally garage/viewport/Change/Back/Home cycles",
+        "exact kept mechanic after every remount"
+      ]
+    },
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 1400,
+        "height": 960
+      },
+      "indexedNotebook": true,
+      "checks": [
+        "active-only fitted play observations",
+        "unobserved real empty-host revision-loading gap",
+        "observer-safe Rally layout transition",
+        "same-tab migration selects authority",
+        "native Keep",
+        "compound copy",
+        "reload exact revision",
+        "profile switch and draft isolation",
+        "Change wins in both pending local read gaps",
+        "later explicit Play preserves owner/draft/kept revision"
+      ]
+    },
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 1400,
+        "height": 960
+      },
+      "indexedNotebook": true,
+      "checks": [
+        "native unwrapped observer/frame control",
+        "four actual saved Rally garage/viewport/Change/Back/Home cycles",
+        "exact kept mechanic after every remount"
+      ]
+    },
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "indexedNotebook": true,
+      "checks": [
+        "active-only fitted play observations",
+        "unobserved real empty-host revision-loading gap",
+        "observer-safe Rally layout transition",
+        "same-tab migration selects authority",
+        "native Keep",
+        "compound copy",
+        "reload exact revision",
+        "profile switch and draft isolation",
+        "Change wins in both pending local read gaps",
+        "later explicit Play preserves owner/draft/kept revision"
+      ]
+    },
+    {
+      "browser": "webkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "indexedNotebook": true,
+      "checks": [
+        "native unwrapped observer/frame control",
+        "four actual saved Rally garage/viewport/Change/Back/Home cycles",
+        "exact kept mechanic after every remount"
+      ]
+    }
+  ],
+  "timeout": [
+    "2026-11-26T05:01:53.0756738Z locator.click: Timeout 30000ms exceeded.",
+    "2026-11-26T05:01:53.0757085Z Call log:",
+    "2026-11-26T05:01:53.0757401Z   - waiting for locator('#liveKeep')",
+    "2026-11-26T05:01:53.0758309Z     - locator resolved to <button id=\"liveKeep\" class=\"btn secondary\">…</button>",
+    "2026-11-26T05:01:53.0758664Z   - attempting click action",
+    "2026-11-26T05:01:53.0759032Z     2 × waiting for element to be visible, enabled and stable",
+    "2026-11-26T05:01:53.0759373Z       - element is not visible",
+    "2026-11-26T05:01:53.0759595Z     - retrying click action",
+    "2026-11-26T05:01:53.0759814Z     - waiting 20ms",
+    "2026-11-26T05:01:53.0760140Z     2 × waiting for element to be visible, enabled and stable",
+    "2026-11-26T05:01:53.0760463Z       - element is not visible",
+    "2026-11-26T05:01:53.0760699Z     - retrying click action",
+    "2026-11-26T05:01:53.0760905Z       - waiting 100ms",
+    "2026-11-26T05:01:53.0761250Z     46 × waiting for element to be visible, enabled and stable",
+    "2026-11-26T05:01:53.0761574Z        - element is not visible",
+    "2026-11-26T05:01:53.0761788Z      - retrying click action",
+    "2026-11-26T05:01:53.0762009Z        - waiting 500ms",
+    "2026-11-26T05:01:53.0762289Z     - waiting for element to be visible, enabled and stable",
+    "2026-11-26T05:01:53.0762788Z ",
+    "2026-11-26T05:01:53.0763120Z     at /home/runner/work/family-game-factory/family-game-factory/tests/storage-native-ui.cjs:22:277 {",
+    "2026-11-26T05:01:53.0763532Z   name: 'TimeoutError'",
+    "2026-11-26T05:01:53.0763741Z }"
+  ]
+}

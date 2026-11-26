@@ -1,0 +1,42 @@
+
+> family-game-factory@2.0.0-foundation test:local-gem-hunt
+> node node_modules/vite/bin/vite.js build --mode creative-art-review --outDir test-results/creative-art-review && node tests/creative-art-game-browser.cjs
+
+vite v6.4.1 building for creative-art-review...
+transforming...
+✓ 311 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) /workspace/jems-consolidation/rehearsal/src/storage/indexed-records.ts is dynamically imported by /workspace/jems-consolidation/rehearsal/src/assets/private-drawings.ts but also statically imported by /workspace/jems-consolidation/rehearsal/src/storage/indexed-creation.ts, /workspace/jems-consolidation/rehearsal/src/storage/indexed-native.ts, /workspace/jems-consolidation/rehearsal/src/storage/indexed-notebook.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /workspace/jems-consolidation/rehearsal/src/storage/native-workspace.ts is dynamically imported by /workspace/jems-consolidation/rehearsal/src/assets/private-drawings.ts but also statically imported by /workspace/jems-consolidation/rehearsal/src/factory/ui.ts, /workspace/jems-consolidation/rehearsal/src/storage/complete-backup.ts, /workspace/jems-consolidation/rehearsal/src/storage/creation-recovery.ts, /workspace/jems-consolidation/rehearsal/src/storage/creation-workspace.ts, /workspace/jems-consolidation/rehearsal/src/storage/native-recovery.ts, /workspace/jems-consolidation/rehearsal/src/storage/notebook-recovery.ts, /workspace/jems-consolidation/rehearsal/src/storage/notebook-workspace.ts, /workspace/jems-consolidation/rehearsal/src/storage/reward-authorities.ts, /workspace/jems-consolidation/rehearsal/src/studio/adapter.ts, /workspace/jems-consolidation/rehearsal/src/studio/local-project.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /workspace/jems-consolidation/rehearsal/src/creation/private-art.ts is dynamically imported by /workspace/jems-consolidation/rehearsal/src/drawing/asset-collection.ts but also statically imported by /workspace/jems-consolidation/rehearsal/src/creation/scene-thumbnails.ts, /workspace/jems-consolidation/rehearsal/src/creation/ui.ts, /workspace/jems-consolidation/rehearsal/src/drawing/animation-editor.ts, /workspace/jems-consolidation/rehearsal/src/drawing/motion-editor.ts, /workspace/jems-consolidation/rehearsal/src/storage/adult-transfer-recovery.ts, /workspace/jems-consolidation/rehearsal/src/storage/complete-backup.ts, /workspace/jems-consolidation/rehearsal/src/studio/ui.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /workspace/jems-consolidation/rehearsal/src/storage/indexed-notebook.ts is dynamically imported by /workspace/jems-consolidation/rehearsal/src/assets/private-drawings.ts but also statically imported by /workspace/jems-consolidation/rehearsal/src/storage/notebook-recovery.ts, /workspace/jems-consolidation/rehearsal/src/storage/notebook-workspace.ts, /workspace/jems-consolidation/rehearsal/src/storage/reward-authorities.ts, /workspace/jems-consolidation/rehearsal/src/studio/local-project.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /workspace/jems-consolidation/rehearsal/src/drawing/lab.ts is dynamically imported by /workspace/jems-consolidation/rehearsal/src/creation/ui.ts but also statically imported by /workspace/jems-consolidation/rehearsal/src/assets/ui.ts, /workspace/jems-consolidation/rehearsal/src/drawing/studio.ts, dynamic import will not move module into another chunk.
+
+computing gzip size...
+test-results/creative-art-review/index.html                       16.84 kB │ gzip:   5.39 kB
+test-results/creative-art-review/assets/gem-hunt-B7Mh54Ux.css      0.40 kB │ gzip:   0.25 kB
+test-results/creative-art-review/assets/index-eUVgwdYv.css       485.07 kB │ gzip:  96.82 kB
+test-results/creative-art-review/assets/review-Cui0hJ2D.js         0.50 kB │ gzip:   0.34 kB
+test-results/creative-art-review/assets/gem-hunt-Cp-Ku-HJ.js     234.12 kB │ gzip:  55.99 kB
+test-results/creative-art-review/assets/index-BWEwwFHk.js      2,084.43 kB │ gzip: 651.58 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 9.60s
+PASS generated companion actor replacement, exact source revision, opaque game rules, offline three-gem victory, replay and learning teardown.
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

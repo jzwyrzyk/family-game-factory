@@ -1,0 +1,18 @@
+{
+  "parent": "1ac8f5b55caaec57dbd9fe637a46e6b8c8aaea0a",
+  "refs": {
+    "199": "5a0970e487d8630eeafd8f8792b092c17936c425",
+    "208": "0e58853773ee6873db9384048f4bcaa36047711b",
+    "212": "f8d49082e528e449792cfc15adbe6a5e1990f524",
+    "215": "ca76b5b151d4de61a5da0d66f64093530fdc1f78",
+    "216": "1ac8f5b55caaec57dbd9fe637a46e6b8c8aaea0a",
+    "217": "aea3cead13d164b7ce93fbded5fee6ecd9896eca",
+    "32": "602288f9f491dd4857d6d8c5526942600d127405"
+  },
+  "B_worktree_sha256": {
+    "src/creation/model.ts": "6b24597604c6f0d2dbeab0b0afd6105056760fb12d85f5ea6dafa22ee7b86f70",
+    "src/drawing/crayon-source.ts": "d587a7bda3cec43c870b7e94fbe097801495750320f263f8ece354cd35ac4b9e",
+    "src/creation/illustrated-art.ts": "dbe73c2f0a0385e45b622070c7f15fbb8df8f2d26dba55372ed87f4b3db1928a",
+    "src/creation/stage.ts": "133edd7512b2481b29c9676f8c7fdd4dd095217f2c31fd89b78e0e8b43ea7a0c"
+  }
+}

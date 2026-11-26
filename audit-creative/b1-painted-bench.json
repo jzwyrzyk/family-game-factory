@@ -1,0 +1,262 @@
+{
+  "head": "e61faded4b15ed9b6cc1eac9a40fd8e8b5bc677f",
+  "tree": "34d886a35d999551b1b76f9a9b860d658fd457a1",
+  "browser": "156.0.8078.79",
+  "fixture": {
+    "items": 60,
+    "roots": 48,
+    "revisions": 12,
+    "width": 768,
+    "height": 512,
+    "sourceBytes": 10748788,
+    "world": "59a36552-9733-4bc5-9809-e0f55326cf1f",
+    "pins": [
+      "art:image:d44fb039-e72d-4da3-8f60-8b2d1d748135:09c8be7cd26c92981ce908b3f68ca7cb774cfe8d8ca9c2c844e60721af451043",
+      "art:image:c8482e80-6b62-430c-81b3-6de5c79cd94a:bfe5c40dfd90f384c92faaee471d72906d9d5e316a7fc22a1ab522a225f0ad8c",
+      "art:image:dfe6768d-f653-407d-8357-6618906abe56:74ba3c365487456c93332a6af8c6a9d45e3eae19e0584c6e219bc3805ba73d92",
+      "art:image:2913e568-cf84-49f6-abe2-c5425981b9cc:d152b484577f7ceeefd6158365a736b51d7f677be68c95fe5cfaf1ac2ff6a423",
+      "art:image:fbda637e-3d1f-4ddb-b7a3-dd0c9396c8a9:4133fbec50d5b055752006200b6d78cb34f5a64178b0386348a4b5ff3976af3f"
+    ]
+  },
+  "viewport": [
+    1280,
+    900
+  ],
+  "serviceWorkers": "blocked",
+  "entryURL": "/arcade/?art=1",
+  "coldEmptyProfileOpenMs": 2386.9337250000003,
+  "medians": {
+    "populatedReloadToShelfMs": 1197.4398499999988,
+    "metadataPageMs": 33.5999999998603,
+    "catalogMs": 56.199999999953434,
+    "usedJsHeap": 17955171,
+    "indexedDbBytes": 15876096,
+    "originStorageBytes": 15876096
+  },
+  "samples": [
+    {
+      "populatedReloadToShelfMs": 827.779176,
+      "metadataPageMs": 59.800000000046566,
+      "catalogMs": 46.10000000009313,
+      "pageItems": 24,
+      "catalogItems": 60,
+      "usedJsHeap": 15783143,
+      "indexedDbBytes": 15876096,
+      "originStorageBytes": 15876096,
+      "firstThumbnailWidth": 256,
+      "navigation": {
+        "domContentLoadedMs": 266.19999999995343
+      }
+    },
+    {
+      "populatedReloadToShelfMs": 1197.4398499999988,
+      "metadataPageMs": 28.699999999953434,
+      "catalogMs": 59.5,
+      "pageItems": 24,
+      "catalogItems": 60,
+      "usedJsHeap": 17674551,
+      "indexedDbBytes": 15876096,
+      "originStorageBytes": 15876096,
+      "firstThumbnailWidth": 256,
+      "navigation": {
+        "domContentLoadedMs": 276.5
+      }
+    },
+    {
+      "populatedReloadToShelfMs": 1380.1360839999998,
+      "metadataPageMs": 52.800000000046566,
+      "catalogMs": 56.199999999953434,
+      "pageItems": 24,
+      "catalogItems": 60,
+      "usedJsHeap": 26581669,
+      "indexedDbBytes": 15876096,
+      "originStorageBytes": 15876096,
+      "firstThumbnailWidth": 256,
+      "navigation": {
+        "domContentLoadedMs": 303.60000000009313
+      }
+    },
+    {
+      "populatedReloadToShelfMs": 1154.5608740000007,
+      "metadataPageMs": 17.4000000001397,
+      "catalogMs": 34.300000000046566,
+      "pageItems": 24,
+      "catalogItems": 60,
+      "usedJsHeap": 17955171,
+      "indexedDbBytes": 15876096,
+      "originStorageBytes": 15876096,
+      "firstThumbnailWidth": 256,
+      "navigation": {
+        "domContentLoadedMs": 224.19999999995343
+      }
+    },
+    {
+      "populatedReloadToShelfMs": 1504.5437829999992,
+      "metadataPageMs": 33.5999999998603,
+      "catalogMs": 61.300000000046566,
+      "pageItems": 24,
+      "catalogItems": 60,
+      "usedJsHeap": 28781425,
+      "indexedDbBytes": 15876096,
+      "originStorageBytes": 15876096,
+      "firstThumbnailWidth": 256,
+      "navigation": {
+        "domContentLoadedMs": 313.19999999995343
+      }
+    }
+  ],
+  "interaction": [
+    {
+      "semanticSearchToTwoResultsMs": 250.41343600000073,
+      "keptOpenToSceneMs": 822.7483749999992,
+      "keptOpenToPlayableMs": 1199.537186999998,
+      "pickerToFirstChoiceMs": 622.6704499999978,
+      "pickerToFirstPaintedThumbMs": 698.4435659999981,
+      "pickerToAllPaintedThumbsMs": 713.0372509999979,
+      "frameIntervalsMs": [
+        33.399999999999636,
+        16.600000000000364,
+        50,
+        16.699999999999818,
+        16.59999999999991,
+        16.700000000000273,
+        66.69999999999982,
+        33.30000000000018,
+        50,
+        33.29999999999973,
+        50,
+        16.700000000000273,
+        16.59999999999991,
+        33.40000000000009,
+        33.29999999999973,
+        50,
+        66.70000000000027,
+        33.29999999999973,
+        50,
+        16.700000000000273,
+        16.59999999999991,
+        33.40000000000009,
+        33.29999999999973,
+        33.30000000000018,
+        16.699999999999818,
+        50,
+        116.59999999999991,
+        33.40000000000009,
+        49.90000000000009,
+        16.800000000000182
+      ],
+      "rows": 12,
+      "thumbnailCount": 12,
+      "canvasVisible": true,
+      "stageSize": [
+        800,
+        450
+      ]
+    },
+    {
+      "semanticSearchToTwoResultsMs": 409.75957500000004,
+      "keptOpenToSceneMs": 822.8638470000005,
+      "keptOpenToPlayableMs": 1266.338405999999,
+      "pickerToFirstChoiceMs": 319.4687049999993,
+      "pickerToFirstPaintedThumbMs": 335.1692640000001,
+      "pickerToAllPaintedThumbsMs": 340.0985870000004,
+      "frameIntervalsMs": [
+        50,
+        33.30000000000018,
+        16.699999999999818,
+        16.599999999999454,
+        33.30000000000018,
+        16.800000000000182,
+        33.19999999999982,
+        16.699999999999818,
+        33.400000000000546,
+        16.699999999999818,
+        16.5,
+        16.699999999999818,
+        16.699999999999818,
+        33.400000000000546,
+        16.699999999999818,
+        16.600000000000364,
+        16.699999999999818,
+        16.599999999999454,
+        33.400000000000546,
+        16.599999999999454,
+        16.700000000000728,
+        16.699999999999818,
+        16.599999999999454,
+        16.600000000000364,
+        16.800000000000182,
+        16.599999999999454,
+        16.700000000000728,
+        16.699999999999818,
+        16.599999999999454,
+        16.700000000000728
+      ],
+      "rows": 12,
+      "thumbnailCount": 12,
+      "canvasVisible": true,
+      "stageSize": [
+        800,
+        450
+      ]
+    },
+    {
+      "semanticSearchToTwoResultsMs": 110.08120899999994,
+      "keptOpenToSceneMs": 137.82228499999837,
+      "keptOpenToPlayableMs": 192.48279399999956,
+      "pickerToFirstChoiceMs": 105.02298200000223,
+      "pickerToFirstPaintedThumbMs": 189.13241700000071,
+      "pickerToAllPaintedThumbsMs": 206.07289300000048,
+      "frameIntervalsMs": [
+        16.699999999999932,
+        16.600000000000023,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045,
+        16.700000000000045,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045,
+        16.700000000000045,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045,
+        16.700000000000045,
+        16.59999999999991,
+        16.600000000000136,
+        16.799999999999955,
+        16.59999999999991,
+        16.700000000000045,
+        16.700000000000045,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045
+      ],
+      "rows": 12,
+      "thumbnailCount": 12,
+      "canvasVisible": true,
+      "stageSize": [
+        800,
+        450
+      ]
+    }
+  ],
+  "externalRequests": [],
+  "entryBundles": {
+    "index-2RMaZPf7.css": {
+      "bytes": 461943,
+      "sha256": "08d3351183d5c4cdc48e7bc0a9f5c4456ff633c04dc1f746013c2c1d45a535a4"
+    },
+    "index-CyoX7aKm.js": {
+      "bytes": 1953687,
+      "sha256": "22dd941d57f5653fdfd8144992d42b6bb7040e244ed6f7d0ef7e858def15291b"
+    }
+  }
+}

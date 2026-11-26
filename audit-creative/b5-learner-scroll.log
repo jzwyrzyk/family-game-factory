@@ -1,0 +1,9 @@
+PASS first-learner creation desktop
+PASS first-learner creation laptop
+PASS first-learner creation portrait
+PASS first-learner creation large-portrait
+PASS first-learner creation tablet
+PASS first-learner creation phone
+PASS first-learner creation small-phone
+PASS first-learner creation landscape
+PASS native Chromium 150% zoom and restoration

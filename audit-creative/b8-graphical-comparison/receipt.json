@@ -1,0 +1,135 @@
+[
+  {
+    "file": "B/cloud-kingdom.png",
+    "original": [
+      702,
+      853
+    ],
+    "candidate": [
+      702,
+      853
+    ],
+    "sourceSHA256": "56166cb8b241362d8dc5d500fce97b228f53a7a10bca38c5802f7da387003440",
+    "candidateSHA256": "138a31fac27f0e262d282e819a186870de9eeeeddd4906b7f27707627c722265",
+    "meanAbsoluteRGB": [
+      84.75390861147015,
+      83.03897422537516,
+      76.14221801384755
+    ],
+    "fractionPixelIdentical": 0.5527984021536191
+  },
+  {
+    "file": "B/enchanted-gem-forest.png",
+    "original": [
+      702,
+      853
+    ],
+    "candidate": [
+      702,
+      853
+    ],
+    "sourceSHA256": "15470f1ce26af0b0fce074435aefd14a5e84b52d6a7e13f83300841be135c932",
+    "candidateSHA256": "11ac5a731afb5c941598246b71e3fc76129a686a747fbe36e860d32fe890f852",
+    "meanAbsoluteRGB": [
+      84.74994572532674,
+      83.03494620962381,
+      76.1640481224303
+    ],
+    "fractionPixelIdentical": 0.5527967321636724
+  },
+  {
+    "file": "B/inventors-workshop.png",
+    "original": [
+      702,
+      853
+    ],
+    "candidate": [
+      702,
+      853
+    ],
+    "sourceSHA256": "dde734ed6d4eb7f70bed987ae43f5dcefaa3dc514ee55368f1fda29d7b2ea742",
+    "candidateSHA256": "55008f4b107095fe60ea95191279d9963e36a402bf7dda8456ccaeca29287a32",
+    "meanAbsoluteRGB": [
+      84.75460666726786,
+      83.03582295434582,
+      76.17503164630949
+    ],
+    "fractionPixelIdentical": 0.5527967321636724
+  },
+  {
+    "file": "B/moon-adventure.png",
+    "original": [
+      702,
+      853
+    ],
+    "candidate": [
+      702,
+      853
+    ],
+    "sourceSHA256": "80eac11744fa513dbbdec840baeabb322ac66e6e18f8523746fd28c47106037d",
+    "candidateSHA256": "d59286b135052460148c2b4984a0cd09d629dae860e4812853d9eb0d433c972c",
+    "meanAbsoluteRGB": [
+      84.7471885719248,
+      83.03399598534416,
+      76.14100393115633
+    ],
+    "fractionPixelIdentical": 0.5526748228975662
+  },
+  {
+    "file": "F/my-art-backdrop.png",
+    "original": [
+      760,
+      900
+    ],
+    "candidate": [
+      760,
+      900
+    ],
+    "sourceSHA256": "79e13374071a53f99284d284e1e898627a629887012744c27f677a5af3cedca1",
+    "candidateSHA256": "f200a146671454ad3931dee925bc42ca3136ed06bfe2935d3704b2b9f98d9c49",
+    "meanAbsoluteRGB": [
+      6.2423216374269,
+      6.52228216374269,
+      5.454662280701754
+    ],
+    "fractionPixelIdentical": 0.8109459064327486
+  },
+  {
+    "file": "F/world-editor.png",
+    "original": [
+      760,
+      900
+    ],
+    "candidate": [
+      760,
+      900
+    ],
+    "sourceSHA256": "0152331e09a811ecbb79176633ce746860c0961970169746596753cefd5ecf0b",
+    "candidateSHA256": "c2e90c8c27c00733214f1d8aff0a569411ed5fb4b1431b81d16acdf56d9944d9",
+    "meanAbsoluteRGB": [
+      8.73299269005848,
+      8.808149122807018,
+      7.899665204678363
+    ],
+    "fractionPixelIdentical": 0.8727090643274854
+  },
+  {
+    "file": "F/world-picker-phone.png",
+    "original": [
+      390,
+      844
+    ],
+    "candidate": [
+      390,
+      844
+    ],
+    "sourceSHA256": "fb7500974b1882ef83846036d688eedb4374566ef9de4a40073ee7531d93827c",
+    "candidateSHA256": "6ba04cdcd48583b06395a715fb6dd953151a3be8f6efe9add6f5ba8b6ef1e9eb",
+    "meanAbsoluteRGB": [
+      17.522542228703365,
+      18.37973022238425,
+      14.149325555960628
+    ],
+    "fractionPixelIdentical": 0.6111374407582938
+  }
+]

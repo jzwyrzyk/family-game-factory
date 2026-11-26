@@ -1,0 +1,56 @@
+{
+  "head": "3d301245b716c2317a27d402c42d092c25765738",
+  "browser": "156.0.8078.79",
+  "results": {
+    "legacy": {
+      "sourceWorld": {
+        "backdrop": "art:image:0ad19522-a5a2-4eff-954d-0f9824ba77de:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+        "fit": "contain",
+        "decorations": [
+          {
+            "id": "first",
+            "assetId": "world-prop-tree-v1",
+            "name": "One tree",
+            "x": 20,
+            "y": 65,
+            "size": 25,
+            "plane": "front"
+          }
+        ]
+      },
+      "selectedWorld": {
+        "backdrop": "art:image:0ad19522-a5a2-4eff-954d-0f9824ba77de:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+        "fit": "contain",
+        "decorations": [
+          {
+            "id": "first",
+            "assetId": "world-prop-tree-v1",
+            "name": "One tree",
+            "x": 20,
+            "y": 65,
+            "size": 25,
+            "plane": "front"
+          }
+        ]
+      },
+      "targetProgramsPreserved": true,
+      "targetActorPreserved": true,
+      "sourceSceneryMatches": true
+    },
+    "modern": {
+      "sourceWorld": {
+        "assetId": "world-forest-v1",
+        "framing": "fill"
+      },
+      "sourceBackdrop": "art:image:0ad19522-a5a2-4eff-954d-0f9824ba77de:a1751693407181098cbe9847f0baaf8a6f78262634ee0c1b6f9730ff4a0af982",
+      "sourceStaticProp": "world-prop-tree-v1",
+      "selectedWorld": {
+        "assetId": "world-forest-v1",
+        "framing": "fill"
+      },
+      "targetProgramsPreserved": true,
+      "targetActorPreserved": true,
+      "sourceSceneryMatches": true
+    }
+  }
+}

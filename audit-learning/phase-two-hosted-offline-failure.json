@@ -1,0 +1,16 @@
+{
+  "head": "c572e715b3bff13d8b45cc27ac515a576f02354d",
+  "run": 45768658229,
+  "job": 139735690523,
+  "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45768658229/job/139735690523",
+  "lines": [
+    "2026-11-26T06:31:06.7396981Z Artifact jems-ui-review-c572e715b3bff13d8b45cc27ac515a576f02354d has been successfully uploaded! Final size is 221452667 bytes. Artifact ID is 15092289871",
+    "2026-11-26T06:33:05.0155970Z PASS deterministic build reached ready",
+    "2026-11-26T06:33:05.3859201Z PASS build / launch / educational interruption",
+    "2026-11-26T06:33:23.2200725Z PASS UI review {\"artifact\":\"/home/runner/work/family-game-factory/family-game-factory/dist-review/jems-ui-review.html\",\"mode\":\"file://, no server\",\"pages\":[\"studio-library\",\"studio\",\"creations\",\"creation\",\"art-studio\",\"lab\",\"problem-solving\",\"jems-journey\",\"jems-rewards\",\"jems-pals\",\"parent\",\"home\",\"game\",\"create\",\"feedback\",\"studioNotifications\"],\"viewports\":4,\"overflows\":[],\"errors\":[],\"network\":[]}",
+    "2026-11-26T06:33:53.6124283Z page.goto: Timeout 30000ms exceeded.",
+    "2026-11-26T06:33:53.6125245Z   - navigating to \"file:///home/runner/work/family-game-factory/family-game-factory/dist-review/jems-ui-review.html\", waiting until \"load\"",
+    "2026-11-26T06:33:53.6126118Z     at /home/runner/work/family-game-factory/family-game-factory/tools/ui-review/integration.cjs:2:729 {",
+    "2026-11-26T06:33:55.0942161Z Artifact jems-ui-review-evidence-c572e715b3bff13d8b45cc27ac515a576f02354d has been successfully uploaded! Final size is 20335377 bytes. Artifact ID is 15092812957"
+  ]
+}

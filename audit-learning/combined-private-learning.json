@@ -1,0 +1,99 @@
+{
+  "source": "ba1904fcb4c009563998a987912d86f16b8f19a7",
+  "variant": "positive",
+  "scenarios": [
+    {
+      "subject": "math",
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "owner": "bench",
+      "world": "world-forest-v1",
+      "pin": "art:image:44888020-184a-4cc4-be28-e98eb287b286:23a334dd96f3f869ff4f641889bcfae3e0354627cdbf49505ab65ee742282e3e",
+      "originalSha": "23a334dd96f3f869ff4f641889bcfae3e0354627cdbf49505ab65ee742282e3e",
+      "opening": {
+        "focused": true,
+        "inViewport": true,
+        "hit": true,
+        "y": 122.125,
+        "bottom": 168.921875
+      },
+      "skill": "g2-hundreds",
+      "outcome": "completed",
+      "independent": true,
+      "context": {
+        "sessionId": "6204d310-a3f6-4027-b07d-e928e2eaeae2",
+        "gameId": "creation",
+        "versionId": "ffbac8f1-2e35-428d-84a8-19dc46ae9087",
+        "projectId": "395e65e8-3c1b-47a5-a185-00240419c2e5",
+        "mode": "checkpoint"
+      },
+      "score": [
+        1,
+        2,
+        3
+      ],
+      "blockedInputs": true,
+      "retainedScene": true,
+      "retainedOriginal": true,
+      "focus": "creationCanvas",
+      "ink": 80,
+      "singleAttempt": 1,
+      "initialGems": 0,
+      "gems": 2,
+      "afterLibrary": [
+        "OTHER ART\nMy Rock\nOriginal picture"
+      ],
+      "unexpectedRequests": [],
+      "pageErrors": []
+    },
+    {
+      "subject": "language",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "owner": "bench",
+      "world": "world-forest-v1",
+      "pin": "art:image:28a9c8f8-42db-4474-a4c9-918b853942aa:23a334dd96f3f869ff4f641889bcfae3e0354627cdbf49505ab65ee742282e3e",
+      "originalSha": "23a334dd96f3f869ff4f641889bcfae3e0354627cdbf49505ab65ee742282e3e",
+      "opening": {
+        "focused": true,
+        "inViewport": true,
+        "hit": true,
+        "y": 224.265625,
+        "bottom": 252.34375
+      },
+      "skill": "g2-cause-effect",
+      "outcome": "shown",
+      "independent": false,
+      "context": {
+        "sessionId": "84543c8b-a4a5-4357-84b9-6f01842687b2",
+        "gameId": "creation",
+        "projectId": "a10cbfce-80a5-46b2-b263-0d819dd8dd70",
+        "versionId": "978b7f63-726c-416c-8ba1-a7f44b0b12ae",
+        "mode": "checkpoint"
+      },
+      "score": [
+        1,
+        2,
+        3
+      ],
+      "blockedInputs": true,
+      "retainedScene": true,
+      "retainedOriginal": true,
+      "focus": "creationCanvas",
+      "ink": 0,
+      "singleAttempt": 1,
+      "initialGems": 0,
+      "gems": 0,
+      "afterLibrary": [
+        "OTHER ART\nMy Rock\nOriginal picture"
+      ],
+      "unexpectedRequests": [],
+      "pageErrors": []
+    }
+  ],
+  "failures": []
+}

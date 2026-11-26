@@ -1,0 +1,101 @@
+{
+  "desktop.png": {
+    "before": "02c72e9ca49f9140ef75f054aa079d0eea406a779e4efbf69f619a60344373b0",
+    "after": "02c72e9ca49f9140ef75f054aa079d0eea406a779e4efbf69f619a60344373b0",
+    "differentPixels": 0,
+    "boundingBox": null,
+    "maximumChannelDifference": 0
+  },
+  "dragon-counting.png": {
+    "before": "0095ee7179a628f70c3b5cddf5f3bb4ebc204fe02950ba491c38f8df3df76304",
+    "after": "2f974cecac6072efe28b8e7f8b6f66b1df1a242d7b2e0947f9b25d16b61e02f8",
+    "differentPixels": 36491,
+    "boundingBox": [
+      128,
+      245,
+      560,
+      1024
+    ],
+    "maximumChannelDifference": 251
+  },
+  "phone.png": {
+    "before": "e8f637081a424b745e8d4c0850af27de04846267efe9cca23eff7833791a64b8",
+    "after": "e8f637081a424b745e8d4c0850af27de04846267efe9cca23eff7833791a64b8",
+    "differentPixels": 0,
+    "boundingBox": null,
+    "maximumChannelDifference": 0
+  },
+  "short-landscape.png": {
+    "before": "469abaf6caff11c0369a16ac74e481e1a8ca36c65066b532a84a991d1b46cc27",
+    "after": "469abaf6caff11c0369a16ac74e481e1a8ca36c65066b532a84a991d1b46cc27",
+    "differentPixels": 0,
+    "boundingBox": null,
+    "maximumChannelDifference": 0
+  },
+  "small-phone.png": {
+    "before": "f112874c11cd0095fa635cadbbb8dc90583e638e41f5a37c6966c55cc7e17853",
+    "after": "f112874c11cd0095fa635cadbbb8dc90583e638e41f5a37c6966c55cc7e17853",
+    "differentPixels": 0,
+    "boundingBox": null,
+    "maximumChannelDifference": 0
+  },
+  "state-correct.png": {
+    "before": "0f7946a1b28ba8e701c1c0786ca69787388655127b33a97a97f09423e5f4d70c",
+    "after": "dc2eaf611a19003f4b971f036930f650a194bd482a8feb5081441c6efc487620",
+    "differentPixels": 179394,
+    "boundingBox": [
+      0,
+      0,
+      1024,
+      768
+    ],
+    "maximumChannelDifference": 245
+  },
+  "state-selected.png": {
+    "before": "113bcd438a159b05489c4cb1189f87379e441a39b3bd22bea714c53497b24ba1",
+    "after": "113bcd438a159b05489c4cb1189f87379e441a39b3bd22bea714c53497b24ba1",
+    "differentPixels": 0,
+    "boundingBox": null,
+    "maximumChannelDifference": 0
+  },
+  "state-tools.png": {
+    "before": "e9f5891452fcf08cbc192f498463fe6ca075e10fa73f4f3dceea9dadaef51784",
+    "after": "e9f5891452fcf08cbc192f498463fe6ca075e10fa73f4f3dceea9dadaef51784",
+    "differentPixels": 0,
+    "boundingBox": null,
+    "maximumChannelDifference": 0
+  },
+  "state-worked.png": {
+    "before": "1dd7f2a3005d9d43c50cab7fc812abdb95aba479398ed42270c8a596d8671525",
+    "after": "1dd7f2a3005d9d43c50cab7fc812abdb95aba479398ed42270c8a596d8671525",
+    "differentPixels": 0,
+    "boundingBox": null,
+    "maximumChannelDifference": 0
+  },
+  "tablet-landscape.png": {
+    "before": "0076513c6c0b8dbb926a8890c6c52bec868db89c2983409ccd41664c3582dde9",
+    "after": "a534e651e5d49c08813bb90fa3dcfbb0be3b0e8534b4e303ef90fbd6e0c4729e",
+    "differentPixels": 15400,
+    "boundingBox": [
+      203,
+      242,
+      821,
+      286
+    ],
+    "maximumChannelDifference": 244
+  },
+  "tablet-portrait.png": {
+    "before": "542957fa7908eb0e3ec506dadd89d2f9f38c7e77e2ea2479ac2bfe504501ff78",
+    "after": "542957fa7908eb0e3ec506dadd89d2f9f38c7e77e2ea2479ac2bfe504501ff78",
+    "differentPixels": 0,
+    "boundingBox": null,
+    "maximumChannelDifference": 0
+  },
+  "wide.png": {
+    "before": "1804486af5abb3b215216c70e814c9e22c0f555967a64d4f2ae8708919d2930d",
+    "after": "1804486af5abb3b215216c70e814c9e22c0f555967a64d4f2ae8708919d2930d",
+    "differentPixels": 0,
+    "boundingBox": null,
+    "maximumChannelDifference": 0
+  }
+}

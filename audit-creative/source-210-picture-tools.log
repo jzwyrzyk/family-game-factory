@@ -1,0 +1,13 @@
+▲ [WARNING] "import.meta" is not available with the "iife" output format and will be empty [empty-import-meta]
+
+    src/storage/native-workspace.ts:8:39:
+      8 │ ... indexedStoragePreview=()=>import.meta.env.MODE==='storage-previ...
+        ╵                               ~~~~~~~~~~~
+
+  You need to set the output format to "esm" for "import.meta" to work correctly.
+
+PASS picture tools: 1×4096 input, 1600×1 turn, exact original preserved
+PASS picture tools: opt-in corner smoothing, bounded alpha, undo/redo and immutable source
+PASS picture tools: committed save survives shelf error without duplicate-save affordance
+PASS picture tools: view changes close and scrub preview; stale decoding cannot reopen
+PASS picture tools: delayed save canceled after profile change; zero errors or image POSTs

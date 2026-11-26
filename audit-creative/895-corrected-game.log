@@ -1,0 +1,7 @@
+locator.waitFor: Timeout 10000ms exceeded.
+Call log:
+[2m  - waiting for locator('.game-art-review iframe').contentFrame().getByText('You did it!', { exact: true }) to be visible[22m
+
+    at main (/workspace/jems-consolidation/audit-creative/candidate-895/tests/game-art-browser.cjs:87:109) {
+  name: 'TimeoutError'
+}

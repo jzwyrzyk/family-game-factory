@@ -1,0 +1,14 @@
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ 'art:rig:3afdc3ec-39bd-47cd-8a94-f2a9e2097368:0c7171c8993c15e5ca0ef1bb3ae74557e56cc618c45d48634e8b253ee8040c73'
+- 'art:rig:05afcf64-5d02-457c-bc0e-6479e698d62c:df1bcfb2cc653aa13c6076db691a9dcbf877fbbacebcfd96706709c2fb8f0575'
+
+    at /workspace/jems-consolidation/audit-creative/candidate-895/tests/creative-motion-browser.cjs:86:69 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 'art:rig:3afdc3ec-39bd-47cd-8a94-f2a9e2097368:0c7171c8993c15e5ca0ef1bb3ae74557e56cc618c45d48634e8b253ee8040c73',
+  expected: 'art:rig:05afcf64-5d02-457c-bc0e-6479e698d62c:df1bcfb2cc653aa13c6076db691a9dcbf877fbbacebcfd96706709c2fb8f0575',
+  operator: 'strictEqual',
+  diff: 'simple'
+}

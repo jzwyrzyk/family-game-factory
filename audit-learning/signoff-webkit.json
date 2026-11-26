@@ -1,0 +1,23 @@
+{
+  "head": "7d5979378a050ee3d80519c82929e69dbc58be7e",
+  "tree": "87b4bc4cad4e48ac83ae05cecd7567925f3c303f",
+  "run": 45773556172,
+  "job": 139751683565,
+  "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45773556172/job/139751683565",
+  "conclusion": "success",
+  "extract": [
+    "2026-11-26T07:13:16.6207193Z # Subtest: only the exact WebKit history cancellation may reach independent ended-session checks",
+    "2026-11-26T07:13:16.6236073Z ok 7 - only the exact WebKit history cancellation may reach independent ended-session checks",
+    "2026-11-26T07:15:58.0886223Z echo \"$storage_failures WebKit storage commands failed\"",
+    "2026-11-26T07:16:14.8902107Z PASS 18 real IndexedDB authority checks: absent/incomplete/complete, malformed and tombstoned markers",
+    "2026-11-26T07:16:52.4250625Z PASS desktop: 30-game pagination, 126 retained versions, exact mechanics, Keep, Fork, reload, preserved legacy originals",
+    "2026-11-26T07:16:57.5076956Z PASS tablet: 30-game pagination, 126 retained versions, exact mechanics, Keep, Fork, reload, preserved legacy originals",
+    "2026-11-26T07:17:04.3679996Z PASS desktop: prepared scene authority, 30 paged scenes, 52 versions, autosave, Keep, copy, reload/play, exact retained legacy bytes",
+    "2026-11-26T07:17:10.6022327Z PASS tablet: prepared scene authority, 30 paged scenes, 52 versions, autosave, Keep, copy, reload/play, exact retained legacy bytes",
+    "2026-11-26T07:17:27.6625324Z {\"browser\":\"webkit\",\"viewport\":{\"width\":1400,\"height\":960},\"indexedNotebook\":false,\"checks\":[\"native unwrapped observer/frame control\",\"four actual saved Rally garage/viewport/Change/Back/Home cycles\",\"exact kept mechanic after every remount\"]}",
+    "2026-11-26T07:17:40.2795020Z {\"browser\":\"webkit\",\"viewport\":{\"width\":390,\"height\":844},\"indexedNotebook\":false,\"checks\":[\"native unwrapped observer/frame control\",\"four actual saved Rally garage/viewport/Change/Back/Home cycles\",\"exact kept mechanic after every remount\"]}",
+    "2026-11-26T07:18:16.3463536Z {\"browser\":\"webkit\",\"viewport\":{\"width\":1400,\"height\":960},\"indexedNotebook\":true,\"checks\":[\"native unwrapped observer/frame control\",\"four actual saved Rally garage/viewport/Change/Back/Home cycles\",\"exact kept mechanic after every remount\"]}",
+    "2026-11-26T07:18:29.0899410Z {\"browser\":\"webkit\",\"viewport\":{\"width\":390,\"height\":844},\"indexedNotebook\":true,\"checks\":[\"native unwrapped observer/frame control\",\"four actual saved Rally garage/viewport/Change/Back/Home cycles\",\"exact kept mechanic after every remount\"]}",
+    "2026-11-26T07:18:46.4059896Z 0 WebKit storage commands failed"
+  ]
+}

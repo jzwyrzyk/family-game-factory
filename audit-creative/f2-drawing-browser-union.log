@@ -1,0 +1,245 @@
+
+> family-game-factory@2.0.0-foundation test:art-browser
+> node tests/art-entry-readiness.cjs && node tests/art-storage-browser.cjs && node tests/art-studio-browser.cjs && node tests/picture-tools-browser.cjs && node tests/drawing-engine-browser.cjs && node tests/creation-private-art-browser.cjs && node tests/sketch-recovery.cjs && node tests/crayon-revision-browser.cjs && node tests/drawing-workspace-browser.cjs && node tests/creative-motion-browser.cjs && node tests/creation-worlds-browser.cjs && node tests/creation-worlds.cjs && node tests/creative-worlds-browser.cjs && node tests/creative-world-browser.cjs && node tests/art-adventure-browser.cjs && node tests/animation-editor-browser.cjs && node tests/creation-motion-browser.cjs && node tests/creative-universe-recovery.cjs && node tests/creation-parts-browser.cjs && node tests/drawing-motion-browser.cjs && node tests/creative-picker-browser.cjs && node scripts/connected-universe-browser.cjs
+
+PASS Art entry with delayed configuration: phone upload/focus, profile switch, late readiness, home/expanded-chat entrances, private library, movement and editable scene
+PASS Art entry with rejected configuration: phone upload, keyboard drawing, post-dialog focus and durable private library
+PASS saved remote game after delayed configuration: initial unavailable preview, explicit read-only retry, unchanged saved work and no paid replay
+PASS native readiness cancellation on pagehide, no hidden restart, fresh pageshow checks and no paid request
+PASS absent legacy database discovery never attempts creation
+PASS original bytes and fingerprint preserved
+PASS selected original read verifies actual bytes even when stored metadata matches
+PASS draft recovery does not save or select a version
+PASS invalid parent identity cannot create a malformed saved history
+PASS explicit version save clears its matching draft
+PASS new movement version preserves prior immutable geometry
+PASS explicit active-car choice remains pinned
+PASS archiving and naming preserve saved version lookup
+PASS cannot erase art used by a scene
+PASS usage is stored separately from image identity
+PASS a portable scene with an original leaves unrelated movement versions and drafts on this device
+PASS a portable scene retains the selected movement and excludes later experiments
+PASS ancestors needed for movement version history travel with the selected revision
+PASS portable bundle includes exact originals and all versions without source owner
+PASS repeat restore reuses identical IDs without duplicates
+PASS restore preserves current metadata and newer draft
+PASS conflicting immutable version rejects the entire restore
+PASS restore conflict does not add earlier valid images
+PASS restore cannot reuse another profile’s image identity
+PASS cross-profile original lookup denied
+PASS cross-profile version lookup denied
+PASS import remaps owner and identifiers while preserving image hash
+PASS import remaps all source and history references
+PASS import does not silently choose a car
+PASS corrupt fingerprint rejected
+PASS cyclic movement history rejected
+PASS foreign or unknown import fields rejected
+PASS reserved object-key identities rejected
+PASS rejected bundles leave no partial import
+PASS stale profile writes rejected
+PASS closed view guard prevents image write
+PASS maintenance and backup lock blocks art writes
+PASS disguised active content rejected
+PASS oversized dimensions rejected before decode
+PASS restored scene history protects original without a usage receipt
+PASS usage listing derives restored scene references without an index row
+PASS restored native game history protects rig without a usage receipt
+PASS explicit erase removes unused versions without changing another profile
+PASS restore into an empty profile reconnects original image, movement and draft identities
+PASS concurrent image saves cannot exceed transactional quota
+PASS whole art import rejected when any capacity would overflow
+PASS capacity rejection adds no image or rig records
+PASS concurrent rig saves cannot exceed transactional quota
+PASS missing workspace cannot disprove a protective usage receipt
+PASS valid source workspace disproves obsolete scene index rows
+PASS original cannot be erased while a derivative depends on it
+PASS unused derivative then original can be explicitly erased
+PASS prepared usage reads its active scene history, including a backdrop missing from legacy and the index
+PASS reading prepared usage preserves the previous storage authority
+PASS pending sketch ownership, source integrity, exact backup, restore, retry and discard
+PASS legacy image database upgrades with parent-first valid rigs, exact pixels and selected car; invalid originals retained for recovery
+PASS inventory errors remain visible and unsupported inventory retains legacy fallback
+PASS 52 private art storage contracts; zero network POSTs
+PASS Art Studio: default navigation, upload, private shelf, truthful refresh failure, metadata/filter, recovered movement draft, notebook quota retry, optional usage-index failure, saved physical ride, picture transform/original preservation, cross-scene use, art export, mobile reflow, invalid image and profile isolation
+▲ [WARNING] "import.meta" is not available with the "iife" output format and will be empty [empty-import-meta]
+
+    src/drawing/library.ts:238:6:
+      238 │   if (import.meta.env?.MODE === 'storage-preview') {
+          ╵       ~~~~~~~~~~~
+
+  You need to set the output format to "esm" for "import.meta" to work correctly.
+
+▲ [WARNING] "import.meta" is not available with the "iife" output format and will be empty [empty-import-meta]
+
+    src/storage/native-workspace.ts:8:39:
+      8 │ ... indexedStoragePreview=()=>import.meta.env.MODE==='storage-previ...
+        ╵                               ~~~~~~~~~~~
+
+  You need to set the output format to "esm" for "import.meta" to work correctly.
+
+PASS picture tools: 1×4096 input, 1600×1 turn, exact original preserved
+PASS picture tools: opt-in corner smoothing, bounded alpha, undo/redo and immutable source
+PASS picture tools: committed save survives shelf error without duplicate-save affordance
+PASS picture tools: view changes close and scrub preview; stale decoding cannot reopen
+PASS picture tools: delayed save canceled after profile change; zero errors or image POSTs
+▲ [WARNING] "import.meta" is not available with the "iife" output format and will be empty [empty-import-meta]
+
+    src/drawing/library.ts:238:6:
+      238 │   if (import.meta.env?.MODE === 'storage-preview') {
+          ╵       ~~~~~~~~~~~
+
+  You need to set the output format to "esm" for "import.meta" to work correctly.
+
+▲ [WARNING] "import.meta" is not available with the "iife" output format and will be empty [empty-import-meta]
+
+    src/storage/native-workspace.ts:8:39:
+      8 │ ... indexedStoragePreview=()=>import.meta.env.MODE==='storage-previ...
+        ╵                               ~~~~~~~~~~~
+
+  You need to set the output format to "esm" for "import.meta" to work correctly.
+
+PASS drawing desktop: draft, drag-to-add, Undo/Redo, pixel masks, actual physics, immutable game binding, unavailable art, painting and profile isolation
+PASS drawing tablet: draft, drag-to-add, Undo/Redo, pixel masks, actual physics, immutable game binding, unavailable art, painting and profile isolation
+PASS drawing phone: touch cancellation, cutout correction, physics playback, pause, save and reopen
+PASS desktop: original/rig fidelity, code/video playback, immutable reuse, portable scene+art, rejected corrupt import, owner isolation/late-decode cancellation and no uploads
+PASS tablet: original/rig fidelity, code/video playback, immutable reuse, portable scene+art, rejected corrupt import, owner isolation/late-decode cancellation and no uploads
+PASS sketch retry across reload, true transparency, editable reopen, immutable version and private bundle restore
+PR199 exact raster, undo/redo of erase, immutable revision, current paper replay and both mismatch fallbacks passed.
+PASS all drawing tools, two paper modes, fill boundaries, undo, redo, clear, transforms, keyboard, pen and touch, actual saved-art continuations and three viewport captures.
+Draw to animation passed: pointer and keyboard path, preview, three saved stops, playback, exact old version, phone layout, zero POSTs.
+World choice, artwork fit, undo, Keep, reopen, incomplete rejection and exact-art remap passed.
+PASS illustrated worlds desktop 1440 960
+PASS illustrated worlds tablet 820 1180
+PASS illustrated worlds phone 390 844
+PASS: illustrated stage, keyboard and touch placement, layers, upload and exact hash, world reuse, private backdrop, retained scene, phone layout, zero POSTs.
+Kept illustrated world, depth, placement, scale, reuse across scenes and Undo passed.
+PASS desktop local picture hunt: three taps, payoff, explicit art replacement, Keep, exact old version and unchanged scripts.
+PASS tablet local picture hunt: three taps, payoff, explicit art replacement, Keep, exact old version and unchanged scripts.
+desktop animation preview, pause/resume, canceled stroke, revision lineage, export and profile switch passed
+phone animation preview, pause/resume, canceled stroke, revision lineage, export and profile switch passed
+PASS drawn path, accessible controls, kept reuse, original pins, deterministic stage position and undo
+My Rock has a stable categorized identity
+My Rock retained original cannot be erased
+My Rock uses one picture in a working collectible game and distinct scene role
+My Rock follows its authored path
+My Rock is a separately animated actor on the identical selected revision
+My Rock is Forest scenery, a moving obstacle and a three-tap collectible in independent activities
+a confirmed animated use retains the actual picker recency receipt
+My Rock usage inventory includes its game, world and animation
+My Rock new revision retains original lineage
+editing My Rock preserves its existing forest, collectible, obstacle and independent animated actor
+My Rock saved game and animation stay pinned
+My Rock explicit update keeps earlier version recoverable
+My Rock archive hides the picker item while adventures resolve it
+My Rock preserves its transparent shape on reuse
+Puddle Friend has a stable categorized identity
+Puddle Friend retained original cannot be erased
+Puddle Friend uses one picture in a working collectible game and distinct scene role
+Puddle Friend follows its authored path
+Puddle Friend usage inventory includes its game, world and animation
+Puddle Friend new revision retains original lineage
+Puddle Friend saved game and animation stay pinned
+Puddle Friend explicit update keeps earlier version recoverable
+Puddle Friend archive hides the picker item while adventures resolve it
+Puddle Friend preserves its transparent shape on reuse
+Moon Buggy has a stable categorized identity
+Moon Buggy retained original cannot be erased
+Moon Buggy uses one picture in a working collectible game and distinct scene role
+Moon Buggy follows its authored path
+Moon Buggy usage inventory includes its game, world and animation
+Moon Buggy new revision retains original lineage
+Moon Buggy saved game and animation stay pinned
+Moon Buggy explicit update keeps earlier version recoverable
+Moon Buggy archive hides the picker item while adventures resolve it
+Moon Buggy preserves its transparent shape on reuse
+Castle Valley has a stable categorized identity
+Castle Valley retained original cannot be erased
+Castle Valley uses one picture in a working collectible game and distinct scene role
+Castle Valley follows its authored path
+Castle Valley usage inventory includes its game, world and animation
+Castle Valley new revision retains original lineage
+Castle Valley saved game and animation stay pinned
+Castle Valley explicit update keeps earlier version recoverable
+Castle Valley archive hides the picker item while adventures resolve it
+Castle Valley preserves its transparent shape on reuse
+second profile sees its own empty collection
+another profile cannot resolve a known private pin
+a stale owner cannot resolve pixels by supplying the former profile id
+stale owner cannot open a picker
+rock exact bytes and identity reach complete backup
+dragon exact bytes and identity reach complete backup
+buggy exact bytes and identity reach complete backup
+castle exact bytes and identity reach complete backup
+duplicate owner for immutable art invalidates recovery before publication
+missing backdrop invalidates the complete recovery point
+identical bytes from a sibling cannot satisfy a world pin
+rock restores exact bytes, archived original, kept/head scene, game, world and named path on fresh device
+dragon restores exact bytes, archived original, kept/head scene, game, world and named path on fresh device
+buggy restores exact bytes, archived original, kept/head scene, game, world and named path on fresh device
+castle restores exact bytes, archived original, kept/head scene, game, world and named path on fresh device
+No outbound service requests
+PASS desktop: original/rig fidelity, code/video playback, immutable reuse, portable scene+art, rejected corrupt import, owner isolation/late-decode cancellation and no uploads
+PASS tablet: original/rig fidelity, code/video playback, immutable reuse, portable scene+art, rejected corrupt import, owner isolation/late-decode cancellation and no uploads
+PASS path authoring, keyboard and pointer controls, preview, draft recovery, immutable versions, original bytes and trusted scene playback.
+My Art semantics, category filtering, rendered thumbnails, scene pin continuity and Jems catalogue actor passed.
+{
+  "browser": "141.0.7390.37",
+  "frontend": {
+    "index-DxA3SUgp.js": "822dd3e8e6076f38ec1efaf02f6f7a1fb199620033d9f0f27f28eff3c4e46657",
+    "index-Op02E-2L.css": "f6fe885a0594ee74c5bbcecdb1994933247898ede6ac500e2ba0b6d538ac1c51"
+  },
+  "desktop": {
+    "width": 1280,
+    "height": 900
+  },
+  "touchViewports": [
+    "390x844",
+    "820x1180"
+  ],
+  "externalRequests": [],
+  "pageErrors": [],
+  "checks": [
+    "Saved a crayon drawing, reopened its editable source, added a gem and found the revision by its semantic name. Original bytes retained their calculated SHA-256.",
+    "dragon: uploaded transparent bytes, observed changing preview frames for Float, saved the movement and rechecked byte fidelity.",
+    "car: uploaded transparent bytes, observed changing preview frames for Right, saved the movement and rechecked byte fidelity.",
+    "rocket: uploaded transparent bytes, observed changing preview frames for Jump, saved the movement and rechecked byte fidelity.",
+    "robot: uploaded transparent bytes, observed changing preview frames for Dance, saved the movement and rechecked byte fidelity.",
+    "butterfly: uploaded transparent bytes, observed changing preview frames for Spin, saved the movement and rechecked byte fidelity.",
+    "imaginary: uploaded transparent bytes, observed changing preview frames for Shake, saved the movement and rechecked byte fidelity.",
+    "Saved scene reopened with its first movement pin after a second version was created.",
+    "Changed illustrated world, added a rocket and used an exact private image as a fitted backdrop. Actor and decoration are independently represented.",
+    "Portable scene export contains the selected picture, movement revision and world references.",
+    "Replaced a scene actor with the searched revision. Actor identity, position and existing programs survived Keep.",
+    "Copied the kept custom world into a second scene while keeping its own actors and their programs.",
+    "Second profile has an empty art shelf after all seven subjects and the scene were saved by the first profile.",
+    "phone 390×844: tapped a path, corrected one spot, paused, kept, canceled another move and reopened the exact saved path after reload.",
+    "tablet 820×1180: tapped a path, corrected one spot, paused, kept, canceled another move and reopened the exact saved path after reload."
+  ],
+  "screenshots": [
+    "a-draw-pebble.png",
+    "d-asset-details.png",
+    "c-bounce-preview.png",
+    "c-float-preview.png",
+    "c-right-preview.png",
+    "c-jump-preview.png",
+    "c-dance-preview.png",
+    "c-spin-preview.png",
+    "c-shake-preview.png",
+    "c-motion-frame-paused.png",
+    "c-motion-frame-rest.png",
+    "b-moon-stage.png",
+    "f-private-backdrop.png",
+    "d-picker.png",
+    "e-host-actor.png",
+    "c-path-phone.png",
+    "c-path-tablet.png"
+  ],
+  "recordings": [
+    "c-pebble-scene.webm"
+  ]
+}
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

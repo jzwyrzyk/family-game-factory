@@ -1,0 +1,77 @@
+{
+  "approved-a": {
+    "source": "7d5979378a050ee3d80519c82929e69dbc58be7e",
+    "mathSkills": 113,
+    "englishSkills": 77,
+    "mathDefinitions": "bfeea94e08d990b988b0477f3404868ea2d5806f6ca30291d73d6170a0966697",
+    "englishDefinitions": "9f4b229af0c3df2ceeefde131c42a8c21cd15c242d5949b933ecfb32c8785fff",
+    "englishBanks": "fbd5957200c4d98937e8a49aae372a63de05a6581f5d81bd54d942de40fe9571",
+    "trials": 51867,
+    "correct": 51867,
+    "mathResultHash": "8bc85b16a3b98804092054cb7bea8ea90ac82afb5f1ef161bbd88a6ce0b94813",
+    "families": [
+      "angles",
+      "arrays",
+      "blocks",
+      "chart",
+      "clock",
+      "coins",
+      "compose",
+      "counterGroups",
+      "fractions",
+      "frames",
+      "numberLine",
+      "ruler",
+      "shapes"
+    ],
+    "englishGrades": [
+      -1,
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "combined-c": {
+    "source": "ba1904fcb4c009563998a987912d86f16b8f19a7",
+    "mathSkills": 113,
+    "englishSkills": 77,
+    "mathDefinitions": "bfeea94e08d990b988b0477f3404868ea2d5806f6ca30291d73d6170a0966697",
+    "englishDefinitions": "9f4b229af0c3df2ceeefde131c42a8c21cd15c242d5949b933ecfb32c8785fff",
+    "englishBanks": "fbd5957200c4d98937e8a49aae372a63de05a6581f5d81bd54d942de40fe9571",
+    "trials": 51867,
+    "correct": 51867,
+    "mathResultHash": "8bc85b16a3b98804092054cb7bea8ea90ac82afb5f1ef161bbd88a6ce0b94813",
+    "families": [
+      "angles",
+      "arrays",
+      "blocks",
+      "chart",
+      "clock",
+      "coins",
+      "compose",
+      "counterGroups",
+      "fractions",
+      "frames",
+      "numberLine",
+      "ruler",
+      "shapes"
+    ],
+    "englishGrades": [
+      -1,
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "embeddedAssets": {
+    "a": 347,
+    "b": 393,
+    "c": 396,
+    "union": 396,
+    "matchingAll": true
+  }
+}

@@ -1,0 +1,257 @@
+
+> family-game-factory@2.0.0-foundation test:art
+> node --import tsx --test tests/drawing-engine.test.ts tests/drawing-bindings.test.ts tests/creation-private-art.test.ts && node --import tsx --test tests/creative-world-art.test.ts tests/drawing-animation.test.ts
+
+TAP version 13
+# Subtest: overlapping cutouts preserve original translucent color and opacity
+ok 1 - overlapping cutouts preserve original translucent color and opacity
+  ---
+  duration_ms: 8.979207
+  type: 'test'
+  ...
+# Subtest: private asset references are bounded opaque IDs, never URLs or executable strings
+ok 2 - private asset references are bounded opaque IDs, never URLs or executable strings
+  ---
+  duration_ms: 13.363525
+  type: 'test'
+  ...
+# Subtest: restored 100-character art IDs save and reload without widening other scene IDs
+ok 3 - restored 100-character art IDs save and reload without widening other scene IDs
+  ---
+  duration_ms: 33.658978
+  type: 'test'
+  ...
+# Subtest: local drawings are allowed in stored scenes but rejected at every generated manifest boundary
+ok 4 - local drawings are allowed in stored scenes but rejected at every generated manifest boundary
+  ---
+  duration_ms: 1.438158
+  type: 'test'
+  ...
+# Subtest: two scenes and copies pin the same art version without sharing editable behavior
+ok 5 - two scenes and copies pin the same art version without sharing editable behavior
+  ---
+  duration_ms: 19.540689
+  type: 'test'
+  ...
+# Subtest: private art does not grant profile access, challenge credit, or an interpreter capability
+ok 6 - private art does not grant profile access, challenge credit, or an interpreter capability
+  ---
+  duration_ms: 6.648097
+  type: 'test'
+  ...
+# Subtest: a scene role survives storage without assigning physics or changing the original pin
+ok 7 - a scene role survives storage without assigning physics or changing the original pin
+  ---
+  duration_ms: 1.321371
+  type: 'test'
+  ...
+# Subtest: a derivative traces to its original across exact owner and parent hashes
+ok 8 - a derivative traces to its original across exact owner and parent hashes
+  ---
+  duration_ms: 92.874434
+  type: 'test'
+  ...
+# Subtest: world illustrations pin approved bytes and legacy scenes retain their saved background
+ok 9 - world illustrations pin approved bytes and legacy scenes retain their saved background
+  ---
+  duration_ms: 39.569799
+  type: 'test'
+  ...
+# Subtest: a private world uses the same pinned source without adding an actor or granting generated access
+ok 10 - a private world uses the same pinned source without adding an actor or granting generated access
+  ---
+  duration_ms: 7.414077
+  type: 'test'
+  ...
+# Subtest: a PR201 named drawing path survives Keep and plays its saved relative moves with its exact art pin
+ok 11 - a PR201 named drawing path survives Keep and plays its saved relative moves with its exact art pin
+  ---
+  duration_ms: 31.346316
+  type: 'test'
+  ...
+# Subtest: a saved drawn car retains its immutable art through mechanic edits, history and copies
+ok 12 - a saved drawn car retains its immutable art through mechanic edits, history and copies
+  ---
+  duration_ms: 10.569857
+  type: 'test'
+  ...
+# Subtest: native art bindings reject unsupported engines and URL-shaped references
+ok 13 - native art bindings reject unsupported engines and URL-shaped references
+  ---
+  duration_ms: 6.028515
+  type: 'test'
+  ...
+# Subtest: Drawing rigs preserve validated child-defined components and create real suspension bindings
+ok 14 - Drawing rigs preserve validated child-defined components and create real suspension bindings
+  ---
+  duration_ms: 4.103624
+  type: 'test'
+  ...
+# Subtest: Changing the child's wheel geometry changes the actual Planck world
+ok 15 - Changing the child's wheel geometry changes the actual Planck world
+  ---
+  duration_ms: 321.084304
+  type: 'test'
+  ...
+# Subtest: Malformed imported vehicle geometry is rejected before physics allocation instead of using a stock fallback
+ok 16 - Malformed imported vehicle geometry is rejected before physics allocation instead of using a stock fallback
+  ---
+  duration_ms: 0.712439
+  type: 'test'
+  ...
+# Subtest: Rally preserves fixed body decorations and rejects every unsupported independent part explicitly
+ok 17 - Rally preserves fixed body decorations and rejects every unsupported independent part explicitly
+  ---
+  duration_ms: 10.425047
+  type: 'test'
+  ...
+# Subtest: Rally sprites and colliders use the same wheel center ordering even for unequal outlines
+ok 18 - Rally sprites and colliders use the same wheel center ordering even for unequal outlines
+  ---
+  duration_ms: 0.444192
+  type: 'test'
+  ...
+# Subtest: A 600 by 420 drawing retains one pixel scale for chassis, tires and actual wheel anchors
+ok 19 - A 600 by 420 drawing retains one pixel scale for chassis, tires and actual wheel anchors
+  ---
+  duration_ms: 23.369226
+  type: 'test'
+  ...
+# Subtest: Explicit square sources retain existing proportions when the legacy calibration already fits safely
+ok 20 - Explicit square sources retain existing proportions when the legacy calibration already fits safely
+  ---
+  duration_ms: 4.729042
+  type: 'test'
+  ...
+# Subtest: Faithful geometry at the wheel-separation safety boundary survives floating-point rounding
+ok 21 - Faithful geometry at the wheel-separation safety boundary survives floating-point rounding
+  ---
+  duration_ms: 1.781828
+  type: 'test'
+  ...
+# Subtest: Rectangular character and machine artwork keeps its proportions in real playground bodies and hinges
+ok 22 - Rectangular character and machine artwork keeps its proportions in real playground bodies and hinges
+  ---
+  duration_ms: 4.861892
+  type: 'test'
+  ...
+# Subtest: Mask corrections are bounded and cannot overwrite or masquerade as source art
+ok 23 - Mask corrections are bounded and cannot overwrite or masquerade as source art
+  ---
+  duration_ms: 0.622723
+  type: 'test'
+  ...
+# Subtest: Invalid, overlapping or impossible drawing rigs fail explicitly
+ok 24 - Invalid, overlapping or impossible drawing rigs fail explicitly
+  ---
+  duration_ms: 0.319985
+  type: 'test'
+  ...
+# Subtest: Shape proposals remain honest offline suggestions and work without a model
+ok 25 - Shape proposals remain honest offline suggestions and work without a model
+  ---
+  duration_ms: 22.892545
+  type: 'test'
+  ...
+# Subtest: Reshaping a drawn car body changes its real collider and mass, not only the picture
+ok 26 - Reshaping a drawn car body changes its real collider and mass, not only the picture
+  ---
+  duration_ms: 1.111293
+  type: 'test'
+  ...
+# Subtest: Hinge placement is validated and changes actual revolute joint location
+ok 27 - Hinge placement is validated and changes actual revolute joint location
+  ---
+  duration_ms: 1.10954
+  type: 'test'
+  ...
+# Subtest: A drawn wing flaps through a bounded physics motor, not by rotating a picture
+ok 28 - A drawn wing flaps through a bounded physics motor, not by rotating a picture
+  ---
+  duration_ms: 65.24729
+  type: 'test'
+  ...
+# Subtest: Other child-created objects instantiate actual independent bodies and joints
+ok 29 - Other child-created objects instantiate actual independent bodies and joints
+  ---
+  duration_ms: 22.143591
+  type: 'test'
+  ...
+# Subtest: animation paths round-trip inside bounded immutable movement assemblies
+ok 30 - animation paths round-trip inside bounded immutable movement assemblies
+  ---
+  duration_ms: 0.812179
+  type: 'test'
+  ...
+# Subtest: Selected wheels drive on suspension and fixed layers can carry another hinge
+ok 31 - Selected wheels drive on suspension and fixed layers can carry another hinge
+  ---
+  duration_ms: 92.134435
+  type: 'test'
+  ...
+# Subtest: Arm and leg action swings the cutout relative to its parent on the move control
+ok 32 - Arm and leg action swings the cutout relative to its parent on the move control
+  ---
+  duration_ms: 13.564194
+  type: 'test'
+  ...
+# Subtest: Opaque black crayon on transparent paper remains selectable ink
+ok 33 - Opaque black crayon on transparent paper remains selectable ink
+  ---
+  duration_ms: 0.510262
+  type: 'test'
+  ...
+# Subtest: shared pointer coordinates preserve My Art precision at a scaled canvas edge
+ok 34 - shared pointer coordinates preserve My Art precision at a scaled canvas edge
+  ---
+  duration_ms: 0.271911
+  type: 'test'
+  ...
+1..34
+# tests 34
+# suites 0
+# pass 34
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2258.702893
+TAP version 13
+# Subtest: scene worlds and their props reuse one trusted catalogue and stay independent of generated inputs
+ok 1 - scene worlds and their props reuse one trusted catalogue and stay independent of generated inputs
+  ---
+  duration_ms: 25.119026
+  type: 'test'
+  ...
+# Subtest: the four pinned world plates, previews, overlays and selectable props have reviewed byte identities
+ok 2 - the four pinned world plates, previews, overlays and selectable props have reviewed byte identities
+  ---
+  duration_ms: 20.18175
+  type: 'test'
+  ...
+# Subtest: nine motions have bounded independent poses and retain the original image contract
+ok 3 - nine motions have bounded independent poses and retain the original image contract
+  ---
+  duration_ms: 6.444809
+  type: 'test'
+  ...
+# Subtest: old assemblies keep their shape, motion remains bounded on import and assembly validation clones its points
+ok 4 - old assemblies keep their shape, motion remains bounded on import and assembly validation clones its points
+  ---
+  duration_ms: 1.626292
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1300.092919
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

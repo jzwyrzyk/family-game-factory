@@ -1,0 +1,11 @@
+▲ [WARNING] "import.meta" is not available with the "iife" output format and will be empty [empty-import-meta]
+
+    src/storage/native-workspace.ts:8:39:
+      8 │ ... indexedStoragePreview=()=>import.meta.env.MODE==='storage-previ...
+        ╵                               ~~~~~~~~~~~
+
+  You need to set the output format to "esm" for "import.meta" to work correctly.
+
+PASS drawing desktop: draft, drag-to-add, Undo/Redo, pixel masks, actual physics, immutable game binding, unavailable art, painting and profile isolation
+PASS drawing tablet: draft, drag-to-add, Undo/Redo, pixel masks, actual physics, immutable game binding, unavailable art, painting and profile isolation
+PASS drawing phone: touch cancellation, cutout correction, physics playback, pause, save and reopen

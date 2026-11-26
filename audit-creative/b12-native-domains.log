@@ -1,0 +1,17 @@
+▲ [WARNING] "import.meta" is not available with the "iife" output format and will be empty [empty-import-meta]
+
+    src/drawing/library.ts:238:6:
+      238 │   if (import.meta.env?.MODE === 'storage-preview') {
+          ╵       ~~~~~~~~~~~
+
+  You need to set the output format to "esm" for "import.meta" to work correctly.
+
+▲ [WARNING] "import.meta" is not available with the "iife" output format and will be empty [empty-import-meta]
+
+    src/storage/native-workspace.ts:8:39:
+      8 │ ... indexedStoragePreview=()=>import.meta.env.MODE==='storage-previ...
+        ╵                               ~~~~~~~~~~~
+
+  You need to set the output format to "esm" for "import.meta" to work correctly.
+
+{"browser":"chromium","checks":["commit-ordered outbox and cursor CAS","resumable native authority, bounded reads, config reuse, CAS, Keep/Undo/Fork","owner-scoped atomic recovery beyond legacy game, revision and play limits","24-card artwork paging and exact scoped original retrieval"]}

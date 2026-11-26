@@ -1,0 +1,159 @@
+{
+  "head": "7d204a9b25866bbf3a3a66ccda82f91f0eaaa5d0",
+  "engine": "141.0.7390.37",
+  "transport": "local HTML then browser offline",
+  "observations": [
+    {
+      "toolbarGrade": 1,
+      "profiles": [
+        {
+          "id": "player1",
+          "name": "Demo Explorer",
+          "grade": 1
+        },
+        {
+          "id": "player2",
+          "name": "Demo Sibling",
+          "grade": 4
+        }
+      ],
+      "snapshots": [
+        {
+          "active": "player1",
+          "grade": 1,
+          "count": "3",
+          "cards": [
+            "My Dragon",
+            "My Rock with a gem",
+            "My Rock"
+          ]
+        },
+        {
+          "active": "player2",
+          "grade": 4,
+          "count": "0",
+          "cards": []
+        },
+        {
+          "active": "player1",
+          "grade": 1,
+          "count": "3",
+          "cards": [
+            "My Dragon",
+            "My Rock with a gem",
+            "My Rock"
+          ]
+        }
+      ]
+    },
+    {
+      "toolbarGrade": 2,
+      "profiles": [
+        {
+          "id": "player1",
+          "name": "Demo Explorer",
+          "grade": 2
+        },
+        {
+          "id": "player2",
+          "name": "Demo Sibling",
+          "grade": 4
+        }
+      ],
+      "snapshots": []
+    },
+    {
+      "toolbarGrade": 3,
+      "profiles": [
+        {
+          "id": "player1",
+          "name": "Demo Explorer",
+          "grade": 3
+        },
+        {
+          "id": "player2",
+          "name": "Demo Sibling",
+          "grade": 4
+        }
+      ],
+      "snapshots": []
+    },
+    {
+      "toolbarGrade": 4,
+      "profiles": [
+        {
+          "id": "player1",
+          "name": "Demo Explorer",
+          "grade": 4
+        },
+        {
+          "id": "player2",
+          "name": "Demo Sibling",
+          "grade": 1
+        }
+      ],
+      "snapshots": [
+        {
+          "active": "player1",
+          "grade": 4,
+          "count": "3",
+          "cards": [
+            "My Dragon",
+            "My Rock with a gem",
+            "My Rock"
+          ]
+        },
+        {
+          "active": "player2",
+          "grade": 1,
+          "count": "0",
+          "cards": []
+        },
+        {
+          "active": "player1",
+          "grade": 4,
+          "count": "3",
+          "cards": [
+            "My Dragon",
+            "My Rock with a gem",
+            "My Rock"
+          ]
+        }
+      ]
+    },
+    {
+      "toolbarGrade": -1,
+      "profiles": [
+        {
+          "id": "player1",
+          "name": "Demo Explorer",
+          "grade": -1
+        },
+        {
+          "id": "player2",
+          "name": "Demo Sibling",
+          "grade": 4
+        }
+      ],
+      "snapshots": []
+    },
+    {
+      "toolbarGrade": 0,
+      "profiles": [
+        {
+          "id": "player1",
+          "name": "Demo Explorer",
+          "grade": 0
+        },
+        {
+          "id": "player2",
+          "name": "Demo Sibling",
+          "grade": 4
+        }
+      ],
+      "snapshots": []
+    }
+  ],
+  "network": [],
+  "errors": []
+}

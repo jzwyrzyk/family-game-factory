@@ -1,0 +1,410 @@
+[
+  {
+    "job": 139650229483,
+    "webkitVersion": " Webkit 26.0 (playwright build v2215) downloaded to /home/runner/.cache/ms-playwright/webkit-2215",
+    "webkit": [
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": false,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:32:05.1120618Z"
+      },
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": false,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T02:32:13.2751051Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": false,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:32:21.1804282Z"
+      },
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": true,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:33:37.5524546Z"
+      },
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": true,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T02:33:45.7329508Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": true,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:33:54.0143411Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": true,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T02:33:59.4525310Z"
+      }
+    ],
+    "timeout": [
+      "2026-11-26T02:33:25.5559545Z page.click: Timeout 30000ms exceeded.",
+      "2026-11-26T02:33:25.5560012Z Call log:",
+      "2026-11-26T02:33:25.5560349Z   - waiting for locator('#studioChange')",
+      "2026-11-26T02:33:25.5561478Z     - locator resolved to <button type=\"button\" id=\"studioChange\" class=\"studio-chip\" aria-label=\"Talk or change my game\">Change</button>",
+      "2026-11-26T02:33:25.5562362Z   - attempting click action",
+      "2026-11-26T02:33:25.5562889Z     - waiting for element to be visible, enabled and stable",
+      "2026-11-26T02:33:25.5563256Z ",
+      "2026-11-26T02:33:25.5563987Z     at checkUnwrappedNativeLifecycle (/home/runner/work/family-game-factory/family-game-factory/tests/studio-native-ui.cjs:89:14)",
+      "2026-11-26T02:33:25.5565418Z     at async /home/runner/work/family-game-factory/family-game-factory/tests/studio-native-ui.cjs:130:4 {",
+      "2026-11-26T02:33:25.5566135Z   name: 'TimeoutError'",
+      "2026-11-26T02:33:25.5566457Z }"
+    ],
+    "nativeErrorLogCount": 0
+  },
+  {
+    "job": 139667075250,
+    "webkitVersion": " Webkit 26.0 (playwright build v2215) downloaded to /home/runner/.cache/ms-playwright/webkit-2215",
+    "webkit": [
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": false,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T03:23:17.6849921Z"
+      },
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": false,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T03:23:24.7728181Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": false,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T03:23:30.8437962Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": false,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T03:23:35.5335291Z"
+      },
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": true,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T03:24:09.9914379Z"
+      },
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": true,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T03:24:17.2243386Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": true,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T03:24:24.8130869Z"
+      }
+    ],
+    "timeout": [
+      "2026-11-26T03:25:26.3677777Z locator.click: Timeout 30000ms exceeded.",
+      "2026-11-26T03:25:26.3678168Z Call log:",
+      "2026-11-26T03:25:26.3678466Z   - waiting for locator('.quality-hill summary')",
+      "2026-11-26T03:25:26.3678960Z     - locator resolved to <summary class=\"\">Make this ride your own</summary>",
+      "2026-11-26T03:25:26.3679340Z   - attempting click action",
+      "2026-11-26T03:25:26.3679857Z     - waiting for element to be visible, enabled and stable",
+      "2026-11-26T03:25:26.3680244Z     - element is visible, enabled and stable",
+      "2026-11-26T03:25:26.3680547Z     - scrolling into view if needed",
+      "2026-11-26T03:25:26.3680725Z ",
+      "2026-11-26T03:25:26.3681222Z     at checkUnwrappedNativeLifecycle (/home/runner/work/family-game-factory/family-game-factory/tests/studio-native-ui.cjs:84:47)",
+      "2026-11-26T03:25:26.3682066Z     at async /home/runner/work/family-game-factory/family-game-factory/tests/studio-native-ui.cjs:130:4 {",
+      "2026-11-26T03:25:26.3682573Z   name: 'TimeoutError'",
+      "2026-11-26T03:25:26.3682835Z }"
+    ],
+    "nativeErrorLogCount": 0
+  },
+  {
+    "job": 139650387061,
+    "webkitVersion": " Webkit 26.0 (playwright build v2215) downloaded to /home/runner/.cache/ms-playwright/webkit-2215",
+    "webkit": [
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": false,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:32:48.8199550Z"
+      },
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": false,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T02:32:55.8022725Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": false,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:33:02.9373797Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": false,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T02:33:07.7328756Z"
+      },
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": true,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:33:33.7554862Z"
+      },
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": true,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T02:33:40.5801751Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": true,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:33:47.0864283Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": true,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T02:33:51.3072851Z"
+      }
+    ],
+    "timeout": [],
+    "nativeErrorLogCount": 0
+  },
+  {
+    "job": 139650604635,
+    "webkitVersion": " Webkit 26.0 (playwright build v2215) downloaded to /home/runner/.cache/ms-playwright/webkit-2215",
+    "webkit": [
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": false,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:33:50.4919109Z"
+      },
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": false,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T02:33:57.3899934Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": false,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:34:03.5107842Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": false,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T02:34:08.2702687Z"
+      },
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": true,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:34:17.8957691Z"
+      },
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": true,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T02:34:25.0083479Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": true,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:34:31.8802447Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": true,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T02:34:36.3986009Z"
+      }
+    ],
+    "timeout": [],
+    "nativeErrorLogCount": 0
+  },
+  {
+    "job": 139645248071,
+    "webkitVersion": " Webkit 26.0 (playwright build v2215) downloaded to /home/runner/.cache/ms-playwright/webkit-2215",
+    "webkit": [
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": false,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:17:21.5116012Z"
+      },
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": false,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T02:17:28.5780398Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": false,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:17:34.6283535Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": false,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T02:17:39.4614850Z"
+      },
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": true,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:17:49.7190623Z"
+      },
+      {
+        "viewport": {
+          "width": 1400,
+          "height": 960
+        },
+        "indexedNotebook": true,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T02:17:57.0008939Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": true,
+        "suite": "active-only fitted play observations",
+        "utc": "2026-11-26T02:18:03.8391212Z"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "indexedNotebook": true,
+        "suite": "native unwrapped observer/frame control",
+        "utc": "2026-11-26T02:18:08.5247103Z"
+      }
+    ],
+    "timeout": [],
+    "nativeErrorLogCount": 0
+  }
+]

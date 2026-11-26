@@ -1,0 +1,118 @@
+{
+  "head": "f8d49082e528e449792cfc15adbe6a5e1990f524",
+  "tree": "dd112327b13660007cc29b13ee8dbfb678c8218a",
+  "readerFiles": {
+    "src/creation/model.ts": "e851560bcd90480eac55b5f420c3a580b022d24b34b34aacefe18c7c2374fb73",
+    "src/creation/stage.ts": "644313ce4e51a76b8d65a4203b87e2da200e592cca8e0d5225ab48ec3769ae27",
+    "src/creation/projects.ts": "b44811d35eb7427ab5b121be5fc9ae8d27f31f330b712c4d716b6820a273c6a3",
+    "src/creation/engine.ts": "384aef962acee12f9d907644deef26982cfd46713a48e277ed74e4f83bad5daf"
+  },
+  "hasTrackedChanges": false,
+  "browser": "156.0.8078.79",
+  "result": {
+    "212": {
+      "with": {
+        "width": 800,
+        "height": 450,
+        "sha": "ffac042c61e50953cb6774baa353cca45ea443ab36a2478d657ffb9f707c56eb",
+        "calls": [
+          {
+            "asset": "forest-background.webp",
+            "args": [
+              0,
+              0,
+              800,
+              450
+            ],
+            "smoothing": true,
+            "quality": "low"
+          },
+          {
+            "asset": "forest-middle.webp",
+            "args": [
+              0,
+              0,
+              800,
+              450
+            ],
+            "smoothing": true,
+            "quality": "low"
+          },
+          {
+            "asset": "tree.webp",
+            "args": [
+              57.5,
+              200.08035714285714,
+              85,
+              79.83928571428571
+            ],
+            "smoothing": true,
+            "quality": "low"
+          },
+          {
+            "asset": "forest-foreground.webp",
+            "args": [
+              0,
+              0,
+              800,
+              450
+            ],
+            "smoothing": true,
+            "quality": "low"
+          },
+          {
+            "asset": "tree.webp",
+            "args": [
+              297.5,
+              30.6875,
+              105,
+              98.625
+            ],
+            "smoothing": true,
+            "quality": "low"
+          }
+        ]
+      },
+      "without": {
+        "width": 800,
+        "height": 450,
+        "sha": "c1e0b588b4c89547ee1ab4151f7e2f01fcf660cc8b5fcbdd8be23c42da86e058",
+        "calls": [
+          {
+            "asset": "forest-background.webp",
+            "args": [
+              0,
+              0,
+              800,
+              450
+            ],
+            "smoothing": true,
+            "quality": "low"
+          },
+          {
+            "asset": "forest-middle.webp",
+            "args": [
+              0,
+              0,
+              800,
+              450
+            ],
+            "smoothing": true,
+            "quality": "low"
+          },
+          {
+            "asset": "forest-foreground.webp",
+            "args": [
+              0,
+              0,
+              800,
+              450
+            ],
+            "smoothing": true,
+            "quality": "low"
+          }
+        ]
+      }
+    }
+  }
+}

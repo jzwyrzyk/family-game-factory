@@ -1,0 +1,32 @@
+✔ editing includes committed, staged, deleted, renamed and untracked paths (389.764531ms)
+✔ requested domains add coverage and cannot hide shared changes (5.253383ms)
+::group::node first
+::endgroup::
+CI_SUITE_RESULT {"command":["node","first"],"seconds":0,"exitCode":9}
+::group::node second
+::endgroup::
+CI_SUITE_RESULT {"command":["node","second"],"seconds":0,"exitCode":0}
+✔ aggregates reject replaced or self-claimed plan bytes before parsing (1.573292ms)
+✔ all original Arcade leaf commands occur exactly once in their original required group (45.387252ms)
+✔ newly integrated regressions survive coordinated changes to both npm and the assignment (12.889234ms)
+✔ retain the independent PR base or previous protected-push inventory (0.216157ms)
+✔ argv parser rejects executable shell expansion; hooks and recursive scripts require review (0.996389ms)
+✔ failed commands remain failures while independent remaining commands still run once (5.191239ms)
+✔ aggregate accepts complete successful receipts and rejects every false-pass state (100.769226ms)
+✔ PR narrowing requires base policy; non-PR narrowing without protected-main evidence fails (6.730719ms)
+✔ shared build identity invalidates changed source, tree, dependencies and artifact bytes (0.533648ms)
+✔ authenticated TAR still rejects links, traversal, devices and duplicate members before extraction (1647.320521ms)
+✔ workflow adapter executes base policy, bootstraps full and keeps unopted main full (4551.112522ms)
+✔ main reuse requires literal opt-in, protected main and the exact trusted push predecessor (0.955086ms)
+✔ main aggregates require authentic reuse even for documentation and never mint new gameplay coverage (77.700543ms)
+✔ protected-main adapter authenticates the predecessor policy and falls back on every missing evidence path (7843.41748ms)
+✔ aggregates authenticate exact plan bytes from the preparation output before parsing (149.425474ms)
+✔ a reuse boolean is insufficient without bounded authenticated source and artifact proof (3.435952ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14865.403749

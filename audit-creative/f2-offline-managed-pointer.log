@@ -1,0 +1,167 @@
+geometry { x: 861.59375, y: 811.984375, width: 70.28125, height: 48 } {
+  disabled: false,
+  rect: {
+    x: 319.671875,
+    y: 718.765625,
+    width: 70.28125,
+    height: 48,
+    top: 718.765625,
+    right: 389.953125,
+    bottom: 766.765625,
+    left: 319.671875
+  },
+  at: '<button id="start">Play!</button>'
+}
+after pointer {"button":"<button id=\"start\">Play!</button>","trace":[],"active":"","status":"Ready when you are.","doc":"visible"}
+after key {"button":"<button id=\"start\">Play!</button>","trace":[["focusin","start","BUTTON",0,0,null,true],["keydown","start","BUTTON",0,0,"Enter",true]],"active":"start","status":"Ready when you are."}
+{
+  "engine": "156.0.8078.79",
+  "errors": [],
+  "diagnostics": {
+    "console": [
+      "Allow attribute will take precedence over 'allowfullscreen'."
+    ],
+    "workers": [],
+    "frames": [
+      {
+        "origin": "http://127.0.0.1:41975",
+        "visible": "visible",
+        "trace": [
+          [
+            "pointerdown",
+            "stage",
+            "MAIN",
+            897,
+            799,
+            null,
+            true
+          ],
+          [
+            "click",
+            "stage",
+            "MAIN",
+            896,
+            798,
+            null,
+            true
+          ]
+        ],
+        "status": "Play the local notebook artwork sample · synthetic review",
+        "canvas": null
+      },
+      {
+        "origin": "null",
+        "visible": "visible",
+        "trace": [
+          [
+            "focusin",
+            "studioLibraryTitle",
+            "H1",
+            0,
+            0,
+            null,
+            true
+          ],
+          [
+            "focusin",
+            "studioTitle",
+            "H1",
+            0,
+            0,
+            null,
+            true
+          ],
+          [
+            "focusin",
+            "studioPromptLabel",
+            "LABEL",
+            0,
+            0,
+            null,
+            true
+          ],
+          [
+            "pointerdown",
+            "",
+            "BUTTON",
+            447,
+            739,
+            null,
+            true
+          ],
+          [
+            "focusin",
+            "",
+            "BUTTON",
+            0,
+            0,
+            null,
+            true
+          ],
+          [
+            "click",
+            "",
+            "BUTTON",
+            446,
+            739,
+            null,
+            true
+          ],
+          [
+            "focusin",
+            "",
+            "IFRAME",
+            0,
+            0,
+            null,
+            true
+          ]
+        ],
+        "canvas": null
+      },
+      {
+        "origin": "null",
+        "visible": "visible",
+        "trace": [],
+        "canvas": null
+      },
+      {
+        "origin": "null",
+        "visible": "visible",
+        "trace": [
+          [
+            "focusin",
+            "start",
+            "BUTTON",
+            0,
+            0,
+            null,
+            true
+          ],
+          [
+            "keydown",
+            "start",
+            "BUTTON",
+            0,
+            0,
+            "Enter",
+            true
+          ]
+        ],
+        "status": "Ready when you are.",
+        "state": "idle",
+        "canvas": {
+          "learningPaused": "false",
+          "assetsReady": "true"
+        }
+      }
+    ]
+  }
+}
+locator.waitFor: Timeout 15000ms exceeded.
+Call log:
+[2m  - waiting for locator('iframe').first().contentFrame().locator('.game-art-review iframe').contentFrame().locator('#game[data-frames]') to be visible[22m
+
+    at /workspace/jems-consolidation/audit-creative/candidate-f2/tools/ui-review/audit-flight-managed-pointer.cjs:42:48 {
+  name: 'TimeoutError'
+}

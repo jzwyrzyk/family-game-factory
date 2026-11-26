@@ -1,0 +1,788 @@
+{
+  "official": {
+    "browser": "141.0.7390.37",
+    "declaredTrials": 8,
+    "passes": 8,
+    "failedAttempts": [],
+    "cases": [
+      {
+        "trial": 1,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319,
+              622
+            ]
+          }
+        ],
+        "hostEvents": [],
+        "stateAfterClick": "playing",
+        "disabled": false,
+        "hostInert": false
+      },
+      {
+        "trial": 2,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319,
+              622
+            ]
+          }
+        ],
+        "hostEvents": [],
+        "stateAfterClick": "playing",
+        "disabled": false,
+        "hostInert": false
+      },
+      {
+        "trial": 3,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319,
+              622
+            ]
+          }
+        ],
+        "hostEvents": [],
+        "stateAfterClick": "playing",
+        "disabled": false,
+        "hostInert": false
+      },
+      {
+        "trial": 4,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319,
+              622
+            ]
+          }
+        ],
+        "hostEvents": [],
+        "stateAfterClick": "playing",
+        "disabled": false,
+        "hostInert": false
+      },
+      {
+        "trial": 5,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319,
+              622
+            ]
+          }
+        ],
+        "hostEvents": [],
+        "stateAfterClick": "playing",
+        "disabled": false,
+        "hostInert": false
+      },
+      {
+        "trial": 6,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319,
+              622
+            ]
+          }
+        ],
+        "hostEvents": [],
+        "stateAfterClick": "playing",
+        "disabled": false,
+        "hostInert": false
+      },
+      {
+        "trial": 7,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319,
+              622
+            ]
+          }
+        ],
+        "hostEvents": [],
+        "stateAfterClick": "playing",
+        "disabled": false,
+        "hostInert": false
+      },
+      {
+        "trial": 8,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.72998046875,
+              622.072509765625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319,
+              622
+            ]
+          }
+        ],
+        "hostEvents": [],
+        "stateAfterClick": "playing",
+        "disabled": false,
+        "hostInert": false
+      }
+    ]
+  },
+  "managed": {
+    "browser": "156.0.8078.79",
+    "declaredTrials": 8,
+    "passes": 7,
+    "failedAttempts": [
+      "FAIL integration journey: generated desktop 2 frame.waitForFunction: Timeout 5000ms exceeded."
+    ],
+    "cases": [
+      {
+        "trial": 1,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.71875,
+              622.0625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.71875,
+              622.0625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319,
+              622
+            ]
+          }
+        ],
+        "hostEvents": [],
+        "stateAfterClick": "playing",
+        "disabled": false,
+        "hostInert": false
+      },
+      {
+        "trial": 2,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.71875,
+              622.0625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.71875,
+              622.0625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319,
+              622
+            ]
+          }
+        ],
+        "hostEvents": [],
+        "stateAfterClick": "playing",
+        "disabled": false,
+        "hostInert": false
+      },
+      {
+        "trial": 3,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [],
+        "hostEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "math-fixture-frame",
+            "point": [
+              579.72998046875,
+              479.760009765625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "math-fixture-frame",
+            "point": [
+              579.72998046875,
+              479.760009765625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "math-fixture-frame",
+            "point": [
+              579,
+              479
+            ]
+          }
+        ],
+        "stateAfterClick": "idle",
+        "disabled": false,
+        "hostInert": false
+      },
+      {
+        "trial": 4,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.71875,
+              622.0625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.71875,
+              622.0625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319,
+              622
+            ]
+          }
+        ],
+        "hostEvents": [],
+        "stateAfterClick": "playing",
+        "disabled": false,
+        "hostInert": false
+      },
+      {
+        "trial": 5,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.71875,
+              622.0625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.71875,
+              622.0625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319,
+              622
+            ]
+          }
+        ],
+        "hostEvents": [],
+        "stateAfterClick": "playing",
+        "disabled": false,
+        "hostInert": false
+      },
+      {
+        "trial": 6,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.71875,
+              622.0625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.71875,
+              622.0625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319,
+              622
+            ]
+          }
+        ],
+        "hostEvents": [],
+        "stateAfterClick": "playing",
+        "disabled": false,
+        "hostInert": false
+      },
+      {
+        "trial": 7,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.71875,
+              622.0625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.71875,
+              622.0625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319,
+              622
+            ]
+          }
+        ],
+        "hostEvents": [],
+        "stateAfterClick": "playing",
+        "disabled": false,
+        "hostInert": false
+      },
+      {
+        "trial": 8,
+        "startRectBefore": [
+          287.90625,
+          598.078125,
+          63.65625,
+          48
+        ],
+        "hostRectAfter": [
+          260,
+          -142.3125,
+          760,
+          760
+        ],
+        "childEvents": [
+          {
+            "kind": "pointerdown",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.71875,
+              622.0625
+            ]
+          },
+          {
+            "kind": "pointerup",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319.71875,
+              622.0625
+            ]
+          },
+          {
+            "kind": "click",
+            "trusted": true,
+            "target": "start",
+            "point": [
+              319,
+              622
+            ]
+          }
+        ],
+        "hostEvents": [],
+        "stateAfterClick": "playing",
+        "disabled": false,
+        "hostInert": false
+      }
+    ]
+  }
+}

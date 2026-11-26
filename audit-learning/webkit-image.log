@@ -1,0 +1,19 @@
+v1.56.1-noble: Pulling from playwright
+cf57d2112d89: Pulling fs layer
+e1de47aaed0a: Pulling fs layer
+495d3111de8d: Pulling fs layer
+44acc34a5cf7: Pulling fs layer
+44acc34a5cf7: Waiting
+495d3111de8d: Retrying in 5 seconds
+e1de47aaed0a: Retrying in 5 seconds
+cf57d2112d89: Retrying in 5 seconds
+495d3111de8d: Retrying in 4 seconds
+e1de47aaed0a: Retrying in 4 seconds
+cf57d2112d89: Retrying in 4 seconds
+495d3111de8d: Retrying in 3 seconds
+e1de47aaed0a: Retrying in 3 seconds
+cf57d2112d89: Retrying in 3 seconds
+495d3111de8d: Retrying in 2 seconds
+e1de47aaed0a: Retrying in 2 seconds
+cf57d2112d89: Retrying in 2 seconds
+error pulling image configuration: download failed after attempts=6: Forbidden

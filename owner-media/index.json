@@ -1,0 +1,306 @@
+[
+ {
+  "file": "learning-desktop.png",
+  "original": "audit-learning/release-final-c-gallery/desktop.png",
+  "sha256": "02c72e9ca49f9140ef75f054aa079d0eea406a779e4efbf69f619a60344373b0",
+  "pixels": [
+   1366,
+   768
+  ]
+ },
+ {
+  "file": "learning-tablet.png",
+  "original": "audit-learning/release-final-c-gallery/tablet-portrait.png",
+  "sha256": "542957fa7908eb0e3ec506dadd89d2f9f38c7e77e2ea2479ac2bfe504501ff78",
+  "pixels": [
+   768,
+   1024
+  ]
+ },
+ {
+  "file": "learning-phone.png",
+  "original": "audit-learning/release-final-c-gallery/phone.png",
+  "sha256": "e8f637081a424b745e8d4c0850af27de04846267efe9cca23eff7833791a64b8",
+  "pixels": [
+   390,
+   844
+  ]
+ },
+ {
+  "file": "compared-answer-methods.png",
+  "original": "audit-learning/qualified-compare-tablet-landscape.png",
+  "sha256": "d9acc637e26475c7c2b788accfe049407b6b096e91336377f651b67b8c02d387",
+  "pixels": [
+   2048,
+   800
+  ]
+ },
+ {
+  "file": "compared-final-learning.png",
+  "original": "audit-learning/final-compare-tablet-landscape.png",
+  "sha256": "b6af5f00bb7eafaf9ff3064f40d7b4dbaf5b65fa346f216fe164b36d8c29addf",
+  "pixels": [
+   2048,
+   800
+  ]
+ },
+ {
+  "file": "compared-first-question.png",
+  "original": "audit-learning/qualified-powers-compare-language.png",
+  "sha256": "82db15ce1809b516d165f43b654ebfbd36f1f5e38803be04740d39f120213343",
+  "pixels": [
+   780,
+   876
+  ]
+ },
+ {
+  "file": "compared-forest.png",
+  "original": "audit-creative/c-final-graphical-comparison/enchanted-gem-forest.png",
+  "sha256": "119831c398b82f577fa2941e645aed75fdd3e8bd333bac1c1f9d397c88da0db3",
+  "pixels": [
+   960,
+   352
+  ]
+ },
+ {
+  "file": "compared-workshop.png",
+  "original": "audit-creative/c-final-graphical-comparison/inventors-workshop.png",
+  "sha256": "dfe868a8a2dfc44729fdaef6d5d7cd4c1fd7cb716acf9e207932712790870a70",
+  "pixels": [
+   960,
+   352
+  ]
+ },
+ {
+  "file": "compared-cloud.png",
+  "original": "audit-creative/c-final-graphical-comparison/cloud-kingdom.png",
+  "sha256": "8d7c24acd26aa5e581960b1406ec9c408756d662da8d11c320a57a05d043de7d",
+  "pixels": [
+   960,
+   352
+  ]
+ },
+ {
+  "file": "compared-moon.png",
+  "original": "audit-creative/c-final-graphical-comparison/moon-adventure.png",
+  "sha256": "78ed2240df30e17e1034b1363091f8bbc734f4969a810abab741a5c2efe09c99",
+  "pixels": [
+   960,
+   352
+  ]
+ },
+ {
+  "file": "compared-world-editor.png",
+  "original": "audit-creative/c-final-graphical-comparison/world-editor.png",
+  "sha256": "2aceb3b92132902f0fcd643ae818cd201d0460ea7e5fdc9447b34949c0af93a9",
+  "pixels": [
+   960,
+   352
+  ]
+ },
+ {
+  "file": "world-picker-phone.png",
+  "original": "audit-creative/c-final-graphical-comparison/world-picker-phone.png",
+  "sha256": "9fe9470c0a2954c717268c1b7c8d6368853e58385cbe1c39327f59fe6127cec9",
+  "pixels": [
+   960,
+   352
+  ]
+ },
+ {
+  "file": "dragon-original.png",
+  "original": "audit-creative/c-final-authored-dragon/original.png",
+  "sha256": "3ea9d8d7d75e644e96c17e5fc7532148b5fe93149c073810c892beb550720b82",
+  "pixels": [
+   900,
+   560
+  ]
+ },
+ {
+  "file": "dragon-wing.png",
+  "original": "audit-creative/c-final-authored-dragon/wing-preview.png",
+  "sha256": "4542c24153f76317ba3ddba930267113d73977104150dc63089e27e7c32414f6",
+  "pixels": [
+   804,
+   515
+  ]
+ },
+ {
+  "file": "dragon-game.png",
+  "original": "audit-creative/c-final-authored-dragon/playable-dragon.png",
+  "sha256": "8c957fc95a60a96852f08fe53c405d02331f78378ff0ae33478860cbf25677af",
+  "pixels": [
+   698,
+   393
+  ]
+ },
+ {
+  "file": "dragon-author-cutouts.png",
+  "original": "audit-creative/c-final-authored-dragon/author-cutouts.png",
+  "sha256": "19191d6b396fba383100198f13fb037ac0849d2d4e1e719e6bef44213015b715",
+  "pixels": [
+   749,
+   194
+  ]
+ },
+ {
+  "file": "rock-thumbnail.png",
+  "original": "audit-creative/c-final-authored-rock/thumbnail.png",
+  "sha256": "8dc45649f62e19cbf794dca7983d0cedc300608913e31db4875227ec9039b3ee",
+  "pixels": [
+   239,
+   283
+  ]
+ },
+ {
+  "file": "rock-forest.png",
+  "original": "audit-creative/c-final-authored-rock/forest.png",
+  "sha256": "f1231f6b74777abca2ac2fe88e55594a28e5ffb07a5d81e5a872aa4f00a9da23",
+  "pixels": [
+   698,
+   393
+  ]
+ },
+ {
+  "file": "rock-actor.png",
+  "original": "audit-creative/c-final-authored-rock/animation.png",
+  "sha256": "678733a86479a39b21486f72caaebc2fc44b2d8a76c17d97238af61ea2cb8100",
+  "pixels": [
+   698,
+   393
+  ]
+ },
+ {
+  "file": "rock-collectible.png",
+  "original": "audit-creative/c-final-authored-rock/collectible.png",
+  "sha256": "1cf601cfb63be09dfb6063cc43020148ac42461b7b43b8e19bd5888b5f67f746",
+  "pixels": [
+   698,
+   393
+  ]
+ },
+ {
+  "file": "rock-obstacle.png",
+  "original": "audit-creative/c-final-authored-rock/obstacle.png",
+  "sha256": "678733a86479a39b21486f72caaebc2fc44b2d8a76c17d97238af61ea2cb8100",
+  "pixels": [
+   698,
+   393
+  ]
+ },
+ {
+  "file": "rock-hand-drawn.png",
+  "original": "audit-creative/c-final-authored-rock/original.png",
+  "sha256": "dea6848535781623a811bfb2915fd3eb063e502bd187ada65f49775482f0731b",
+  "pixels": [
+   900,
+   560
+  ]
+ },
+ {
+  "file": "picker-settled.png",
+  "original": "audit-creative/c-final-graphical-comparison/settled-phone.png",
+  "sha256": "46c887a5379bf2eed02d4007d842300b21924854ec962d68ea1bfad318b2ac5b",
+  "pixels": [
+   820,
+   886
+  ]
+ },
+ {
+  "file": "scored-game.png",
+  "original": "rehearsal/test-results/creative-learning/combined-hunt-math.png",
+  "sha256": "58a778afa031770b37cb10432e482cbed140f46ec62c5e333b2974578f89f4f1",
+  "pixels": [
+   1280,
+   900
+  ]
+ },
+ {
+  "file": "assisted-game.png",
+  "original": "rehearsal/test-results/creative-learning/combined-hunt-language.png",
+  "sha256": "df2dd8b59c3d9df4e89abb97215a874255c1fa2c9bdd5a520d004d98d701c1f4",
+  "pixels": [
+   390,
+   844
+  ]
+ },
+ {
+  "file": "world-math-scratch.png",
+  "original": "rehearsal/test-results/ui-review/connected-learning/math-activity.png",
+  "sha256": "71ca65b1ba9b0ec2e06567e08fc1ed23ee67b45021a9a225764170c8285137e9",
+  "pixels": [
+   1074,
+   746
+  ]
+ },
+ {
+  "file": "world-english-return.png",
+  "original": "rehearsal/test-results/ui-review/connected-learning/language-returned.png",
+  "sha256": "cd107f121ea3cefbc8eb1df4b78ca4bc6a1e9d8a9bcb2252532d53810426b93a",
+  "pixels": [
+   1074,
+   746
+  ]
+ },
+ {
+  "file": "rock-motion.webm",
+  "original": "rehearsal/test-results/connected-universe/c-pebble-scene.webm",
+  "sha256": "b97ce76b8c905ce97c35c83eadd8c4dc0208c35b6e53fc9fdb2b07b0d630423e",
+  "pixels": null
+ },
+ {
+  "file": "original-kept.png",
+  "original": "evidence/C-final-owner/original.png",
+  "sha256": "80433c2d66b7171eff845cc863469108ca68737de1c5f78d3ccafceb73288411",
+  "pixels": [
+   1074,
+   746
+  ]
+ },
+ {
+  "file": "new-revision.png",
+  "original": "evidence/C-final-owner/revision.png",
+  "sha256": "9c10204d949e716d070090007c6b0e63e10200b7781fc76434f1835ff7e40156",
+  "pixels": [
+   1074,
+   746
+  ]
+ },
+ {
+  "file": "world-kept.png",
+  "original": "evidence/C-final-owner/kept-world.png",
+  "sha256": "fc6794d003883cc353ae2a549ca9e903db9f01e695070ace20718df77cda6a88",
+  "pixels": [
+   1074,
+   746
+  ]
+ },
+ {
+  "file": "world-reused.png",
+  "original": "evidence/C-final-owner/fork-world.png",
+  "sha256": "3002f4e378e745c2006fc5eb550e8f357649ae23bd957b645412bea2bc008820",
+  "pixels": [
+   1074,
+   746
+  ]
+ },
+ {
+  "file": "restore-preview.png",
+  "original": "audit-creative/c-offline-recovery/preview.png",
+  "sha256": "6c6a06f564f2b1ab527928fad53eec36d32d90a1dd415fedf9c0bff863c82f99",
+  "pixels": [
+   1074,
+   746
+  ]
+ },
+ {
+  "file": "notebook-flight.webm",
+  "source": "563de940eacd3f3573bf93236ab5eebd4608043a",
+  "original": "Recorded directly from the four-synthetic-picture game canvas via its ordinary keyboard journey.",
+  "sha256": "c7e2e62749c4798de8a09d87790de298b5bbf1415781692bbde44569f9e75dcc",
+  "pixels": [
+   720,
+   400
+  ]
+ }
+]

@@ -1,0 +1,16 @@
+{
+  "id": "bdf759f4-ec92-40ac-9384-41370cf76370",
+  "title": "Navi's playground",
+  "background": "world-forest-v1",
+  "world": null,
+  "pal": "pal-navi-base-core-2026-11-20",
+  "viewport": {
+    "width": 1440,
+    "height": 1080
+  },
+  "loadedArt": [
+    "/arcade/art/creative-worlds/v1/forest-background.webp",
+    "/arcade/art/creative-worlds/v1/forest-middle.webp",
+    "/arcade/art/creative-worlds/v1/forest-foreground.webp"
+  ]
+}

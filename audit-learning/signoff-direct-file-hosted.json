@@ -1,0 +1,51 @@
+{
+  "head": "7d5979378a050ee3d80519c82929e69dbc58be7e",
+  "tree": "87b4bc4cad4e48ac83ae05cecd7567925f3c303f",
+  "run": 45773556173,
+  "job": 139751683549,
+  "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45773556173/job/139751683549",
+  "conclusion": "success",
+  "extract": [
+    "2026-11-26T07:12:47.2300564Z PASS coverage: 16 discovered page IDs, 16 manifest pages; 32 intermediate states.",
+    "2026-11-26T07:15:25.6838028Z PASS deterministic build reached ready",
+    "2026-11-26T07:15:26.0680687Z PASS build / launch / educational interruption",
+    "2026-11-26T07:15:44.2832232Z PASS UI review {\"artifact\":\"/home/runner/work/family-game-factory/family-game-factory/dist-review/jems-ui-review.html\",\"mode\":\"file://, no server\",\"pages\":[\"studio-library\",\"studio\",\"creations\",\"creation\",\"art-studio\",\"lab\",\"problem-solving\",\"jems-journey\",\"jems-rewards\",\"jems-pals\",\"parent\",\"home\",\"game\",\"create\",\"feedback\",\"studioNotifications\"],\"viewports\":4,\"overflows\":[],\"errors\":[],\"network\":[]}",
+    "2026-11-26T07:16:35.1714038Z PASS coding: add Jump and run real scene engine",
+    "2026-11-26T07:16:35.2442708Z PASS drawing: local PNG upload and durable library",
+    "2026-11-26T07:16:35.4177601Z PASS guardian/device management and synthetic invitation",
+    "2026-11-26T07:16:41.6378108Z PASS all embedded image assets decode",
+    "2026-11-26T07:18:31.9899298Z PASS 7 viewport captures and pointer inputs. 36 review samples and local save recovery.",
+    "2026-11-26T07:18:53.9484801Z PASS modernization desktop",
+    "2026-11-26T07:19:02.4508464Z PASS modernization landscape",
+    "2026-11-26T07:19:10.2967398Z PASS modernization portrait",
+    "2026-11-26T07:19:16.9717453Z PASS modernization phone",
+    "2026-11-26T07:19:49.2193919Z PASS Pal fidelity app desktop",
+    "2026-11-26T07:19:52.5821901Z PASS Pal fidelity app landscape",
+    "2026-11-26T07:19:56.0807777Z PASS Pal fidelity app portrait",
+    "2026-11-26T07:19:58.8459240Z PASS Pal fidelity app phone",
+    "2026-11-26T07:19:58.8477402Z PASS exact Pal variants, transparent pixels, fail-closed presentation and responsive cards",
+    "2026-11-26T07:20:55.1464720Z PASS Pal fidelity offline desktop",
+    "2026-11-26T07:21:50.8756634Z PASS Pal fidelity offline landscape",
+    "2026-11-26T07:22:46.7247825Z PASS Pal fidelity offline portrait",
+    "2026-11-26T07:23:42.4034452Z PASS Pal fidelity offline phone",
+    "2026-11-26T07:23:42.4037386Z PASS exact Pal variants, transparent pixels, fail-closed presentation and responsive cards"
+  ],
+  "artifacts": [
+    {
+      "id": 15095460290,
+      "name": "jems-ui-review-7d5979378a050ee3d80519c82929e69dbc58be7e",
+      "zipBytes": 221452769,
+      "digest": "sha256:d3a7fdae7652620bc9f6b0831f2e2015217c271e3eec17622fbb3ba6413c8af4",
+      "expiresAt": "2026-12-10T07:12:50Z",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45773556173/artifacts/15095460290"
+    },
+    {
+      "id": 15095258482,
+      "name": "jems-ui-review-evidence-7d5979378a050ee3d80519c82929e69dbc58be7e",
+      "zipBytes": 68862228,
+      "digest": "sha256:f427a07548af277111667aeda22b451fcd8dda949077474acd3e94fec06d4798",
+      "expiresAt": "2026-12-10T07:23:42Z",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45773556173/artifacts/15095258482"
+    }
+  ]
+}

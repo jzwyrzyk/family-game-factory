@@ -1,0 +1,16 @@
+{
+  "head": "ca76b5b151d4de61a5da0d66f64093530fdc1f78",
+  "game": "picture",
+  "sourceTest": "/workspace/jems-consolidation/audit-creative/source-215/tests/art-adventure-browser.cjs",
+  "samples": [
+    {
+      "layout": "desktop",
+      "elapsedMs": 383.15131599999995
+    },
+    {
+      "layout": "tablet",
+      "elapsedMs": 410.88704099999995
+    }
+  ],
+  "exitCode": 0
+}

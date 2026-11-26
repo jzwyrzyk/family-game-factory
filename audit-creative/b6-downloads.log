@@ -1,0 +1,14 @@
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ 'a6c73e34ab30631be52581a47eab4268ff0152a6ae771c04d86d2c5644048d7c'
+- '4b1aa0290d332e50881f66852fd4db1b91bc3db4b485dc71da4937d885d49ec8'
+
+    at main (/workspace/jems-consolidation/audit-creative/candidate-b6/tests/audit-crayon-download.cjs:102:14) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 'a6c73e34ab30631be52581a47eab4268ff0152a6ae771c04d86d2c5644048d7c',
+  expected: '4b1aa0290d332e50881f66852fd4db1b91bc3db4b485dc71da4937d885d49ec8',
+  operator: 'strictEqual',
+  diff: 'simple'
+}

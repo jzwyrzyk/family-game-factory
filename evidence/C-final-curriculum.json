@@ -1,0 +1,3819 @@
+{
+  "source": "563de940eacd3f3573bf93236ab5eebd4608043a",
+  "rows": [
+    {
+      "subject": "Math",
+      "skill": "pk-touch",
+      "label": "Touch each object once",
+      "grade": -1,
+      "domain": "operations",
+      "intent": "Touch each object once using local illustrated materials.",
+      "standards": [
+        "P-MATH 3"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated touch"
+      ],
+      "visual": [
+        "early picture touch"
+      ],
+      "checked": 63,
+      "examples": 18
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-small",
+      "label": "Recognize a small group",
+      "grade": -1,
+      "domain": "operations",
+      "intent": "Recognize a small group using local illustrated materials.",
+      "standards": [
+        "P-MATH 2"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated groups"
+      ],
+      "visual": [
+        "early picture groups"
+      ],
+      "checked": 63,
+      "examples": 18
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-count",
+      "label": "Count a collection",
+      "grade": -1,
+      "domain": "operations",
+      "intent": "Count a collection using local illustrated materials.",
+      "standards": [
+        "P-MATH 3"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 18
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-numeral",
+      "label": "Match numbers and collections",
+      "grade": -1,
+      "domain": "place-value",
+      "intent": "Match numbers and collections using local illustrated materials.",
+      "standards": [
+        "P-MATH 5"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 18
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-build",
+      "label": "Build a collection",
+      "grade": -1,
+      "domain": "operations",
+      "intent": "Build a collection using local illustrated materials.",
+      "standards": [
+        "P-MATH 3"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated build"
+      ],
+      "visual": [
+        "early picture build"
+      ],
+      "checked": 63,
+      "examples": 18
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-compare",
+      "label": "Compare two groups",
+      "grade": -1,
+      "domain": "operations",
+      "intent": "Compare two groups using local illustrated materials.",
+      "standards": [
+        "P-MATH 4"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated groups"
+      ],
+      "visual": [
+        "early picture groups"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-equal",
+      "label": "Match equal groups",
+      "grade": -1,
+      "domain": "operations",
+      "intent": "Match equal groups using local illustrated materials.",
+      "standards": [
+        "P-MATH 4"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated groups"
+      ],
+      "visual": [
+        "early picture groups"
+      ],
+      "checked": 63,
+      "examples": 18
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-shape",
+      "label": "Match familiar shapes",
+      "grade": -1,
+      "domain": "geometry",
+      "intent": "Match familiar shapes using local illustrated materials.",
+      "standards": [
+        "P-MATH 9"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 15
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-classify",
+      "label": "Sort familiar objects",
+      "grade": -1,
+      "domain": "data",
+      "intent": "Sort familiar objects using local illustrated materials.",
+      "standards": [
+        "P-SCI 3"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-pattern",
+      "label": "Continue repeating patterns",
+      "grade": -1,
+      "domain": "operations",
+      "intent": "Continue repeating patterns using local illustrated materials.",
+      "standards": [
+        "P-MATH 7"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-position",
+      "label": "Find an object in space",
+      "grade": -1,
+      "domain": "geometry",
+      "intent": "Find an object in space using local illustrated materials.",
+      "standards": [
+        "P-MATH 10"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 18
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-size",
+      "label": "Compare lengths",
+      "grade": -1,
+      "domain": "measurement",
+      "intent": "Compare lengths using local illustrated materials.",
+      "standards": [
+        "P-MATH 8"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 18
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-join",
+      "label": "Join small collections",
+      "grade": -1,
+      "domain": "operations",
+      "intent": "Join small collections using local illustrated materials.",
+      "standards": [
+        "P-MATH 6"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated groups"
+      ],
+      "visual": [
+        "early picture groups"
+      ],
+      "checked": 63,
+      "examples": 17
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-remove",
+      "label": "Take objects away",
+      "grade": -1,
+      "domain": "operations",
+      "intent": "Take objects away using local illustrated materials.",
+      "standards": [
+        "P-MATH 6"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated groups"
+      ],
+      "visual": [
+        "early picture groups"
+      ],
+      "checked": 63,
+      "examples": 18
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-sort-shape",
+      "label": "Classify objects by shape",
+      "grade": -1,
+      "domain": "geometry",
+      "intent": "Classify objects by shape using local illustrated materials.",
+      "standards": [
+        "P-MATH 9"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated sort"
+      ],
+      "visual": [
+        "early picture sort"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-sort-size",
+      "label": "Classify objects by size",
+      "grade": -1,
+      "domain": "measurement",
+      "intent": "Classify objects by size using local illustrated materials.",
+      "standards": [
+        "P-MATH 8"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated sort"
+      ],
+      "visual": [
+        "early picture sort"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "pk-numeral-group",
+      "label": "Match a printed numeral to a group",
+      "grade": -1,
+      "domain": "place-value",
+      "intent": "Match a printed numeral to a group using local illustrated materials.",
+      "standards": [
+        "P-MATH 5"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated groups"
+      ],
+      "visual": [
+        "early picture groups"
+      ],
+      "checked": 63,
+      "examples": 20
+    },
+    {
+      "subject": "Math",
+      "skill": "k-touch",
+      "label": "Count each object",
+      "grade": 0,
+      "domain": "operations",
+      "intent": "Count each object using local illustrated materials.",
+      "standards": [
+        "K.CC.B.4a"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated touch"
+      ],
+      "visual": [
+        "early picture touch"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "k-count",
+      "label": "Count up to twenty",
+      "grade": 0,
+      "domain": "operations",
+      "intent": "Count up to twenty using local illustrated materials.",
+      "standards": [
+        "K.CC.B.5"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "k-numeral",
+      "label": "Recognize numerals through twenty",
+      "grade": 0,
+      "domain": "place-value",
+      "intent": "Recognize numerals through twenty using local illustrated materials.",
+      "standards": [
+        "K.CC.A.3"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "k-build",
+      "label": "Make a requested quantity",
+      "grade": 0,
+      "domain": "operations",
+      "intent": "Make a requested quantity using local illustrated materials.",
+      "standards": [
+        "K.CC.B.5"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated build"
+      ],
+      "visual": [
+        "early picture build"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "k-compare",
+      "label": "Which group has more or fewer?",
+      "grade": 0,
+      "domain": "operations",
+      "intent": "Which group has more or fewer? using local illustrated materials.",
+      "standards": [
+        "K.CC.C.6"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated groups"
+      ],
+      "visual": [
+        "early picture groups"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "k-compare-numeral",
+      "label": "Compare written numerals",
+      "grade": 0,
+      "domain": "place-value",
+      "intent": "Compare written numerals using local illustrated materials.",
+      "standards": [
+        "K.CC.C.7"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "k-equal",
+      "label": "Find equal quantities",
+      "grade": 0,
+      "domain": "operations",
+      "intent": "Find equal quantities using local illustrated materials.",
+      "standards": [
+        "K.CC.C.6"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated groups"
+      ],
+      "visual": [
+        "early picture groups"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "k-join",
+      "label": "Add concrete quantities within ten",
+      "grade": 0,
+      "domain": "operations",
+      "intent": "Add concrete quantities within ten using local illustrated materials.",
+      "standards": [
+        "K.OA.A.1"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 20
+    },
+    {
+      "subject": "Math",
+      "skill": "k-remove",
+      "label": "Subtract concrete quantities within ten",
+      "grade": 0,
+      "domain": "operations",
+      "intent": "Subtract concrete quantities within ten using local illustrated materials.",
+      "standards": [
+        "K.OA.A.2"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 20
+    },
+    {
+      "subject": "Math",
+      "skill": "k-missing",
+      "label": "Find the missing part",
+      "grade": 0,
+      "domain": "operations",
+      "intent": "Find the missing part using local illustrated materials.",
+      "standards": [
+        "K.OA.A.3"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 20
+    },
+    {
+      "subject": "Math",
+      "skill": "k-teen",
+      "label": "Ten and some more",
+      "grade": 0,
+      "domain": "place-value",
+      "intent": "Ten and some more using local illustrated materials.",
+      "standards": [
+        "K.NBT.A.1"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "k-classify",
+      "label": "Count one category",
+      "grade": 0,
+      "domain": "data",
+      "intent": "Count one category using local illustrated materials.",
+      "standards": [
+        "K.MD.B.3"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 20
+    },
+    {
+      "subject": "Math",
+      "skill": "k-pattern",
+      "label": "Continue a repeating pattern",
+      "grade": 0,
+      "domain": "operations",
+      "intent": "Continue a repeating pattern using local illustrated materials.",
+      "standards": [
+        "Local pattern extension"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "k-shape",
+      "label": "Identify shapes in varied orientations",
+      "grade": 0,
+      "domain": "geometry",
+      "intent": "Identify shapes in varied orientations using local illustrated materials.",
+      "standards": [
+        "K.G.A.2"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 15
+    },
+    {
+      "subject": "Math",
+      "skill": "k-solid",
+      "label": "Match solid objects",
+      "grade": 0,
+      "domain": "geometry",
+      "intent": "Match solid objects using local illustrated materials.",
+      "standards": [
+        "K.G.A.3"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "k-position",
+      "label": "Locate an object",
+      "grade": 0,
+      "domain": "geometry",
+      "intent": "Locate an object using local illustrated materials.",
+      "standards": [
+        "K.G.A.1"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 18
+    },
+    {
+      "subject": "Math",
+      "skill": "k-compose",
+      "label": "Join two equal triangles",
+      "grade": 0,
+      "domain": "geometry",
+      "intent": "Join two equal triangles using local illustrated materials.",
+      "standards": [
+        "K.G.B.6"
+      ],
+      "routes": [
+        "compose (explore)",
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 15
+    },
+    {
+      "subject": "Math",
+      "skill": "k-size",
+      "label": "Compare two lengths",
+      "grade": 0,
+      "domain": "measurement",
+      "intent": "Compare two lengths using local illustrated materials.",
+      "standards": [
+        "K.MD.A.2"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 18
+    },
+    {
+      "subject": "Math",
+      "skill": "k-order",
+      "label": "Put quantities in order",
+      "grade": 0,
+      "domain": "operations",
+      "intent": "Put quantities in order using local illustrated materials.",
+      "standards": [
+        "K.CC.B.4c"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated groups"
+      ],
+      "visual": [
+        "early picture groups"
+      ],
+      "checked": 63,
+      "examples": 20
+    },
+    {
+      "subject": "Math",
+      "skill": "k-sort-shape",
+      "label": "Classify shapes by type",
+      "grade": 0,
+      "domain": "data",
+      "intent": "Classify shapes by type using local illustrated materials.",
+      "standards": [
+        "K.MD.B.3"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated sort"
+      ],
+      "visual": [
+        "early picture sort"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "k-sort-size",
+      "label": "Classify objects by size",
+      "grade": 0,
+      "domain": "data",
+      "intent": "Classify objects by size using local illustrated materials.",
+      "standards": [
+        "K.MD.B.3"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated sort"
+      ],
+      "visual": [
+        "early picture sort"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "k-numeral-group",
+      "label": "Match numerals and sets through twenty",
+      "grade": 0,
+      "domain": "place-value",
+      "intent": "Match numerals and sets through twenty using local illustrated materials.",
+      "standards": [
+        "K.CC.B.4b"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated groups"
+      ],
+      "visual": [
+        "early picture groups"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "k-attributes",
+      "label": "Identify shapes by their attributes",
+      "grade": 0,
+      "domain": "geometry",
+      "intent": "Identify shapes by their attributes using local illustrated materials.",
+      "standards": [
+        "K.G.B.4"
+      ],
+      "routes": [
+        "choice via authoritative subject entry",
+        "early illustrated numbers"
+      ],
+      "visual": [
+        "early picture numbers"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-add-10",
+      "label": "Add within 10",
+      "grade": 1,
+      "domain": "operations",
+      "intent": "Combine two quantities and count on within ten.",
+      "standards": [
+        "1.OA.C.6"
+      ],
+      "routes": [
+        "frames (answer)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "ten-frame",
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-subtract-10",
+      "label": "Subtract within 10",
+      "grade": 1,
+      "domain": "operations",
+      "intent": "Take away or find the difference within ten.",
+      "standards": [
+        "1.OA.C.6"
+      ],
+      "routes": [
+        "numberLine (answer)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "number-line",
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-make-ten",
+      "label": "Make ten",
+      "grade": 1,
+      "domain": "operations",
+      "intent": "Find the missing part of ten.",
+      "standards": [
+        "1.OA.C.6"
+      ],
+      "routes": [
+        "frames (answer)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "ten-frame"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-add-20",
+      "label": "Add within 20",
+      "grade": 1,
+      "domain": "operations",
+      "intent": "Combine quantities using a ten or a known fact.",
+      "standards": [
+        "1.OA.C.6"
+      ],
+      "routes": [
+        "frames (answer)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "ten-frame",
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-subtract-20",
+      "label": "Subtract within 20",
+      "grade": 1,
+      "domain": "operations",
+      "intent": "Use a related addition fact or subtract through ten.",
+      "standards": [
+        "1.OA.B.4",
+        "1.OA.C.6"
+      ],
+      "routes": [
+        "numberLine (answer)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "number-line",
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-missing-addend",
+      "label": "Find a missing part",
+      "grade": 1,
+      "domain": "operations",
+      "intent": "Find an unknown in an addition relationship.",
+      "standards": [
+        "1.OA.D.8"
+      ],
+      "routes": [
+        "frames (answer)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "number-line",
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-equality",
+      "label": "Understand equals",
+      "grade": 1,
+      "domain": "operations",
+      "intent": "Compare the values on both sides of an equation.",
+      "standards": [
+        "1.OA.D.7"
+      ],
+      "routes": [
+        "counterGroups (explore)",
+        "choice via authoritative subject entry"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-tens-ones",
+      "label": "Tens and ones",
+      "grade": 1,
+      "domain": "place-value",
+      "intent": "Compose a two-digit number from tens and ones.",
+      "standards": [
+        "1.NBT.B.2"
+      ],
+      "routes": [
+        "blocks (answer)",
+        "quantity via authoritative subject entry"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-compare",
+      "label": "Compare two-digit numbers",
+      "grade": 1,
+      "domain": "place-value",
+      "intent": "Use tens, then ones, to compare quantities.",
+      "standards": [
+        "1.NBT.B.3"
+      ],
+      "routes": [
+        "choice via authoritative subject entry"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-add-tens",
+      "label": "Add multiples of ten",
+      "grade": 1,
+      "domain": "place-value",
+      "intent": "Combine tens within 100.",
+      "standards": [
+        "1.NBT.C.4"
+      ],
+      "routes": [
+        "blocks (answer)",
+        "quantity via authoritative subject entry"
+      ],
+      "visual": [
+        "place-value",
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-subtract-tens",
+      "label": "Subtract multiples of ten",
+      "grade": 1,
+      "domain": "place-value",
+      "intent": "Subtract whole tens within 90.",
+      "standards": [
+        "1.NBT.C.6"
+      ],
+      "routes": [
+        "blocks (answer)",
+        "quantity via authoritative subject entry"
+      ],
+      "visual": [
+        "number-line",
+        "authored question",
+        "place-value"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-length",
+      "label": "Compare lengths",
+      "grade": 1,
+      "domain": "measurement",
+      "intent": "Order three measured lengths.",
+      "standards": [
+        "1.MD.A.1"
+      ],
+      "routes": [
+        "ruler (explore)",
+        "choice via authoritative subject entry"
+      ],
+      "visual": [
+        "chart"
+      ],
+      "checked": 63,
+      "examples": 5
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-time",
+      "label": "Hours and half hours",
+      "grade": 1,
+      "domain": "measurement",
+      "intent": "Read a clock to the hour or half hour.",
+      "standards": [
+        "1.MD.B.3"
+      ],
+      "routes": [
+        "clock (explore)",
+        "choice via authoritative subject entry"
+      ],
+      "visual": [
+        "clock"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-data",
+      "label": "Read a small chart",
+      "grade": 1,
+      "domain": "data",
+      "intent": "Read quantities in up to three categories.",
+      "standards": [
+        "1.MD.C.4"
+      ],
+      "routes": [
+        "chart (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "chart"
+      ],
+      "checked": 63,
+      "examples": 6
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-shapes",
+      "label": "Shape attributes",
+      "grade": 1,
+      "domain": "geometry",
+      "intent": "Recognize flat shapes from their sides and corners.",
+      "standards": [
+        "1.G.A.1"
+      ],
+      "routes": [
+        "shapes (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "shape"
+      ],
+      "checked": 63,
+      "examples": 4
+    },
+    {
+      "subject": "Math",
+      "skill": "g1-halves-quarters",
+      "label": "Equal halves and quarters",
+      "grade": 1,
+      "domain": "geometry",
+      "intent": "Name two or four equal parts of a whole.",
+      "standards": [
+        "1.G.A.3"
+      ],
+      "routes": [
+        "choice via authoritative subject entry"
+      ],
+      "visual": [
+        "fraction"
+      ],
+      "checked": 63,
+      "examples": 2
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-add-100",
+      "label": "Add within 100",
+      "grade": 2,
+      "domain": "operations",
+      "intent": "Use place value to add two-digit numbers.",
+      "standards": [
+        "2.NBT.B.5"
+      ],
+      "routes": [
+        "blocks (answer)",
+        "quantity via authoritative subject entry"
+      ],
+      "visual": [
+        "ten-frame",
+        "authored question",
+        "place-value"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-subtract-100",
+      "label": "Subtract within 100",
+      "grade": 2,
+      "domain": "operations",
+      "intent": "Decompose tens when subtracting two-digit numbers.",
+      "standards": [
+        "2.NBT.B.5"
+      ],
+      "routes": [
+        "blocks (answer)",
+        "quantity via authoritative subject entry"
+      ],
+      "visual": [
+        "number-line",
+        "authored question",
+        "place-value"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-hundreds",
+      "label": "Hundreds, tens and ones",
+      "grade": 2,
+      "domain": "place-value",
+      "intent": "Compose and interpret three-digit numbers.",
+      "standards": [
+        "2.NBT.A.1",
+        "2.NBT.A.3"
+      ],
+      "routes": [
+        "blocks (answer)",
+        "quantity via authoritative subject entry"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-add-1000",
+      "label": "Add within 1,000",
+      "grade": 2,
+      "domain": "operations",
+      "intent": "Add hundreds, tens and ones with regrouping.",
+      "standards": [
+        "2.NBT.B.7"
+      ],
+      "routes": [
+        "blocks (answer)",
+        "quantity via authoritative subject entry"
+      ],
+      "visual": [
+        "ten-frame",
+        "authored question",
+        "place-value"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-subtract-1000",
+      "label": "Subtract within 1,000",
+      "grade": 2,
+      "domain": "operations",
+      "intent": "Subtract three-digit numbers using place value.",
+      "standards": [
+        "2.NBT.B.7"
+      ],
+      "routes": [
+        "blocks (answer)",
+        "quantity via authoritative subject entry"
+      ],
+      "visual": [
+        "number-line",
+        "authored question",
+        "place-value"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-skip-count",
+      "label": "Count by 5, 10 and 100",
+      "grade": 2,
+      "domain": "place-value",
+      "intent": "Continue a skip-counting sequence within 1,000.",
+      "standards": [
+        "2.NBT.A.2"
+      ],
+      "routes": [
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 5
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-compare",
+      "label": "Compare three-digit numbers",
+      "grade": 2,
+      "domain": "place-value",
+      "intent": "Compare hundreds, then tens, then ones.",
+      "standards": [
+        "2.NBT.A.4"
+      ],
+      "routes": [
+        "choice via authoritative subject entry"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-even-odd",
+      "label": "Even and odd",
+      "grade": 2,
+      "domain": "operations",
+      "intent": "Pair objects to decide whether a quantity is even.",
+      "standards": [
+        "2.OA.C.3"
+      ],
+      "routes": [
+        "counterGroups (explore)",
+        "choice via authoritative subject entry"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-arrays",
+      "label": "Equal rows and columns",
+      "grade": 2,
+      "domain": "operations",
+      "intent": "Find totals using equal rows, up to five by five.",
+      "standards": [
+        "2.OA.C.4"
+      ],
+      "routes": [
+        "arrays (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "array"
+      ],
+      "checked": 63,
+      "examples": 4
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-length",
+      "label": "Length differences",
+      "grade": 2,
+      "domain": "measurement",
+      "intent": "Find a difference between measurements in the same unit.",
+      "standards": [
+        "2.MD.A.4",
+        "2.MD.B.5"
+      ],
+      "routes": [
+        "ruler (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-time",
+      "label": "Time to five minutes",
+      "grade": 2,
+      "domain": "measurement",
+      "intent": "Read an analog clock in five-minute steps.",
+      "standards": [
+        "2.MD.C.7"
+      ],
+      "routes": [
+        "clock (explore)",
+        "choice via authoritative subject entry"
+      ],
+      "visual": [
+        "clock"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-money",
+      "label": "Count money",
+      "grade": 2,
+      "domain": "measurement",
+      "intent": "Combine explicitly valued U.S. coins in cents.",
+      "standards": [
+        "2.MD.C.8"
+      ],
+      "routes": [
+        "coins (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 5
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-data",
+      "label": "Compare chart categories",
+      "grade": 2,
+      "domain": "data",
+      "intent": "Compare quantities shown in a bar chart.",
+      "standards": [
+        "2.MD.D.10"
+      ],
+      "routes": [
+        "chart (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "chart"
+      ],
+      "checked": 63,
+      "examples": 6
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-shapes",
+      "label": "Sides, angles and faces",
+      "grade": 2,
+      "domain": "geometry",
+      "intent": "Identify polygons and a cube using their attributes.",
+      "standards": [
+        "2.G.A.1"
+      ],
+      "routes": [
+        "shapes (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "shape"
+      ],
+      "checked": 63,
+      "examples": 4
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-fractions",
+      "label": "Equal parts of a whole",
+      "grade": 2,
+      "domain": "geometry",
+      "intent": "Describe halves, thirds and fourths as equal shares.",
+      "standards": [
+        "2.G.A.3"
+      ],
+      "routes": [
+        "choice via authoritative subject entry"
+      ],
+      "visual": [
+        "fraction"
+      ],
+      "checked": 63,
+      "examples": 3
+    },
+    {
+      "subject": "Math",
+      "skill": "g2-word-problems",
+      "label": "Two-step addition stories",
+      "grade": 2,
+      "domain": "operations",
+      "intent": "Use two addition/subtraction steps in a short story.",
+      "standards": [
+        "2.OA.A.1"
+      ],
+      "routes": [
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-groups",
+      "label": "Understand equal groups",
+      "grade": 3,
+      "domain": "operations",
+      "intent": "Connect equal groups with multiplication.",
+      "standards": [
+        "3.OA.A.1"
+      ],
+      "routes": [
+        "arrays (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "array"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-multiply",
+      "label": "Multiplication facts",
+      "grade": 3,
+      "domain": "operations",
+      "intent": "Recall or derive multiplication facts within 100.",
+      "standards": [
+        "3.OA.C.7",
+        "3.OA.B.5"
+      ],
+      "routes": [
+        "arrays (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "array",
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 39
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-divide",
+      "label": "Division as sharing",
+      "grade": 3,
+      "domain": "operations",
+      "intent": "Use a related multiplication fact to share equally.",
+      "standards": [
+        "3.OA.A.2",
+        "3.OA.B.6"
+      ],
+      "routes": [
+        "arrays (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 26
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-missing-factor",
+      "label": "Missing factors",
+      "grade": 3,
+      "domain": "operations",
+      "intent": "Find an unknown factor in a multiplication equation.",
+      "standards": [
+        "3.OA.A.4"
+      ],
+      "routes": [
+        "arrays (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-two-step",
+      "label": "Two-step multiplication stories",
+      "grade": 3,
+      "domain": "operations",
+      "intent": "Find a group total, then add or take away.",
+      "standards": [
+        "3.OA.D.8"
+      ],
+      "routes": [
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-patterns",
+      "label": "Continue number patterns",
+      "grade": 3,
+      "domain": "operations",
+      "intent": "Continue a constant-step pattern from a stated rule.",
+      "standards": [
+        "3.OA.D.9"
+      ],
+      "routes": [
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-round",
+      "label": "Round to tens or hundreds",
+      "grade": 3,
+      "domain": "place-value",
+      "intent": "Choose the nearest multiple of ten or one hundred.",
+      "standards": [
+        "3.NBT.A.1"
+      ],
+      "routes": [
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-add-subtract",
+      "label": "Add and subtract fluently",
+      "grade": 3,
+      "domain": "operations",
+      "intent": "Use place-value relationships within 1,000.",
+      "standards": [
+        "3.NBT.A.2"
+      ],
+      "routes": [
+        "blocks (answer)",
+        "quantity via authoritative subject entry"
+      ],
+      "visual": [
+        "place-value",
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-multiply-tens",
+      "label": "Multiply a multiple of ten",
+      "grade": 3,
+      "domain": "place-value",
+      "intent": "Use a fact such as 3 times 4 to solve 3 times 40.",
+      "standards": [
+        "3.NBT.A.3"
+      ],
+      "routes": [
+        "arrays (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "array",
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 15
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-unit-fraction",
+      "label": "Unit fractions",
+      "grade": 3,
+      "domain": "fractions",
+      "intent": "Describe one equal part using fraction notation.",
+      "standards": [
+        "3.NF.A.1"
+      ],
+      "routes": [
+        "fractions (answer)",
+        "fraction via authoritative subject entry"
+      ],
+      "visual": [
+        "fraction"
+      ],
+      "checked": 63,
+      "examples": 5
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-fraction-number",
+      "label": "Fractions as numbers",
+      "grade": 3,
+      "domain": "fractions",
+      "intent": "Connect equal parts of one with a position on a number line.",
+      "standards": [
+        "3.NF.A.2"
+      ],
+      "routes": [
+        "numberLine (answer)",
+        "fraction via authoritative subject entry"
+      ],
+      "visual": [
+        "number-line",
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 12
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-equivalent-fraction",
+      "label": "Simple equivalent fractions",
+      "grade": 3,
+      "domain": "fractions",
+      "intent": "Recognize equal amounts partitioned in different ways.",
+      "standards": [
+        "3.NF.A.3"
+      ],
+      "routes": [
+        "fractions (answer)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "fraction"
+      ],
+      "checked": 63,
+      "examples": 4
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-compare-fraction",
+      "label": "Compare related fractions",
+      "grade": 3,
+      "domain": "fractions",
+      "intent": "Compare fractions with the same denominator or numerator and the same whole.",
+      "standards": [
+        "3.NF.A.3.d"
+      ],
+      "routes": [
+        "fractions (explore)",
+        "choice via authoritative subject entry"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 6
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-time",
+      "label": "Elapsed time in minutes",
+      "grade": 3,
+      "domain": "measurement",
+      "intent": "Find elapsed minutes without crossing midnight.",
+      "standards": [
+        "3.MD.A.1"
+      ],
+      "routes": [
+        "clock (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 14
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-mass-volume",
+      "label": "Mass and liquid volume",
+      "grade": 3,
+      "domain": "measurement",
+      "intent": "Solve same-unit mass and liquid-volume stories.",
+      "standards": [
+        "3.MD.A.2"
+      ],
+      "routes": [
+        "arrays (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "groups",
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 14
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-area",
+      "label": "Area in square units",
+      "grade": 3,
+      "domain": "measurement",
+      "intent": "Cover a rectangle with unit squares.",
+      "standards": [
+        "3.MD.C.5",
+        "3.MD.C.7"
+      ],
+      "routes": [
+        "arrays (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "array"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-perimeter",
+      "label": "Perimeter",
+      "grade": 3,
+      "domain": "measurement",
+      "intent": "Add all side lengths of a rectangle.",
+      "standards": [
+        "3.MD.D.8"
+      ],
+      "routes": [
+        "arrays (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "shape"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-data",
+      "label": "Scaled chart data",
+      "grade": 3,
+      "domain": "data",
+      "intent": "Interpret a chart in which each count represents several objects.",
+      "standards": [
+        "3.MD.B.3"
+      ],
+      "routes": [
+        "chart (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "chart"
+      ],
+      "checked": 63,
+      "examples": 6
+    },
+    {
+      "subject": "Math",
+      "skill": "g3-shapes",
+      "label": "Shape categories",
+      "grade": 3,
+      "domain": "geometry",
+      "intent": "Recognize shared polygon attributes and inclusive categories.",
+      "standards": [
+        "3.G.A.1"
+      ],
+      "routes": [
+        "shapes (explore)",
+        "choice via authoritative subject entry"
+      ],
+      "visual": [
+        "shape"
+      ],
+      "checked": 63,
+      "examples": 5
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-place-value",
+      "label": "Large-number place values",
+      "grade": 4,
+      "domain": "place-value",
+      "intent": "Identify the value of a digit through the hundred-thousands place.",
+      "standards": [
+        "4.NBT.A.2"
+      ],
+      "routes": [
+        "blocks (answer)",
+        "quantity via authoritative subject entry"
+      ],
+      "visual": [
+        "place-value"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-compare",
+      "label": "Compare large whole numbers",
+      "grade": 4,
+      "domain": "place-value",
+      "intent": "Compare whole numbers through one million.",
+      "standards": [
+        "4.NBT.A.2"
+      ],
+      "routes": [
+        "choice via authoritative subject entry"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-round",
+      "label": "Round large whole numbers",
+      "grade": 4,
+      "domain": "place-value",
+      "intent": "Round to a specified place up to hundred thousands.",
+      "standards": [
+        "4.NBT.A.3"
+      ],
+      "routes": [
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-add-subtract",
+      "label": "Multi-digit addition and subtraction",
+      "grade": 4,
+      "domain": "operations",
+      "intent": "Add and subtract whole numbers through one million.",
+      "standards": [
+        "4.NBT.B.4"
+      ],
+      "routes": [
+        "blocks (answer)",
+        "quantity via authoritative subject entry"
+      ],
+      "visual": [
+        "place-value",
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-multiply",
+      "label": "Multi-digit multiplication",
+      "grade": 4,
+      "domain": "operations",
+      "intent": "Multiply up to four digits by one digit, or two digits by two digits.",
+      "standards": [
+        "4.NBT.B.5"
+      ],
+      "routes": [
+        "arrays (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "array",
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 37
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-divide",
+      "label": "Division and remainders",
+      "grade": 4,
+      "domain": "operations",
+      "intent": "Find whole-number quotients or remainders with a one-digit divisor.",
+      "standards": [
+        "4.NBT.B.6"
+      ],
+      "routes": [
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 13
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-comparison",
+      "label": "Multiplicative comparison",
+      "grade": 4,
+      "domain": "operations",
+      "intent": "Distinguish times-as-many relationships from additive ones.",
+      "standards": [
+        "4.OA.A.1",
+        "4.OA.A.2"
+      ],
+      "routes": [
+        "arrays (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-factors",
+      "label": "Recognize factors",
+      "grade": 4,
+      "domain": "operations",
+      "intent": "Recognize factors of whole numbers within 100.",
+      "standards": [
+        "4.OA.B.4"
+      ],
+      "routes": [
+        "choice via authoritative subject entry"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-patterns",
+      "label": "Patterns from a rule",
+      "grade": 4,
+      "domain": "operations",
+      "intent": "Use an explicit additive or multiplicative rule.",
+      "standards": [
+        "4.OA.C.5"
+      ],
+      "routes": [
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 11
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-equivalent-fraction",
+      "label": "Generate equivalent fractions",
+      "grade": 4,
+      "domain": "fractions",
+      "intent": "Scale numerator and denominator by the same factor.",
+      "standards": [
+        "4.NF.A.1"
+      ],
+      "routes": [
+        "fractions (answer)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "fraction"
+      ],
+      "checked": 63,
+      "examples": 5
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-compare-fraction",
+      "label": "Compare unlike fractions",
+      "grade": 4,
+      "domain": "fractions",
+      "intent": "Compare equal wholes using common-size parts or benchmarks.",
+      "standards": [
+        "4.NF.A.2"
+      ],
+      "routes": [
+        "fractions (explore)",
+        "choice via authoritative subject entry"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-add-fraction",
+      "label": "Add and subtract like fractions",
+      "grade": 4,
+      "domain": "fractions",
+      "intent": "Combine or separate fractions with the same denominator.",
+      "standards": [
+        "4.NF.B.3"
+      ],
+      "routes": [
+        "fractions (answer)",
+        "fraction via authoritative subject entry"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-multiply-fraction",
+      "label": "Whole numbers times fractions",
+      "grade": 4,
+      "domain": "fractions",
+      "intent": "Combine repeated groups of a fraction.",
+      "standards": [
+        "4.NF.B.4"
+      ],
+      "routes": [
+        "fractions (answer)",
+        "fraction via authoritative subject entry"
+      ],
+      "visual": [
+        "fraction",
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 12
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-decimal",
+      "label": "Tenths and hundredths",
+      "grade": 4,
+      "domain": "fractions",
+      "intent": "Connect fractions with denominator 10 or 100 to decimals.",
+      "standards": [
+        "4.NF.C.5",
+        "4.NF.C.6"
+      ],
+      "routes": [
+        "blocks (answer)",
+        "quantity via authoritative subject entry"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-compare-decimal",
+      "label": "Compare decimals",
+      "grade": 4,
+      "domain": "fractions",
+      "intent": "Compare tenths and hundredths for the same whole.",
+      "standards": [
+        "4.NF.C.7"
+      ],
+      "routes": [
+        "choice via authoritative subject entry"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-measurement",
+      "label": "Convert measurement units",
+      "grade": 4,
+      "domain": "measurement",
+      "intent": "Convert a larger unit into a smaller unit within one system.",
+      "standards": [
+        "4.MD.A.1"
+      ],
+      "routes": [
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)",
+        "arrays (explore)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-time-money",
+      "label": "Time and money problems",
+      "grade": 4,
+      "domain": "measurement",
+      "intent": "Solve elapsed-time or money-change stories.",
+      "standards": [
+        "4.MD.A.2"
+      ],
+      "routes": [
+        "blocks (answer)",
+        "quantity via authoritative subject entry",
+        "clock (explore)",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-area-perimeter",
+      "label": "Rectangle formulas",
+      "grade": 4,
+      "domain": "measurement",
+      "intent": "Use known area or perimeter to find a missing side.",
+      "standards": [
+        "4.MD.A.3"
+      ],
+      "routes": [
+        "arrays (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 7
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-data",
+      "label": "Fraction measurement data",
+      "grade": 4,
+      "domain": "data",
+      "intent": "Interpret frequencies of measurements in halves, fourths and eighths.",
+      "standards": [
+        "4.MD.B.4"
+      ],
+      "routes": [
+        "chart (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)",
+        "fraction via authoritative subject entry"
+      ],
+      "visual": [
+        "line-plot"
+      ],
+      "checked": 63,
+      "examples": 13
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-angles",
+      "label": "Angle measurement",
+      "grade": 4,
+      "domain": "measurement",
+      "intent": "Classify and combine stated angle measures.",
+      "standards": [
+        "4.MD.C.5",
+        "4.MD.C.7"
+      ],
+      "routes": [
+        "angles (explore)",
+        "choice via authoritative subject entry",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "angle",
+        "authored question"
+      ],
+      "checked": 63,
+      "examples": 21
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-shapes",
+      "label": "Parallel sides in polygons",
+      "grade": 4,
+      "domain": "geometry",
+      "intent": "Count pairs of parallel sides in familiar polygons.",
+      "standards": [
+        "4.G.A.1",
+        "4.G.A.2"
+      ],
+      "routes": [
+        "shapes (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "shape"
+      ],
+      "checked": 63,
+      "examples": 5
+    },
+    {
+      "subject": "Math",
+      "skill": "g4-symmetry",
+      "label": "Lines of symmetry",
+      "grade": 4,
+      "domain": "geometry",
+      "intent": "Recognize mirror folds in regular familiar shapes.",
+      "standards": [
+        "4.G.A.3"
+      ],
+      "routes": [
+        "shapes (explore)",
+        "quantity via authoritative subject entry",
+        "blocks (independent quantity entry in practice)"
+      ],
+      "visual": [
+        "shape"
+      ],
+      "checked": 63,
+      "examples": 3
+    },
+    {
+      "subject": "English",
+      "skill": "pk-ela-vocabulary",
+      "label": "Understand spoken words",
+      "grade": -1,
+      "domain": "vocabulary",
+      "intent": "Understand spoken words",
+      "standards": [
+        "P-LC 6"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 32
+    },
+    {
+      "subject": "English",
+      "skill": "pk-ela-description",
+      "label": "Identify an object from clues",
+      "grade": -1,
+      "domain": "listening",
+      "intent": "Identify an object from clues",
+      "standards": [
+        "P-LC 2"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 12
+    },
+    {
+      "subject": "English",
+      "skill": "pk-ela-category",
+      "label": "Choose a category member",
+      "grade": -1,
+      "domain": "vocabulary",
+      "intent": "Choose a category member",
+      "standards": [
+        "P-LC 7"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 12
+    },
+    {
+      "subject": "English",
+      "skill": "pk-ela-related",
+      "label": "Match related pictures",
+      "grade": -1,
+      "domain": "vocabulary",
+      "intent": "Match related pictures",
+      "standards": [
+        "P-LC 7"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 12
+    },
+    {
+      "subject": "English",
+      "skill": "pk-ela-directions",
+      "label": "Follow a spoken direction",
+      "grade": -1,
+      "domain": "listening",
+      "intent": "Follow a spoken direction",
+      "standards": [
+        "P-LC 2"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 12
+    },
+    {
+      "subject": "English",
+      "skill": "pk-ela-rhyme",
+      "label": "Recognize rhyming words",
+      "grade": -1,
+      "domain": "phonological-awareness",
+      "intent": "Recognize rhyming words",
+      "standards": [
+        "P-LIT 1"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 18
+    },
+    {
+      "subject": "English",
+      "skill": "pk-ela-letters",
+      "label": "Recognize a named letter",
+      "grade": -1,
+      "domain": "phonics",
+      "intent": "Recognize a named letter",
+      "standards": [
+        "P-LIT 3"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 12
+    },
+    {
+      "subject": "English",
+      "skill": "pk-ela-onset",
+      "label": "Match a beginning sound",
+      "grade": -1,
+      "domain": "phonological-awareness",
+      "intent": "Match a beginning sound",
+      "standards": [
+        "P-LIT 1"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 30
+    },
+    {
+      "subject": "English",
+      "skill": "pk-ela-syllables",
+      "label": "Count spoken syllables",
+      "grade": -1,
+      "domain": "phonological-awareness",
+      "intent": "Count spoken syllables",
+      "standards": [
+        "P-LIT 1"
+      ],
+      "routes": [
+        "sound-taps"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 12
+    },
+    {
+      "subject": "English",
+      "skill": "pk-ela-story",
+      "label": "Understand a short spoken story",
+      "grade": -1,
+      "domain": "listening",
+      "intent": "Understand a short spoken story",
+      "standards": [
+        "P-LIT 5"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 18
+    },
+    {
+      "subject": "English",
+      "skill": "pk-ela-sequence",
+      "label": "Recall story events in order",
+      "grade": -1,
+      "domain": "listening",
+      "intent": "Recall story events in order",
+      "standards": [
+        "P-LIT 4"
+      ],
+      "routes": [
+        "choice",
+        "picture-order"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 36
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-vocabulary",
+      "label": "Understand spoken words",
+      "grade": 0,
+      "domain": "vocabulary",
+      "intent": "Understand spoken words",
+      "standards": [
+        "L.K.5c"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 32
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-description",
+      "label": "Identify an object from clues",
+      "grade": 0,
+      "domain": "listening",
+      "intent": "Identify an object from clues",
+      "standards": [
+        "SL.K.2"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 12
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-category",
+      "label": "Choose a category member",
+      "grade": 0,
+      "domain": "vocabulary",
+      "intent": "Choose a category member",
+      "standards": [
+        "L.K.5a"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 12
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-related",
+      "label": "Match related pictures",
+      "grade": 0,
+      "domain": "vocabulary",
+      "intent": "Match related pictures",
+      "standards": [
+        "L.K.5c"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 12
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-directions",
+      "label": "Follow a spoken direction",
+      "grade": 0,
+      "domain": "listening",
+      "intent": "Follow a spoken direction",
+      "standards": [
+        "SL.K.2"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 12
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-rhyme",
+      "label": "Recognize rhyming words",
+      "grade": 0,
+      "domain": "phonological-awareness",
+      "intent": "Recognize rhyming words",
+      "standards": [
+        "RF.K.2a"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 18
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-letters",
+      "label": "Recognize a named letter",
+      "grade": 0,
+      "domain": "phonics",
+      "intent": "Recognize a named letter",
+      "standards": [
+        "RF.K.1d"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 12
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-onset",
+      "label": "Match a beginning sound",
+      "grade": 0,
+      "domain": "phonological-awareness",
+      "intent": "Match a beginning sound",
+      "standards": [
+        "RF.K.2d"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 30
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-syllables",
+      "label": "Count spoken syllables",
+      "grade": 0,
+      "domain": "phonological-awareness",
+      "intent": "Count spoken syllables",
+      "standards": [
+        "RF.K.2b"
+      ],
+      "routes": [
+        "sound-taps"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 12
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-story",
+      "label": "Understand a short spoken story",
+      "grade": 0,
+      "domain": "listening",
+      "intent": "Understand a short spoken story",
+      "standards": [
+        "RL.K.1"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 18
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-sequence",
+      "label": "Recall story events in order",
+      "grade": 0,
+      "domain": "listening",
+      "intent": "Recall story events in order",
+      "standards": [
+        "RL.K.2"
+      ],
+      "routes": [
+        "choice",
+        "picture-order"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 36
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-blend",
+      "label": "Blend spoken word parts",
+      "grade": 0,
+      "domain": "phonological-awareness",
+      "intent": "Blend spoken word parts",
+      "standards": [
+        "RF.K.2b"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 24
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-case",
+      "label": "Match uppercase and lowercase letters",
+      "grade": 0,
+      "domain": "phonics",
+      "intent": "Match uppercase and lowercase letters",
+      "standards": [
+        "RF.K.1d"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 24
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-sound-letter",
+      "label": "Match a spoken onset to a letter",
+      "grade": 0,
+      "domain": "phonics",
+      "intent": "Match a spoken onset to a letter",
+      "standards": [
+        "RF.K.3a"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 12
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-printed-word",
+      "label": "Recognize a printed CVC word",
+      "grade": 0,
+      "domain": "early-reading",
+      "intent": "Recognize a printed CVC word",
+      "standards": [
+        "RF.K.3"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 16
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-common-word",
+      "label": "Read a common position word",
+      "grade": 0,
+      "domain": "early-reading",
+      "intent": "Read a common position word",
+      "standards": [
+        "RF.K.3c"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v2"
+      ],
+      "passageItems": 0,
+      "checked": 12
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-ending",
+      "label": "Match ending sounds",
+      "grade": 0,
+      "domain": "phonological-awareness",
+      "intent": "Match the last sound in familiar spoken words",
+      "standards": [
+        "RF.K.2d"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v3"
+      ],
+      "passageItems": 0,
+      "checked": 9
+    },
+    {
+      "subject": "English",
+      "skill": "k-ela-segment",
+      "label": "Count sounds in short words",
+      "grade": 0,
+      "domain": "phonological-awareness",
+      "intent": "Segment short spoken words and count their sounds",
+      "standards": [
+        "RF.K.2d"
+      ],
+      "routes": [
+        "sound-taps"
+      ],
+      "packs": [
+        "v3"
+      ],
+      "passageItems": 0,
+      "checked": 9
+    },
+    {
+      "subject": "English",
+      "skill": "g1-initial-letters",
+      "label": "Beginning letters and sounds",
+      "grade": 1,
+      "domain": "phonics",
+      "intent": "Recognize common first-letter sound correspondences in print",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.1.3"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g1-cvc-patterns",
+      "label": "Short-vowel CVC words",
+      "grade": 1,
+      "domain": "phonics",
+      "intent": "Identify common consonant-vowel-consonant spelling patterns",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.1.3.B"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g1-short-a-e",
+      "label": "Short a and short e",
+      "grade": 1,
+      "domain": "phonics",
+      "intent": "Distinguish short a/e spelling patterns",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.1.3.B"
+      ],
+      "routes": [
+        "choice",
+        "word-tiles"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g1-short-i-o-u",
+      "label": "Short i, o, and u",
+      "grade": 1,
+      "domain": "phonics",
+      "intent": "Distinguish short i/o/u spelling patterns",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.1.3.B"
+      ],
+      "routes": [
+        "choice",
+        "word-tiles"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g1-digraph-sh-ch",
+      "label": "sh and ch digraphs",
+      "grade": 1,
+      "domain": "phonics",
+      "intent": "Recognize sh/ch two-letter graphemes",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.1.3.A"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g1-digraph-th-wh",
+      "label": "th and wh digraphs",
+      "grade": 1,
+      "domain": "phonics",
+      "intent": "Recognize th/wh graphemes in written words",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.1.3.A"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g1-final-blends",
+      "label": "Ending consonant blends",
+      "grade": 1,
+      "domain": "phonics",
+      "intent": "Identify common final consonant blends",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.1.3.A"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g1-silent-e",
+      "label": "Final-e word patterns",
+      "grade": 1,
+      "domain": "phonics",
+      "intent": "Recognize vowel-consonant-e spelling patterns",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.1.3.C"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g1-plural-s",
+      "label": "Nouns with plural -s",
+      "grade": 1,
+      "domain": "spelling",
+      "intent": "Construct and identify regular plural nouns",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.1.1.C"
+      ],
+      "routes": [
+        "choice",
+        "word-tiles"
+      ],
+      "packs": [
+        "v1",
+        "v3"
+      ],
+      "passageItems": 0,
+      "checked": 8
+    },
+    {
+      "subject": "English",
+      "skill": "g1-irregular-words",
+      "label": "Common irregular words",
+      "grade": 1,
+      "domain": "spelling",
+      "intent": "Recognize and spell taught common irregular words",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.1.3.G"
+      ],
+      "routes": [
+        "choice",
+        "word-tiles"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g1-punctuation",
+      "label": "Sentence ending marks",
+      "grade": 1,
+      "domain": "grammar",
+      "intent": "Choose the appropriate end punctuation for a sentence",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.1.2.B"
+      ],
+      "routes": [
+        "punctuation",
+        "edit"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g1-story-details",
+      "label": "Remember story details",
+      "grade": 1,
+      "domain": "comprehension",
+      "intent": "Answer text-dependent questions about a short connected passage",
+      "standards": [
+        "CCSS.ELA-LITERACY.RL.1.1"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 4,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g2-vowel-ai-ay",
+      "label": "ai and ay patterns",
+      "grade": 2,
+      "domain": "phonics",
+      "intent": "Distinguish written long-a vowel teams",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.2.3.B"
+      ],
+      "routes": [
+        "choice",
+        "fill-gap"
+      ],
+      "packs": [
+        "v1",
+        "v3"
+      ],
+      "passageItems": 6,
+      "checked": 10
+    },
+    {
+      "subject": "English",
+      "skill": "g2-vowel-ee-ea",
+      "label": "ee and ea patterns",
+      "grade": 2,
+      "domain": "phonics",
+      "intent": "Recognize common long-e vowel teams",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.2.3.B"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g2-vowel-oa-ow",
+      "label": "oa and ow patterns",
+      "grade": 2,
+      "domain": "phonics",
+      "intent": "Recognize common long-o vowel teams",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.2.3.B"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g2-r-controlled",
+      "label": "r-controlled vowel patterns",
+      "grade": 2,
+      "domain": "phonics",
+      "intent": "Identify ar/or/er spelling patterns",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.2.3.B"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g2-two-syllables",
+      "label": "Two-syllable spelling patterns",
+      "grade": 2,
+      "domain": "phonics",
+      "intent": "Recognize syllable chunks in familiar two-syllable words",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.2.3.C"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g2-inflections",
+      "label": "Inflectional endings",
+      "grade": 2,
+      "domain": "spelling",
+      "intent": "Form familiar words with -ing and -ed",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.2.2.D"
+      ],
+      "routes": [
+        "choice",
+        "word-tiles"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g2-prefix-un-re",
+      "label": "un- and re- prefixes",
+      "grade": 2,
+      "domain": "vocabulary",
+      "intent": "Use common prefixes to infer meaning",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.2.4.B"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g2-compounds",
+      "label": "Compound word meaning",
+      "grade": 2,
+      "domain": "vocabulary",
+      "intent": "Interpret and build familiar compound words",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.2.4.D"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g2-contractions",
+      "label": "Contractions and apostrophes",
+      "grade": 2,
+      "domain": "spelling",
+      "intent": "Relate common contractions to their expanded forms",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.2.2.C"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g2-adjectives",
+      "label": "Adjectives and descriptions",
+      "grade": 2,
+      "domain": "grammar",
+      "intent": "Recognize words that describe nouns",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.2.1.E"
+      ],
+      "routes": [
+        "choice",
+        "select-word"
+      ],
+      "packs": [
+        "v1",
+        "v3"
+      ],
+      "passageItems": 4,
+      "checked": 8
+    },
+    {
+      "subject": "English",
+      "skill": "g2-complete-sentences",
+      "label": "Complete sentences",
+      "grade": 2,
+      "domain": "grammar",
+      "intent": "Distinguish a complete thought from a fragment",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.2.1.F"
+      ],
+      "routes": [
+        "choice",
+        "sentence-tiles"
+      ],
+      "packs": [
+        "v1",
+        "v3"
+      ],
+      "passageItems": 0,
+      "checked": 8
+    },
+    {
+      "subject": "English",
+      "skill": "g2-cause-effect",
+      "label": "Cause and effect in stories",
+      "grade": 2,
+      "domain": "comprehension",
+      "intent": "Identify causes and consequences explicitly supported by short text",
+      "standards": [
+        "CCSS.ELA-LITERACY.RL.2.3"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 4,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g3-multisyllable",
+      "label": "Common multisyllabic patterns",
+      "grade": 3,
+      "domain": "phonics",
+      "intent": "Identify meaningful syllable divisions in longer words",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.3.3.C"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g3-prefixes",
+      "label": "Meaningful prefixes",
+      "grade": 3,
+      "domain": "vocabulary",
+      "intent": "Use re-, un-, dis-, and pre- to interpret new words",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.3.3.A"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g3-suffixes",
+      "label": "Meaningful suffixes",
+      "grade": 3,
+      "domain": "vocabulary",
+      "intent": "Use familiar suffixes to determine word meanings",
+      "standards": [
+        "CCSS.ELA-LITERACY.RF.3.3.B"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g3-context-clues",
+      "label": "Vocabulary from context",
+      "grade": 3,
+      "domain": "vocabulary",
+      "intent": "Use adjacent context to select a word meaning",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.3.4.A"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 4,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g3-syn-ant",
+      "label": "Synonyms and antonyms",
+      "grade": 3,
+      "domain": "vocabulary",
+      "intent": "Distinguish similar and opposite meanings",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.3.5.C"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g3-figurative",
+      "label": "Literal and figurative meanings",
+      "grade": 3,
+      "domain": "vocabulary",
+      "intent": "Interpret simple figurative language in context",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.3.5.A"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g3-agreement",
+      "label": "Subject–verb agreement",
+      "grade": 3,
+      "domain": "grammar",
+      "intent": "Select correct present-tense verbs for singular/plural subjects",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.3.1.F"
+      ],
+      "routes": [
+        "choice",
+        "sentence-tiles",
+        "fill-gap"
+      ],
+      "packs": [
+        "v1",
+        "v3"
+      ],
+      "passageItems": 4,
+      "checked": 8
+    },
+    {
+      "subject": "English",
+      "skill": "g3-tense",
+      "label": "Consistent verb tense",
+      "grade": 3,
+      "domain": "grammar",
+      "intent": "Use correct time relationships in sentence verbs",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.3.1.E"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g3-quotation",
+      "label": "Commas and quotation marks",
+      "grade": 3,
+      "domain": "grammar",
+      "intent": "Apply conventions to simple dialogue",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.3.2.C"
+      ],
+      "routes": [
+        "choice",
+        "edit"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g3-main-idea",
+      "label": "Main idea and supporting details",
+      "grade": 3,
+      "domain": "comprehension",
+      "intent": "Identify the main idea of a short informational text",
+      "standards": [
+        "CCSS.ELA-LITERACY.RI.3.2"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 4,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g3-inference",
+      "label": "Evidence-based inference",
+      "grade": 3,
+      "domain": "comprehension",
+      "intent": "Infer a character feeling or unstated cause from textual clues",
+      "standards": [
+        "CCSS.ELA-LITERACY.RL.3.1"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 4,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g3-text-evidence",
+      "label": "Support answers with text evidence",
+      "grade": 3,
+      "domain": "comprehension",
+      "intent": "Select passage details that support a claim",
+      "standards": [
+        "CCSS.ELA-LITERACY.RI.3.1"
+      ],
+      "routes": [
+        "choice",
+        "evidence"
+      ],
+      "packs": [
+        "v1",
+        "v3"
+      ],
+      "passageItems": 8,
+      "checked": 8
+    },
+    {
+      "subject": "English",
+      "skill": "g4-roots",
+      "label": "Greek and Latin roots",
+      "grade": 4,
+      "domain": "vocabulary",
+      "intent": "Infer words from recurring roots such as tele, port, and spect",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.4.4.B"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g4-word-meanings",
+      "label": "Multiple-meaning vocabulary",
+      "grade": 4,
+      "domain": "vocabulary",
+      "intent": "Disambiguate word meanings using sentence context",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.4.4.A"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 4,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g4-precise-words",
+      "label": "Precise word choices",
+      "grade": 4,
+      "domain": "vocabulary",
+      "intent": "Choose words with appropriate intensity and tone",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.4.5.C"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g4-simile-metaphor",
+      "label": "Similes and metaphors",
+      "grade": 4,
+      "domain": "vocabulary",
+      "intent": "Interpret comparisons as literary language",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.4.5.A"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g4-complex-sentences",
+      "label": "Compound and complex sentences",
+      "grade": 4,
+      "domain": "grammar",
+      "intent": "Choose conjunctions that clarify relationships",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.4.1.F"
+      ],
+      "routes": [
+        "choice",
+        "sentence-tiles"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g4-pronouns",
+      "label": "Pronoun agreement",
+      "grade": 4,
+      "domain": "grammar",
+      "intent": "Match pronouns to clear, appropriate antecedents",
+      "standards": [
+        "CCSS.ELA-LITERACY.L.4.1.A"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g4-transitions",
+      "label": "Paragraph transitions",
+      "grade": 4,
+      "domain": "writing",
+      "intent": "Select transitions that accurately connect ideas",
+      "standards": [
+        "CCSS.ELA-LITERACY.W.4.2.C"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 0,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g4-viewpoint",
+      "label": "Narrator point of view",
+      "grade": 4,
+      "domain": "comprehension",
+      "intent": "Identify the viewpoint used to tell a passage",
+      "standards": [
+        "CCSS.ELA-LITERACY.RL.4.6"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 4,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g4-theme",
+      "label": "Theme and supporting evidence",
+      "grade": 4,
+      "domain": "comprehension",
+      "intent": "Infer a story theme from events and outcomes",
+      "standards": [
+        "CCSS.ELA-LITERACY.RL.4.2"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 4,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g4-compare-texts",
+      "label": "Compare two texts",
+      "grade": 4,
+      "domain": "comprehension",
+      "intent": "Compare explicit ideas across short passages",
+      "standards": [
+        "CCSS.ELA-LITERACY.RI.4.9"
+      ],
+      "routes": [
+        "choice"
+      ],
+      "packs": [
+        "v1"
+      ],
+      "passageItems": 4,
+      "checked": 4
+    },
+    {
+      "subject": "English",
+      "skill": "g4-evidence-inference",
+      "label": "Evidence and inference",
+      "grade": 4,
+      "domain": "comprehension",
+      "intent": "Identify which evidence justifies an inference",
+      "standards": [
+        "CCSS.ELA-LITERACY.RI.4.1"
+      ],
+      "routes": [
+        "choice",
+        "evidence"
+      ],
+      "packs": [
+        "v1",
+        "v3"
+      ],
+      "passageItems": 8,
+      "checked": 8
+    },
+    {
+      "subject": "English",
+      "skill": "g4-revision",
+      "label": "Revise an explanation",
+      "grade": 4,
+      "domain": "writing",
+      "intent": "Practice communicating an idea with concrete detail; open-ended work is unscored",
+      "standards": [
+        "CCSS.ELA-LITERACY.W.4.5"
+      ],
+      "routes": [
+        "creative"
+      ],
+      "packs": [
+        "v1",
+        "v3"
+      ],
+      "passageItems": 4,
+      "checked": 8
+    }
+  ]
+}

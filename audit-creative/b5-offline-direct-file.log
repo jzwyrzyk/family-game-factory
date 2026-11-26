@@ -1,0 +1,9 @@
+Recovery status undefined 
+page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at file:///tmp/jems-audit-b5-offline.html
+Call log:
+[2m  - navigating to "file:///tmp/jems-audit-b5-offline.html", waiting until "domcontentloaded"[22m
+
+    at open (/workspace/jems-consolidation/audit-creative/offline-file-recovery.cjs:12:52)
+    at async /workspace/jems-consolidation/audit-creative/offline-file-recovery.cjs:27:11 {
+  name: 'Error'
+}

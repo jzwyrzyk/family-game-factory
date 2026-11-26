@@ -1,0 +1,54 @@
+{
+  "newConstructed": {
+    "samples": 72,
+    "skills": 8,
+    "ids": [
+      "g1-add-10",
+      "g1-add-20",
+      "g1-make-ten",
+      "g1-missing-addend",
+      "g1-subtract-10",
+      "g1-subtract-20",
+      "g3-equivalent-fraction",
+      "g4-equivalent-fraction"
+    ],
+    "modelCounts": {
+      "frames": 36,
+      "numberLine": 18,
+      "fractions": 18
+    }
+  },
+  "onlyWritten": {
+    "samples": 147,
+    "skills": 18,
+    "ids": [
+      "g1-data",
+      "g1-shapes",
+      "g2-data",
+      "g2-length",
+      "g2-money",
+      "g2-shapes",
+      "g3-area",
+      "g3-data",
+      "g3-divide",
+      "g3-missing-factor",
+      "g3-perimeter",
+      "g3-time",
+      "g4-angles",
+      "g4-area-perimeter",
+      "g4-data",
+      "g4-shapes",
+      "g4-symmetry",
+      "g4-time-money"
+    ],
+    "modelCounts": {
+      "chart": 30,
+      "shapes": 36,
+      "ruler": 9,
+      "coins": 9,
+      "arrays": 45,
+      "clock": 12,
+      "angles": 6
+    }
+  }
+}

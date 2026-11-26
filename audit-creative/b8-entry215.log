@@ -1,0 +1,4 @@
+PASS Art entry with delayed configuration: phone upload/focus, profile switch, late readiness, home/expanded-chat entrances, private library, movement and editable scene
+PASS Art entry with rejected configuration: phone upload, keyboard drawing, post-dialog focus and durable private library
+PASS saved remote game after delayed configuration: initial unavailable preview, explicit read-only retry, unchanged saved work and no paid replay
+PASS native readiness cancellation on pagehide, no hidden restart, fresh pageshow checks and no paid request

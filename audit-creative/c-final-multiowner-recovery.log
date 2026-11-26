@@ -1,0 +1,29 @@
+{
+  "browser": "chromium",
+  "checks": 23,
+  "results": [
+    "archive explicitly identifies prepared per-owner sources",
+    "82 notebook sessions captured across valid owner scopes",
+    "52 native games captured across valid owner scopes",
+    "42 coding scenes captured across valid owner scopes",
+    "legacy compatibility envelope has no over-cap combined snapshot",
+    "capture preserves original legacy bytes",
+    "restored notebook explicitly active for player1",
+    "exact notebook words and identities restored for player1",
+    "native owner graph restored for player1",
+    "coding owner graph restored for player1",
+    "restored notebook explicitly active for player2",
+    "exact notebook words and identities restored for player2",
+    "native owner graph restored for player2",
+    "coding owner graph restored for player2",
+    "source-loss restore publishes complete receipt",
+    "fresh target begins with no prepared records database",
+    "fresh target exact notebook player1",
+    "fresh target native graph player1",
+    "fresh target coding graph player1",
+    "fresh target exact notebook player2",
+    "fresh target native graph player2",
+    "fresh target coding graph player2",
+    "fresh target complete receipt"
+  ]
+}

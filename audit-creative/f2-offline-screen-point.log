@@ -1,0 +1,18 @@
+geometry { x: 861.59375, y: 811.984375, width: 70.28125, height: 48 } {
+  disabled: false,
+  rect: {
+    x: 319.671875,
+    y: 718.765625,
+    width: 70.28125,
+    height: 48,
+    top: 718.765625,
+    right: 389.953125,
+    bottom: 766.765625,
+    left: 319.671875
+  },
+  at: '<button id="start">Play!</button>'
+}
+after pointer {"button":"<button id=\"start\">Play!</button>","trace":[],"active":"","status":"Ready when you are.","doc":"visible"}
+actual screen center {"coords":{"x":806.54765625,"y":619.596142443657},"offsets":[{"id":"","left":260,"top":100.84375,"scaleX":1,"scaleY":1,"borderX":0,"borderY":0},{"id":"appFrame","left":348,"top":18,"scaleX":0.7458333333333333,"scaleY":0.7458333129882813,"borderX":0,"borderY":0}],"top":"<iframe id=\"appFrame\" title=\"Jems application source review\" allow=\"fullscreen\" allowfullscreen=\"\" s"}
+after screen click {"trace":[["pointerdown","start","BUTTON",355,706,null,true],["focusin","start","BUTTON",0,0,null,true],["click","start","BUTTON",354,705,null,true],["focusin","game","CANVAS",0,0,null,true]],"active":"game","status":"Let’s play!"}
+PASS standalone notebook flight: four approved drawings, five exact pins, opaque renderer, scored round, collision and kept game.

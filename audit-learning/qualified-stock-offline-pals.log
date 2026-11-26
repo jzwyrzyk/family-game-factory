@@ -1,0 +1,5 @@
+page.goto: Target page, context or browser has been closed
+Call log:
+[2m  - navigating to "http://localhost:43199/", waiting until "load"[22m
+
+    at /workspace/jems-consolidation/audit-learning/qualified-a/tests/pals-fidelity-browser.cjs:47:263

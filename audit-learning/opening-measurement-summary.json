@@ -1,0 +1,241 @@
+{
+  "sources": {
+    "approved": "04341b0d529dbc3eec88de4d06d679e03168203b",
+    "candidate": "a7c0d31aaf05d614b0f07a06d41a1d6179e13d01"
+  },
+  "browser": "141.0.7390.37",
+  "groups": [
+    {
+      "subject": "language",
+      "device": "desktop",
+      "version": "approved",
+      "n": 12,
+      "fixtures": [
+        "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f"
+      ],
+      "items": [
+        "Why did Ava put on boots?"
+      ],
+      "focused": {
+        "n": 12,
+        "medianMs": 26.5,
+        "p95Ms": 44.5
+      },
+      "firstVisible": {
+        "n": 12,
+        "medianMs": 28.0,
+        "p95Ms": 46.7
+      },
+      "visibleAndFocused": {
+        "n": 12,
+        "medianMs": 28.0,
+        "p95Ms": 46.7
+      },
+      "firstFrameVisible": 12,
+      "activeAndVisibleAfter130ms": 12
+    },
+    {
+      "subject": "language",
+      "device": "desktop",
+      "version": "candidate",
+      "n": 12,
+      "fixtures": [
+        "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f"
+      ],
+      "items": [
+        "Why did Ava put on boots?"
+      ],
+      "focused": {
+        "n": 12,
+        "medianMs": 35.3,
+        "p95Ms": 94.3
+      },
+      "firstVisible": {
+        "n": 12,
+        "medianMs": 36.6,
+        "p95Ms": 95.4
+      },
+      "visibleAndFocused": {
+        "n": 12,
+        "medianMs": 36.6,
+        "p95Ms": 95.4
+      },
+      "firstFrameVisible": 12,
+      "activeAndVisibleAfter130ms": 12
+    },
+    {
+      "subject": "language",
+      "device": "phone",
+      "version": "approved",
+      "n": 12,
+      "fixtures": [
+        "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f"
+      ],
+      "items": [
+        "Why did Ava put on boots?"
+      ],
+      "focused": {
+        "n": 12,
+        "medianMs": 37.1,
+        "p95Ms": 637.6
+      },
+      "firstVisible": {
+        "n": 0,
+        "medianMs": null,
+        "p95Ms": null
+      },
+      "visibleAndFocused": {
+        "n": 0,
+        "medianMs": null,
+        "p95Ms": null
+      },
+      "firstFrameVisible": 0,
+      "activeAndVisibleAfter130ms": 0
+    },
+    {
+      "subject": "language",
+      "device": "phone",
+      "version": "candidate",
+      "n": 12,
+      "fixtures": [
+        "ec78534197d8567e0fbfbdc92a8ac9254217f845c979dbc44f618261d399280f"
+      ],
+      "items": [
+        "Why did Ava put on boots?"
+      ],
+      "focused": {
+        "n": 12,
+        "medianMs": 37.5,
+        "p95Ms": 275.1
+      },
+      "firstVisible": {
+        "n": 0,
+        "medianMs": null,
+        "p95Ms": null
+      },
+      "visibleAndFocused": {
+        "n": 0,
+        "medianMs": null,
+        "p95Ms": null
+      },
+      "firstFrameVisible": 0,
+      "activeAndVisibleAfter130ms": 0
+    },
+    {
+      "subject": "math",
+      "device": "desktop",
+      "version": "approved",
+      "n": 12,
+      "fixtures": [
+        "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0"
+      ],
+      "items": [
+        "4 hundreds, 1 tens and 9 ones make what number?"
+      ],
+      "focused": {
+        "n": 12,
+        "medianMs": 37.5,
+        "p95Ms": 70.7
+      },
+      "firstVisible": {
+        "n": 12,
+        "medianMs": 38.8,
+        "p95Ms": 76.5
+      },
+      "visibleAndFocused": {
+        "n": 12,
+        "medianMs": 38.8,
+        "p95Ms": 76.5
+      },
+      "firstFrameVisible": 12,
+      "activeAndVisibleAfter130ms": 12
+    },
+    {
+      "subject": "math",
+      "device": "desktop",
+      "version": "candidate",
+      "n": 12,
+      "fixtures": [
+        "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0"
+      ],
+      "items": [
+        "4 hundreds, 1 tens and 9 ones make what number?"
+      ],
+      "focused": {
+        "n": 12,
+        "medianMs": 35.2,
+        "p95Ms": 46.5
+      },
+      "firstVisible": {
+        "n": 12,
+        "medianMs": 36.8,
+        "p95Ms": 47.8
+      },
+      "visibleAndFocused": {
+        "n": 12,
+        "medianMs": 36.8,
+        "p95Ms": 47.8
+      },
+      "firstFrameVisible": 12,
+      "activeAndVisibleAfter130ms": 12
+    },
+    {
+      "subject": "math",
+      "device": "phone",
+      "version": "approved",
+      "n": 12,
+      "fixtures": [
+        "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0"
+      ],
+      "items": [
+        "4 hundreds, 1 tens and 9 ones make what number?"
+      ],
+      "focused": {
+        "n": 12,
+        "medianMs": 35.2,
+        "p95Ms": 370.5
+      },
+      "firstVisible": {
+        "n": 0,
+        "medianMs": null,
+        "p95Ms": null
+      },
+      "visibleAndFocused": {
+        "n": 0,
+        "medianMs": null,
+        "p95Ms": null
+      },
+      "firstFrameVisible": 0,
+      "activeAndVisibleAfter130ms": 0
+    },
+    {
+      "subject": "math",
+      "device": "phone",
+      "version": "candidate",
+      "n": 12,
+      "fixtures": [
+        "c8b4e08ced237a5d067ebabd9435395236b6a08ff2cb21c01952682ae6e530e0"
+      ],
+      "items": [
+        "4 hundreds, 1 tens and 9 ones make what number?"
+      ],
+      "focused": {
+        "n": 12,
+        "medianMs": 36.5,
+        "p95Ms": 92.7
+      },
+      "firstVisible": {
+        "n": 0,
+        "medianMs": null,
+        "p95Ms": null
+      },
+      "visibleAndFocused": {
+        "n": 0,
+        "medianMs": null,
+        "p95Ms": null
+      },
+      "firstFrameVisible": 0,
+      "activeAndVisibleAfter130ms": 0
+    }
+  ]
+}

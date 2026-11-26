@@ -1,0 +1,54 @@
+FAIL Language Arts desktop AssertionError [ERR_ASSERTION]: My Powers opens with the question focused and visible: {"focused":true,"visible":false,"top":876.28125,"bottom":923.078125,"viewport":900}
+    at exports.assertQuestionEntry (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/learning-entry-viewport.cjs:13:10)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at process.processImmediate (node:internal/timers:541:9)
+    at async subjectAndNative (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/language-integration.ts:67:5)
+    at async main (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/language-integration.ts:248:37) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+FAIL Language Arts mobile AssertionError [ERR_ASSERTION]: My Powers opens with the question focused and visible: {"focused":true,"visible":false,"top":1081.25,"bottom":1109.328125,"viewport":844}
+    at exports.assertQuestionEntry (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/learning-entry-viewport.cjs:13:10)
+    at async subjectAndNative (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/language-integration.ts:67:5)
+    at async main (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/language-integration.ts:248:37) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+PASS generated preview: isolated worker, channel validation, required ELA, replay release and provenance
+AggregateError: 2 Language Arts journeys failed
+    at main (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/language-integration.ts:250:30) {
+  [errors]: [
+    AssertionError [ERR_ASSERTION]: My Powers opens with the question focused and visible: {"focused":true,"visible":false,"top":876.28125,"bottom":923.078125,"viewport":900}
+        at exports.assertQuestionEntry (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/learning-entry-viewport.cjs:13:10)
+        at runNextTicks (node:internal/process/task_queues:65:5)
+        at process.processImmediate (node:internal/timers:541:9)
+        at async subjectAndNative (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/language-integration.ts:67:5)
+        at async main (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/language-integration.ts:248:37) {
+      generatedMessage: false,
+      code: 'ERR_ASSERTION',
+      actual: false,
+      expected: true,
+      operator: '==',
+      diff: 'simple'
+    },
+    AssertionError [ERR_ASSERTION]: My Powers opens with the question focused and visible: {"focused":true,"visible":false,"top":1081.25,"bottom":1109.328125,"viewport":844}
+        at exports.assertQuestionEntry (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/learning-entry-viewport.cjs:13:10)
+        at async subjectAndNative (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/language-integration.ts:67:5)
+        at async main (/workspace/jems-consolidation/audit-learning/initial-visibility-negative/tests/language-integration.ts:248:37) {
+      generatedMessage: false,
+      code: 'ERR_ASSERTION',
+      actual: false,
+      expected: true,
+      operator: '==',
+      diff: 'simple'
+    }
+  ]
+}

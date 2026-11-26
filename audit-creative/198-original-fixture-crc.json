@@ -1,0 +1,15 @@
+[
+  {
+    "chunk": "IHDR",
+    "crcMatches": true
+  },
+  {
+    "chunk": "IDAT",
+    "crcMatches": false,
+    "inflateError": "Error -3 while decompressing data: incorrect data check"
+  },
+  {
+    "chunk": "IEND",
+    "crcMatches": true
+  }
+]

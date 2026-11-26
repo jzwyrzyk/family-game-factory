@@ -1,0 +1,12 @@
+PASS learning desktop: grades, mandatory modes/rate, durable Lab error/help/exit, profile isolation, native pause/resume, shared remix history, fraction construction
+PASS quality learning desktop: actual driving result, short-round checkpoint, host input lock, shared pacing, workshop checkpoint, focus return and manual pause
+PASS declarative preview desktop: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+PASS generated preview desktop: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+PASS generated-v2 preview desktop: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+PASS learning mobile: grades, mandatory modes/rate, durable Lab error/help/exit, profile isolation, native pause/resume, shared remix history, fraction construction
+PASS quality learning mobile: actual driving result, short-round checkpoint, host input lock, shared pacing, workshop checkpoint, focus return and manual pause
+PASS declarative preview mobile: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+PASS generated preview mobile: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+PASS generated-v2 preview mobile: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling
+PASS archived v2 learning: immutable older archive remains blocked until a compatible new revision is reviewed
+PASS learning recovery: visible explanation, no replacement practice, unchanged future record and exact recovery export

@@ -1,0 +1,112 @@
+::group::node first
+::endgroup::
+CI_SUITE_RESULT {"command":["node","first"],"seconds":0,"exitCode":9}
+::group::node second
+::endgroup::
+CI_SUITE_RESULT {"command":["node","second"],"seconds":0,"exitCode":0}
+TAP version 13
+# Subtest: aggregates reject replaced or self-claimed plan bytes before parsing
+ok 1 - aggregates reject replaced or self-claimed plan bytes before parsing
+  ---
+  duration_ms: 1.581156
+  type: 'test'
+  ...
+# Subtest: all original Arcade leaf commands occur exactly once in their original required group
+ok 2 - all original Arcade leaf commands occur exactly once in their original required group
+  ---
+  duration_ms: 9.164839
+  type: 'test'
+  ...
+# Subtest: newly integrated regressions survive coordinated changes to both npm and the assignment
+ok 3 - newly integrated regressions survive coordinated changes to both npm and the assignment
+  ---
+  duration_ms: 2.098169
+  type: 'test'
+  ...
+# Subtest: retain the independent PR base or previous protected-push inventory
+ok 4 - retain the independent PR base or previous protected-push inventory
+  ---
+  duration_ms: 0.154885
+  type: 'test'
+  ...
+# Subtest: argv parser rejects executable shell expansion; hooks and recursive scripts require review
+ok 5 - argv parser rejects executable shell expansion; hooks and recursive scripts require review
+  ---
+  duration_ms: 0.75881
+  type: 'test'
+  ...
+# Subtest: failed commands remain failures while independent remaining commands still run once
+ok 6 - failed commands remain failures while independent remaining commands still run once
+  ---
+  duration_ms: 0.609694
+  type: 'test'
+  ...
+# Subtest: aggregate accepts complete successful receipts and rejects every false-pass state
+ok 7 - aggregate accepts complete successful receipts and rejects every false-pass state
+  ---
+  duration_ms: 40.567447
+  type: 'test'
+  ...
+# Subtest: PR narrowing requires base policy; non-PR narrowing without protected-main evidence fails
+ok 8 - PR narrowing requires base policy; non-PR narrowing without protected-main evidence fails
+  ---
+  duration_ms: 6.879997
+  type: 'test'
+  ...
+# Subtest: shared build identity invalidates changed source, tree, dependencies and artifact bytes
+ok 9 - shared build identity invalidates changed source, tree, dependencies and artifact bytes
+  ---
+  duration_ms: 0.442901
+  type: 'test'
+  ...
+# Subtest: authenticated TAR still rejects links, traversal, devices and duplicate members before extraction
+ok 10 - authenticated TAR still rejects links, traversal, devices and duplicate members before extraction
+  ---
+  duration_ms: 722.298212
+  type: 'test'
+  ...
+# Subtest: workflow adapter executes base policy, bootstraps full and keeps unopted main full
+ok 11 - workflow adapter executes base policy, bootstraps full and keeps unopted main full
+  ---
+  duration_ms: 602.093025
+  type: 'test'
+  ...
+# Subtest: main reuse requires literal opt-in, protected main and the exact trusted push predecessor
+ok 12 - main reuse requires literal opt-in, protected main and the exact trusted push predecessor
+  ---
+  duration_ms: 0.91158
+  type: 'test'
+  ...
+# Subtest: main aggregates require authentic reuse even for documentation and never mint new gameplay coverage
+ok 13 - main aggregates require authentic reuse even for documentation and never mint new gameplay coverage
+  ---
+  duration_ms: 6.623603
+  type: 'test'
+  ...
+# Subtest: protected-main adapter authenticates the predecessor policy and falls back on every missing evidence path
+ok 14 - protected-main adapter authenticates the predecessor policy and falls back on every missing evidence path
+  ---
+  duration_ms: 1581.052741
+  type: 'test'
+  ...
+# Subtest: aggregates authenticate exact plan bytes from the preparation output before parsing
+ok 15 - aggregates authenticate exact plan bytes from the preparation output before parsing
+  ---
+  duration_ms: 0.555512
+  type: 'test'
+  ...
+# Subtest: a reuse boolean is insufficient without bounded authenticated source and artifact proof
+ok 16 - a reuse boolean is insufficient without bounded authenticated source and artifact proof
+  ---
+  duration_ms: 0.711869
+  type: 'test'
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2988.458956

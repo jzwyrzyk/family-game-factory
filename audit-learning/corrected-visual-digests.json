@@ -1,0 +1,74 @@
+{
+  "desktop.png": {
+    "source": "f8a3111a1dfd8666ac32373e80737b200c84e27bad1b1f33cdcaa8401e936361",
+    "candidate": "f8a3111a1dfd8666ac32373e80737b200c84e27bad1b1f33cdcaa8401e936361",
+    "corrected": "f8a3111a1dfd8666ac32373e80737b200c84e27bad1b1f33cdcaa8401e936361",
+    "correctedSameScenario": "f8a3111a1dfd8666ac32373e80737b200c84e27bad1b1f33cdcaa8401e936361"
+  },
+  "dragon-counting.png": {
+    "source": "e95b477a295e439c6e858da0d0401e640d641e7a5e0851b36e3f999c1cc93986",
+    "candidate": "e95b477a295e439c6e858da0d0401e640d641e7a5e0851b36e3f999c1cc93986",
+    "corrected": "85e35ecfda76e50a49c4e66513d3ae6c2fd51d8243abc41ab50595e6ced26c6e",
+    "correctedSameScenario": "e95b477a295e439c6e858da0d0401e640d641e7a5e0851b36e3f999c1cc93986"
+  },
+  "phone.png": {
+    "source": "784111d49c5f0f94edc951d6efd09dc32e8a5cd31b207823ec617bb91f00890c",
+    "candidate": "784111d49c5f0f94edc951d6efd09dc32e8a5cd31b207823ec617bb91f00890c",
+    "corrected": "784111d49c5f0f94edc951d6efd09dc32e8a5cd31b207823ec617bb91f00890c",
+    "correctedSameScenario": "784111d49c5f0f94edc951d6efd09dc32e8a5cd31b207823ec617bb91f00890c"
+  },
+  "short-landscape.png": {
+    "source": "b82c19e222aec735b995b7d8509aca52250fc4e9e3c485ebafe2b6d2e34d6e2c",
+    "candidate": "b82c19e222aec735b995b7d8509aca52250fc4e9e3c485ebafe2b6d2e34d6e2c",
+    "corrected": "b82c19e222aec735b995b7d8509aca52250fc4e9e3c485ebafe2b6d2e34d6e2c",
+    "correctedSameScenario": "b82c19e222aec735b995b7d8509aca52250fc4e9e3c485ebafe2b6d2e34d6e2c"
+  },
+  "small-phone.png": {
+    "source": "1811dd911e42836a924508e6f63302383009f50a53a13e3f573fad86330755a2",
+    "candidate": "1811dd911e42836a924508e6f63302383009f50a53a13e3f573fad86330755a2",
+    "corrected": "1811dd911e42836a924508e6f63302383009f50a53a13e3f573fad86330755a2",
+    "correctedSameScenario": "1811dd911e42836a924508e6f63302383009f50a53a13e3f573fad86330755a2"
+  },
+  "state-correct.png": {
+    "source": "87b271197abcca9ea701770b858f7f4035aee150e942cd7778bdd1944987e937",
+    "candidate": "87b271197abcca9ea701770b858f7f4035aee150e942cd7778bdd1944987e937",
+    "corrected": "1f93ae6a545a691d9f70d7bd23440a8bc5566da03b9a15bb4d063179f91a9795",
+    "correctedSameScenario": "87b271197abcca9ea701770b858f7f4035aee150e942cd7778bdd1944987e937"
+  },
+  "state-selected.png": {
+    "source": "87f1b03c0ebf97d128925dfb89435ab85448399bb9d1d15357e94075f8d90758",
+    "candidate": "87f1b03c0ebf97d128925dfb89435ab85448399bb9d1d15357e94075f8d90758",
+    "corrected": "87f1b03c0ebf97d128925dfb89435ab85448399bb9d1d15357e94075f8d90758",
+    "correctedSameScenario": "87f1b03c0ebf97d128925dfb89435ab85448399bb9d1d15357e94075f8d90758"
+  },
+  "state-tools.png": {
+    "source": "e4f2e7a25ed44cb74ff1a869b227249afc4490f9a58ed81bece7b79a5b650880",
+    "candidate": "e4f2e7a25ed44cb74ff1a869b227249afc4490f9a58ed81bece7b79a5b650880",
+    "corrected": "e4f2e7a25ed44cb74ff1a869b227249afc4490f9a58ed81bece7b79a5b650880",
+    "correctedSameScenario": "e4f2e7a25ed44cb74ff1a869b227249afc4490f9a58ed81bece7b79a5b650880"
+  },
+  "state-worked.png": {
+    "source": "1dd7f2a3005d9d43c50cab7fc812abdb95aba479398ed42270c8a596d8671525",
+    "candidate": "1dd7f2a3005d9d43c50cab7fc812abdb95aba479398ed42270c8a596d8671525",
+    "corrected": "1dd7f2a3005d9d43c50cab7fc812abdb95aba479398ed42270c8a596d8671525",
+    "correctedSameScenario": "1dd7f2a3005d9d43c50cab7fc812abdb95aba479398ed42270c8a596d8671525"
+  },
+  "tablet-landscape.png": {
+    "source": "80e4760fef86d6b7ec3a1b2a0ab31add483d66c71a2b2f2cc69f297e891daebe",
+    "candidate": "80e4760fef86d6b7ec3a1b2a0ab31add483d66c71a2b2f2cc69f297e891daebe",
+    "corrected": "80e4760fef86d6b7ec3a1b2a0ab31add483d66c71a2b2f2cc69f297e891daebe",
+    "correctedSameScenario": "80e4760fef86d6b7ec3a1b2a0ab31add483d66c71a2b2f2cc69f297e891daebe"
+  },
+  "tablet-portrait.png": {
+    "source": "353b46a63ace8773152aa65dd310d2e43513f07ab11266f9ddbc24fbcb099b1c",
+    "candidate": "353b46a63ace8773152aa65dd310d2e43513f07ab11266f9ddbc24fbcb099b1c",
+    "corrected": "353b46a63ace8773152aa65dd310d2e43513f07ab11266f9ddbc24fbcb099b1c",
+    "correctedSameScenario": "353b46a63ace8773152aa65dd310d2e43513f07ab11266f9ddbc24fbcb099b1c"
+  },
+  "wide.png": {
+    "source": "552fe7df71514392e00025040dcbf6e771694e7ace035b27409487a7eee0de0d",
+    "candidate": "552fe7df71514392e00025040dcbf6e771694e7ace035b27409487a7eee0de0d",
+    "corrected": "552fe7df71514392e00025040dcbf6e771694e7ace035b27409487a7eee0de0d",
+    "correctedSameScenario": "552fe7df71514392e00025040dcbf6e771694e7ace035b27409487a7eee0de0d"
+  }
+}

@@ -1,0 +1,1226 @@
+[
+  {
+    "pr": 196,
+    "head": "6c38b2507abf355bfe351d51a375165ec0c54ca3",
+    "merge_base": "bc602f1ede502f398308ad56f973c4bf7997ff08",
+    "title": "Adopt authentic artwork and shared creative-world contracts",
+    "pr_body": "## Intent and resulting behavior\n\nAdopt the owner's Connected Creative Universe directive for Workstreams A\u2013F. The standard establishes permanent protection of original artwork and the 2D direction for new games. It assigns ownership of drawing, identity, worlds, animation, game bindings, recovery and migration review.\n\n## Implementation and integration\n\nFoundation for the drawing and integrated picker PRs. Base protected main `bc602f1ede502f398308ad56f973c4bf7997ff08`. The Learning Workspace series #192\u2013195 owns temporary working paper and keeps its independent release sequence.\n\n## Evidence and documentation\n\nThe documentation range check verifies routing and links for head `6c38b2507abf355bfe351d51a375165ec0c54ca3`. The product doctrine, new standard, ADR, index, registry, PR template and maintenance process now describe version pinning and source ownership.\n\n## Preview, acceptance and delivery\n\nDocumentation only. Rendered and storage acceptance belongs to the dependent source PRs. This PR requests review and authorizes no deployment, spending, production bridge or family activation.\n",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 7,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          ".github/PULL_REQUEST_TEMPLATE.md",
+          "PRODUCT-DOCTRINE.md",
+          "docs/README.md",
+          "docs/creative-universe/STANDARD.md",
+          "docs/decisions/2026-11-26-connected-creative-universe.md",
+          "docs/decisions/README.md"
+        ],
+        "byte_identical_to_interim_B": [
+          "docs/context/MAINTENANCE.md"
+        ]
+      },
+      "test": {
+        "changed_on_source": 0,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 0,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [],
+        "byte_identical_to_interim_B": []
+      }
+    }
+  },
+  {
+    "pr": 197,
+    "head": "637914ba850d42cb64ee7a45e071b88573c80716",
+    "merge_base": "bc602f1ede502f398308ad56f973c4bf7997ff08",
+    "title": "Establish the Jems Creative Asset and World Design Standard",
+    "pr_body": "## Intent and resulting behavior\n\nRecord the owner's Connected Creative Universe and Drawing Workspace directives. The canonical standard specifies authentic child artwork, exact admitted originals, 2D development, versioned reuse and the independent release gate for generated-game delivery.\n\n## Implementation and integration\n\nProtected base `bc602f1ede502f398308ad56f973c4bf7997ff08`. The standard assigns source and migration responsibility to A\u2013F and documents the boundary to temporary learning paper in PRs #192\u2013195. The implementation PR depends on this standard.\n\n## Evidence\n\n| Check | Source | Result |\n| --- | --- | --- |\n| npm run docs:check | 637914ba850d42cb64ee7a45e071b88573c80716 | Link, routing and fingerprint checks passed. |\n\n## Preview and acceptance\n\nDocumentation-only change. Interactive application evidence belongs in the implementation PR.\n\n## Documentation review\n\nUpdated product doctrine, architecture, decision and documentation indexes, drawing gold standard, documentation review registry and the PR template.\n\n## Delivery and follow-up\n\nProposed standard. This PR carries no runnable application change, release intent, worker setting or deployment.\n",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 8,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          ".github/PULL_REQUEST_TEMPLATE.md",
+          "ARCHITECTURE-CURRENT.md",
+          "PRODUCT-DOCTRINE.md",
+          "docs/README.md",
+          "docs/decisions/2026-11-26-connected-creative-universe.md",
+          "docs/decisions/README.md",
+          "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md",
+          "docs/drawings/GOLD_STANDARD.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 0,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 0,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [],
+        "byte_identical_to_interim_B": []
+      }
+    }
+  },
+  {
+    "pr": 198,
+    "head": "81767273becb93bd9bae9a46725b26af644e4578",
+    "merge_base": "bc602f1ede502f398308ad56f973c4bf7997ff08",
+    "title": "Set the creative asset and world standard and preserve exact reviewed originals",
+    "pr_body": "## Intent and resulting behavior\n\nEstablish the owner-approved Creative Asset & World Design Standard for A\u2013F. The reviewed adult workshop import retains the same PNG bytes that the operator authorized. Its format check rejects files with embedded file-detail chunks or trailing bytes before sending a digest.\n\n## Implementation and integration\n\nBase `bc602f1ede502f398308ad56f973c4bf7997ff08`. Head `81767273becb93bd9bae9a46725b26af644e4578`. This head includes both parallel standards proposals through Git ancestry, #196 at `6c38b2507abf355bfe351d51a375165ec0c54ca3` and #197 at `637914ba850d42cb64ee7a45e071b88573c80716`. Both documentation entry points resolve to one canonical standard. This is the foundation for the integrated creative editor PR. The import uses the existing private art store, digest approval, trusted device unlock and selected profile. Historical beta rasters retain their original stored representation. The parallel learning stack #192\u2013195 owns transient scratchpad work.\n\n## Evidence\n\n| Acceptance criterion | Local check on this tree | Result |\n| --- | --- | --- |\n| Exact accepted bytes, digest-only host request, refusal and concurrent profile switch | `CHROMIUM_PATH=/usr/bin/chromium node tests/beta-reviewed-art-browser.cjs` | Passed using real PNG/IndexedDB, synthetic origin and simulated authorization responses |\n| Container acceptance and rejection | `node --import tsx tests/beta-reviewed-png.test.ts` | Both tests passed |\n| Type and documentation contracts | `npm run typecheck`, `npm run docs:check` | Passed |\n\n## Preview and acceptance\n\nThe input retains its existing presentation. To review behavior in private DEV, import a synthetic operator-reviewed raster-only PNG and compare its stored digest to the submitted digest. Try a file with embedded metadata. Private DEV access, owner acceptance, deployed TEST and physical device verification are pending.\n\n## Documentation review\n\nProduct doctrine, architecture, delivery record, documentation map, decisions, family operator/privacy guides and PR template point to the standard. Reviewed experience, creation, art, validation, delivery and context. Source adds a managed family browser check.\n\n## Delivery and follow-up\n\nDraft source only. Existing family, operator and privacy restrictions apply. No worker change, traffic change, paid operation or external family activation. General generated-game asset delivery remains subject to independent security and release qualification.\n",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 13,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          ".github/PULL_REQUEST_TEMPLATE.md",
+          "ARCHITECTURE-CURRENT.md",
+          "DELIVERY-STATE.md",
+          "docs/README.md",
+          "docs/creative-universe/STANDARD.md",
+          "docs/decisions/README.md",
+          "docs/drawings/GOLD_STANDARD.md",
+          "docs/family-beta/OWNER.md",
+          "docs/family-beta/PRIVACY.md"
+        ],
+        "byte_identical_to_interim_B": [
+          "PRODUCT-DOCTRINE.md",
+          "docs/context/MAINTENANCE.md",
+          "docs/decisions/2026-11-26-connected-creative-universe.md",
+          "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md"
+        ]
+      },
+      "test": {
+        "changed_on_source": 2,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "tests/beta-reviewed-art-browser.cjs"
+        ],
+        "byte_identical_to_interim_B": [
+          "tests/beta-reviewed-png.test.ts"
+        ]
+      },
+      "runtime": {
+        "changed_on_source": 2,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "src/family-beta/artwork.ts"
+        ],
+        "byte_identical_to_interim_B": [
+          "src/family-beta/reviewed-png.ts"
+        ]
+      }
+    }
+  },
+  {
+    "pr": 199,
+    "head": "5a0970e487d8630eeafd8f8792b092c17936c425",
+    "merge_base": "6c38b2507abf355bfe351d51a375165ec0c54ca3",
+    "title": "Creative Universe A: keep editable original drawings and revision history",
+    "pr_body": "## Intent and resulting behavior\n\nWorkstream A of the Connected Creative Universe directive lets a child continue a kept drawing from its original brush strokes. My Art offers an eraser, clear paper and a **Keep drawing** action on supported sketches. Saving a change produces an immutable child-owned image revision. Each previously saved scene or adventure keeps its selected version.\n\n## Implementation and integration\n\nThis draft depends on the Creative Asset & World Design Standard at `6c38b2507abf355bfe351d51a375165ec0c54ca3`. The candidate is `5a0970e487d8630eeafd8f8792b092c17936c425`. Its application source matches the first implementation head, `dc1dba8a6c4d139ca887aaf3f8bc1eb622d7ecfb`. The private drawing store owns the exact kept PNG, including its bounded, versioned ancillary crayon chunk. The existing source ID, source digest, image capacity checks and family transfer transactions apply. Opening first validates record bounds and checksum, then compares every pixel of the rendered strokes with the decoded original. A differing renderer or invalid source leaves the exact saved image available in picture tools. Uploads and older images retain their existing raster representation. This is additive and requires no database migration. An earlier client can display and back up the same PNG. Follow-on work can use the drawing dialog and the shared PNG checksum helper.\n\n## Evidence\n\nThe fixture makes a synthetic pebble with boots through real pointer input. It saves and reloads the sketch, checks erasing and undo/redo, compares original bytes after a new revision, restores the exported library into an empty browser context, and checks mismatched replay rejection and zero POSTs. The phone screenshot exercises the recovered source. The desktop screenshot exercises the drawing activity. [Desktop drawing](https://github.com/jzwyrzyk/family-game-factory/blob/dc1dba8a6c4d139ca887aaf3f8bc1eb622d7ecfb/docs/creative-universe/evidence/editable-sketch.png) \u00b7 [Restored phone drawing](https://github.com/jzwyrzyk/family-game-factory/blob/dc1dba8a6c4d139ca887aaf3f8bc1eb622d7ecfb/docs/creative-universe/evidence/restored-sketch-phone.png)\n\nAll of the following local checks passed against clean corrected source `5a0970e487d8630eeafd8f8792b092c17936c425`.\n\n| Check | Result and scope |\n| --- | --- |\n| `npm run build` | TypeScript and production Vite build passed. The served build receipt reports the exact commit and a clean tree. |\n| `npm run test:art` | All 24 drawing, binding and scene-art unit checks passed. |\n| `npm run test:art-browser` | All seven browser scripts passed. Coverage includes 46 private-storage contracts, draft recovery, revision lineage, real local PNG codecs, explicit scene bindings, profile changes, desktop and emulated touch flows and the new crayon round trip. |\n| `npm run docs:check -- --base 6c38b2507abf355bfe351d51a375165ec0c54ca3 --head 5a0970e487d8630eeafd8f8792b092c17936c425` | Zero errors and zero review reminders. |\n\nThe linked development captures show the same drawing and controls exercised by the exact-head run. The latter captured fresh desktop and phone images with SHA-256 digests `176e9850c8a04de5ad2abde359b31d7e13eabd68c61ec26c2d87d94fd9d8950f` and `e446693fda63ccdc50e1d6216995865027e956b437fff6f050a5a5b456351772` respectively.\n\n### CI coverage correction\n\nThe first Arcade run stopped in prepare's `npm run test:ci`. The added browser journey raised the creative leaf-command count to 66 while the coverage fixture still expected 65. Local reproduction at the first head failed exactly one of 118 tests. The downstream aggregates rejected the absent plan and shard receipts as designed. The corrected head updates the expected count to 66 and the validation review record. All 118 CI contract tests passed locally on the corrected head. The production build, 24 art unit tests, all seven art browser scripts, and range docs check passed again at that clean head. The exact-head screenshot digests also reproduced. The new hosted Arcade run is pending. [Corrected-head run](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45748427756) [Initial failed prepare](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45746979497/job/139665294953)\n\n## Preview and acceptance\n\nLocal production-bundle Chromium testing uses generated fixture marks and an emulated phone viewport. For manual acceptance, open My Art \u2192 Draw here, draw and keep a picture, reopen **Keep drawing**, undo a stroke and save a second version. Both images should remain selectable. Export and restore the library on another local test profile to check editable recovery. Hosted DEV, TEST/UAT, physical tablet, owner acceptance and production release evidence are pending.\n\n## Documentation review\n\nReviewed the product doctrine, current architecture, Art Studio gold standard, child-interface requirements, storage and recovery contract, permanent Creative Asset & World Design Standard and the CI/release contracts. Updated the Art Studio feature contract and routed the new browser journey to its review area. The package adds the regression to the existing artwork CI gate. The established release process, product intent and validation policy still apply.\n\n## Delivery and follow-up\n\nSource implementation is proposed in this draft. The existing private storage and reader remain the recovery path across rollback. No worker pin, service configuration, deployment, spend or family activation is included. General generated-game artwork delivery still requires independent qualification.\n",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 1,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "docs/drawings/ART_STUDIO.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 2,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "scripts/ci/pipeline.test.mjs",
+          "tests/crayon-revision-browser.cjs"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 5,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "src/drawing/crayon-source.ts",
+          "src/drawing/paint.ts",
+          "src/drawing/studio.ts",
+          "src/drawing/style.css"
+        ],
+        "byte_identical_to_interim_B": [
+          "src/drawing/png-crc.ts"
+        ]
+      }
+    }
+  },
+  {
+    "pr": 200,
+    "head": "19189bf436369bd6deca26b9fa6fd635b04c1317",
+    "merge_base": "6c38b2507abf355bfe351d51a375165ec0c54ca3",
+    "title": "Creative Universe 1 \u00b7 Preserve authentic child art and illustrate four Jems worlds",
+    "pr_body": "## Intent and resulting behavior\n\nThe owner approved a connected private art library and four original worlds. This first review unit establishes the permanent authorship and 2D rules and supplies the product-owned art catalogue consumed by the scene renderer in the dependent implementation.\n\n## Implementation and integration\n\nReconciled with the canonical standard in #196. Base `6c38b2507abf355bfe351d51a375165ec0c54ca3`, head `19189bf436369bd6deca26b9fa6fd635b04c1317`. Four original painted settings, eight transparent stage layers, four small previews and 32 individual props. The Moon and Cloud catalogues share a golden star. No child artwork or private data was supplied to ImageGen. Runtime indices and provenance identify every shipped file. Later review units integrate the drawing workspace and the rendered scenes.\n\n## Evidence\n\nTypecheck passed. The catalogue test checked all 48 optimized files against their expected digest, size, world and dimensions. Four 16:9 compositions were inspected. The cloud prop sheet was replaced and rechecked on dark backing. [Manifest](https://github.com/jzwyrzyk/family-game-factory/blob/19189bf436369bd6deca26b9fa6fd635b04c1317/docs/creation-studio/world-art-manifest.json)\n\n## Preview and acceptance\n\nLocal product art candidates are available under `public/art/creative-worlds/v1`; previews end in `-preview.webp`. Actual stage, full-screen, export and viewport evidence belong to the dependent implementation. Owner art approval, private DEV and TEST acceptance are pending.\n\n## Documentation review\n\nProduct doctrine, the decision index, Creative Asset & World Design Standard, art direction record, documentation registry and PR template were updated. Local `npm run docs:check` passed.\n\n## Delivery\n\nDraft source for review. Production and external family activation remain under their existing release gates.",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 3,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "DELIVERY-STATE.md",
+          "docs/creation-studio/WORLD_ART.md",
+          "docs/creative-universe/STANDARD.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 1,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "tests/creative-world-art.test.ts"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 1,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [],
+        "byte_identical_to_interim_B": [
+          "src/creation/illustrated-art.ts"
+        ]
+      }
+    }
+  },
+  {
+    "pr": 201,
+    "head": "114e03b44253f85a715fe6f0d84e868c8b573f55",
+    "merge_base": "5a0970e487d8630eeafd8f8792b092c17936c425",
+    "title": "Draw and reuse movement paths for private artwork in Creative Studio",
+    "pr_body": "## Intent and resulting behavior\n\nA child can select an original picture or cutout in Creative Studio and draw a movement path for it with a mouse, touch or direction buttons. The child chooses its name and speed. Adding the path writes editable Move blocks to the selected actor\u2019s script. The saved picture remains pinned to its original reference. A kept scene makes its path available for reuse in another private-art scene.\n\n## Implementation and integration\n\nWorkstream C depends on `feat/creative-drawing-source` at `5a0970e487d8630eeafd8f8792b092c17936c425`. The final runtime source is `73779309bfa22cc45e65ecda9968e81e12a77643`. The evidence and CI contract head is `114e03b44253f85a715fe6f0d84e868c8b573f55`. This PR owns the motion composer, optional Repeat-group name and owner-scoped kept-revision reads from both scene storage authorities. Coordinate overlapping `creation/ui.ts`, `model.ts` and the review fingerprints with B, D and F before integration.\n\nThe path uses up to 24 relative moves with explicit durations. Scene playback uses the existing fixed-clock engine. Copies receive new block IDs, so changing the kept source leaves the destination intact. A temporary path pad stays in memory until added or closed. Undo, draft recovery, scene bundles, private references and explicit Keep flow through current contracts.\n\n## Evidence\n\n| Claim | Exact-source evidence | Scope |\n| --- | --- | --- |\n| Build and deterministic movement | `npm run build`, `npm run test:creation` on `fe015626` | Typecheck and Vite passed. All 90 tests passed with the local fixture server available. The first network-restricted run could not run the generated-manifest fixture suite. |\n| Render, reuse and undo | `node tests/creation-motion-browser.cjs` on the built application | Chromium traced a path with the mouse, used the keyboard arrows, stepped playback in reduced-motion mode and finished at the expected stage position. The second scene copied the kept path with fresh IDs. No POST requests occurred. |\n| Portrait regression | The first expanded sweep at `fe015626` found the 768 \u00d7 1024 bundled starter too small when Step was available for every actor. | `73779309` confines that shortcut to private artwork. All eight responsive first-learner journeys, native Chromium 150% zoom and the focused motion journey passed on the corrected build. All three screenshots were byte-identical on the corrected build. A Chromium touch-event drag on a tablet viewport also passed on the first build. |\n| Visual evidence | [Desktop pad](docs/creative-universe/evidence/motion/draw-a-path.png), [390 px pad](docs/creative-universe/evidence/motion/draw-a-path-phone.png), [playback](docs/creative-universe/evidence/motion/path-playback.png) | Synthetic artwork, desktop Chromium and phone viewport emulation. |\n| Creative shard coverage | The first coverage expectation retained the previous 65 leaf commands. The drawing and motion browser journeys add one creative leaf each. | The corrected expectation is 67 creative, 43 browser, 12 learning and 2 notifications. All 118 CI contract tests passed locally. The checker retains its missing and duplicate command negatives. |\n| Review and regression routing | `node scripts/ci/suites.mjs` and exact-range `npm run docs:check` | Existing Creative Studio unit and browser suites include the new regressions. Documentation reports zero errors. |\n\n## Preview and acceptance\n\nPrivate DEV, TEST and owner review remain pending. To review, open a drawing in Creative Studio, choose **Draw a path**, trace or use arrows, add it and Keep the scene. Open another drawing, select **Paths from my kept scenes** and play the copied path. The current implementation moves a whole actor. Physical rigs retain their existing editor and runtime. No real family data or physical-device acceptance was part of the local checks.\n\n## Documentation review\n\nConsulted the artwork, scene, storage, release, child interface and Creative Asset & World standards. Updated the [scene contract](docs/creation-studio/README.md), [drawn-path guide](docs/creation-studio/DRAWN_PATHS.md), architecture and review records. Package changes add coverage within existing CI shard assignments and deployment governance.\n\n## Delivery and follow-up\n\nDraft source for review. Hosted qualification, production deployment and external family activation are pending. The changes add no model calls, billed operations or generated-game artwork delivery.\n",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 3,
+        "path_absent_from_interim_B": [
+          "docs/creation-studio/DRAWN_PATHS.md"
+        ],
+        "differs_from_interim_B": [
+          "ARCHITECTURE-CURRENT.md",
+          "docs/creation-studio/README.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 3,
+        "path_absent_from_interim_B": [
+          "tests/creation-motion-browser.cjs",
+          "tests/creation-motion-path.test.ts"
+        ],
+        "differs_from_interim_B": [
+          "scripts/ci/pipeline.test.mjs"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 9,
+        "path_absent_from_interim_B": [
+          "src/creation/motion-editor.css",
+          "src/creation/motion-editor.ts",
+          "src/creation/motion-path.ts"
+        ],
+        "differs_from_interim_B": [
+          "src/creation/learner-controls.ts",
+          "src/creation/model.ts",
+          "src/creation/storage.ts",
+          "src/creation/ui.ts",
+          "src/storage/creation-workspace.ts",
+          "src/storage/indexed-creation.ts"
+        ],
+        "byte_identical_to_interim_B": []
+      }
+    }
+  },
+  {
+    "pr": 202,
+    "head": "80fab162842b2cc99bb9e0dfdae5e7ed17ab2b10",
+    "merge_base": "6c38b2507abf355bfe351d51a375165ec0c54ca3",
+    "title": "Qualify a pinned private sprite slot with the offline 2D sandbox",
+    "pr_body": "## Intent and resulting behavior\n\nOwner-authorized Workstream E calls for scoped delivery of private artwork in generated 2D games, pending independent qualification. This PR exercises a single selected synthetic sprite with the archived v2 runtime. An actual keyboard input moves the public fixture actor. A trusted compositor paints the exact selected pixels at that actor's reported position.\n\n## Implementation and integration\n\nStacked on [the creative universe contract, #196](https://github.com/jzwyrzyk/family-game-factory/pull/196), base `6c38b2507abf355bfe351d51a375165ec0c54ca3`. Source head `80fab162842b2cc99bb9e0dfdae5e7ed17ab2b10`. The QA harness receives validated display commands through the existing QA capture. Private bytes, database handles, owner and family IDs stay outside the generated iframe and worker. The reviewed slot binds a public alias to an artifact digest and game revision. The host binding adds the exact selected asset revision and content hash. A fresh permitted play session is required. No schema migration, hosted handler, production switch, paid operation or release workflow is introduced.\n\n## Evidence\n\n| Criterion | Local check at the source head above | Result |\n| --- | --- | --- |\n| Approved 2D behavior and compatibility | `CHROMIUM_PATH=/usr/bin/chromium npm run test:generated-art` | Existing desktop, tablet, phone, unknown-image/decode and retained-runtime checks plus the new offline fixture pass. |\n| Selected pixels in motion | Ordinary right-arrow input in the archived sandbox, revalidated image command, aspect-fit and center/transparent-margin pixel assertions | Pass. The workshop is approved Jems environment artwork. The small drawing is synthetic. [Rendered compositor capture](https://github.com/jzwyrzyk/family-game-factory/blob/80fab162842b2cc99bb9e0dfdae5e7ed17ab2b10/docs/game-intelligence/evidence/generated-slot-compositor.png). |\n| Isolation, exact pins and lifecycle | Wrong family, owner, game revision, artifact, slot, selected revision and digest, denied consent, unrecognized alias and revoked session | Pass. The iframe receives no selected raster or local owner ID. Zero network requests after the fixture shell opens. |\n| Static checks | `npm run typecheck` and `npm run docs:check` | Pass. Documentation checker reports zero errors and reminders. |\n\nOne early harness iteration failed because tsx's function-name helper was missing from a Playwright-serialized fixture callback. The synthetic page provides that helper. This adds coverage to the existing generated-art suite. The initial 0ce941d hosted run failed its exact browser-group count assertion (the new generated-art leaf raises it from 43 to 44). Its PR-range docs check also required the new contract in the routed documentation index. Head 80fab16 updates the explicit count and reference index. The locally reproduced CI orchestration suite passes 118 checks, and the base-to-head documentation check passes with zero errors or reminders. CI selection and shard configuration remain unchanged.\n\n## Preview and acceptance\n\nThe production application has no entrance to this qualification tool. The screenshot and repeatable browser command above cover the proposed design on local Chromium. Hosted DEV/TEST, independent security review, physical devices, production deployment and family activation are outside this evidence.\n\n## Documentation and context review\n\nThe [scoped delivery contract](https://github.com/jzwyrzyk/family-game-factory/blob/80fab162842b2cc99bb9e0dfdae5e7ed17ab2b10/docs/game-intelligence/PRIVATE-SPRITE-QUALIFICATION.md) records authorship, version pins, limitations and deployment boundaries. The reference registry routes the new contract and tooling. The generation, validation, delivery and routing reviews cover this diff.\n\n## Delivery and follow-up\n\nThis draft is available for source and independent security review. General delivery needs a scoped production frame transport, camera/layer composition, persisted grant and consent lifecycle, recovery, independent hosted qualification and release approval. The separate picture-hunt feature uses trusted local scene storage and can be reviewed independently.\n",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 3,
+        "path_absent_from_interim_B": [
+          "docs/game-intelligence/PRIVATE-SPRITE-QUALIFICATION.md"
+        ],
+        "differs_from_interim_B": [
+          "docs/README.md",
+          "docs/evidence/README.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 2,
+        "path_absent_from_interim_B": [
+          "tests/generated-private-slot-browser.ts"
+        ],
+        "differs_from_interim_B": [
+          "scripts/ci/pipeline.test.mjs"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 0,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [],
+        "byte_identical_to_interim_B": []
+      }
+    }
+  },
+  {
+    "pr": 204,
+    "head": "ba220630d229ad5cf46ceca3dcb8fc3afc3a2223",
+    "merge_base": "81767273becb93bd9bae9a46725b26af644e4578",
+    "title": "Validate reviewed PNG scanlines before preserving exact originals",
+    "pr_body": "## Intent and resulting behavior\n\nThe restricted family uploader can keep the exact PNG approved for that family. This change qualifies the image portion of the file before requesting its digest approval. The color model determines which palette and transparency records apply. A streaming check verifies the expected number of scanline bytes, including interlaced passes. Ordinary decoding, private storage, the active explorer check and the adult unlock continue through the existing uploader.\n\n## Implementation and integration\n\nDirect dependency on #198 at `81767273becb93bd9bae9a46725b26af644e4578`. Scoped head `ba220630d229ad5cf46ceca3dcb8fc3afc3a2223`. The original-byte uploader, digest review API and Chromium acceptance test belong to #198. This follow-up extends its file validation and existing positive and negative fixtures. It introduces no storage migration, external dependencies or generated-game access.\n\n## Evidence\n\n| Check on the scoped source | Local outcome |\n| --- | --- |\n| `node --import tsx tests/beta-reviewed-png.test.ts` | Three tests pass, covering exact truecolor, indexed transparency and interlaced rasters, file details, truncated containers, palette applicability and expected scanline counts |\n| `CHROMIUM_PATH=/usr/bin/chromium node tests/beta-reviewed-art-browser.cjs` | Real file input and IndexedDB pass exact bytes, digest-only authorization, refusal and explorer change using synthetic fixtures |\n| `npm run typecheck` and `npm run build:family-beta` | Pass. Vite reports its existing chunk-size advisory |\n| `npm run docs:check` | Pass after reviewing the experience and validation entries |\n\n## Preview and acceptance\n\nThe operator input uses its existing presentation. No new visual surface or screenshot. In private DEV, try an approved synthetic indexed or truecolor PNG through the guardian input and compare its stored digest with the reviewed digest. A PNG with incomplete picture data should stop before any approval request. The new check requires browser support for streaming DEFLATE. Private DEV, owner acceptance and hosted TEST remain pending.\n\n## Documentation review\n\nThe architecture corrects its historical raster-reencoding statement. The operator guide identifies the indexed-color palette and documents preparing a separate image-only export for review. Rejected input leaves the source file in the guardian's possession. Previously saved raster-only uploads retain their historical stored representation.\n\n## Delivery and follow-up\n\nDraft source and offline validation. The existing digest authorization, family privacy settings, device qualification and release process govern any rollout. No deployment, family data transfer, traffic cutover or paid operation was performed.\n",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 2,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "ARCHITECTURE-CURRENT.md",
+          "docs/family-beta/OWNER.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 1,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "tests/beta-reviewed-png.test.ts"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 2,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "src/family-beta/artwork.ts",
+          "src/family-beta/reviewed-png.ts"
+        ],
+        "byte_identical_to_interim_B": []
+      }
+    }
+  },
+  {
+    "pr": 205,
+    "head": "ac5bc7942e40057013f316440574122ad95a8c48",
+    "merge_base": "81767273becb93bd9bae9a46725b26af644e4578",
+    "title": "Workstream F: verify private artwork across retained worlds before editor integration",
+    "pr_body": "## Intent and resulting behavior\n\nThis is the compatibility prerequisite for Workstream F. It extends the converged Creative Asset & World Design Standard and exercises actual My Art, scene editing, drawing selection, Keep and portable export in the standalone interactive reviewer.\n\n## Implementation and integration\n\nStacked on #198 at `81767273becb93bd9bae9a46725b26af644e4578`. Protected main was `bc602f1ede502f398308ad56f973c4bf7997ff08`. The new browser check runs in the existing standalone UI workflow and writes into its evidence artifact. #195 separately extends the review suite and learning host. #200 supplies the illustrated catalogue. F editor integration also depends on D's universal selection contract.\n\n## Evidence\n\n| Claim | Check | Result |\n| --- | --- | --- |\n| Retained scenes preserve a private drawing | `node tools/ui-review/world-compatibility.cjs` | Passed on test source `1a4e1d2e9630836359a8a86df24be09ee0b165df`. The fixture exported its exact uploaded PNG bytes, rendered one known pigment across four distinct canvases, retained actor and program data through undo/redo and reopened its first project. |\n| Layout | Same run, Chromium, synthetic data | Captured 1440\u00d7900, 820\u00d71180 and 390\u00d7844 workspaces and stage PNGs under `test-results/ui-review/world-compatibility/`. No external requests or page exceptions. |\n| Existing behavior | Protected baseline, `npm run test:creation`, `npm run test:art`, `npm run test:creation-browser`, `node tests/creation-private-art-browser.cjs` | 87 creation and 24 art unit tests passed. Browser checks exercised playback, project recovery, owner isolation, late decode, export and responsive layouts. |\n| Build and reference checks | `npm run build`, `npm run review:build`, `npm run docs:check` | Passed locally. |\n\n## Preview and acceptance\n\nThe downloadable HTML was tested locally using its in-memory transport after managed Chromium denied direct file navigation. Hosted CI uses the normal file entry. Owner, physical-device and hosted TEST acceptance for premium composition are pending. The four worlds exercised here are the retained v1 backgrounds.\n\n## Documentation review\n\nUpdated the canonical standard, UI review guide, delivery ledger and validation/delivery review records. The normal PR artifact carries the regenerable screenshots. Receipt-only head `ac5bc7942e40057013f316440574122ad95a8c48`.\n\n## Delivery and follow-up\n\nDraft test and standards change. The premium editor, independent game-delivery qualification, production and external-family activation are separate.",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 3,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "DELIVERY-STATE.md",
+          "docs/creative-universe/STANDARD.md",
+          "docs/ui-review/README.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 0,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 0,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [],
+        "byte_identical_to_interim_B": []
+      }
+    }
+  },
+  {
+    "pr": 206,
+    "head": "897ac9301b0424ea163dceb22fcd0903eb3f1779",
+    "merge_base": "81767273becb93bd9bae9a46725b26af644e4578",
+    "title": "Qualify scoped drawing slots in isolated 2D game playback",
+    "pr_body": "## Intent and resulting behavior\n\nA reviewer can play a compiled 2D game locally with a synthetic picture in its selected actor slot. The normal generated-game client does not receive private artwork. This branch implements Workstream E of the Connected Creative Universe directive.\n\n## Implementation and integration\n\nBase is the converged standard and family file contract in #198 at `81767273becb93bd9bae9a46725b26af644e4578`. Candidate `897ac9301b0424ea163dceb22fcd0903eb3f1779`. The trusted local adapter checks an exact compiled artifact, declared actor slot, captured owner and image pin, then produces a bounded raster with no embedded source or metadata. The local frame and worker are removed on exit. The production entry never selects this adapter. Independent security and release qualification is required before designing any production admission. Premium publication PR #169 retains its separate worker and digest scope.\n\n## Evidence\n\n| Claim | Check at candidate source | Result |\n| --- | --- | --- |\n| Existing generated fixtures and isolated actor slot work | npm run test:generated-art | Desktop, tablet and phone fixtures and actual synthetic worker journey passed in Chromium. |\n| Typed source and documentation | npm run typecheck and SHA-range npm run docs:check | Passed. |\n| Visible child drawing in a 2D game | [Rendered screenshot](docs/game-intelligence/evidence/connected-art/workshop-rock.png) | Synthetic artwork, offline review only. |\n\n## Preview and acceptance\n\nThe qualification artifact can be built locally as described in the [premium contract](docs/game-intelligence/PREMIUM-BUILDER.md). Hosted DEV, TEST, owner and physical-device acceptance remain pending.\n\n## Documentation review\n\nUpdated the generation contract and recorded the validation and delivery reviews. No production data route or worker setting was added.\n\n## Delivery and follow-up\n\nDraft source and offline qualification. No deployment, external family activation, model request or paid trial.\n",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 1,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "docs/game-intelligence/PREMIUM-BUILDER.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 1,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [],
+        "byte_identical_to_interim_B": [
+          "tests/creative-game-art-browser.ts"
+        ]
+      },
+      "runtime": {
+        "changed_on_source": 0,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [],
+        "byte_identical_to_interim_B": []
+      }
+    }
+  },
+  {
+    "pr": 207,
+    "head": "16c4132d92e8c9d21ae20b604238656184e42fa7",
+    "merge_base": "81767273becb93bd9bae9a46725b26af644e4578",
+    "title": "Integrate editable drawing revisions, coded paths, reviewed PNGs and four illustrated worlds",
+    "pr_body": "## Intent and resulting behavior\n\nA child can reopen a layered crayon drawing, keep another revision and use a drawn path in a Creative Studio actor program. The host can select from a versioned collection of four Jems worlds. This prerequisite supplies the catalogue, artwork and provenance for the downstream stage renderer. Reviewed family PNGs keep their exact approved bytes after bounded validation.\n\n## Implementation and integration\n\nThe integration base is #198 at `81767273becb93bd9bae9a46725b26af644e4578`. The source head is `16c4132d92e8c9d21ae20b604238656184e42fa7` and its tree is `2645d38f05b0e02daea213bbd49656056d2a1175`.\n\n| Input | Scope and ownership |\n| --- | --- |\n| #199, incorporated through #201 | My Art owns editable crayon sources and immutable private PNG revisions. |\n| #201, `e1b67c17fa3c2ff103b221173cf476ac82d09206` | Creative Studio owns named paths represented by ordinary editable movement blocks, their actor programs and stored revisions. |\n| #200, `19189bf436369bd6deca26b9fa6fd635b04c1317` | The world catalogue owns 48 original files, including 32 props. The stage owner qualifies their composition with real actors. |\n| #204, `ba220630d229ad5cf46ceca3dcb8fc3afc3a2223` | Reviewed-family import owns PNG envelope and raster admission ahead of local storage. |\n \nWorkstreams A, B and C supply these interfaces to D, E and F. The downstream activity integration and the separate learning-workspace stack have their own PRs. #205 is outside this input cutoff.\n\n## Evidence\n\nAll local checks below used the exact source head listed above. The two illustrated and drawing paths use synthetic artwork.\n\n| Check | Result and limits |\n| --- | --- |\n| TypeScript and frontend production build | Passed. Generated build-info identifies the exact head and a clean checkout. The first sandboxed attempt stopped when the offline-build Git metadata subprocess was denied. The normal build completed on rerun with the required sandbox permission. |\n| Creative Studio regression suite | 90 passed, including three path persistence, ownership and movement cases. |\n| Illustrated catalogue | All 48 delivered files matched the manifest hashes, alpha declarations and geometry. All four worlds and 32 props resolved. |\n| Reviewed PNG admission | Three tests passed, including accepted truecolor and indexed pictures and rejection of embedded metadata, malformed streams and trailing content. |\n| Crayon and path Chromium journeys | Both passed. My Art covered editing, fractional transparency, undo/redo after reload, version lineage, byte-exact backup recovery, foreign-raster rejection and zero POSTs. Scene playback covered accessible controls, authored path reuse, immutable pins, deterministic position and undo. |\n| Registry range gate | Passed against the exact #198 base. 127 registered documents and local links checked, with zero errors or review reminders. |\n\n[Editable drawing](docs/creative-universe/evidence/editable-sketch.png) \u00b7 [Restored phone drawing](docs/creative-universe/evidence/restored-sketch-phone.png) \u00b7 [Phone path editor](docs/creative-universe/evidence/motion/draw-a-path-phone.png) \u00b7 [Executed scene](docs/creative-universe/evidence/motion/path-playback.png) \u00b7 [World art provenance](docs/creation-studio/WORLD_ART.md)\n\nThe source repair in `97a8c418ebffad3c5946eb0c1fabda48a6ca7f4c` keeps the stage playback controls and status on one row at 768 \u00d7 1024. The mounted Math activity supplies its own question-heading color. Local production-build Chromium passed all eight learner viewports, 150% zoom and restoration, and the desktop and tablet scene journeys with a 4.5:1 contrast assertion. The CI coverage suite passed 118 checks, including the named crayon and movement tests. Documentation validation passed against the PR base across 127 registered documents. Hosted checks for this head run separately.\n\nAt this head, a clean production build passed the Chromium offline-shell journey. The test verifies all 48 bundled world files against the independent art-manifest hashes and checks the exact cached URLs. With the network disabled it decodes Moon Adventure\u2019s background, middle and foreground layers and verifies their dimensions and digests. Private API, config, preview, cross-origin, quota, retained-game and Pal canaries also pass. The full PR documentation range passed.\n\n## Preview and acceptance\n\nA private DEV receipt, owner visual and interactive review, physical device results and integrated TEST evidence remain pending. Review by saving a drawing, changing one stroke, reopening the original revision, drawing a path for a selected actor, playing it and reopening the kept scene. The collection artwork receives separate owner review on composed stages. Current evidence supports local source behavior.\n\n## Documentation review\n\nOne [Creative Asset & World Design Standard](docs/creative-universe/STANDARD.md) governs all inputs. Previous standard locations resolve to that document. The doctrine, architecture, family owner guide, decision record, delivery state and registry preserve the upstream requirements and release distinctions. The registry routes the incoming crayon test, world test, manifest and artwork. The author of any new reference kind owns validation, rendering, usage enumeration, export and recovery together.\n\n## Delivery and follow-up\n\nDraft source integration targeting #198. Parent and child consent checks, the existing private storage authority and the isolated generated-game boundary remain in force. Review saved-source readers, exact artwork import and compatible rollback at TEST. Production deployment and family activation require their existing release gates. This PR's activity used synthetic data and local validation.\n\n\n",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 10,
+        "path_absent_from_interim_B": [
+          "docs/creation-studio/CREATIVE_ASSET_AND_WORLD_STANDARD.md",
+          "docs/creation-studio/DRAWN_PATHS.md"
+        ],
+        "differs_from_interim_B": [
+          ".github/PULL_REQUEST_TEMPLATE.md",
+          "ARCHITECTURE-CURRENT.md",
+          "DELIVERY-STATE.md",
+          "docs/creation-studio/README.md",
+          "docs/creation-studio/WORLD_ART.md",
+          "docs/creative-universe/STANDARD.md",
+          "docs/drawings/ART_STUDIO.md",
+          "docs/family-beta/OWNER.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 8,
+        "path_absent_from_interim_B": [
+          "tests/creation-motion-browser.cjs",
+          "tests/creation-motion-path.test.ts"
+        ],
+        "differs_from_interim_B": [
+          "scripts/ci/pipeline.test.mjs",
+          "tests/beta-reviewed-png.test.ts",
+          "tests/crayon-revision-browser.cjs",
+          "tests/creation-browser.cjs",
+          "tests/creative-world-art.test.ts",
+          "tests/offline-shell.cjs"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 18,
+        "path_absent_from_interim_B": [
+          "src/creation/motion-editor.css",
+          "src/creation/motion-editor.ts",
+          "src/creation/motion-path.ts"
+        ],
+        "differs_from_interim_B": [
+          "src/creation/learner-controls.ts",
+          "src/creation/model.ts",
+          "src/creation/storage.ts",
+          "src/creation/style.css",
+          "src/creation/ui.ts",
+          "src/drawing/crayon-source.ts",
+          "src/drawing/paint.ts",
+          "src/drawing/studio.ts",
+          "src/drawing/style.css",
+          "src/family-beta/artwork.ts",
+          "src/family-beta/reviewed-png.ts",
+          "src/storage/creation-workspace.ts",
+          "src/storage/indexed-creation.ts"
+        ],
+        "byte_identical_to_interim_B": [
+          "src/creation/illustrated-art.ts",
+          "src/drawing/png-crc.ts"
+        ]
+      }
+    }
+  },
+  {
+    "pr": 208,
+    "head": "0e58853773ee6873db9384048f4bcaa36047711b",
+    "merge_base": "19189bf436369bd6deca26b9fa6fd635b04c1317",
+    "title": "Creative Universe 2 \u00b7 Keep editable drawings and reuse pinned private assets",
+    "pr_body": "## Intent and resulting behavior\n\nA child can reopen a kept crayon drawing, undo an old stroke, use an eraser and save a new revision. The visible-pixels PNG is distinct from the exact editable original. The shared picker offers optional semantic search, actual cutout previews, contextual roles and explicit version changes. Scene exports include the selected art and its sources. Full private backups retain the whole library.\n\n## Implementation and integration\n\nBase #200 at `19189bf436369bd6deca26b9fa6fd635b04c1317`. Review head `0e58853773ee6873db9384048f4bcaa36047711b`. Existing owners, drawing DB, assembly pins and restore transactions remain authoritative. This stack adopts #196's canonical standard. The #199 v1 encoder and the current reader were compared in Chromium. The optional reviewed family intake incorporates profile and operation guards and overlaps #198. The next PR integrates these assets into animation and worlds.\n\n## Evidence\n\nThe drawing checks exercised crayon replay, byte-exact restore into a clean profile, visible-only export and zero artwork POSTs. Picker qualification included 26 unit cases, a full desktop and tablet scene journey and phone touch targets. Synthetic family entry checked exact admitted PNG bytes. [Picker receipt](https://github.com/jzwyrzyk/family-game-factory/blob/0e58853773ee6873db9384048f4bcaa36047711b/docs/drawings/evidence/creative-picker-receipt.json) \u00b7 [Drawing screenshots](https://github.com/jzwyrzyk/family-game-factory/tree/0e58853773ee6873db9384048f4bcaa36047711b/docs/drawings/evidence)\n\n## Preview and acceptance\n\nUse My Art \u2192 Draw here \u2192 Keep, reopen the drawing, erase and keep a version. Select each version for a private scene and return to the earlier saved scene. Local Chromium coverage uses synthetic profiles. Operator-reviewed family intake accepts bounded 8-bit, noninterlaced RGB(A) PNGs in its documented privacy envelope. Older raster-only records retain their pixels. Physical devices, hosted DEV/TEST and owner acceptance are pending.\n\n## Documentation review\n\nMy Art, family privacy and operator guidance, architecture, delivery and the registry cover these changes. The documentation range check passed.\n\n## Delivery\n\nDraft source only. No production, worker pin, paid operation or external family activation.",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 5,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "ARCHITECTURE-CURRENT.md",
+          "DELIVERY-STATE.md",
+          "docs/drawings/ART_STUDIO.md",
+          "docs/family-beta/OWNER.md",
+          "docs/family-beta/PRIVACY.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 6,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "tests/art-entry-readiness.cjs",
+          "tests/beta-browser.ts",
+          "tests/beta-early-browser.ts",
+          "tests/beta-privacy.test.ts",
+          "tests/creation-private-art-browser.cjs",
+          "tests/creation-private-art.test.ts"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 17,
+        "path_absent_from_interim_B": [
+          "src/assets/creative-catalog.ts",
+          "src/assets/creative-identity.ts",
+          "src/assets/png-checksum.ts"
+        ],
+        "differs_from_interim_B": [
+          "src/assets/creative-picker.css",
+          "src/assets/creative-picker.ts",
+          "src/assets/private-drawings.ts",
+          "src/creation/model.ts",
+          "src/creation/private-art.ts",
+          "src/creation/ui.ts",
+          "src/drawing/paint.ts",
+          "src/drawing/picture.ts",
+          "src/drawing/sketch.ts",
+          "src/drawing/studio.ts",
+          "src/drawing/style.css",
+          "src/drawing/transfer.ts",
+          "src/family-beta/artwork.ts",
+          "src/family-beta/reviewed-png.ts"
+        ],
+        "byte_identical_to_interim_B": []
+      }
+    }
+  },
+  {
+    "pr": 209,
+    "head": "e370770e3ad757bc13308c0f19b36e8c98832d80",
+    "merge_base": "bc602f1ede502f398308ad56f973c4bf7997ff08",
+    "title": "Reconcile creative library prerequisites and original world artwork",
+    "pr_body": "## Intent and resulting behavior\n\nProvide one review base for the creative asset library and its consumers. The integrated application is in [PR #215](https://github.com/jzwyrzyk/family-game-factory/pull/215). This dependency branch combines the authentic artwork doctrine and reviewed upload contract (#196\u2013198), editable source preservation (#199), four illustrated worlds (#200), reusable movement paths (#201), the independent offline selected-slot qualification (#202) and exact PNG validation (#204).\n\n## Implementation and evidence\n\nProtected main at reconciliation was `bc602f1ede502f398308ad56f973c4bf7997ff08`. Combined head `e370770e3ad757bc13308c0f19b36e8c98832d80` includes the corrected #199, #201 and #202 test registrations. The manifest has 67 creative, 44 browser, 12 learning and two notification leaves. All 118 CI orchestration tests passed locally. The exact main-to-head documentation check passed with zero errors or review reminders.\n\nThe feature PRs retain their exact source diffs and local/hosted evidence. #215 records cross-feature recovery, truthful attribution, actual rendered local games/worlds and the clickable sandbox. Shared document links and registry routes from the parallel doctrine reviews were preserved.\n\n## Release\n\nDraft source review. Hosted DEV/TEST, owner acceptance, independent security review and production release have separate gates. The previous household main deployment predates this candidate. External activation requires its own authorization.\n",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 19,
+        "path_absent_from_interim_B": [
+          "docs/creation-studio/DRAWN_PATHS.md",
+          "docs/game-intelligence/PRIVATE-SPRITE-QUALIFICATION.md"
+        ],
+        "differs_from_interim_B": [
+          ".github/PULL_REQUEST_TEMPLATE.md",
+          "ARCHITECTURE-CURRENT.md",
+          "DELIVERY-STATE.md",
+          "docs/README.md",
+          "docs/creation-studio/README.md",
+          "docs/creation-studio/WORLD_ART.md",
+          "docs/creative-universe/STANDARD.md",
+          "docs/decisions/README.md",
+          "docs/drawings/ART_STUDIO.md",
+          "docs/drawings/GOLD_STANDARD.md",
+          "docs/evidence/README.md",
+          "docs/family-beta/OWNER.md",
+          "docs/family-beta/PRIVACY.md"
+        ],
+        "byte_identical_to_interim_B": [
+          "PRODUCT-DOCTRINE.md",
+          "docs/context/MAINTENANCE.md",
+          "docs/decisions/2026-11-26-connected-creative-universe.md",
+          "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md"
+        ]
+      },
+      "test": {
+        "changed_on_source": 8,
+        "path_absent_from_interim_B": [
+          "tests/creation-motion-browser.cjs",
+          "tests/creation-motion-path.test.ts",
+          "tests/generated-private-slot-browser.ts"
+        ],
+        "differs_from_interim_B": [
+          "scripts/ci/pipeline.test.mjs",
+          "tests/beta-reviewed-art-browser.cjs",
+          "tests/beta-reviewed-png.test.ts",
+          "tests/crayon-revision-browser.cjs",
+          "tests/creative-world-art.test.ts"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 17,
+        "path_absent_from_interim_B": [
+          "src/creation/motion-editor.css",
+          "src/creation/motion-editor.ts",
+          "src/creation/motion-path.ts"
+        ],
+        "differs_from_interim_B": [
+          "src/creation/learner-controls.ts",
+          "src/creation/model.ts",
+          "src/creation/storage.ts",
+          "src/creation/ui.ts",
+          "src/drawing/crayon-source.ts",
+          "src/drawing/paint.ts",
+          "src/drawing/studio.ts",
+          "src/drawing/style.css",
+          "src/family-beta/artwork.ts",
+          "src/family-beta/reviewed-png.ts",
+          "src/storage/creation-workspace.ts",
+          "src/storage/indexed-creation.ts"
+        ],
+        "byte_identical_to_interim_B": [
+          "src/creation/illustrated-art.ts",
+          "src/drawing/png-crc.ts"
+        ]
+      }
+    }
+  },
+  {
+    "pr": 210,
+    "head": "b9843081251ef61abfa52541e8e868688dae5007",
+    "merge_base": "16c4132d92e8c9d21ae20b604238656184e42fa7",
+    "title": "Make original artwork move, save its design and reuse it in illustrated worlds",
+    "pr_body": "## Intent and resulting behavior\n\nAfter a child keeps or imports a picture in My Art, **Make it move** opens on that picture. Jump, Bounce, Spin, Dance, Left, Right, Float, Shake and Path use the child's marks. Save keeps an exact movement version. From a scene actor, **Try the saved parts** revalidates the original and rig hash, then opens a read-only physics preview. **Back to scene** returns to its existing code. Scene blocks continue to move its composite sprite. **Use in Creative Studio** plays that version in its chosen world. **Bring its parts to life** opens the manual parts editor for independently moving cutouts, hinges, wheels and motors.\n\n## Implementation and integration\n\nSource `b9843081251ef61abfa52541e8e868688dae5007` on #207 at `16c4132d92e8c9d21ae20b604238656184e42fa7`. #207 reconciles #199 editable PNGs, #201 named coded paths, #200 illustrated assets and #204 family admission on #198. The input mapper matches #203. The scene owns motion, world placement and role. IDs and hashes resolve in the current profile. Existing scene histories retain exact pins. New local fields require a compatible reader on rollback. The #208 interchange test imported its actual tagged library, kept the original ID, SHA-256 and semantic label, and reopened the new edition pixel for pixel in #208. Previous 1/32-coordinate PNGs require a matching pixel replay. Explicit scene roles round-trip independently of mechanics. #209, #211 and #213\u2013216 offer parallel UI, artwork, library and game changes and need a single integration decision before promotion. #202 and #206 are independent generated-game qualification work.\n\n## Evidence\n\n| Behavior | Evidence and local scope |\n| --- | --- |\n| Original bytes and visible art | Seven synthetic subjects, independently decoded preview comparisons, SHA-256 after saves. [Results and screenshot index](https://github.com/jzwyrzyk/family-game-factory/blob/b9843081251ef61abfa52541e8e868688dae5007/docs/creative-universe/evidence/README.md) |\n| Three movement modes | [Saved whole-picture Bounce](https://github.com/jzwyrzyk/family-game-factory/blob/b9843081251ef61abfa52541e8e868688dae5007/docs/creative-universe/evidence/c-pebble-scene.webm), [articulated butterfly playback](https://github.com/jzwyrzyk/family-game-factory/blob/b9843081251ef61abfa52541e8e868688dae5007/docs/creative-universe/evidence/c-articulated-butterfly.webm), named editable Move groups in the scene interpreter |\n| Usability and recovery | Chromium desktop, phone and tablet viewports, explicit reduced-motion playback, pause/resume, keyboard and touch correction, pointer cancellation, reload, prior pin, profile switching and portable export |\n| Shared worlds | Four illustrated 2D environments, 32 illustrated props, child backdrop, decoration layers, retained scene copy/Undo; case-specific browser checks |\n| Source checks | Production build/typecheck, art and creation suites, movement and world browser checks, base/head documentation range. The normal JS and CSS match the recorded SHA-256 values. The input branch corrected the 768 \u00d7 1024 stage and added the two new creative leaves to the required test inventory. The gateway, preview and family gateway include the validator import closure in their restricted packaging. The 118 CI orchestration and 84 deployment tests passed locally. Real gateway, preview, Coach and family gateway containers imported their entrypoints as UID 1000 with network disabled. For the local builds, npm used a transient session CA with TLS verification enabled. The offline browser checked the 48 manifest-pinned public world assets, decoded three Moon layers offline and exercised the private-route cache canaries. |\n\n## Workstream and dependency handoff\n\n| Workstream | Review unit and dependency | Tested outcome | Activity evidence |\n| --- | --- | --- | --- |\n| A \u00b7 Drawing Workspace | #207 on #198, plus A/D compatibility here | Draw, keep original bytes, reopen editable strokes, make a second version and restore peer portable libraries. The learning scratchpad shares pointer mapping. | [Child-style drawing](https://github.com/jzwyrzyk/family-game-factory/blob/b9843081251ef61abfa52541e8e868688dae5007/docs/creative-universe/evidence/a-draw-pebble.png) |\n| B \u00b7 Illustrated worlds | #200 integrated in #207, consumed here | Validate 48 artwork hashes and render the layered Moon environment with a saved drawing. | [Moon scene](https://github.com/jzwyrzyk/family-game-factory/blob/b9843081251ef61abfa52541e8e868688dae5007/docs/creative-universe/evidence/b-moon-stage.png) |\n| C \u00b7 Draw-to-Animation | This PR on #207 | All nine choices, named coded paths, real moving joints, 91 creation tests, 31 art tests, 59 storage contracts, seven independent artwork comparisons, pause, resume, recovery and exact scene pins. | [Playback and input evidence](https://github.com/jzwyrzyk/family-game-factory/blob/b9843081251ef61abfa52541e8e868688dae5007/docs/creative-universe/evidence/README.md) |\n| D \u00b7 Library and picker | This PR, compatible with the #199 and #208 editable PNG libraries | Search original and child revisions, resolve exact pins by owner and hash, preserve an inert contextual role and restore another revision without changing saved scenes. | [Picker](https://github.com/jzwyrzyk/family-game-factory/blob/b9843081251ef61abfa52541e8e868688dae5007/docs/creative-universe/evidence/d-picker.png) |\n| E \u00b7 Game artwork | Trusted editor in this PR, localhost worker review separately in #212 | Replace an actor's picture and keep its program. The dedicated reviewed fixture played a full game with a synthetic child's sprite. | [Host actor](https://github.com/jzwyrzyk/family-game-factory/blob/b9843081251ef61abfa52541e8e868688dae5007/docs/creative-universe/evidence/e-host-actor.png) \u00b7 [Local game](https://github.com/jzwyrzyk/family-game-factory/pull/212) |\n| F \u00b7 Building worlds | This PR on B's versioned catalogue and D's pin reader | Keep, restore and reuse a backdrop and decoration layers across two scenes while preserving each scene's actors. | [Paper hills stage](https://github.com/jzwyrzyk/family-game-factory/blob/b9843081251ef61abfa52541e8e868688dae5007/docs/creative-universe/evidence/f-private-backdrop.png) |\n\nAll six rows are local source candidates. Protected merge, authenticated DEV/TEST, physical device review, production deployment and external family activation remain separate stages.\n\n## Preview and acceptance\n\nTo review the core path, open My Art, draw or import a synthetic picture, choose **Make it move \u2192 Bounce \u2192 Save animation \u2192 Use in Creative Studio \u2192 Play**. Save another move and reopen the first scene. Use **Bring its parts to life** to select a wing and try its hinge. Actual artefacts and scope are in the evidence index above.\n\nPrivate DEV, TEST and physical-device/stylus review are pending. PR workflows report current hosted results independently. The local playback recording uses the repository's synthetic practice-pacing setup.\n\n## Documentation review\n\nThe drawing gold standard, Art Studio guide, scene and storage contracts, canonical architecture, delivery record and documentation registry describe the source and release boundaries. The browser evidence index links actual recordings and screenshots, including [the Plum bird rig reopened from a scene](https://github.com/jzwyrzyk/family-game-factory/blob/b9843081251ef61abfa52541e8e868688dae5007/docs/creative-universe/evidence/c-scene-saved-parts.webm).\n\n## Delivery and follow-up\n\nDraft source. Production deployment, new worker selection, paid services and family activation are outside this PR. The generated-game companion can use a private picture in the trusted editor. General executable-game delivery remains closed.\n",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 7,
+        "path_absent_from_interim_B": [
+          "docs/creative-universe/evidence/README.md"
+        ],
+        "differs_from_interim_B": [
+          "ARCHITECTURE-CURRENT.md",
+          "DELIVERY-STATE.md",
+          "docs/creation-studio/README.md",
+          "docs/drawings/ART_STUDIO.md",
+          "docs/drawings/GOLD_STANDARD.md",
+          "docs/storage/README.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 16,
+        "path_absent_from_interim_B": [
+          "scripts/connected-universe-browser.cjs",
+          "tests/animation-editor-browser.cjs",
+          "tests/creation-motion-path.test.ts",
+          "tests/creative-png-compat.cjs",
+          "tests/creative-world-browser.cjs",
+          "tests/drawing-animation.test.ts"
+        ],
+        "differs_from_interim_B": [
+          "scripts/deployment/test_build.py",
+          "tests/art-storage-browser.cjs",
+          "tests/art-studio-browser.cjs",
+          "tests/crayon-revision-browser.cjs",
+          "tests/creation-engine.test.ts",
+          "tests/creation-private-art-browser.cjs",
+          "tests/creation-private-art.test.ts",
+          "tests/drawing-engine-browser.cjs",
+          "tests/drawing-engine.test.ts",
+          "tests/picture-tools-browser.cjs"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 34,
+        "path_absent_from_interim_B": [
+          "src/creation/world-editor.ts",
+          "src/creation/worlds.ts",
+          "src/drawing/animation-editor.css",
+          "src/drawing/animation-editor.ts",
+          "src/drawing/animation-path.ts",
+          "src/drawing/asset-picker.ts",
+          "src/drawing/creative-assets.ts",
+          "src/drawing/semantic-identity.ts"
+        ],
+        "differs_from_interim_B": [
+          "src/assets/private-drawings.ts",
+          "src/creation/challenges.ts",
+          "src/creation/engine.ts",
+          "src/creation/learner-controls.ts",
+          "src/creation/model.ts",
+          "src/creation/private-art.ts",
+          "src/creation/projects.ts",
+          "src/creation/stage.ts",
+          "src/creation/style.css",
+          "src/creation/ui.ts",
+          "src/drawing/crayon-source.ts",
+          "src/drawing/lab.ts",
+          "src/drawing/library.ts",
+          "src/drawing/model.ts",
+          "src/drawing/paint.ts",
+          "src/drawing/picture.ts",
+          "src/drawing/playground.ts",
+          "src/drawing/rally.ts",
+          "src/drawing/segmentation.ts",
+          "src/drawing/studio.css",
+          "src/drawing/studio.ts",
+          "src/drawing/style.css",
+          "src/drawing/transfer.ts",
+          "src/storage/adult-transfer-recovery.ts",
+          "src/storage/complete-backup.ts"
+        ],
+        "byte_identical_to_interim_B": [
+          "src/drawing/pointer-input.ts"
+        ]
+      }
+    }
+  },
+  {
+    "pr": 211,
+    "head": "e4ea7063af5cf109d616bba3e4fe6aa7243ed205",
+    "merge_base": "0e58853773ee6873db9384048f4bcaa36047711b",
+    "title": "Creative Universe 3 \u00b7 Render illustrated worlds and animate original artwork in 2D",
+    "pr_body": "## Jump button visual correction\n\nAt `e4ea7063af5cf109d616bba3e4fe6aa7243ed205`, the graphical Jump button and its inserted program step show the character beside the upward arrow. Both had a four-pixel gap in Chromium at 1440, 820, 390 and 320 CSS pixels wide. The production build and illustrated-world checks passed. [Updated Jump button](https://github.com/jzwyrzyk/family-game-factory/blob/e4ea7063af5cf109d616bba3e4fe6aa7243ed205/docs/creation-studio/evidence/worlds/jump-control.png) \u00b7 [Updated workspace screenshots](https://github.com/jzwyrzyk/family-game-factory/blob/e4ea7063af5cf109d616bba3e4fe6aa7243ed205/docs/creation-studio/evidence/worlds/README.md)\n\n## Intent and resulting behavior\n\nThe running Creative Studio editor, player, fullscreen stage, gallery and portable scenes use four original illustrated worlds with 32 individual props. A child can make a picture into an actor or backdrop, author movement, keep a version and reuse it in a trusted game companion. Original drawing colors, pixels and movement pins survive selection and playback.\n\n## Implementation and integration\n\nDepends on #208 for private identity, crayon recovery and the picker, #200 for versioned world art and #196 for the shared standard. Library base `0e58853773ee6873db9384048f4bcaa36047711b`. Integrated stage and asset paths were tested from `37679c14c45418ab52597a850f48da83325cdaed` and offline suite revision `e326f1874f6ea9c32070aea9e6b027b650148cd9`. #207 already incorporates #200 with an alternate art-input stack. Review against the intended base before merging overlapping implementations. The general private delivery bridge remains disabled. The source contains a fixed local reviewer for one generated module.\n\n## Evidence\n\n- Production build, 678 repository-wide unit tests, 118 orchestration checks, 27 art tests and 90 Creation tests passed locally. The feature counts are separately run suites and can overlap the unit inventory.\n- All four worlds passed canvas layer checks. Three viewport pairs cover desktop, tablet and phone. Offline reload, prop positioning, unchanged coordinates, playback, saved thumbnail, scene export, expanded/fullscreen view and retained legacy versions were exercised. [Before/after and rendered scenes](https://github.com/jzwyrzyk/family-game-factory/blob/feature/creative-studio-worlds/docs/creation-studio/evidence/worlds/README.md)\n- Approved Nook and a synthetic privately drawn pebble appeared together in the same world. [Actual stage](https://github.com/jzwyrzyk/family-game-factory/blob/feature/creative-studio-worlds/docs/creation-studio/evidence/worlds/cloud-nook-and-child-style-pebble.jpg)\n- 54 private-art continuity cases, 162 family/storage/reward/Pal contracts, complete backup/restore and all eight synthetic family Chromium stages passed on the integrated source. Movement and generated-game checks passed, including source integrity and zero artwork uploads. [Movement](https://github.com/jzwyrzyk/family-game-factory/blob/feature/creative-studio-worlds/docs/drawings/evidence/animation-path-scene.png) \u00b7 [Game review](https://github.com/jzwyrzyk/family-game-factory/blob/feature/creative-studio-worlds/docs/game-intelligence/creative-assets/README.md)\n\n## Preview and acceptance\n\nOpen Creative Studio \u2192 Make a scene. Select a pictured world, place a prop, choose a private drawing, move the actor, Keep and reopen. Exercise offline playback after installation. The viewer uses fixed 2D coordinates. Physical-device frame pacing, owner artwork approval, deployed private DEV and integrated TEST acceptance remain pending.\n\n## Documentation review\n\nUpdated architecture, delivery, My Art, world governance and the doc registry. Reviewed scope, pinning, overlap and source ownership. The range documentation check passed.\n\n## Delivery\n\nDraft source, local synthetic acceptance. No production promotion, model call with private artwork or external family activation.\n\n## Reconciliation and final source\n\nReview head `1969df66038d5d1e9b77534f3d08d5d0c01b3380`. The final drawing input uses the exact stateless pointer helper from the parallel Learning Workspace in #203; the crayon editor retains its own pen precision. A clean build of runtime `7f2172d75740e9311f715e40208154c3c01104c1` passed the drawing-entry/restore/no-replay checks and all three world layouts. [Independent continuity receipt](https://github.com/jzwyrzyk/family-game-factory/blob/1969df66038d5d1e9b77534f3d08d5d0c01b3380/docs/creation-studio/evidence/worlds/continuity-37679c1.json)\n\nFor workstream B on the parallel #207 base, use #214. It contains the stage integration as one focused commit and preserves that base\u2019s movement authoring and art chooser. Reviewers should select the appropriate stack before merging overlapping stage files.",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 11,
+        "path_absent_from_interim_B": [
+          "docs/creation-studio/evidence/worlds/README.md",
+          "docs/game-intelligence/creative-assets/README.md"
+        ],
+        "differs_from_interim_B": [
+          "ARCHITECTURE-CURRENT.md",
+          "DELIVERY-STATE.md",
+          "docs/creation-studio/ACCEPTANCE.md",
+          "docs/creation-studio/README.md",
+          "docs/drawings/ART_STUDIO.md",
+          "docs/drawings/GOLD_STANDARD.md",
+          "docs/family-beta/OWNER.md",
+          "docs/family-beta/PRIVACY.md",
+          "docs/game-intelligence/README.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 10,
+        "path_absent_from_interim_B": [
+          "tests/creation-worlds.cjs",
+          "tests/drawing-motion-browser.cjs"
+        ],
+        "differs_from_interim_B": [
+          "scripts/ci/pipeline.test.mjs",
+          "tests/art-storage-browser.cjs",
+          "tests/beta-browser.ts",
+          "tests/beta-privacy.test.ts",
+          "tests/creation-engine.test.ts",
+          "tests/creation-learner-browser.cjs",
+          "tests/drawing-engine.test.ts",
+          "tests/private-generation-preflight.test.ts"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 22,
+        "path_absent_from_interim_B": [
+          "src/assets/creative-catalog.ts",
+          "src/drawing/motion-editor.css"
+        ],
+        "differs_from_interim_B": [
+          "src/creation/challenges.ts",
+          "src/creation/introduction.ts",
+          "src/creation/landing.css",
+          "src/creation/model.ts",
+          "src/creation/private-art.ts",
+          "src/creation/projects.ts",
+          "src/creation/stage.ts",
+          "src/creation/style.css",
+          "src/creation/ui.ts",
+          "src/creation/world-tools.ts",
+          "src/drawing/lab.ts",
+          "src/drawing/model.ts",
+          "src/drawing/motion-editor.ts",
+          "src/drawing/motion.ts",
+          "src/drawing/paint.ts",
+          "src/drawing/studio.ts",
+          "src/family-beta/reviewed-png.ts",
+          "src/pals/creation.ts"
+        ],
+        "byte_identical_to_interim_B": [
+          "src/creation/scene-thumbnails.ts",
+          "src/drawing/pointer-input.ts"
+        ]
+      }
+    }
+  },
+  {
+    "pr": 212,
+    "head": "f8d49082e528e449792cfc15adbe6a5e1990f524",
+    "merge_base": "b9843081251ef61abfa52541e8e868688dae5007",
+    "title": "Qualify a child-selected sprite in the localhost 2D Gem Hunt game",
+    "pr_body": "## Intent and resulting behavior\n\nIn a dedicated local review build, choose a picture for an actor, then play Gem Hunt in the Gem Factory workshop. An archived generated-module worker runs the rules. The trusted host moves the child's original sprite. Collecting three gems, replay and leaving for a learning checkpoint are implemented.\n\n## Implementation and integration\n\nBase #210, `b9843081251ef61abfa52541e8e868688dae5007`. Source `f8d49082e528e449792cfc15adbe6a5e1990f524`. The host resolves the active profile and pinned image. The sandbox sees symbolic controls and entities. General delivery is closed. Existing model-stage instructions now require original child art and 2D mechanics. Repair and retained game behavior keep their existing readers. #202 and #206 track parallel generic-slot experiments. Consolidate the overlapping generation instructions and maintain the checked request-size budget before release.\n\n## Evidence\n\n| Claim | Check | Local result |\n| --- | --- | --- |\n| Play, pixels, privacy and lifecycle | Dedicated Vite review build followed by `node tests/creative-art-game-browser.cjs` | Passed on Chromium. Actor replacement preserved its program and revision. Its exact-color silhouette moved, three gems triggered victory, replay and learning interruption worked. [Gameplay capture](https://github.com/jzwyrzyk/family-game-factory/blob/f8d49082e528e449792cfc15adbe6a5e1990f524/docs/drawings/evidence/connected-game-gem-hunt.png) |\n| Ordinary build exclusion | `npm run build` and search production JS for the review control, fixture and CSS markers | Passed |\n| Model budgets and reviewed companions | Generation budget, generated scene, Game Intelligence and premium suites | 83 checks passed in the combined dependent checkout |\n| Documentation | `npm run docs:check` | Reviewed generation, creation, validation and delivery registry entries |\n\n## Preview and acceptance\n\nUse the two commands in [the qualification contract](https://github.com/jzwyrzyk/family-game-factory/blob/f8d49082e528e449792cfc15adbe6a5e1990f524/docs/game-intelligence/CREATIVE-ART-SLOTS.md) with synthetic artwork and a loopback hostname. Ordinary private DEV can qualify the host companion picker separately. Hosted checks, independent security review, real devices and owner review remain pending.\n\n## Documentation review\n\nUpdated the architecture, presentation standard and delivery record. The new slot contract documents the exact tested boundary and requirements for future scoped delivery.\n\n## Delivery and follow-up\n\nDraft review-only implementation on #210. No new service, paid generation, hosted general asset transport, worker deployment, traffic change or external family activation.\n",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 4,
+        "path_absent_from_interim_B": [
+          "docs/game-intelligence/CREATIVE-ART-SLOTS.md"
+        ],
+        "differs_from_interim_B": [
+          "ARCHITECTURE-CURRENT.md",
+          "DELIVERY-STATE.md",
+          "docs/game-intelligence/PRESENTATION-QUALITY.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 1,
+        "path_absent_from_interim_B": [
+          "tests/creative-art-game-browser.cjs"
+        ],
+        "differs_from_interim_B": [],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 1,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "src/creation/ui.ts"
+        ],
+        "byte_identical_to_interim_B": []
+      }
+    }
+  },
+  {
+    "pr": 213,
+    "head": "c4214a037088d589557edb401b1fbf6ae29cf108",
+    "merge_base": "897ac9301b0424ea163dceb22fcd0903eb3f1779",
+    "title": "Build the Jems Drawing Workspace and connect retained artwork across 2D activities",
+    "pr_body": "## Intent and resulting behavior\n\nDeliver the owner's Drawing Workspace directive inside the connected My Art, Creative Studio and 2D game journey. A child can draw My Rock, keep its actual pixels and editable marks, return to it after reload, make it move and place that version in a scene. A subsequent edit keeps the earlier image and scene intact.\n\n## Implementation and integration\n\nApplication source `e9b4332432e90359deb9cd4f5f7d030a7a2a3f35`. Protected main verified at `bc602f1ede502f398308ad56f973c4bf7997ff08`. Base #206 carries the separate synthetic game-delivery qualification and depends on the reconciled standard in #198, which incorporates #196 and #197. The four painted environment plates and props come from #200. This PR also reads #199's retained binary crayon PNGs and validates #201's optional named Repeat groups. Learning PR #203 uses the same pointer implementation with its own transient scratchpad lifetime. Production rollout does not need any new model call.\n\n| Workstream | Source and acceptance |\n| --- | --- |\n| A \u00b7 Drawing Workspace | e9b43324. Eighteen colors, pressure-aware drawing, shapes, fill, stamps, reversible edits, transparent export, tall paper, interrupted Keep recovery and guarded continuations. |\n| B \u00b7 Illustrated worlds | 13e9d982. Four versioned original Jems environments, rendered plate/middle/foreground, and retained prior backgrounds. |\n| C \u00b7 Draw-to-animation | 1bb4850f and 81d3a2c4. Versioned whole-sprite paths, editable scene movement, independent physics rigs and compatibility with named groups. |\n| D \u00b7 Asset library and picker | 46080838 and 0bba94ea. Existing owner-scoped store, exact revisions, explicit replacement and separate role, archived pins, recovery and checked hashes. |\n| E \u00b7 2D generated-game integration | #206 at 897ac930. Isolated reviewed slot and offline compiled fixture. General production delivery is gated. |\n| F \u00b7 World building | 484ef4f3 and 13e9d982. Select private or illustrated worlds, choose framing and layer order, then export, import or reopen the pinned scene. |\n\n## Evidence\n\nThe normal compiled application, synthetic local recovery, exact PNG replay and generated-worker adapter have independent checks. Rendered phone, tablet, desktop, motion, world and picker evidence is linked from the drawing, scene and generation contracts. The focused HTML opens the actual My Art editor. The full HTML also includes navigation, scenes and native games. Neither uses real family data. The [acceptance receipt](https://github.com/jzwyrzyk/family-game-factory/blob/c4214a037088d589557edb401b1fbf6ae29cf108/docs/creative-universe/DRAWING_WORKSPACE_ACCEPTANCE.md) records all six workstreams and screenshots. The PR head is c4214a037088d589557edb401b1fbf6ae29cf108. The application tree matches the clean-tested source e9b4332432e90359deb9cd4f5f7d030a7a2a3f35. The build, 32 art tests, 87 scene tests, complete art browser suite, focused sandbox, 16-destination/four-viewport full sandbox, and range documentation check passed locally.\n\n## Preview and acceptance\n\nOpen My Art \u2192 Draw here. Choose Thing, draw My Rock, keep it and follow Make it move or Make a scene. Reopen the saved drawing, edit it, keep another version and inspect the original scene. The game option explains the supported Rally route. Desktop Chromium, emulated pen/touch, offline packaging and synthetic storage provide local evidence. Private DEV/TEST URL and exact deployment receipt, physical-device check and owner visual acceptance remain pending. No public deployment was requested.\n\n## Documentation review\n\nUpdated the canonical Creative Asset & World Design Standard, architecture, Art Studio, Creative Studio, premium generation, family privacy and PR governance. The implementation extends existing storage and release authorities. Older readers need compatibility review before deployment. Parallel PRs #202 and #207\u2013212 contain overlapping alternative contracts or integrations. Coordinate their owners before advancing protected main; retain the exact chosen version of every saved drawing and world.\n\n## Delivery and follow-up\n\nDraft for review. This branch preserves the protected release and does not authorize production traffic, paid generation, a new private-art delivery service or external family activation.\n",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 14,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "ARCHITECTURE-CURRENT.md",
+          "DELIVERY-STATE.md",
+          "docs/README.md",
+          "docs/creative-universe/STANDARD.md",
+          "docs/drawings/ART_STUDIO.md"
+        ],
+        "byte_identical_to_interim_B": [
+          "docs/creation-studio/README.md",
+          "docs/creation-studio/WORLD_ART.md",
+          "docs/creative-universe/DRAWING_WORKSPACE_ACCEPTANCE.md",
+          "docs/drawings/GOLD_STANDARD.md",
+          "docs/family-beta/ARCHITECTURE.md",
+          "docs/family-beta/OWNER.md",
+          "docs/family-beta/PRIVACY.md",
+          "docs/storage/README.md",
+          "docs/ui-review/README.md"
+        ]
+      },
+      "test": {
+        "changed_on_source": 18,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "tests/art-entry-readiness.cjs"
+        ],
+        "byte_identical_to_interim_B": [
+          "tests/art-storage-browser.cjs",
+          "tests/art-studio-browser.cjs",
+          "tests/beta-artwork-browser.ts",
+          "tests/beta-browser.ts",
+          "tests/beta-reviewed-art-browser.cjs",
+          "tests/crayon-revision-browser.cjs",
+          "tests/creation-private-art-browser.cjs",
+          "tests/creation-private-art.test.ts",
+          "tests/creation-worlds-browser.cjs",
+          "tests/creative-motion-browser.cjs",
+          "tests/creative-world-art.test.ts",
+          "tests/drawing-engine.test.ts",
+          "tests/drawing-workspace-browser.cjs",
+          "tests/fixtures/my-art/pebble-binary-v1.png",
+          "tests/sketch-keep-storage.cjs",
+          "tests/sketch-recovery.cjs",
+          "tests/storage-adult-transfer-browser.cjs"
+        ]
+      },
+      "runtime": {
+        "changed_on_source": 37,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "src/assets/creative-library.ts",
+          "src/assets/private-drawings.ts",
+          "src/creation/model.ts",
+          "src/creation/private-art.ts",
+          "src/creation/projects.ts",
+          "src/creation/stage.ts",
+          "src/creation/ui.ts",
+          "src/drawing/crayon-source.ts",
+          "src/drawing/library.ts",
+          "src/drawing/studio.ts",
+          "src/storage/adult-transfer-recovery.ts",
+          "src/storage/complete-backup.ts"
+        ],
+        "byte_identical_to_interim_B": [
+          "src/assets/art-lineage.ts",
+          "src/assets/creative-picker.css",
+          "src/assets/creative-picker.ts",
+          "src/creation/challenges.ts",
+          "src/creation/illustrated-art.ts",
+          "src/creation/style.css",
+          "src/creation/world-settings.ts",
+          "src/drawing/lab.ts",
+          "src/drawing/legacy-crayon-editor.ts",
+          "src/drawing/model.ts",
+          "src/drawing/motion-editor.ts",
+          "src/drawing/motion.css",
+          "src/drawing/motion.ts",
+          "src/drawing/paint.ts",
+          "src/drawing/png-crc.ts",
+          "src/drawing/png-replay.ts",
+          "src/drawing/pointer-input.ts",
+          "src/drawing/sketch-keep-record.ts",
+          "src/drawing/sketch-keep.ts",
+          "src/drawing/sketch.ts",
+          "src/drawing/studio.css",
+          "src/drawing/style.css",
+          "src/drawing/transfer.ts",
+          "src/drawing/workspace-engine.ts",
+          "src/family-beta/artwork.ts"
+        ]
+      }
+    }
+  },
+  {
+    "pr": 214,
+    "head": "c88fd2800010a9600c66a0fdf42297403ad9c85b",
+    "merge_base": "4be7c6dd70b588cfbd288cc8d7a68fe94d9ae37c",
+    "title": "Workstream B \u00b7 Four illustrated worlds in Creative Studio",
+    "pr_body": "## Jump button visual correction\n\nAt `df9f9eaadff6ac3a3ad8ffa796e76b9dc3ce711d`, the graphical Jump button and its inserted program step show the character beside the upward arrow. Both had a four-pixel gap in Chromium at 1440, 820, 390 and 320 CSS pixels wide. The production build and illustrated-world checks passed. [Updated Jump button](https://github.com/jzwyrzyk/family-game-factory/blob/df9f9eaadff6ac3a3ad8ffa796e76b9dc3ce711d/docs/creation-studio/evidence/worlds/jump-control.png) \u00b7 [Updated workspace screenshots](https://github.com/jzwyrzyk/family-game-factory/blob/df9f9eaadff6ac3a3ad8ffa796e76b9dc3ce711d/docs/creation-studio/evidence/worlds/README.md)\n\n## Intent and resulting behavior\n\nThe coding stage now shows Enchanted Gem Forest, Inventor\u2019s Workshop, Cloud Kingdom and Moon Adventure. Children choose a pictured world, add individual props, change layers or use their own picture as a backdrop. Their actors keep their original marks and movement. The editor, player, fullscreen view, saved thumbnails and supported recording use the same stage.\n\n## Implementation and integration\n\nWorkstream B review head `81e846e87b98b2717a8e15c4fd904bc2094d5f2b` directly based on #207 at `4be7c6dd70b588cfbd288cc8d7a68fe94d9ae37c`. #207 already includes the exact art catalogue of #200, with 32 transparent props and four sets of versioned layers and previews. The existing owner-scoped My Art chooser and named movement paths in #207 remain the authorities. Legacy background IDs and actor positions retain their behavior. #211 is the wider A\u2013F review build on a separate stack. Both contain the stage change. Apply the renderer once when consolidating the stacks.\n\n## Evidence\n\n| Local check | Result |\n| --- | --- |\n| Production build and TypeScript | Passed |\n| Creation unit and interpreter tests | 92 passed |\n| Stage pixels | Four illustrated stages compared against art assets, four classic backgrounds compared against protected-main samples |\n| Interactive editor | Desktop 1440\u00d7960, tablet 820\u00d71180 and phone 390\u00d7844 passed. The journey covered placement, selection, layer controls, Keep, reopen, thumbnails, fullscreen, portable export and offline private-scene playback |\n| Regression | Eight recovery paths passed. The #207 pointer/keyboard motion path, reuse and Undo checks passed. Fourteen CI inventory checks passed |\n\n[Before and after at all three sizes, fullscreen, kept thumbnail and Pal alongside child-style artwork](https://github.com/jzwyrzyk/family-game-factory/blob/81e846e87b98b2717a8e15c4fd904bc2094d5f2b/docs/creation-studio/evidence/worlds/README.md) \u00b7 [Illustration provenance and manifest](https://github.com/jzwyrzyk/family-game-factory/blob/81e846e87b98b2717a8e15c4fd904bc2094d5f2b/docs/creation-studio/world-art-manifest.json)\n\n## Preview and acceptance\n\nFrom Creative Studio choose Make a scene, select a world tile, add a prop and play. Keep it, reload offline and play it again. Fixed 2D positions and authored physics govern behavior. The comparisons used local Chromium and synthetic records. Physical iPad/Android performance, owner visual approval, private DEV and integrated TEST acceptance are pending.\n\n## Documentation review\n\nThe Creation Studio feature and acceptance contracts, stage evidence, architecture, delivery and registry are updated. Documentation routing and links passed.\n\n## Delivery\n\nDraft for review against #207. Production promotion and external family activation require their existing separate qualification.\n\n## Portrait and final-head qualification\n\nThe eight-layout learner check found the reduced-motion Step control pushed status onto a second line on a 768\u00d71024 tablet. The toolbar fix restored a 416\u00d7234 stage with all controls available. All eight learner layouts, 150% browser zoom, world and legacy pixel checks, and offline reopen passed. The existing desktop/tablet Creation journeys also produced real video downloads and exercised learning guards, challenge reconstruction and tap handling. The clean final production build records `81e846e87b98b2717a8e15c4fd904bc2094d5f2b`. [Portrait controls and updated screenshots](https://github.com/jzwyrzyk/family-game-factory/blob/81e846e87b98b2717a8e15c4fd904bc2094d5f2b/docs/creation-studio/evidence/worlds/README.md)",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 5,
+        "path_absent_from_interim_B": [
+          "docs/creation-studio/evidence/worlds/README.md"
+        ],
+        "differs_from_interim_B": [
+          "ARCHITECTURE-CURRENT.md",
+          "DELIVERY-STATE.md",
+          "docs/creation-studio/ACCEPTANCE.md",
+          "docs/creation-studio/README.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 4,
+        "path_absent_from_interim_B": [
+          "tests/creation-worlds.cjs"
+        ],
+        "differs_from_interim_B": [
+          "scripts/ci/pipeline.test.mjs",
+          "tests/creation-engine.test.ts",
+          "tests/creation-learner-browser.cjs"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 11,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "src/creation/challenges.ts",
+          "src/creation/introduction.ts",
+          "src/creation/landing.css",
+          "src/creation/model.ts",
+          "src/creation/projects.ts",
+          "src/creation/stage.ts",
+          "src/creation/style.css",
+          "src/creation/ui.ts",
+          "src/creation/world-tools.ts",
+          "src/pals/creation.ts"
+        ],
+        "byte_identical_to_interim_B": [
+          "src/creation/scene-thumbnails.ts"
+        ]
+      }
+    }
+  },
+  {
+    "pr": 215,
+    "head": "ca76b5b151d4de61a5da0d66f64093530fdc1f78",
+    "merge_base": "e370770e3ad757bc13308c0f19b36e8c98832d80",
+    "title": "Reuse a child\u2019s pinned artwork across My Art, movement, worlds and local 2D games",
+    "pr_body": "## Intent and resulting behavior\n\nA child can keep a drawing, name it, choose its exact revision in another activity, and see where it was used. The drawing, its edits and its saved movements remain in the existing private drawing and scene authorities. One rock can decorate a world, follow an authored path and serve as a local game's collectible. Editing that rock leaves the earlier adventures pinned. A freshly restored profile recovers the original bytes and editable strokes.\n\n## Implementation and integration\n\nHead `ca76b5b151d4de61a5da0d66f64093530fdc1f78` on [combined dependency PR #209](https://github.com/jzwyrzyk/family-game-factory/pull/209) at `e370770e3ad757bc13308c0f19b36e8c98832d80`. Protected main at the integration cutoff is `bc602f1ede502f398308ad56f973c4bf7997ff08`. Incorporated inputs include the three converged standards #196\u2013198, editable drawings #199, original illustrated worlds #200, movement #201, offline generated-slot experiment #202 and reviewed PNG admission #204. The generic pointer helper matches learning #203; the learning scratchpad has its own lifetime.\n\nMy Art owns images, revisions, classification and discovery. Creative Studio owns instances, programs, pinned backgrounds and world layout. The game host owns explicit compatible mechanics. Storage owns reference validation, archive and recovery. The compatibility reader accepts both candidate semantic and role spellings and rejects conflicting aliases. Contextual role alone cannot change the engine. An original download remains distinct from exporting the visible pixels of a sketch.\n\nParallel #205\u2013208 and #210\u2013214 contain overlapping alternatives. The release maintainer must reconcile any selected alternative before merging to main. Their additional experimental formats or generated-game adapters cannot be assumed interchangeable. Prior released readers and private-family handling require separate rollout review. Retired original bytes from older family uploads cannot be reconstructed.\n\n## Evidence\n\n[Acceptance, reproducible commands and screenshots](https://github.com/jzwyrzyk/family-game-factory/blob/ca76b5b151d4de61a5da0d66f64093530fdc1f78/docs/creative-universe/EVIDENCE.md) \u00b7 [Destination matrix](https://github.com/jzwyrzyk/family-game-factory/blob/ca76b5b151d4de61a5da0d66f64093530fdc1f78/docs/creative-universe/STANDARD.md#destination-compatibility) \u00b7 [Offline review](https://github.com/jzwyrzyk/family-game-factory/blob/ca76b5b151d4de61a5da0d66f64093530fdc1f78/docs/ui-review/README.md#connected-creative-universe)\n\n| Behavior | Local evidence |\n| --- | --- |\n| Artwork, ownership and recovery | Four synthetic editable subjects are selected in game, scene, animation and world contexts. Browser checks verify exact initial and updated pins, original SHA and stroke recovery, archive visibility, stale owner denial and fresh-device restore. |\n| Picker and activity return | Desktop and phone screenshots, actual thumbnails, version family and category filtering. Drawing inside the picker returns selection to the same activity. The game idea and existing game remain recoverable after a separate picture hunt. |\n| Illustrated stages and placements | Four painted stages, 32 transparent props, keyboard position controls, private backdrop, layer visibility, older classic worlds, export, restore and pending thumbnail disposal. |\n| Local 2D play and movement | The selected original is the actual picture-hunt target. Play and Keep an explicit replacement. Rally requires a valid car rig. Movement programs preserve identity and author-selected behavior. |\n| Independent generation contract | Offline v2 host compositor exercises a bounded selected slot in isolation. The application does not enable general production delivery of private drawings to generated code. |\n| Orchestration and documentation | Required coverage counts 71 creative, 44 browser, 12 learning and 2 notification leaf commands. All original commands remain. The exact upstream-to-head documentation range passes. |\n\n### Source heads and dependent PRs\n\n| Workstream | Input PR heads | Shared application head |\n| --- | --- | --- |\n| A | #199 `5a0970e487d8630eeafd8f8792b092c17936c425`, #204 `ba220630d229ad5cf46ceca3dcb8fc3afc3a2223` | #215 `ca76b5b151d4de61a5da0d66f64093530fdc1f78` |\n| B and F | #200 `19189bf436369bd6deca26b9fa6fd635b04c1317` | #215 connects actual layered stages, custom placements and shared picker |\n| C | #201 `114e03b44253f85a715fe6f0d84e868c8b573f55` | #215 adds movement discovery and recovers pinned path use |\n| D | #209 `e370770e3ad757bc13308c0f19b36e8c98832d80` | #215 `ca76b5b151d4de61a5da0d66f64093530fdc1f78` |\n| E | #202 `80fab162842b2cc99bb9e0dfdae5e7ed17ab2b10` | #215 supplies the local game entrances and explicit Keep |\n| Shared doctrine and upload foundation | #196 `6c38b2507abf355bfe351d51a375165ec0c54ca3`, #197 `637914ba850d42cb64ee7a45e071b88573c80716`, #198 `81767273becb93bd9bae9a46725b26af644e4578` | Reconciled through #209 |\n\n### Exact-head local results\n\nThe production build and typecheck passed. The art unit suite passed 33/33, creation passed 90/90 and CI orchestration passed 118/118. All art and creation browser scripts passed, including 57 storage checks, four original/edited recoveries, eight creation recovery journeys, desktop and tablet gameplay, eight learner viewports and native Chromium 150% zoom. Complete backup and adult transfer passed separately. The upstream-to-head and protected-main-to-head documentation checks both reported zero errors.\n\nThe standalone HTML represents this PR head, has SHA-256 `223eba75fdd9192f62693ec1fa2242c4c298091cd84924f8cd38f63bb83136a0` and embeds 392 assets. Its smoke, integration and picker journeys passed with zero external requests. The local managed Chromium blocks file navigation by administrative policy. The tests loaded the exact HTML through the repository's in-memory launcher. The [GitHub artifact workflow](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45749318444) tracks the independently built file-open qualification.\n\nThe GitHub merge candidate observed for the stack was `ac217b1910cfa241aa7b2a36e3484b26516fb889`. The 17 hosted checks for the PR head were queued at the last local evidence cut. No hosted pass or private DEV deployment receipt is claimed.\n\n## Preview and acceptance\n\nOpen the offline UI sandbox in **Populated**, select **My Art \u00b7 choose a saved creation**, then use My Rock in a local picture hunt. The package uses four synthetic editable drawings and the production UI. Hosted DEV/TEST and physical-device checks remain pending. The hosted checks tab and Actions artifacts report their own status for this SHA.\n\n## Documentation review\n\nReviewed the standard, destination matrix, original and visible-only downloads, trusted game bindings, world art, storage, decision, architecture, delivery, evidence and context registry.\n\n## Delivery and follow-up\n\nDraft source review. No production deployment, paid operation, transfer of family data, or external activation occurred. Independent security and release qualification are required for any future general generated-game delivery.\n",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 14,
+        "path_absent_from_interim_B": [
+          "docs/creative-universe/EVIDENCE.md",
+          "docs/game-intelligence/CREATIVE-ASSET-BINDINGS.md"
+        ],
+        "differs_from_interim_B": [
+          "ARCHITECTURE-CURRENT.md",
+          "DELIVERY-STATE.md",
+          "docs/README.md",
+          "docs/creation-studio/README.md",
+          "docs/creation-studio/WORLD_ART.md",
+          "docs/creative-universe/STANDARD.md",
+          "docs/decisions/2026-11-26-connected-creative-universe.md",
+          "docs/drawings/ART_STUDIO.md",
+          "docs/game-intelligence/PREMIUM-BUILDER.md",
+          "docs/game-intelligence/README.md",
+          "docs/storage/README.md",
+          "docs/ui-review/README.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 14,
+        "path_absent_from_interim_B": [
+          "tests/art-adventure-browser.cjs",
+          "tests/art-adventure.test.ts",
+          "tests/creative-picker-browser.cjs",
+          "tests/creative-universe-recovery.cjs",
+          "tests/creative-worlds-browser.cjs",
+          "tests/creative-worlds.test.ts"
+        ],
+        "differs_from_interim_B": [
+          "scripts/ci/pipeline.test.mjs",
+          "tests/art-entry-readiness.cjs",
+          "tests/art-storage-browser.cjs",
+          "tests/art-studio-browser.cjs",
+          "tests/crayon-revision-browser.cjs",
+          "tests/creation-private-art-browser.cjs",
+          "tests/creation-private-art.test.ts",
+          "tests/pals-creation.test.ts"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "runtime": {
+        "changed_on_source": 31,
+        "path_absent_from_interim_B": [
+          "src/creation/art-game.ts",
+          "src/creation/world-assets.ts",
+          "src/creation/world-editor.css",
+          "src/creation/world-editor.ts",
+          "src/drawing/creative-assets.ts",
+          "src/drawing/creative-picker.css",
+          "src/drawing/picker-create.ts",
+          "src/drawing/picker-dialog.css",
+          "src/studio/game-art-picker.ts"
+        ],
+        "differs_from_interim_B": [
+          "src/assets/private-drawings.ts",
+          "src/creation/challenges.ts",
+          "src/creation/model.ts",
+          "src/creation/private-art.ts",
+          "src/creation/projects.ts",
+          "src/creation/stage.ts",
+          "src/creation/storage.ts",
+          "src/creation/style.css",
+          "src/creation/ui.ts",
+          "src/drawing/library.ts",
+          "src/drawing/paint.ts",
+          "src/drawing/picture.ts",
+          "src/drawing/studio.ts",
+          "src/drawing/transfer.ts",
+          "src/factory/workspace.ts",
+          "src/pals/creation.ts",
+          "src/storage/adult-transfer-recovery.ts",
+          "src/storage/complete-backup.ts",
+          "src/studio/adapter.ts",
+          "src/studio/art-entry.ts",
+          "src/studio/ui.ts"
+        ],
+        "byte_identical_to_interim_B": [
+          "src/drawing/pointer-input.ts"
+        ]
+      }
+    }
+  },
+  {
+    "pr": 216,
+    "head": "1ac8f5b55caaec57dbd9fe637a46e6b8c8aaea0a",
+    "merge_base": "c4214a037088d589557edb401b1fbf6ae29cf108",
+    "title": "Workstream E: pin original artwork to playable 2D game tests",
+    "pr_body": "## Intent and resulting behavior\n\nA child can choose a My Art revision from a drawing, a new idea or an existing game's tools, assign it one of nine roles and say what it should do. One rock can be both a collectible and an obstacle. The plan stays with that game. Replacing a picture in a role requires an explicit choice and preserves older game tests.\n\n## Implementation and integration\n\nThe source is `1ac8f5b55caaec57dbd9fe637a46e6b8c8aaea0a`. The application base is #213 at `c4214a037088d589557edb401b1fbf6ae29cf108`, which integrates the #206 renderer. Workstream D owns the private drawing catalog, logical identity and lineage. E owns notebook roles, exact version bindings and their resolution for a game. #202 and #212 contain parallel test hosts. #215 at `ca76b5b151d4de61a5da0d66f64093530fdc1f78` is a separate integration on #209 with its own game-art picker. Select and reconcile the shared catalog and notebook formats before a protected-main merge. Protected application main was `bc602f1ede502f398308ad56f973c4bf7997ff08`. The private worker main was `dddf53dbc76796be19782c1bb5bbb99b86e99909`.\n\nThe existing private drawing store owns original bytes. The notebook records the original and selected revision fingerprints and game-local roles. The standalone offline review build verifies the game program and exact synthetic originals, strips editor metadata, and supplies visible rasters to an opaque scripts-only frame. Its generated worker receives bounded handles and aspect ratios. A new launch checks the current scope and the exact stored bytes again. The normal application holds online Build and retry for plans with selected artwork before spending admission.\n\n## Evidence\n\n| Criterion | Local observation and limits |\n| --- | --- |\n| Actual playable rendering | Playwright compares the complete initial 720 \u00d7 400 canvas to a direct composite. The rocket is the player, the rock appears as both collectible and obstacle, the dragon is a character, and the valley is the background. Real input exercises scoring, collision and winning. |\n| Improvements and recovery | A faster reviewed program keeps the same five pins. The earlier program remains playable after Keep and reload. Tests cover explicit replacement, notebook copies, original-byte restore, broken backups, archive and missing images. |\n| Scope and privacy | Synthetic checks cover origin/profile mismatch, copied and forged handles, wrong revisions and hashes, denied unbound draw commands, stale authorization, profile teardown, opaque frame isolation and outbound request monitoring. The existing hostile-module browser tests exercise blocked network/DOM access and termination. |\n| Regression | Generated-art, drawing browser and unit suites, 48 generation/readiness and storage-related contract tests, complete recovery, adult transfer, normal/family builds and documentation checks passed locally. The standard and family builds were checked for exclusion of the review fixture. All 32 Studio unit tests, the desktop and mobile Studio journeys, and the remote ACK/Keep/recovery fixture also passed. A legacy desktop v1 learning preview timed out on its first run. That case passed on unmodified reruns of this head and its base. The v2 desktop and mobile learning previews passed on the first run. |\n\n[Four rendered captures and reproduction instructions](https://github.com/jzwyrzyk/family-game-factory/tree/1ac8f5b55caaec57dbd9fe637a46e6b8c8aaea0a/docs/game-art/evidence)\n\n## Preview and acceptance\n\nRun `npm run test:game-art` using the locked dependencies and Playwright Chromium. The test builds the standalone synthetic preview. The protocol guide includes directions for manual play and replay. The normal build includes the planning journey. Local samples use four synthetic originals and two archived-runtime programs and make no provider calls. The renderer supports eight active images including the background.\n\nPrivate hosted DEV, owner visual and interactive acceptance, physical devices, TEST and authenticated worker/sandbox qualification are pending. The local test supplies no receipt for hosted generation. The previous public deployment observation was `aa56b60abe152e750f9f0b5e8949bdb44be53196`.\n\n## Documentation review\n\nReviewed the product, architecture, delivery, My Art, Creative Studio, child interface, privacy, Game Intelligence and premium generation contracts. The canonical Creative Asset & World Design Standard now specifies D/E ownership. The linked protocol, decision and evidence record the local capability, threat model and release gates. Nine documentation areas were refreshed. The base-to-head documentation check passed with 127 registered documents.\n\n## Delivery and follow-up\n\nDraft for integration and independent review. Before enabling hosted binding, qualify authenticated cross-family grants, withdrawal during play, cache isolation, learning-host continuity, interruption and scoped delivery. Keep private pixels out of all downstream model-facing captures. Persistent thumbnails and generic rig adapters remain outside this reviewed implementation. Older strict notebook readers reject the new field after first write. Qualify a compatible rollback reader before household rollout. Deployment, worker updates, paid generation and external family activation require separate controls.\n",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 11,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [],
+        "byte_identical_to_interim_B": [
+          ".github/PULL_REQUEST_TEMPLATE.md",
+          "ARCHITECTURE-CURRENT.md",
+          "DELIVERY-STATE.md",
+          "docs/README.md",
+          "docs/creative-universe/STANDARD.md",
+          "docs/decisions/2026-11-26-private-game-art.md",
+          "docs/decisions/README.md",
+          "docs/drawings/ART_STUDIO.md",
+          "docs/game-art/README.md",
+          "docs/game-art/evidence/README.md",
+          "docs/game-intelligence/PREMIUM-BUILDER.md"
+        ]
+      },
+      "test": {
+        "changed_on_source": 7,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [],
+        "byte_identical_to_interim_B": [
+          "tests/art-entry-readiness.cjs",
+          "tests/game-art-browser.cjs",
+          "tests/game-art-security.cjs",
+          "tests/game-art/dragon.png",
+          "tests/game-art/rock.png",
+          "tests/game-art/rocket.png",
+          "tests/game-art/world.png"
+        ]
+      },
+      "runtime": {
+        "changed_on_source": 15,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [],
+        "byte_identical_to_interim_B": [
+          "src/assets/creative-library.ts",
+          "src/assets/private-drawings.ts",
+          "src/drawing/library.ts",
+          "src/drawing/studio.ts",
+          "src/game-art/bindings.ts",
+          "src/game-art/plan-view.ts",
+          "src/game-art/resolve.ts",
+          "src/game-art/review-package.ts",
+          "src/game-art/review.ts",
+          "src/storage/adult-transfer-recovery.ts",
+          "src/storage/complete-backup.ts",
+          "src/studio/art-entry.css",
+          "src/studio/art-entry.ts",
+          "src/studio/notebook.ts",
+          "src/studio/ui.ts"
+        ]
+      }
+    }
+  },
+  {
+    "pr": 217,
+    "head": "aea3cead13d164b7ce93fbded5fee6ecd9896eca",
+    "merge_base": "1969df66038d5d1e9b77534f3d08d5d0c01b3380",
+    "title": "Creative Studio \u00b7 Build, keep and reuse personalized 2D worlds",
+    "pr_body": "## What the child can do\n\nBegin with Enchanted Gem Forest, Inventor\u2019s Workshop, Cloud Kingdom, Moon Adventure or a white stage. Pick scenery across the four collections, add personal artwork, turn or resize a placement, change its visual layer, give that instance a code block, play and keep the result. **Use this world** starts an independent scene from its exact kept revision, including when a newer draft exists.\n\n## Dependencies and ownership\n\nReview on top of #211 at `1969df66038d5d1e9b77534f3d08d5d0c01b3380`. It brings #196 (standard), #200 (versioned worlds and 32 props) and #208 (owner-scoped private artwork and picker). This PR carries forward the regression in #205. F owns composition and kept-world reuse. B owns the art registry and D owns personal asset selection. Local and IndexedDB persistence use the existing scene authority. The shared drawing input helper carries coordinates. Learning scratchpads, rewards and challenge geometry retain their existing contracts.\n\n## Evidence\n\nTested application head `7c31f717712a23001c0d95ed9ed88fa3e4ade3a3`. Review head `aea3cead13d164b7ce93fbded5fee6ecd9896eca` includes the final evidence and documentation registry. Local production build, 92 scene tests, 27 My Art tests, 17 Pal integration tests, three illustrated stage layouts, touch and keyboard placement, challenge and recovery browser journeys, and IndexedDB kept-version reconstruction passed. The standalone regression recovered the original bytes and compared the personal landscape with its stage and decoded video export. The local standalone uses its in-memory transport. CI builds the exact PR-head standalone download and opens it directly. The documentation range check passed.\n\n[Rendered screenshots, exported video and test instructions](https://github.com/jzwyrzyk/family-game-factory/blob/aea3cead13d164b7ce93fbded5fee6ecd9896eca/docs/creation-studio/evidence/world-composition/README.md) \u00b7 [Canonical standard](https://github.com/jzwyrzyk/family-game-factory/blob/aea3cead13d164b7ce93fbded5fee6ecd9896eca/docs/creative-universe/STANDARD.md#building-and-keeping-a-world)\n\n## Release\n\nDraft source for integration. The blank stage starts with one editable gem under the retained schema. Owner art sign-off, physical device and hosted DEV/TEST acceptance, and mixed-version rollback qualification remain open. Generated-game delivery currently has separate scoped sprite qualification. General world composition delivery, production promotion and external family activation require their own qualification and release decisions.\n\nParallel integrations #215 and #216 use separate library/game contracts. #216 exercises individual pinned backgrounds and object roles in an offline game test. Neither PR supplies a reviewed adapter for an entire kept Studio composition. Reconcile shared scene/catalogue representations when selecting a protected-main integration. The currently integrated generated-companion browser test passed replacement, cancellation, Undo, movement, Keep, owner checks, history and reload with zero POSTs.",
+    "review_count": 0,
+    "comment_count": 0,
+    "inline_count": 0,
+    "changes": {
+      "document": {
+        "changed_on_source": 9,
+        "path_absent_from_interim_B": [
+          "docs/creation-studio/evidence/world-composition/README.md"
+        ],
+        "differs_from_interim_B": [
+          "ARCHITECTURE-CURRENT.md",
+          "DELIVERY-STATE.md",
+          "PRODUCT-DOCTRINE.md",
+          "docs/creation-studio/ACCEPTANCE.md",
+          "docs/creation-studio/README.md",
+          "docs/creative-universe/STANDARD.md",
+          "docs/decisions/2026-11-26-connected-creative-universe.md",
+          "docs/ui-review/README.md"
+        ],
+        "byte_identical_to_interim_B": []
+      },
+      "test": {
+        "changed_on_source": 6,
+        "path_absent_from_interim_B": [
+          "tests/creation-worlds.cjs"
+        ],
+        "differs_from_interim_B": [
+          "tests/creation-engine.test.ts",
+          "tests/creation-private-art-browser.cjs",
+          "tests/pals-creation.test.ts"
+        ],
+        "byte_identical_to_interim_B": [
+          "tests/creation-storage.test.ts",
+          "tests/storage-creation-browser.cjs"
+        ]
+      },
+      "runtime": {
+        "changed_on_source": 11,
+        "path_absent_from_interim_B": [],
+        "differs_from_interim_B": [
+          "src/assets/creative-picker.ts",
+          "src/creation/landing.css",
+          "src/creation/model.ts",
+          "src/creation/private-art.ts",
+          "src/creation/projects.ts",
+          "src/creation/stage.ts",
+          "src/creation/ui.ts",
+          "src/creation/world-tools.ts"
+        ],
+        "byte_identical_to_interim_B": [
+          "src/creation/storage.ts",
+          "src/storage/creation-workspace.ts",
+          "src/storage/indexed-creation.ts"
+        ]
+      }
+    }
+  }
+]

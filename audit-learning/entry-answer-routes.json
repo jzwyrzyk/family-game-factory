@@ -1,0 +1,23 @@
+{
+  "source": "c88969fce3b6052c3b1d1d45e2640b049a8c3ace",
+  "items": 219,
+  "passed": {
+    "specialized": 72,
+    "blocks": 219,
+    "written": 72
+  },
+  "failures": [],
+  "errors": [],
+  "byModel": {
+    "frames": 108,
+    "numberLine": 54,
+    "chart": 30,
+    "shapes": 36,
+    "ruler": 9,
+    "coins": 9,
+    "arrays": 45,
+    "fractions": 54,
+    "clock": 12,
+    "angles": 6
+  }
+}

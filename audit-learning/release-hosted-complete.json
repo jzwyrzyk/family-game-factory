@@ -1,0 +1,734 @@
+{
+  "candidate": "a7c0d31aaf05d614b0f07a06d41a1d6179e13d01",
+  "tree": "95b0455eee11138ab463f0d37c26ae4871991cc4",
+  "actualMerge": "6da01a817b8dda1e49f045297c26626809fff71b",
+  "workflows": [
+    {
+      "id": 45764310386,
+      "name": "Release regression contracts",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310386",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 139721418371,
+          "name": "contracts",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310386/job/139721418371"
+        }
+      ],
+      "artifacts": []
+    },
+    {
+      "id": 45764310408,
+      "name": "Jems environment contracts",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310408",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 139721418128,
+          "name": "contracts",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310408/job/139721418128"
+        }
+      ],
+      "artifacts": []
+    },
+    {
+      "id": 45764310420,
+      "name": "Parent reporting and dashboard",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310420",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 139721418476,
+          "name": "parent-dashboard",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310420/job/139721418476"
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 15091700136,
+          "name": "parent-dashboard-evidence",
+          "digest": "sha256:b799b83ec6f090fc3c8fbe1b0d54150412e57599af58901dde96112af1f35944",
+          "bytes": 4762210,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310420/artifacts/15091700136"
+        }
+      ]
+    },
+    {
+      "id": 45764310504,
+      "name": "Jems preview bundle",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310504",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 139721418690,
+          "name": "bundle",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310504/job/139721418690"
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 15090968553,
+          "name": "jems-site-bundle",
+          "digest": "sha256:dfc24ce48f33fdaf3ca0dc83cbc5cf46e060cda1c5a7e664f8e3a5b4bf52fb97",
+          "bytes": 220143259,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310504/artifacts/15090968553"
+        }
+      ]
+    },
+    {
+      "id": 45764310438,
+      "name": "Documentation context",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310438",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 139721418353,
+          "name": "Documentation references",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310438/job/139721418353"
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 15090489855,
+          "name": "documentation-context",
+          "digest": "sha256:faeb2147ce942993594e4ca40bdfb32eb7a5e045f2d1afca7cde8599620a8b64",
+          "bytes": 823,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310438/artifacts/15090489855"
+        }
+      ]
+    },
+    {
+      "id": 45764310489,
+      "name": "Service image packaging",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310489",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 139721418440,
+          "name": "service-images",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310489/job/139721418440"
+        }
+      ],
+      "artifacts": []
+    },
+    {
+      "id": 45764310390,
+      "name": "Coding learner review",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310390",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 139721418263,
+          "name": "learner",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310390/job/139721418263"
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 15091007970,
+          "name": "coding-learner-evidence",
+          "digest": "sha256:0a00830bb17a923ae070a2dbbb183126a7ed1d306317f850e533e552e1763b09",
+          "bytes": 7180338,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310390/artifacts/15091007970"
+        }
+      ]
+    },
+    {
+      "id": 45764310549,
+      "name": "Jems operations contracts",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310549",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 139721419203,
+          "name": "Jems operations policy",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310549/job/139721419203"
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 15091153611,
+          "name": "jems-diagnostics-OFFLINE-fixture-45764310549-1",
+          "digest": "sha256:bcac4085d6c2b500afa57ab8b9c285bb6bf46a3b83801fab33fb359c1e32167f",
+          "bytes": 671,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310549/artifacts/15091153611"
+        }
+      ]
+    },
+    {
+      "id": 45764310422,
+      "name": "Early learning preview",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310422",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 139721418627,
+          "name": "synthetic-journeys",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310422/job/139721418627"
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 15091597050,
+          "name": "early-learning-browser",
+          "digest": "sha256:fc2f2a65ac9995b21599f2f030d47f7fca2f33cec1794d85c616bc81af20cbaf",
+          "bytes": 1527539,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310422/artifacts/15091597050"
+        }
+      ]
+    },
+    {
+      "id": 45764310360,
+      "name": "jems full visual review",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310360",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 139721418488,
+          "name": "selection",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310360/job/139721418488"
+        },
+        {
+          "id": 139722119640,
+          "name": "joy-contract",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310360/job/139722119640"
+        },
+        {
+          "id": 139722119670,
+          "name": "studio-journey",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310360/job/139722119670"
+        },
+        {
+          "id": 139722119676,
+          "name": "gem-factory",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310360/job/139722119676"
+        },
+        {
+          "id": 139722119717,
+          "name": "brand-contract",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310360/job/139722119717"
+        },
+        {
+          "id": 139722119744,
+          "name": "screenshots",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310360/job/139722119744"
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 15091123817,
+          "name": "gem-factory-gameplay",
+          "digest": "sha256:1cb8b928422a33d4654e8ea822ef759620b51f2571b600f19fd00fdb1b83d237",
+          "bytes": 33815967,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310360/artifacts/15091123817"
+        },
+        {
+          "id": 15090948923,
+          "name": "jems-page-by-page-review",
+          "digest": "sha256:ad443a0309a84a90ac49af0eba29fb10e4e1dc9142c45f28b4f881df2981a397",
+          "bytes": 16668134,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310360/artifacts/15090948923"
+        },
+        {
+          "id": 15090474766,
+          "name": "visual-selection-1",
+          "digest": "sha256:5f513e6006522cb874e9ce12d67afb19d0c83dcc1a58b5a9eb27bdc3c3a4baab",
+          "bytes": 2156,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310360/artifacts/15090474766"
+        }
+      ]
+    },
+    {
+      "id": 45764310582,
+      "name": "Mind Your Jems art and gameplay review",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310582",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 139721419032,
+          "name": "screenshots",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310582/job/139721419032"
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 15090983511,
+          "name": "mind-your-jems-browser-screenshots",
+          "digest": "sha256:02cf31bfc7d11a091ebaa9e7d0e8dcb8ea910ac4f0e2931e3c7274b4ba5c5f31",
+          "bytes": 77114094,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310582/artifacts/15090983511"
+        },
+        {
+          "id": 15090793819,
+          "name": "mind-your-jems-reference-review",
+          "digest": "sha256:482f69a6f1337f6ee534d355fcb92cc538da6e38000abc6bf17b7b5a7a7993d5",
+          "bytes": 11425822,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310582/artifacts/15090793819"
+        }
+      ]
+    },
+    {
+      "id": 45764310510,
+      "name": "Trusted family device security",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310510",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 139721419476,
+          "name": "auth-contract",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310510/job/139721419476"
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 15091438308,
+          "name": "private-family-synthetic-layouts-6da01a817b8dda1e49f045297c26626809fff71b",
+          "digest": "sha256:c96bb9c7bb1cff94e1b78725b9e601493dc30dc85d7e6dbf4394cb95b2c59132",
+          "bytes": 15018973,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310510/artifacts/15091438308"
+        }
+      ]
+    },
+    {
+      "id": 45764310542,
+      "name": "Bubble Gum Builders play and visual review",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310542",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 139721418636,
+          "name": "host-integration",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310542/job/139721418636"
+        },
+        {
+          "id": 139721418928,
+          "name": "gameplay",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310542/job/139721418928"
+        },
+        {
+          "id": 139721418972,
+          "name": "touch-transport-probe",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310542/job/139721418972"
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 15091458271,
+          "name": "bubble-gum-builders-browser-evidence",
+          "digest": "sha256:e46a2643572dd622b8da4bc7d2acf14ef31f1eeaef49f5d9db9a39686d093cf9",
+          "bytes": 17803322,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310542/artifacts/15091458271"
+        },
+        {
+          "id": 15091337748,
+          "name": "bubble-gum-host-integration-evidence",
+          "digest": "sha256:11114354b2b83c2ee22e06e22bd2a91a23e41729fbb1fed244328e4145bfe403",
+          "bytes": 17640254,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310542/artifacts/15091337748"
+        },
+        {
+          "id": 15091127764,
+          "name": "bubble-gum-touch-probe-evidence",
+          "digest": "sha256:dd3ce22bd371626d4e570826370c058afabfa3839dea3ddf21c5a5967109dc1a",
+          "bytes": 5215,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310542/artifacts/15091127764"
+        }
+      ]
+    },
+    {
+      "id": 45764310430,
+      "name": "Standalone UI review",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310430",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 139721418531,
+          "name": "offline-review",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310430/job/139721418531"
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 15091682465,
+          "name": "jems-ui-review-evidence-a7c0d31aaf05d614b0f07a06d41a1d6179e13d01",
+          "digest": "sha256:bc847f3e6c30955df5afb6d33d6c3afe1ba51dda045324e2c4a6cc4480f68179",
+          "bytes": 66952273,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310430/artifacts/15091682465"
+        },
+        {
+          "id": 15091670544,
+          "name": "jems-ui-review-a7c0d31aaf05d614b0f07a06d41a1d6179e13d01",
+          "digest": "sha256:d1864980c54823ccca993954bf0fbe0654dfc30d9b0207aca64b54f61443b7d3",
+          "bytes": 40887116,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310430/artifacts/15091670544"
+        }
+      ]
+    },
+    {
+      "id": 45764310396,
+      "name": "Arcade journeys",
+      "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 139722684764,
+          "name": "prepare",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139722684764"
+        },
+        {
+          "id": 139723511481,
+          "name": "image-isolation",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139723511481"
+        },
+        {
+          "id": 139723511759,
+          "name": "shard (browser-generated)",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139723511759"
+        },
+        {
+          "id": 139723511779,
+          "name": "shard (browser-storage)",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139723511779"
+        },
+        {
+          "id": 139723511796,
+          "name": "shard (mining)",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139723511796"
+        },
+        {
+          "id": 139723511797,
+          "name": "shard (physical)",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139723511797"
+        },
+        {
+          "id": 139723511823,
+          "name": "shard (child-coach)",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139723511823"
+        },
+        {
+          "id": 139723511845,
+          "name": "shard (factory)",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139723511845"
+        },
+        {
+          "id": 139723511853,
+          "name": "shard (creation-art)",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139723511853"
+        },
+        {
+          "id": 139723511857,
+          "name": "shard (learning-math)",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139723511857"
+        },
+        {
+          "id": 139723511875,
+          "name": "shard (learning-language)",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139723511875"
+        },
+        {
+          "id": 139723511892,
+          "name": "shard (studio-core)",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139723511892"
+        },
+        {
+          "id": 139723511908,
+          "name": "shard (pals-rewards)",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139723511908"
+        },
+        {
+          "id": 139723511912,
+          "name": "shard (notifications)",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139723511912"
+        },
+        {
+          "id": 139723511920,
+          "name": "shard (browser-core)",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139723511920"
+        },
+        {
+          "id": 139723512873,
+          "name": "legacy-creative-shadow",
+          "conclusion": "skipped",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139723512873"
+        },
+        {
+          "id": 139728480535,
+          "name": "browser",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139728480535"
+        },
+        {
+          "id": 139728480545,
+          "name": "notifications",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139728480545"
+        },
+        {
+          "id": 139728480551,
+          "name": "learning",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139728480551"
+        },
+        {
+          "id": 139728480571,
+          "name": "private-coach-image",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139728480571"
+        },
+        {
+          "id": 139728480581,
+          "name": "creative",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139728480581"
+        },
+        {
+          "id": 139730223368,
+          "name": "validation-evidence",
+          "conclusion": "success",
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/job/139730223368"
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 15092460179,
+          "name": "ci-receipt-1-learning-math",
+          "digest": "sha256:c7d1107276f389e9222644488a6c92c4887aba439d7d6242fffd0f2664f15bbe",
+          "bytes": 753,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15092460179"
+        },
+        {
+          "id": 15092400880,
+          "name": "ci-receipt-1-creation-art",
+          "digest": "sha256:e9852f8434c86296013f585cef2306642018939c6f36cc050ac501b9247270b3",
+          "bytes": 790,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15092400880"
+        },
+        {
+          "id": 15092325531,
+          "name": "ci-receipt-1-browser-storage",
+          "digest": "sha256:37cec112f885b1661b62a3e2c8e8b29ae6ebe2c34a40c1769512b7946b7e01dc",
+          "bytes": 956,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15092325531"
+        },
+        {
+          "id": 15092241352,
+          "name": "arcade-evidence-45764310396-1-notifications",
+          "digest": "sha256:9768e89ecaccf63e6b0ac8bb1fb96f5a5739aa8e3f05373513acdf761d68ec56",
+          "bytes": 2257399,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15092241352"
+        },
+        {
+          "id": 15092175268,
+          "name": "arcade-evidence-45764310396-1-mining",
+          "digest": "sha256:f67209a12687a5020f6598699bb0506da4326ddda120752eb4c4fd384cd8d8f6",
+          "bytes": 75736282,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15092175268"
+        },
+        {
+          "id": 15092136752,
+          "name": "arcade-evidence-45764310396-1-creation-art",
+          "digest": "sha256:75853e0dd05e6e3db1358ca1b0a3e6c4f709e85550f7286cf04bb85b3ca346d8",
+          "bytes": 14025705,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15092136752"
+        },
+        {
+          "id": 15092050840,
+          "name": "ci-receipt-1-mining",
+          "digest": "sha256:9902f4572100636b4e56c04db7cb54a373e4710aa96a715e13e9e08d9736a43c",
+          "bytes": 543,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15092050840"
+        },
+        {
+          "id": 15091996634,
+          "name": "ci-receipt-1-child-coach",
+          "digest": "sha256:e73c58b4bd7a2e8a5a99ba620fb0d5aef4efee536ffae62357a14a03bf088462",
+          "bytes": 972,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091996634"
+        },
+        {
+          "id": 15091992509,
+          "name": "ci-receipt-1-notifications",
+          "digest": "sha256:babefda70e38098bd7d9ac6ff51addb58e7a51822cfd2d1816c74b1349f4db12",
+          "bytes": 583,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091992509"
+        },
+        {
+          "id": 15091982628,
+          "name": "arcade-evidence-45764310396-1-studio-core",
+          "digest": "sha256:1fa3c25c93eaa931717d13d5a8f956c5ab6f3590681e8e9bc939425d7d389b34",
+          "bytes": 74775171,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091982628"
+        },
+        {
+          "id": 15091968984,
+          "name": "arcade-validation-6da01a817b8dda1e49f045297c26626809fff71b-1",
+          "digest": "sha256:d9b1aabd800932ef3e7c5f12410f1ebfdbba9a9e3f996b24d8df08ab63b75d8d",
+          "bytes": 3280,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091968984"
+        },
+        {
+          "id": 15091807261,
+          "name": "ci-receipt-1-physical",
+          "digest": "sha256:23d0ce0d4bebf891bc4ff6ef79a7e91aaab0695d7ec864dee20b3cdb62b413bb",
+          "bytes": 565,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091807261"
+        },
+        {
+          "id": 15091793793,
+          "name": "ci-receipt-1-studio-core",
+          "digest": "sha256:0c84b43858bdfe57412c5f2aaca2045a6c78ca710716815725efab01767ac6e7",
+          "bytes": 812,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091793793"
+        },
+        {
+          "id": 15091736129,
+          "name": "arcade-build-6da01a817b8dda1e49f045297c26626809fff71b-1",
+          "digest": "sha256:b38c076fbb990703cef4ff2ea61d9f08a56cb0dc38cc3af8ec8cd51ba1d9b69d",
+          "bytes": 224051771,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091736129"
+        },
+        {
+          "id": 15091722597,
+          "name": "arcade-evidence-45764310396-1-physical",
+          "digest": "sha256:30e66130bf55e903db819c9e21b69fa5755341d6d02573b01ac6f7d77a72ec7e",
+          "bytes": 3933137,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091722597"
+        },
+        {
+          "id": 15091663759,
+          "name": "arcade-evidence-45764310396-1-child-coach",
+          "digest": "sha256:e1c748d8f84503cc3b8098fc73c874f0b328f745a630879211ea232f6a1e8c95",
+          "bytes": 12053948,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091663759"
+        },
+        {
+          "id": 15091598812,
+          "name": "arcade-evidence-45764310396-1-browser-generated",
+          "digest": "sha256:9b5a54b82e02bb9161393b5acc03a4fb0f50f07cbabc412e47595bb03dfd2803",
+          "bytes": 28408406,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091598812"
+        },
+        {
+          "id": 15091533627,
+          "name": "arcade-evidence-45764310396-1-pals-rewards",
+          "digest": "sha256:7da64d78d7edd94333eba0e1bbd83c97624543778b9f09731dd7fa34e03eb7c8",
+          "bytes": 22376307,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091533627"
+        },
+        {
+          "id": 15091459817,
+          "name": "arcade-evidence-45764310396-1-browser-core",
+          "digest": "sha256:0f77cd9328b9b5424219e3edc6f54ccf9b4e827862829047e7ce0d7db9931f4c",
+          "bytes": 392036,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091459817"
+        },
+        {
+          "id": 15091453725,
+          "name": "arcade-evidence-45764310396-1-learning-language",
+          "digest": "sha256:5ee44218467fb2fcb19b86be5b130e0fed803c6c91c1444e452b0eaaa2b83b0e",
+          "bytes": 3552636,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091453725"
+        },
+        {
+          "id": 15091404905,
+          "name": "ci-receipt-1-browser-core",
+          "digest": "sha256:af155c35098c6d7c288d04f2e0fa986887fd9d07f26ec8425c164ebb803f9a40",
+          "bytes": 742,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091404905"
+        },
+        {
+          "id": 15091264594,
+          "name": "ci-receipt-1-pals-rewards",
+          "digest": "sha256:c5e495a37f1dbf8da0b288ed4e74d82999bbe27afb38a1a5f89ff2c4fd1804df",
+          "bytes": 777,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091264594"
+        },
+        {
+          "id": 15091254793,
+          "name": "ci-receipt-1-browser-generated",
+          "digest": "sha256:5a757ecd377fa263891553d2b59c470827fbb3e48c476048022ace43325148a6",
+          "bytes": 737,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091254793"
+        },
+        {
+          "id": 15091244235,
+          "name": "arcade-evidence-45764310396-1-learning-math",
+          "digest": "sha256:b8b57b860060b59a2b3140fc4ca9281e3d8dcc8e8df4ed1f858d88f722568165",
+          "bytes": 12089512,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091244235"
+        },
+        {
+          "id": 15091234538,
+          "name": "arcade-evidence-45764310396-1-browser-storage",
+          "digest": "sha256:ebc5c0665c3160185c8f6d264570b88057f639e3c82adcd9c4527301174cec71",
+          "bytes": 5874955,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091234538"
+        },
+        {
+          "id": 15091139749,
+          "name": "ci-receipt-1-factory",
+          "digest": "sha256:a9985699064283bddc63b4c86983ba3e4ed6db3f4c44b13759aac539a668459f",
+          "bytes": 537,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091139749"
+        },
+        {
+          "id": 15091129805,
+          "name": "arcade-evidence-45764310396-1-factory",
+          "digest": "sha256:5c514be5ce0439f384af4fbe46926c6be6be7917ede4c5d1a813c311b7eaa2e5",
+          "bytes": 33814455,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091129805"
+        },
+        {
+          "id": 15091103543,
+          "name": "arcade-plan-1",
+          "digest": "sha256:c5fa68006007fc8ad13dd0dca78c07abf7b1e744b1e8f13249bf1465649e6ae0",
+          "bytes": 7798,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091103543"
+        },
+        {
+          "id": 15091084843,
+          "name": "ci-receipt-1-learning-language",
+          "digest": "sha256:e90f6e24c8b092b8a835d4eeefa6512980720a2f2f0d96b2cfa9691a839b1649",
+          "bytes": 648,
+          "url": "https://github.com/jzwyrzyk/family-game-factory/actions/runs/45764310396/artifacts/15091084843"
+        }
+      ]
+    }
+  ]
+}

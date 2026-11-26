@@ -1,0 +1,504 @@
+{
+  "head": "563de940eacd3f3573bf93236ab5eebd4608043a",
+  "tree": "388246f5bb56fb56bd3e463765061d72e6c80216",
+  "source": "19189bf436369bd6deca26b9fa6fd635b04c1317",
+  "layers": {
+    "actor": 32,
+    "back": 4,
+    "middle": 4,
+    "foreground": 4,
+    "preview": 4
+  },
+  "assets": [
+    {
+      "id": "world-prop-tree-v1",
+      "path": "public/art/creative-worlds/v1/tree.webp",
+      "dimensions": [
+        280,
+        263
+      ],
+      "fileSHA256": "1d5a073675697af3d9038620bfef64eb9006744f09ad418301c063fb0f073655",
+      "rgbaSHA256": "6066b84d1704570595dc7ce880f1b783d5250d20f486ef8ed9a0bbbc7ea53a21"
+    },
+    {
+      "id": "world-prop-mossy-rock-v1",
+      "path": "public/art/creative-worlds/v1/mossy-rock.webp",
+      "dimensions": [
+        280,
+        172
+      ],
+      "fileSHA256": "42dae76db85f4dcfce879e4aee947f5f65004479f9935f51642fe5d9b82a6b66",
+      "rgbaSHA256": "1fe3298f3c5678c0377d1d96a28a172543f9a6d317ef49a79b3ee5fc1d5d57f1"
+    },
+    {
+      "id": "world-prop-flowers-v1",
+      "path": "public/art/creative-worlds/v1/flowers.webp",
+      "dimensions": [
+        280,
+        233
+      ],
+      "fileSHA256": "275051a6bb29d6d14a1899da2e9ab8e4c218b76cfa9643872f5e3fb5863198a2",
+      "rgbaSHA256": "2983ec3713e3c2eec9de807eb8d4b95f277b05f6faf6cf44e4f571c09e9193a7"
+    },
+    {
+      "id": "world-prop-mushrooms-v1",
+      "path": "public/art/creative-worlds/v1/mushrooms.webp",
+      "dimensions": [
+        280,
+        246
+      ],
+      "fileSHA256": "baeef833e1408e40f989a1d0735320740342ea870ed992f270ae255f0a839bb8",
+      "rgbaSHA256": "a8dccd2e8d8dbeddcba89edf7d448154d3e1dbfb4a4ac8beb08bd673e6be3de6"
+    },
+    {
+      "id": "world-prop-amethyst-v1",
+      "path": "public/art/creative-worlds/v1/amethyst.webp",
+      "dimensions": [
+        280,
+        244
+      ],
+      "fileSHA256": "c42cd2ee3e6cd1aa4bade11c53b9131256ef77d9ab885378ad09ddb238bc4ce5",
+      "rgbaSHA256": "11b5bb553e69654b1c2dedaba3796721185d10b7b04de04aea94fc47c61e2890"
+    },
+    {
+      "id": "world-prop-log-v1",
+      "path": "public/art/creative-worlds/v1/log.webp",
+      "dimensions": [
+        280,
+        173
+      ],
+      "fileSHA256": "07f178d1291d48795afb13ad7d1395fdcb02cdee16e075cab7aed74fd71086fd",
+      "rgbaSHA256": "e1ccb191ace1c49577b7ff662ad95f076691a4af9883ed5e66d4f88064d71314"
+    },
+    {
+      "id": "world-prop-bridge-v1",
+      "path": "public/art/creative-worlds/v1/bridge.webp",
+      "dimensions": [
+        280,
+        166
+      ],
+      "fileSHA256": "708dfc0fc369f53f405459c0b4f81bec9dfa2408c5b2249fd4488eca2a883470",
+      "rgbaSHA256": "d40a338d3a14a371ec8b55f76e257afc40e5b2d23174331a862a8fc66e9cde53"
+    },
+    {
+      "id": "world-prop-treasure-chest-v1",
+      "path": "public/art/creative-worlds/v1/treasure-chest.webp",
+      "dimensions": [
+        280,
+        216
+      ],
+      "fileSHA256": "f22c9f28edddd989da8fcfa4643293481ea9faccecad2f7d15d41cab18257db1",
+      "rgbaSHA256": "ffb2ecd5c4860e09458afbf8e73ff9084ba97d7d2558597c79fd8887636b074a"
+    },
+    {
+      "id": "world-forest-v1-background",
+      "path": "public/art/creative-worlds/v1/forest-background.webp",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "fileSHA256": "929ff3bc1d7741f2d17f9edf944da616fce21c08deeb8cbb6e209c544e1eb512",
+      "rgbaSHA256": "d804990d2ea2870eef33c65cb8c4be40e63779fd81d662b59439f3ee326575b4"
+    },
+    {
+      "id": "world-forest-v1-middle",
+      "path": "public/art/creative-worlds/v1/forest-middle.webp",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "fileSHA256": "3343342bd4adad2abff437fba05e3e516f1ff170dfb3f185e99af82060c36d4d",
+      "rgbaSHA256": "9aef470111d859d8e6d6975df638ce11a6b0b21f9e6ae3cd858e0324de451568"
+    },
+    {
+      "id": "world-forest-v1-foreground",
+      "path": "public/art/creative-worlds/v1/forest-foreground.webp",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "fileSHA256": "95aac40d5ccf2df6a8b51fdb30a7aabbb23e90a08b098fe90f714c462ce30961",
+      "rgbaSHA256": "7d70ea036c1d3248391aabacc67a10a7ed24c82d9f962af8a8612021baf803e2"
+    },
+    {
+      "id": "world-forest-v1-preview",
+      "path": "public/art/creative-worlds/v1/forest-preview.webp",
+      "dimensions": [
+        384,
+        216
+      ],
+      "fileSHA256": "a46136a0fd20b872556b85f2c652765241e97d8ab922906b16f42aecaaa8f33e",
+      "rgbaSHA256": "6e91a9a14b4b2fa9e1d184b77196ce16f5c3f9c28a0c88b077f561ddb6ab6df8"
+    },
+    {
+      "id": "world-prop-workbench-v1",
+      "path": "public/art/creative-worlds/v1/workbench.webp",
+      "dimensions": [
+        280,
+        245
+      ],
+      "fileSHA256": "932a5ed4e41b4b1f1278c8887bde0b00614fec203ca88c0069a1ddb2b8644cf2",
+      "rgbaSHA256": "2f2d91dee85ad49e1e229fb5a2794f3fae706e7d243e871e9b17b883c47d7dc5"
+    },
+    {
+      "id": "world-prop-crate-v1",
+      "path": "public/art/creative-worlds/v1/crate.webp",
+      "dimensions": [
+        280,
+        220
+      ],
+      "fileSHA256": "ea0ade82339f8fc5db71a4521f55a6f100afb0539f8cd2ef37fbf31ce9ec2ea8",
+      "rgbaSHA256": "c7607993c210dd7de4af2378a5bbe97ac2425b73b3efffd7c7534e4ad4f08513"
+    },
+    {
+      "id": "world-prop-gear-v1",
+      "path": "public/art/creative-worlds/v1/gear.webp",
+      "dimensions": [
+        280,
+        271
+      ],
+      "fileSHA256": "2ea3836dce0004eaa1214ce832d6ae968d5a57718b4c2c5d8f32755ead063c97",
+      "rgbaSHA256": "25fdbaaf4699d65afe38b4a931060199dbb4aa55dd9cb53b9130b917e0b37418"
+    },
+    {
+      "id": "world-prop-polisher-v1",
+      "path": "public/art/creative-worlds/v1/polisher.webp",
+      "dimensions": [
+        280,
+        279
+      ],
+      "fileSHA256": "61820392062177e3c91fcc3838d555446652cdc4ebc8efd5463e0a200c6e2014",
+      "rgbaSHA256": "7829b40b27a9d62905f197f1b5368522e8330c102864b05168cd28ccba00ff53"
+    },
+    {
+      "id": "world-prop-button-v1",
+      "path": "public/art/creative-worlds/v1/button.webp",
+      "dimensions": [
+        280,
+        222
+      ],
+      "fileSHA256": "780dc211cb564b952cb42b94e9a30ef4ed87535de5e0d8fc2e26c0bc85545496",
+      "rgbaSHA256": "b58b871e5f6d69d2f60797f183286b7f77db7a000cc8fad65772447e6854d750"
+    },
+    {
+      "id": "world-prop-wrench-v1",
+      "path": "public/art/creative-worlds/v1/wrench.webp",
+      "dimensions": [
+        280,
+        134
+      ],
+      "fileSHA256": "a338a11789decf44c09fa615f5e8aa7b40a40013ea95abdbdfc65ea0455435c0",
+      "rgbaSHA256": "af4640a589f2e96b1c907f94c07b636065707b213ff0e804ee83e6e74b27cdc0"
+    },
+    {
+      "id": "world-prop-pipe-v1",
+      "path": "public/art/creative-worlds/v1/pipe.webp",
+      "dimensions": [
+        280,
+        259
+      ],
+      "fileSHA256": "68bb854a50a87e6fec2c8866fedc7d98123806e7bb81bbca9d36357bb362aeaa",
+      "rgbaSHA256": "23d011f064382c27ffa8c537cbc82d8ed7408380aad82db595d78fdad5cac2d5"
+    },
+    {
+      "id": "world-prop-spring-v1",
+      "path": "public/art/creative-worlds/v1/spring.webp",
+      "dimensions": [
+        217,
+        280
+      ],
+      "fileSHA256": "e233a409a9cb954028e3161c5ebd91f6db42eae775c3c7e4835be1dc2dda541e",
+      "rgbaSHA256": "5df063accaeb2c57a00a4cc4044b02f37684b2b87ef184536b74825a11098b05"
+    },
+    {
+      "id": "world-workshop-v1-background",
+      "path": "public/art/creative-worlds/v1/workshop-background.webp",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "fileSHA256": "fd64c12985efa099110515c69ab5ca47a33be17e91d452154a149a77f7e7a6bf",
+      "rgbaSHA256": "b79b8aff139157e45b41bc04c864048cf44fe33af1b280f3e07d5c7ab614a2cd"
+    },
+    {
+      "id": "world-workshop-v1-middle",
+      "path": "public/art/creative-worlds/v1/workshop-middle.webp",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "fileSHA256": "653aafdafde421077c3db0330af19f70b2ab79e693c27e97ac637b1cf2fef2e8",
+      "rgbaSHA256": "40ee9389e5260acf8233f793ce7fab5bd7494b761f4a1c6825a6822a2349d98e"
+    },
+    {
+      "id": "world-workshop-v1-foreground",
+      "path": "public/art/creative-worlds/v1/workshop-foreground.webp",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "fileSHA256": "3042ff1f106b413d6d6104787a4d68d122f7c6ab35d7526391334f27596ce0e1",
+      "rgbaSHA256": "8d3d1a58723e9eedd644478255eba859db09249ae3b1faa69d63d746dfc6a7ab"
+    },
+    {
+      "id": "world-workshop-v1-preview",
+      "path": "public/art/creative-worlds/v1/workshop-preview.webp",
+      "dimensions": [
+        384,
+        216
+      ],
+      "fileSHA256": "6dfe1d1c3c3e728a0cd86e22b4b73a7a9561628cf2b5137b0742e7059223fca1",
+      "rgbaSHA256": "967c354f259c1fea392e8a73bf60959b68a6fd91ac5706fdd878bcb19ce415c8"
+    },
+    {
+      "id": "world-prop-cloud-platform-v1",
+      "path": "public/art/creative-worlds/v1/cloud-platform.webp",
+      "dimensions": [
+        280,
+        178
+      ],
+      "fileSHA256": "5c33cf0a6791ea83cec345fbb58b9b51433ca87d159c6bf6a861d6e990dc8d05",
+      "rgbaSHA256": "c85721c8961c5c2daf90e5bd38df86c6a6e855b08d5d4824892a949897820190"
+    },
+    {
+      "id": "world-prop-sky-island-v1",
+      "path": "public/art/creative-worlds/v1/sky-island.webp",
+      "dimensions": [
+        280,
+        212
+      ],
+      "fileSHA256": "4678b00cc070093635d858479902ae35594a1385a6a3fef22940298126450601",
+      "rgbaSHA256": "55aca8d34bbd7c74f5a063c2d58e81aaa6841fb19d53e860c1b271ee8812161e"
+    },
+    {
+      "id": "world-prop-balloon-v1",
+      "path": "public/art/creative-worlds/v1/balloon.webp",
+      "dimensions": [
+        215,
+        280
+      ],
+      "fileSHA256": "5048350698989f8919b5b65ec9181d2b4a24739d2516af29834f6470d8c332cd",
+      "rgbaSHA256": "28096ddf7c55f6730ec339c1f7648b9b373e10f5a303d91d43060b720d0af448"
+    },
+    {
+      "id": "world-prop-star-v1",
+      "path": "public/art/creative-worlds/v1/star.webp",
+      "dimensions": [
+        280,
+        263
+      ],
+      "fileSHA256": "3a2e05473cce09d83864d7c4999d6b30223006390f1dd6cfd0e4d14dec366577",
+      "rgbaSHA256": "6d195845b397e1f3ab89a52385e302c49b670e52a5bce4ff1ba389807ea58f1c"
+    },
+    {
+      "id": "world-prop-rainbow-v1",
+      "path": "public/art/creative-worlds/v1/rainbow.webp",
+      "dimensions": [
+        280,
+        205
+      ],
+      "fileSHA256": "048f63719263bf099dd22e50f11672a4145da75382b8ecbd1efb3d0b013ad282",
+      "rgbaSHA256": "a264db1b296f60f995351111b11ce1681ff5da7f56754e55aa1192ea1b4167fe"
+    },
+    {
+      "id": "world-prop-turret-v1",
+      "path": "public/art/creative-worlds/v1/turret.webp",
+      "dimensions": [
+        217,
+        280
+      ],
+      "fileSHA256": "f353d292ff424883a056345eea52960d3d03cbe1c6d0b912c9acf7e0d1c0593a",
+      "rgbaSHA256": "7d1ebebcdd4c4f7c9f875d7bdef337ed70f994ece794ad2c8103fb8c644ecc05"
+    },
+    {
+      "id": "world-prop-floating-gem-v1",
+      "path": "public/art/creative-worlds/v1/floating-gem.webp",
+      "dimensions": [
+        280,
+        233
+      ],
+      "fileSHA256": "863d48d7edfd8aeb4d22625dd4cc67aa67e6a7d0e3b6c5f4ce5dbb4239868732",
+      "rgbaSHA256": "cfebcf04cb97115d103344f32fc6010a967f7a7c9576f27f324b0c3a022def4d"
+    },
+    {
+      "id": "world-prop-cloud-stairs-v1",
+      "path": "public/art/creative-worlds/v1/cloud-stairs.webp",
+      "dimensions": [
+        280,
+        248
+      ],
+      "fileSHA256": "4286374dc3c4a2d1f38734724393deea1c2dd5524d19c71ef50bcf8034948fef",
+      "rgbaSHA256": "b8c9d2dabfa0cc3951ec682d61993ae749edb27014db11d57d50040bfa30dad1"
+    },
+    {
+      "id": "world-cloud-v1-background",
+      "path": "public/art/creative-worlds/v1/cloud-background.webp",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "fileSHA256": "eff8af17bdc39acd5b97a18e5090392028207d436c13778596b41831013515fa",
+      "rgbaSHA256": "14848b9fe44b961f1d3907ce1e8d5b3be788d0001fef9b14b83174ea1107a1fd"
+    },
+    {
+      "id": "world-cloud-v1-middle",
+      "path": "public/art/creative-worlds/v1/cloud-middle.webp",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "fileSHA256": "b6029e3b5b56d5f929632671dbd7d4bb951d1e06e22f42f803191845f7cfe01b",
+      "rgbaSHA256": "71389fc5a678c3e1d5dad541e2767ecde28218ca608223e9ddf0a558afc0586e"
+    },
+    {
+      "id": "world-cloud-v1-foreground",
+      "path": "public/art/creative-worlds/v1/cloud-foreground.webp",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "fileSHA256": "6f7d467fefa10a01d6ffb12e89bdd307fe9739910e02667eb4e46482021750f5",
+      "rgbaSHA256": "862fe50d15e0af2473f7528e94ed6048bc809793bea8c99d96a9e765ec06a279"
+    },
+    {
+      "id": "world-cloud-v1-preview",
+      "path": "public/art/creative-worlds/v1/cloud-preview.webp",
+      "dimensions": [
+        384,
+        216
+      ],
+      "fileSHA256": "4146bea7cf09f6c1c534e782134e9521d7cb8bee69a3263073b0bc97ba9c1da5",
+      "rgbaSHA256": "b88260fd3e35a62efa088c38f25695002c15728803792ccbdc2d9b0fca6accc9"
+    },
+    {
+      "id": "world-prop-moon-rock-v1",
+      "path": "public/art/creative-worlds/v1/moon-rock.webp",
+      "dimensions": [
+        280,
+        203
+      ],
+      "fileSHA256": "b3c546a2228bab452169b6665ec8c7be020e78809f7d18fc8bc211e7daba5ab5",
+      "rgbaSHA256": "a36298afd1b6231699a555af14ad448b25955283b8d4838d943e21e2a10ae4cc"
+    },
+    {
+      "id": "world-prop-rocket-v1",
+      "path": "public/art/creative-worlds/v1/rocket.webp",
+      "dimensions": [
+        215,
+        280
+      ],
+      "fileSHA256": "5ab27ab9d77f70bc3a156b1950c271ccc0f1666c9175c96a8773db0edb69c293",
+      "rgbaSHA256": "bfe6449a8887fd25df242d509f65dccb04ebf46eedfa60046e94660d2875686d"
+    },
+    {
+      "id": "world-prop-satellite-v1",
+      "path": "public/art/creative-worlds/v1/satellite.webp",
+      "dimensions": [
+        280,
+        198
+      ],
+      "fileSHA256": "dbdf91aa49736e76410d2a45ec3d09fd15be5c8703606cb009aff6b24f3a8297",
+      "rgbaSHA256": "25b878b33279425bb28fa619a435185418dce1550fc6a52df22b6ea31176e00a"
+    },
+    {
+      "id": "world-prop-crater-v1",
+      "path": "public/art/creative-worlds/v1/crater.webp",
+      "dimensions": [
+        280,
+        143
+      ],
+      "fileSHA256": "ec8617e3bc2ce3cdf2bb544ba85c8ea7daa92d693b8bd2e3d19bfe060a099aa4",
+      "rgbaSHA256": "f12e621dd81ca46de94591692459b54968181aee31343ab81b59e901bfda2e02"
+    },
+    {
+      "id": "world-prop-station-v1",
+      "path": "public/art/creative-worlds/v1/station.webp",
+      "dimensions": [
+        280,
+        250
+      ],
+      "fileSHA256": "17a7ccc6999aa3358632449f6e582893b2a05a9f91499fd3a397407fccdba630",
+      "rgbaSHA256": "3dc06661bd5ade140439f8c14095543c7a757b039d1310dd99f196e8dceb8359"
+    },
+    {
+      "id": "world-prop-space-crystal-v1",
+      "path": "public/art/creative-worlds/v1/space-crystal.webp",
+      "dimensions": [
+        273,
+        280
+      ],
+      "fileSHA256": "1fabb3d97debf5b460eba4d67e31e1e1cbb9b9e3c6909f5495b119ad34027057",
+      "rgbaSHA256": "6edb228655a25edd720d5812475b15c6b3fe7f9b2a94d835bd89a2cf03199c70"
+    },
+    {
+      "id": "world-prop-meteorite-v1",
+      "path": "public/art/creative-worlds/v1/meteorite.webp",
+      "dimensions": [
+        280,
+        242
+      ],
+      "fileSHA256": "3b60677d624a6801ac025426711d08dfbad2dab20c510f8c2417d86c44ab751a",
+      "rgbaSHA256": "36d06cb4fe0fd311201e11020bc7b424fe979e283398cbb5cafd518e4caa3cb3"
+    },
+    {
+      "id": "world-prop-rover-v1",
+      "path": "public/art/creative-worlds/v1/rover.webp",
+      "dimensions": [
+        280,
+        226
+      ],
+      "fileSHA256": "eb666cb4082c6d97eb67cad56a3c95ac6a20648648d29fec1debee6489e6b760",
+      "rgbaSHA256": "c374d5da19a9766f0f0e1e6394ac84ac87dbe81a37561f025faffea1964c786f"
+    },
+    {
+      "id": "world-moon-v1-background",
+      "path": "public/art/creative-worlds/v1/moon-background.webp",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "fileSHA256": "a7f86bf0b5f448306721776a017c3280180eb082b5cda2292b8d97f823f4c9a7",
+      "rgbaSHA256": "3d266ebae03c3e9104e62e2caae746865b5f4d26872e005dc18208510828e56d"
+    },
+    {
+      "id": "world-moon-v1-middle",
+      "path": "public/art/creative-worlds/v1/moon-middle.webp",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "fileSHA256": "5b2cf4940497c352db0dd51a72a4572e649bcc775cc257f3f713f590792d63a1",
+      "rgbaSHA256": "afa59db5b45949ba2be250337d0dff64b3eafeb1dd4b03a7760da8ddeedf8541"
+    },
+    {
+      "id": "world-moon-v1-foreground",
+      "path": "public/art/creative-worlds/v1/moon-foreground.webp",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "fileSHA256": "07359ec073716a04454f94528f639f87013a67d7bcd7e7365cabd65d2c5be25e",
+      "rgbaSHA256": "7879d361e04a99943cd9be9184da45af58fcf0bd1054b0a9239299f4e4541da0"
+    },
+    {
+      "id": "world-moon-v1-preview",
+      "path": "public/art/creative-worlds/v1/moon-preview.webp",
+      "dimensions": [
+        384,
+        216
+      ],
+      "fileSHA256": "59c0c990d8743775bef894bb1cf37e070245e53e7a5ab7505098e817e75f7ad5",
+      "rgbaSHA256": "b76d3b7ef3f1043840431ff28a57a97b74034a491b1e16788995bfe0b6672f5b"
+    }
+  ],
+  "historicalMasterDigests": [
+    "2b14b321aa805e41b9eb2d0ae2a452cbe56f0fbf7f57f641a4c60783c09a4513",
+    "437ee97ff305c31f9b3e1637c04cf39a0ff8f4d75927e3ad3303026f631b534f",
+    "52b700fae0bf0778fa2d17931b596d45f82e809db83ab5827b230816c66bf4df",
+    "5681a2430d461d8e2e92bf8aa4dab7184776eacb81adb6ebfb925749d0cc5edd",
+    "744a661435a456fd1127c670993df8e2183b88c03e87a10a09670f3099930a2e",
+    "747fb56c072927f56245a4e71bceedec6c589dc2b78db87e281093d2bbdc2557",
+    "a7a2cfc3dac0f72c1b86db8126bcac8f0ab497c130130c2e0b355a75c5dc7657",
+    "e7da280fb80c73d77e0ba9e5fcf49586b1b600524328dfb089e86d7d7324f81f"
+  ]
+}

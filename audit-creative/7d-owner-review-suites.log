@@ -1,0 +1,33 @@
+
+> family-game-factory@2.0.0-foundation review:test
+> node tools/ui-review/smoke.cjs && node tools/ui-review/integration.cjs
+
+PAGE home page-studio-library
+PAGE create page-studio
+PAGE creations page-creations
+PAGE coding page-creation
+PAGE art page-art-studio
+PAGE powers page-lab
+PAGE reasoning page-problem-solving
+PAGE journey page-jems-journey
+PAGE rewards page-jems-rewards
+PAGE pals page-jems-pals
+PAGE parent page-parent
+PAGE legacy-home page-home
+PAGE legacy-game page-game
+PAGE legacy-create page-create
+PAGE legacy-feedback page-feedback
+PAGE notifications studioNotifications
+PASS deterministic build reached ready
+PASS build / launch / educational interruption
+PASS UI review {"artifact":"/workspace/jems-consolidation/audit-creative/candidate-7d/dist-review/jems-ui-review.html","mode":"Single standalone file served on loopback","pages":["studio-library","studio","creations","creation","art-studio","lab","problem-solving","jems-journey","jems-rewards","jems-pals","parent","home","game","create","feedback","studioNotifications"],"viewports":4,"overflows":[],"errors":[],"network":[]}
+PASS coding: add Jump and run real scene engine
+PASS drawing: local PNG upload and durable library
+PASS guardian/device management and synthetic invitation
+PASS all embedded image assets decode
+SOURCE SMALL TEXT []
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

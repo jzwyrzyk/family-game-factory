@@ -1,0 +1,59 @@
+{
+  "dimensions": [
+    698,
+    393
+  ],
+  "b4_b5_byte_identical": true,
+  "native_original_same": false,
+  "mean_absolute_rgb_difference": [
+    60.89919945755594,
+    72.69200988648046,
+    127.07176082883119
+  ],
+  "source": {
+    "id": "794bdfdf-5008-4241-9282-95101cba954e",
+    "title": "Navi's playground",
+    "background": "world-forest-v1",
+    "world": null,
+    "pal": "pal-navi-base-core-2026-11-20",
+    "viewport": {
+      "width": 1440,
+      "height": 1080
+    },
+    "loadedArt": [
+      "/arcade/art/creative-worlds/v1/forest-background.webp",
+      "/arcade/art/creative-worlds/v1/forest-middle.webp",
+      "/arcade/art/creative-worlds/v1/forest-foreground.webp"
+    ]
+  },
+  "b4": {
+    "id": "d03a8a91-97e3-4a02-9c81-8de930f2047b",
+    "title": "Navi's playground",
+    "background": "meadow",
+    "world": {
+      "assetId": "world-terrace-1b1460063ff8",
+      "framing": "fill"
+    },
+    "pal": "pal-navi-base-core-2026-11-20",
+    "viewport": {
+      "width": 1440,
+      "height": 1080
+    },
+    "loadedArt": []
+  },
+  "b5": {
+    "id": "5be11607-79c6-4ff1-90a9-1f1e9d67cc32",
+    "title": "Navi's playground",
+    "background": "world-forest-v1",
+    "world": {
+      "assetId": "world-terrace-1b1460063ff8",
+      "framing": "fill"
+    },
+    "pal": "pal-navi-base-core-2026-11-20",
+    "viewport": {
+      "width": 1440,
+      "height": 1080
+    },
+    "loadedArt": []
+  }
+}

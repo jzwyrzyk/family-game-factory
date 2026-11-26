@@ -1,0 +1,64 @@
+From b886016c5ff4789a86710a0838c34935e3f46ff4 Mon Sep 17 00:00:00 2001
+From: Joseph Wyrzykowski <jzwyrzyk@gmail.com>
+Date: Thu, 26 Nov 2026 05:50:10 +0000
+Subject: [PATCH] Verify the actual return target through a held press
+
+
+diff --git a/tests/storage-native-ui.cjs b/tests/storage-native-ui.cjs
+index 99418057..a23e77ad 100644
+--- a/tests/storage-native-ui.cjs
++++ b/tests/storage-native-ui.cjs
+@@ -1,6 +1,41 @@
+ /* Built application acceptance for the explicitly selected storage-preview. */
+ const assert=require('node:assert/strict'),fs=require('node:fs'),{build}=require('esbuild'),{chromium,webkit}=require('playwright');
+ const {start}=require('./browser-server.cjs');
++// A child can start a press as soon as the new game is painted. Capture the
++// button's actual visible position, then keep that point through a held press.
++async function observeReturnTarget(page) {
++  await page.evaluate(() => {
++    window.firstPaintReturnTarget = null;
++    window.addEventListener('factory-game', () => {
++      requestAnimationFrame(() => {
++        const button = document.getElementById('returnLive');
++        let bounds = button.getBoundingClientRect();
++        if (bounds.top < 0 || bounds.bottom > innerHeight) {
++          button.scrollIntoView({block:'center', behavior:'instant'});
++          bounds = button.getBoundingClientRect();
++        }
++        const x = bounds.left + bounds.width / 2, y = bounds.top + bounds.height / 2;
++        window.firstPaintReturnTarget = {x, y, hit:document.elementFromPoint(x, y)?.closest('button')?.id, scrollY};
++      });
++    }, {once:true});
++  });
++}
++async function pressReturnTarget(page) {
++  const captured = await page.waitForFunction(() => window.firstPaintReturnTarget);
++  const point = await captured.jsonValue();
++  await captured.dispose();
++  assert.equal(point.hit, 'returnLive', 'the return control is visible under the initial pointer');
++  await page.mouse.move(point.x, point.y);
++  await page.mouse.down();
++  const releasedOn = await page.evaluate(async ({x, y}) => {
++    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
++    const button = document.getElementById('returnLive');
++    return {hit:document.elementFromPoint(x, y)?.closest('button')?.id, scrollY, buttonTop:button.getBoundingClientRect().top};
++  }, point);
++  await page.mouse.up();
++  assert.equal(releasedOn.hit, 'returnLive', 'the return control stays under the held pointer: '+JSON.stringify({point,releasedOn}));
++}
++
+ (async()=>{
+  const directory=process.env.STUDIO_BUILD_DIR||'test-results/storage-preview';if(!fs.existsSync(directory+'/index.html'))throw Error('Build with vite build --mode storage-preview --outDir test-results/storage-preview first.');
+  const fixture=await build({stdin:{contents:`export * from './src/factory/workspace';export * from './src/runtime/manifests';`,resolveDir:process.cwd()},bundle:true,write:false,format:'iife',globalName:'nativeFixture',platform:'browser'});
+@@ -19,9 +54,9 @@ const {start}=require('./browser-server.cjs');
+    // Choose the long retained history, including versions outside the first page.
+    await page.getByRole('navigation').getByRole('button',{name:'My Creations',exact:true}).click();if(!await page.getByRole('button',{name:'Saved game 00',exact:true}).count())await page.locator('#liveMoreGames').click();await page.getByRole('button',{name:'Saved game 00',exact:true}).click();await page.waitForFunction(()=>document.getElementById('liveName').textContent==='Saved game 00'&&document.querySelectorAll('#compareVersion option').length>=24&&document.getElementById('liveEditor').getAttribute('aria-busy')!=='true');
+    await page.locator('#versionTools').evaluate(element=>element.open=true);while(await page.locator('#liveMoreVersions').isVisible()){const count=await page.locator('#compareVersion option').count();await page.locator('#liveMoreVersions').click();await page.waitForFunction(count=>document.getElementById('liveMoreVersions').hidden||document.querySelectorAll('#compareVersion option').length>count,count);}assert.equal(await page.locator('#compareVersion option').count(),126);
++   await observeReturnTarget(page);
+    await page.fill('#livePrompt','Give me four buckets');await page.locator('#livePromptForm button[type=submit]').click();await page.waitForFunction(()=>FG.runtime.snapshot()?.config?.bucketCount===4);
+-   assert.equal(await page.evaluate(()=>window.scrollY),0,'switching to play finishes the programmatic scroll before a child can tap');
+-   await page.locator('#returnLive').click();
++   await pressReturnTarget(page);
+    await page.locator('#page-feedback:not(.hidden) #liveKeep').waitFor({state:'visible'});
+    await page.locator('#liveKeep').click();await page.waitForFunction(()=>document.getElementById('liveStatus').textContent.includes('pinned'));
+    await page.locator('#versionTools').evaluate(element=>element.open=true);await page.fill('#forkName','Recovered indexed copy');await page.locator('#liveForkForm button[type=submit]').click();await page.waitForFunction(()=>document.getElementById('liveStatus').textContent.includes('Saved as a new game'));

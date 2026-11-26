@@ -1,0 +1,168 @@
+diff --git a/src/creation/ui.ts b/src/creation/ui.ts
+index 0d44626f..ed430b2a 100644
+--- a/src/creation/ui.ts
++++ b/src/creation/ui.ts
+@@ -1390,6 +1390,7 @@ export function installCreationStudio(host: Host) {
+         });
+         return choice;
+       },replaceActorId?{}:{
++        showRecent:true,
+         catalogue:catalogueChoices(ownedPals().map(id=>({id,form:ownedPalForm(id)}))),
+         cataloguePreview:item=>art(item.assetId),
+         onChooseCatalogue:item=>{
+diff --git a/src/drawing/asset-collection.ts b/src/drawing/asset-collection.ts
+index 9052bb22..e0c9f482 100644
+--- a/src/drawing/asset-collection.ts
++++ b/src/drawing/asset-collection.ts
+@@ -51,6 +51,7 @@ export interface CreativePickerOptions {
+   catalogueCompatibility?: (item: CatalogueChoice) => string | undefined;
+   onChooseCatalogue?: (item: CatalogueChoice) => void;
+   roleLabel?: string;
++  showRecent?: boolean;
+   relatedCreativeId?: string;
+   layout?:{controls:HTMLElement;results:HTMLElement;status:HTMLElement};
+   card?:(item:PickerChoice)=>HTMLButtonElement;
+@@ -97,7 +98,7 @@ export function mountCreativeAssetPicker(container: HTMLElement, choices: readon
+   const search = element('input'), group = element('select');
+   search.type = 'search'; search.placeholder = 'Find my art'; search.setAttribute('aria-label',options.layout?'Find my art':'Find artwork'); search.maxLength = 60;
+   group.setAttribute('aria-label', 'Art collection');
+-  const names = {...(options.layout?{'':'All my art'}:{recent:'Recent art'}), ...(options.relatedCreativeId ? {family:'Versions of this picture'} : {}), ...categoryNames, other:'Other art', motion:'Moving creations', versions:'Saved versions',
++  const names = {...(options.layout?{'':'All my art'}:{}), ...(!options.layout||options.showRecent?{recent:'Recent art'}:{}), ...(options.relatedCreativeId ? {family:'Versions of this picture'} : {}), ...categoryNames, other:'Other art', motion:'Moving creations', versions:'Saved versions',
+     ...(options.catalogue ? {pal:'My Pals', jems:'Jems artwork'} : {})};
+   for (const [id, title] of Object.entries(names)) group.add(new Option(title, id));
+   tools.append(search, group);
+@@ -137,6 +138,11 @@ export function mountCreativeAssetPicker(container: HTMLElement, choices: readon
+       if (collection in categoryNames && item.category !== collection && !(!options.layout && collection === 'prop' && item.category === 'other')) return false;
+       return !query || [item.label, item.semanticIdentity ?? '', item.detail, item.logicalName].some(text => text.toLowerCase().includes(query));
+     });
++    // Using an older movement again changes its recency, never its place in
++    // the saved-version order shown by the scene's full collection.
++    if (options.showRecent && collection === '') {
++      items.sort((a,b)=>b.savedAt.localeCompare(a.savedAt) || b.assetId.localeCompare(a.assetId));
++    }
+     count.textContent = items.length ? `${items.length} saved ${items.length === 1 ? 'choice' : 'choices'}` : choices.length ? 'No art found. Try another name or collection.' : empty || 'No pictures here yet.';
+     for (const item of items.slice(0, limit)) {
+       if(options.card){results.append(options.card(item));continue;}
+diff --git a/src/drawing/studio.ts b/src/drawing/studio.ts
+index 201951cc..1edb60be 100644
+--- a/src/drawing/studio.ts
++++ b/src/drawing/studio.ts
+@@ -39,7 +39,7 @@ export function installArtStudio(host:Host){
+   <input id="artUpload" type="file" accept="image/png,image/jpeg" hidden><input id="artCamera" type="file" accept="image/png,image/jpeg" capture="environment" hidden><input id="artImport" type="file" accept="application/json,.json" hidden>`;
+   document.querySelector('main')!.append(page);
+   const $=<T extends HTMLElement=HTMLElement>(id:string)=>page.querySelector<T>('#'+id)!;
+-  let visible=false,epoch=0,refreshRun=0,selected='',category='all',archive=false,items:DrawingMetadata[]=[],rigs:SavedRig[]=[],urls:string[]=[],nextPage:[string,string]|null=null,total=0;
++  let visible=false,epoch=0,refreshRun=0,detailsRun=0,selected='',category='all',archive=false,items:DrawingMetadata[]=[],rigs:SavedRig[]=[],urls:string[]=[],nextPage:[string,string]|null=null,total=0;
+   const status=(text:string,error=false)=>{$('artStatus').textContent=text;$('artStatus').classList.toggle('is-error',error);$('artStatus').setAttribute('role',error?'alert':'status');};
+   const release=()=>{urls.forEach(URL.revokeObjectURL);urls=[];};
+   const imageUrl=(item:Drawing|DrawingMetadata,thumbnail=false)=>{const url=URL.createObjectURL(thumbnail&&item.preview?new Blob([item.preview],{type:'image/png'}):'bytes' in item?drawingBlob(item):new Blob([],{type:'image/png'}));urls.push(url);return url;};
+@@ -83,14 +83,27 @@ export function installArtStudio(host:Host){
+       const versions=rigs.filter(r=>r.assembly.sourceId===item.id),copy=node('div','art-card-copy');
+       copy.append(node('span','art-card-category',categories[item.category??'other']),node('strong','',item.name));
+       const meta=node('span','art-card-meta',versions.length?`${versions.length} movement ${versions.length===1?'version':'versions'}`:item.sourceId?'Edited picture · original kept':'Original picture');
+-      copy.append(meta);card.append(preview,copy);card.onclick=()=>void action(async()=>{const captured=owner(),run=epoch;selected=item.id;renderGrid();await details(item.id);focusSelectedArtwork(item.id,captured,run);});grid.append(card);
++      copy.append(meta);card.append(preview,copy);
++      card.onclick=()=>void action(async()=>{
++        const captured=owner(),run=epoch,pane=$('artDetails');
++        if(selected!==item.id || pane.hidden || pane.dataset.drawingId!==item.id || !pane.querySelector('#artDetailTitle')){
++          selected=item.id;
++          renderGrid();
++          await details(item.id);
++        }
++        focusSelectedArtwork(item.id,captured,run);
++      });
++      grid.append(card);
+     }
+     if(nextPage){const more=button('Show more art','arrow',async()=>{const captured=owner(),at=epoch,after=nextPage;if(!after)return;const page=await drawingPage(captured,{limit:24,after,archived:archive,...(category==='all'?{}:{category:category as DrawingCategory}),search:$<HTMLInputElement>('artSearch').value});if(!current(captured,at))return;items.push(...page.items);nextPage=page.next;renderGrid();});more.id='artLoadMore';grid.append(more);}
+     for(const filter of $('artFilters').querySelectorAll<HTMLButtonElement>('button'))filter.setAttribute('aria-pressed',String(filter.dataset.category===category));
+     setIconLabel($('artShowArchive'),'clock',archive?'Show current art':'Show archived art');
+   }
+   async function details(id:string){
+-    const captured=owner(),run=epoch;if(!items.some(item=>item.id===id)||!current(captured,run))return;const item=await drawing(captured,id);if(!current(captured,run)||selected!==id)return;
++    const captured=owner(),run=epoch,request=++detailsRun;
++    const valid=()=>current(captured,run) && selected===id && request===detailsRun;
++    if(!items.some(item=>item.id===id)||!valid())return;
++    const item=await drawing(captured,id);if(!valid())return;
+     const pane=$('artDetails');pane.replaceChildren();pane.dataset.drawingId=id;pane.hidden=false;
+     const heading=node('div','art-detail-heading'),title=node('h2','',item.name);title.id='artDetailTitle';title.tabIndex=-1;
+     const close=button('Close','close',()=>{selected='';pane.hidden=true;renderGrid();});close.setAttribute('aria-label','Close artwork details');heading.append(title,close);pane.append(heading);
+@@ -181,7 +194,7 @@ export function installArtStudio(host:Host){
+     tools.append(button('Delete unused picture','trash',async()=>{if(!confirm('Delete this picture and its movement versions from this device? Download your art library first to keep a copy. Pictures used by saved work cannot be deleted.'))return;await deleteArtwork(captured,id,()=>current(captured,run));if(!current(captured,run))return;selected='';if(!await refresh())return;status('Unused picture deleted.');notify(captured);}));
+     if(item.sourceId)tools.append(node('p','art-small','This is an edited copy. The original picture remains saved separately.'));
+     pane.append(tools);
+-    const [draft,usage]=await Promise.all([loadDrawingDraft(captured,id),artUsages(captured,id)]);if(!current(captured,run)||selected!==id)return;
++    const [draft,usage]=await Promise.all([loadDrawingDraft(captured,id),artUsages(captured,id)]);if(!valid())return;
+     if(draft){const note=node('div','art-draft-note');note.append(node('p','','You have an unfinished movement design.'),button('Resume unfinished design','edit',()=>draft.assembly.kind==='picture' || draft.assembly.motion && 'stops' in draft.assembly.motion ? openPath(true) : editMovement()));note.querySelector('button')!.id='artResumeDraft';actions.before(note);}
+     if(usage.length){const count=new Set(usage.map(item=>item.targetKind+':'+item.targetId)).size;pane.append(node('p','art-small',`Used in ${count} saved ${count===1?'creation':'creations'}. Archiving keeps those adventures working.`));}
+   }
+diff --git a/tests/creative-motion-browser.cjs b/tests/creative-motion-browser.cjs
+index f66c9f72..c4afc7e7 100644
+--- a/tests/creative-motion-browser.cjs
++++ b/tests/creative-motion-browser.cjs
+@@ -82,7 +82,14 @@ const {start}=require('./browser-server.cjs');
+     assert.ok(stored.revisions.some(r=>JSON.stringify(r.scene)===JSON.stringify(scene)),'the first scene survives a new motion revision unchanged');
+     assert.equal(stored.attempts.length,0);
+     await page.locator('#creationAddActor').click();
+-    await page.locator('#creationPrivateActorChoices [data-private-art]').filter({hasText:'Animation path'}).last().click();
++    const movementChoices=page.locator('#creationPrivateActorChoices [data-private-art]').filter({hasText:'Animation path'});
++    const collection=page.locator('#creationActorArtFilters').getByLabel('Art collection');
++    assert.equal((await movementChoices.first().getAttribute('data-private-art')).split(':')[2],second,'The newest saved version comes first in All my art');
++    await collection.selectOption('recent');
++    assert.equal(await movementChoices.first().getAttribute('data-private-art'),actor.assetId,'Recent shows the first version just reused in a scene');
++    await collection.selectOption('');
++    assert.equal(await movementChoices.last().getAttribute('data-private-art'),actor.assetId,'All my art keeps the saved order of the two versions');
++    await movementChoices.last().click();
+     const added=await page.evaluate(()=>FG.creation.scene());assert.equal(added.actors[1].assetId,actor.assetId);
+     const inserted=added.programs.find(p=>p.actorId===added.actors[1].id && p.trigger.type==='start');
+     assert.deepEqual(inserted.actions.map(({id,...a})=>a),actions.map(({id,...a})=>a));
+diff --git a/tests/game-art-browser.cjs b/tests/game-art-browser.cjs
+index f2019e8b..88201423 100644
+--- a/tests/game-art-browser.cjs
++++ b/tests/game-art-browser.cjs
+@@ -29,7 +29,16 @@ async function main(){
+     if(upload)await page.setInputFiles('#artUpload',{name:name+'.png',mimeType:'image/png',buffer:fs.readFileSync(path.join(__dirname,'game-art',name+'.png'))});
+     else await page.locator('#artGrid .art-card').filter({has:page.getByText(name,{exact:true})}).click();
+     await page.waitForFunction(name=>document.querySelector('#artDetailTitle')?.textContent===name,name);
+-    await page.selectOption('#artGameRole',role);if(role==='collectible')await page.getByPlaceholder('My idea (optional)').fill('Give me one point');await page.click('#artPlanGame');
++    await page.selectOption('#artGameRole',role);
++    if(role==='collectible'){
++      const idea=page.getByPlaceholder('My idea (optional)');
++      await idea.fill('Give me one point');
++      await page.locator('#artGrid .art-card[aria-pressed="true"]').click();
++      await page.waitForFunction(()=>document.activeElement?.id==='artDetailTitle');
++      assert.equal(await page.locator('#artGameRole').inputValue(),role,'Reselecting the current picture preserves its role');
++      assert.equal(await idea.inputValue(),'Give me one point','Reselecting the current picture preserves the child’s intent');
++    }
++    await page.click('#artPlanGame');
+     await page.locator('#studioArtPlan').waitFor().catch(async error=>{console.error(await page.locator('main .page:not(.hidden)').innerText(),errors);throw error;});await page.waitForFunction(role=>window.FG.studio.exportNotebook().sessions.some(s=>s.gameArt?.pins.some(p=>p.role===role)),role);
+   };
+   const picker=async()=>{
+@@ -72,14 +81,24 @@ async function main(){
+   const sample=()=>canvas.evaluate(c=>Array.from(c.getContext('2d').getImageData(100,12,1,1).data));
+   assert.deepEqual(await sample(),[198,226,237,255],'The selected background contributes actual canvas pixels');
+   await canvas.screenshot({path:path.join(evidence,'valley-first-round.png')});
+-  const hold=async(key,ms)=>{await page.keyboard.down(key);await page.waitForTimeout(ms);await page.keyboard.up(key);};
+-  await hold('ArrowRight',2350);await frame.getByText('Score: 1',{exact:true}).waitFor();
++  const hold=async(key,steps)=>{
++    const game=await (await page.locator('.game-art-review iframe').elementHandle()).contentFrame();
++    const before=Number(await frame.locator('#game').getAttribute('data-ticks'));
++    await page.keyboard.down(key);
++    try{
++      // The game advances by simulation ticks. A busy browser may render fewer
++      // ticks during a wall-clock hold, even with the same key still pressed.
++      await game.waitForFunction(target=>Number(document.querySelector('#game').dataset.ticks)>=target
++        || document.querySelector('#status').dataset.state==='won',before+steps,{timeout:15000});
++    }finally{await page.keyboard.up(key);}
++  };
++  await hold('ArrowRight',141);await frame.getByText('Score: 1',{exact:true}).waitFor();
+   assert.equal(await frame.locator('#status').getAttribute('data-state'),'playing','the larger rock blocks travel');
+-  await hold('ArrowUp',650);await hold('ArrowRight',1600);await frame.getByText('You did it!',{exact:true}).waitFor();
++  await hold('ArrowUp',39);await hold('ArrowRight',96);await frame.getByText('You did it!',{exact:true}).waitFor();
+   await page.getByRole('button',{name:'Keep this art test'}).click();
+   await page.getByText('This art test is kept.',{exact:true}).waitFor();await page.getByRole('button',{name:'Back to my idea',exact:true}).click();
+   const kept=(await session()).gameArt;assert.equal(kept.kept,kept.tests[0].id);
+-  frame=await play('Try faster flight');await hold('ArrowUp',370);await hold('ArrowRight',420);await frame.locator('#game').screenshot({path:path.join(evidence,'valley-improved-round.png')});
++  frame=await play('Try faster flight');await hold('ArrowUp',22);await hold('ArrowRight',25);await frame.locator('#game').screenshot({path:path.join(evidence,'valley-improved-round.png')});
+   const improved=(await session()).gameArt;
+   assert.deepEqual(improved.tests[1].pins,kept.tests[0].pins);assert.equal(improved.tests[1].parent,kept.kept);assert.notEqual(improved.tests[1].program,kept.tests[0].program);assert.equal(improved.kept,kept.kept);
+   await page.getByRole('button',{name:'Back to my idea',exact:true}).click();

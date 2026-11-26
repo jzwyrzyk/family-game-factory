@@ -1,0 +1,24 @@
+{
+  "head": "4cc6e8b445a201da155740e184ed9d9e4a1ce5f3",
+  "browser": "156.0.8078.79",
+  "origin": {
+    "id": "8cf0e1e5-628b-4907-b6f6-ed05a998f01e",
+    "sha": "3ea9d8d7d75e644e96c17e5fc7532148b5fe93149c073810c892beb550720b82",
+    "actualSha": "3ea9d8d7d75e644e96c17e5fc7532148b5fe93149c073810c892beb550720b82",
+    "editableMarks": 4,
+    "transparent": true,
+    "whole": "c563a17a-ba19-4fbb-80ca-495b1d70c7a7",
+    "articulated": "092c15c6-9d65-4b88-9d79-25c755e546d0"
+  },
+  "keptWorld": "42e8bbcd-fda3-43fb-93a2-4cce9e60a4d4",
+  "secondAnimation": "2fcff267-a37b-424c-8c36-a488584a0e19",
+  "partScene": "56ec8b9b-1306-4eb8-b5c1-8ee73f3d7160",
+  "game": "5a1e13d5-5d7e-447d-a580-492088b3c179",
+  "winCount": 3,
+  "originalUnchanged": true,
+  "selectedWholePin": "art:rig:c563a17a-ba19-4fbb-80ca-495b1d70c7a7:78cdae1f2e646034ba24b782c15af6346cd5712a9a76ee997349bf89197e880a",
+  "selectedPartPin": "art:rig:092c15c6-9d65-4b88-9d79-25c755e546d0:f364dce3512a40ccf3c438b8bcf022e54fc3dd8f2da49f0a7f1f3deef86d1e83",
+  "selectedGamePin": "art:image:8cf0e1e5-628b-4907-b6f6-ed05a998f01e:3ea9d8d7d75e644e96c17e5fc7532148b5fe93149c073810c892beb550720b82",
+  "externalOrNonGetRequests": [],
+  "authoringScope": "Drawing, scene playback, inspector and game through the browser; whole and articulated rig fixtures created through the existing native saveRig writer."
+}

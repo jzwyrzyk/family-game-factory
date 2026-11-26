@@ -1,0 +1,97 @@
+{
+  "shared-original": [
+    {
+      "skillId": "g2-money",
+      "op": "coins",
+      "answer": 52,
+      "availableQuantity": true
+    },
+    {
+      "skillId": "g2-length",
+      "op": "subtract",
+      "answer": 28,
+      "availableQuantity": true
+    },
+    {
+      "skillId": "g3-divide",
+      "op": "divide",
+      "answer": 5,
+      "availableQuantity": true
+    },
+    {
+      "skillId": "g3-area",
+      "op": "area",
+      "answer": 20,
+      "availableQuantity": true
+    },
+    {
+      "skillId": "g4-angles",
+      "op": "add",
+      "answer": 80,
+      "availableQuantity": true
+    },
+    {
+      "skillId": "g3-groups",
+      "op": "multiply",
+      "answer": 12,
+      "availableQuantity": true
+    },
+    {
+      "skillId": "g3-multiply",
+      "op": "multiply",
+      "answer": 25,
+      "availableQuantity": true
+    }
+  ],
+  "corrected": [
+    {
+      "skillId": "g2-money",
+      "op": "coins",
+      "answer": 52,
+      "availableQuantity": false,
+      "model": "coins"
+    },
+    {
+      "skillId": "g2-length",
+      "op": "subtract",
+      "answer": 28,
+      "availableQuantity": false,
+      "model": "ruler"
+    },
+    {
+      "skillId": "g3-divide",
+      "op": "divide",
+      "answer": 5,
+      "availableQuantity": false,
+      "model": "arrays"
+    },
+    {
+      "skillId": "g3-area",
+      "op": "area",
+      "answer": 20,
+      "availableQuantity": false,
+      "model": "arrays"
+    },
+    {
+      "skillId": "g4-angles",
+      "op": "add",
+      "answer": 80,
+      "availableQuantity": false,
+      "model": "angles"
+    },
+    {
+      "skillId": "g3-groups",
+      "op": "multiply",
+      "answer": 12,
+      "availableQuantity": true,
+      "model": "arrays"
+    },
+    {
+      "skillId": "g3-multiply",
+      "op": "multiply",
+      "answer": 25,
+      "availableQuantity": true,
+      "model": "arrays"
+    }
+  ]
+}

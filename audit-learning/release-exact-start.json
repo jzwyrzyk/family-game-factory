@@ -1,0 +1,12 @@
+{
+  "source": "a7c0d31aaf05d614b0f07a06d41a1d6179e13d01",
+  "viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "requests": [],
+  "errors": [],
+  "readyMs": 40946,
+  "constructed": "10",
+  "passed": true
+}

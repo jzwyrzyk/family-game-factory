@@ -1,0 +1,15 @@
+AssertionError [ERR_ASSERTION]: the return control stays under the held pointer: {"point":{"x":724.8203125,"y":677.5625,"hit":"returnLive","scrollY":785},"releasedOn":{"scrollY":441,"buttonTop":988.2100219726562}}
++ actual - expected
+
++ undefined
+- 'returnLive'
+
+    at pressReturnTarget (/workspace/jems-consolidation/audit-learning/return-hit-verification/tests/storage-native-ui.cjs:36:10)
+    at async /workspace/jems-consolidation/audit-learning/return-hit-verification/tests/storage-native-ui.cjs:59:4 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: 'returnLive',
+  operator: 'strictEqual',
+  diff: 'simple'
+}

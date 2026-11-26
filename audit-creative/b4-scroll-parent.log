@@ -1,0 +1,150 @@
+FAIL first-learner creation desktop: the code pane owns all vertical program scrolling
++ actual - expected
+
++ [
++   {
++     accessibleName: null,
++     class: '',
++     client: 583,
++     first: 'DoneWorld Waterfall islandsGem FactoryGarden terraceJem gardensCloud island',
++     overflow: 'auto',
++     parent: '<details id="creationSceneOptions" class="creation-scene-options"',
++     parentOpen: false,
++     scroll: 615,
++     summary: undefined,
++     tag: 'DIV'
++   }
++ ]
+- []
+
+FAIL first-learner creation laptop: the code pane owns all vertical program scrolling
++ actual - expected
+
++ [
++   {
++     accessibleName: null,
++     class: '',
++     client: 497,
++     first: 'DoneWorld Waterfall islandsGem FactoryGarden terraceJem gardensCloud island',
++     overflow: 'auto',
++     parent: '<details id="creationSceneOptions" class="creation-scene-options"',
++     parentOpen: false,
++     scroll: 615,
++     summary: undefined,
++     tag: 'DIV'
++   }
++ ]
+- []
+
+PASS first-learner creation portrait
+PASS first-learner creation large-portrait
+FAIL first-learner creation tablet: the code pane owns all vertical program scrolling
++ actual - expected
+
++ [
++   {
++     accessibleName: null,
++     class: '',
++     client: 497,
++     first: 'DoneWorld Waterfall islandsGem FactoryGarden terraceJem gardensCloud island',
++     overflow: 'auto',
++     parent: '<details id="creationSceneOptions" class="creation-scene-options"',
++     parentOpen: false,
++     scroll: 615,
++     summary: undefined,
++     tag: 'DIV'
++   }
++ ]
+- []
+
+PASS first-learner creation phone
+PASS first-learner creation small-phone
+PASS first-learner creation landscape
+PASS native Chromium 150% zoom and restoration
+AssertionError [ERR_ASSERTION]: every first-learner layout and journey must pass
++ actual - expected
+
++ [
++   {
++     errors: [],
++     layout: 'desktop',
++     message: 'the code pane owns all vertical program scrolling\n' +
++       '+ actual - expected\n' +
++       '\n' +
++       '+ [\n' +
++       '+   {\n' +
++       '+     accessibleName: null,\n' +
++       "+     class: '',\n" +
++       '+     client: 583,\n' +
++       "+     first: 'DoneWorld Waterfall islandsGem FactoryGarden terraceJem gardensCloud island',\n" +
++       "+     overflow: 'auto',\n" +
++       `+     parent: '<details id="creationSceneOptions" class="creation-scene-options"',\n` +
++       '+     parentOpen: false,\n' +
++       '+     scroll: 615,\n' +
++       '+     summary: undefined,\n' +
++       "+     tag: 'DIV'\n" +
++       '+   }\n' +
++       '+ ]\n' +
++       '- []\n',
++     paidRequests: [],
++     status: 'failed'
++   },
++   {
++     errors: [],
++     layout: 'laptop',
++     message: 'the code pane owns all vertical program scrolling\n' +
++       '+ actual - expected\n' +
++       '\n' +
++       '+ [\n' +
++       '+   {\n' +
++       '+     accessibleName: null,\n' +
++       "+     class: '',\n" +
++       '+     client: 497,\n' +
++       "+     first: 'DoneWorld Waterfall islandsGem FactoryGarden terraceJem gardensCloud island',\n" +
++       "+     overflow: 'auto',\n" +
++       `+     parent: '<details id="creationSceneOptions" class="creation-scene-options"',\n` +
++       '+     parentOpen: false,\n' +
++       '+     scroll: 615,\n' +
++       '+     summary: undefined,\n' +
++       "+     tag: 'DIV'\n" +
++       '+   }\n' +
++       '+ ]\n' +
++       '- []\n',
++     paidRequests: [],
++     status: 'failed'
++   },
++   {
++     errors: [],
++     layout: 'tablet',
++     message: 'the code pane owns all vertical program scrolling\n' +
++       '+ actual - expected\n' +
++       '\n' +
++       '+ [\n' +
++       '+   {\n' +
++       '+     accessibleName: null,\n' +
++       "+     class: '',\n" +
++       '+     client: 497,\n' +
++       "+     first: 'DoneWorld Waterfall islandsGem FactoryGarden terraceJem gardensCloud island',\n" +
++       "+     overflow: 'auto',\n" +
++       `+     parent: '<details id="creationSceneOptions" class="creation-scene-options"',\n` +
++       '+     parentOpen: false,\n' +
++       '+     scroll: 615,\n' +
++       '+     summary: undefined,\n' +
++       "+     tag: 'DIV'\n" +
++       '+   }\n' +
++       '+ ]\n' +
++       '- []\n',
++     paidRequests: [],
++     status: 'failed'
++   }
++ ]
+- []
+
+    at /workspace/jems-consolidation/audit-creative/candidate-b4/tests/audit-scroll-parent.cjs:429:12 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [Array],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

@@ -1,0 +1,48 @@
+{
+  "browser": "156.0.8078.79",
+  "localOnly": true,
+  "results": [
+    {
+      "side": "before",
+      "fallback": false,
+      "round": 1,
+      "committed": 46,
+      "dcl": 7246,
+      "ready": 9588,
+      "loaded": 9588,
+      "source": "c572e715b3bff13d8b45cc27ac515a576f02354d",
+      "native": true,
+      "keys": 347,
+      "verified": 347,
+      "fullAssetResolveHashMs": 19405
+    },
+    {
+      "side": "after",
+      "fallback": false,
+      "round": 1,
+      "committed": 22,
+      "dcl": 7648,
+      "ready": 8287,
+      "loaded": 8288,
+      "source": "85476a654a716bac7124d7cafc1254d0ca5c1f2c",
+      "native": true,
+      "keys": 347,
+      "verified": 347,
+      "fullAssetResolveHashMs": 2180
+    },
+    {
+      "side": "after",
+      "fallback": true,
+      "round": 1,
+      "committed": 22,
+      "dcl": 6454,
+      "ready": 7610,
+      "loaded": 7611,
+      "source": "85476a654a716bac7124d7cafc1254d0ca5c1f2c",
+      "native": false,
+      "keys": 347,
+      "verified": 347,
+      "fullAssetResolveHashMs": 3042
+    }
+  ]
+}

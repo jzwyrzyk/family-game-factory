@@ -1,0 +1,7 @@
+page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at file:///workspace/jems-consolidation/audit-learning/corrected-exact-assets/jems-ui-review.html
+Call log:
+[2m  - navigating to "file:///workspace/jems-consolidation/audit-learning/corrected-exact-assets/jems-ui-review.html", waiting until "domcontentloaded"[22m
+
+    at /workspace/jems-consolidation/audit-learning/exact-offline-start.cjs:9:41 {
+  name: 'Error'
+}

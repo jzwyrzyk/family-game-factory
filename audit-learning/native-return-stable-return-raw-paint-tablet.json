@@ -1,0 +1,155 @@
+{
+  "active": "page-feedback",
+  "keep": true,
+  "editorHidden": false,
+  "grade": 1,
+  "route": "?arcade=1",
+  "events": [
+    {
+      "t": 7474,
+      "type": "pointerup",
+      "page": "page-feedback",
+      "target": "liveMoreVersions",
+      "x": 149.13999938964844,
+      "y": 588.8400268554688,
+      "scroll": 1248,
+      "returnTop": 0
+    },
+    {
+      "t": 7474,
+      "type": "click",
+      "page": "page-feedback",
+      "target": "liveMoreVersions",
+      "x": 149,
+      "y": 588,
+      "scroll": 1248,
+      "returnTop": 0
+    },
+    {
+      "t": 7806,
+      "type": "pointerdown",
+      "page": "page-feedback",
+      "target": "liveMoreVersions",
+      "x": 149.13999938964844,
+      "y": 588.8400268554688,
+      "scroll": 1248,
+      "returnTop": 0
+    },
+    {
+      "t": 7807,
+      "type": "pointerup",
+      "page": "page-feedback",
+      "target": "liveMoreVersions",
+      "x": 149.13999938964844,
+      "y": 588.8400268554688,
+      "scroll": 1248,
+      "returnTop": 0
+    },
+    {
+      "t": 7807,
+      "type": "click",
+      "page": "page-feedback",
+      "target": "liveMoreVersions",
+      "x": 149,
+      "y": 588,
+      "scroll": 1248,
+      "returnTop": 0
+    },
+    {
+      "t": 8052,
+      "type": "pointerdown",
+      "page": "page-feedback",
+      "target": "BUTTON",
+      "x": 100.87999725341797,
+      "y": 269.3399963378906,
+      "scroll": 1248,
+      "returnTop": 0
+    },
+    {
+      "t": 8053,
+      "type": "pointerup",
+      "page": "page-feedback",
+      "target": "BUTTON",
+      "x": 100.87999725341797,
+      "y": 269.3399963378906,
+      "scroll": 1248,
+      "returnTop": 0
+    },
+    {
+      "t": 8053,
+      "type": "click",
+      "page": "page-feedback",
+      "target": "BUTTON",
+      "x": 100,
+      "y": 269,
+      "scroll": 1248,
+      "returnTop": 0
+    },
+    {
+      "t": 8548,
+      "type": "factory-game",
+      "page": "page-feedback",
+      "scroll": 1248,
+      "returnTop": 0,
+      "route": "buckets"
+    },
+    {
+      "t": 8553,
+      "type": "factory-page",
+      "page": "page-feedback",
+      "scroll": 1248,
+      "returnTop": 0,
+      "route": "game"
+    },
+    {
+      "type": "after gameOpen",
+      "scroll": 0
+    },
+    {
+      "type": "paintAim",
+      "scroll": 370,
+      "returnTop": 912.0625,
+      "x": 468.703125,
+      "y": 944.5625,
+      "target": "returnLive"
+    },
+    {
+      "t": 8739,
+      "type": "pointerdown",
+      "page": "page-game",
+      "target": "returnLive",
+      "x": 468.703125,
+      "y": 944.5625,
+      "scroll": 370,
+      "returnTop": 912
+    },
+    {
+      "t": 8912,
+      "type": "pointerup",
+      "page": "page-game",
+      "target": "returnLive",
+      "x": 468.703125,
+      "y": 944.5625,
+      "scroll": 370,
+      "returnTop": 911
+    },
+    {
+      "t": 8912,
+      "type": "click",
+      "page": "page-game",
+      "target": "returnLive",
+      "x": 468,
+      "y": 944,
+      "scroll": 370,
+      "returnTop": 911
+    },
+    {
+      "t": 8913,
+      "type": "factory-page",
+      "page": "page-game",
+      "scroll": 370,
+      "returnTop": 911,
+      "route": "feedback"
+    }
+  ]
+}
