@@ -1,8 +1,5 @@
 name: Bubble Gum Builders play and visual review
 on:
-  push:
-    branches:
-      - 'feature/bubble-gum-builders-overhaul-20261122'
   pull_request:
     paths:
       - 'src/games/bubble-gum-*'
@@ -23,8 +20,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: bubble-gum-builders-${{ github.head_ref || github.ref }}
-  cancel-in-progress: true
+  group: bubble-gum-builder-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   host-integration:

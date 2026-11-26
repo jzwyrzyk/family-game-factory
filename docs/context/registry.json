@@ -84,7 +84,10 @@
     "docs/development/SETUP.md",
     "docs/development/COSTS.md",
     "docs/decisions/2026-11-23-dev-test-prod.md",
-    "docs/ui-review/README.md"
+    "docs/ui-review/README.md",
+    "docs/history/2026-11-26/PRODUCT-DOCTRINE.md",
+    "docs/history/2026-11-26/ARCHITECTURE-CURRENT.md",
+    "docs/history/2026-11-26/DELIVERY-STATE.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -125,7 +128,9 @@
     "docs/development/*.md",
     "infra/nonproduction/*.md",
     "docs/development/evidence/*.md",
-    "docs/storage/*.md"
+    "docs/storage/*.md",
+    "docs/history/2026-11-26/*.md",
+    "docs/evidence/DEVELOPMENT-VELOCITY.md"
   ],
   "areas": [
     {
@@ -880,7 +885,8 @@
         "docs/game-intelligence/premium-benchmark/*.md",
         "docs/development/*.md",
         "infra/nonproduction/*.md",
-        "docs/ui-review/*.md"
+        "docs/ui-review/*.md",
+        "docs/evidence/DEVELOPMENT-VELOCITY.md"
       ],
       "sources": [
         "tests/**",
@@ -891,10 +897,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:23:11.824Z",
-      "sourceDigest": "5f7b1ef674e2b84dd647d329848d15cf1839bc2b621d5472752fe3445bcdc3d3",
+      "reviewedAt": "2026-11-26T04:36:23.364Z",
+      "sourceDigest": "07bc305375730f9cda5b545e4a4e8906eadc35b1af32a501054b487bc2956885",
       "reviewOutcome": "updated",
-      "reviewReason": "Delivery state records the failed hosted Pal reload and the visible onboarding path. The exact same regression commands, assertions, rendering code and timeouts remain in force, with two new pre-navigation persistence assertions.",
+      "reviewReason": "Compared the frozen npm command identities, hosted per-command timings, fixture ordering, local-only selection and visual screenshot consumers. The execution inventory records the retained evidence and release limits.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1114,7 +1120,8 @@
         "docs/development/*.md",
         "infra/nonproduction/*.md",
         "docs/evidence/README.md",
-        "docs/ui-review/*.md"
+        "docs/ui-review/*.md",
+        "docs/evidence/DEVELOPMENT-VELOCITY.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -1135,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T01:23:12.305Z",
-      "sourceDigest": "3a5ab9bfd335677e581d5e32600605a1c3cf253d9a45b9e0e271b77ea454684f",
+      "reviewedAt": "2026-11-26T04:36:23.751Z",
+      "sourceDigest": "0738bb7e8cd26e21626752feda5454bebe857721c61ba33440705e8e10a005ae",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the passing protected-main suite and the subsequent failed documentation-candidate Pal shard with its retained evidence and correction.",
+      "reviewReason": "Verified the six protected contexts and unchanged frozen release source. Documented PR-scoped cancellation, visual evidence ownership, current environment blockers and the separate release regression partition.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1393,10 +1400,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:58.459Z",
-      "sourceDigest": "37c0c3f9ee5432f31d4741e23cb41fe2cc54569af18aec957152e780590aad46",
+      "reviewedAt": "2026-11-26T04:36:24.145Z",
+      "sourceDigest": "d2cec1aa74d216e82cb4b0ec5a555a477c48225fd8098ab455130adab36262ec",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the roster and Journey decision with companion contracts and updated the documentation index.",
+      "reviewReason": "Reviewed indexed historical source records, compatibility headings, local link targets, compact session entry points and branch handoffs. Documentation diagnostics now reuse the existing digest pass.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

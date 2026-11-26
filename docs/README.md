@@ -6,7 +6,7 @@ Private family operating procedures are in the [owner guide](family-beta/OWNER.m
 
 [Private family beta architecture and trust boundaries](family-beta/ARCHITECTURE.md) covers the household baseline, independent family accounts, protected browser delivery, approved entry artwork and the synthetic browser acceptance contract.
 
-CI and validation: [architecture, complete workflow audit, coverage, benchmarks and evidence reuse](evidence/README.md#ci-architecture-and-performance).
+[Focused editing, workflow inventory and session handoff](evidence/DEVELOPMENT-VELOCITY.md). CI and validation: [architecture, complete workflow audit, coverage, benchmarks and evidence reuse](evidence/README.md#ci-architecture-and-performance).
 
 Start with the canonical references below. Feature documents remain the detailed contracts; this index keeps them discoverable without copying all of their content into an engineering handbook.
 

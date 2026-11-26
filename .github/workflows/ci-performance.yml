@@ -27,6 +27,11 @@ jobs:
           # workflow_run.head_sha, a PR checkout, or downloaded executable files.
           ref: ${{ github.sha }}
           persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /scripts/ci/report-performance.mjs
+            /scripts/ci/classify-impact.mjs
+            /ops/ci-performance.json
       - uses: actions/setup-node@v4
         with:
           node-version: 22

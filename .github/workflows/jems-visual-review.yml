@@ -3,8 +3,8 @@ on:
   pull_request:
   workflow_dispatch:
 concurrency:
-  group: jems-visual-${{ github.head_ref || github.ref_name }}
-  cancel-in-progress: true
+  group: jems-visual-review-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   selection:
     # This is an optional visual lane. Arcade still owns the required docs,
@@ -36,7 +36,7 @@ jobs:
           import fs from 'node:fs';
           const plan = JSON.parse(fs.readFileSync('ci-plan.json', 'utf8'));
           const reason = plan.requiredShards.length
-            ? 'All five visual jobs remain selected: application impact, full validation, or a conservative fallback requires their existing assertions.'
+            ? 'Capture the page gallery. On PRs, consult the exact prospective merge Arcade studio-core and factory receipts for Brand, Studio, Delight and Gem Factory. Their status is reported independently. Manual dispatch also runs these four contracts here.'
             : 'The trusted base classifies this exact source as ' + plan.mode + '. Visual jobs are explicitly not required; release-intent reuse, when applicable, passed independent exact-evidence verification. Required documentation and operations checks remain in Arcade.';
           fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '\n### Optional visual lane\n\n' + reason + '\n');
           JS
@@ -63,92 +63,29 @@ jobs:
       - name: Build production
         run: npm run build
       - name: Capture all real jems pages
+        id: pages
         run: node tests/brand-review-pages.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: jems-page-by-page-review
           path: test-results/brand-review/
-          if-no-files-found: warn
-  brand-contract:
-    needs: selection
-    if: needs.selection.outputs.has-shards == 'true'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npx playwright install chromium
-      - name: Build for isolated smoke test
-        run: npm run build
-      - name: Run isolated jems brand-browser contract
-        run: node tests/brand-browser.cjs
-  studio-journey:
-    needs: selection
-    if: needs.selection.outputs.has-shards == 'true'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npx playwright install chromium
-      - name: Build for isolated smoke test
-        run: npm run build
-      - name: Run isolated Studio save-play-iterate journey
-        run: node tests/studio-journey.cjs
-  joy-contract:
-    needs: selection
-    if: needs.selection.outputs.has-shards == 'true'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npx playwright install chromium
-      - name: Build jems with joy layer
-        run: npm run build
-      - name: Test earned celebrations and Math-English accents
-        run: node tests/jems-delight-browser.cjs
-  gem-factory:
-    needs: selection
-    if: needs.selection.outputs.has-shards == 'true'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npx playwright install chromium
-      - name: Build the playable workshop
-        run: npm run build
-      - name: Play desktop, tablet and phone orders through the learning host
-        run: npm run test:gem-factory
+          if-no-files-found: error
+
+      - name: Qualify all four gameplay and interaction contracts on manual dispatch
+        if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' && (steps.pages.outcome == 'success' || steps.pages.outcome == 'failure') }}
+        run: |
+          node --input-type=module <<'JS'
+          import { runCommands } from './scripts/ci/run-suite.mjs';
+          import { expandCommands, readJSON } from './scripts/ci/suites.mjs';
+          const checks = ['node tests/brand-browser.cjs', 'node tests/studio-journey.cjs',
+            'node tests/jems-delight-browser.cjs', 'npm run test:gem-factory'];
+          const results = runCommands(expandCommands(checks, readJSON('package.json').scripts));
+          if (results.some(result => result.exitCode !== 0)) process.exitCode = 1;
+          JS
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' }}
         with:
           name: gem-factory-gameplay
           path: test-results/gem-factory/
-          if-no-files-found: warn
+          if-no-files-found: error

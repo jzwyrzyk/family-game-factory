@@ -20,10 +20,10 @@ permissions:
 # verifier migration. It is not a mutable repository variable or PR input.
 env:
   CI_MAIN_REUSE_POLICY: protected-main-equivalence-v1
-# Cancel only superseded validation of the same PR/main branch, never releases.
+# Only superseded revisions of a single PR share a cancellation group.
 concurrency:
-  group: arcade-journeys-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: test-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   prepare:
     runs-on: ubuntu-24.04
