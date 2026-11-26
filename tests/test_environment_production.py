@@ -718,6 +718,31 @@ fingerprint(root,process.argv[3],async url => {
                 }
             return {"variables": [], "total_count": 0}
 
+        def quiet(repo, path):
+            if "/actions/workflows/" in path:
+                return {"total_count": 0, "workflow_runs": []}
+            if path.endswith(("/FACTORY_ACTIONS_APPROVED", "/FACTORY_RUNNER_SMOKE_APPROVED")):
+                return {"name": path.rsplit("/", 1)[-1], "value": "false"}
+            return read(repo, path)
+
+        gate.production_worker_binding(worker, SOURCE, quiet, template, rotating=True)
+        for status in ("waiting", "in_progress", "queued", "pending", "requested"):
+
+            def busy(repo, path):
+                if "status=" + status + "&" in path:
+                    return {"total_count": 1, "workflow_runs": [{"id": 4}]}
+                return quiet(repo, path)
+
+            with self.subTest(status=status), self.assertRaises(ERROR):
+                gate.production_worker_binding(worker, SOURCE, busy, template, rotating=True)
+
+        def enabled(repo, path):
+            if path.endswith("/FACTORY_ACTIONS_APPROVED"):
+                return {"name": "FACTORY_ACTIONS_APPROVED", "value": "true"}
+            return quiet(repo, path)
+
+        with self.assertRaises(ERROR):
+            gate.production_worker_binding(worker, SOURCE, enabled, template, rotating=True)
         gate.production_worker_binding(worker, SOURCE, read, template)
         with self.assertRaises(ERROR):
             gate.production_worker_binding(worker, SIGNER, read, template)
@@ -754,7 +779,9 @@ fingerprint(root,process.argv[3],async url => {
         call = []
         with patch.object(gate, "production_worker_binding") as binding:
             gate.runtime_supply(self.record, read, lambda a, **kw: call.append(a))
-            binding.assert_called_once_with(self.record["manifest"]["worker"]["production"], SOURCE, read)
+            binding.assert_called_once_with(
+                self.record["manifest"]["worker"]["production"], SOURCE, read, rotating=False
+            )
         self.assertIn("--deny-self-hosted-runners", call[0])
 
         def moved(repo, path):

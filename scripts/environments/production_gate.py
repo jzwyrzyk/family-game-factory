@@ -460,7 +460,7 @@ WORKER_TEMPLATES = {
 }
 
 
-def production_worker_binding(worker, source, read, templates=WORKER_TEMPLATES):
+def production_worker_binding(worker, source, read, templates=WORKER_TEMPLATES, *, rotating=False):
     for file, (count, checksum) in templates.items():
         result = read(WORKERS, "/contents/.github/workflows/" + file + "?ref=" + worker["sourceSha"])
         require(
@@ -484,6 +484,15 @@ def production_worker_binding(worker, source, read, templates=WORKER_TEMPLATES):
         "FACTORY_PRIVATE_WORKER_SHA": worker["sourceSha"],
         "FACTORY_SANDBOX_IMAGE": worker["sandboxImage"],
     }
+    if rotating:
+        pins.update(FACTORY_ACTIONS_APPROVED="false", FACTORY_RUNNER_SMOKE_APPROVED="false")
+        for workflow in WORKER_TEMPLATES:
+            for status in ("requested", "waiting", "pending", "queued", "in_progress"):
+                runs = read(WORKERS, f"/actions/workflows/{workflow}/runs?status={status}&per_page=1")
+                require(
+                    runs["total_count"] == 0 and runs["workflow_runs"] == [],
+                    "Private worker has in-flight execution",
+                )
     for name, value in pins.items():
         result = read(WORKERS, "/actions/variables/" + name)
         require(
@@ -526,7 +535,12 @@ def runtime_supply(record, read=private_get, execute=subprocess.run):
             and ref["object"]["sha"] == w["sourceSha"],
             "Worker main or execution tag changed",
         )
-    production_worker_binding(m["worker"]["production"], m["sourceSha"], read)
+    production_worker_binding(
+        m["worker"]["production"],
+        m["sourceSha"],
+        read,
+        rotating=m["worker"]["production"] != record["recovery"]["worker"],
+    )
     retained = record["recovery"]["worker"]
     ref = read(retained["repository"], "/git/ref/tags/" + retained["executionTag"])
     require(

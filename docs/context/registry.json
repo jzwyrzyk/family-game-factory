@@ -929,10 +929,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:42:56.150Z",
-      "sourceDigest": "8d4f62d303c15ea361fcd64ece9828430ebab7ba7b3cbcde43fb73182363ba94",
+      "reviewedAt": "2026-11-26T23:44:42.407Z",
+      "sourceDigest": "5764c6e393e1c015aabd343ddc189c0db2a1d42f2b44d1f70c46eb68cc053997",
       "reviewOutcome": "updated",
-      "reviewReason": "Cross-producer fixtures now exercise the authentic TEST frontend fingerprint, runtime observation, finalized fixture reuse and funded configuration intake through production approval.",
+      "reviewReason": "The private worker rotation fixtures exercise all five active execution states and reject enabled admissions before any forward production transition.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1174,10 +1174,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T23:42:56.401Z",
-      "sourceDigest": "e3b2dbd53fa01a98b8933f38a0d7bd6b210a76fae58ae2fa2127a4c534d96519",
+      "reviewedAt": "2026-11-26T23:44:42.680Z",
+      "sourceDigest": "04758f9c9b3e7cf6b6b9b12c6f7e3d41ca8b672048e3659340d355a8eba02425",
       "reviewOutcome": "updated",
-      "reviewReason": "First-cutover recovery now verifies each historical household byte and the approved deployment while promotion independently checks both TEST lane configurations and private worker workflow identities.",
+      "reviewReason": "The coordinated production procedure keeps new work closed through mixed traffic and records explicit ledger reconciliation and private runtime quiescence requirements.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
