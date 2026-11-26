@@ -654,10 +654,10 @@
         "tests/theme-workspace.test.ts"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:21:40.465Z",
-      "sourceDigest": "6175f04fd8c0080046811bd5571bd3bc69bf4505d8b5d12c70343bbee0508fc1",
+      "reviewedAt": "2026-11-26T04:32:34.569Z",
+      "sourceDigest": "7d596bb3a08cd932af6053fd72c3ba404418a3c6533e064bb410967c5616c2ed",
       "reviewOutcome": "updated",
-      "reviewReason": "Routed early sound counts and Grade 2 syllable splits to their authored response controls, preserving historical content and evaluators.",
+      "reviewReason": "Retain both the interactive multiplication array and the earlier voluntary base-ten answer path on one visual attempt. Preserve symbolic and challenge limits.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -900,10 +900,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:21:41.183Z",
-      "sourceDigest": "b9efd47b0790ae0e24e406ba0fd49b74711af55a4dd4d64e2c72c0e385bb332a",
+      "reviewedAt": "2026-11-26T04:32:35.177Z",
+      "sourceDigest": "cc81e351090f6a71e8701b7d1aedaef6bb6f90eda771437f051dc5cc8253ffc7",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the hosted ambiguous exit, unfinished explicit submission and independently reproduced Grade 2 syllable regression in the Learning Workspace evidence guide.",
+      "reviewReason": "Preserve the exact Grade 3 multiplication construction assertion and verify eligible gallery grades plus a higher-grade learner opening a prerequisite.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -55,6 +55,8 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     ? {kind:'blocks', role:'answer'} as const : undefined;
   const plan = mode !== 'checkpoint' || initial.representation==='visual' ? availableModel ?? quantityFallback : undefined;
   const constructsAnswer = plan?.role === 'answer';
+  const arrayWithBlocks = plan?.kind === 'arrays' && initial.parameters.operation === 'multiply'
+    && initial.answerKind === 'number' && mode !== 'checkpoint' && !options.challenge;
   // A quantity/fraction construction is an actual mathematical representation,
   // not evidence of unaided symbolic recall. Choice tiles retain the item form.
   const item: MathItem = !isEarlyGrade(initial.grade) && mode !== 'checkpoint' && plan
@@ -87,10 +89,13 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
 
   const tabs = el('div','math-mode-tabs'); tabs.setAttribute('role','group'); tabs.setAttribute('aria-label','How would you like to answer?');
   const typeTab=button('Write an answer'),buildTab=button(kind==='choice'?'Choose a tile':'Build an answer');
-  tabs.append(typeTab,buildTab); tabs.hidden=!constructsAnswer || !(mode==='both'||(mode==='checkpoint'&&plan));
+  tabs.append(typeTab,buildTab); tabs.hidden=!arrayWithBlocks && (!constructsAnswer || !(mode==='both'||(mode==='checkpoint'&&plan)));
   shell.work.append(tabs);
   const answerArea=el('div','math-answer-area'),interactionArea=el('div','math-interaction-area');
+  const blockAnswer = el('div','math-block-answer');
+  blockAnswer.hidden = true;
   shell.work.append(interactionArea,answerArea);
+  if (arrayWithBlocks) shell.work.append(blockAnswer);
   feedback.id=options.legacyIds?'math-feedback':`${prefix}-feedback`;
   const support=el('div','math-support-actions'),hintButton=button('Give me a hint'),showButton=button('Show me how');
   hintButton.dataset.action='hint';showButton.dataset.action='show-solution';
@@ -135,7 +140,7 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     title.focus({preventScroll:true});return document.activeElement===title;
   }
   function returnToAnswer() {
-    const area=answerArea.hidden?interactionArea:answerArea;
+    const area=!blockAnswer.hidden?blockAnswer:answerArea.hidden?interactionArea:answerArea;
     const control=area.querySelector<HTMLElement>('input:not([hidden]),button:not(:disabled)');
     if(control)focusAndReveal(control,'center');else focusQuestion();
   }
@@ -227,8 +232,17 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     mountMathModel(interactionArea,item,plan,{submit,isLocked:()=>locked||disposed||done,signal:listeners.signal});
   }
   function setPath(interactive:boolean) {
-    interactionArea.hidden=!interactive || !plan;
-    answerArea.hidden=interactive && constructsAnswer;
+    if (arrayWithBlocks) {
+      interactionArea.hidden = false;
+      answerArea.hidden = interactive;
+      blockAnswer.hidden = !interactive;
+      if (interactive && !blockAnswer.childElementCount) {
+        mountMathModel(blockAnswer,item,{kind:'blocks',role:'answer'},{submit,isLocked:()=>locked||disposed||done,signal:listeners.signal});
+      }
+    } else {
+      interactionArea.hidden=!interactive || !plan;
+      answerArea.hidden=interactive && constructsAnswer;
+    }
     // A frame with given counters and an empty fraction line already present
     // their stimulus in the model. Keep the given visible on the written path.
     shell.stimulus.hidden=interactive && (
@@ -241,7 +255,7 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   on(typeTab,'click',()=>{setPath(false);returnToAnswer();});on(buildTab,'click',()=>{setPath(true);returnToAnswer();});
   // Showing the model first makes visual-form evidence truthful in both mode,
   // even when the child later chooses the written response for the same item.
-  setPath(mode!=='checkpoint'||plan?.role==='explore');
+  setPath(!arrayWithBlocks && (mode!=='checkpoint'||plan?.role==='explore'));
   // A question is the entry point, including on touch devices. Focusing a text
   // input here would open the software keyboard before the child can read it.
   focusQuestion();

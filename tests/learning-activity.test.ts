@@ -125,6 +125,32 @@ test('three errors provide a worked example and a supportive way back to play',a
   }finally{await page.close();}
 });
 
+test('a multiplication array and a child-built base-ten answer share the same attempt',async()=>{
+  const page=await mount(multiply(),'interaction');
+  try {
+    const root=page.locator('.math-activity');
+    const id=await root.getAttribute('data-attempt-id');
+    assert.ok(await page.locator('[data-model="arrays"]').isVisible());
+    assert.ok(await page.locator('#math-answer').isVisible());
+    await page.getByRole('button',{name:'Build an answer',exact:true}).click();
+    assert.equal(await page.locator('#math-answer').isVisible(),false);
+    assert.equal(await page.locator('.math-built-number').textContent(),'0');
+    for(let i=0;i<5;i++)await page.locator('button[data-place="10"][data-delta="1"]').click();
+    await page.getByRole('button',{name:'Write an answer',exact:true}).click();
+    await page.getByRole('button',{name:'Build an answer',exact:true}).click();
+    for(let i=0;i<6;i++)await page.locator('button[data-place="1"][data-delta="1"]').click();
+    assert.equal(await root.getAttribute('data-attempt-id'),id);
+    assert.equal(await page.locator('.math-built-number').textContent(),'56');
+    await page.locator('[data-action=check-interaction]').click();
+    await page.waitForFunction(()=>(window as any).results.length===1);
+    const e=await evidence(page);
+    assert.equal(e.results[0].independent,true);
+    assert.equal(e.profile.learning.attempts.length,1);
+    assert.equal(e.profile.learning.attempts[0].item.representation,'visual');
+    assert.equal(e.profile.learning.attempts[0].answers[0].normalized,'56/1');
+  } finally {await page.close();}
+});
+
 test('interaction mode constructs a quantity without pre-filling the answer',async()=>{
   const item=generateItem('g2-hundreds',{random:()=>0});
   const page=await mount(item,'interaction');try{

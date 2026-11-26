@@ -142,7 +142,16 @@ async function main() {
       }
     }
     if(!baseline){
+      await open('g4-add-fraction');
+      assert.deepEqual(await page.locator('#grade option:enabled').evaluateAll(options => options.map(o => o.value)), ['4']);
+      await open('g1-make-ten');
+      await page.selectOption('#grade','3');
+      await page.waitForFunction(() => {
+        const w = document.querySelector('#appFrame').contentWindow;
+        return w.FG?.store.current().grade === 3 && w.FG.learning.activeItem?.skillId === 'g1-make-ten';
+      });
       await open('pk-touch');
+      assert.equal(await page.locator('#grade option:enabled').count(),6);
       for(const theme of ['factory','mining','gum','dragon','math-lab']){
         await page.selectOption('#learningTheme',theme);
         const expected=theme==='math-lab'?'jems':theme;
