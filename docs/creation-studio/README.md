@@ -237,3 +237,9 @@ The introductory sequence starts with one step, follows with correcting a direct
 Sources reviewed November 25, 2026 include the [2026 CSTA PK–12 edition](https://csteachers.org/2026-csta-pk-12-computer-science-standards/), [Michigan's adopted K–12 CS standards](https://www.michigan.gov/mde/services/academic-standards/michigan-k-12-computer-science-standards) and [Boston College's Coding as Another Language Kindergarten ScratchJr curriculum](https://sites.bc.edu/codingasanotherlanguage/curricula/scratchjr-curricula/kindergarten-scratchjr/). The CSTA 2026 edition has grade-specific identifiers. Michigan's state framework retains its adopted K–2 identifiers.
 
 On the four early directional challenges, **Predict a move** accepts an optional tap before checking a specific scene. The bounded evaluator samples the first visible displacement. Equal diagonal movement, a hidden actor or an execution limit yields no directional observation. Changing the scene invalidates the pending choice. The saved check can contain a pair of direction labels for the parent. A correct scene or a Run click alone contributes no prediction response.
+
+### World versions and placements
+
+The four illustrated starters share the versioned artwork used by the player and thumbnails. The world settings retain the static whole-stage art slot and also support a separately selectable drawing backdrop with its own visibility and framing. A child can mix props from different worlds, duplicate a placement, change its layer and move it with the keyboard or the stage handle. Layer changes change the paint order within a plane and preserve the order used by simultaneous scripts.
+
+Use this world creates an independent project from the exact kept version inside the creation store transaction. The copy keeps its pinned artwork, actor IDs, programs and placement settings. Both the local and IndexedDB authorities check the owner and kept version before copying.

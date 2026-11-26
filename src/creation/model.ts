@@ -10,7 +10,8 @@ export const CREATION_LIMITS = {
 } as const;
 
 export type CreationOrigin = 'child' | 'starter' | 'assisted';
-export type SceneBackground = 'meadow' | 'night' | 'workshop' | 'sky';
+export type SceneBackground = 'blank' | 'meadow' | 'night' | 'workshop' | 'sky' | typeof ILLUSTRATED_WORLDS[number]['id'];
+export type SceneLayer = 'backdrop' | 'back' | 'middle' | 'front';
 /** A world version pins its bundled plate and any aligned overlays. */
 export interface BundledSceneWorld {
   id: string; label: string; url: string;
@@ -47,13 +48,14 @@ export type CreationBlock = BlockBase & (
   | {type: 'emit'; name: string}
 );
 export type SceneTrigger = {type: 'start' | 'tap'} | {type: 'event'; name: string};
-export const SCENE_ROLES = ['character', 'decoration', 'obstacle', 'collectible'] as const;
+export const SCENE_ROLES = ['character', 'decoration', 'scenery', 'obstacle', 'collectible', 'player', 'npc', 'vehicle', 'environment', 'background'] as const;
 export type SceneRole = typeof SCENE_ROLES[number];
 export interface SceneActor {
   /** The child's description of this appearance in this scene. */
   role?: SceneRole;
   id: string; name: string; assetId: string; x: number; y: number;
-  size?: number; visible?: boolean;
+  creativeRole?: SceneRole;
+  size?: number; visible?: boolean; layer?: SceneLayer; stackOrder?: number; angle?: number; backdropFit?: 'contain' | 'cover';
 }
 export interface SceneProgram {
   id: string; actorId: string; trigger: SceneTrigger; actions: CreationBlock[];
@@ -67,6 +69,7 @@ export interface CreationProvenance {
 export interface CreationProject {
   schema: typeof CREATION_SCHEMA;
   id: string; title: string; width: number; height: number; background: SceneBackground; world?: SceneWorld;
+  worldLayers?: {middle:boolean; foreground:boolean};
   actors: SceneActor[]; programs: SceneProgram[]; variables: Record<string, number>;
   provenance?: CreationProvenance;
 }
@@ -115,11 +118,15 @@ const operators = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte'];
 
 /** Strictly validates before cloning: unsupported executable/asset payloads are never retained. */
 export function validateCreationProject(input: unknown): CreationProject {
-  const p = record(input, ['schema','id','title','width','height','background','world','actors','programs','variables','provenance'], 'project');
+  const p = record(input, ['schema','id','title','width','height','background','world','worldLayers','actors','programs','variables','provenance'], 'project');
   if (p.schema !== CREATION_SCHEMA) fail('Unsupported saved project version.');
   id(p.id, 'project ID'); text(p.title, 80, 'project title');
   number(p.width, 200, 1600, 'stage width', true); number(p.height, 160, 1200, 'stage height', true);
-  if (!['meadow','night','workshop','sky'].includes(p.background as string)) fail('Choose a supported background.');
+  if (!['blank','meadow','night','workshop','sky'].includes(p.background as string) && !ILLUSTRATED_WORLDS.some(world => world.id === p.background)) fail('Choose a supported background.');
+  if (p.worldLayers !== undefined) {
+    const layers = record(p.worldLayers, ['middle','foreground'], 'world layers');
+    if (typeof layers.middle !== 'boolean' || typeof layers.foreground !== 'boolean') fail('Choose visible world layers.');
+  }
   if (p.world !== undefined) {
     const world = record(p.world,['assetId','framing'],'world');
     if (!SCENE_WORLDS.some(item=>item.id===world.assetId) && parsePrivateArtId(world.assetId)?.kind!=='image') fail('Choose an available world picture.');
@@ -129,7 +136,7 @@ export function validateCreationProject(input: unknown): CreationProject {
   if (!p.actors.length) fail('Add at least one character.');
   const actorIds = new Set<string>();
   for (const raw of p.actors) {
-    const a = record(raw, ['id','name','assetId','x','y','size','visible','role'], 'character');
+    const a = record(raw, ['id','name','assetId','x','y','size','visible','role','creativeRole','layer','angle','stackOrder','backdropFit'], 'character');
     id(a.id, 'character ID');
     if (a.role !== undefined && !SCENE_ROLES.includes(a.role as SceneRole)) fail('Choose a supported scene role.');
     if(!isCreationId(a.assetId)&&!parsePrivateArtId(a.assetId))fail('Invalid asset reference.');
@@ -138,8 +145,15 @@ export function validateCreationProject(input: unknown): CreationProject {
     actorIds.add(a.id);
     number(a.x, 0, p.width, 'character x'); number(a.y, 0, p.height, 'character y');
     if (a.size !== undefined) number(a.size, 16, 240, 'character size');
+    if (a.stackOrder !== undefined) number(a.stackOrder, 0, CREATION_LIMITS.actors - 1, 'stack position', true);
+    if (a.angle !== undefined) number(a.angle, -180, 180, 'picture angle');
+    if (a.backdropFit !== undefined && (a.layer !== 'backdrop' || !['contain','cover'].includes(a.backdropFit as string))) fail('Choose a supported backdrop fit.');
+    if (a.layer !== undefined && !['backdrop','back','middle','front'].includes(a.layer as string)) fail('Choose a supported scene layer.');
+    if (a.layer === 'backdrop' && parsePrivateArtId(a.assetId)?.kind !== 'image') fail('Choose an original drawing for your backdrop.');
+    if (a.creativeRole !== undefined && !SCENE_ROLES.includes(a.creativeRole as SceneRole)) fail('Choose a supported role for this scene.');
     if (a.visible !== undefined && typeof a.visible !== 'boolean') fail('Invalid character visibility.');
   }
+  if (p.actors.filter(raw => (raw as SceneActor).layer === 'backdrop').length > 1) fail('Choose one drawing for your backdrop.');
   if (!p.variables || typeof p.variables !== 'object' || Array.isArray(p.variables)
     || ![Object.prototype, null].includes(Object.getPrototypeOf(p.variables))) fail('Invalid variables.');
   const variables = p.variables as Record<string, unknown>;
@@ -227,5 +241,13 @@ export function validateCreationProject(input: unknown): CreationProject {
     if (source.sourceKind !== undefined && !['curated','generated','creation','art'].includes(source.sourceKind as string)) fail('Invalid source kind.');
     for (const field of ['sourceProjectId','sourceRevisionId','sourceSessionId','sourceGameId']) if (source[field] !== undefined) id(source[field], 'source reference');
   }
-  return JSON.parse(JSON.stringify(input)) as CreationProject;
+  const project = JSON.parse(JSON.stringify(input)) as CreationProject;
+  for (const actor of project.actors) {
+    if (!actor.creativeRole) continue;
+    const canonical = actor.creativeRole === 'scenery' ? 'environment' : actor.creativeRole;
+    if (actor.role && actor.role !== canonical) fail('This actor has conflicting roles.');
+    actor.role = canonical;
+    delete actor.creativeRole;
+  }
+  return project;
 }

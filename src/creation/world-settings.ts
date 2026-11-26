@@ -7,9 +7,9 @@ export function worldSettings(host:HTMLElement, dialog:HTMLDialogElement, action
   owner():string;
   isCurrent():boolean;
   picture(id:string):HTMLElement;
-  choose(world:SceneWorld | undefined, background?:CreationProject['background'], current?:()=>boolean):Promise<boolean>;
+  choose(world:SceneWorld | undefined, background?:CreationProject['background'], current?:()=>boolean, asPlacement?:boolean):Promise<boolean>;
 }) {
-  host.innerHTML = `<label>World <select id="creationBackground"></select></label>
+  host.innerHTML = `<label>World <select id="creationBackground" aria-label="World"></select></label>
     <img id="creationWorldPreview" width="112" height="63" alt="" hidden>
     <button type="button" id="creationWorldFromArt" class="creation-button">Use my artwork</button>
     <label id="creationWorldFramingLabel">Picture size <select id="creationWorldFraming"><option value="fit">Show whole picture</option><option value="fill">Fill the stage</option></select></label>`;
@@ -37,7 +37,7 @@ export function worldSettings(host:HTMLElement, dialog:HTMLDialogElement, action
   }
   dialog.querySelector('button')!.onclick = close;
   dialog.addEventListener('close',()=>{controls.replaceChildren(); grid.replaceChildren(); message.textContent='';});
-  useArt.onclick = async () => {
+  async function open(asPlacement = false) {
     if (!actions.isCurrent() || !scene) return;
     const token = ++epoch, owner = actions.owner(), projectId = scene.id;
     const current = () => token === epoch && dialog.open && owner === actions.owner() && actions.isCurrent() && scene?.id === projectId;
@@ -55,7 +55,7 @@ export function worldSettings(host:HTMLElement, dialog:HTMLDialogElement, action
         button.append(actions.picture(choice.assetId),label);
         button.onclick=async()=>{
           if(!current()) return;
-          const applied=await actions.choose({assetId:choice.assetId,framing:'fit'},undefined,current);
+          const applied=await actions.choose({assetId:choice.assetId,framing:'fit'},undefined,current,asPlacement);
           if(current() && applied) close();
           else if(current()) message.textContent='Could not open that picture. Choose another or restore it in My Art.';
         };
@@ -63,6 +63,7 @@ export function worldSettings(host:HTMLElement, dialog:HTMLDialogElement, action
       });
     } catch(error){if(current())message.textContent=(error as Error).message;}
   };
+  useArt.onclick = () => open();
   select.onchange = async () => {
     const assetId = select.value;
     if(SCENE_WORLDS.some(world=>world.id===assetId)) await actions.choose({assetId,framing:'fill'});
@@ -72,11 +73,11 @@ export function worldSettings(host:HTMLElement, dialog:HTMLDialogElement, action
     if(scene?.world) await actions.choose({...scene.world,framing:frame.value==='fill'?'fill':'fit'});
   };
   return {
-    close,
+    close, open,
     render(project:CreationProject){
       scene=project;
       const world=project.world;
-      const bundled = SCENE_WORLDS.find(item => item.id === world?.assetId);
+      const bundled = SCENE_WORLDS.find(item => item.id === (world?.assetId ?? project.background));
       const own = world && !bundled;
       preview.hidden = !bundled?.preview;
       if (bundled?.preview) {

@@ -156,10 +156,10 @@
         "docs/creative-universe/STANDARD.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:35:53.678Z",
-      "sourceDigest": "38f01a9b8e700567483406a7a6adaeb9bf89c0da93ffac8fda750aa026c04416",
+      "reviewedAt": "2026-11-26T04:38:42.156Z",
+      "sourceDigest": "20628bd864adf37c9fb1864456641a85fe8bb5535ef697512832dcb387b81d3a",
       "reviewOutcome": "updated",
-      "reviewReason": "The canonical creative standard now specifies the notebook role owner and exact original and edition binding required for local game play.",
+      "reviewReason": "Reviewed product guidance and linked Creation Studio and Drawing Studio behavior for exact reuse and editable crayon admission.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -424,10 +424,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "5600267a35c47b7152c90d520cddf419bff4a933f3b9e140e91f3e8372e61d4b",
-      "reviewedAt": "2026-11-26T03:35:54.299Z",
+      "sourceDigest": "ed4992daf896357520826f418cefd93793c21876ee726c9e255d747d5c1b6fb7",
+      "reviewedAt": "2026-11-26T04:37:49.983Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The shared catalog preserves existing scene choices while resolving a single game drawing and its verified private ancestry.",
+      "reviewReason": "Reviewed integrated world editing and kept-copy storage, exact crayon coordinate recovery, the explicit service archive input and CI leaf contracts against current documentation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -695,10 +695,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T00:23:35.574Z",
-      "sourceDigest": "ca7b341e9de009c700ec5b750b52d88705543bbb56fe2f4833bd1dc2dfd64a33",
+      "reviewedAt": "2026-11-26T04:37:50.739Z",
+      "sourceDigest": "04ba1e7226ba9eb97da748000d996e8f432806a244f8187e3e6dc8612fc9c74a",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified the protected worker main and tag, scoped production observation, and preserved the historical scene JSON package for all three readers.",
+      "reviewReason": "Reviewed integrated world editing and kept-copy storage, exact crayon coordinate recovery, the explicit service archive input and CI leaf contracts against current documentation.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -912,10 +912,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:35:54.558Z",
-      "sourceDigest": "547f817e7c28d73bab4f183d26ef6a48a8ff3a532906e32497cf3100b21c6c51",
+      "reviewedAt": "2026-11-26T04:37:51.119Z",
+      "sourceDigest": "efae1b74d8f561606c563dee96f44d0d204f7fddb9b5742983ced3361cfae6dd",
       "reviewOutcome": "updated",
-      "reviewReason": "Added exact full-canvas comparison, explicit test Keep, copy, rebuild, negative authorization checks and real notebook selection in Chromium.",
+      "reviewReason": "Reviewed integrated world editing and kept-copy storage, exact crayon coordinate recovery, the explicit service archive input and CI leaf contracts against current documentation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1156,10 +1156,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:35:54.715Z",
-      "sourceDigest": "7804ff23caa74613f8af0d05e48c322d9b5e546b7e4f2bb4a929e076486a2466",
+      "reviewedAt": "2026-11-26T04:37:51.504Z",
+      "sourceDigest": "91c6673e7811701a9f46ed6035236d477b4db7169ae07c45efbeb990b392663d",
       "reviewOutcome": "updated",
-      "reviewReason": "The delivery register records the refreshed application, worker and household identities, the Workstream E stack, and separate hosted qualification.",
+      "reviewReason": "Reviewed integrated world editing and kept-copy storage, exact crayon coordinate recovery, the explicit service archive input and CI leaf contracts against current documentation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1653,10 +1653,10 @@
         "tests/game-art/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "78e3e623d9bf3ac39a538a8a8a40fe053d0283d45ffabf3efba991bacd095333",
-      "reviewedAt": "2026-11-26T03:35:54.972Z",
+      "sourceDigest": "554a48193c631bb36dbb99682273c99adf0aee2fc64cc1aeaa6b59a584ad6624",
+      "reviewedAt": "2026-11-26T04:37:51.880Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the shared catalog, optional role and authored action, guarded selection, original bytes and durable saved test pins.",
+      "reviewReason": "Reviewed integrated world editing and kept-copy storage, exact crayon coordinate recovery, the explicit service archive input and CI leaf contracts against current documentation.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1736,10 +1736,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "f1522ac0a7fb231e7389d3acf894d8a4f06b8f03ed4d25e7b1c4aee5717bf76a",
-      "reviewedAt": "2026-11-26T03:35:55.163Z",
+      "sourceDigest": "c6b5ee414e0a948ebf15addc0e5bfa6bd17c2ecc4363999ddfbb129299b152ef",
+      "reviewedAt": "2026-11-26T04:37:52.282Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented reference verification and origin-scoped identity remapping for local plans, tests and private recovery. Earlier readers need rollback qualification."
+      "reviewReason": "Reviewed integrated world editing and kept-copy storage, exact crayon coordinate recovery, the explicit service archive input and CI leaf contracts against current documentation."
     }
   ]
 }

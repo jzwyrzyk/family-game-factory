@@ -1,3 +1,4 @@
+import type {SceneCopyOptions} from '../creation/storage';
 import {IndexedRecords} from './indexed-records';
 import type {DurableRecord,RecordChange,RecordScope} from './record-contract';
 import {CreationStore,CREATION_KEY,CREATION_LIMITS,validateCreationWorkspace,type CreationWorkspace,type CreationEntry,type CreationRevision,type CreationDraft,type CreationAttempt} from '../creation/storage';
@@ -72,7 +73,7 @@ export class IndexedCreationStore {
  keep(id:string,head?:string){return this.edit(id,s=>s.keep(id,this.scope.profile,head));}
  autosave(id:string,scene:CreationProject,head:string){return this.edit(id,s=>s.autosave(id,this.scope.profile,scene,head));}
  discardDraft(id:string){return this.edit(id,s=>s.discardDraft(id,this.scope.profile));}
- copy(id:string,title?:string,options:{detachChallenge?:boolean}={}){return this.edit(id,s=>s.copy(id,this.scope.profile,title,options));}
+ copy(id:string,title?:string,options:SceneCopyOptions={}){return this.edit(id,s=>s.copy(id,this.scope.profile,title,options));}
  markHintUsed(id:string){return this.edit(id,s=>s.markHintUsed(id,this.scope.profile));}
  recordAttempt(id:string,head:string,result:{challengeId:string;passed:boolean;hintUsed:boolean;prediction?:MovementPrediction}){return this.edit(id,s=>s.recordAttempt(id,this.scope.profile,head,result));}
  async checkout(id:string,revisionId:string,expected?:string){const p=await this.get(id);if(expected!==undefined&&p.headId!==expected)throw Error('This scene changed elsewhere. Open its latest version.');const r=await this.revision(revisionId,id),row=await this.row(P,id);if((row?.value as CreationEntry).headId!==p.headId)throw Error('This scene changed elsewhere.');const next={...p,headId:r.id,title:r.scene.title,updatedAt:new Date().toISOString()};await this.records.commit({id:crypto.randomUUID(),scope:this.scope,changes:[{collection:P,id,value:next,expectedVersion:row!.version}]},{enqueue:false});return next;}

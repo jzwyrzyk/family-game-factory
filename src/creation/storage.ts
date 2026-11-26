@@ -7,6 +7,10 @@ import { assertRewardSourceWritable } from '../rewards/write-guard';
 
 export const CREATION_KEY='family-game-factory-creation-v1';
 export const CREATION_LIMITS=Object.freeze({projects:40,revisions:400,drafts:40,attempts:500,characters:2_000_000});
+export interface SceneCopyOptions {
+  detachChallenge?: boolean;
+  keptRevisionId?: string;
+}
 export interface CreationStoragePort {getItem(key:string):string|null;setItem(key:string,value:string):void}
 export interface CreationEntry {
   id:string;owner:string;title:string;headId:string;keptId:string|null;createdAt:string;updatedAt:string;challengeId?:string;hintUsed?:boolean;
@@ -175,9 +179,16 @@ export class CreationStore {
       const children=data.revisions.filter(r=>r.projectId===id&&r.parentId===p.headId),next=childId?children.find(r=>r.id===childId):children.at(-1);
       if(!next)throw Error('No later version on this branch. Choose a saved version.');p.headId=next.id;p.title=next.scene.title;p.updatedAt=now();return p;});
   }
-  copy(id:string,owner:string,title?:string,options:{detachChallenge?:boolean}={}):CreationEntry {
-    return this.write(data=>{const source=this.entry(data,id,owner),head=data.revisions.find(r=>r.id===source.headId)!,at=now();
-      const projectId=uid(),revisionId=uid(),scene=validateEditableProject({...head.scene,id:projectId,title:(title?.trim()||`${source.title} copy`).slice(0,60),
+  copy(id:string,owner:string,title?:string,options:SceneCopyOptions={}):CreationEntry {
+    return this.write(data=>{
+      const source=this.entry(data,id,owner);
+      if(options.keptRevisionId !== undefined && source.keptId !== options.keptRevisionId)
+        throw Error('The kept world changed. Open My scenes to choose it again.');
+      const version=options.keptRevisionId ?? source.headId;
+      const head=data.revisions.find(r=>r.projectId===source.id && r.id===version);
+      if(!head)throw Error('This version needs recovery before you can use it.');
+      const at=now();
+      const projectId=uid(),revisionId=uid(),scene=validateEditableProject({...head.scene,id:projectId,title:(title?.trim()||(options.keptRevisionId ? `${head.scene.title.slice(0,48)} · new scene` : `${source.title} copy`)).slice(0,60),
         provenance:{...head.scene.provenance,createdBy:'child',sourceKind:'creation',sourceProjectId:source.id,sourceRevisionId:head.id}});
       const hasHint=source.hintUsed||data.attempts.some(a=>a.projectId===source.id&&a.hintUsed);
       const p:CreationEntry={id:projectId,owner,title:scene.title,headId:revisionId,keptId:null,createdAt:at,updatedAt:at,...(source.challengeId&&!options.detachChallenge?{challengeId:source.challengeId,...(hasHint?{hintUsed:true}:{})}:{})};

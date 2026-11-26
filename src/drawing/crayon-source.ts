@@ -32,7 +32,7 @@ function locateSource(bytes: ArrayBuffer) {
 }
 export const hasCrayonSource = (bytes: ArrayBuffer) => !!locateSource(bytes);
 
-export function readCrayonSource(bytes: ArrayBuffer): CrayonSource | undefined {
+export function readCrayonSource(bytes: ArrayBuffer, scale: 32 | 64 = coordinateScale): CrayonSource | undefined {
   const chunk = locateSource(bytes);
   if (!chunk) return;
   const {offset, size} = chunk;
@@ -48,7 +48,7 @@ export function readCrayonSource(bytes: ArrayBuffer): CrayonSource | undefined {
     if (ink > crayons.length || width < 3 || width > 24 || length < 1 || length > maxStrokePoints || pos + length * 4 > size) return;
     const stroke: Stroke = {color: crayons[ink] ?? 'erase', size: width, points: []};
     for (let point = 0; point < length; point++) {
-      const x = data.getUint16(pos) / coordinateScale, y = data.getUint16(pos + 2) / coordinateScale;
+      const x = data.getUint16(pos) / scale, y = data.getUint16(pos + 2) / scale;
       if (x > paperWidth || y > paperHeight) return;
       stroke.points.push({x, y});
       pos += 4;
@@ -111,9 +111,13 @@ export function renderStrokes(ctx: CanvasRenderingContext2D, strokes: Stroke[], 
 /** Imports can carry arbitrary PNG chunks. Only open strokes that reproduce
  * the selected visible image in this renderer. Raster tools always remain available. */
 export async function verifiedCrayonSource(bytes: ArrayBuffer): Promise<CrayonSource> {
-  const source = readCrayonSource(bytes);
   try {
-    if (source && await pixelsMatchPng(bytes,paperWidth,paperHeight,ctx=>renderStrokes(ctx,source.strokes,source.transparent))) return source;
+    // The two historical encoders used the same format tag. The selected
+    // PNG itself determines which coordinate interpretation is admissible.
+    for (const scale of [64, 32] as const) {
+      const source = readCrayonSource(bytes, scale);
+      if (source && await pixelsMatchPng(bytes,paperWidth,paperHeight,ctx=>renderStrokes(ctx,source.strokes,source.transparent))) return source;
+    }
   } catch { /* The original PNG remains usable even if its source cannot be replayed. */ }
   throw Error('These strokes could not reopen exactly. Your saved picture is safe. You can still use Picture tools.');
 }

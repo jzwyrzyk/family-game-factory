@@ -1,3 +1,4 @@
+import type {SceneCopyOptions} from '../creation/storage';
 import {IndexedCreationStore} from './indexed-creation';
 import {CreationStore,CREATION_KEY,type CreationStoragePort} from '../creation/storage';
 import type {CreationProject} from '../creation/model';
@@ -28,7 +29,7 @@ export class CreationWorkspace {
  async autosave(id:string,owner:string,scene:CreationProject,head:string){this.check(owner);return this.indexed?this.indexed.autosave(id,scene,head):this.legacy!.autosave(id,owner,scene,head);}
  async discardDraft(id:string,owner:string){this.check(owner);return this.indexed?this.indexed.discardDraft(id):this.legacy!.discardDraft(id,owner);}
  async checkout(id:string,owner:string,revision:string,head?:string){this.check(owner);return this.indexed?this.indexed.checkout(id,revision,head):this.legacy!.checkout(id,owner,revision,head);}
- async copy(id:string,owner:string,title?:string,options:{detachChallenge?:boolean}={}){this.check(owner);return this.indexed?this.indexed.copy(id,title,options):this.legacy!.copy(id,owner,title,options);}
+ async copy(id:string,owner:string,title?:string,options:SceneCopyOptions={}){this.check(owner);return this.indexed?this.indexed.copy(id,title,options):this.legacy!.copy(id,owner,title,options);}
  async markHintUsed(id:string,owner:string){this.check(owner);return this.indexed?this.indexed.markHintUsed(id):this.legacy!.markHintUsed(id,owner);}
  async recordAttempt(id:string,owner:string,head:string,result:{challengeId:string;passed:boolean;hintUsed:boolean;prediction?:MovementPrediction}){this.check(owner);return this.indexed?this.indexed.recordAttempt(id,head,result):this.legacy!.recordAttempt(id,owner,head,result);}
  async remove(id:string,owner:string){this.check(owner);return this.indexed?this.indexed.remove(id):this.legacy!.remove(id,owner);}

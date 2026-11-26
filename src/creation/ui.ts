@@ -1,5 +1,9 @@
+import { createIllustratedStarter } from './projects';
+import { WORLD_PROPS } from './illustrated-art';
+import { worldTiles, worldControls, placeBackdrop, setWorldLayer, orderedPlacements, stackPlacement } from './world-tools';
+import { sceneThumbnails } from './scene-thumbnails';
 import { renderCreativePicker } from '../assets/creative-picker';
-import { SCENE_ROLES, type SceneRole } from './model';
+import { SCENE_ROLES, type SceneRole, type SceneActor } from './model';
 import { worldSettings } from './world-settings';
 import { createPalPortrait } from '../pals/ui';
 import {earlySoundMuted} from '../learning/early/audio';
@@ -109,7 +113,7 @@ export function installCreationStudio(host: Host) {
           <button id="creationCharacterTools" class="creation-button" aria-expanded="false" aria-controls="creationCharacterPanel">Characters &amp; tools</button>
           <div id="creationCharacterPanel">
             <div class="creation-code-heading"><h2 id="creationCodeTitle">My character’s blocks</h2><div class="creation-tools-switch" role="group" aria-label="Coding tools"><button id="creationSimpleMode" aria-pressed="true">First steps</button><button id="creationFullMode" aria-pressed="false">More tools</button></div></div>
-            <section class="creation-cast-card"><div id="creationActors" class="creation-actors" role="group" aria-label="Choose a character"></div><button id="creationAddActor" class="creation-button creation-quiet" aria-label="Add a character">${iconMarkup('add')} Character</button><details id="creationSceneOptions" class="creation-scene-options"><summary>Scene settings</summary><div><button id="creationSettingsDone" type="button" class="creation-button">Done</button><div class="creation-setting-row"><div id="creationWorldSettings" class="creation-setting-row"></div><span id="creationPositionHelp">Drag a character to set its starting spot.</span></div><div id="creationActorSettings" class="creation-actor-settings"></div><div id="creationVariables" class="creation-variables"></div></div></details></section>
+            <section class="creation-cast-card"><div id="creationActors" class="creation-actors" role="group" aria-label="Choose a character"></div><button id="creationAddActor" class="creation-button creation-quiet" aria-label="Add a character">${iconMarkup('add')} Character</button><details id="creationSceneOptions" class="creation-scene-options"><summary>Scene settings</summary><div><button id="creationSettingsDone" type="button" class="creation-button">Done</button><div class="creation-setting-row"><div id="creationWorldSettings" class="creation-setting-row"></div><span id="creationPositionHelp">Drag a character to set its starting spot.</span></div><div id="creationWorldTools" class="creation-world-tools"></div><div id="creationPlacementActions"></div><div id="creationActorSettings" class="creation-actor-settings"></div><div id="creationVariables" class="creation-variables"></div></div></details></section>
           </div>
           <div id="creationSimpleEvents" class="creation-simple-events" role="group" aria-label="When the code starts"><button id="creationOnPlay" aria-pressed="true"><span aria-hidden="true">⚑</span> On Play</button><button id="creationOnTap" aria-pressed="false"><span aria-hidden="true">☝</span> On tap</button><span id="creationEventNotice" hidden></span><span id="creationPlanHint">Add an action. Try it. Change it.</span></div><div class="creation-script-row"><label>Script <select id="creationScript" aria-label="Choose a script"></select></label><button id="creationAddScript" class="creation-button creation-quiet">${iconMarkup('add')} Script</button></div><div id="creationTrigger" class="creation-trigger"></div>
           <div class="creation-sequence"><div id="creationBlocks" class="creation-blocks"></div></div>
@@ -123,7 +127,7 @@ export function installCreationStudio(host: Host) {
     </dialog>
     <input id="creationImport" type="file" accept="application/json,.json" hidden>
     <dialog id="creationVersionPicker" class="creation-dialog" aria-labelledby="creationVersionPickerTitle"><div class="creation-shelf-heading"><h2 id="creationVersionPickerTitle">Choose art version</h2><button id="creationCloseVersionPicker" type="button" class="creation-button" aria-label="Close art versions">${iconMarkup('close')}</button></div><p id="creationVersionArtStatus" role="status"></p><div id="creationVersionArtFilters"></div><div id="creationVersionArtChoices" class="creation-actor-choices"></div></dialog>
-    <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">${iconMarkup('close')}</button></div><div id="creationPalSlot"></div><section><div class="creation-shelf-heading"><h3>My art</h3><button id="creationOpenArtStudio" class="creation-button">${iconMarkup('edit')} My Art</button></div><p id="creationActorArtStatus" role="status"></p><div id="creationActorArtFilters"></div><div id="creationPrivateActorChoices" class="creation-actor-choices"></div></section><h3>Characters & things</h3><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
+    <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">${iconMarkup('close')}</button></div><div id="creationPalSlot"></div><section><div class="creation-shelf-heading"><h3>My art</h3><button id="creationOpenArtStudio" class="creation-button">${iconMarkup('edit')} My Art</button></div><p id="creationActorArtStatus" role="status"></p><div id="creationActorArtFilters"></div><div id="creationPrivateActorChoices" class="creation-actor-choices"></div></section><section id="creationJemsProps"></section><h3>Characters & things</h3><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
   document.querySelector('main')!.append(page);
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => page.querySelector<T>('#' + id)!;
   const introduction=createStudioIntroduction(host.guidance,()=>shelf('landing'));
@@ -132,13 +136,14 @@ export function installCreationStudio(host: Host) {
   const stage = new CreationStage($<HTMLCanvasElement>('creationCanvas'),privateArt,message=>status(message,true));
   const palShelf = node('section', 'creation-pal-shelf'); palShelf.id = 'creationPals';
   palShelf.setAttribute('aria-label', 'Make something with your Pals');
-  $('creationStarters').before(palShelf);
+  $('creationStarters').before(palShelf,worldTiles(id => void act(() => create('blank',id))));
   const palTools = node('div', 'creation-pal-tools'); palTools.id = 'creationPalTools';
   $('creationPalSlot').append(palTools);
   let scene: CreationProject | null = null, entryId = '', revisionId = '', sceneOwner = '', selectedActor = '', selectedProgram = '';
   let predictionReader:ReturnType<typeof createReadAloudControl>|null=null;
   let prediction:{choice:MovementChoice;scene:CreationProject}|null=null;
   let sourceSessionId = '', challengeId: string | null = null, hintUsed = false, targetMode = false, visible = false;
+  let thumbnails: ReturnType<typeof sceneThumbnails> | undefined;
   let viewEpoch = 0;
   let engine: SceneEngine | null = null, frame = 0, last = 0, checkpointTimer: ReturnType<typeof setInterval> | undefined;
   let insert: Insert | null = null, undo: CreationProject[] = [], redo: CreationProject[] = [], dirty = false, recoveryPending = false;
@@ -211,7 +216,7 @@ export function installCreationStudio(host: Host) {
   }
   const worlds = worldSettings($('creationWorldSettings'), $<HTMLDialogElement>('creationWorldDialog'), {
     owner, isCurrent:()=>isCurrent() && !recoveryPending && !FG.learning.active, picture:art,
-    async choose(world, background, current = () => true) {
+    async choose(world, background, current = () => true, asPlacement = false) {
       let applied = false;
       await act(async () => {
         assertEditing();
@@ -220,7 +225,10 @@ export function installCreationStudio(host: Host) {
         const picture = world && parsePrivateArtId(world.assetId) ? await privateArt.load(world.assetId) : undefined;
         if (!current() || !isCurrent() || scene !== captured || capturedOwner !== owner() || viewEpoch !== view) return;
         await mutation(project => {
-          if (world) project.world = world;
+          if (asPlacement && picture) {
+            selectedActor = placeBackdrop(project, picture).id;
+            selectedProgram = ''; insert = null;
+          } else if (world) project.world = world;
           else if (background) { delete project.world; project.background = background; }
         });
         if (picture) indexSceneArt(entryId,capturedOwner,[picture]);
@@ -244,7 +252,7 @@ export function installCreationStudio(host: Host) {
   function paint() {
     if (!scene || !engine) return;
     const snapshot = engine.snapshot();
-    stage.render(targetMode && challengeId ? createChallengeTarget(challengeId) : scene, snapshot, targetMode || snapshot.status === 'running' ? '' : selectedActor);
+    stage.render(targetMode && challengeId ? createChallengeTarget(challengeId) : scene, snapshot, targetMode || snapshot.status === 'running' ? '' : selectedActor, !targetMode && !challengeId && snapshot.status !== 'running');
     $('creationClock').textContent = (snapshot.timeMs / 1000).toFixed(1) + ' s';
     $('creationRunStatus').textContent = snapshot.status === 'limit' ? snapshot.reason || 'Try fewer repeats.' : snapshot.status === 'running' ? 'Follow your blocks' : snapshot.status === 'paused' ? 'Paused' : snapshot.status === 'completed' ? 'Try a change, or tap a character' : 'Ready to try';
     const words = [...snapshot.actors.filter(actor => actor.visible && actor.speech).map(actor => `${actor.name}: ${actor.speech}`),
@@ -328,7 +336,7 @@ export function installCreationStudio(host: Host) {
     prediction=null;
     const loaded = await (await store()).load(id, owner());
     worlds.close(); viewEpoch++;
-    privateArt.clear();stage.clear();
+    thumbnails?.clear(); privateArt.clear();stage.clear();
     status(''); $<HTMLDetailsElement>('creationMore').open = false;
     stop(); scene = loaded.scene; entryId = id; revisionId = loaded.revision.id; sceneOwner = owner();
     selectedActor = scene.actors[0]?.id || ''; selectedProgram = scene.programs.find(p => p.actorId === selectedActor)?.id || '';
@@ -352,7 +360,7 @@ export function installCreationStudio(host: Host) {
   async function openChallenges() { await act(async () => { if (!await enter()) return; await shelf('challenge'); }); }
   async function shelf(mode: 'landing' | 'free' | 'challenge' = 'landing') {
     if (locked()) return; await saveVersion(); stop(); worlds.close(); viewEpoch++; scene = null; entryId = ''; sceneOwner = owner(); sourceSessionId = ''; recoveryPending = false;
-    privateArt.clear();stage.clear(); setExpandedView(false); page.classList.remove('has-scene'); document.body.classList.remove('creation-editing');
+    thumbnails?.clear(); privateArt.clear();stage.clear(); setExpandedView(false); page.classList.remove('has-scene'); document.body.classList.remove('creation-editing');
     $('creationWorkspace').hidden = true; $('creationShelf').hidden = false;
     introduction.hide();$('creationWelcome').hidden=mode!=='landing';$('creationLandingBack').hidden=mode==='landing';
     $('creationHeading').innerHTML=mode==='landing'?'Make it. <span>Make it move.</span>':mode==='free'?'Make a scene':'Rebuild a scene';
@@ -361,7 +369,7 @@ export function installCreationStudio(host: Host) {
     $('creationFreeMode').setAttribute('aria-pressed', String(mode === 'free')); $('creationChallengeMode').setAttribute('aria-pressed', String(mode === 'challenge'));
     await renderShelf(); status(''); if (mode === 'challenge') renderGuide('practice'); $('creationHeading').focus({ preventScroll: true });
   }
-  async function create(kind: 'dragon' | 'buckets' | 'robot' | 'blank') { const project = await (await store()).create(owner(), createStarterProject(kind)); await loadScene(project.id); }
+  async function create(kind: 'dragon' | 'buckets' | 'robot' | 'blank', worldId?:string) { const project = await (await store()).create(owner(), createIllustratedStarter(kind,worldId)); await loadScene(project.id); }
   async function challenge(id: string) { const project = await (await store()).create(owner(), { ...createChallengeStarter(id), id: uid() }, { challengeId: id }); await loadScene(project.id); }
   async function scenesByActivity() {
     return (await store()).listByActivity(owner());
@@ -485,15 +493,34 @@ export function installCreationStudio(host: Host) {
       const button = node('button', 'creation-starter creation-starter-' + kind); button.type = 'button'; button.dataset.creationStarter = kind;
       const image = node('img'); image.src = src; image.alt = '';
       const info = node('span', 'creation-starter-copy'); info.append(node('strong', '', name), iconNode('b', '', 'arrow', 'Make a scene'));
-      button.append(image, info); button.onclick = async () => await act(async () => await create(kind)); starters.append(button);
+      button.append(image, info); button.onclick = async () => await act(async () => await create(kind,kind === 'blank' ? 'blank' : undefined)); starters.append(button);
     }
     const current=await store(),captured=owner(),view=viewEpoch,first=await current.page(captured,null,24),projects=first.items;let after=first.next;
+    thumbnails?.clear();
+    thumbnails = sceneThumbnails(privateArt, () => visible && viewEpoch === view && owner() === captured);
     const saved = $('creationSaved'); saved.replaceChildren();
     const append=async(items:typeof projects)=>{for (const project of items) {
       const loaded = await current.load(project.id,captured);if(owner()!==captured||viewEpoch!==view)return;const button = node('button', 'creation-saved-card'); button.type = 'button'; button.dataset.scene = project.id;
-      const thumb = art(loaded.scene.actors[0]?.assetId || 'gem');
+      const thumb = thumbnails!.add(loaded.scene);
       const copy = node('span'); copy.append(node('strong', '', project.title), node('small', '', project.challengeId ? 'Scene challenge · continue' : loaded.draft ? 'Unfinished ideas saved' : project.keptId ? 'A scene you kept' : 'Your work in progress'));
-      button.append(thumb, copy, createIcon('arrow', 'creation-saved-arrow')); button.onclick = async () => await act(async () => await loadScene(project.id)); saved.append(button);
+      button.append(thumb, copy, createIcon('arrow', 'creation-saved-arrow')); button.onclick = async () => await act(async () => await loadScene(project.id));
+      if (!project.keptId || project.challengeId) {
+        saved.append(button);
+        continue;
+      }
+      const card = node('div', 'creation-kept-world');
+      const reuse = iconNode('button', 'creation-button', 'add', 'Use this world');
+      reuse.type = 'button';
+      reuse.dataset.useWorld = project.id;
+      reuse.setAttribute('aria-label', 'Use the kept world from ' + project.title);
+      const keptRevisionId = project.keptId;
+      reuse.onclick = () => act(async () => {
+        if (locked() || owner() !== captured || viewEpoch !== view) return;
+        const copy = await current.copy(project.id, captured, undefined, {keptRevisionId, detachChallenge:true});
+        if (owner() === captured && viewEpoch === view) await loadScene(copy.id);
+      });
+      card.append(button, reuse);
+      saved.append(card);
     }};await append(projects);
     const more=node('button','creation-button','More scenes');more.id='creationMoreScenesPage';if(after)saved.append(more);more.onclick=()=>act(async()=>{if(!after)return;const page=await current.page(captured,after,24);more.remove();await append(page.items);after=page.next;if(after)saved.append(more);});
     $('creationSavedSection').hidden=false;
@@ -646,7 +673,29 @@ export function installCreationStudio(host: Host) {
       button.onclick = async () => await act(() => { if (locked()) return; selectedActor = actor.id; selectedProgram = scene!.programs.find(p => p.actorId === selectedActor)?.id || ''; insert = null; renderEditor(); paint(); });
       cast.append(button);
     }
+    const worldPanel = $('creationWorldTools');
+    worldPanel.replaceChildren();
+    worldPanel.hidden = !!challengeId;
+    if (!challengeId) worldPanel.append(worldControls(scene, {
+      layer: (name, visible) => void act(() => mutation(project => setWorldLayer(project, name, visible))),
+      chooseBackdrop: () => void worlds.open(true),
+      toggleBackdrop: visible => void act(() => mutation(project => {
+        const backdrop = project.actors.find(actor => actor.layer === 'backdrop');
+        if (backdrop) backdrop.visible = visible;
+      })),
+      addProp: id => void act(() => addWorldProp(id)),
+    }));
     renderActorSettings(); renderPrograms(); renderVariables(); updateUndo();
+  }
+  async function addWorldProp(id:string) {
+    const prop = creationAsset(id);
+    if (!prop || challengeId) return;
+    await mutation(project => {
+      const actor = { id: uid(), assetId: prop.id, name: prop.label, x: Math.round(project.width / 2), y: Math.round(project.height * .65), size: 110 };
+      project.actors.push(actor); selectedActor = actor.id; selectedProgram = ''; insert = null;
+    });
+    $<HTMLDetailsElement>('creationSceneOptions').open = false;
+    status('Drag ' + prop.label + ' to a spot.');
   }
   function input(label: string, value: string | number, change: (value: string) => void, options: { min?: number; max?: number; step?: number | 'any'; maxLength?: number } = {}) {
     const wrap = node('label', 'creation-field'), field = node('input'); wrap.append(node('span', '', label)); field.value = String(value); field.setAttribute('aria-label', label);
@@ -663,11 +712,15 @@ export function installCreationStudio(host: Host) {
     const box = $('creationActorSettings'); box.replaceChildren(); const actor = scene!.actors.find(a => a.id === selectedActor); if (!actor) return;
     const set = async (key: string, value: string | number) => await mutation(project => Object.assign(project.actors.find(a => a.id === actor.id)!, { [key]: value }));
     box.append(input('Name', actor.name, async value => await set('name', value.trim() || 'My character'), { maxLength: 40 }), input('Start x', actor.x, async value => await set('x', +value), { min: 0, max: scene!.width }), input('Start y', actor.y, async value => await set('y', +value), { min: 0, max: scene!.height }), input('Size', actor.size || 100, async value => await set('size', +value), { min: 20, max: 240 }));
+    if (!challengeId) {
+      box.append(input('Rotate', actor.angle ?? 0, value => set('angle', +value), {min:-180,max:180}));
+    }
     if (!challengeId && parsePrivateArtId(actor.assetId)) {
-      box.append(choice('Role in this scene', actor.role ?? '', [
+      box.append(choice('Role in this scene', actor.role ?? actor.creativeRole ?? '', [
         ['', 'Choose a role'], ...SCENE_ROLES.map(role => [role, role[0].toUpperCase() + role.slice(1)] as [string, string]),
       ], async value => await mutation(project => {
         const target = project.actors.find(a => a.id === actor.id)!;
+        delete target.creativeRole;
         if (value) target.role = value as SceneRole;
         else delete target.role;
       })));
@@ -681,18 +734,56 @@ export function installCreationStudio(host: Host) {
       });
       box.append(replace);
     }
-    if (!challengeId && scene!.actors.length > 1) {
-      const position = scene!.actors.findIndex(item => item.id === actor.id);
-      box.append(choice('Picture layer', String(position), scene!.actors.map((_, index, actors) => [
-        String(index), index === 0 ? 'At the back' : index === actors.length - 1 ? 'At the front' : 'Layer ' + (index + 1),
+    const placements = $('creationPlacementActions');
+    const layersOpen = placements.querySelector('details')?.open ?? false;
+    placements.replaceChildren();
+    if (!challengeId) {
+      const controls = node('div', 'creation-placement-controls');
+      const layers = node('details','creation-layer-tools');
+      layers.append(node('summary','','Layers'));
+      layers.open = layersOpen;
+      const action = (name: string, change: (project: CreationProject, placed: SceneActor) => void, group:HTMLElement = controls) => {
+        const button = node('button', 'creation-button', name);
+        button.type = 'button';
+        button.onclick = () => act(() => mutation(project => change(project, project.actors.find(item => item.id === actor.id)!)));
+        button.setAttribute('aria-label',name);
+        group.append(button);
+      };
+      action('Move left', (_, a) => { a.x = Math.max(0, a.x - 20); });
+      action('Move right', (p, a) => { a.x = Math.min(p.width, a.x + 20); });
+      action('Move up', (_, a) => { a.y = Math.max(0, a.y - 20); });
+      action('Move down', (p, a) => { a.y = Math.min(p.height, a.y + 20); });
+      action('Smaller', (_, a) => { a.size = Math.max(16, (a.size ?? 100) - 20); });
+      action('Bigger', (_, a) => { a.size = Math.min(240, (a.size ?? 100) + 20); });
+      action('Turn', (_, a) => { a.angle = (((a.angle ?? 0) + 195) % 360) - 180; });
+      if (actor.layer === 'backdrop') {
+        placements.append(choice('Fit drawing', actor.backdropFit ?? 'contain',
+          [['contain','Show whole drawing'], ['cover','Fill the stage']], value => set('backdropFit', value)));
+      } else {
+        layers.append(choice('Scene layer', actor.layer || 'middle',
+          [['back','Behind the scenery'], ['middle','With the characters'], ['front','At the front']], value => set('layer',value)));
+        action('Bring to front', (p,a) => stackPlacement(p,a,true), layers);
+        action('Send to back', (p,a) => stackPlacement(p,a,false), layers);
+        placements.append(layers);
+        action('Duplicate', (p, a) => {
+          const twin = {...a, id:uid(), x:Math.min(p.width, a.x + 20), y:Math.min(p.height, a.y + 20)};
+          p.actors.push(twin);
+          selectedActor = twin.id; selectedProgram = ''; insert = null;
+        });
+      }
+      placements.prepend(node('h3', '', actor.name), controls);
+    }
+
+    if (!challengeId) {
+      const peers = orderedPlacements(scene!.actors).filter(item => (item.layer ?? 'middle') === (actor.layer ?? 'middle'));
+      if (peers.length > 1) box.append(choice('Picture layer', String(peers.indexOf(actor)), peers.map((_, index) => [
+        String(index), index === 0 ? 'At the back' : index === peers.length - 1 ? 'At the front' : 'Layer ' + (index + 1),
       ]), async value => mutation(project => {
-        const from = project.actors.findIndex(item => item.id === actor.id);
-        const [placed] = project.actors.splice(from, 1);
-        project.actors.splice(Number(value), 0, placed);
+        stackPlacement(project, project.actors.find(item => item.id === actor.id)!, Number(value));
       })));
     }
     const remove = iconNode('button', 'creation-text-button', 'trash', 'Remove'); remove.setAttribute('aria-label', 'Remove ' + actor.name); remove.disabled = !!challengeId || scene!.actors.length < 2;
-    remove.onclick = async () => await act(async () => await mutation(project => { project.actors = project.actors.filter(a => a.id !== actor.id); project.programs = project.programs.filter(p => p.actorId !== actor.id); selectedActor = project.actors[0].id; selectedProgram = project.programs.find(p => p.actorId === selectedActor)?.id || ''; insert = null; })); box.append(remove);
+    remove.onclick = async () => await act(async () => await mutation(project => { project.actors = project.actors.filter(a => a.id !== actor.id); project.programs = project.programs.filter(p => p.actorId !== actor.id); selectedActor = project.actors[0].id; selectedProgram = project.programs.find(p => p.actorId === selectedActor)?.id || ''; insert = null; })); (challengeId ? box : placements).append(remove);
     const tap = iconNode('button', 'creation-button creation-quiet', 'star', 'Try tap'); tap.id = 'creationTapActor'; tap.setAttribute('aria-label', 'Tap ' + actor.name);
     tap.onclick = async () => await act(() => { assertEditing(); learningThen(() => { $('creationFeedback').hidden = true; if (targetMode || !engine) freshEngine(); if (engine!.snapshot().status === 'idle') engine!.start(); engine!.resume(); engine!.tap(actor.id); animate(); }); }); $('creationTapSlot').replaceChildren(tap);
     box.querySelectorAll<HTMLInputElement>('input').forEach(field => { if (challengeId && field.getAttribute('aria-label') !== 'Name') field.disabled = true; });
@@ -920,7 +1011,7 @@ export function installCreationStudio(host: Host) {
   function leave() {
     if (!visible) return; stop(); clearInterval(checkpointTimer); worlds.close(); visible = false; viewEpoch++;
     stopReading(); setExpandedView(false); page.classList.remove('has-scene'); document.body.classList.remove('creation-editing'); fullTools = false; expandedBlockId = '';
-    privateArt.clear();stage.clear();
+    thumbnails?.clear(); privateArt.clear();stage.clear();
     $<HTMLDialogElement>('creationActorDialog').close(); $<HTMLDialogElement>('creationVersionPicker').close(); $('creationLearning').hidden = true;
   }
   $('creationHome').onclick = async () => await act(async () => { await saveVersion(); host.home(); });
@@ -1078,6 +1169,24 @@ export function installCreationStudio(host: Host) {
   function renderActorChoices(palsOnly = false) {
     const box = $('creationActorChoices'), ids = ownedPals(); box.replaceChildren();
     $('creationActorDialogTitle').textContent = palsOnly ? 'Which Pal is joining?' : 'Who’s joining your scene?';
+    const propShelf = $('creationJemsProps');
+    propShelf.replaceChildren();
+    if (!palsOnly && !challengeId) {
+      const details = node('details');
+      details.append(node('summary', '', 'Props from every world'));
+      const grid = node('div', 'creation-world-props');
+      for (const prop of WORLD_PROPS) {
+        const button = node('button', 'creation-character-choice');
+        button.type = 'button'; button.dataset.bundledArt = prop.id;
+        button.append(art(prop.id), node('strong','',prop.label));
+        button.onclick = () => act(async () => {
+          await addWorldProp(prop.id);
+          $<HTMLDialogElement>('creationActorDialog').close();
+        });
+        grid.append(button);
+      }
+      details.append(grid); propShelf.append(details);
+    }
     for (const asset of [...propsForWorld(scene?.world?.assetId), ...CREATION_ASSETS]) {
       if (asset.palId ? challengeId || !ids.includes(asset.palId) || asset.id !== palSceneAssetId(asset.palId, ownedPalForm(asset.palId)) : palsOnly) continue;
       const b = node('button', 'creation-character-choice'); b.type = 'button'; b.dataset.creationAsset = asset.id;
@@ -1089,7 +1198,22 @@ export function installCreationStudio(host: Host) {
       }); box.append(b);
     }
   }
-  let drag: { id: string; x: number; y: number; moved: boolean } | null = null;
+  type PlacementDrag = {
+    id:string; pointer:number; view:number; origin:{x:number;y:number};
+    start:{x:number;y:number}; size:number; resizing:boolean; moved:boolean;
+  };
+  let drag: PlacementDrag | null = null;
+  function dragTransform(gesture:PlacementDrag, point:{x:number;y:number}, project:CreationProject) {
+    if (gesture.resizing) {
+      const from = Math.max(1, Math.hypot(gesture.start.x-gesture.origin.x, gesture.start.y-gesture.origin.y));
+      const to = Math.hypot(point.x-gesture.origin.x, point.y-gesture.origin.y);
+      return {size:Math.max(16,Math.min(240,Math.round(gesture.size*to/from)))};
+    }
+    return {
+      x:Math.max(0,Math.min(project.width, gesture.origin.x + point.x - gesture.start.x)),
+      y:Math.max(0,Math.min(project.height, gesture.origin.y + point.y - gesture.start.y)),
+    };
+  }
   const canvas = $<HTMLCanvasElement>('creationCanvas');
   // Size the actual canvas element, not a letterboxed CSS content area. Pointer
   // positions therefore keep the exact same mapping as the saved scene.
@@ -1102,15 +1226,43 @@ export function installCreationStudio(host: Host) {
   };
   new ResizeObserver(fitStage).observe(canvasWrap);
   canvas.onpointerdown = async event => {
-    if (!isCurrent() || locked() || targetMode) return; const point = stage.point(event), id = stage.hit(point.x, point.y); if (!id) return;
+    if (!event.isPrimary || !isCurrent() || locked() || targetMode) return; const point = stage.point(event), grip = stage.resizeHit(point.x,point.y), id = grip || stage.hit(point.x, point.y); if (!id) return;
     if (recoveryPending) { status(recoveryMessage, true); return; }
     if (engine?.snapshot().status === 'running' || engine?.snapshot().status === 'completed') { await act(() => learningThen(() => { engine!.resume(); engine!.tap(id); animate(); })); return; }
     selectedActor = id; selectedProgram = scene!.programs.find(p => p.actorId === id)?.id || ''; insert = null; renderEditor(); paint();
-    if (!challengeId) { drag = { id, ...point, moved: false }; canvas.setPointerCapture(event.pointerId); }
+    if (!challengeId) {
+      const placed = scene!.actors.find(actor => actor.id === id)!;
+      drag = {id, pointer:event.pointerId, view:viewEpoch, start:point, origin:{x:placed.x,y:placed.y},
+        size:placed.size ?? 100, resizing:!!grip, moved:false};
+      canvas.setPointerCapture(event.pointerId);
+    }
   };
-  canvas.onpointermove = event => { if (!drag || !scene || !engine) return; const point = stage.point(event); if (Math.hypot(point.x - drag.x, point.y - drag.y) < 3 && !drag.moved) return; drag.moved = true; const snapshot = engine.snapshot(); const actor = snapshot.actors.find(a => a.id === drag!.id)!; actor.x = Math.max(0, Math.min(scene.width, point.x)); actor.y = Math.max(0, Math.min(scene.height, point.y)); stage.render(scene, snapshot, selectedActor); };
-  canvas.onpointerup = async event => { const moving = drag; drag = null; if (!moving?.moved) return; const point = stage.point(event); await act(async () => await mutation(project => { const actor = project.actors.find(a => a.id === moving.id)!; actor.x = Math.max(0, Math.min(project.width, point.x)); actor.y = Math.max(0, Math.min(project.height, point.y)); })); };
-  canvas.onpointercancel = () => { drag = null; paint(); };
+  canvas.onpointermove = event => {
+    if (!drag || drag.pointer !== event.pointerId || drag.view !== viewEpoch || !scene || !engine) return;
+    const point = stage.point(event);
+    if (!drag.moved && Math.hypot(point.x - drag.start.x, point.y - drag.start.y) < 3) return;
+    drag.moved = true;
+    const snapshot = engine.snapshot(), actor = snapshot.actors.find(a => a.id === drag!.id);
+    if (actor) Object.assign(actor,dragTransform(drag,point,scene));
+    stage.render(scene,snapshot,selectedActor,true);
+  };
+  canvas.onpointerup = event => {
+    const gesture = drag;
+    if (gesture?.pointer !== event.pointerId) return;
+    drag = null;
+    if (!gesture.moved || gesture.view !== viewEpoch) return;
+    const point = stage.point(event);
+    void act(async () => {
+      if (gesture.view !== viewEpoch) return;
+      await mutation(project => {
+        const placed = project.actors.find(a => a.id === gesture.id);
+        if (placed) Object.assign(placed,dragTransform(gesture,point,project));
+      });
+    });
+  };
+  canvas.onpointercancel = canvas.onlostpointercapture = event => {
+    if (drag?.pointer === event.pointerId) { drag = null; paint(); }
+  };
   page.addEventListener('click',event=>{
     const target = event.target as HTMLElement;
     if (!target.closest('.jems-read-aloud')) stopReading();
@@ -1131,7 +1283,7 @@ export function installCreationStudio(host: Host) {
   window.addEventListener('factory-profile-before-change', event => { if (!visible) return;if(pendingActions){event.preventDefault();status('Your scene is still saving. Try changing players again in a moment.');}else stop(); });
   window.addEventListener('factory-profile', () => {
     leave(); scene = null; entryId = ''; revisionId = ''; sceneOwner = ''; engine = null; undo = []; redo = []; dirty = false; recoveryPending = false; sourceSessionId = ''; stage.clear();
-    for (const id of ['creationBlocks','creationActors','creationSaved','creationFeedback','creationSource','creationGuideSlot','creationPracticeGuideSlot','creationActorSettings','creationVariables','creationTrigger','creationStatus','creationVersionList','creationPrivateActorChoices','creationActorArtStatus','creationActorArtFilters','creationVersionArtFilters','creationVersionArtChoices','creationVersionArtStatus','creationPals','creationPalTools','creationActorChoices']) $(id).replaceChildren();
+    for (const id of ['creationBlocks','creationActors','creationSaved','creationFeedback','creationSource','creationGuideSlot','creationPracticeGuideSlot','creationActorSettings','creationPlacementActions','creationJemsProps','creationWorldTools','creationVariables','creationTrigger','creationStatus','creationVersionList','creationPrivateActorChoices','creationActorArtStatus','creationActorArtFilters','creationVersionArtFilters','creationVersionArtChoices','creationVersionArtStatus','creationPals','creationPalTools','creationActorChoices']) $(id).replaceChildren();
     $('creationCodeTitle').textContent = 'My character’s blocks'; $<HTMLInputElement>('creationTitle').value = '';
   });
   window.addEventListener('beforeunload', event => { if (visible&&pendingActions&&rewardSourceWritable()){event.preventDefault();event.returnValue='';} });

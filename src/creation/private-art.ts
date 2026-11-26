@@ -99,7 +99,7 @@ export function remapArtOrigin(scene:CreationProject, picture:(id:string)=>strin
 /** Decoding is bounded and checked again after each asynchronous operation.
  * A rig is composited in its saved pose; the scene's blocks move the resulting
  * actor. Independent joints remain in the Drawing Lab and physical games. */
-export async function resolvePrivateArt(owner:string,assetId:string,current:()=>boolean=()=>true):Promise<ResolvedPrivateArt> {
+export async function resolvePrivateArt(owner:string,assetId:string,current:()=>boolean=()=>true,limit:512|1600=512):Promise<ResolvedPrivateArt> {
   const ref=parsePrivateArtId(assetId);
   if(!ref||!owner)throw Error('Choose available artwork from your own Art Studio.');
   if(!current())throw stale();
@@ -116,7 +116,7 @@ export async function resolvePrivateArt(owner:string,assetId:string,current:()=>
   try{
     if(!current())throw stale();
     if(bitmap.width<1||bitmap.height<1||bitmap.width>4096||bitmap.height>4096)throw Error('This drawing has unsupported dimensions.');
-    const scale=Math.min(1,512/Math.max(bitmap.width,bitmap.height));
+    const scale=Math.min(1,limit/Math.max(bitmap.width,bitmap.height));
     const original=document.createElement('canvas');original.width=Math.max(1,Math.round(bitmap.width*scale));original.height=Math.max(1,Math.round(bitmap.height*scale));
     original.getContext('2d')!.drawImage(bitmap,0,0,original.width,original.height);
     let image=original;
@@ -143,7 +143,8 @@ export class PrivateArtResolver {
   private epoch=0;
   private cache=new Map<string,ResolvedPrivateArt>();
   private pending=new Map<string,Promise<ResolvedPrivateArt>>();
-  constructor(private currentOwner:()=>string){}
+  constructor(private currentOwner:()=>string, private limit:512|1600=512){}
+  backdropResolver(){return new PrivateArtResolver(this.currentOwner,1600);}
   private sync(){if(this.owner!==this.currentOwner()){this.clear();this.owner=this.currentOwner();}}
   clear(){this.epoch++;this.cache.clear();this.pending.clear();this.owner='';}
   get(id:string){this.sync();return this.cache.get(id);}
@@ -152,9 +153,9 @@ export class PrivateArtResolver {
     const loaded=this.cache.get(id);if(loaded)return Promise.resolve(loaded);
     const existing=this.pending.get(id);if(existing)return existing;
     const owner=this.owner,epoch=this.epoch,current=()=>epoch===this.epoch&&owner===this.currentOwner();
-    const pending=resolvePrivateArt(owner,id,current).then(result=>{
+    const pending=resolvePrivateArt(owner,id,current,this.limit).then(result=>{
       if(!current())throw stale();
-      if(this.cache.size>=32)this.cache.delete(this.cache.keys().next().value!);
+      if(this.cache.size>=(this.limit===1600 ? 1 : 32))this.cache.delete(this.cache.keys().next().value!);
       this.cache.set(id,result);return result;
     }).finally(()=>{if(current())this.pending.delete(id);});
     this.pending.set(id,pending);return pending;

@@ -1,3 +1,4 @@
+import { ILLUSTRATED_WORLDS } from './illustrated-art';
 /** Trusted assets and explicit adapters into the editable scene model.
  * A scene is a new creation pinned to its source. This does not translate game JavaScript.
  */
@@ -159,6 +160,26 @@ function starter(kind:CreationStarter,title:string,config?:Mechanics):CreationPr
 export function createStarterProject(kind:CreationStarter,title=titleFor[kind]):CreationProject {
   if(!Object.hasOwn(titleFor,kind))throw Error('Choose an available scene starter.');
   return starter(kind,title);
+}
+
+export function createIllustratedStarter(kind: CreationStarter, worldId?: string): CreationProject {
+  if (kind === 'blank' && worldId === 'blank') {
+    const project = starter('blank', 'My world');
+    delete project.world;
+    project.background = 'blank';
+    return project;
+  }
+  const defaults = { dragon: 'world-forest-v1', buckets: 'world-cloud-v1', robot: 'world-workshop-v1', blank: 'world-moon-v1' };
+  const world = ILLUSTRATED_WORLDS.find(item => item.id === (worldId ?? defaults[kind]));
+  if (!world) throw Error('Choose an available illustrated world.');
+  const project = starter(kind, worldId ? world.label : titleFor[kind]);
+  project.world = {assetId:world.id,framing:'fill'};
+  if (worldId) {
+    const prop = creationAsset(world.props[0]);
+    if (!prop) throw Error('This world is missing its starter object.');
+    Object.assign(project.actors[0], { assetId: prop.id, name: prop.label });
+  }
+  return project;
 }
 
 export class CreationSourceUnavailableError extends Error {
