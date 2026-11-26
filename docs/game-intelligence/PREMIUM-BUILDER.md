@@ -91,7 +91,7 @@ The [optional private payload manifest](../storage/ROLLOUT.md#assets-and-revisio
 
 New plans and code prompts specify 2D games. Sprites, layered scenery, lighting and parallax can express visual depth. A spatial action the runtime cannot deliver still requires the creator's choice. The generator has no private drawing input. A professional illustration of the same subject cannot stand in for the child's drawing.
 
-A local review tool runs one synthetic rock through a playable game in the generated-module-v2 worker. Open the generated HTML in an isolated browser profile, choose **Try the rock**, then **Play!** and use the arrows. **Close playtest** destroys the frame. The runner uses the existing drawing database, immutable image or rig pin, archived runtime and illustrated Gem Factory background. The input fixture and its drawing are synthetic. [Rendered activity](evidence/connected-art/workshop-rock.png)
+A local review tool runs one synthetic rock through a playable game in the generated-module-v2 worker. Open the generated HTML in an isolated browser profile, choose **Try the rock**, then **Play!** and use the arrows. **Close playtest** destroys the frame. The runner uses the existing drawing database schema in a separate synthetic namespace, the immutable image or rig pin, the archived runtime and the illustrated Gem Factory background. The input fixture and its drawing are synthetic. [Rendered activity](evidence/connected-art/workshop-rock.png)
 
 ```sh
 node --import tsx tools/creative-game-art/review.ts /tmp/jems-local-art-review.html

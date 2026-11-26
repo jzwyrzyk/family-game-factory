@@ -100,6 +100,9 @@ async function main() {
     assert.match(results.outcomes[4], /changed|own profile/);
     assert.equal(results.frames, 0);
     assert.equal(results.original, true);
+    const databases = await page.evaluate(() => IDBFactory.prototype.databases.call(indexedDB));
+    assert.ok(databases.some(db => db.name === 'jems-offline-game-art-review-v1:family-private-drawings-v1'));
+    assert.ok(databases.every(db => db.name?.startsWith('jems-offline-game-art-review-v1:')));
     assert.deepEqual(requests, []);
     console.log('PASS pinned private sprite, worker playback, movement, cancellation, scope, offline and immutable originals');
   } finally {await browser.close();}
