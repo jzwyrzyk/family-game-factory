@@ -1407,10 +1407,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:25:29.001Z",
+      "reviewedAt": "2026-11-26T03:57:59.345Z",
       "sourceDigest": "968fcd23e7be49e88481858bf405ee29ba1dc02e2c99777f4ae8d0dd59c729d8",
-      "reviewOutcome": "updated",
-      "reviewReason": "The registry now requires the linked rendered world evidence index and includes it in the Creative Studio review area.",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The world and Jump screenshot evidence follows existing documentation ownership and maintenance rules. No change to the PR governance text is required.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
