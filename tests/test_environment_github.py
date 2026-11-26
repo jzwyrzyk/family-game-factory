@@ -307,6 +307,7 @@ class ReportingTests(unittest.TestCase):
         text = api.mutations[0][2]["body"]
         self.assertIn("Not deployed", text)
         self.assertIn("not inferred from merges", text)
+        self.assertIn("[Production website](https://jzwyrzyk.github.io/family-game-factory/)", text)
 
     def test_retire_only_verified_owned_dev_deployments(self):
         api = FakeGitHub()
