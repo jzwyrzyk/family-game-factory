@@ -654,10 +654,10 @@
         "tests/theme-workspace.test.ts"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:32:34.569Z",
-      "sourceDigest": "7d596bb3a08cd932af6053fd72c3ba404418a3c6533e064bb410967c5616c2ed",
+      "reviewedAt": "2026-11-26T04:45:28.666Z",
+      "sourceDigest": "0034d3db53c2fbc492ecba02c6fa94227a8ac6fd116763d6bac85a04e9c17cca",
       "reviewOutcome": "updated",
-      "reviewReason": "Retain both the interactive multiplication array and the earlier voluntary base-ten answer path on one visual attempt. Preserve symbolic and challenge limits.",
+      "reviewReason": "The former quantity answer entry stays available alongside all eligible non-early numeric exploratory models outside challenges and checkpoints.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
