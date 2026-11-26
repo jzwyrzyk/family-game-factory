@@ -56,3 +56,5 @@
 #page-creation[data-illustrated=true] .creation-canvas-wrap { background: #28243d; }
 
 .creation-scene-options:not([open]) > div { display: none; }
+.creation-kept-world { display: grid; align-content: start; gap: 4px; }
+.creation-kept-world > .creation-button { justify-self: start; min-height: 44px; }

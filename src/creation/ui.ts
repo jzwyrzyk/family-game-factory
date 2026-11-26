@@ -477,7 +477,24 @@ export function installCreationStudio(host: Host) {
       const loaded = await current.load(project.id,captured);if(owner()!==captured||viewEpoch!==view)return;const button = node('button', 'creation-saved-card'); button.type = 'button'; button.dataset.scene = project.id;
       const thumb = thumbnails!.add(loaded.scene);
       const copy = node('span'); copy.append(node('strong', '', project.title), node('small', '', project.challengeId ? 'Scene challenge · continue' : loaded.draft ? 'Unfinished ideas saved' : project.keptId ? 'A scene you kept' : 'Your work in progress'));
-      button.append(thumb, copy, createIcon('arrow', 'creation-saved-arrow')); button.onclick = async () => await act(async () => await loadScene(project.id)); saved.append(button);
+      button.append(thumb, copy, createIcon('arrow', 'creation-saved-arrow')); button.onclick = async () => await act(async () => await loadScene(project.id));
+      if (!project.keptId || project.challengeId) {
+        saved.append(button);
+        continue;
+      }
+      const card = node('div', 'creation-kept-world');
+      const reuse = iconNode('button', 'creation-button', 'add', 'Use this world');
+      reuse.type = 'button';
+      reuse.dataset.useWorld = project.id;
+      reuse.setAttribute('aria-label', 'Use the kept world from ' + project.title);
+      const keptRevisionId = project.keptId;
+      reuse.onclick = () => act(async () => {
+        if (locked() || owner() !== captured || viewEpoch !== view) return;
+        const copy = await current.copy(project.id, captured, undefined, {keptRevisionId, detachChallenge:true});
+        if (owner() === captured && viewEpoch === view) await loadScene(copy.id);
+      });
+      card.append(button, reuse);
+      saved.append(card);
     }};await append(projects);
     const more=node('button','creation-button','More scenes');more.id='creationMoreScenesPage';if(after)saved.append(more);more.onclick=()=>act(async()=>{if(!after)return;const page=await current.page(captured,after,24);more.remove();await append(page.items);after=page.next;if(after)saved.append(more);});
     $('creationSavedSection').hidden=false;
