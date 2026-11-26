@@ -4,6 +4,25 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { ILLUSTRATED_WORLDS, WORLD_PROPS } from '../src/creation/illustrated-art';
 
+import { SCENE_WORLDS } from '../src/creation/model';
+import { creationAsset, createStarterProject, propsForWorld, validateEditableProject, validateGeneratedCreationManifest } from '../src/creation/projects';
+
+test('scene worlds and their props reuse one trusted catalogue and stay independent of generated inputs', () => {
+  for (const illustrated of ILLUSTRATED_WORLDS) {
+    const registered = SCENE_WORLDS.find(item => item.id === illustrated.id);
+    assert.equal(registered?.url, illustrated.background);
+    assert.equal(registered?.foreground, illustrated.foreground);
+    const props = propsForWorld(illustrated.id);
+    assert.deepEqual(props.map(prop=>prop.id), illustrated.props);
+    const scene = createStarterProject('blank');
+    scene.world = {assetId:illustrated.id,framing:'fit'};
+    scene.actors[0].assetId = props[0].id;
+    assert.equal(creationAsset(props[0].id)?.url, props[0].url);
+    assert.equal(validateEditableProject(scene).actors[0].assetId, props[0].id);
+    assert.throws(()=>validateGeneratedCreationManifest(scene), /available artwork/);
+  }
+});
+
 type Asset = { id: string; file: string; dimensions: number[]; bytes: number; sha256: string; alpha: string; worlds: string[] };
 const manifest = JSON.parse(readFileSync('docs/creation-studio/world-art-manifest.json', 'utf8')) as { assets: Asset[] };
 const entries = new Map(manifest.assets.map(asset => ['./' + asset.file, asset]));

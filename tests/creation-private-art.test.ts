@@ -123,7 +123,7 @@ test('a derivative traces to its original across exact owner and parent hashes',
 });
 
 test('world illustrations pin approved bytes and legacy scenes retain their saved background',()=>{
-  for(const world of SCENE_WORLDS){
+  for(const world of SCENE_WORLDS.filter(world=>!world.middle)){
     const bytes=readFileSync(new URL('../public/'+world.url.slice(2),import.meta.url));
     assert.ok(createHash('sha256').update(bytes).digest('hex').startsWith(world.id.split('-').at(-1)!));
   }

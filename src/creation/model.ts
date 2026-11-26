@@ -1,3 +1,5 @@
+import { ILLUSTRATED_WORLDS } from './illustrated-art';
+
 /** The local, serializable Creation Lab language. It contains data, never source code. */
 export const CREATION_SCHEMA = 'jems.creation.v1' as const;
 export const CREATION_TICK_MS = 10;
@@ -9,12 +11,17 @@ export const CREATION_LIMITS = {
 
 export type CreationOrigin = 'child' | 'starter' | 'assisted';
 export type SceneBackground = 'meadow' | 'night' | 'workshop' | 'sky';
-/** IDs pin existing approved illustrations. A revised illustration needs a new ID and source path. */
-export const SCENE_WORLDS = [
+/** A world version pins its bundled plate and any aligned overlays. */
+export interface BundledSceneWorld {
+  id: string; label: string; url: string;
+  middle?: string; foreground?: string; preview?: string; props?: readonly string[];
+}
+export const SCENE_WORLDS: readonly BundledSceneWorld[] = [
   {id:'world-islands-9b2446de258a', label:'Waterfall islands', url:'./art/mind-your-jems/scene-sky.webp'},
   {id:'world-workshop-b6e81f59ab4d', label:'Gem Factory', url:'./gem-factory-workshop.webp'},
   {id:'world-terrace-1b1460063ff8', label:'Garden terrace', url:'./jems-journey/background.webp'},
-] as const;
+  ...ILLUSTRATED_WORLDS.map(world => ({...world, url: world.background})),
+];
 export interface SceneWorld {assetId:string; framing:'fit'|'fill'}
 export function starterWorld(place:'islands'|'workshop'|'terrace'):SceneWorld {
   const id = {islands:SCENE_WORLDS[0].id, workshop:SCENE_WORLDS[1].id, terrace:SCENE_WORLDS[2].id}[place];

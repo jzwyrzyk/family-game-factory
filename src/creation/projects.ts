@@ -1,13 +1,14 @@
 /** Trusted assets and explicit adapters into the editable scene model.
  * A scene is a new creation pinned to its source. This does not translate game JavaScript.
  */
+import { WORLD_PROPS } from './illustrated-art';
 import historicalArt from '../pals/historical-scene-art.json';
 import { defaults, validateConfig } from '../runtime/manifests';
 import type { Mechanics } from '../runtime/types';
 import type { Revision } from '../factory/workspace';
 import type { StudioSession } from '../studio/notebook';
 import { PAL_CATALOG, palArtworkPath, palSceneAssetId, type PalForm, type PalId } from '../pals/catalog';
-import { starterWorld, validateCreationProject, parsePrivateArtId, type PrivateArtReference, type CreationProject, type CreationBlock } from './model';
+import { starterWorld, SCENE_WORLDS, validateCreationProject, parsePrivateArtId, type PrivateArtReference, type CreationProject, type CreationBlock } from './model';
 export {parsePrivateArtId};
 export type {PrivateArtReference};
 
@@ -64,8 +65,16 @@ const historicalAssets: readonly CreationAsset[] = [
     url: './' + asset.url, palForm: asset.form as PalForm })),
 ];
 
+const worldProps = new Map<string, CreationAsset>(WORLD_PROPS.map(prop => [prop.id, {...prop, kind:'image'}]));
+
+/** Product-owned objects appear in their world's existing actor picker. */
+export function propsForWorld(id?: string): CreationAsset[] {
+  const world = SCENE_WORLDS.find(item => item.id === id);
+  return world?.props?.map(prop => worldProps.get(prop)!) ?? [];
+}
+
 export function creationAsset(id: string): CreationAsset | undefined {
-  return CREATION_ASSETS.find(asset=>asset.id===id) ?? historicalAssets.find(asset=>asset.id===id);
+  return CREATION_ASSETS.find(asset=>asset.id===id) ?? worldProps.get(id) ?? historicalAssets.find(asset=>asset.id===id);
 }
 
 /** Opaque local references are data, never paths or fetchable URLs. The browser
