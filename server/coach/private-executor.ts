@@ -5,7 +5,7 @@
  * model approval and family allowance gates pass.
  */
 import {createServer,type IncomingMessage,type ServerResponse} from 'node:http';
-import {createRemoteJWKSet,jwtVerify} from 'jose';
+import {createRemoteJWKSet,jwtVerify,type JWTVerifyGetKey} from 'jose';
 import {approved,validateCoachContext,type CoachProvider} from './service';
 import {OpenAICoachProvider,coachFailureEvent,tagCoachFailure,normalizePrivateCoachReply,type PrivateCoachConfig,type CoachFailureEvent,type CoachFailureStage} from './private-provider';
 import {validateCoachReply} from '../../src/studio/design';
@@ -18,14 +18,18 @@ import {readNarrationRequest} from './narration-transport';
 import {adultPilotFlags} from '../adult-pilot';
 import {readJsonBody} from '../http-json';
 
+import {syntheticCoachReply} from './synthetic-scenario';
+import {testGatewayPrincipal,testCoachOrigin,testHouseholdPrincipal,trialExpiry} from './test-identity';
 export type VerifyCaller=(token:string)=>Promise<boolean>;
-export function googleCallerVerifier(audience:string,approvedServiceAccount:string):VerifyCaller {
- if(!/^https:\/\/[^/?#]+$/.test(audience)||approvedServiceAccount!=='factory-gateway@family-game-factory-jzw.iam.gserviceaccount.com')
+export function googleCallerVerifier(audience:string,approvedServiceAccount:string,env:NodeJS.ProcessEnv=process.env,keys?:JWTVerifyGetKey):VerifyCaller {
+ const funded=env.K_SERVICE==='jems-test-coach'&&approvedServiceAccount===testHouseholdPrincipal;
+ const expiresAt=funded?trialExpiry(env):Infinity;
+ if(!/^https:\/\/[^/?#]+$/.test(audience)||(env.K_SERVICE==='jems-test-coach'?(audience!==testCoachOrigin(env)||!funded&&approvedServiceAccount!==testGatewayPrincipal):approvedServiceAccount!=='factory-gateway@family-game-factory-jzw.iam.gserviceaccount.com'))
   throw Error('PRIVATE_COACH_IDENTITY_REQUIRED');
- const googleKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
+ const googleKeys=keys??createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
  return async(token)=>{
   const {payload}=await jwtVerify(token,googleKeys,{issuer:['https://accounts.google.com','accounts.google.com'],audience,algorithms:['RS256']});
-  return payload.email===approvedServiceAccount&&payload.email_verified===true;
+  return Date.now()<expiresAt&&payload.email===approvedServiceAccount&&payload.email_verified===true;
  };
 }
 export interface PrivateCoachRuntime {
@@ -33,7 +37,7 @@ export interface PrivateCoachRuntime {
  enabled:boolean;
  verifyCaller:VerifyCaller;
  provider:CoachProvider;
- maxConcurrent?:number;
+ syntheticCaller?:VerifyCaller;maxConcurrent?:number;
  audio?:SpeechProvider;
  audioConfig?:SpeechConfig;
  reportFailure?:(event:CoachFailureEvent)=>void|Promise<void>;
@@ -65,6 +69,14 @@ export function privateCoachHandler(runtime:PrivateCoachRuntime){
    if(req.headers.origin||req.headers['x-factory-request']!=='1')throw Error('FORBIDDEN');
    const path=new URL(req.url||'','http://private').pathname;
    const token=req.headers.authorization?.match(/^Bearer ([A-Za-z0-9._-]{40,12000})$/)?.[1];
+   if(path==='/v1/private-coach/synthetic/status'||path==='/v1/private-coach/synthetic'){
+    if(!token||!runtime.syntheticCaller||!await runtime.syntheticCaller(token))throw Error('FORBIDDEN');
+    if(path.endsWith('/status')&&req.method==='GET')return send(res,200,{available:true,mode:'fixture'});
+    if(path.endsWith('/status')||req.method!=='POST'||!String(req.headers['content-type']??'').startsWith('application/json'))throw Error('FORBIDDEN');
+    const input=await readJsonBody(req,128,{invalidJsonError:'INVALID_REQUEST'});
+    if(!input||Object.keys(input).length!==2||input.version!==1||input.scenario!=='moon-hopper')throw Error('INVALID_REQUEST');
+    return send(res,200,{reply:syntheticCoachReply,usedMicroUsd:0});
+   }
    if(!token||!await runtime.verifyCaller(token))throw Error('FORBIDDEN');
    if(path==='/v1/private-coach/narration/status'||path==='/v1/private-coach/narration'){
     const ready=!!runtime.narration&&!!runtime.narrationConfig&&narrationApproved(runtime.narrationConfig);
@@ -188,7 +200,8 @@ function privateConfig(env:NodeJS.ProcessEnv):PrivateCoachConfig {
  * a dedicated scoped API key, current prices and the approved gateway identity.
  */
 export function dedicatedCoachRuntime(env:NodeJS.ProcessEnv){
- if(env.K_SERVICE!=='factory-coach-private'||env.FACTORY_COACH_EXECUTION_ENV!=='dedicated-cloud-run')
+ if(env.K_SERVICE==='jems-test-coach'&&(env.FACTORY_COACH_PRIVATE_AUDIENCE!==testCoachOrigin(env)||env.FACTORY_COACH_GATEWAY_SERVICE_ACCOUNT!==testGatewayPrincipal))throw Error('PRIVATE_COACH_IDENTITY_REQUIRED');
+ if(!['factory-coach-private','jems-test-coach'].includes(env.K_SERVICE??'')||env.FACTORY_COACH_EXECUTION_ENV!=='dedicated-cloud-run')
   throw Error('DEDICATED_PRIVATE_CLOUD_RUN_REQUIRED');
  if(env.FACTORY_OPENAI_API_KEY||env.FACTORY_COACH_API_KEY)
   throw Error('GENERATION_OR_GATEWAY_KEY_FORBIDDEN_IN_PRIVATE_COACH');
@@ -196,9 +209,13 @@ export function dedicatedCoachRuntime(env:NodeJS.ProcessEnv){
  const requested=env.FACTORY_COACH_APPROVED==='true';
  const audioRequested=env.FACTORY_COACH_AUDIO_APPROVED==='true';
  const narrationRequested=env.FACTORY_NARRATION_APPROVED==='true';
+ const test=env.K_SERVICE==='jems-test-coach';
+ const syntheticCaller=test?googleCallerVerifier(testCoachOrigin(env),testGatewayPrincipal,env):undefined;
+ if(test&&(audioRequested||narrationRequested))throw Error('TEST_TRIAL_AUTHORIZATION_REQUIRED');
+ if(test&&requested)trialExpiry(env);
  if(!requested&&!audioRequested&&!narrationRequested){
   if(config.apiKey)throw Error('COACH_SECRET_FORBIDDEN_WHILE_INACTIVE');
-  return {config,enabled:false,verifyCaller:async(_token:string)=>false,
+  return {config,enabled:false,syntheticCaller,verifyCaller:async(_token:string)=>false,
    provider:new OpenAICoachProvider(config)};
  }
  if(requested&&(!approved(config)||!config.apiKey||config.apiKey.length<16))
@@ -208,8 +225,8 @@ export function dedicatedCoachRuntime(env:NodeJS.ProcessEnv){
  if(narrationRequested&&!narrationApproved(readingConfig))throw Error('NARRATION_APPROVAL_REQUIRED');
  const audience=env.FACTORY_COACH_PRIVATE_AUDIENCE||'';
  const caller=env.FACTORY_COACH_GATEWAY_SERVICE_ACCOUNT||'';
- if(privateCoachOrigin(audience)!==audience)throw Error('COACH_AUDIENCE_REQUIRED');
- return {config,enabled:requested,verifyCaller:googleCallerVerifier(audience,caller),
+ if(privateCoachOrigin(audience,env)!==audience)throw Error('COACH_AUDIENCE_REQUIRED');
+ return {config,enabled:requested,syntheticCaller,verifyCaller:googleCallerVerifier(audience,test?testHouseholdPrincipal:caller,env),
   provider:new OpenAICoachProvider(config),
   audioConfig,
   narrationConfig:readingConfig,

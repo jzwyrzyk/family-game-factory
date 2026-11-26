@@ -19,7 +19,7 @@ export function json(res:ServerResponse,status:number,data:unknown,cookies?:stri
 }
 const read=(req:IncomingMessage)=>readJsonBody(req,4096,{invalidJsonError:'INVALID_REQUEST',emptyObject:true});
 export function betaRouter(d:FamilyDirectory,key:string,options:{
- runtime:(id:string)=>Promise<Handler>;operatorReadiness?:{jobCeilingMicroUsd:number;generationDispatch:boolean;coachBridge:boolean;speechBridge:boolean};preview?:PreviewRouting;worker?:Handler;scheduler?:Handler;generatedRecovery?:(id:string,req:IncomingMessage,res:ServerResponse)=>Promise<void>;surface?:Surface;adminIdentity?:typeof verifyAdministrator;
+ runtime:(id:string)=>Promise<Handler>;reset?:(subject:string,input:unknown)=>Promise<unknown>;operatorReadiness?:{jobCeilingMicroUsd:number;generationDispatch:boolean;coachBridge:boolean;speechBridge:boolean};preview?:PreviewRouting;worker?:Handler;scheduler?:Handler;generatedRecovery?:(id:string,req:IncomingMessage,res:ServerResponse)=>Promise<void>;surface?:Surface;adminIdentity?:typeof verifyAdministrator;
 }):Handler {
  const hub=new URL(d.config.hubOrigin),admin=new BetaAdministration(d);
  return async(req,res)=>{
@@ -41,6 +41,12 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
     (req.headers.origin!==origin||req.headers['x-factory-request']!=='1'||!(path==='/v1/coach/audio'?/^audio\/(?:webm|mp4|ogg)(?:;|$)/i:/^application\/json(?:;|$)/i).test(req.headers['content-type']??''))))throw Error('FORBIDDEN');
    if(!id&&(path==='/manage'||path.startsWith('/manage/'))){
     const assertion=req.headers['x-goog-iap-jwt-assertion'];
+    if(req.method==='POST'&&path==='/manage/test-reset'){
+     const reset=d.config.testReset;
+     if(d.config.environment!=='test'||!reset||!options.reset)throw Error('NOT_FOUND');
+     const sub=await (options.adminIdentity??verifyAdministrator)(typeof assertion==='string'?assertion:undefined,{administrator:{audience:d.config.administrator.audience,subject:reset.subject}});
+     json(res,200,await options.reset(sub,await read(req)));return;
+    }
     const sub=await (options.adminIdentity??verifyAdministrator)(typeof assertion==='string'?assertion:undefined,d.config);
     if(req.method==='POST'&&path==='/manage/action'){json(res,200,await admin.change(sub,await read(req)));return;}
     if(req.method==='GET'&&(path==='/manage/state'||path.startsWith('/manage/family/'))){
@@ -165,7 +171,7 @@ export function betaRouter(d:FamilyDirectory,key:string,options:{
    if(res.headersSent){res.end();return;}
    const reason=e instanceof Error?e.message:'';
    const status=reason==='NOT_FOUND'||reason==='FAMILY_UNAVAILABLE'?404:
-    ['PLAY_REQUIRED','UNAUTHENTICATED'].includes(reason)?401:['PROFILE_VERSION_CONFLICT','STORAGE_CONFLICT','STORAGE_OPERATION_REUSED','STORAGE_CONSENT_CHANGED'].includes(reason)?409:['RATE_LIMIT','PARENT_LOCKED'].includes(reason)?429:
+    ['PLAY_REQUIRED','UNAUTHENTICATED'].includes(reason)?401:['PROFILE_VERSION_CONFLICT','STORAGE_CONFLICT','STORAGE_OPERATION_REUSED','STORAGE_CONSENT_CHANGED','TEST_RESET_CONFLICT','TEST_RESET_BUSY'].includes(reason)?409:['RATE_LIMIT','PARENT_LOCKED'].includes(reason)?429:
     /^(FORBIDDEN|ADMIN_REQUIRED|INVALID_(PARENT_ACCESS|INVITATION)|.*_REQUIRED|FAMILY_ACCESS_PAUSED|INVITATIONS_PAUSED|INVALID_LIFECYCLE|DELETION_PENDING|CONTINUITY_DISABLED|CONTINUITY_DENIED|STORAGE_DOMAIN_DENIED)$/.test(reason)?403:
     /^(INVALID_|STORAGE_(?:CURSOR|PAGE|RECORD|OPERATION)_|BETA_CAPACITY|RECEIPT_REUSED|REQUEST_PENDING)/.test(reason)?400:503;
    json(res,status,{errorCode:status===503?'SERVICE_UNAVAILABLE':reason});

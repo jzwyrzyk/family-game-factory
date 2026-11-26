@@ -39,7 +39,7 @@ export interface ActionExecution {
 const WORKFLOW_STAGE_MS=12*60*1000,WORKFLOW_PREPARE_MS=18*60*1000,MAX_ATTEMPTS=3;
 
 export class ActionCoordinator {
- constructor(private repo:Repository,private dispatcher:DispatchPort,private approval:AgentApproval,private leaseMs=900000,private requireVerifiedParentPrivacy=false,private adultPilotMode=false,private premiumPilot?:PremiumPilot,private premiumGameCeiling?:number){
+ constructor(private repo:Repository,private dispatcher:DispatchPort,private approval:AgentApproval,private leaseMs=900000,private requireVerifiedParentPrivacy=false,private adultPilotMode=false,private premiumPilot?:PremiumPilot,private premiumGameCeiling?:number,private testExecution?:Job['testExecution']){
   if(isPremiumApproval(approval))throw Error('LEGACY_APPROVAL_REQUIRED');
  }
  private get stageMs(){return Math.min(this.leaseMs,WORKFLOW_STAGE_MS);}
@@ -77,6 +77,12 @@ export class ActionCoordinator {
  }
  async enqueue(id:string){await this.repo.transaction(s=>{const j=s.jobs.find(x=>x.id===id);if(j?.status==='queued'&&!j.execution){j.execution={attempt:0,dispatchPending:true,queuedAt:Date.now()};this.initializeLease(s,j);}return true;});}
  private permissionError(s:PipelineState,j:Job):string|undefined {
+  if(this.testExecution||j.testExecution){
+   const policy=this.testExecution,pin=j.testExecution;
+   if(!pin||!policy||pin.providerMode!==policy.providerMode||pin.publicSourceSha!==policy.publicSourceSha||
+    pin.workerSha!==policy.workerSha||pin.expiresAt!==policy.expiresAt||pin.authorizationSha256!==policy.authorizationSha256||
+    Date.now()>=pin.expiresAt||pin.providerMode==='funded'&&!j.premiumPolicy||pin.providerMode==='fixture'&&(j.adapter!=='mock'||j.premiumPolicy))return 'TEST_EXECUTION_POLICY_REQUIRED';
+  }
   if(s.platformSpendingStopped)return 'SPENDING_CUTOFF';
   if(j.premiumPolicy){
    if(!this.adultPilotMode)return 'ADULT_PILOT_ACCESS_REQUIRED';
@@ -249,6 +255,7 @@ export class ActionCoordinator {
      this.failure(s,j,safeProviderFailure(report?.errorCode));return receipt();
     }
     if(j.premiumPolicy)this.recordUsage(j,requirePinnedPremium(j,this.premiumPilot),stage,report,false);
+    if(j.testExecution?.providerMode==='fixture'&&report.usageUnits!==0)throw Error('BUDGET_EXCEEDED');
     if(!Number.isInteger(report.usageUnits)||report.usageUnits<0||j.usedUnits+report.usageUnits>j.maxUnits)throw Error('BUDGET_EXCEEDED');
    }
    if(stage==='generate'){

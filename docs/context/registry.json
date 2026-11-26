@@ -711,10 +711,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:19:59.740Z",
-      "sourceDigest": "8aec10f384d09c1592dc6758e68333d58d254f0da000b4131c63ef65b4a6fdd0",
+      "reviewedAt": "2026-11-26T23:27:12.170Z",
+      "sourceDigest": "73c29b0a86e0f9819df2c56401671d63d0a07d504b1c939b13db592f4b87e707",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed exact validator and restricted family build dependencies.",
+      "reviewReason": "Reviewed the environment and private-service contracts and documented the exact isolated TEST gateway, nonproduction storage selectors, worker callback binding, synthetic reset and independently funded household.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -770,10 +770,10 @@
         "tools/game-art-review/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:31:05.691Z",
-      "sourceDigest": "bbc14bf55c40022eb6d37c0b3d2a278ca446f04f4837a91148eb92aafcc86424",
+      "reviewedAt": "2026-11-26T23:26:24.198Z",
+      "sourceDigest": "ba99a3244002dc931a1d810492b0d3fc00128a00ce41611c2da9970ac28ae1e5",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed linked domain documentation for this candidate and its tested private-art boundary.",
+      "reviewReason": "Recorded the finite TEST fixture prompts, exact worker policy and source pins, actual browser play and settled reservations in the family activation guidance. Existing premium lineage limits still apply.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -802,10 +802,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:56.441Z",
-      "sourceDigest": "50bb0b9c9ee3b6c2cf7a3d58319542761c1cc7287ec38b7594787b37b1398837",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The integrated UI candidate preserves its saved-concept build surface. These refinements change neither coach admission nor model prompts outside the active asset catalog.",
+      "reviewedAt": "2026-11-26T23:27:12.692Z",
+      "sourceDigest": "35037027ad3deec60a592db9bda26d580bac2f961be8ccc45f084412be5e5ff8",
+      "reviewOutcome": "updated",
+      "reviewReason": "Documented the keyless private TEST conversation and the separately time-limited paid household path, including distinct verified caller identities and source-bound acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
@@ -929,10 +929,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T22:35:32.999Z",
-      "sourceDigest": "62a93630c83508e452c3c6bc433b38f0fcab5a826f922457d5ee660d5c025ba2",
+      "reviewedAt": "2026-11-26T23:27:36.934Z",
+      "sourceDigest": "45f39cedac76cd963e62c456a180e238d0d90ec823fe94e769e4a8652ba33de5",
       "reviewOutcome": "updated",
-      "reviewReason": "The standalone review guide records the full-size notebook pointer journey and the navigation budget used to open the exact download.",
+      "reviewReason": "Reviewed the authenticated runtime controls, complete typed TEST configuration, existing regression suites and actual browser rehearsal. The activation guide distinguishes local fixture evidence from provider, private runner and deployed TEST acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
