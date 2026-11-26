@@ -88,6 +88,8 @@
     "docs/ui-review/README.md",
     "docs/creative-universe/STANDARD.md",
     "docs/decisions/2026-11-26-connected-creative-universe.md",
+    "docs/creation-studio/WORLD_ART.md",
+    "docs/creation-studio/world-art-manifest.json",
     "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md"
   ],
   "linkCheckPatterns": [
@@ -315,10 +317,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:12:29.990Z",
-      "sourceDigest": "f67c99400e7e3adb04624a40649019007e2d3047f824780f2226c832be666198",
-      "reviewOutcome": "updated",
-      "reviewReason": "The reviewed family upload now verifies the PNG scanline count locally before digest authorization. The owner guide and architecture describe the accepted palette and exact stored bytes.",
+      "reviewedAt": "2026-11-26T03:12:00.058Z",
+      "sourceDigest": "ba3d8d381cc13596fc5c1f4ea0f721398f46956285bff57bbb074bb55a7fe07c",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Four newly illustrated product environments have separate origin and version records. The accepted standard already covers child authorship and immutable uses.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -415,13 +417,15 @@
         "src/creation/**",
         "server/agent/creation-schema.ts",
         "tests/creation-*",
-        "public/art/creative-worlds/**"
+        "public/art/creative-worlds/**",
+        "docs/creation-studio/world-art-manifest.json",
+        "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "4bfdf27858ae0a63fe083cc59cbe7775d6e2454ef761f8bc7d567c1db66e37f1",
-      "reviewedAt": "2026-11-26T03:06:15.823Z",
+      "sourceDigest": "a8bb53d3aa90d9c1e7af9d7752cc1ee6727276a145a0ab9a399c5f9a10909404",
+      "reviewedAt": "2026-11-26T03:12:02.230Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Creative Studio now has a canonical standard for versioned world scenery and the separation between contextual roles and private artwork identity.",
+      "reviewReason": "Registered the four original environments and their layer, prop and preview files in the creative world artwork manifest.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -901,10 +905,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:12:33.756Z",
-      "sourceDigest": "c45bb87d4b11a6132536363dbb1721d5cc9b3799e6c91bc9265caf98bbc4e43c",
+      "reviewedAt": "2026-11-26T03:12:02.488Z",
+      "sourceDigest": "83c23ae7f11c5e9a126b91d2cd247e3751ec0f01e85def1206f1090964231b99",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed beta PNG fixtures now encode actual complete rasters and cover indexed transparency, Adam7 passes, and mismatched scanline counts. The existing Chromium file input regression remains the end-to-end acceptance check.",
+      "reviewReason": "Recorded the manifest checks for content identity, scale and mapped files in the delivery entry for this source candidate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1145,10 +1149,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:11:32.489Z",
-      "sourceDigest": "793d6e866130ac01e32634111bc85996ec9b10c3f48d7437620df271cad5bbf6",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Only a local qualification command and its evidence changed. There is no application route, service, release workflow or environment activation in this branch.",
+      "reviewedAt": "2026-11-26T03:12:03.342Z",
+      "sourceDigest": "d6691c0e7097678f19c4b2277e4782b32634074014cb41f4b11b9bc94c906b82",
+      "reviewOutcome": "updated",
+      "reviewReason": "Recorded the consulted protected baseline and current household embedded release independently of local art readiness.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1403,10 +1407,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:11:58.404Z",
-      "sourceDigest": "4352b43b5f05ed18db64d490ebdd766ac27aa8c4977c62611d31cd56dfdd9ab8",
-      "reviewOutcome": "updated",
-      "reviewReason": "Registered the private slot qualification contract and mapped its offline compositor to the generation area. Other document routing remains intact.",
+      "reviewedAt": "2026-11-26T03:12:03.174Z",
+      "sourceDigest": "7a051079928b455c2ce3057ed43f727e5774c1c79cf8889bca2fd94e78dc13f0",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The current governance requires a single canonical creative standard. The catalogue and provenance now participate in existing creation documentation checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

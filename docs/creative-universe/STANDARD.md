@@ -53,3 +53,13 @@ New development uses 2D sprites, layered environments and compatible physics. Ar
 | E | Game host owns explicit adapters and trust checks. Security and release owners independently qualify any future change to general delivery. | A named playable example, preserved game behavior, an isolated generated realm, and confirmation of disabled production delivery. |
 
 For each change record its PR and dependencies, exact head, reproducible tests, screenshots and motion capture where relevant. Record what passed locally, hosted checks and private preview identity, TEST acceptance, production state and external family activation separately. Use synthetic work in public artifacts. Existing parent reports, learning evidence, reward receipts, earned Pals and prior histories retain their own authorities. [Delivery governance](../development/DEV-TEST-PROD.md)
+
+The owner of a new reference kind updates validators, renderers, authoritative usage checks, backup/restore, copy/remap and the destination matrix together. The storage maintainer reviews migrations and rollback compatibility. Integration review covers overlapping files and stacked PR heads before release.
+
+## Acceptance and extension
+
+Exercise a synthetic hand-drawn rock, a character, a vehicle and a world. Name and revise them, select exact versions across activities, change roles, archive, restore and switch profiles. Compare original bytes and hashes following recovery. Check visible pixels, editor return, keyboard and touch input, missing versions and failed writes. Inspect a live game outcome as well as its artwork. Keep local implementation, offline evidence, hosted qualification, production deployment and family activation separately evidenced.
+
+Related contracts cover detailed [Art Studio behavior](../drawings/ART_STUDIO.md), [scene authoring](../creation-studio/README.md), [private family storage](../family-beta/ARCHITECTURE.md), [child interface](../brand/CHILD_INTERFACE.md), and [game generation](../game-intelligence/PREMIUM-BUILDER.md).
+
+The first illustrated collection has four versioned stages with aligned overlays and individually selectable transparent objects. Every published revision retains its old catalogue ID and pixels. [Art briefs, manifest and approval status](../creation-studio/WORLD_ART.md)
