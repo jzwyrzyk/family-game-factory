@@ -900,10 +900,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T02:04:23.762Z",
-      "sourceDigest": "f4ba7c637b1e58d413e8bb8deb8ba15975e56769b1b329844abbb022d9686ff3",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The inherited browser tests measure actual heading contrast and exercise visible checkpoint exits, preserved interruption state and budget refunds. Existing CI commands and evidence classes apply.",
+      "reviewedAt": "2026-11-26T02:11:52.582Z",
+      "sourceDigest": "af69f01e58a8af63e125bc00824c5cd54fcd3c8121ab1fda06ff100494e38dd5",
+      "reviewOutcome": "updated",
+      "reviewReason": "The Arcade inventory now includes the additional Creation Studio checkpoint command and verifies its assignment to the existing creative shard. The delivery record identifies the added check.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1144,10 +1144,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T02:04:34.277Z",
-      "sourceDigest": "4e0fcc4058148ea8ac6f36420b31e933163d746624d7156551ffb0655f92e191",
+      "reviewedAt": "2026-11-26T02:11:52.882Z",
+      "sourceDigest": "1fdfe42a78932f956478f54b6520d34733492c55ca97dafac7ea2bcaff45db77",
       "reviewOutcome": "updated",
-      "reviewReason": "Delivery records the final 679-test receipt and all eight Creation Studio learner layouts, with separate owner and private release gates.",
+      "reviewReason": "The integrated delivery record identifies the 66-command creative suite including the fullscreen checkpoint regression.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
