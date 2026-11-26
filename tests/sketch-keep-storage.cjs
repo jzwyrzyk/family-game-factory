@@ -13,6 +13,8 @@ module.exports = async function sketchKeepStorage() {
   const draft = {token:crypto.randomUUID(),sheet,name:'Moon glow',category:'other',sourceId:source.id,sourceSha256:source.sha256};
   const file = await art.stageSketchKeep(owner,draft,guard,canvas);
   await art.verifySketchKeep(owner,draft.token);
+  const renamedFile = await art.stageSketchKeep(owner,{...draft,name:'Moon lantern'},guard,canvas);
+  check(await art.drawingHash(await renamedFile.arrayBuffer())===await art.drawingHash(await file.arrayBuffer()),'renaming a recovered page changed its protected pixels');
   await reject(()=>art.stageSketchKeep(owner,{...draft,sourceSha256:'f'.repeat(64)},guard,canvas),'unmatched source accepted');
   await reject(()=>art.stageSketchKeep(owner,{...draft,token:crypto.randomUUID()},guard,canvas),'pending page was overwritten');
   await reject(()=>art.deleteArtwork(owner,source.id,guard),'pending source erased');

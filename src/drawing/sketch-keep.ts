@@ -1,7 +1,7 @@
 import {DRAWING_CATEGORIES, drawingHash, saveDrawing, type Drawing, type DrawingCategory} from '../assets/private-drawings';
 import {ART_LIMITS, artOwner, artRequest, assertArtWrite, withArtTransaction, type ArtGuard, type DrawingMetadata} from './library';
 import {readSketch, sketchPng, verifySketchPixels} from './sketch';
-import {parseSheet, type Sheet} from './workspace-engine';
+import {parseSheet, sheetSize, type Sheet} from './workspace-engine';
 import {
   pendingSketchRecord, clearSketchRecord, artFootprint, checkReservedArtRoom, invalidSketchKeep,
   sketchKeepKey, sketchSizeKey, sketchSizeRange, sketchUuid, type KeepRecord,
@@ -46,9 +46,9 @@ export async function verifySketchKeep(owner:string, token:string):Promise<Sketc
 
 export async function stageSketchKeep(owner: string, keep: SketchKeep, guard: ArtGuard, canvas: HTMLCanvasElement): Promise<Blob> {
   assertArtWrite(owner, guard);
-  const sheet = parseSheet(keep.sheet);
+  const sheet = parseSheet(keep.sheet), size = sheetSize(sheet);
   if (!sketchUuid.test(keep.token) || !keep.name.trim() || keep.name.trim() !== keep.name || keep.name.length > 60 ||
-      !DRAWING_CATEGORIES.includes(keep.category) || !sheet.marks.length || Boolean(keep.sourceId) !== Boolean(keep.sourceSha256))
+      canvas.width !== size.width || canvas.height !== size.height || !DRAWING_CATEGORIES.includes(keep.category) || !sheet.marks.length || Boolean(keep.sourceId) !== Boolean(keep.sourceSha256))
     throw invalidSketchKeep();
   // Capture once. A later browser/encoder, revised stamp file or export cannot change
   // the original pixels of a Keep that reached the journal.
@@ -66,8 +66,12 @@ export async function stageSketchKeep(owner: string, keep: SketchKeep, guard: Ar
       throw Error('The original version needs recovery before this page can be kept.');
     if (prior && prior.image.sourceId !== keep.sourceId) throw invalidSketchKeep();
     const sameSheet = prior && JSON.stringify(readSketch(prior.image.bytes)) === JSON.stringify(sheet);
-    if (sameSheet && prior.image.name === keep.name && prior.image.category === (source?.category ?? keep.category)) {
+    if (sameSheet) {
       assertArtWrite(owner,guard);
+      const category = source?.category ?? keep.category;
+      if (prior.image.name !== keep.name || prior.image.category !== category) {
+        tx.objectStore('meta').put({...prior, image:{...prior.image, name:keep.name, category}});
+      }
       return new Blob([prior.image.bytes], {type:'image/png'});
     }
     const sameImage = prior?.image.sha256 === sha256;
