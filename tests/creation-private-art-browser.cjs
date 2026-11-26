@@ -24,7 +24,7 @@ async function pacing(page){await page.evaluate(()=>{FG.store.changeProfile({rat
 async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.openArt&&window.FG?.studio&&window.FG?.drawings);}
 
 (async()=>{
- const server=start();if(!server.listening)await once(server,'listening');
+ const server=start(process.env.ART_BUILD_DIR || 'dist');if(!server.listening)await once(server,'listening');
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox']});
  fs.mkdirSync('test-results',{recursive:true});
  try{
@@ -108,8 +108,9 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     await profile(page,1);await pacing(page);
     await navigate(page,'#studioNavScenes');await page.locator('#creationFreeMode').click();await page.locator('[data-creation-starter="blank"]').click();
     await page.locator('#creationAddActor').click();
-    await page.waitForFunction(()=>document.getElementById('creationActorArtStatus').textContent.includes('Add one'));
-    assert.equal(await page.locator('#creationPrivateActorChoices button').count(),0);await page.locator('#creationCloseActor').click();
+    await page.locator('#creationPrivateActorChoices .creative-picker-results').waitFor({state:'attached'});
+    assert.match(await page.locator('#creationPrivateActorChoices [role=status]').textContent(), /No pictures/);
+    assert.equal(await page.locator('#creationPrivateActorChoices [data-private-art]').count(),0);await page.locator('#creationCloseActor').click();
     await page.locator('#creationBack').click();
     const broken=structuredClone(bundle);broken.scene.actors[1].assetId=broken.scene.actors[1].assetId.slice(0,-1)+(broken.scene.actors[1].assetId.endsWith('0')?'1':'0');
     await page.setInputFiles('#creationImport',{name:'broken-scene.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(broken))});

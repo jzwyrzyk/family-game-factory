@@ -1,6 +1,6 @@
 # Draw a path
 
-A child can open a picture or saved cutout in Creative Studio, select that actor, and choose **Draw a path**. Trace on the pad, tap destinations, or use the four direction buttons. The picture follows the end of the path on the pad. Undo step removes the most recent point. Give the path a name and choose its speed, then add it to the actor’s selected script. Play runs the sequence, including existing actions before it. In reduced-motion mode the first-steps play bar also exposes Step for deliberate 100 ms advances. The composer has no automatic playback.
+A child can open a picture or saved cutout in Creative Studio, select that actor, and choose **Draw a path**. Trace on the pad, tap destinations, or use the four direction buttons. The picture follows the end of the path on the pad. Undo step removes the most recent point. Give the path a name and choose its speed, then add it to the actor’s selected script. Play runs the sequence, including existing actions before it. With a private-art actor selected in reduced-motion mode, the first-steps play bar also exposes Step for deliberate 100 ms advances. The composer has no automatic playback.
 
 ## Persistence and reuse
 
@@ -16,3 +16,5 @@ The stage clamps playback to its own boundaries. The composer edits whole-actor 
 - [Browser journey](../../tests/creation-motion-browser.cjs) exercises a synthetic transparent picture, path editing, reduced-motion stepping, ordinary playback, pixel-reference pinning, cross-scene reuse and undo. It writes screenshots to `test-results/creation-motion` by default.
 
 The local production build at `fe015626a235e9f53928458f866eb7da6ecd1eae` passed the 90 Creative Studio unit checks and the focused mouse and keyboard journey. The screenshots show a synthetic transparent moon rock on a [desktop path pad](../creative-universe/evidence/motion/draw-a-path.png), the [390 px path pad](../creative-universe/evidence/motion/draw-a-path-phone.png) and the [completed scene](../creative-universe/evidence/motion/path-playback.png). The phone screenshot uses Chromium viewport emulation.
+
+The first regression sweep found a smaller stage on the 768 × 1024 bundled starter when the reduced-motion shortcut appeared for every actor. Source `73779309bfa22cc45e65ecda9968e81e12a77643` confines the shortcut to private-art selections. The portrait learner journey and focused motion journey passed on that production build. All three motion screenshots matched the original evidence byte for byte.

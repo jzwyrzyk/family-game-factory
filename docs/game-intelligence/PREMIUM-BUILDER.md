@@ -4,6 +4,8 @@ The [November 26 activation package](premium-benchmark/NOVEMBER-26.md) describes
 
 The owner selected `adult-astra-high-v1` to improve execution of each child's agreed idea. The pilot is a separately approved policy inside the existing builder. A chat turn, readiness verdict, model suggestion or source merge cannot submit a paid job. Build still needs the creator's explicit action, authenticated family/profile, trusted device, current permission and available allowance. The [decision record](../decisions/2026-11-23-premium-builder.md) describes the choice. The [delivery record](../../DELIVERY-STATE.md) tracks release evidence.
 
+Private child artwork stays out of every model, including the optional image producer and screenshot-based model review. A new environment may use approved Jems illustrations. A child's selected drawing retains its own appearance. The local host and the offline sprite experiment have separate delivery boundaries. [Private artwork in 2D play](CREATIVE-ASSET-BINDINGS.md)
+
 ## Stage contracts
 
 | Stage | Model or executor | Responsibility |

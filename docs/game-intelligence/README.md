@@ -6,6 +6,8 @@ The original v1 advisory preflight expanded within PR #43 into source-backed int
 
 **Current draft extension:** [presentation and playable quality](PRESENTATION-QUALITY.md) adds a bound style-aware production plan, optional explicitly approved raster art, actual desktop/tablet capture and mandatory separate review to the real generated-game route. Visual, intent, gameplay and input each need supported passes; a compile or animation response alone cannot make a new real game Ready. This supports pixel, flat 2D, illustrated, dimensional and realistic appearances without requiring Gem Factory's look or loop. [ADR0006](../decisions/0006-style-diverse-playable-quality.md) records the owner direction. Provider activation, human calibration, a held-out multi-style evaluation and child enjoyment remain unverified by this implementation.
 
+New development uses 2D play. The trusted host can generate a local editable picture hunt from an exact private-art version. The isolated v2 sprite-slot experiment requires independent security and release qualification before any hosted integration. [Private artwork in 2D play](CREATIVE-ASSET-BINDINGS.md)
+
 ## Problem statement
 
 A game may compile, respond to touch and pass browser tests but fail the child's real idea. Using rigid-body physics to stick bubble-gum stickers on a rocket is complexity without value. A robot path puzzle needs a grid and clear steps, not 3D physics. A hill-driving game may genuinely need suspension, mass and grip. **Jems must be an effective game designer, not a demonstration of whichever engine is available.**

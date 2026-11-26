@@ -1,3 +1,4 @@
+import {classicBackground, paintedWorld, WORLD_BACKDROPS, WORLD_DECORATIONS, WORLD_DECORATION_LIMIT} from './world-assets';
 /** The local, serializable Creation Lab language. It contains data, never source code. */
 export const CREATION_SCHEMA = 'jems.creation.v1' as const;
 export const CREATION_TICK_MS = 10;
@@ -29,7 +30,11 @@ export type CreationBlock = BlockBase & (
   | {type: 'emit'; name: string}
 );
 export type SceneTrigger = {type: 'start' | 'tap'} | {type: 'event'; name: string};
+export const SCENE_ROLES = ['player', 'npc', 'vehicle', 'collectible', 'obstacle', 'decoration', 'environment', 'background'] as const;
+export type SceneRole = typeof SCENE_ROLES[number];
 export interface SceneActor {
+  /** Context for this appearance. Programs remain the authority for behavior. */
+  role?: SceneRole;
   id: string; name: string; assetId: string; x: number; y: number;
   size?: number; visible?: boolean;
 }
@@ -42,13 +47,34 @@ export interface CreationProvenance {
   sourceProjectId?: string; sourceRevisionId?: string;
   sourceSessionId?: string; sourceGameId?: string;
 }
+export interface WorldDecoration {
+  id:string; assetId:string; name:string;
+  /** Percent of the stage; size is the longest side as a percent of stage height. */
+  x:number; y:number; size:number; plane:'back'|'front';
+}
+export interface SceneWorld {
+  backdrop:string; fit:'cover'|'contain'; decorations:WorldDecoration[]; middle?:boolean; foreground?:boolean;
+}
 export interface CreationProject {
   schema: typeof CREATION_SCHEMA;
-  id: string; title: string; width: number; height: number; background: SceneBackground;
+  id: string; title: string; width: number; height: number; background: SceneBackground; world?: SceneWorld;
   actors: SceneActor[]; programs: SceneProgram[]; variables: Record<string, number>;
   provenance?: CreationProvenance;
 }
 export type SceneProject = CreationProject;
+
+export function sceneAssetIds(scene:CreationProject):string[] {
+  const ids = scene.actors.map(actor => actor.assetId);
+  if (scene.world) ids.push(scene.world.backdrop, ...scene.world.decorations.map(decoration => decoration.assetId));
+  return ids;
+}
+export function mapSceneAssetIds(scene:CreationProject, remap:(assetId:string)=>string):void {
+  for (const actor of scene.actors) actor.assetId = remap(actor.assetId);
+  if (scene.world) {
+    scene.world.backdrop = remap(scene.world.backdrop);
+    for (const decoration of scene.world.decorations) decoration.assetId = remap(decoration.assetId);
+  }
+}
 
 const forbiddenIds = new Set(['__proto__', 'prototype', 'constructor']);
 export const isCreationId = (value: unknown): value is string =>
@@ -88,19 +114,39 @@ const operators = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte'];
 
 /** Strictly validates before cloning: unsupported executable/asset payloads are never retained. */
 export function validateCreationProject(input: unknown): CreationProject {
-  const p = record(input, ['schema','id','title','width','height','background','actors','programs','variables','provenance'], 'project');
+  const p = record(input, ['schema','id','title','width','height','background','world','actors','programs','variables','provenance'], 'project');
   if (p.schema !== CREATION_SCHEMA) fail('Unsupported saved project version.');
   id(p.id, 'project ID'); text(p.title, 80, 'project title');
   number(p.width, 200, 1600, 'stage width', true); number(p.height, 160, 1200, 'stage height', true);
   if (!['meadow','night','workshop','sky'].includes(p.background as string)) fail('Choose a supported background.');
+  if (p.world !== undefined) {
+    const world = record(p.world, ['backdrop','fit','decorations','middle','foreground'], 'world');
+    if (!classicBackground(world.backdrop) && !WORLD_BACKDROPS.some(asset => asset.id === world.backdrop) && !parsePrivateArtId(world.backdrop)) fail('Choose a saved world picture.');
+    if (world.fit !== 'cover' && world.fit !== 'contain') fail('Choose how the picture fits.');
+    for(const field of ['middle','foreground'])if(world[field]!==undefined&&
+      (typeof world[field]!=='boolean'||!paintedWorld(String(world.backdrop))))fail('Choose a layer from this illustrated world.');
+    list(world.decorations, WORLD_DECORATION_LIMIT, 'world decorations');
+    const ids = new Set<string>();
+    for (const raw of world.decorations) {
+      const d = record(raw, ['id','assetId','name','x','y','size','plane'], 'decoration');
+      id(d.id, 'decoration ID'); text(d.name, 60, 'decoration name');
+      if (ids.has(d.id)) fail('Each decoration needs its own placement.');
+      ids.add(d.id);
+      if (!WORLD_DECORATIONS.some(asset => asset.id === d.assetId) && !parsePrivateArtId(d.assetId)) fail('Choose a saved decoration.');
+      number(d.x, 0, 100, 'decoration position'); number(d.y, 0, 100, 'decoration position');
+      number(d.size, 5, 100, 'decoration size');
+      if (d.plane !== 'back' && d.plane !== 'front') fail('Choose a decoration layer.');
+    }
+  }
   list(p.actors, CREATION_LIMITS.actors, 'characters');
   if (!p.actors.length) fail('Add at least one character.');
   const actorIds = new Set<string>();
   for (const raw of p.actors) {
-    const a = record(raw, ['id','name','assetId','x','y','size','visible'], 'character');
+    const a = record(raw, ['id','name','assetId','x','y','size','visible','role'], 'character');
     id(a.id, 'character ID');
     if(!isCreationId(a.assetId)&&!parsePrivateArtId(a.assetId))fail('Invalid asset reference.');
     text(a.name, 60, 'character name');
+    if (a.role !== undefined && !SCENE_ROLES.includes(a.role as SceneRole)) fail('Choose an available role.');
     if (actorIds.has(a.id)) fail('Character IDs must be unique.');
     actorIds.add(a.id);
     number(a.x, 0, p.width, 'character x'); number(a.y, 0, p.height, 'character y');

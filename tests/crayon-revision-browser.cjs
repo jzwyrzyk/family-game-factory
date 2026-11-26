@@ -94,6 +94,14 @@ async function main() {
     assert.equal(revision.sourceSha256, original.sha256);
     assert.notEqual(revision.sha256, original.sha256);
 
+    await page.locator('.art-detail-tools summary').click();
+    for (const [label, expected] of [['Download original picture',original.sha256], ['Download this picture version',revision.sha256]]) {
+      const download = page.waitForEvent('download');
+      await page.getByRole('button', {name:label,exact:true}).click();
+      const bytes = fs.readFileSync(await (await download).path());
+      assert.equal(require('node:crypto').createHash('sha256').update(bytes).digest('hex'),expected);
+    }
+
     // Transfer both images through the real downloadable library. Restore into
     // a clean browser profile to prove recovery independently of the first DB.
     await page.locator('.art-library-more summary').click();

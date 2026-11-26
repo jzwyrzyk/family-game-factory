@@ -12,3 +12,10 @@ These are original Jems product illustrations made for the four Creative Studio 
 Each environment has a 1280 × 720 opaque plate, two aligned transparent overlays and a 384 × 216 preview of the composite. Props have individual alpha channels and padding. The initial cloud prop sheet had a mist across the negative space. The replacement sheet preserved the clear exterior needed for a cutout. Inspect the transparent props against both light and dark backgrounds. The stage uses the versioned files for artwork; the selector uses the smaller previews. New versions must retain the older catalogue IDs and files for kept scenes.
 
 Source art review found four distinct compositions and a clear central play area. Exact retained approval rests with the product owner after inspecting actors in the running stage. The local captures and actual render tests are recorded with the implementation. The collection has no external runtime dependency. [Product standard](../creative-universe/STANDARD.md)
+
+
+## Stage integration
+
+The four starter buttons use the four preview images and pin the selected world edition. The stage resolves its aligned background, middle and foreground files from [the catalogue](../../src/creation/illustrated-art.ts). The large stage never stretches a preview into a backdrop. **World** lets the child toggle middle and front scenery, choose a prop collection, and place a prop from any collection in another world. New placements have no behavior. The same actor and program execute against each visible world. **My art** supplies private, exact-revision pixels at the host; the product art catalogue carries only bundled Jems files.
+
+[The catalogue test](../../tests/creative-world-art.test.ts) verifies 48 file hashes. [The browser journey](../../tests/creative-worlds-browser.cjs) opens all four painted worlds, observes a canvas change when the foreground is toggled, imports a synthetic drawing, checks its hash in a kept scene bundle and reopens an independent arrangement. Owner sign-off on the illustrated composites is pending.

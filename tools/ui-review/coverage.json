@@ -242,6 +242,11 @@
       "id": "coding-intro",
       "label": "Creative Studio: optional movement introduction",
       "action": "coding-intro"
+    },
+    {
+      "id": "creative-picker",
+      "label": "My Art \u00b7 choose a saved creation",
+      "action": "creative-picker"
     }
   ],
   "journeys": [
@@ -258,7 +263,8 @@
     "Trusted devices \u2192 invitation \u2192 guardian choices \u2192 private adult session",
     "My Games \u2192 My Journey \u2192 My Pals / Gems & achievements / My Powers \u2192 practice",
     "Creative Studio \u2192 first-visit movement \u2192 skip / finish \u2192 Make / Rebuild / experiment",
-    "Ready saved conversation \u2192 unsent correction \u2192 explicit Build \u2192 updated review \u2192 explicit Build"
+    "Ready saved conversation \u2192 unsent correction \u2192 explicit Build \u2192 updated review \u2192 explicit Build",
+    "My Rock \u2192 choose its saved picture \u2192 picture hunt or world placement \u2192 revise \u2192 reopen the earlier adventure"
   ],
   "scenarios": [
     "normal",

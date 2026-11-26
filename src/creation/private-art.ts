@@ -1,10 +1,11 @@
 /** Trusted local-art adapter. Private pixels never become a URL or a model input. */
-import { drawing, drawingPage, drawingBlob } from '../assets/private-drawings';
-import { rigById, listRigs } from '../drawing/store';
-import { validateAssembly, type DrawingAssembly } from '../drawing/model';
+import { drawing, drawingBlob } from '../assets/private-drawings';
+import { rigById } from '../drawing/store';
+import { assemblyHash } from '../drawing/creative-assets';
+export { assemblyHash, listCreativeAssets as listArtChoices } from '../drawing/creative-assets';
 import { layerCanvas } from '../drawing/segmentation';
 import { parsePrivateArtId, privateArtId, validateEditableProject } from './projects';
-import type { CreationProject } from './model';
+import { sceneAssetIds, mapSceneAssetIds, type CreationProject } from './model';
 import {exportArtBundle,validateArtBundle,importArtBundle,type ArtBundle} from '../drawing/transfer';
 
 export interface ArtSelection {drawingId:string;rigId?:string}
@@ -23,10 +24,11 @@ export function unionOriginalArtPixels(original:Uint8ClampedArray,mask:Uint8Clam
   }
   return result;
 }
-export async function assemblyHash(input:DrawingAssembly):Promise<string> {
-  return hex(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(validateAssembly(input)))));
+function activeArtView(owner:string, current:()=>boolean) {
+  return () => current() && String((window as any).FG?.store?.current?.()?.id) === owner;
 }
 export async function artChoice(owner:string,selection:ArtSelection,current:()=>boolean=()=>true):Promise<ArtChoice> {
+  current=activeArtView(owner,current);
   if(!current())throw stale();
   const source=await drawing(owner,selection.drawingId);
   if(!current())throw stale();
@@ -40,20 +42,8 @@ export async function artChoice(owner:string,selection:ArtSelection,current:()=>
   }
   return {drawingId:source.id,assetId:privateArtId({kind:'image',id:source.id,sha256:source.sha256}),label:source.name,detail:'Original artwork'};
 }
-export async function listArtChoices(owner:string,current:()=>boolean=()=>true):Promise<ArtChoice[]> {
-  const [sources,rigs]=await Promise.all([drawingPage(owner,{limit:100,archived:false}),listRigs(owner)]);
-  if(!current())throw stale();
-  const choices:ArtChoice[]=[];
-  for(const source of sources.items){
-    choices.push({drawingId:source.id,assetId:privateArtId({kind:'image',id:source.id,sha256:source.sha256}),label:source.name,detail:'Original artwork'});
-    const latest=rigs.find(rig=>rig.assembly.sourceId===source.id&&rig.assembly.sourceSha256===source.sha256);
-    if(latest)choices.push({drawingId:source.id,rigId:latest.id,assetId:privateArtId({kind:'rig',id:latest.id,sha256:await assemblyHash(latest.assembly)}),label:source.name,detail:'Latest saved cutout design'});
-    if(!current())throw stale();
-  }
-  return choices;
-}
 export function privateArtReferences(project:CreationProject):string[] {
-  return [...new Set(project.actors.map(actor=>actor.assetId).filter(id=>parsePrivateArtId(id)))];
+  return [...new Set(sceneAssetIds(project).filter(id=>parsePrivateArtId(id)))];
 }
 export interface SceneArtBundle {schema:'jems.scene-art.v1';scene:CreationProject;art:ArtBundle}
 /** A download includes immutable originals and the exact cutout versions used. */
@@ -97,7 +87,7 @@ export async function importSceneArt(owner:string,input:unknown,current:()=>bool
   }
   if(!current())throw stale();
   const scene=bundle.scene;
-  for(const actor of scene.actors)actor.assetId=references.get(actor.assetId)||actor.assetId;
+  mapSceneAssetIds(scene, id => references.get(id) ?? id);
   if(scene.provenance?.sourceKind==='art'){
     const source=scene.provenance;
     if(source.sourceProjectId)source.sourceProjectId=imported.drawingIds[source.sourceProjectId]||source.sourceProjectId;
@@ -110,6 +100,7 @@ export async function importSceneArt(owner:string,input:unknown,current:()=>bool
  * A rig is composited in its saved pose; the scene's blocks move the resulting
  * actor. Independent joints remain in the Drawing Lab and physical games. */
 export async function resolvePrivateArt(owner:string,assetId:string,current:()=>boolean=()=>true):Promise<ResolvedPrivateArt> {
+  current=activeArtView(owner,current);
   const ref=parsePrivateArtId(assetId);
   if(!ref||!owner)throw Error('Choose available artwork from your own Art Studio.');
   if(!current())throw stale();

@@ -28,7 +28,7 @@ After an upload/photo import, local drawing save or edited-picture save, the new
 
 The existing private drawing record owns the complete PNG. Its versioned, private PNG ancillary chunk contains only tool choices, brush sizes, ordered points and paper choice. Both the raster and strokes travel through the same byte quotas, export, recovery and owner-scoped transactions. The 900 × 560 page supports 160 strokes, 4096 points per stroke and coordinates on a 1/64-pixel grid. Opening checks chunk bounds, checksum and tool values, then compares the rendered strokes against every decoded pixel. An incompatible renderer or inconsistent source leaves the original available in the ordinary picture tools. Older images without a stroke source retain their existing tools. A raster crop or rotation keeps its source link and an immutable new PNG.
 
-The learning workspace's working paper remains ephemeral. Opening and saving permanent artwork requires the child's explicit My Art action. [Browser regression](../../tests/crayon-revision-browser.cjs) · [Desktop drawing](../creative-universe/evidence/editable-sketch.png) · [Recovered drawing on a phone viewport](../creative-universe/evidence/restored-sketch-phone.png)
+The learning workspace's working paper remains ephemeral. Opening and saving permanent artwork requires the child's explicit My Art action. [Browser regression](../../tests/crayon-revision-browser.cjs)
 
 ## Later web-journey and menu integration
 
@@ -89,3 +89,11 @@ To move family progress and its art: download progress and each relevant player'
 | Local scene integration and portability | `src/creation/private-art.ts`, `projects.ts`, `stage.ts`, `ui.ts`; `tests/creation-private-art.test.ts`, `tests/creation-private-art-browser.cjs` |
 
 Acceptance uses synthetic pictures in the real production browser bundle. It checks original preservation, real alpha-mask/geometry consequences, private storage, profile changes, version reuse, corrupt/oversized imports, camera/drawing entry points, missing-asset recovery, game/scene playback, portability, mobile reflow and zero image POSTs. See the [scoped evidence record](EVIDENCE.md). Synthetic fixture tests and emulated touch do not establish real iPad/Android camera behavior, battery performance, universal segmentation or learning efficacy. See [the staged program](PROGRAM.md) for the still-separate research work.
+
+## Reusing a picture across activities
+
+**Choose artwork** opens the same private picker used for scene actors, backgrounds, placement and compatible game actions. **Library tools → Choose art to move** opens the selected original or saved rig in the movement editor. Children can give a picture an optional meaning such as “pebble”, search by name or meaning, browse by collection, or pick an earlier cutout. Recent art uses local usage dates when available and save dates for previously unused versions. My Pals and Jems artwork identify their own source. Only currently owned forms appear among the selectable Pals.
+
+The root drawing ID identifies a creative asset within its owner. Every saved picture revision has its own ID and SHA-256. The picker follows parent drawing IDs and fingerprints, including archived ancestors, to find that root. A rig pins the exact source picture and has a separate hash for its assembly. Saved scenes and games continue resolving their original pins after edits or renames. Choosing **Update art** on a scene actor changes only the selected version in the edited scene. The actor retains its name, role, position and code.
+
+**Where it plays** reads retained scene and game histories to show a picture family's uses, including world layers, animated actors and named games. The usage list helps children find their work. Erasure separately checks retained dependencies and preserves originals that still have derived pictures or saved uses. Portable backups validate optional semantic metadata, parent fingerprints and immutable rig references before import. [Picker browser journey](../../tests/creative-picker-browser.cjs)

@@ -60,3 +60,8 @@ The modernization candidate includes the consolidated My Journey sections, Make/
 Choose **My Journey** in the destination selector to inspect the three dashboard cards. Check **Empty** for starter selection and **Unlocked** for an equipped companion and earned gems. Follow each card into the corresponding live section, then return through My Journey.
 
 The Journey, Pals, rewards and Powers destinations render the shared production header and cards. Use the empty scenario to review the two starter choices. Compare the same application viewport on each page and use Shift+Tab from the announced heading to check the back action’s visible keyboard focus.
+
+
+## Connected creative universe
+
+Choose **Populated** or **Unlocked**, then **My Art · choose a saved creation**. My Rock, Clover Cat, Rocket Bus and My Hill World are synthetic editable crayon drawings. Choose a thumbnail, open the picture in Creative Studio, or start a local picture hunt. Use **Keep drawing** to save another revision, then reopen the earlier adventure. The game and world use real local project, pin and renderer code. The separate generated-game preview retains its synthetic transport.

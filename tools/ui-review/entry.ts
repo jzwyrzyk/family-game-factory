@@ -1,4 +1,5 @@
 import '../../src/style.css';
+import {seedCreativeFixtures} from './creative-fixtures';
 import {parentDashboardFixture} from '../../tests/parent-dashboard-fixture';
 import {StudioNotebook} from '../../src/studio/notebook';
 import {CREATION_KEY} from '../../src/creation/storage';
@@ -29,6 +30,7 @@ if(!localStorage.getItem('family-game-factory-state-v1')){
 // Dynamic import is bundled into this same IIFE; initialization follows fixtures.
 async function boot(){
  if(['unlocked','populated'].includes(config.scenario)){
+  await seedCreativeFixtures();
   const rewards=new RewardsStore(REWARDS_DB_NAME),pals=new PalsStore(PALS_DB_NAME);
   const before=palSnapshotFromRewards(await rewards.export(),'player1');
   await pals.chooseStarter('player1',PAL_CATALOG[0].id,before);

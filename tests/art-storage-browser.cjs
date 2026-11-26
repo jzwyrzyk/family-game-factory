@@ -45,7 +45,11 @@ const { chromium } = require('playwright');
    await rejects(() => art.deleteArtwork(owner, original.id), 'cannot erase art used by a scene');
    check((await art.artUsages(owner, original.id)).length === 1, 'usage is stored separately from image identity');
    const draftForBackup = structuredClone(changed); draftForBackup.notes = 'Backup draft'; await art.saveDrawingDraft(owner, draftForBackup, second.id);
+   await art.updateDrawing(owner, original.id, {semantic:'moon rover',category:'vehicle'});
+   check((await art.drawingPage(owner,{search:'rover'})).items[0].id===original.id,'optional child meaning is searchable');
+   await rejects(()=>art.updateDrawing(owner, original.id, {semantic:'x'.repeat(61)}),'overlong artwork meaning is rejected');
    const bundle = await art.exportArtBundle(owner);
+   check(bundle.drawings[0].semantic==='moon rover','portable library retains artwork meaning');
    check(!JSON.stringify(bundle).includes('player1') && bundle.drawings.length === 1 && bundle.rigs.length === 2, 'portable bundle includes exact originals and all versions without source owner');
    await art.updateDrawing(owner, original.id, { name:'A newer local name' });
    const newerDraft = structuredClone(draftForBackup); newerDraft.notes = 'Newer local draft'; await art.saveDrawingDraft(owner, newerDraft, second.id);
@@ -60,6 +64,7 @@ const { chromium } = require('playwright');
    await rejects(() => art.drawing(owner, original.id), 'cross-profile original lookup denied');
    await rejects(() => art.rigById(owner, first.id), 'cross-profile version lookup denied');
    const imported = await art.importArtBundle(owner, JSON.stringify(bundle));
+   check(imported.drawings[0].semantic==='moon rover'&&imported.drawings[0].category==='vehicle','copied asset retains optional child metadata');
    check(imported.drawings[0].owner === owner && imported.drawings[0].id !== original.id && imported.drawings[0].sha256 === original.sha256, 'import remaps owner and identifiers while preserving image hash');
    check(imported.rigs.find(rig => rig.id === imported.rigIds[second.id]).parentId === imported.rigIds[first.id] && imported.rigs.every(rig => rig.assembly.sourceId === imported.drawingIds[original.id]), 'import remaps all source and history references');
    check(await art.activeRig(owner) === null, 'import does not silently choose a car');
@@ -115,6 +120,16 @@ const { chromium } = require('playwright');
    check((await art.artUsages(owner, stale.id)).length === 0, 'valid source workspace disproves obsolete scene index rows');
    await art.deleteArtwork(owner,stale.id); localStorage.removeItem('family-game-factory-creation-v1');
    const source = await art.saveDrawing(owner, 'Source with derivative', file), derivative = await art.saveDrawing(owner, 'Separate crop', file, source.id);
+   const picturePin='art:image:'+derivative.id+':'+derivative.sha256;
+   const adventure={title:'Pebble parade',actors:[{id:'pebble',assetId:picturePin,role:'collectible'}],
+    programs:[{actorId:'pebble',actions:[{type:'repeat',actions:[{type:'move'}]}]}],
+    world:{backdrop:picturePin,decorations:[{assetId:picturePin}]}};
+   localStorage.setItem('family-game-factory-creation-v1',JSON.stringify({projects:[{id:'parade',owner}],revisions:[{projectId:'parade',scene:adventure}],drafts:[]}));
+   const uses=await art.artUsages(owner,source.id,true);
+   check(uses.length===1 && uses[0].title==='Pebble parade' && ['animation','world background','world decoration','collectible'].every(role=>uses[0].contexts.includes(role)),
+    'where it plays combines exact pins in child roles, animations and world layers across the picture family');
+   check((await art.artUsages(owner,source.id)).length===0,'an asset family usage never changes the exact revision it describes');
+   localStorage.removeItem('family-game-factory-creation-v1');
    await rejects(() => art.deleteArtwork(owner, source.id), 'original cannot be erased while a derivative depends on it');
    await art.deleteArtwork(owner, derivative.id); await art.deleteArtwork(owner, source.id);
    check((await art.drawings(owner)).length === 0, 'unused derivative then original can be explicitly erased');

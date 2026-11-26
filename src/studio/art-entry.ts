@@ -2,14 +2,13 @@ import {setIconLabel} from '../brand/icons';
 import './art-entry.css';
 
 interface ArtEntryOptions {
-  homeAction: HTMLElement;
-  libraryTools: HTMLElement;
+  chooseGameArt(): void;
   open(): void;
 }
 
 /** Keep each entrance on the same guarded Art Studio route. The wider menu
  * can call that route without owning a second library or upload handler. */
-export function installArtEntryPoints({homeAction,libraryTools,open}:ArtEntryOptions){
+export function installArtEntryPoints({chooseGameArt,open}:ArtEntryOptions){
   const byId=(id:string)=>document.getElementById(id)!;
   const button=(id:string,label:string,className='studio-button')=>{
     const element=document.createElement('button');
@@ -21,7 +20,7 @@ export function installArtEntryPoints({homeAction,libraryTools,open}:ArtEntryOpt
   byId('page-creations').querySelector('.page-head')!.append(button('collectionArtStudio','My Art'));
 
   const picture=button('studioUseDrawing','Use my picture');
-  picture.setAttribute('aria-label','Use my picture in My Art');
+  picture.onclick=chooseGameArt;
   const composer=byId('studioExtraTools'),gameHelp=byId('studioHelp');
   gameHelp.after(picture);
   return {
