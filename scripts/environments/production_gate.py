@@ -2,6 +2,7 @@
 """Protected release intake. Read-only GitHub lookups; artifacts are data, never code."""
 
 import argparse
+import base64
 import hashlib
 import json
 import os
@@ -17,6 +18,7 @@ import zipfile
 import ci_evidence
 import github as gh
 import release as manifest
+import retained_pages
 
 ROOT = Path(__file__).resolve().parents[2]
 # The two controllers have separate contracts and both have a release.py.
@@ -148,10 +150,16 @@ def receipt(api, row, name="receipt.json"):
     return json_bytes(data), hashlib.sha256(data).hexdigest()
 
 
-def pages_ref(record):
+def pages_ref(record, *, recovery=False):
+    extra = ("retainedInventorySha256",) if recovery and "retainedInventorySha256" in record else ()
+    if extra:
+        require(
+            record.get("sourceSha") == retained_pages.SOURCE and matches(record[extra[0]], manifest.HASH),
+            "Invalid original household recovery",
+        )
     keys(
         record,
-        ("sourceSha", "workflowSha", "runId", "artifactId", "archiveSha256", "policySha256"),
+        ("sourceSha", "workflowSha", "runId", "artifactId", "archiveSha256", "policySha256", *extra),
         "Pages preparation",
     )
     positive(record["runId"])
@@ -239,7 +247,14 @@ def validate(record):
     chain = record["supplyChain"]
     keys(
         chain,
-        ("testWorkerRepositoryId", "sandboxSignerSha", "arcade", "testBuild", "testTrigger"),
+        (
+            "testWorkerRepositoryId",
+            "sandboxSignerSha",
+            "sandboxSourceSha",
+            "arcade",
+            "testBuild",
+            "testTrigger",
+        ),
         "supply chain",
     )
     positive(chain["testWorkerRepositoryId"])
@@ -248,7 +263,10 @@ def validate(record):
             matches(chain[name], r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}"),
             "Invalid TEST Cloud Build identity",
         )
-    require(matches(chain["sandboxSignerSha"], manifest.SHA), "Invalid sandbox signer")
+    require(
+        all(matches(chain[k], manifest.SHA) for k in ("sandboxSignerSha", "sandboxSourceSha")),
+        "Invalid sandbox source or signer",
+    )
     require(
         isinstance(chain["arcade"], dict) and chain["arcade"].get("sourceHeadSha") == m["sourceSha"],
         "Missing full CI identity",
@@ -270,7 +288,7 @@ def validate(record):
         m["worker"]["test"]["sandboxImage"] == m["worker"]["production"]["sandboxImage"],
         "Production sandbox differs from qualified TEST digest",
     )
-    pages_ref(recovery["pages"])
+    pages_ref(recovery["pages"], recovery=True)
     pages_ref(record["pages"])
     require(record["pages"]["sourceSha"] == m["sourceSha"], "Pages release source differs")
     ci_evidence.timestamp(record["expiresAt"])
@@ -309,7 +327,13 @@ def evidence(api, record):
     verified_ci = ci_evidence.verify_full_ci(api, source, "release")
     require(verified_ci == record["supplyChain"]["arcade"], "Full Arcade evidence changed")
     fp = runs["frontend"]
-    run_and_jobs(api, fp, TEST, source, ["integrated-test-frontend"])
+    run_and_jobs(
+        api,
+        fp,
+        TEST,
+        source,
+        ["integrated-test-serving", "integrated-test-frontend", "integrated-test-final-observation"],
+    )
     row = metadata(api, fp, f"integrated-test-frontend-{fp}-1", source)
     front, _ = receipt(api, row, "frontend.json")
     require(
@@ -323,12 +347,16 @@ def evidence(api, record):
         and digest(front["files"]) == front["frontendSha256"] == m["frontend"]["sha256"],
         "TEST frontend changed",
     )
+    lane_hashes = {}
+    targets = set()
     for name, job, prefix in (
         ("uat", "integrated-test-uat", "integrated-test-uat"),
         ("live", "integrated-test-live", "integrated-test-live"),
     ):
         run = runs[name]
-        run_and_jobs(api, run, TEST, source, [job, "integrated-test-final-observation"])
+        run_and_jobs(
+            api, run, TEST, source, ["integrated-test-serving", job, "integrated-test-final-observation"]
+        )
         observed, raw_hash = receipt(api, metadata(api, run, f"{prefix}-{run}-1", source))
         expected = m["evidence"][name]
         require(
@@ -342,8 +370,50 @@ def evidence(api, record):
             == {role: f"{TEST_REGISTRY}/{role}@" + m["backends"][role].split("@")[1] for role in ORDER},
             "TEST serving configuration or runtime image changed",
         )
+        lane_hashes["fixture" if name == "uat" else "live"] = observed["observedConfigurationSha256"]
+        require(
+            matches(observed.get("targetSha256"), manifest.HASH)
+            and matches(observed["observedConfigurationSha256"], manifest.HASH),
+            "Missing TEST target observation",
+        )
+        targets.add(observed["targetSha256"])
+        chain = record["supplyChain"]
+        require(
+            observed.get("testWorker") == m["worker"]["test"]
+            and observed.get("sandboxSignerSha") == chain["sandboxSignerSha"]
+            and observed.get("sandboxSourceSha") == chain["sandboxSourceSha"]
+            and observed.get("testWorkerRepositoryId") == str(chain["testWorkerRepositoryId"]),
+            "TEST receipt uses a different worker or sandbox provenance",
+        )
+        if name == "live":
+            require(
+                matches(observed.get("settlementSha256"), manifest.HASH)
+                and type(observed.get("repairAttempts")) is int
+                and observed["repairAttempts"] > 0,
+                "Live repair or financial settlement absent",
+            )
         if name == "uat":
-            require(observed.get("testWorker") == m["worker"]["test"], "TEST worker changed")
+            execution = observed.get("workerExecution")
+            require(
+                isinstance(execution, list) and len(execution) == 2, "Two private execution proofs required"
+            )
+            for proof in execution:
+                keys(
+                    proof,
+                    ("runId", "artifactId", "archiveSha256", "executionSha256"),
+                    "verified private run",
+                )
+                require(
+                    all(matches(proof[k], r"[1-9][0-9]{0,19}") for k in ("runId", "artifactId"))
+                    and all(matches(proof[k], manifest.HASH) for k in ("archiveSha256", "executionSha256")),
+                    "Unverified private execution",
+                )
+            require(
+                all(
+                    len({p[k] for p in execution}) == 2 for k in ("runId", "artifactId", "executionSha256")
+                ),
+                "Duplicate private execution",
+            )
             recovery = observed.get("recovery")
             keys(
                 recovery,
@@ -351,6 +421,12 @@ def evidence(api, record):
                 "deployed recovery",
             )
             require(all(matches(v, manifest.HASH) for v in recovery.values()), "Recovery was not exercised")
+    require(
+        len(targets) == 1
+        and lane_hashes["fixture"] != lane_hashes["live"]
+        and digest(lane_hashes) == m["configuration"]["testSha256"],
+        "TEST fixture and funded configuration pair differs",
+    )
     require(
         0 < m["evidence"]["live"]["spendMicrousd"] <= m["evidence"]["live"]["limitMicrousd"] <= 5_000_000,
         "Funded lineage evidence missing or over ceiling",
@@ -376,6 +452,57 @@ def private_get(repo, path):
     return json_bytes(raw)
 
 
+# Independently reviewed private workflow templates from the retained production
+# overlay. Only the exact application SHA substitutions may vary.
+WORKER_TEMPLATES = {
+    "factory-private.yml": (7, "a5bbf37a413ca5dcb9e22373b8b11ea452aa02aed20079ecec9173cafbcf4193"),
+    "factory-smoke.yml": (3, "0434501a160be9b62556e9e0d898c1c002ed73f85f9e2db276c1a58645574bcb"),
+}
+
+
+def production_worker_binding(worker, source, read, templates=WORKER_TEMPLATES):
+    for file, (count, checksum) in templates.items():
+        result = read(WORKERS, "/contents/.github/workflows/" + file + "?ref=" + worker["sourceSha"])
+        require(
+            result["type"] == "file"
+            and result["path"] == ".github/workflows/" + file
+            and result["encoding"] == "base64"
+            and type(result["size"]) is int
+            and 0 < result["size"] <= 131072,
+            "Invalid private workflow metadata",
+        )
+        body = base64.b64decode("".join(result["content"].split()), validate=True)
+        blob = hashlib.sha1(b"blob " + str(len(body)).encode() + b"\0" + body).hexdigest()
+        require(
+            len(body) == result["size"]
+            and blob == result["sha"]
+            and body.count(source.encode()) == count
+            and hashlib.sha256(body.replace(source.encode(), b"APPLICATION")).hexdigest() == checksum,
+            "Private workflow or selected application checkout changed",
+        )
+    pins = {
+        "FACTORY_PRIVATE_WORKER_SHA": worker["sourceSha"],
+        "FACTORY_SANDBOX_IMAGE": worker["sandboxImage"],
+    }
+    for name, value in pins.items():
+        result = read(WORKERS, "/actions/variables/" + name)
+        require(
+            result.get("name") == name and result.get("value") == value, "Private worker settings drifted"
+        )
+    for environment in (
+        "factory-generation",
+        "factory-sandbox",
+        "factory-quality",
+        "factory-infrastructure",
+    ):
+        rows = read(WORKERS, "/environments/" + environment + "/variables?per_page=100")
+        require(
+            len(rows["variables"]) == rows["total_count"]
+            and all(r["value"] == pins[r["name"]] for r in rows["variables"] if r["name"] in pins),
+            "Environment overrides the reviewed worker setting",
+        )
+
+
 def runtime_supply(record, read=private_get, execute=subprocess.run):
     m = record["manifest"]
     for lane, repo_id in (
@@ -399,6 +526,7 @@ def runtime_supply(record, read=private_get, execute=subprocess.run):
             and ref["object"]["sha"] == w["sourceSha"],
             "Worker main or execution tag changed",
         )
+    production_worker_binding(m["worker"]["production"], m["sourceSha"], read)
     retained = record["recovery"]["worker"]
     ref = read(retained["repository"], "/git/ref/tags/" + retained["executionTag"])
     require(
@@ -420,6 +548,8 @@ def runtime_supply(record, read=private_get, execute=subprocess.run):
             "--source-ref",
             "refs/heads/main",
             "--source-digest",
+            record["supplyChain"]["sandboxSignerSha"],
+            "--signer-digest",
             record["supplyChain"]["sandboxSignerSha"],
             "--deny-self-hosted-runners",
         ],
