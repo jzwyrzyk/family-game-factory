@@ -891,10 +891,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:52:09.934Z",
-      "sourceDigest": "a1b90b416f634e1267b36c2eaf22bbb2ab8b495cf0b5e2290b5fd1f3043dbe1c",
+      "reviewedAt": "2026-11-26T02:01:21.683Z",
+      "sourceDigest": "1338f8a0de6233a839f80db086c9487f181a31de005c580bb561ad9de958a093",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Real-browser regressions exercise visible counter bounds, rejected drops and the same tracked attempts through the established learning UI command.",
+      "reviewReason": "Reviewed the foundation's composed light-surface contrast and persisted unused-checkpoint exit tests together with Math's counter bounds, rejected drops, geometric models and tracked construction submissions. The same learning UI and browser commands retain their assigned CI scope.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
