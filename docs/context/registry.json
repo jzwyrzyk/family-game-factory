@@ -894,10 +894,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:07:05.195Z",
-      "sourceDigest": "13b55f506d582f6afa8a3f6100cfbb6df884f0c3813427ce6b4c51f9e2095b55",
+      "reviewedAt": "2026-11-26T03:21:39.478Z",
+      "sourceDigest": "44eae5990229b9407abb742383425bdaad8aad4c5eed99859b6d29f4183d5a3c",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The new offline sketch and recovery journey joins the existing test:art-browser creative CI shard and adds no separate CI authority or provider coverage.",
+      "reviewReason": "Count the new editable-crayon browser regression in the existing creative shard. Exact command membership, complete coverage and failure-closed receipt checks still use the same policy.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
