@@ -65,3 +65,12 @@
 @media(max-width:420px){.drawing-lab{max-width:100vw;width:100vw;max-height:100dvh;border-radius:0}.dl-header{gap:10px;padding:16px 13px}.dl-header p{font-size:12px}.dl-header>button{padding:9px;min-width:44px;font-size:12px}.dl-header>button .jems-icon{display:none}.dl-main{padding:11px}.dl-steps{font-size:10px;gap:8px;padding:11px 13px}.dl-steps b{width:21px;height:21px}.dl-steps>span{gap:5px}.dl-stage-actions{gap:6px}.dl-stage-actions>button{flex:1 1 42%;font-size:12px}.dl-footer{padding:13px;font-size:11px}.drawing-paint .dp-work{padding:11px}}
 @media(pointer:coarse){.drawing-lab button{min-height:48px}.dl-stage-actions [data-go],.dl-stage-actions [data-jump]{min-width:116px;min-height:60px;font-size:15px;touch-action:none}}
 @media(prefers-reduced-motion:reduce){.drawing-lab::backdrop{backdrop-filter:none}.drawing-lab *{scroll-behavior:auto}}
+
+.drawing-paint .dp-tools label,.drawing-paint .dp-tools button,.drawing-paint .dl-canvas-help,
+.drawing-paint .dl-header p,.drawing-paint .dl-header button,.drawing-paint [data-message]{
+  font-size:var(--jems-child-label,18px);
+}
+.drawing-paint .dp-tools .dp-paper-toggle{display:flex;flex-direction:row;align-items:center;gap:10px;min-height:44px}
+.drawing-paint .dp-paper-toggle input{width:24px;min-height:24px;height:24px;accent-color:#7952c9}
+.drawing-paint [data-eraser][aria-pressed=true]{border:2px solid #7952c9;background:#eee7fa}
+.drawing-paint [data-paper].dp-transparent{background-color:white;background-image:repeating-conic-gradient(#e6e2ef 0 25%,transparent 0 50%);background-size:20px 20px}

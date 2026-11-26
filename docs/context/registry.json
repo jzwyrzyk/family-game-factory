@@ -149,10 +149,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:38:12.735Z",
-      "sourceDigest": "6925af7797920346bfc5542e781245e8f039124dca019a6962d867f334a2a400",
-      "reviewOutcome": "updated",
-      "reviewReason": "The first-creation contract now records single admission for repeated taps without changing saved-idea ownership or readiness rules.",
+      "reviewedAt": "2026-11-26T03:07:03.998Z",
+      "sourceDigest": "95691a00496eefde227dad526f8469818749046d0a2fb8396ebb9ef34eea6ad3",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The permanent authentic-artwork doctrine already specifies preservation, versioned reuse and explicit Keep. The new offline crayon editor follows those requirements.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -894,10 +894,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:23:11.824Z",
-      "sourceDigest": "5f7b1ef674e2b84dd647d329848d15cf1839bc2b621d5472752fe3445bcdc3d3",
-      "reviewOutcome": "updated",
-      "reviewReason": "Delivery state records the failed hosted Pal reload and the visible onboarding path. The exact same regression commands, assertions, rendering code and timeouts remain in force, with two new pre-navigation persistence assertions.",
+      "reviewedAt": "2026-11-26T03:21:39.478Z",
+      "sourceDigest": "44eae5990229b9407abb742383425bdaad8aad4c5eed99859b6d29f4183d5a3c",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Count the new editable-crayon browser regression in the existing creative shard. Exact command membership, complete coverage and failure-closed receipt checks still use the same policy.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1138,10 +1138,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T01:23:12.305Z",
-      "sourceDigest": "3a5ab9bfd335677e581d5e32600605a1c3cf253d9a45b9e0e271b77ea454684f",
-      "reviewOutcome": "updated",
-      "reviewReason": "Recorded the passing protected-main suite and the subsequent failed documentation-candidate Pal shard with its retained evidence and correction.",
+      "reviewedAt": "2026-11-26T03:07:06.155Z",
+      "sourceDigest": "0f06813f92e2b9a100767df63ef687efd9e63be61f4792c3852b63f9572bb2b8",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The package change registers one local artwork regression in its existing gate. Deployment identity, traffic, provider and family activation contracts remain as recorded.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1396,10 +1396,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:05:50.558Z",
-      "sourceDigest": "3519bd3b6a3b81b4fcd3a4628c1b50c54065abb8da7b3fca64a3097169ec380a",
-      "reviewOutcome": "updated",
-      "reviewReason": "Registered the shared standard and decision and updated the PR template and maintenance ownership.",
+      "reviewedAt": "2026-11-26T03:07:07.028Z",
+      "sourceDigest": "23cff545dfe6a42a928aee7f15b4c27789d28071820fab4dd93f75d7b73db3c1",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The new crayon browser fixture is routed to the existing art-studio area. The existing maintenance and evidence separation workflow still applies.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1618,13 +1618,14 @@
         "tests/art-*",
         "tests/drawing-*",
         "tests/creation-private-art*",
-        "tests/picture-tools-browser.cjs"
+        "tests/picture-tools-browser.cjs",
+        "tests/crayon-revision-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "b0021e16fa3a1ec1088b8ed9d923b951798654608b6d7ef72522c4c9bf76512e",
-      "reviewedAt": "2026-11-26T03:05:50.127Z",
+      "sourceDigest": "a4c4c6a0d0eb43bf769211198c658966f33aa95b947048348385a8f15bb892c8",
+      "reviewedAt": "2026-11-26T03:07:03.230Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Routed the shared identity, original-byte, pinning, ownership and lifecycle standard into Art Studio review.",
+      "reviewReason": "Documented the kept crayon source, checked pixel replay, immutable derivative, transparent paper and portable exact-byte recovery in ART_STUDIO.md.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
