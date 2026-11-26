@@ -315,10 +315,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:06:14.867Z",
-      "sourceDigest": "cec11c6abfe338d300c585a6b062e905a07024c747e0d3d68e5d938ab97392b5",
+      "reviewedAt": "2026-11-26T03:12:29.990Z",
+      "sourceDigest": "f67c99400e7e3adb04624a40649019007e2d3047f824780f2226c832be666198",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed workshop input now retains the exact authorized PNG and rejects embedded file details before the adult digest request.",
+      "reviewReason": "The reviewed family upload now verifies the PNG scanline count locally before digest authorization. The owner guide and architecture describe the accepted palette and exact stored bytes.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -901,10 +901,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:11:30.494Z",
-      "sourceDigest": "fbdc9555545a55850a72a2d4a3c47a3b4294b528d8e2cdc86f38ae4ba9b7fa1a",
+      "reviewedAt": "2026-11-26T03:12:33.756Z",
+      "sourceDigest": "c45bb87d4b11a6132536363dbb1721d5cc9b3799e6c91bc9265caf98bbc4e43c",
       "reviewOutcome": "updated",
-      "reviewReason": "The generated-art suite now runs a synthetic immutable-sprite slot after its existing desktop, tablet, phone and negative checks. This adds local scope, pin and revocation coverage.",
+      "reviewReason": "Reviewed beta PNG fixtures now encode actual complete rasters and cover indexed transparency, Adam7 passes, and mismatched scanline counts. The existing Chromium file input regression remains the end-to-end acceptance check.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
