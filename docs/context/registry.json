@@ -87,7 +87,9 @@
     "docs/ui-review/README.md",
     "docs/creative-universe/STANDARD.md",
     "docs/decisions/2026-11-26-connected-creative-universe.md",
-    "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md"
+    "docs/drawings/CREATIVE_ASSET_AND_WORLD_STANDARD.md",
+    "docs/creation-studio/world-art-manifest.json",
+    "docs/creation-studio/CREATIVE_ASSET_AND_WORLD_STANDARD.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -314,10 +316,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:06:14.867Z",
-      "sourceDigest": "cec11c6abfe338d300c585a6b062e905a07024c747e0d3d68e5d938ab97392b5",
+      "reviewedAt": "2026-11-26T03:15:06.005Z",
+      "sourceDigest": "f4f47cfee71b78977686f3e95aa720f603aa1fcd182b76ced56bd987284fa2a9",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed workshop input now retains the exact authorized PNG and rejects embedded file details before the adult digest request.",
+      "reviewReason": "The four Jems-owned plates, overlays and props are documented with their approval state and separate provenance in the world art contract.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -414,13 +416,15 @@
         "src/creation/**",
         "server/agent/creation-schema.ts",
         "tests/creation-*",
-        "public/art/creative-worlds/**"
+        "public/art/creative-worlds/**",
+        "docs/creation-studio/world-art-manifest.json",
+        "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "459ce51aa8724e9d12c3c1758f00dfd3f819075f05a88d16739101ce5b802393",
-      "reviewedAt": "2026-11-26T03:13:43.265Z",
+      "sourceDigest": "556b0bccfe3630c9850068e0ad3c3c60a3d59e2e635872b445426789fc055561",
+      "reviewedAt": "2026-11-26T03:15:06.595Z",
       "reviewOutcome": "updated",
-      "reviewReason": "DRAWN_PATHS documents the authored path editor, bounded motion coordinates, transactional drafts and editable move blocks used by scene playback.",
+      "reviewReason": "The scene catalogue and manifest record immutable WebP identities, scale, alpha, intended uses and matching worlds for the host renderer.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -899,10 +903,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:13:43.651Z",
-      "sourceDigest": "b98452577fa2417360f989477d26f07b810cd19877d7af6fe21c6ae0363613a1",
+      "reviewedAt": "2026-11-26T03:15:06.762Z",
+      "sourceDigest": "6796bc5ed8c8f78599f6392a9efd10a6eefee89d452f0e1f158afcde0d3f8abd",
       "reviewOutcome": "updated",
-      "reviewReason": "The crayon and scene path regression suites cover the real editor, history, archived versions, pointer cancellation and local playback.",
+      "reviewReason": "The world art suite checks all forty-eight WebP byte identities, dimensions, alpha declarations, catalogue coverage and the bundle size ceiling.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1143,10 +1147,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:13:44.066Z",
-      "sourceDigest": "c8ddc6e8fbe83007e19bee2bbd9c40b521859c62c1df33d481b2f0e93fa7c6ea",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The new crayon and scene checks extend existing package entry points and do not change service deployment, worker credentials or activation gates.",
+      "reviewedAt": "2026-11-26T03:15:06.970Z",
+      "sourceDigest": "afc3429a3eff1716069b1f4e978036c86f244c2ed5ae56a4b6ed2b7cde46f0a6",
+      "reviewOutcome": "updated",
+      "reviewReason": "The delivery record distinguishes these candidate crayon, path and catalogue capabilities from deployed activity rendering and owner artwork acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1401,10 +1405,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:13:44.414Z",
-      "sourceDigest": "f3d0a8aaa2883560534a3eba689c193c763b04798d64bc2e2560346d6adc4bae",
+      "reviewedAt": "2026-11-26T03:15:07.223Z",
+      "sourceDigest": "9949b49fee52f9382ac0c405465d30627ee3e2c0719b222034b4032eaf85978a",
       "reviewOutcome": "updated",
-      "reviewReason": "Integrated the upstream crayon revision browser route while retaining the canonical creative universe standard and prior registry ownership.",
+      "reviewReason": "The registry retains the shared creative standard, compatibility link and both incoming source routes for editable crayons and world artwork.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

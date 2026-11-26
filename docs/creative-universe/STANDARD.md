@@ -36,6 +36,8 @@ For young children, begin with visible movement choices and a single playback ac
 
 New development uses 2D sprites, layered environments and compatible physics. Artwork, light, shadows and parallax can supply depth. Preserve legacy readers, retained games and historical staging. Introduce no 3D asset conversion. Pin illustrated world editions so later scenery changes cannot silently redesign a saved adventure. Review the rendered activity with the actor visible at phone and tablet sizes. Use approved Jems environment art or new Jems-specific illustrations created independently of private work. Keep controls, text and interactive subjects readable against the actual plate. [Game presentation](../game-intelligence/PRESENTATION-QUALITY.md) · [Brand library](../brand/LIBRARY_V1_2.md)
 
+Catalogue each released illustration by immutable ID, dimensions, digest, straight or opaque alpha, intended scale, layer, allowed use and approval state. Collection 1 supplies Enchanted Gem Forest, Inventor’s Workshop, Cloud Kingdom and Moon Adventure. Each has a plate, two transparent depth layers, a preview and eight individually selectable props. Inspect the actual composed editor and playback before owner approval. [Illustration collection and provenance](../creation-studio/WORLD_ART.md)
+
 ## Generated games and privacy
 
 1. The trusted host checks the active owner, exact chosen image or design, digest, consent and intended game use. Read only that version. Stop if the owner changes or the digest fails.
