@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T16:40:45.006Z",
-      "sourceDigest": "1d530593a1468be6f32358ae39c963f515fa1527bb1238f10afa17b3cbdaa512",
+      "reviewedAt": "2026-11-26T16:42:29.984Z",
+      "sourceDigest": "b3a544d062622803235185da2d088d149447096bfba2b3b72be8895977ec2512",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed confirmed one-level provider nesting failure, exact anchored service filter and new-image qualification requirement; preserved all scope/IAM boundaries, original DEV/TEST plan and no-delete/no-archive gates; recorded latest administrator recovery and registered recovery-worktree discovery.",
+      "reviewReason": "Reviewed final staged filter-equivalence tests and all changed delivery sources: depth-one filter, original-image mismatch guard, grouped replacement build references, registered recovery-worktree discovery and source-bound build approval; reconciled current setup instructions and dated ledger.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
