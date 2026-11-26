@@ -1,5 +1,7 @@
 # Creation Studio acceptance evidence
 
+In graphical First steps, the Jump character and upward arrow need a visible gap in the palette and in the saved sequence. The learner browser suite measures their separation at each viewport. [Rendered control](evidence/worlds/jump-control.png)
+
 ## Illustrated environments and world building · November 26, 2026
 
 The integrated editor keeps versioned illustrated world layers, selected objects and private backdrops with each scene revision. Desktop, tablet and phone Chromium captures cover actual fitted canvases and editing controls. [Qualification and screenshots](evidence/worlds/README.md) · [World art manifest](world-art-manifest.json)

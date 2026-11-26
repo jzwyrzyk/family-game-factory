@@ -2,6 +2,8 @@
 
 The reconciled implementation is based on PR #207 at `4be7c6dd70b588cfbd288cc8d7a68fe94d9ae37c`. The catalogue, crayon source and authored-path format are inherited from that branch. The world picker extends its owner-scoped private art dialog. The visual baseline is protected application commit `bc602f1ede502f398308ad56f973c4bf7997ff08`. The before images show its blank starter. The after images show actual selected scenes in the same viewport sizes. Each world tile creates a project that can be edited, played, kept, copied and reopened.
 
+The graphical Jump button and its program step place the character to the left of the arrow. Chromium measured a four-pixel gap at desktop, tablet and phone widths, including 320 pixels. [Jump button close-up](jump-control.png)
+
 | Local Chromium viewport | Protected baseline | Integrated activity | World picker |
 | --- | --- | --- | --- |
 | Desktop, 1440 × 960 | [Before](before-desktop.jpg) | [Enchanted Gem Forest](after-desktop.jpg) | [Desktop tiles](world-picker-desktop.jpg) |

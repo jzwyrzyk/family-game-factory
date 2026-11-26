@@ -423,10 +423,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "cd9653f54e491ad2f89304c996ddfbfb90db107ee393272b3357181681dfa736",
-      "reviewedAt": "2026-11-26T03:29:09.502Z",
+      "sourceDigest": "578c28b5e183849f660ab24bc3ec7fd9c2febcfff90ffc82b1443bd0f6bf28d0",
+      "reviewedAt": "2026-11-26T03:56:04.454Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The reduced-motion portrait toolbar preserves the fixed scene and visible Step control at 768x1024. The rendered evidence index includes the corrected layout and build digests.",
+      "reviewReason": "Recorded the graphical Jump control spacing requirement and refreshed the actual phone, tablet and desktop inspection evidence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -905,10 +905,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:25:10.586Z",
-      "sourceDigest": "241c6b1eb2baa3547f7028a0500c8f2acda2d56c562f009b01521b2c69acd456",
-      "reviewOutcome": "updated",
-      "reviewReason": "World pixel, classic scene, hit, reuse and offline browser checks are included in the creative shard alongside crayon and drawn-path journeys. The evidence index records their rendered scope.",
+      "reviewedAt": "2026-11-26T03:56:04.617Z",
+      "sourceDigest": "d405ff0d5080b3d1ded76132600d19c839ede8c27da0c0776bad949b01ac754f",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The existing learner layout suite adds one geometry assertion for Jump. Its existing viewport, execution and release coverage remain applicable.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -334,8 +334,11 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
 }
 
 .creation-action-pose img{display:none}
-[data-graphical=true] .creation-action-pose{position:relative;display:inline-block;width:1.1em;height:1em;text-align:right}
-[data-graphical=true] .creation-action-pose img{display:block;position:absolute;left:-.15em;bottom:0;width:1em;height:1em;object-fit:contain;pointer-events:none}
+[data-graphical=true] .creation-action-pose img{display:block;width:1em;height:1em;object-fit:contain;pointer-events:none}
+[data-graphical=true] .creation-pose-jump{display:inline-flex;align-items:center;gap:4px;flex:none}
+[data-graphical=true] .creation-jump-arrow{font-size:.65em}
+[data-graphical=true] .creation-pose-dance{position:relative;display:inline-block;width:1.1em;height:1em;text-align:right}
+[data-graphical=true] .creation-pose-dance img{position:absolute;left:-.15em;bottom:0}
 @media(prefers-reduced-motion:no-preference){
  [data-graphical=true] button:focus-visible .creation-pose-jump img{animation:creation-small-hop .55s ease-out}
  [data-graphical=true] button:focus-visible .creation-pose-dance img{animation:creation-small-dance .6s ease-in-out}
