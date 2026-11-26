@@ -310,10 +310,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:45:20.619Z",
-      "sourceDigest": "47252f4893832a8830dfedcd10360acefc30e9cdb3ebd7c5ae12c8d92ccf833d",
+      "reviewedAt": "2026-11-26T02:24:59.146Z",
+      "sourceDigest": "30091ef9102ebb53feba6eda4be3ea2064e1d5eb16cb578a5a0a42631bff0efe",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Math layouts now reuse the brand palette and child target sizes. The approved brand library, touch conventions and asset source selections still apply.",
+      "reviewReason": "The native checkpoint keeps its documented viewport overlay in the original Arcade and fitted-stage overlay in Studio for both the existing Language activity and the shared workspace. Only the selector for the transitional renderer changes; exit, assessment, profile and game lifecycle contracts are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
