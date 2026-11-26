@@ -1,3 +1,4 @@
+import {mountCreativePicker} from '../assets/creative-picker';
 import { createPalPortrait } from '../pals/ui';
 import {earlySoundMuted} from '../learning/early/audio';
 import {profileGrade} from '../learning/engine';
@@ -15,7 +16,7 @@ import { publishSourceEvidence } from '../problem-solving/signals';
 import { createIcon, iconMarkup, setIconLabel, type IconName } from '../brand/icons';
 import {rewardSourceWritable} from '../rewards/write-guard';
 import { createGuideCard, type GuideHost } from '../studio/guide-card';
-import {PrivateArtResolver,artChoice,listArtChoices,privateArtReferences,exportSceneArt,importSceneArt,type ArtSelection,type ResolvedPrivateArt} from './private-art';
+import {PrivateArtResolver,artChoice,privateArtReferences,exportSceneArt,importSceneArt,type ArtSelection,type ResolvedPrivateArt} from './private-art';
 import {ART_LIMITS,registerArtUsage,releaseArtUsage} from '../drawing/library';
 import { addPalToProject, createPalPlayground, isCreationPalId, type CreationPalId } from '../pals/creation';
 import { palSceneAssetId, type PalForm } from '../pals/catalog';
@@ -114,7 +115,7 @@ export function installCreationStudio(host: Host) {
       <section id="creationVersions" class="creation-versions" hidden><div class="creation-shelf-heading"><h2>Saved versions</h2><button id="creationCloseHistory" class="creation-button">${iconMarkup('close')} Close</button></div><div id="creationVersionList"></div></section>
     </div>
     <input id="creationImport" type="file" accept="application/json,.json" hidden>
-    <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">${iconMarkup('close')}</button></div><div id="creationPalSlot"></div><section><div class="creation-shelf-heading"><h3>My art</h3><button id="creationOpenArtStudio" class="creation-button">${iconMarkup('edit')} My Art</button></div><p id="creationActorArtStatus" role="status"></p><div id="creationPrivateActorChoices" class="creation-actor-choices"></div></section><h3>Characters & things</h3><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
+    <dialog id="creationActorDialog" class="creation-dialog" aria-labelledby="creationActorDialogTitle"><div class="creation-shelf-heading"><h2 id="creationActorDialogTitle">Who’s joining your scene?</h2><button id="creationCloseActor" class="creation-button" aria-label="Close character picker">${iconMarkup('close')}</button></div><div id="creationPalSlot"></div><section><div class="creation-shelf-heading"><h3>My art</h3><button id="creationOpenArtStudio" class="creation-button">${iconMarkup('edit')} My Art</button></div><p id="creationActorArtStatus" role="status"></p><div id="creationPrivateActorChoices"></div></section><h3>Characters & things</h3><div id="creationActorChoices" class="creation-actor-choices"></div></dialog>`;
   document.querySelector('main')!.append(page);
   const $ = <T extends HTMLElement = HTMLElement>(id: string) => page.querySelector<T>('#' + id)!;
   const introduction=createStudioIntroduction(host.guidance,()=>shelf('landing'));
@@ -632,6 +633,19 @@ export function installCreationStudio(host: Host) {
     const box = $('creationActorSettings'); box.replaceChildren(); const actor = scene!.actors.find(a => a.id === selectedActor); if (!actor) return;
     const set = async (key: string, value: string | number) => await mutation(project => Object.assign(project.actors.find(a => a.id === actor.id)!, { [key]: value }));
     box.append(input('Name', actor.name, async value => await set('name', value.trim() || 'My character'), { maxLength: 40 }), input('Start x', actor.x, async value => await set('x', +value), { min: 0, max: scene!.width }), input('Start y', actor.y, async value => await set('y', +value), { min: 0, max: scene!.height }), input('Size', actor.size || 100, async value => await set('size', +value), { min: 20, max: 240 }));
+    if (!challengeId && parsePrivateArtId(actor.assetId)) {
+      const roles = [['','Choose a role'],['character','Character'],['decoration','Decoration'],['scenery','Scenery'],['obstacle','Obstacle'],['collectible','Collectible']];
+      const label = node('label','creation-field','Role in this scene');
+      const select = node('select');
+      for (const [value,text] of roles) select.append(new Option(text,value));
+      select.value = actor.creativeRole || '';
+      select.onchange = () => { void act(async () => await mutation(project => {
+        const placed = project.actors.find(item => item.id === actor.id)!;
+        if (select.value) placed.creativeRole = select.value as typeof actor.creativeRole;
+        else delete placed.creativeRole;
+      })); };
+      label.append(select);box.append(label);
+    }
     const remove = iconNode('button', 'creation-text-button', 'trash', 'Remove'); remove.setAttribute('aria-label', 'Remove ' + actor.name); remove.disabled = !!challengeId || scene!.actors.length < 2;
     remove.onclick = async () => await act(async () => await mutation(project => { project.actors = project.actors.filter(a => a.id !== actor.id); project.programs = project.programs.filter(p => p.actorId !== actor.id); selectedActor = project.actors[0].id; selectedProgram = project.programs.find(p => p.actorId === selectedActor)?.id || ''; insert = null; })); box.append(remove);
     const tap = iconNode('button', 'creation-button creation-quiet', 'star', 'Try tap'); tap.id = 'creationTapActor'; tap.setAttribute('aria-label', 'Tap ' + actor.name);
@@ -966,28 +980,23 @@ export function installCreationStudio(host: Host) {
   async function renderPrivateChoices(){
     const capturedOwner=owner(),capturedView=viewEpoch,dialog=$<HTMLDialogElement>('creationActorDialog');
     const current=()=>capturedOwner===owner()&&capturedView===viewEpoch&&isCurrent()&&dialog.open;
-    const choices=$('creationPrivateActorChoices'),message=$('creationActorArtStatus');choices.replaceChildren();message.textContent='Opening your art collection…';
-    try{
-      const items=await listArtChoices(capturedOwner,current);if(!current())return;
-      message.textContent=items.length?'Choose an original or a saved cutout. Its artwork stays linked to this exact version.':'Your drawings can join this scene. Add one in My Art.';
-      for(const item of items){
-        const choice=node('button','creation-character-choice');choice.type='button';choice.dataset.privateArt=item.assetId;
-        choice.append(art(item.assetId),node('strong','',item.label),node('small','',item.detail));
-        choice.onclick=()=>actAsync(async()=>{
-          assertEditing();choice.disabled=true;
-          try{
-            const resolved=await privateArt.load(item.assetId);if(!current())return;
-            await mutation(project=>{
-              const actor={id:uid(),assetId:item.assetId,name:item.label,x:400,y:300,size:140,visible:true};project.actors.push(actor);
-              const program={id:uid(),actorId:actor.id,trigger:{type:'tap' as const},actions:[]};project.programs.push(program);selectedActor=actor.id;selectedProgram=program.id;insert=null;
-            });
-            indexSceneArt(entryId,capturedOwner,[resolved]);
-            dialog.close();status('Your own art is in the scene. Add blocks to tell it what to do.');
-          }finally{if(current())choice.disabled=false;}
-        });
-        choices.append(choice);
-      }
-    }catch(error){if(current())message.textContent=(error as Error).message;}
+    const choices=$('creationPrivateActorChoices');
+    $('creationActorArtStatus').textContent='';
+    const picker=mountCreativePicker(choices,capturedOwner,current,async item=>{
+      assertEditing();
+      const resolved=await privateArt.load(item.assetId);if(!current())return;
+      await mutation(project=>{
+        const actor={id:uid(),assetId:item.assetId,name:item.label,x:400,y:300,size:140,visible:true};
+        project.actors.push(actor);
+        const program={id:uid(),actorId:actor.id,trigger:{type:'tap' as const},actions:[]};
+        project.programs.push(program);selectedActor=actor.id;selectedProgram=program.id;insert=null;
+      });
+      if(!current())return;
+      indexSceneArt(entryId,capturedOwner,[resolved]);
+      dialog.close();status('Your own art is in the scene.');
+    });
+    dialog.addEventListener('close',()=>picker.dispose(),{once:true});
+    await picker.ready;
   }
   $('creationAddActor').onclick = async () => await act(async () => { assertEditing(); renderActorChoices(); $<HTMLDialogElement>('creationActorDialog').showModal();void await renderPrivateChoices(); });
   $('creationOpenArtStudio').onclick=async ()=>await act(async ()=>{assertEditing();await saveVersion();if(FG.artStudio?.open){$<HTMLDialogElement>('creationActorDialog').close();FG.artStudio.open();}else $('creationActorArtStatus').textContent='My Art is still opening. Try again in a moment.';});

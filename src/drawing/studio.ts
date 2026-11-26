@@ -1,3 +1,4 @@
+import {matchesArtSearch} from '../assets/creative-identity';
 import {drawing,drawingPage,drawingBlob,saveDrawing,updateDrawing,deleteArtwork,type Drawing,type DrawingCategory} from '../assets/private-drawings';
 import {artUsages,ART_LIMITS,type DrawingMetadata} from './library';
 import {listRigs,loadDrawingDraft,type SavedRig} from './store';
@@ -60,7 +61,7 @@ export function installArtStudio(host:Host){
   }
   function renderGrid(){
     release();const grid=$('artGrid');grid.replaceChildren();const query=$<HTMLInputElement>('artSearch').value.trim().toLowerCase();
-    const found=items.filter(item=>Boolean(item.archived)===archive&&(category==='all'||(item.category??'other')===category)&&(!query||item.name.toLowerCase().includes(query)));
+    const found=items.filter(item=>Boolean(item.archived)===archive&&(category==='all'||(item.category??'other')===category)&&matchesArtSearch(item,query));
     $('artCount').textContent=String(total);
     $('artEmpty').hidden=found.length>0;
     $('artEmpty').querySelector('h3')!.textContent=archive?'Your archived art':items.length?'No art matches yet.':'Your ideas belong here.';
@@ -85,7 +86,8 @@ export function installArtStudio(host:Host){
     const preview=node('div','art-detail-image art-checker'),img=node('img');img.src=imageUrl(item);img.alt=item.name;preview.append(img);pane.append(preview);
     const metadata=node('form','art-metadata'),label=node('label','','Name'),name=node('input');name.value=item.name;name.maxLength=60;name.setAttribute('aria-label','Artwork name');label.append(name);
     const kindLabel=node('label','','Collection'),kind=node('select');kind.setAttribute('aria-label','Artwork collection');for(const [key,text]of Object.entries(categories)){const option=node('option','',text);option.value=key;kind.append(option);}kind.value=item.category??'other';kindLabel.append(kind);
-    const metadataSave=button('Save details','check',async()=>{await updateDrawing(captured,id,{name:name.value,category:kind.value as DrawingCategory},()=>current(captured,run));if(!current(captured,run)||!await refresh())return;status('Artwork details saved.');notify(captured);});metadata.append(label,kindLabel,metadataSave);metadata.onsubmit=e=>{e.preventDefault();metadataSave.click();};pane.append(metadata);
+    const subjectLabel=node('label','','What is it?'),subject=node('input');subject.maxLength=60;subject.value=item.semanticIdentity||'';subject.placeholder='Anything you imagine';subjectLabel.append(subject);
+    const metadataSave=button('Save details','check',async()=>{await updateDrawing(captured,id,{name:name.value,category:kind.value as DrawingCategory,semanticIdentity:subject.value},()=>current(captured,run));if(!current(captured,run)||!await refresh())return;status('Artwork details saved.');notify(captured);});metadata.append(label,kindLabel,subjectLabel,metadataSave);metadata.onsubmit=e=>{e.preventDefault();metadataSave.click();};pane.append(metadata);
     const versions=rigs.filter(r=>r.assembly.sourceId===id),versionLabel=node('label','art-version-label','Movement version'),choice=node('select');choice.id='artVersion';choice.setAttribute('aria-label','Movement version');
     const original=node('option','','Original picture');original.value='';choice.append(original);
     for(const [i,rig]of versions.entries()){const count=rig.assembly.pieces.length,option=node('option','',`${versions.length-i} · ${rig.assembly.kind} · ${count} ${count===1?'part':'parts'}`);option.value=rig.id;choice.append(option);}if(versions.length)choice.value=versions[0].id;versionLabel.append(choice);pane.append(versionLabel);

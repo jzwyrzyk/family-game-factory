@@ -1,5 +1,17 @@
 # Art Studio: draw it, develop it, reuse it
 
+## Connected creative asset picker
+
+My Art accepts an optional **What is it?** description. A child can enter “rock” or an invented word, leave the field empty, and change it later. The shelf and picker search the description and artwork names. Updating the description from any picture updates the related pictures in one owner-scoped transaction. Pinned image bytes and movement versions retain their original hashes.
+
+The trusted picker joins private picture metadata with saved movement versions in the existing local art database. A picture's oldest verified ancestor supplies its stable logical identity. Each picker result identifies the exact selected picture and optional saved movement. Parent IDs and fingerprints preserve the path back to the original. Portable copies remap those links into the importing profile. Restore uses the existing exact-ID and content checks. No database upgrade or rewriting of legacy pictures is required.
+
+Creative Studio can insert the original, an edited picture, or any retained cutout version. Search and collection filters work with touch or a keyboard. Archive hides a picture and its cutouts from new selections. An earlier scene still resolves the exact version it used. In scene settings the child can assign an optional role to their private actor. “Decoration”, “obstacle” and “collectible” describe its part in that scene. Blocks and the host's explicit mechanics control what it does.
+
+Downloading a scene with artwork includes its placed pictures, selected movement versions and their required ancestors. Unfinished drafts and unrelated movement versions stay on the device. Downloading the whole My Art library still includes those drafts and versions for recovery.
+
+[Shared catalog](../../src/assets/creative-catalog.ts) · [Picker](../../src/assets/creative-picker.ts) · [Portable art](../../src/drawing/transfer.ts)
+
 ## My Art navigation and preserved visual reference — November 25, 2026
 
 **My Art** is the canonical destination in Home and Menu → Make. The original **You drew it. Now let’s play.** heading, gem illustration, gradient panel, Upload a drawing / Take a photo / Draw here arrangement and collection remain the visual reference. Readability is improved without replacing the composition or assets. Optional picture controls in a game/scene open the same library and offer an owner-bound return to that activity. Scene links use **Creative Studio**. Original pixels, derivatives, exact references, camera/upload and private storage contracts below are unchanged. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
