@@ -927,10 +927,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T07:32:35.187Z",
-      "sourceDigest": "4811f4fc0c73d0f76f129edd657a9100050434d3e7aa76cc0c39ca49754db26b",
+      "reviewedAt": "2026-11-26T07:46:17.617Z",
+      "sourceDigest": "90049cbfe53965f251ce2d391309d0c8b20051efe48632ffd5da05e169d75d09",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the union of original leaf commands, direct-file and managed browser paths, original-asset hash verifier and two cross-subject creative owner journeys.",
+      "reviewReason": "Verified the original CI inventory and the live My Art game with a suspended second tap, one scored or supported attempt, and exact rewards.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1172,10 +1172,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T07:32:35.636Z",
-      "sourceDigest": "b3f7ba896adbfafa722c201ee0c51553b31cb477976815693a392fe981060cfd",
+      "reviewedAt": "2026-11-26T07:46:18.056Z",
+      "sourceDigest": "fd2978034817f82342bed677dbfc8ed5c0bec46819fb29259bb1377ab9ee35b8",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the independently qualified review parents and the existing frozen cloud release boundary.",
+      "reviewReason": "Reviewed the joined synthetic owner and live gameplay tests and their applicable documentation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
