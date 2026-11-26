@@ -104,9 +104,9 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     catch {saving.hidden=false;}
   }
   save();
-  function focus(node:HTMLElement){
+  function focus(node:HTMLElement, block:ScrollLogicalPosition='nearest'){
     if(!root.isConnected||!root.getClientRects().length)return;
-    node.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});
+    node.scrollIntoView({block,inline:'nearest',behavior:'instant'});
     node.focus({preventScroll:true});
   }
   function complete(outcome:LanguageResult['outcome'],independent=false){
@@ -221,7 +221,10 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     form.append(label,field,go);work.append(form);
   } else throw Error('Unsupported reviewed language interaction.');
   // Focus the question, not the input: no surprise software keyboard on tablets.
-  focus(title);
+  // When My Powers opens a question below the fold, leave room for the
+  // passage or construction controls beneath it on the first screen.
+  const initialBlock = target.closest('#page-lab') && work.getBoundingClientRect().top >= innerHeight ? 'start' : 'nearest';
+  focus(title, initialBlock);
   return {
     item,attemptId:attempt.id,focus:()=>{focus(title);return true;},
     dispose(reason:'interrupted'='interrupted'){

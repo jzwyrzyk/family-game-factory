@@ -314,10 +314,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:11:07.053Z",
-      "sourceDigest": "6e3f73f66b45405d195425db676c4a865239b24b9e5abc1ecfa0115eb0008c76",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "Legacy game navigation settles at the existing page origin before input; the established navigation contract and recorded destinations still apply.",
+      "reviewedAt": "2026-11-26T06:19:03.495Z",
+      "sourceDigest": "7404c3e1f120de98c7dfdba62bcd0e2c91265fb8be217897b6c02c473b880006",
+      "reviewOutcome": "updated",
+      "reviewReason": "My Powers resets before focusing and leaves contextual English reading content alongside the question.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -654,10 +654,10 @@
         "tests/theme-workspace.test.ts"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:46:39.434Z",
-      "sourceDigest": "d02e8f9eb76c4c124437f40672907e6315a51d47f6499a049fce8dbda94c667e",
+      "reviewedAt": "2026-11-26T06:19:03.101Z",
+      "sourceDigest": "134e9976913f85d02341be13dc708122eb49b6e680a1ba4566198a90f17ffe60",
       "reviewOutcome": "updated",
-      "reviewReason": "Eight additional skills retain their assessed base-ten route as well as their new skill-specific answer model.",
+      "reviewReason": "The active question and the start of English content are visible on normal My Powers entry; reviewed both real subject journeys and their grade-dependent question contracts.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -900,10 +900,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:51:26.044Z",
-      "sourceDigest": "ec0e1f2736bce49f351e1831bcc4e98aa1303b603c0903e8c2b2811d31e552fa",
+      "reviewedAt": "2026-11-26T06:19:04.299Z",
+      "sourceDigest": "2b49557c5a830a0fa7dd08291582d42db37ee5f6c44bd7dbdeee61a0c5498e22",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed first-painted retained game return with a held physical press across frames, two Chromium versions, original Keep/Fork and 126-version reload assertions and a pre-fix negative control.",
+      "reviewReason": "The normal-entry regression checks focus, pointer hit testing and visible passage or working area on a phone and desktop.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
