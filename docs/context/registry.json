@@ -680,10 +680,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T18:24:22.137Z",
+      "reviewedAt": "2026-11-25T22:12:44.826Z",
       "sourceDigest": "b8d5f8f52eb9183a29d58846b3f208bffb5b6f9ae00f2093b7491b7e54967b24",
       "reviewOutcome": "updated",
-      "reviewReason": "Completion records database and migration-stage diagnostics without filtering, deleting or omitting stored originals; inventory absence avoids a needless legacy creation probe.",
+      "reviewReason": "Verified the household dispatcher, private main and execution tag equality, pinned workflow checks, separate coach and disabled family activation against both repositories.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -1134,10 +1134,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-25T21:23:13.987Z",
-      "sourceDigest": "e59f705db2c5d19717d0d9e28976d7e26fb4af728f1263d6aaeaaf9f68eae1a4",
+      "reviewedAt": "2026-11-25T22:22:20.675Z",
+      "sourceDigest": "88f269e5f104f50c96fb0e878d55fb16e09c75cdf070e55a85edb426be31674a",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded 77b Security failure, independently verified passing workflows, scoped corrections and local evidence; successor exact-head hosted checks still govern review readiness, with release and real-data operations held.",
+      "reviewReason": "Recorded the verified #186 merge, its 11 successful push workflows, tree equality, PR dispositions, worker continuity and the #188 handoff.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1698,9 +1698,9 @@
       ],
       "reviewAfterDays": 30,
       "sourceDigest": "18b933d6e8a56f3b05e01944d099956324a5654bc728c3a18d0cc160908e6e86",
-      "reviewedAt": "2026-11-25T18:50:03.148Z",
+      "reviewedAt": "2026-11-25T22:12:45.294Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Rollout records capture readiness ordering, lossless exact-string and bounded quota retry for legacy recovery, preserved protected rollback and no additional capacity or deletion; benchmark pins and native WebKit evidence limits remain explicit."
+      "reviewReason": "Recorded the merged F06 source, opt-in durable workspaces, native private-copy conflicts and reviewed recovery limits."
     }
   ]
 }
