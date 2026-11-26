@@ -1,8 +1,9 @@
-import {setIconLabel} from '../brand/icons';
+import {createNumericKeypad, createScratchpad} from './workspace/support';
+import {createLearningWorkspace} from './workspace/shell';
 import {earlyInstruction} from './early/audio';
 import {mountEarlyMath} from './early/render';
 import {isEarlyGrade} from './grades';
-import { beginAttempt, finishAttempt, selectItem, submitAnswer, useHint, type Attempt } from './engine';
+import { profileGrade, beginAttempt, finishAttempt, selectItem, submitAnswer, useHint, type Attempt } from './engine';
 import type { LearnerProfile, LearningContext, LearningMode, MathItem } from './types';
 import { interactionKind, quantityPlaces, renderMathVisual } from './visuals';
 import {createReadAloudControl} from '../speech/read-aloud-control';
@@ -55,42 +56,33 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   let disposed = false, done = false, locked = false, errors = 0, hintDepth = 0;
   let completionTimer: ReturnType<typeof setTimeout> | undefined;
   const listeners = new AbortController();
-  const root = el('section','math-activity'); root.dataset.answerKind = item.answerKind; root.dataset.skillId = item.skillId;
+  const shell = createLearningWorkspace({subject:'math', grade:profileGrade(options.profile),
+    title:item.question, id:`${prefix}-question`, owner:String(options.profile.id ?? ''), gameId:options.context?.gameId,
+    signal:listeners.signal, onLeave:options.onLeave && (()=>{ if(!disposed&&!done) options.onLeave?.(); })});
+  const {root,title,feedback,helpPanel:hintPanel} = shell;
+  root.dataset.answerKind = item.answerKind; root.dataset.skillId = item.skillId;
   const early=isEarlyGrade(item.grade);root.classList.toggle('early-activity',early);
   root.dataset.mode = mode; root.dataset.attemptId = attempt.id; root.dataset.interactionKind = kind;
-  root.setAttribute('role','group'); root.setAttribute('aria-labelledby',`${prefix}-question`);
-  const title = el('h2',undefined,item.question); title.id = `${prefix}-question`; title.tabIndex = -1;
-  if(early&&options.onLeave){
-    const back=button('Back to Games','early-leave');
-    setIconLabel(back,'arrow','Back to Games','jems-icon--back');
-    back.dataset.action='leave-game';
-    back.addEventListener('click',()=>{if(!disposed&&!done)options.onLeave?.();},{signal:listeners.signal});
-    root.append(back);
-  }
-  root.append(title);
   const instruction=early?earlyInstruction(()=>item.question,String(options.profile.id),()=>!disposed&&!done&&!locked,
     mode=>{if(attempt.promptDelivery!=='grown-up')attempt.promptDelivery=mode;save();}):null;
   const questionReading = instruction??createReadAloudControl({
     text: () => [item.question,...(item.choices || []).map((choice,index) => `Option ${index+1}: ${choice.label}.`)].join(' '),
     canRead: () => !disposed && !done && !locked,
   });
-  root.append(questionReading.element);
-  // Keep the useful format instruction when this item has no construction mode.
-  if(kind==='answer'&&mode==='interaction')root.append(el('p','math-prompt','Write your answer. Hints can help.'));
-  if(item.visual)root.append(renderMathVisual(item.visual));
+  shell.header.append(questionReading.element);
+  if(item.visual)shell.stimulus.append(renderMathVisual(item.visual));
 
   const tabs = el('div','math-mode-tabs'); tabs.setAttribute('role','group'); tabs.setAttribute('aria-label','How would you like to answer?');
   const typeTab=button('Write an answer'),buildTab=button(kind==='choice'?'Choose a tile':'Build an answer');
   tabs.append(typeTab,buildTab); tabs.hidden=mode!=='both'||kind==='answer'||kind==='choice';
-  root.append(tabs);
+  shell.work.append(tabs);
   const answerArea=el('div','math-answer-area'),interactionArea=el('div','math-interaction-area');
-  root.append(answerArea,interactionArea);
-  const feedback=el('p','math-feedback'); feedback.id=options.legacyIds?'math-feedback':`${prefix}-feedback`;
-  feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');feedback.setAttribute('aria-atomic','true');
-  root.append(feedback);
+  shell.work.append(interactionArea,answerArea);
+  feedback.id=options.legacyIds?'math-feedback':`${prefix}-feedback`;
   const support=el('div','math-support-actions'),hintButton=button('Give me a hint'),showButton=button('Show me how');
-  hintButton.dataset.action='hint';showButton.dataset.action='show-solution';support.append(hintButton,showButton);root.append(support);
-  const hintPanel=el('section','math-hint');hintPanel.hidden=true;
+  hintButton.dataset.action='hint';showButton.dataset.action='show-solution';
+  support.append(hintButton,showButton);shell.footer.append(support);
+  shell.connectHelp(hintButton);
   const hintTitle=el('h3'),hintText=el('p'),helpActions=el('div','math-help-actions');
   const hintReading=createReadAloudControl({text:()=>hintTitle.textContent+'. '+hintText.textContent,
     label:'Read the help',canRead:()=>!disposed&&!done&&!locked&&!hintPanel.hidden});
@@ -103,7 +95,7 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   const helpAnnouncement=el('div','math-sr-only');helpAnnouncement.dataset.mathAnnouncement='help';
   helpAnnouncement.setAttribute('role','status');helpAnnouncement.setAttribute('aria-live','polite');helpAnnouncement.setAttribute('aria-atomic','true');
   root.append(helpAnnouncement);
-  root.append(hintPanel);
+
   const saveWarning=el('p','math-save-warning','This device could not save your practice. Ask a grown-up before closing this page.');
   saveWarning.hidden=true;saveWarning.setAttribute('role','alert');root.append(saveWarning);
   target.replaceChildren(root);
@@ -126,7 +118,7 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     node.focus({preventScroll:true});return document.activeElement===node;
   }
   function focusQuestion() {
-    if(done||!reveal(root,'start'))return false;
+    if(done||!reveal(title,'nearest'))return false;
     title.focus({preventScroll:true});return document.activeElement===title;
   }
   function returnToAnswer() {
@@ -143,6 +135,7 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   function complete(outcome:MathActivityResult['outcome'], independent=false) {
     if(disposed||done)return;
     done=true;locked=true;stopReading();
+    listeners.abort();questionReading.dispose();hintReading.dispose();
     if(completionTimer)clearTimeout(completionTimer);
     finishAttempt(options.profile,attempt.id,outcome==='shown'?'shown':'completed');save();
     root.querySelectorAll<HTMLButtonElement|HTMLInputElement>('button,input').forEach(node=>node.disabled=true);
@@ -152,12 +145,12 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     if(disposed||done||locked)return;
     hintDepth=Math.max(hintDepth,item.hints.length+1);
     useHint(options.profile,attempt.id,hintDepth);save();
-    presentHelp('Let’s work it out together',item.workedExample);
+    shell.setHelpState(true);presentHelp('Let’s work it out together',item.workedExample);
     const visual=item.hints.at(-1)?.visual;
     if(visual)hintPanel.append(renderMathVisual(visual));
     const continueButton=button('Continue playing','math-primary');continueButton.dataset.action='continue-supported';
     on(continueButton,'click',()=>complete('shown',false));helpActions.prepend(continueButton);hintPanel.append(helpActions,hintReading.element);
-    feedback.textContent='You can use this example. We’ll try a related idea another time.';feedback.dataset.state='support';
+    shell.setFeedback('support', 'Try this idea next time.');
     hintButton.disabled=true;showButton.disabled=true;
     helpAnnouncement.textContent='';focusAndReveal(hintTitle,'start');
   }
@@ -165,7 +158,7 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
     if(disposed||done||locked)return;
     if(hintDepth>=item.hints.length){showWorked();return;}
     const hint=item.hints[hintDepth++];useHint(options.profile,attempt.id,hintDepth);save();
-    presentHelp(`Hint ${hintDepth} of ${item.hints.length}`,hint.text);
+    shell.setHelpState(false);presentHelp(`Hint ${hintDepth} of ${item.hints.length}`,hint.text);
     if(hint.visual)hintPanel.append(renderMathVisual(hint.visual));
     hintPanel.append(helpActions,hintReading.element);
     hintButton.textContent=hintDepth<item.hints.length?'Another hint':'Show how to finish';
@@ -175,16 +168,16 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   function submit(raw:string) {
     if(disposed||done||locked||instruction&&!instruction.ready())return;stopReading();
     const result=submitAnswer(options.profile,attempt.id,raw);save();
-    if(!result.valid){feedback.dataset.state='input';feedback.textContent=result.message||'Enter an answer, then check it.';return;}
+    if(!result.valid){shell.setFeedback('input',result.message||'Enter an answer, then check it.');return;}
     if(result.correct){
-      locked=true;feedback.dataset.state='correct';
+      locked=true;
       const independent=result.attempt.independent;
-      feedback.textContent=independent?'That works!':'You worked it out with help. That counts as practice.';
+      shell.setFeedback('correct', independent?'That works!':'You worked it out!');
       root.querySelectorAll<HTMLButtonElement|HTMLInputElement>('button,input').forEach(node=>node.disabled=true);
       completionTimer=setTimeout(()=>complete('completed',independent),450);
       return;
     }
-    errors++;feedback.dataset.state='incorrect';feedback.textContent='Not quite yet. Let’s look at a useful step.';
+    errors++;shell.setFeedback('incorrect','Try another way.');
     if(options.challenge && !early){complete('incorrect',false);return;}
     if(errors>=3){showWorked();return;}
     if(options.profile.hints!==false)revealHint();
@@ -196,15 +189,22 @@ export function mountMathActivity(target: HTMLElement, options: MathActivityOpti
   input.type='text';input.autocomplete='off';input.spellcheck=false;input.maxLength=80;
   input.inputMode=item.answerKind==='number'?'decimal':item.answerKind==='fraction'?'text':'text';
   input.setAttribute('aria-describedby',feedback.id);input.setAttribute('aria-label','Math answer');
-  input.placeholder=item.answerKind==='fraction'?'e.g. 1/2':item.answerKind==='text'?'Your answer':'Answer';
-  const inputLabel=el('label',undefined,item.answerKind==='fraction'?'Write a fraction, like 1/2':item.unit?`Your answer (${item.unit})`:'Your answer');inputLabel.htmlFor=input.id;
+  input.placeholder='';
+  const inputLabel=el('label',undefined,item.answerKind==='fraction'?'Your fraction':item.unit?`Your answer (${item.unit})`:'Your answer');inputLabel.htmlFor=input.id;
   const submitButton=button('Check answer','math-primary');submitButton.id=options.legacyIds?'math-submit':`${prefix}-submit`;submitButton.type='submit';
-  if(early){mountEarlyMath(form,item,submit);}
+  if(early){mountEarlyMath(form,item,submit,options.context?.gameId);}
   else if(item.answerKind==='choice'&&item.choices?.length){
     const choices=el('div','math-choice-grid');choices.setAttribute('role','group');choices.setAttribute('aria-label','Answer choices');
     for(const choice of item.choices){const tile=button(choice.label);tile.dataset.value=choice.value;on(tile,'click',()=>{choices.querySelectorAll('button').forEach(node=>node.setAttribute('aria-pressed',String(node===tile)));submit(choice.value);});choices.append(tile);}
     form.append(choices);input.hidden=true;submitButton.hidden=true;
-  }else form.append(inputLabel,input,submitButton);
+  }else {
+    form.append(inputLabel,input,submitButton);
+    if(item.answerKind==='number'||item.answerKind==='fraction') {
+      const pad=createNumericKeypad(input,item.answerKind,listeners.signal);
+      form.append(pad);
+    }
+  }
+  if(!early && !options.challenge) shell.tools.append(createScratchpad(listeners.signal));
   on(form,'submit',event=>{event.preventDefault();submit(input.value);});answerArea.append(form);
 
   if(kind==='quantity') {

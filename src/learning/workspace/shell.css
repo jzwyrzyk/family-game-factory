@@ -1,0 +1,105 @@
+.learning-workspace {
+  --workspace-target: 58px;
+  --workspace-action: var(--jems-action-purple, #7136c9);
+  --workspace-accent: var(--jems-purple, #8b5cf6);
+  --workspace-tint: #f2edff;
+  --workspace-edge: #b3a2d6;
+  --workspace-ink: var(--jems-ink, #0b1e3b);
+  box-sizing: border-box;
+  display: flex; flex-direction: column;
+  container-type: inline-size;
+  width: min(100%, 1080px);
+  min-width: 0;
+  margin: auto;
+  padding: clamp(16px, 3.3vw, 42px);
+  color: var(--workspace-ink);
+  color-scheme: light;
+  background: var(--jems-cloud, #fff7ee);
+  border-radius: var(--jems-radius-lg, 21px);
+  box-shadow: var(--jems-shadow-card, 0 7px 22px #0b1e3b0c);
+  font: 500 20px/1.45 var(--jems-body, system-ui, sans-serif);
+  overflow-wrap: anywhere;
+  text-align: start;
+}
+.learning-workspace[data-subject="language"] {
+  --workspace-action: var(--jems-success-ink, #0b634c);
+  --workspace-accent: var(--jems-coral, #ff5e7a);
+  --workspace-tint: #e1f6ed;
+  --workspace-edge: #89b4a7;
+}
+.learning-workspace[data-band="early"] { --workspace-target: 72px; }
+.learning-workspace[data-band="upper"] { --workspace-target: 50px; }
+.learning-workspace *, .learning-workspace *::before, .learning-workspace *::after { box-sizing: border-box; }
+.learning-workspace [hidden], .learning-workspace :is(.workspace-feedback,.workspace-stimulus,.workspace-tools,.workspace-pal,.workspace-footer):empty { display: none !important; }
+.workspace-header,.workspace-footer,.workspace-header .jems-read-aloud { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.workspace-header { order: -1; justify-content: space-between; }
+.workspace-header .jems-read-aloud { margin: 0 0 0 auto; }
+.workspace-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: clamp(12px, 2vw, 24px) 0; }
+.learning-workspace .workspace-question {
+  color: var(--workspace-ink);
+  font: 780 clamp(24px, 3.6vw, 40px)/1.17 var(--jems-round, system-ui, sans-serif);
+  letter-spacing: -.025em; text-align: start; margin: 0; max-width: 40ch;
+}
+.workspace-pal { flex: none; width: clamp(54px, 9vw, 104px); }
+.workspace-pal img { display: block; width: 100%; height: auto; object-fit: contain; }
+[data-band="upper"] .workspace-pal { max-width: 60px; }
+.workspace-desk { display: grid; gap: 12px; align-items: start; }
+.workspace-task { min-width: 0; padding: clamp(12px, 3vw, 32px); border-radius: 20px; background: #fff; }
+.workspace-stimulus:not(:empty) { margin-block-end: 14px; }
+.workspace-tools { min-width: 0; }
+.workspace-footer { margin-block-start: 14px; }
+.learning-workspace :where(button, summary) {
+  display: inline-flex; justify-content: center; align-items: center; gap: 6px;
+  min-height: 44px; min-width: 44px; max-width: 100%; padding: 8px 14px;
+  font: 700 18px/1.22 var(--jems-body, system-ui, sans-serif); text-transform: none;
+  border: 1.5px solid var(--workspace-edge); border-radius: 14px;
+  background: white; color: var(--workspace-ink); cursor: pointer; touch-action: manipulation;
+}
+.learning-workspace :is(input,textarea,select) { font: inherit; color: var(--workspace-ink); background: #fff; }
+.learning-workspace :where(button, summary):hover { border-color: var(--workspace-action); }
+.learning-workspace button:disabled { cursor: default; }
+.learning-workspace .workspace-work :where(button:not(:disabled)):active { transform: translateY(1px); }
+.learning-workspace :is(.math-primary,.language-primary,.workspace-primary) {
+  min-height: var(--workspace-target); background: var(--workspace-action);
+  color: white; border-color: var(--workspace-action); box-shadow: 0 3px 0 #0b1e3b25;
+}
+.learning-workspace [aria-pressed="true"] { background: var(--workspace-tint); outline: 2px solid var(--workspace-action); outline-offset: -2px; }
+.learning-workspace :is(button,input,textarea,summary,select):focus-visible,.learning-workspace .workspace-help h3:focus-visible {
+  outline: 3px solid var(--jems-action-blue, #195fd0); outline-offset: 3px;
+}
+.learning-workspace .workspace-question:focus { outline: none; }
+.learning-workspace .workspace-feedback { margin: 14px 0 0; font-size: 20px; font-weight: 700; }
+.workspace-feedback[data-state="correct"] { color: var(--jems-success-ink, #0b634c); }
+.workspace-feedback .jems-icon { vertical-align: middle; margin-inline-end: 6px; }
+.workspace-help { margin-block: 14px 0; background: #fff2d3; border-inline-start: 4px solid #a9770e; border-radius: 14px; padding: 16px; }
+.workspace-help h3,.workspace-help p { color: var(--workspace-ink); margin: 0 0 8px; }
+.workspace-help h3 { font-size: 22px; }
+.workspace-help p { font-size: 20px; }
+.workspace-header .jems-read-aloud .jems-reading-notice { margin: 0; }
+.workspace-header .jems-reading-notice:empty { display: none; }
+.workspace-footer > div { display: flex; gap: 8px; flex-wrap: wrap; }
+@container (min-width: 720px) {
+  .workspace-desk:has(.workspace-tools details[open]) { grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); }
+}
+@media (max-height: 500px) {
+  .workspace-heading { margin-block: 10px; }
+  .workspace-pal { max-width: 54px; }
+}
+@media (max-width: 440px) {
+  .learning-workspace { padding: 12px; }
+  .workspace-task { padding: 12px; }
+  .workspace-header .jems-read-aloud { margin-inline-start: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .learning-workspace *, .learning-workspace *::before { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+.workspace-footer [data-action="show-solution"] {
+  color: var(--workspace-action); background: transparent; border-color: transparent;
+  text-decoration: underline; text-underline-offset: .2em; box-shadow: none;
+}
+
+/* In My Powers the active task gets the page width. Reports follow the activity. */
+#page-lab .two-column:has(.learning-workspace) { grid-template-columns: minmax(0,1fr); }
+#page-lab .panel:has(#lab-question .learning-workspace) { min-width: 0; padding: clamp(6px,1.5vw,16px); }
+#lab-question .learning-workspace { margin-inline: auto; }
+.learning-workspace [hidden] { display: none !important; }

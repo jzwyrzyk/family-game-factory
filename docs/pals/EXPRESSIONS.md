@@ -119,3 +119,5 @@ as the scene renderer before a state becomes ready. The exact approved asset,
 same-form neutral fallback, owner/context cancellation and bounded cache remain
 authoritative. Missing/unreadable preparation uses Picture unavailable and the
 existing explicit retry; an opaque original is not shown as a successful fallback.
+
+The learning workspace subscribes to the Pal host for the current owner's selected portrait. Neutral, thinking, encouraging retry and celebration reuse the existing expression resolver and earned form. The host observes the companion and encouragement preferences. Its hint action uses the subject's existing assistance pathway.

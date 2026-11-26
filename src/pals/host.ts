@@ -1,7 +1,8 @@
-import { createPalsPage, createPalsWidget, createPalCameo, createPalPortrait } from './ui';
+import { createPalsPage, createPalsWidget, createPalCameo, createPalPortrait, retirePortrait } from './ui';
 import { palDefinition, palLine, type PalId, type PalLineKind } from './catalog';
 import type { PalsController, PalsNotice } from './service';
 import { setIconLabel } from '../brand/icons';
+import { presentWorkspaceCompanion } from '../learning/workspace/theme';
 import './pals.css';
 
 interface PalsHost {
@@ -74,25 +75,6 @@ export function installPalsInterface(host: PalsHost) {
     const playing = !document.getElementById('page-studio')?.classList.contains('hidden');
     cameo.setVisible(playing && !FG.learning.active && !document.hidden);
   }
-  function learningHelp() {
-    document.querySelectorAll('[data-pal-hint]').forEach(element => element.remove());
-    const active = pals.state.profile?.activeId;
-    if (!active || !pals.state.profile?.preferences.showCompanion || !FG.learning.active) return;
-    const hint = Array.from(document.querySelectorAll<HTMLButtonElement>('.math-support-actions [data-action="hint"],.language-help-controls [data-action="hint"]'))
-      .find(button => !button.disabled && button.getClientRects().length > 0);
-    if (!hint) return;
-    const button = node('button', 'pals-hint-button', `Ask ${palDefinition(active).name} for a hint`);
-    button.type = 'button'; button.dataset.palHint = active;
-    button.onclick = () => {
-      if (pals.state.profile?.activeId !== active || !FG.learning.active || hint.disabled || !hint.isConnected) return;
-      // The existing host action records hint depth and assisted evidence. The
-      // Pal never receives the answer key or changes correctness/difficulty.
-      hint.click();
-      button.textContent = `${palDefinition(active).name}: clues are useful!`;
-      button.disabled = hint.disabled || !hint.isConnected;
-    };
-    hint.parentElement!.append(button);
-  }
   function clear() {
     clearTimeout(noticeTimer); clearTimeout(toastTimer); pending = null; pendingOwner = ''; toastHost.replaceChildren();
   }
@@ -126,7 +108,17 @@ export function installPalsInterface(host: PalsHost) {
     }
   }
   const unsubscribe = pals.subscribe((state, notice) => {
-    page.update(state); widget.update(state); cameo.update(state); visibility(); learningHelp(); host.refreshCreation();
+    const profile = state.profile;
+    const selected = !state.loading && profile?.owner === state.owner && state.owner === FG.store.current().id
+      && profile.preferences.showCompanion && profile.owned.find(pal => pal.id === profile.activeId);
+    presentWorkspaceCompanion(selected ? {
+      owner: state.owner, id: selected.id, stage: selected.stage, encouragement: profile!.preferences.encouragement,
+      portrait(expression) {
+        const element = createPalPortrait(selected.id, selected.stage, '', expression, true);
+        return { element, dispose: () => retirePortrait(element) };
+      },
+    } : null);
+    page.update(state); widget.update(state); cameo.update(state); visibility(); host.refreshCreation();
     for (const [key] of controls) {
       const input = parent.querySelector<HTMLInputElement>(`[data-pal-preference="${key}"]`)!;
       input.checked = state.profile?.preferences[key] ?? true; input.disabled = state.loading || state.saving || !state.profile;
@@ -148,7 +140,7 @@ export function installPalsInterface(host: PalsHost) {
   const hidePage = () => { openNow = false; page.hide(); nav.classList.remove('active'); nav.removeAttribute('aria-current'); };
   const onPage = () => { hidePage(); queueMicrotask(visibility); };
   const onProfile = () => { hidePage(); clear(); lastEncouragementAt = 0; queueMicrotask(visibility); };
-  const onLearning = () => { queueMicrotask(() => { visibility(); learningHelp(); if (!FG.learning.active) { clearTimeout(noticeTimer); noticeTimer = setTimeout(presentNotice, 260); } }); };
+  const onLearning = () => { queueMicrotask(() => { visibility(); if (!FG.learning.active) { clearTimeout(noticeTimer); noticeTimer = setTimeout(presentNotice, 260); } }); };
   const onVisibility = () => { visibility(); if (document.hidden) clear(); };
   window.addEventListener('factory-page', onPage);
   window.addEventListener('factory-profile', onProfile);
@@ -160,7 +152,7 @@ export function installPalsInterface(host: PalsHost) {
   FG.pals = { version: 1, open, view: () => pals.state.profile ? structuredClone(pals.state.profile) : null };
   if (new URLSearchParams(location.search).get('pals') === '1') open();
   return { open, dashboardCard: widget.element, get isOpen() { return openNow; }, dispose() {
-    clear(); unsubscribe(); page.dispose(); widget.dispose(); cameo.dispose();
+    clear(); unsubscribe(); presentWorkspaceCompanion(null); page.dispose(); widget.dispose(); cameo.dispose();
     nav.remove(); parent.remove(); toastHost.remove();
     window.removeEventListener('factory-page', onPage); window.removeEventListener('factory-profile', onProfile);
     window.removeEventListener('factory-learning-active', onLearning); document.removeEventListener('visibilitychange', onVisibility);
