@@ -146,10 +146,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:38:12.735Z",
-      "sourceDigest": "6925af7797920346bfc5542e781245e8f039124dca019a6962d867f334a2a400",
-      "reviewOutcome": "updated",
-      "reviewReason": "The first-creation contract now records single admission for repeated taps without changing saved-idea ownership or readiness rules.",
+      "reviewedAt": "2026-11-26T01:45:19.713Z",
+      "sourceDigest": "dcfdddcc90aace523b5b773160d919ae2d689b18c302275c500dfa172eba6d3b",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The workspace changes presentation and optional working tools. The existing child-owned learning, profile and reward principles continue to govern the host.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -310,10 +310,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:37:55.191Z",
-      "sourceDigest": "9fc46a601c3012b0fd13afe7231ff32b111837e443a734f47bfa672e1a5056ce",
-      "reviewOutcome": "updated",
-      "reviewReason": "The first-creation contract records the per-idea Build gesture guard across async storage and review. Shared headings and navigation still use the guarded host routes.",
+      "reviewedAt": "2026-11-26T02:24:59.146Z",
+      "sourceDigest": "30091ef9102ebb53feba6eda4be3ea2064e1d5eb16cb578a5a0a42631bff0efe",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The native checkpoint keeps its documented viewport overlay in the original Arcade and fitted-stage overlay in Studio for both the existing Language activity and the shared workspace. Only the selector for the transitional renderer changes; exit, assessment, profile and game lifecycle contracts are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -645,10 +645,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T02:09:44.693Z",
-      "sourceDigest": "8dfd020d7abadd0b6d39efa2a39e264d8fd8091d4d3a074b62136c2b2b392fec",
+      "reviewedAt": "2026-11-26T01:47:03.820Z",
+      "sourceDigest": "937d42c456c7e0d6e76e8ba0a5c14c5c72caa1a61b63eaa53b1e3726019b18c0",
       "reviewOutcome": "updated",
-      "reviewReason": "Record device-only first actions, shared mute and stopping behavior, graphical action poses and accessible empty collections in the early preview.",
+      "reviewReason": "Math preserves the active response and centers it on explicit return from hints. The integration contract documents the shared question and working tools.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -891,10 +891,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:23:11.824Z",
-      "sourceDigest": "5f7b1ef674e2b84dd647d329848d15cf1839bc2b621d5472752fe3445bcdc3d3",
-      "reviewOutcome": "updated",
-      "reviewReason": "Delivery state records the failed hosted Pal reload and the visible onboarding path. The exact same regression commands, assertions, rendering code and timeouts remain in force, with two new pre-navigation persistence assertions.",
+      "reviewedAt": "2026-11-26T01:59:09.198Z",
+      "sourceDigest": "7f6f06866628a978a1e86606837685ee3943e8c88a8ef4dc69be61296f51fa1b",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The My Powers brand journey now checks approved Ink and measured contrast on the light learning surface. The original game journey uses the visible checkpoint exit, verifies persisted interrupted evidence and its unused-budget refund, and still exercises the ordinary game exit. Host navigation, receipts and CI assignments are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1135,10 +1135,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T01:23:12.305Z",
-      "sourceDigest": "3a5ab9bfd335677e581d5e32600605a1c3cf253d9a45b9e0e271b77ea454684f",
-      "reviewOutcome": "updated",
-      "reviewReason": "Recorded the passing protected-main suite and the subsequent failed documentation-candidate Pal shard with its retained evidence and correction.",
+      "reviewedAt": "2026-11-26T01:45:23.244Z",
+      "sourceDigest": "89d01be4965b0dd852a8ab6cf2f75824fcfd09bbc248e5908a42bc10eaf1c3dd",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The feature branch adds local Math presentation and browser fixtures. It changes no release manifest, operational environment, worker version or production authorization.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1578,10 +1578,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "b2c55a9dc03986bb12d1396de7e56859273c25b444b57611e930bc3e6004534c",
-      "reviewedAt": "2026-11-25T23:20:59.505Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Character inventory marks Luma and Zippa as historical and records active profile counts. Nook and Navi retain their existing approved Base and Grown artwork.",
+      "sourceDigest": "1c1c86f312ab8f397e0d7e43258bf3f65ddcdedc7cdde971e9d2b3f8192d96d0",
+      "reviewedAt": "2026-11-26T01:45:23.597Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The workspace consumes existing active species portraits and approved expressions. The original selected source and all character forms retain their current art approval.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1662,10 +1662,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "ada2accbff6a1c4c26061297e83a2ab48bdb799664d38749f63d7cf76e56d403",
-      "reviewedAt": "2026-11-26T01:23:10.842Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The reload regression verifies the retained owner, active Navi and timestamp before and after the visible maker welcome. Starter rules, menu behavior and approved artwork are unchanged.",
+      "sourceDigest": "0b061b3f6905daab7524e43cefd5f49bd44ea9a4a57dbe225f4cc5c312458604",
+      "reviewedAt": "2026-11-26T01:45:24.381Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "The expression contract describes presentation of owned form-specific portraits for learning states and the existing subject hint action.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",

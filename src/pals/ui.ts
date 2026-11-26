@@ -45,7 +45,7 @@ const count = (value: number) => new Intl.NumberFormat('en-US').format(value);
 const portraitRequests = new WeakMap<HTMLElement, number>();
 const portraitTimeouts = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
 
-function retirePortrait(portrait: HTMLElement) {
+export function retirePortrait(portrait: HTMLElement) {
   portraitRequests.set(portrait, (portraitRequests.get(portrait) ?? 0) + 1);
   clearTimeout(portraitTimeouts.get(portrait));
   portraitTimeouts.delete(portrait);

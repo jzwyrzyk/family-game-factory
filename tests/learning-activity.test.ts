@@ -1,13 +1,13 @@
 import {after,before,test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
-import {build} from 'esbuild';
+import {build,buildSync} from 'esbuild';
 import {chromium,type Browser,type Page} from 'playwright';
 import {generateItem} from '../src/learning/content';
 import type {MathItem,LearningMode} from '../src/learning/types';
 
 let browser:Browser,bundle:string;
-const styles=readFileSync('src/learning/activity.css','utf8')+'\n'+readFileSync('src/speech/read-aloud.css','utf8')+'\n'+readFileSync('src/brand/icons.css','utf8');
+const styles=buildSync({entryPoints:['src/learning/activity.css'],bundle:true,write:false}).outputFiles[0].text+'\n'+readFileSync('src/speech/read-aloud.css','utf8')+'\n'+readFileSync('src/brand/icons.css','utf8');
 before(async()=>{
   const output=await build({stdin:{contents:"export * from './src/learning/activity'; export * from './src/learning/visuals';",resolveDir:process.cwd(),loader:'ts'},bundle:true,format:'iife',globalName:'LearningUITest',platform:'browser',write:false});
   bundle=output.outputFiles[0].text;
