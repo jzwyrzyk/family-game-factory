@@ -314,10 +314,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:59:18.597Z",
-      "sourceDigest": "d4c09d12fe4f3663f63189d128ce9efbdb7cfd7ccbc4c1f076a887fdfb59a9ac",
-      "reviewOutcome": "updated",
-      "reviewReason": "The shared host, game exits, brand and theme presentation, and isolated family entry now use the workspace controls. Reviewed private stylesheet inclusion separately from the ordinary gallery.",
+      "reviewedAt": "2026-11-26T05:11:07.053Z",
+      "sourceDigest": "6e3f73f66b45405d195425db676c4a865239b24b9e5abc1ecfa0115eb0008c76",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Legacy game navigation settles at the existing page origin before input; the established navigation contract and recorded destinations still apply.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -900,10 +900,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:32:35.177Z",
-      "sourceDigest": "cc81e351090f6a71e8701b7d1aedaef6bb6f90eda771437f051dc5cc8253ffc7",
-      "reviewOutcome": "updated",
-      "reviewReason": "Preserve the exact Grade 3 multiplication construction assertion and verify eligible gallery grades plus a higher-grade learner opening a prerequisite.",
+      "reviewedAt": "2026-11-26T05:11:07.874Z",
+      "sourceDigest": "8007006fa159f5018406ea3ec0a6ee7fa116da9473a79d95c2035e769e8378ca",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The documented native storage and recovery suite now checks the stable game entry scroll and visible Keep control in its existing 30-game journey.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
