@@ -1,5 +1,7 @@
 # jems decision records
 
+- [November 26 — the Connected Creative Universe](2026-11-26-connected-creative-universe.md) establishes permanent authentic-art and 2D reuse doctrine.
+
 - [November 22: unified game navigation and one Notifications surface](2026-11-22-unified-game-notifications.md) — consolidate PR125 after shell/chat and Conversation Coach, preserving separate gameplay overhauls.
 
 These records explain durable choices without turning chat history into another backlog. They are a compact index of decisions; [product doctrine](../../PRODUCT-DOCTRINE.md) describes intent, [architecture](../../ARCHITECTURE-CURRENT.md) describes the system and [delivery state](../../DELIVERY-STATE.md) records implementation and operational evidence.

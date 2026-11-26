@@ -84,7 +84,10 @@
     "docs/development/SETUP.md",
     "docs/development/COSTS.md",
     "docs/decisions/2026-11-23-dev-test-prod.md",
-    "docs/ui-review/README.md"
+    "docs/ui-review/README.md",
+    "docs/creation-studio/CREATIVE_ASSET_AND_WORLD_STANDARD.md",
+    "docs/creation-studio/world-art-manifest.json",
+    "docs/decisions/2026-11-26-connected-creative-universe.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -310,10 +313,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:37:55.191Z",
-      "sourceDigest": "9fc46a601c3012b0fd13afe7231ff32b111837e443a734f47bfa672e1a5056ce",
+      "reviewedAt": "2026-11-26T03:09:22.226Z",
+      "sourceDigest": "ba3d8d381cc13596fc5c1f4ea0f721398f46956285bff57bbb074bb55a7fe07c",
       "reviewOutcome": "updated",
-      "reviewReason": "The first-creation contract records the per-idea Build gesture guard across async storage and review. Shared headings and navigation still use the guarded host routes.",
+      "reviewReason": "Documented the owner's permanent authentic-art and 2D principles. Product illustrations carry separate authorship, scale, activity use and review status.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -407,13 +410,16 @@
       "sources": [
         "src/creation/**",
         "server/agent/creation-schema.ts",
-        "tests/creation-*"
+        "tests/creation-*",
+        "public/art/creative-worlds/**",
+        "docs/creation-studio/world-art-manifest.json",
+        "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fee0252694b94e3f1254485510ef5c6da2cbd6ca19ac18af19c0ec8e8e26b54d",
-      "reviewedAt": "2026-11-25T23:20:54.040Z",
+      "sourceDigest": "a8bb53d3aa90d9c1e7af9d7752cc1ee6727276a145a0ab9a399c5f9a10909404",
+      "reviewedAt": "2026-11-26T03:09:23.437Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The scene rendering contract distinguishes legacy pinned tokens and neutral bytes from new active actor choices.",
+      "reviewReason": "Reviewed the four composition plates, registered transparent layers and individual object manifest. Stage integration uses these immutable catalogue references.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -891,10 +897,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:23:11.824Z",
-      "sourceDigest": "5f7b1ef674e2b84dd647d329848d15cf1839bc2b621d5472752fe3445bcdc3d3",
+      "reviewedAt": "2026-11-26T03:09:23.676Z",
+      "sourceDigest": "83c23ae7f11c5e9a126b91d2cd247e3751ec0f01e85def1206f1090964231b99",
       "reviewOutcome": "updated",
-      "reviewReason": "Delivery state records the failed hosted Pal reload and the visible onboarding path. The exact same regression commands, assertions, rendering code and timeouts remain in force, with two new pre-navigation persistence assertions.",
+      "reviewReason": "Recorded the catalogue integrity check and exact source stage in the delivery record. Owner visual review and hosted qualification remain pending.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1135,10 +1141,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T01:23:12.305Z",
-      "sourceDigest": "3a5ab9bfd335677e581d5e32600605a1c3cf253d9a45b9e0e271b77ea454684f",
+      "reviewedAt": "2026-11-26T03:09:41.235Z",
+      "sourceDigest": "d6691c0e7097678f19c4b2277e4782b32634074014cb41f4b11b9bc94c906b82",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the passing protected-main suite and the subsequent failed documentation-candidate Pal shard with its retained evidence and correction.",
+      "reviewReason": "Recorded current household embedded source and identified these illustrations as a source candidate awaiting owner review and hosted acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1393,10 +1399,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:58.459Z",
-      "sourceDigest": "37c0c3f9ee5432f31d4741e23cb41fe2cc54569af18aec957152e780590aad46",
+      "reviewedAt": "2026-11-26T03:09:24.151Z",
+      "sourceDigest": "2f3dea80168267acab79eb3aa72ba759d4f2baabd86fb9995a52493a5c232548",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the roster and Journey decision with companion contracts and updated the documentation index.",
+      "reviewReason": "Added the canonical standard and ownership decision to required documents and routed world illustrations through Creation review. Expanded the pull request evidence template.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

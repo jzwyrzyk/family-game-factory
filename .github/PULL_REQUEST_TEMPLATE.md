@@ -19,6 +19,8 @@
 <!-- For child-facing UI, apply docs/brand/CHILD_INTERFACE.md: remove redundant copy, retain 18px labels / 20px task text, verify actual-surface contrast at phone sizes and in help/error states, and preserve explicit friendly narration and cancellation. State observed coverage, not a site-wide claim from one screenshot. -->
 
 ## Preview and acceptance
+<!-- For creative assets and worlds, identify the storage or rendering owner and dependent PRs. Verify exact source/revision preservation, role and mechanics, older saves, offline recovery and profile changes. Provide the rendered activity on phone, tablet and desktop, artwork provenance and the status of visual approval. General generated-game private-art delivery requires separate qualification. See docs/creation-studio/CREATIVE_ASSET_AND_WORLD_STANDARD.md. -->
+
 
 <!-- Follow docs/development/DEV-TEST-PROD.md. Applicable application changes need an interactive private DEV preview; documentation-only changes may state not applicable. Automated status must bind the current PR head and actual deployment receipt. A merged PR is not necessarily deployed. -->
 

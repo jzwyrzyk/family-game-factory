@@ -1,5 +1,9 @@
 # jems product doctrine
 
+## The child owns the finished artwork
+
+Keep exact original bytes and a recoverable source. Jems brings the drawing to life through explicit 2D composition and movement. Generative alteration or disclosure of private child art to an image model is permanently prohibited. Save permitted preparation as a linked derivative. A game or scene keeps its selected revision and contextual role. New games use 2D sprites and environments. [Creative Asset & World Design Standard](docs/creation-studio/CREATIVE_ASSET_AND_WORLD_STANDARD.md)
+
 Family beta participation belongs to an invited, authorized adult. Children use supervised local profiles. Each family controls its own work and allowance. Provider approval, verified guardian consent, adult development privileges and play-session acknowledgment are separate decisions. Public release requires a further owner decision.
 
 **Purpose:** canonical summary of existing product intent and principles. These are standards to build toward, not a claim that every capability is implemented or validated.

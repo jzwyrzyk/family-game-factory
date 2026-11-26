@@ -1,5 +1,9 @@
 # jems delivery state
 
+## Connected Creative Universe artwork candidate — November 26
+
+Protected main was verified at `bc602f1ede502f398308ad56f973c4bf7997ff08`. The first review unit contains four original Jems world plates, eight transparent scene layers, four picker previews and 32 individual prop images. The catalogue and [provenance manifest](docs/creation-studio/world-art-manifest.json) pin the collection. Owner visual review and hosted qualification remain pending. The existing household Pages release reported embedded source `aa56b60abe152e750f9f0b5e8949bdb44be53196` during development.
+
 ## November 26, 2026 — protected application integration
 
 The owner accepted the offline visual and interactive candidate `d5c2cfaff8e3941667fdc6d4d5426c341ab009ad`, including Journey cards, secondary headers and Nook/Navi selection. All 16 PR workflows passed on attempt one. The prospective merge `34b9aecdbb13739c1ad207d615ae71d7f6de2919` and protected merge `7059b8cdee6aae088f1fba0d8011e64f2b511ae6` have tree `de31a19c2ac7a3e083e999eeacc482f47ff23b86`. #188 is incorporated through ancestry and qualified behavior. #189 previously merged as `3b92ad7906c5ab82788ff9194a098844073ad964`. The app retains the #186 family/storage and recovery behavior, retired Pal readers and migration, learner gates, Send/Build sequencing and cumulative spending controls. [#190](https://github.com/jzwyrzyk/family-game-factory/pull/190) · [Full PR regression](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45732287572) · [Protected-main Arcade](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45733678844) · [Chromium, WebKit and storage](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45732287788) · [Standalone HTML](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45732287663)
