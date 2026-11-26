@@ -4,7 +4,7 @@ import { validSemanticIdentity } from '../assets/art-lineage';
 import { type Drawing, DRAWING_CATEGORIES, prepareDrawing } from '../assets/private-drawings';
 import { type SavedRig, type DrawingDraft } from './store';
 import { validateAssembly, type DrawingAssembly } from './model';
-import { ART_LIMITS, artOwner, artRequest, saveDrawingMetadata, assertArtWrite, checkArtCapacity, withArtTransaction, type ArtGuard } from './library';
+import { ART_LIMITS, artOwner, artRequest, saveDrawingMetadata, ownerArtRecords, assertArtWrite, checkArtCapacity, withArtTransaction, type ArtGuard } from './library';
 
 export type PortableDrawing = Omit<Drawing, 'owner' | 'bytes' | 'preview'> & { data: string };
 export type PortableRig = Omit<SavedRig, 'owner'>;
@@ -84,20 +84,21 @@ export async function validateArtBundle(input: unknown): Promise<ArtBundle> { re
 export async function exportArtBundle(owner: string, selection?: { drawingIds?: string[]; rigIds?: string[] }): Promise<ArtBundle> {
   artOwner(owner);
   const snapshot = await withArtTransaction(['drawings', 'rigs', 'drafts'], 'readonly', async transaction => {
-    const originals = (await artRequest(transaction.objectStore('drawings').getAll()) as Drawing[]).filter(item => item.owner === owner);
-    const rigs = (await artRequest(transaction.objectStore('rigs').getAll()) as SavedRig[]).filter(item => item.owner === owner);
-    const drafts = (await artRequest(transaction.objectStore('drafts').getAll()) as DrawingDraft[]).filter(item => item.owner === owner);
+    const [originals, rigs, drafts] = await Promise.all([
+      ownerArtRecords<Drawing>(transaction, 'drawings', owner),
+      ownerArtRecords<SavedRig>(transaction, 'rigs', owner),
+      selection ? [] : ownerArtRecords<DrawingDraft>(transaction, 'drafts', owner),
+    ]);
     return { originals, rigs, drafts };
   });
   const selectedOriginals = new Set(selection ? selection.drawingIds || [] : snapshot.originals.map(item => item.id));
   const selectedRigs = new Set(selection ? selection.rigIds || [] : snapshot.rigs.map(item => item.id));
   if ([...selectedOriginals].some(id => !snapshot.originals.some(item => item.id === id)) || [...selectedRigs].some(id => !snapshot.rigs.some(item => item.id === id))) throw Error('Choose artwork or movement versions from this profile.');
-  for (const rig of snapshot.rigs) if (selectedOriginals.has(rig.assembly.sourceId)) selectedRigs.add(rig.id);
-  for (const draft of snapshot.drafts) if (selectedOriginals.has(draft.sourceId) && draft.parentId) selectedRigs.add(draft.parentId);
+  // A scene takes the selected versions and the ancestors they need.
+  // Drafts and sibling experiments belong only in a full library backup.
   let changed = true;
   while (changed) {
     const before = selectedRigs.size + selectedOriginals.size;
-    for (const draft of snapshot.drafts) if (selectedOriginals.has(draft.sourceId) && draft.parentId) selectedRigs.add(draft.parentId);
     for (const rig of snapshot.rigs) if (selectedRigs.has(rig.id)) { selectedOriginals.add(rig.assembly.sourceId); if (rig.parentId) selectedRigs.add(rig.parentId); }
     for (const item of snapshot.originals) if (selectedOriginals.has(item.id) && item.sourceId) selectedOriginals.add(item.sourceId);
     changed = before !== selectedRigs.size + selectedOriginals.size;

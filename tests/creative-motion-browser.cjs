@@ -67,6 +67,7 @@ const {start}=require('./browser-server.cjs');
     assert.equal(bundle.art.drawings[0].data,bytes,'exported artwork preserves exact PNG bytes');
     assert.equal(bundle.art.rigs[0].assembly.motion.points.length,3);
     assert.equal(bundle.art.rigs[0].assembly.motion.sprite,'original');
+    assert.ok(bundle.art.rigs[0].assembly.pieces.every(piece=>!piece.physical),'drawing a path assigns no physical behavior');
     assert.equal(bundle.art.rigs[0].id,first);
     await page.evaluate(id=>FG.artStudio.open(id),original);
     await page.locator('#artDrawPath').click();await editor.locator('[data-speed]').selectOption('1000');

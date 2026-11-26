@@ -19,7 +19,7 @@ export async function editMotionPath(owner: string, source: Drawing, rigId: stri
   const parent = rigId ? await rigById(owner, rigId) : null;
   if (!sameView()) return;
   const assembly = parent?.assembly ?? defaultAssembly(source, 'character', [{
-    id:'picture', name:'My picture', role:'body', physical:true, parentId:null,
+    id:'picture', name:'My picture', role:'decoration', physical:false, parentId:null,
     region:{x:0, y:0, w:1, h:1, shape:'rect'},
   }]);
   const motion: DrawingMotion = structuredClone(assembly.motion ?? {points:[], stepMs:600, sprite:parent ? 'cutout' : 'original'});

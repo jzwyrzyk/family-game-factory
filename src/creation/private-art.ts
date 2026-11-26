@@ -84,12 +84,17 @@ export async function importSceneArt(owner:string,input:unknown,current:()=>bool
   if(!current())throw stale();
   const scene=bundle.scene;
   for(const slot of sceneAssetSlots(scene))slot.assetId=references.get(slot.assetId)||slot.assetId;
-  if(scene.provenance?.sourceKind==='art'){
-    const source=scene.provenance;
-    if(source.sourceProjectId)source.sourceProjectId=imported.drawingIds[source.sourceProjectId]||source.sourceProjectId;
-    if(source.sourceRevisionId)source.sourceRevisionId=imported.rigIds[source.sourceRevisionId]||source.sourceRevisionId;
-  }
+  remapArtOrigin(scene, id=>imported.drawingIds[id], id=>imported.rigIds[id]);
   return validateEditableProject(scene);
+}
+
+/** Imported assets receive new owner-local IDs. Original picture revisions
+ * use their immutable content hash, which remains valid across a transfer. */
+export function remapArtOrigin(scene:CreationProject, picture:(id:string)=>string|undefined, rig:(id:string)=>string|undefined) {
+  const origin=scene.provenance;
+  if(origin?.sourceKind!=='art')return;
+  if(origin.sourceProjectId)origin.sourceProjectId=picture(origin.sourceProjectId)??origin.sourceProjectId;
+  if(origin.sourceRevisionId)origin.sourceRevisionId=rig(origin.sourceRevisionId)??origin.sourceRevisionId;
 }
 
 /** Decoding is bounded and checked again after each asynchronous operation.

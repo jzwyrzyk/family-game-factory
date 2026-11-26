@@ -308,6 +308,7 @@ export async function openDrawingLab(owner:string,source:Drawing,onPlayCar?:(rig
     carArtwork=createCarArtwork(assembly,sourceCanvas,sourceAspect);
     car=createVehicle({},'meadow',carArtwork.geometry);carScene=car.snapshot();
    }else{
+    if(assembly.motion && !assembly.pieces.some(piece=>piece.physical))throw Error('Play your path in Creative Studio. Choose a moving part to try physics here.');
     assemblyRig(assembly,sourceAspect);other=createDrawingPlayground(assembly,sourceAspect);otherScene=other.snapshot();
    }
    mode='play';pendingPivot=false;pendingNew=false;brushMode=null;
