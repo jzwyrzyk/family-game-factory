@@ -741,10 +741,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:13:36.892Z",
-      "sourceDigest": "0892ac493840a0ab15b14e3b134b3d1fbca59f242f7dac9dbf431666a9e73414",
+      "reviewedAt": "2026-11-26T03:20:35.240Z",
+      "sourceDigest": "7e10a95c1479397bd6add2fd7f8495b884db8de2f6c96be2ccf1b7b8fb4e4391",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented how the local review adapter binds compiled 2D output to a sanitized sprite without delivering private artwork to any model or production game.",
+      "reviewReason": "The isolated binding preserves a child sprite's edges when fitting and painting, independently of scenery filtering in the reviewed runtime.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -899,10 +899,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:13:37.453Z",
-      "sourceDigest": "b203cefe655522dddd7bf1a2ce0b3fb09cdb13f8b08c6cf1ed6489d4f629cf05",
+      "reviewedAt": "2026-11-26T03:20:36.726Z",
+      "sourceDigest": "1c0e75cedbd8e6e7fc38768b553af58741ea7467db3f2542b33f865873b12048",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The existing generated-art CI command now also exercises an offline qualified actor slot, byte isolation and revocation using synthetic pixels.",
+      "reviewReason": "The isolated game fixture verifies edge sampling and updates its synthetic screenshot; the production admission and hosted qualification gates are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
