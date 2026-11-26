@@ -1,5 +1,71 @@
 # Direct Jems diagnostic access
 
+## Canonical SDK preflight — November 26, 2026
+
+The owner reports successful **separate-task** managed SDK verification under actual
+alias **`GCP`**, effective account
+`jems-codex-diagnostics@family-game-factory-jzw.iam.gserviceaccount.com`. Self-check
+and full three-service reads exited 0; all services were Ready/reconciled and serving
+intended revisions at 100%. Positive metadata and negative deployment, IAM, secret,
+destructive and impersonation checks passed across the tested resources. Exact probe
+resource list, source SHA and sanitized receipt were not supplied here; this is
+owner-reported finite acceptance, not a universal privilege audit or this task's run.
+
+Use `scripts/ops/diagnose_sdk.py` as the canonical client from this reviewed operations
+source. It selects the version-1 managed connection by actual alias or unique/default
+GCP entry, loads its `credentials_file` external-account configuration in memory,
+requires impersonation of the existing diagnostic account, and verifies the effective
+account through Google's authenticated userinfo before and after metadata reads.
+It reuses the existing Cloud Run v1 redaction/health reader over the supported Google
+Auth SDK. The legacy reader is checksum-pinned by an activation approval and remains
+byte-identical; SDK selection lives in `managed_diagnostic_identity.py`. No ambient ADC fallback, gcloud invocation, credential copy, token cache,
+key creation, managed-file write or permission expansion is used. Unsupported
+credential configuration and unavailable connections fail with fixed safe codes.
+
+Install dependencies **outside the source/managed credential directory**, for example
+in a task-owned `work/diagnostic-venv`, using
+`scripts/ops/diagnostic-requirements.txt`. Preserve proxy, CA and managed auth guards.
+Then run from a clean pinned checkout:
+
+```sh
+/path/to/work/diagnostic-venv/bin/python scripts/ops/diagnostic_preflight.py --expected-source FULL_REVIEWED_SHA --identity-alias GCP --live --verify-permissions
+```
+
+The preflight verifies HEAD, cleanliness and hashes of required tools, then executes
+both self-check and full diagnostics. Without `--live`, it verifies configuration
+only and reports `CONFIGURED_NOT_VERIFIED`. Individual SDK commands support
+`--self-check` and `--verify-permissions`. The finite checks include service
+read/update/delete/IAM, project admin/data/log operations, named secret access/delete,
+and account impersonation/key/IAM operations. Verify named resource existence in the
+operator inventory; an empty testIamPermissions response for a nonexistent resource
+cannot prove denied access. API errors, unavailable identity and unexpected permissions
+fail acceptance. Service/revision metadata reads supply actual positive-read evidence.
+
+**Checkout discrepancy:** this task began at `a5f1f41cad0c8881cbb05ca97d0d1364cf5878f4`,
+where `scripts/ops/diagnose.py` does not exist. Fetching main obtained
+`bc602f1ede502f398308ad56f973c4bf7997ff08`, which includes the legacy reader. The new
+SDK tools are in the isolated operations candidate until reviewed integration. Future
+Codex tasks must fetch/pin the reviewed operations source, or the later main containing
+it, and verify the tool paths before diagnosing IAM. Do not use a stale environment
+snapshot as proof that merged tooling is absent. Do not silently advance frozen
+application/worker pins while refreshing an isolated diagnostic checkout.
+
+**Current-task reproduction limit:** after the separate success was reported, this
+task's environment still reported `outbound_identities:[]` at spec revision 1 with no
+manifest. Both real SDK commands returned `IDENTITY_NOT_CONFIGURED`. Synthetic SDK
+regressions pass; independent live reproduction remains blocked in this environment.
+A clean-source preflight retry and its exact source/receipt must accompany the next
+attached task. The existing connection is not recreated or widened. The environment
+change API offered here has no OIDC-attachment or reusable-image publication control.
+SDK support removes the reported gcloud PATH/read-only token-cache dependency; a
+published environment still needs the existing connection and reviewed source.
+
+The CLI instructions below are historical and remain an explicit fallback. Do not
+make a managed credential directory writable or copy it to work around a gcloud cache
+error. Alias `jems-diagnostics` in those earlier examples is not this verified alias.
+
+November 26 continuation: [consolidated Cloud Shell setup and verified blockers](PERMANENT_CLOUD_SETUP.md), [autonomous triage and 401 investigation](AUTONOMOUS_TRIAGE.md). Earlier receipts below retain their original scope.
+
 ## Production HTTP request evidence through GitHub
 
 Use the [production diagnostics guide](PRODUCTION_DIAGNOSTICS.md) for the separate protected-main workflow, scoped source, report interpretation and ChatGPT retrieval procedure. It uses GitHub Actions federation to a private request-metadata broker. Its browser-based setup is independent of the managed Codex identity and Cloud Shell. See the [delivery ledger](../../DELIVERY-STATE.md) for the last verified state.

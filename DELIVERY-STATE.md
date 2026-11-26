@@ -1,5 +1,72 @@
 # jems delivery state
 
+## November 26, 2026 — permanent cloud diagnostics preparation; Coach success evidence
+
+Operations-only preparation against frozen main `bc602f1ede502f398308ad56f973c4bf7997ff08`.
+The [consolidated setup plan](docs/operations/PERMANENT_CLOUD_SETUP.md) and
+[autonomous triage runbook](docs/operations/AUTONOMOUS_TRIAGE.md) preserve PR153,
+the existing Codex diagnostic identity and current release/environment controllers.
+New source provides offline/default planning, read-only inventory, hash-bound explicit
+apply, partial-setup checks, finite IAM audits and sanitized offline request triage.
+This is source preparation, not merged, deployed or accepted permanent access.
+
+**Owner-supplied live production evidence:** Gateway Coach POST returned **HTTP 200
+at `2026-11-24T14:47:26.454968Z`**. Private Coach POST
+`/v1/private-coach/complete` returned **HTTP 200 at
+`2026-11-24T14:47:26.650244Z`** on
+`factory-coach-private-r-890188092e3f4396dab0`. These temporally correlated
+observations establish successful post-deployment HTTP handling across both services.
+The Gateway serving revision, trace-level correlation and actual user-visible
+response acceptance remain unverified. No paid request was replayed and no rollback
+was initiated. Recent Gateway 401s are a separate unresolved investigation; permitted
+OPTIONS 204 is preflight success, not evidence of authenticated application success.
+
+**Subsequent owner-reported managed connection verification:** in a separate task,
+alias **`GCP`** authenticated effectively as
+`jems-codex-diagnostics@family-game-factory-jzw.iam.gserviceaccount.com`. SDK self-check
+and full three-service diagnostics exited 0; all three services were Ready,
+reconciled and serving intended revisions at 100%. Positive metadata and negative
+deployment, IAM, secret, destructive and impersonation checks passed over the tested
+resources. Exact source/probe tuples and a sanitized receipt were not supplied here.
+This finite separate-task result supersedes an assertion that the existing connection
+itself is broken, but does not attach it to this environment.
+
+The canonical SDK client and source preflight now avoid gcloud and writable managed
+credential caches, support alias `GCP`, verify effective identity and reuse the existing
+redacted reader. The initial checkout `a5f1f41…` lacked the diagnostic script; fetching
+current main resolved the legacy tooling discrepancy. Future tasks need the reviewed
+operations source containing the SDK additions. This task retried actual SDK self-check
+and full/permission diagnostics after the report; both remained
+`IDENTITY_NOT_CONFIGURED`, with environment status still reporting no attached identity.
+Independent live reproduction from this environment remains blocked; synthetic SDK
+regressions and the separate owner's success must not be conflated.
+
+**Access evidence from this task:** managed environment status is current and shows
+no outbound identity or secret binding; `OIC_MANIFEST_PATH` is absent. Installed
+Google Cloud SDK 594.0.1 and executed both existing `diagnose.py` modes; each stopped
+with `IDENTITY_NOT_CONFIGURED`. Effective account, positive reads, denied privileges
+and recent request metadata were unverified in this task at that checkpoint; the
+separate SDK result above has its own scope. The available environment change API
+cannot attach OIDC; reuse the existing connection through environment settings.
+The owner's inventory reports the Codex pool/provider ACTIVE and the GitHub diagnostic
+provider/pool, broker and dedicated accounts absent. GitHub confirms PR153 merged and
+its first live attempt [45323244621](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45323244621)
+failed; the recorded `invalid_target` is consistent with the now-reported missing
+provider. The owner reports `global/_Default` retained request logs. No new live GCP
+inventory, image build, IAM change, deployment, spending or recurring execution took
+place. Exact administrator inventory, approved broker image/provenance, effective IAM,
+GitHub environment settings and coverage review are still required before apply and
+end-to-end acceptance. Current DEV/TEST configuration remains disabled and unset.
+
+Focused synthetic authentication tests passed 29/29 on Node 22. The final local operations suite passed 262/262, including 23 new permanent-access,
+SDK and preflight regression tests. An intermediate full run caught the frozen
+activation checksum on the legacy diagnostic file; the fix preserved its original
+bytes and moved SDK identity selection to an additive module. No release checksum
+was refreshed. Final hosted validation is recorded separately in the candidate PR. Live identity and broker acceptance
+are blocked independently of those offline results. Learning #218, creative #220 and
+CI #219 remain separate; all frozen release identities and production controls are
+preserved.
+
 ## November 26, 2026 — protected application integration
 
 The owner accepted the offline visual and interactive candidate `d5c2cfaff8e3941667fdc6d4d5426c341ab009ad`, including Journey cards, secondary headers and Nook/Navi selection. All 16 PR workflows passed on attempt one. The prospective merge `34b9aecdbb13739c1ad207d615ae71d7f6de2919` and protected merge `7059b8cdee6aae088f1fba0d8011e64f2b511ae6` have tree `de31a19c2ac7a3e083e999eeacc482f47ff23b86`. #188 is incorporated through ancestry and qualified behavior. #189 previously merged as `3b92ad7906c5ab82788ff9194a098844073ad964`. The app retains the #186 family/storage and recovery behavior, retired Pal readers and migration, learner gates, Send/Build sequencing and cumulative spending controls. [#190](https://github.com/jzwyrzyk/family-game-factory/pull/190) · [Full PR regression](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45732287572) · [Protected-main Arcade](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45733678844) · [Chromium, WebKit and storage](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45732287788) · [Standalone HTML](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45732287663)

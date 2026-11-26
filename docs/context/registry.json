@@ -1135,10 +1135,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T01:23:12.305Z",
-      "sourceDigest": "3a5ab9bfd335677e581d5e32600605a1c3cf253d9a45b9e0e271b77ea454684f",
+      "reviewedAt": "2026-11-26T05:19:57.346Z",
+      "sourceDigest": "4b32c0ab839747fcf7867ef771f7b26445da8ddcd38ea1854d0d5d350e96245f",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the passing protected-main suite and the subsequent failed documentation-candidate Pal shard with its retained evidence and correction.",
+      "reviewReason": "Reviewed additive SDK and bootstrap sources against the frozen activation dependencies; preserved legacy hashes and workflow bytes, recorded 262 offline operations and 29 authentication passes, separate-task GCP acceptance, current-task attachment gap and exact remaining image/IAM/coverage gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1393,10 +1393,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:58.459Z",
-      "sourceDigest": "37c0c3f9ee5432f31d4741e23cb41fe2cc54569af18aec957152e780590aad46",
+      "reviewedAt": "2026-11-26T05:18:13.578Z",
+      "sourceDigest": "b19c31c5abbbf9b825ffae612d738bdcd36a74d8c2884c2f0cd4886d2667dca1",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the roster and Journey decision with companion contracts and updated the documentation index.",
+      "reviewReason": "Added the standard reviewed-source managed SDK preflight to AGENTS and the canonical assistant guide, distinguishing stale checkouts and unavailable attachments from permission denial without altering product or release authority.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -1,0 +1,159 @@
+"""SDK auth regression: no CLI/cache writes, fixed identity, scope and redaction."""
+import json
+import contextlib
+import io
+import sys
+from pathlib import Path
+import tempfile
+import unittest
+from unittest.mock import Mock, patch
+
+import diagnose
+import diagnostic_preflight as preflight
+import diagnose_sdk as sdk
+import managed_diagnostic_identity as managed
+from test_diagnose import service, revision, LEAK
+
+
+class Response:
+    def __init__(self, value, status=200):
+        self.value, self.status_code = value, status
+    def iter_content(self, size):
+        yield json.dumps(self.value).encode()
+    def close(self): pass
+
+
+class Session:
+    def __init__(self, account=diagnose.DIAGNOSTICS_ACCOUNT, status=200):
+        self.account, self.status = account, status
+        self.calls, self.closed = [], False
+    def request(self, method, url, **kwargs):
+        self.calls.append((method, url, kwargs))
+        if url == sdk.USERINFO:
+            return Response({'id': '1054529152893', 'email': self.account, 'verified_email': True})
+        if method == 'POST':
+            return Response({'permissions': ['run.services.get', 'run.services.getIamPolicy']
+                             if url.startswith('https://run.googleapis.com/') else []})
+        kind, name = url.rsplit('/', 2)[1:]
+        return Response(service(name) if kind == 'services' else revision(name), self.status)
+    def close(self): self.closed = True
+
+
+class SDKTests(unittest.TestCase):
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.folder = Path(tmp.name)
+        self.manifest, self.credentials = self.folder / 'manifest.json', self.folder / 'credentials.json'
+        self.credentials.write_text(json.dumps({
+            'type': 'external_account', 'token_url': 'https://sts.googleapis.com/v1/token',
+            'service_account_impersonation_url': 'https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/' +
+                                                diagnose.DIAGNOSTICS_ACCOUNT + ':generateAccessToken',
+            'credential_source': {'file': '/managed/subject-token'}}))
+        self.connections([{'provider_kind': 'gcp', 'alias': 'GCP', 'credentials_file': str(self.credentials)}])
+        self.env = {'OIC_MANIFEST_PATH': str(self.manifest), 'PATH': '',
+                    'HTTPS_PROXY': 'https://approved.invalid', 'GUARD_BINDING': LEAK}
+
+    def connections(self, rows):
+        self.manifest.write_text(json.dumps({'version': 1, 'connections': rows}))
+
+    def test_sdk_only_selector_actual_alias_and_no_gcloud(self):
+        session = Session()
+        before = self.credentials.read_bytes()
+        self.credentials.chmod(0o444)
+        with patch('subprocess.run', side_effect=AssertionError('No CLI allowed')):
+            report = sdk.report('GCP', verify_permissions=True, environ=self.env, session_factory=lambda env: session)
+        self.assertEqual(report['exit_code'], 0)
+        self.assertEqual(report['identity_alias'], 'GCP')
+        self.assertEqual(report['identity_account_verification'], 'verified')
+        self.assertEqual(len(report['services']), 3)
+        self.assertTrue(session.closed)
+        self.assertEqual(self.credentials.read_bytes(), before)
+        self.assertEqual(set(p.name for p in self.folder.iterdir()), {'manifest.json', 'credentials.json'})
+        self.assertNotIn(LEAK, json.dumps(report))
+        self.assertTrue(all(call[2]['allow_redirects'] is False for call in session.calls))
+
+    def test_wrong_effective_identity_stops_before_cloud_run(self):
+        session = Session('owner@example.invalid')
+        with self.assertRaisesRegex(diagnose.DiagnosticError, 'EFFECTIVE_IDENTITY_MISMATCH'):
+            sdk.report('GCP', environ=self.env, session_factory=lambda _: session)
+        self.assertEqual(len(session.calls), 1)
+        self.assertTrue(session.closed)
+
+    def test_missing_connection_wrong_alias_and_ambiguity_never_fall_back(self):
+        for env, alias in (({}, 'GCP'), (self.env, 'jems-diagnostics')):
+            factory = Mock()
+            with self.assertRaises(diagnose.DiagnosticError): sdk.report(alias, environ=env, session_factory=factory)
+            factory.assert_not_called()
+        self.connections([{'provider_kind': 'gcp', 'alias': name, 'credentials_file': str(self.credentials)}
+                          for name in ('GCP', 'other')])
+        with self.assertRaisesRegex(diagnose.DiagnosticError, 'IDENTITY_SELECTION_REQUIRED'):
+            sdk.report(environ=self.env)
+
+    def test_permission_denied_is_unavailable_and_redacted(self):
+        result = sdk.report('GCP', environ=self.env, session_factory=lambda _: Session(status=403))
+        self.assertEqual(result['exit_code'], 2)
+        self.assertNotIn(LEAK, json.dumps(result))
+        self.assertTrue(all('ACCESS_DENIED' in row['error'] for row in result['services']))
+
+    def test_credential_keys_owner_credentials_executables_and_wrong_target_rejected(self):
+        base = json.loads(self.credentials.read_text())
+        for change in ({'type': 'service_account', 'private_key': LEAK}, {'type': 'authorized_user'},
+                       {'credential_source': {'executable': {'command': LEAK}}},
+                       {'service_account_impersonation_url': LEAK}, {'token_url': 'https://evil.invalid'}):
+            self.credentials.write_text(json.dumps({**base, **change}))
+            with self.assertRaises(diagnose.DiagnosticError) as error: sdk.credential_info(self.credentials)
+            self.assertNotIn(LEAK, str(error.exception))
+
+    def test_transport_exception_and_redirect_never_expose_raw_data(self):
+        for mode in ('exception', 'redirect'):
+            session = Session()
+            session.request = Mock(side_effect=RuntimeError(LEAK)) if mode == 'exception' else Mock(return_value=Response({'secret': LEAK}, 302))
+            with self.assertRaises(diagnose.DiagnosticError) as error:
+                sdk.report('GCP', environ=self.env, session_factory=lambda _: session)
+            self.assertNotIn(LEAK, str(error.exception))
+
+    def test_metadata_reader_rejects_arbitrary_and_cross_family_names(self):
+        session = Session()
+        reader = sdk.Reader({}, lambda _: session)
+        with self.assertRaisesRegex(diagnose.DiagnosticError, 'EFFECTIVE_IDENTITY_UNVERIFIED'):
+            reader.describe('services', 'factory-gateway')
+        reader.identity()
+        for kind, name in (('services', 'other'), ('secrets', 'factory-gateway'), ('revisions', '../secrets')):
+            with self.assertRaisesRegex(diagnose.DiagnosticError, 'RESOURCE_OUTSIDE_SCOPE'):
+                reader.describe(kind, name)
+        self.assertEqual(len(session.calls), 1)
+
+    def test_sdk_selector_preserves_proxy_and_managed_guard(self):
+        env = managed.identity_environment('GCP', self.env, require_cli=False)
+        self.assertEqual(env['HTTPS_PROXY'], self.env['HTTPS_PROXY'])
+        self.assertEqual(env['GUARD_BINDING'], LEAK)
+        self.assertNotIn('CLOUDSDK_CONFIG', env)
+        with self.assertRaisesRegex(diagnose.DiagnosticError, 'IDENTITY_OVERRIDE_UNVERIFIED'):
+            managed.identity_environment('GCP', {**self.env, 'CLOUDSDK_AUTH_ACCESS_TOKEN': LEAK}, require_cli=False)
+
+
+class PreflightTests(unittest.TestCase):
+    def test_wrong_source_and_dirty_tree_stop_before_connection(self):
+        for replies in (['b' * 40], ['a' * 40, ' M changed']):
+            with patch.object(preflight, 'git', side_effect=replies), \
+                 patch.object(preflight.managed, 'identity_environment') as select, \
+                 patch.object(sys, 'argv', ['preflight', '--expected-source', 'a' * 40, '--live']), \
+                 contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(preflight.main(), 2)
+                select.assert_not_called()
+
+    def test_offline_preflight_never_reads_cloud(self):
+        with patch.object(preflight, 'git', side_effect=['a' * 40, '']), \
+             patch.object(preflight.managed, 'identity_environment', return_value={
+                 'GOOGLE_APPLICATION_CREDENTIALS': '/managed/fixture', 'JEMS_DIAGNOSTIC_IDENTITY_ALIAS': 'GCP'}), \
+             patch.object(preflight.diagnose_sdk, 'credential_info'), \
+             patch.object(preflight.diagnose_sdk, 'report') as live, \
+             patch.object(sys, 'argv', ['preflight', '--expected-source', 'a' * 40]), \
+             contextlib.redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(preflight.main(), 0)
+            live.assert_not_called()
+            self.assertEqual(json.loads(out.getvalue())['status'], 'CONFIGURED_NOT_VERIFIED')
+
+
+if __name__ == '__main__': unittest.main()

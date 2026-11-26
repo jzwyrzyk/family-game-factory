@@ -1,5 +1,7 @@
 # Browser setup for production request diagnostics
 
+November 26 continuation: [consolidated Cloud Shell setup and verified blockers](PERMANENT_CLOUD_SETUP.md), [autonomous triage and 401 investigation](AUTONOMOUS_TRIAGE.md). Earlier receipts below retain their original scope.
+
 **Status on November 24, 2026.** This is a proposed setup for `family-game-factory-jzw` (number `1054529152893`). The diagnostics PR provides source. Creating the view, deploying the diagnostic function, allowing federation, approving costs and verifying the production read path each require separate operational evidence. This procedure uses Google Cloud Console and GitHub. A signed-in administrator with existing authority performs the approved steps.
 
 ## Trust and cost decision

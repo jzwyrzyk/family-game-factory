@@ -1,5 +1,7 @@
 # Production HTTP request evidence
 
+November 26 continuation: [consolidated Cloud Shell setup and verified blockers](PERMANENT_CLOUD_SETUP.md), [autonomous triage and 401 investigation](AUTONOMOUS_TRIAGE.md). Earlier receipts below retain their original scope.
+
 Use this reader to answer which Cloud Run revision handled an HTTP request and what status it returned. Read the observation interval alongside the canary or promotion receipt. This repository is public. Only the six approved request fields and bounded operational metadata belong in its reports. The summary remains visible for the workflow run's retention period, which can exceed the artifact's seven days.
 
 ## Inventory at the November 24 review
