@@ -1174,10 +1174,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T23:29:20.251Z",
-      "sourceDigest": "38cd6d3d3a7f8f5e7827ccc07c39372dddf72af9745dd7dbe616427a7bdbb9fe",
+      "reviewedAt": "2026-11-26T23:31:15.886Z",
+      "sourceDigest": "5f5d75b095a82c3416ae0399f1fdd6a735cfa0a9f798d22b10294a6ff2c13d71",
       "reviewOutcome": "updated",
-      "reviewReason": "The integrated TEST handoff specifies private phased Terraform state, protected build identities, authenticated UAT, optional spending, rollback and live evidence gates.",
+      "reviewReason": "The integrated TEST handoff requires the existing public delegated zone and plan-time ownership check before a foundation apply, with independently isolated IAM, UAT, funding and rollback gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
