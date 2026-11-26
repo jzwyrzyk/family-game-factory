@@ -7,6 +7,9 @@ export interface ReadAloudOptions {
   label?: string;
   buttonClass?: string;
   onStarted?(): void;
+  onDelivered?():void;
+  onUnavailable?():void;
+  deviceOnly?:boolean|(()=>boolean);
 }
 /** A visible, tap-only speaker control. Dictation keeps its separate microphone. */
 export function createReadAloudControl(options: ReadAloudOptions) {
@@ -31,9 +34,9 @@ export function createReadAloudControl(options: ReadAloudOptions) {
       onStarted: () => {notice.textContent='';setIconLabel(button,'stop','Stop reading');button.setAttribute('aria-pressed','true');options.onStarted?.();},
       onPlayRequired: () => {setIconLabel(button,'volume','Play reading');button.setAttribute('aria-pressed','false');notice.textContent='Tap Play reading to hear it.';},
       onMode: mode => {button.dataset.voiceMode=mode;},
-      onFinished: showIdle,
-      onUnavailable: () => { notice.textContent = 'Voice is not ready here. Ask a grown-up to read with you.'; },
-    });
+      onFinished: showIdle, onDelivered: options.onDelivered,
+      onUnavailable: () => { options.onUnavailable?.(); notice.textContent = 'Voice is not ready here. Ask a grown-up to read with you.'; },
+    },{deviceOnly:typeof options.deviceOnly==='function'?options.deviceOnly():options.deviceOnly});
   };
   showIdle();
   return { element, button, notice,

@@ -1,3 +1,4 @@
+const {authorizeLearningParent}=require('./learning-parent-fixture.cjs');
 /* Production child journeys. Network responses and storage faults are explicit
  * fixtures; no paid model, credentials, or experimental UI harness is used. */
 const {chromium}=require('playwright');
@@ -43,7 +44,7 @@ async function openPhysicalGum(page){
     if(!session)throw Error('Missing saved physical workshop session');
     return session.id;
   });
-  await page.reload();await page.waitForFunction(()=>window.FG?.studio);
+  await page.reload();await page.waitForFunction(()=>window.FG?.studio);await exploreWelcome(page);
   await page.locator(`#studioLibrary [data-session="${originalSession}"] .studio-saved-open`).click();
   await page.waitForSelector('.quality-builder');
 }
@@ -80,11 +81,21 @@ async function localJourney(browser,url,device,viewport){
   await page.goto(url);await page.waitForFunction(()=>window.FG?.studio&&window.FG?.learning);
   await exploreWelcome(page);
   await assertTouchDevice(page,device,'after initial navigation');
-  const first=await page.locator('#studioStarters [data-starter]').first().boundingBox();
-  assert.ok(first&&first.y>=0&&first.y+first.height<=viewport.height,'a complete playable game choice is in the first viewport');
+  // The approved hierarchy puts destinations before curated games; scroll to the full playable card.
+  await page.evaluate(()=>document.fonts.ready);
+  const firstCard=page.locator('#studioStarters [data-starter]').first();
+  // Center the card after font layout settles. Nearest-edge scrolling can leave
+  // its Play control behind the mobile bottom navigation.
+  await firstCard.evaluate(node=>node.scrollIntoView({block:'center',behavior:'instant'}));
+  const first=await firstCard.boundingBox();
+  assert.ok(first&&first.y>=0&&first.y+first.height<=viewport.height,`a complete playable choice is reachable below the destinations: ${JSON.stringify(first)}`);
+  assert.equal(await firstCard.evaluate(node=>{
+    const box=node.getBoundingClientRect();
+    return [box.top+5,box.bottom-5].every(y=>node.contains(document.elementFromPoint(box.left+box.width/2,y)));
+  }),true,'the complete playable choice is unobstructed by fixed navigation');
   await assertTargets(page,['#studioNavHome','#studioNavCreate','#studioNavMenu','#studioProfileSummary','#studioNew']);
   await page.click('#studioNavMenu');
-  await assertTargets(page,['#studioNavPowers']);
+  await assertTargets(page,['#studioNavJourney']);
   await page.click('#studioMenuClose');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
   await journeyScreenshot(page,device,'first-screen');
@@ -312,8 +323,9 @@ async function remoteJourney(browser,url,device,viewport,variant='v1'){
    // A parent-authorized English setting applies to the same generated v2
    // preview, not a separate practice-only game. Required learning must pause
    // play and preserve the actual game state until the child continues.
-   await page.evaluate(()=>{
-    FG.store.changeProfile({learningSubject:'language',allowSubjectSwitch:true,grade:2,rate:1,hints:false});
+   await authorizeLearningParent(page);
+    await page.evaluate(async ()=>{
+    await FG.store.changeLearningProfile({learningSubject:'language',allowSubjectSwitch:true,grade:2,rate:1,hints:false});
     FG.store.current().mathWindow=[];FG.store.save();
    });
    assert.equal(await page.evaluate(()=>FG.learning.subject),'language');

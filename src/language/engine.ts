@@ -1,3 +1,4 @@
+import {withinGrade, isEarlyGrade} from '../learning/grades';
 import {LANGUAGE_SKILLS, getLanguageSkill} from './curriculum';
 import {LANGUAGE_BANK, LANGUAGE_PACKS, generateLanguageItem, evaluateLanguageAnswer} from './content';
 import {profileGrade} from '../learning/engine';
@@ -31,7 +32,7 @@ export interface LanguageResponse {
 export interface LanguageAttempt {
   id:string;item:LanguageItem;context:StoredContext;startedAt:number;finishedAt?:number;
   answers:LanguageResponse[];hintDepth:number;hints:{step:number;at:number}[];
-  readTargetAt?:number;outcome:LanguageOutcome;correct:boolean;independent:boolean;
+  promptDelivery?:'audio'|'grown-up'; readTargetAt?:number;outcome:LanguageOutcome;correct:boolean;independent:boolean;
   draft?:string;
 }
 interface Recent {independent:boolean;struggled:boolean;at:number}
@@ -70,11 +71,11 @@ function trustedItem(item:unknown):item is LanguageItem {
   if(!template||template.q!==item.question||template.kind!==item.kind||template.t!==item.tier)return false;
   if(template.kind!=='creative'&&template.a!==item.answer)return false;
   if(template.kind==='creative'&&item.answer!==undefined)return false;
-  if(item.passage!==template.passage||item.explanation!==template.ex)return false;
+  if(item.stimulus!==template.stimulus||item.passage!==template.passage||item.explanation!==template.ex)return false;
   const skill=LANGUAGE_SKILLS.find(s=>s.id===item.skillId);
   if(!skill||item.grade!==skill.grade||item.domain!==skill.domain||
      typeof item.title!=='string'||item.title.length>150)return false;
-  const form=template.kind==='word-tiles'?'encoding':template.kind==='sentence-tiles'||template.kind==='edit'?'syntax':
+  const form=template.kind==='picture-order'?'comprehension':template.kind==='word-tiles'?'encoding':template.kind==='sentence-tiles'||template.kind==='edit'?'syntax':
     template.kind==='creative'?'expression':skill.domain==='comprehension'?'comprehension':'pattern';
   if(item.form!==form)return false;
   if(item.purpose!==undefined&&!['focus','review','confidence','prerequisite','explore'].includes(item.purpose))return false;
@@ -89,7 +90,7 @@ function trustedItem(item:unknown):item is LanguageItem {
       new Set(choices.map((c:any)=>c?.value)).size===4&&
       expected.every(v=>choices.some((c:any)=>c?.value===v&&c.label===v));
   }
-  if(template.kind==='word-tiles'||template.kind==='sentence-tiles'){
+  if(template.kind==='picture-order'||template.kind==='word-tiles'||template.kind==='sentence-tiles'){
     if(item.choices!==undefined||!Array.isArray(item.tiles))return false;
     const expected=template.kind==='word-tiles'?template.a.split(''):template.a.split(/\s+/);
     return JSON.stringify([...item.tiles].sort())===JSON.stringify([...expected].sort());
@@ -117,6 +118,7 @@ function validAttempt(a:unknown):a is LanguageAttempt {
   if(a.finishedAt!==undefined&&!safeTime(a.finishedAt))return false;
   if(!['open','completed','shown','incorrect','interrupted','skipped','explored'].includes(a.outcome)||typeof a.independent!=='boolean'||typeof a.correct!=='boolean')return false;
   if(!safeCount(a.hintDepth)||a.hintDepth>4||!Array.isArray(a.hints)||a.hints.length>4||a.hints.some((h:unknown)=>!isObject(h)||!safeCount(h.step)||!safeTime(h.at)))return false;
+  if(a.promptDelivery!==undefined&&!['audio','grown-up'].includes(a.promptDelivery))return false;
   if(a.readTargetAt!==undefined&&!safeTime(a.readTargetAt))return false;
   if(a.draft!==undefined&&(typeof a.draft!=='string'||a.draft.length>1200))return false;
   if(!Array.isArray(a.answers)||a.answers.length>12||a.answers.some((v:unknown)=>!isObject(v)||typeof v.raw!=='string'||v.raw.length>400||typeof v.normalized!=='string'||v.normalized.length>400||typeof v.correct!=='boolean'||!safeTime(v.at)))return false;
@@ -169,7 +171,7 @@ function completeSchedule(summary:LanguageEvidence,attempt:LanguageAttempt,now:n
 }
 export function beginLanguageAttempt(profile:LanguageProfile,item:LanguageItem,context:LanguageContext={}):LanguageAttempt {
   if(!trustedItem(item))throw Error('Unreviewed language question.');
-  if(item.grade>profileGrade(profile))throw Error('Language item exceeds parent grade scope.');
+  if(!withinGrade(item.grade,profileGrade(profile)))throw Error('Language item exceeds parent grade scope.');
   const state=ensureLanguage(profile),now=bounded(context.now??Date.now());
   for(const open of state.attempts.filter(a=>a.outcome==='open'))finishLanguageAttempt(profile,open.id,'interrupted',now);
   const attempt:LanguageAttempt={
@@ -186,6 +188,7 @@ export function beginLanguageAttempt(profile:LanguageProfile,item:LanguageItem,c
 export function submitLanguageAnswer(profile:LanguageProfile,id:string,raw:string,now=Date.now()){
   const state=ensureLanguage(profile),attempt=findOpen(state,id);
   if(attempt.outcome!=='open')return {valid:false,correct:attempt.correct,attempt,message:'This activity has finished.'};
+  if(!withinGrade(attempt.item.grade,profileGrade(profile)))return {valid:false,correct:false,attempt,message:'This activity exceeds the current grade.'};
   if(attempt.correct)return {valid:false,correct:true,attempt,message:'This answer was already counted.'};
   if(attempt.answers.length>=12)return {valid:false,correct:false,attempt,message:'Let us try a worked example now.'};
   const check=evaluateLanguageAnswer(attempt.item,raw);
@@ -193,7 +196,7 @@ export function submitLanguageAnswer(profile:LanguageProfile,id:string,raw:strin
   attempt.answers.push({raw:raw.slice(0,400),normalized:check.normalized,correct:check.correct,at:bounded(now)});
   if(check.correct){
     attempt.correct=true;
-    attempt.independent=attempt.answers.length===1&&attempt.hintDepth===0&&attempt.readTargetAt===undefined;
+    attempt.independent=attempt.promptDelivery!=='grown-up'&&attempt.answers.length===1&&attempt.hintDepth===0&&attempt.readTargetAt===undefined;
   } else evidence(state,attempt.item.skillId,bounded(now)).incorrectResponses++;
   return {...check,attempt};
 }
@@ -213,6 +216,7 @@ export function recordLanguageReadAloud(profile:LanguageProfile,id:string,now=Da
 export function finishLanguageAttempt(profile:LanguageProfile,id:string,outcome:Exclude<LanguageOutcome,'open'>,now=Date.now()){
   const state=ensureLanguage(profile),attempt=findOpen(state,id);
   if(attempt.outcome!=='open')return attempt;
+  if(!withinGrade(attempt.item.grade,profileGrade(profile)))outcome='interrupted';
   if(outcome==='completed'&&!attempt.correct)throw Error('Cannot award completion for an incorrect answer.');
   if(outcome==='explored'&&attempt.item.kind!=='creative')throw Error('Only open writing is unscored exploration.');
   attempt.outcome=outcome;attempt.finishedAt=bounded(now);
@@ -263,7 +267,7 @@ const select=(items:LanguageSkill[],random:()=>number):LanguageSkill=>items[Math
 export function selectLanguageItem(profile:LanguageProfile,context:LanguageContext={}):LanguageItem {
   const state=ensureLanguage(profile),grade=profileGrade(profile),random=context.random||Math.random;
   // Keep extended creative writing for natural breaks or voluntary practice, never a timed mid-game pause.
-  const allowed=LANGUAGE_SKILLS.filter(s=>s.grade<=grade&&LANGUAGE_BANK[s.id]?.items.length&&
+  const allowed=LANGUAGE_SKILLS.filter(s=>withinGrade(s.grade,grade)&&(isEarlyGrade(grade)||!isEarlyGrade(s.grade)||profile.languageFocus?.includes(s.id))&&LANGUAGE_BANK[s.id]?.items.length&&
     (context.opportunity!=='mid-play'||!LANGUAGE_BANK[s.id].items.some(item=>item.kind==='creative')));
   if(!allowed.length)throw Error('No language curriculum available.');
   const preferred=(profile.languageFocus||[]).filter(x=>allowed.some(s=>s.id===x));
@@ -284,6 +288,10 @@ export function selectLanguageItem(profile:LanguageProfile,context:LanguageConte
   if(!pool.length)pool=allowed;
   const last=state.recentSkills.slice(0,2);
   const fresh=pool.filter(s=>!last.includes(s.id));if(fresh.length)pool=fresh;
+  if(isEarlyGrade(grade)){
+    const ready=pool.filter(s=>s.prerequisites.every(id=>(state.skills[id]?.independent??0)>=2));
+    pool=ready.length?ready:allowed.filter(s=>s.grade===grade&&!s.prerequisites.length);
+  }
   let skill=select(pool,random);
   const weak=state.skills[skill.id];
   if(weak&&weak.recent.slice(-2).length===2&&weak.recent.slice(-2).every(x=>x.struggled)&&
@@ -307,7 +315,7 @@ export function reportLanguage(profile:LanguageProfile,now=Date.now()){
     grade:profileGrade(profile),totals:{...state.totals},
     due:LANGUAGE_SKILLS.filter(s=>state.skills[s.id]?.dueAt!==null&&
       state.skills[s.id]?.dueAt!==undefined&&(state.skills[s.id]?.dueAt||Infinity)<=now).map(x=>x.id),
-    skills:LANGUAGE_SKILLS.filter(s=>s.grade<=profileGrade(profile)||state.skills[s.id]).map(s=>{
+    skills:LANGUAGE_SKILLS.filter(s=>withinGrade(s.grade,profileGrade(profile))||state.skills[s.id]).map(s=>{
       const ev=state.skills[s.id],status=languageEvidenceState(ev);
       return {id:s.id,title:s.title,grade:s.grade,domain:s.domain,state:status,
         presentations:ev?.presentations||0,independent:ev?.independent||0,assisted:ev?.assisted||0,

@@ -1,0 +1,35 @@
+import {build} from 'esbuild';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {execFileSync} from 'node:child_process';
+const root=process.cwd(),out=path.resolve(process.env.UI_REVIEW_OUT||'dist-review');
+await fs.mkdir(out,{recursive:true});
+const sha=process.env.UI_REVIEW_BASE_SHA||execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+execFileSync('git',['diff','--exit-code',sha,'--','src','public','index.html','tests/parent-dashboard-fixture.ts'],{stdio:'pipe'});
+const manifest=JSON.parse(await fs.readFile('tools/ui-review/coverage.json','utf8'));
+manifest.excludedPRs=JSON.parse(await fs.readFile('tools/ui-review/excluded-prs.json','utf8'));
+const files=await fs.readdir('public',{recursive:true});
+const types={'.webp':'image/webp','.png':'image/png','.svg':'image/svg+xml','.woff':'font/woff','.woff2':'font/woff2','.ttf':'font/ttf','.json':'application/json'};
+const assets={};
+const exact=process.env.UI_REVIEW_EXACT_ASSETS==='1';
+if(!exact)execFileSync('python3',['tools/ui-review/prepare-assets.py'],{stdio:'inherit'});
+for(const name of files){const ext=path.extname(name);if(!types[ext]||name==='factory-config.json')continue;assets[name.replaceAll('\\','/')]=[types[ext],(await fs.readFile(path.join(!exact&&name.startsWith('jems-pals/')&&name.endsWith('.webp')?'work/ui-review/assets':'public',name))).toString('base64')];}
+const options={bundle:true,write:false,format:'iife',target:'chrome110',minify:true,define:{'import.meta.env.BASE_URL':'"./"','import.meta.env.MODE':'"early-preview"','import.meta.env.DEV':'false','import.meta.env.PROD':'true'},plugins:[{name:'review-only',setup(b){
+ b.onResolve({filter:/\/offline$/},()=>({path:'offline',namespace:'review'}));
+ b.onLoad({filter:/.*/,namespace:'review'},()=>({contents:'export function installOffline(){}',loader:'js'}));
+ b.onResolve({filter:/^\//},a=>a.kind==='url-token'?{path:a.path,external:true}:null);
+ b.onResolve({filter:/\.(woff2?|ttf|png|webp|svg)$/},a=>a.kind==='url-token'?{path:a.path,external:true}:null);
+ b.onLoad({filter:/src\/brand\/icons.ts$/},async a=>({contents:(await fs.readFile(a.path,'utf8')).replace("const url = new URL('jems-art/icons/jems-icons.svg', document.baseURI);", "const url = new URL(document.baseURI);" ).replace('return url.href;', 'return url.hash;'),loader:'ts'}));
+}}]};
+const result=await build({...options,entryPoints:['tools/ui-review/entry.ts'],outfile:'app.js'});
+const js=result.outputFiles.find(x=>x.path.endsWith('.js')).text,css=result.outputFiles.find(x=>x.path.endsWith('.css')).text;
+let html=await fs.readFile('index.html','utf8');
+html=html.replace(/<script[^>]*src=[^>]+><\/script>/g,'').replace(/<link[^>]+>/g,'');
+manifest.assetPackaging=exact?'Exact original bytes':'Gem Pal images: same artwork, maximum 768px WebP quality 90; other assets exact';
+const sourceKind=process.env.UI_REVIEW_SOURCE_KIND || (execFileSync('git',['branch','--show-current'],{encoding:'utf8'}).trim()==='main'?'merged main':'candidate branch');
+const payload={sha,sourceKind,builtAt:new Date().toISOString(),manifest,assets,html,css,js,bootstrap:await fs.readFile('tools/ui-review/bootstrap.js','utf8')};
+const esc=s=>JSON.stringify(s).replaceAll('<','\\u003c');
+const shell=await fs.readFile('tools/ui-review/shell.html','utf8');
+await fs.writeFile(path.join(out,'jems-ui-review.html'),shell.replace('/*__PAYLOAD__*/',()=>`const PAYLOAD=${esc(payload)};`));
+await fs.writeFile(path.join(out,'coverage.json'),JSON.stringify({...manifest,sha,sourceKind,assets:Object.keys(assets).length},null,2));
+console.log(`Built ${path.join(out,'jems-ui-review.html')} (${Object.keys(assets).length} embedded assets), baseline ${sha}`);

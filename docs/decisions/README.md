@@ -6,11 +6,16 @@ These records explain durable choices without turning chat history into another 
 
 ## Index
 
+- [Journey cards, starter eligibility and permanent retirements](2026-11-25-journey-cards-and-starter-pals.md)
+
+- [November 25: one child-facing Jems world](2026-11-25-child-experience-modernization.md) — owner-approved navigation, landing-page reference, purpose-driven scenes and unified Send/Build concept. Supersedes earlier menu and retained-game placement only.
+
 | Record | Decision | Status | Source |
 | --- | --- | --- | --- |
+| [Private Family Beta](2026-11-25-private-family-beta.md) | Family origins, server-authorized workspaces, verified privacy controls, shared accounting and authenticated household delivery | Proposed for release review | Owner assignment, November 2026 |
 | [DEV → TEST → PROD](2026-11-23-dev-test-prod.md) | Independent private PR previews, permanent isolated TEST and exact-release approval through the existing production controller; zero routine Cloud Shell | Accepted operating direction; source foundation and deployed completion separate | Owner's November 23 automated environment assignment, superseding previous unimplemented DEV/staging proposals |
 | [Retained games in My Creations](2026-11-23-retained-games-in-my-creations.md) | Move Dragon/Buckets cards into My Creations, preserve every variant and retain four Home games; scope the owner's retention exception to this cutover | Accepted for implementation; source and live acceptance separate | Owner's November 23 retained-games and production-cutover direction |
-| [Premium game builder](2026-11-23-premium-builder.md) | Use Astra High for all Adult Private premium game construction and repair, with separately approved planning and review | Accepted for implementation. Activation follows the production cutover and separate approval. | Owner's November 23 premium builder assignment |
+| [Premium game builder](2026-11-23-premium-builder.md) | Use Astra High for all Adult Private premium game construction and repair, with separately approved planning and review | Merged through #139 and #168. Adult Private retains a cumulative $5 game-lineage ceiling. Provider entitlement, trial spending and worker activation require separate acceptance. | Owner's November 23 premium builder assignment |
 | [Direct operations](2026-11-20-direct-operations.md) | Eliminate routine command/output relay through a reusable cloud identity; brief notice for larger in-scope fixes | Accepted operating intent; reconciled diagnostic source, prior environment evidence separate from current access; no-merge preparation hold | Owner's November 20 access-efficiency discussion and November 21 preparation-only continuation |
 | [0001](0001-child-led-creation.md) | Child-led creation and explicit version promotion | Accepted, retrospectively documented | Owner-approved coaching standard |
 | [0002](0002-intent-faithful-game-forms.md) | Choose intent-faithful game forms using independent axes | Accepted, retrospectively documented | Game Intelligence standards and Bubble Gum decision |
@@ -80,3 +85,5 @@ Never copy private child content, credentials or restricted evidence into this p
 - [November 20: readable learning surfaces and friendly narration](2026-11-20-learning-readability-and-narration.md) — question-first copy, semantic light/dark separation, readable type and deliberate local female voice selection.
 
 - [November 21: explicit profile levels, fitted play and persistent reading](2026-11-21-profile-play-and-reading.md) — conservative per-profile learning setup, common viewport/fullscreen, shared read-aloud and separately approved natural narration.
+
+- [Pre-K and kindergarten](2026-11-25-early-learning.md) records grade compatibility, authorization and release dependencies.

@@ -1,0 +1,98 @@
+{
+  "schema": "jems.storage.sync-wire-benchmark.v1",
+  "source": "478c988c1014a08e60a0210613dd824222555060",
+  "gitTree": "95077685ef756d27f52d7fe74a26c33627b415ab",
+  "browser": "Chromium 156.0.8078.79",
+  "environment": "Debian GNU/Linux 13, headless Playwright with /usr/bin/chromium",
+  "evidence": "Exact committed source rerun reported by synchronization agent; actual source bundled with esbuild and real IndexedDB. Native transport model and actual browser fetch against deterministic in-page server are individually labeled. No cloud, provider, HTTP headers or billed Firestore operations. Later reversible-removal implementation has separate correctness tests and is not covered by this earlier payload receipt.",
+  "result": {
+    "browser": "chromium",
+    "checks": 16,
+    "writes": 5,
+    "localVersion": 9,
+    "serverVersion": 5,
+    "measurements": [
+      {
+        "label": "native first selected copy",
+        "kind": "synthetic native transport JSON; excludes HTTP headers and Firestore costs",
+        "calls": {
+          "status": 1,
+          "lookup": 1,
+          "commit": 1,
+          "changes": 2
+        },
+        "requestBytes": 1437,
+        "responseBytes": 1948
+      },
+      {
+        "label": "native unchanged check",
+        "kind": "synthetic native transport JSON; excludes HTTP headers and Firestore costs",
+        "calls": {
+          "status": 1,
+          "changes": 1
+        },
+        "requestBytes": 82,
+        "responseBytes": 189
+      },
+      {
+        "label": "native one mechanic revision",
+        "kind": "synthetic native transport JSON; excludes HTTP headers and Firestore costs",
+        "calls": {
+          "status": 1,
+          "lookup": 1,
+          "commit": 1,
+          "changes": 2
+        },
+        "requestBytes": 1477,
+        "responseBytes": 1988
+      },
+      {
+        "label": "Parent initial check, receive, explicit selected copy",
+        "kind": "actual browser fetch JSON against in-page deterministic continuity fixture; excludes HTTP headers and Firestore costs",
+        "calls": {
+          "status": 3,
+          "changes": 8,
+          "lookup": 1,
+          "commit": 1
+        },
+        "requestBytes": 2710,
+        "responseBytes": 6202
+      },
+      {
+        "label": "Parent unchanged check",
+        "kind": "actual browser fetch JSON against in-page deterministic continuity fixture; excludes HTTP headers and Firestore costs",
+        "calls": {
+          "status": 1,
+          "changes": 1
+        },
+        "requestBytes": 83,
+        "responseBytes": 237
+      },
+      {
+        "label": "Parent concurrent edit conflict",
+        "kind": "actual browser fetch JSON against in-page deterministic continuity fixture; excludes HTTP headers and Firestore costs",
+        "calls": {
+          "status": 1,
+          "lookup": 1,
+          "commit": 1,
+          "read": 4
+        },
+        "requestBytes": 1870,
+        "responseBytes": 478
+      },
+      {
+        "label": "Parent Keep both with interrupted local preservation and retry",
+        "kind": "actual browser fetch JSON against in-page deterministic continuity fixture; excludes HTTP headers and Firestore costs",
+        "calls": {
+          "read": 6,
+          "status": 1,
+          "lookup": 1,
+          "commit": 1,
+          "changes": 3
+        },
+        "requestBytes": 2369,
+        "responseBytes": 4046
+      }
+    ]
+  }
+}

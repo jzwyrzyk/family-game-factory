@@ -30,7 +30,7 @@ const passwordHash=(passphrase:string,salt:string)=>scryptSync(passphrase,Buffer
 const passphraseOk=(value:unknown):value is string=>typeof value==='string'&&value.length>=12&&value.length<=128;
 /** Return false, rather than throwing, for a mismatch so the transaction saves
  * its shared lockout counter. Adult profile switching uses the same throttle. */
-function checkParentPassphrase(auth:FamilyParentAuth|undefined,passphrase:string,now:number){
+export function checkParentPassphrase(auth:FamilyParentAuth|undefined,passphrase:string,now:number){
  if(!auth)throw Error('INVALID_PARENT_ACCESS');
  if(auth.lockedUntil>now)throw Error('PARENT_LOCKED');
  if(!equal(auth.digest,passwordHash(passphrase,auth.salt))){
@@ -78,12 +78,29 @@ const parentCookie=(familyId:string,deviceId:string,sessionKey:string,now:number
 const rotatedSecret=(key:string,deviceId:string,sequence:number,secret:string)=>
  hmac(key,'jems-device-rotation-v1\n'+deviceId+'\n'+sequence+'\n'+secret);
 
+/** Beta uses the same device credential, passphrase verifier and rotation as household. */
+export function newParentAuth(passphrase:unknown):FamilyParentAuth {
+ if(!passphraseOk(passphrase))throw Error('INVALID_PARENT_ACCESS');
+ const salt=randomBytes(16).toString('hex');
+ return {salt,digest:passwordHash(passphrase,salt),failedAttempts:0,lockedUntil:0};
+}
+export function newTrustedDevice(familyId:string,name:string,now:number){
+ const secret=token();
+ const device:TrustedDevice={id:randomUUID(),familyId,name,secretHash:digest(secret),rotation:0,createdAt:now,lastSeenAt:now,expiresAt:now+DEVICE_MAX};
+ return {device,secret};
+}
+export function deviceCredentials(device:TrustedDevice,secret:string,key:string,now:number){
+ return [accessCookie(device.familyId,device.id,key,now),deviceCookie(device,secret,now)];
+}
+export function firstPartyCookie(cookie:string){
+ return cookie.replace(/^factory_/, '__Host-factory_').replace(/; Path=[^;]+/,'; Path=/').replace('; SameSite=None; Partitioned','; SameSite=Strict');
+}
 export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;familyId:string;sessionKey:string;
- adultPilot?:AdultPilotFlags;eraseCoachReceipts?:(session:VerifiedSession)=>Promise<unknown>}){
+ firstParty?:boolean;hostCookies?:boolean;adultPilot?:AdultPilotFlags;eraseCoachReceipts?:(session:VerifiedSession)=>Promise<unknown>}){
  return async(request:IncomingMessage,response:ServerResponse)=>{
   const cors={'Access-Control-Allow-Origin':config.appOrigin,'Access-Control-Allow-Credentials':'true','Vary':'Origin','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'};
   const reply=(status:number,value:unknown,cookies?:string[])=>{
-   response.writeHead(status,{...cors,'Content-Type':'application/json',...(cookies?{'Set-Cookie':cookies}:{})});
+   response.writeHead(status,{...cors,'Content-Type':'application/json',...(cookies?{'Set-Cookie':(config.firstParty||config.hostCookies)?cookies.map(firstPartyCookie):cookies}:{})});
    response.end(JSON.stringify(value));
   };
   const readBody=async()=>{
@@ -109,28 +126,27 @@ export function trustedDeviceHandler(repo:Repository,config:{appOrigin:string;fa
        !passphraseOk(input.parentPassphrase)||typeof input.deviceName!=='string'||!/^.{1,48}$/u.test(input.deviceName.trim()))
      throw Error('INVALID_REQUEST');
     const name=input.deviceName.trim(),inviteHash=digest(input.invitation),passphrase=input.parentPassphrase;
-    const id=randomUUID(),secret=token(),salt=randomBytes(16).toString('hex');
+    const {device,secret}=newTrustedDevice(config.familyId,name,now);
     const enrolled=await repo.transaction(state=>{
      const invitation=state.invitations?.find(x=>x.hash===inviteHash&&x.familyId===config.familyId&&!x.used&&x.expiresAt>now);
-     if(!invitation)throw Error('INVALID_INVITATION');
+     if(!invitation||(config.firstParty&&invitation.purpose!=='trusted-device'))throw Error('INVALID_INVITATION');
      const existing=state.parentAuth?.[config.familyId];
      if(existing){
       if(!checkParentPassphrase(existing,passphrase,now))return null;
      }else{
       state.parentAuth??={};
-      state.parentAuth[config.familyId]={salt,digest:passwordHash(passphrase,salt),failedAttempts:0,lockedUntil:0};
+      state.parentAuth[config.familyId]=newParentAuth(passphrase);
      }
      state.devices??=[];
      // Bound persistent metadata without resurrecting expired or revoked devices.
      state.devices=state.devices.filter(d=>d.familyId!==config.familyId||deviceLive(d,now)||(!!d.revokedAt&&d.revokedAt>now-30*DAY));
      if(state.devices.filter(d=>d.familyId===config.familyId&&deviceLive(d,now)).length>=MAX_DEVICES)throw Error('DEVICE_LIMIT');
      invitation.used=true;
-     const device:TrustedDevice={id,familyId:config.familyId,name,secretHash:digest(secret),rotation:0,createdAt:now,lastSeenAt:now,expiresAt:now+DEVICE_MAX};
      state.devices.push(device);return device;
     });
     if(!enrolled)throw Error('INVALID_PARENT_ACCESS');
     reply(200,{connected:true,trusted:true,deviceName:enrolled.name,expiresAt:now+ACCESS},
-      [accessCookie(config.familyId,enrolled.id,config.sessionKey,now),deviceCookie(enrolled,secret,now)]);
+      deviceCredentials(enrolled,secret,config.sessionKey,now));
     return;
    }
    if(path==='/v1/sessions/renew'&&request.method==='POST'){

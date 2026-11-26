@@ -17,8 +17,8 @@ export function loadApprovedPalArtwork(): Promise<PalArtworkResolver> {
     .then(async response => {
       if (!response.ok) throw Error('Pal pictures could not load. Try again.');
       const resolver = createPalArtworkResolver(await response.json());
-      if (!resolver || resolver.manifest.scope.id !== 'original-23'
-        || resolver.manifest.scope.characterCount !== 23 || resolver.manifest.scope.assetCount !== 184) {
+      if (!resolver || resolver.manifest.scope.id !== 'active-core-21'
+        || resolver.manifest.scope.characterCount !== 21 || resolver.manifest.scope.assetCount !== 168) {
         throw Error('Pal pictures could not load. Try again.');
       }
       resolved = resolver;

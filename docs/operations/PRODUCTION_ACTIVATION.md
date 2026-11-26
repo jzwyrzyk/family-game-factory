@@ -1,5 +1,7 @@
 # Jems production activation and exact-source release
 
+The November 24 cutover is complete. The production workflow definitions merged in #126, the Gateway promotion completed in #152 and the Pages publication was recorded in #161. The temporary candidate route was removed. Candidate-specific authenticated chat remained unverified. The historical cutover exception applied only to that source. Use the current release record for a new promotion, its exact-source acceptance and rollback requirements. [November 24 observation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45508931546) · [November 26 serving metadata](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45728127526) · [Current release gates](../../DELIVERY-STATE.md)
+
 ## Owner-approved acceptance exception — November 24
 
 On November24 the owner stopped the manual browser procedure and asked whether release gates could be bypassed and what adverse consequences that would have. After the candidate-specific and full-cutover evidence gaps, failure/charging risks, recovery limitations and retained safeguards were explained, the owner explicitly replied **approve**. This authorizes a one-time risk-accepted full cutover. It supersedes the manual functional/data evidence holds below only for the listed unavailable checks; it does not turn missing evidence into a pass or authorize ignoring observed failures.

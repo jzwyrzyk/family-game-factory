@@ -36,7 +36,7 @@ const validateBase = (raw: string) => JSON.parse(raw);
 async function fixture() {
   const database = new MemoryDatabase(), storage = new MemoryStorage();
   const rewards = new RewardsStore(REWARDS_DB_NAME, database), pals = new PalsStore(PALS_DB_NAME, database, () => time);
-  await pals.chooseStarter(owner, 'glim', { owner, lifetimeGems: 0, activities: [] });
+  await pals.chooseStarter(owner, 'navi', { owner, lifetimeGems: 0, activities: [] });
   await rewards.project(owner, [createRewardFact({ owner, kind: 'game.developed', sourceId: 'original-game', occurredAt: time + 100 })]);
   await pals.sync(owner, palSnapshotFromRewards(await rewards.export(), owner));
   await pals.setPreferences(owner, { encouragement: false });

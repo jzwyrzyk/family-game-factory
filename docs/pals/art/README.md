@@ -4,9 +4,11 @@
 
 **Reconciled November 20, 2026 (America/New_York).** The original **23 individual profiles across 22 roster entries** have approved artwork for both forms: **46 neutral masters plus 138 expressions, 184 images total** in selected package **2.9**. Each form has Neutral, Celebrate, Thinking and Encouraging retry. There are no unresolved current forms or pending core-expression approvals in this original roster.
 
-The [existing character index](character-references.json) remains the authority for identity, selected references, approval scope and history. The [versioned export manifest](../../../public/jems-pals/manifest.json) binds these approved sources to **184 lossless WebP files** under `public/jems-pals/`, version `core-2026-11-20`. Each record includes the full source PNG hash, exported WebP hash, dimensions and form/expression identity. Original pixels, dimensions, alpha and background treatment are retained.
+The [existing character index](character-references.json) remains the authority for identity, selected references, approval scope and history. The [versioned export manifest](../../../public/jems-pals/manifest.json) binds these approved sources to **168 active lossless WebP images** under `public/jems-pals/`, version `core-2026-11-20`. Each record includes the full source PNG hash, exported WebP hash, dimensions and form/expression identity. Original pixels, dimensions, alpha and background treatment are retained.
 
 **Brio remains separate:** his two neutral masters are approved and six expressions remain in review. His [profile and image files](characters/brio/README.md), [adoption decision](../../decisions/2026-11-19-brio-art-adoption.md), art approvals and asset records are unchanged; his application mapping now binds the approved neutrals to the collection. The complete index therefore still represents **23 roster entries and 24 profiles**. F contains the separate F1 Navi and F2 Mote profiles; C Tollo and J Pock remain set aside.
+
+The application has 22 active profiles including Brio. Luma and Zippa remain in the historical crosswalk for saved games. Nook and Navi are the free starters. [Roster decision](../../decisions/2026-11-25-journey-cards-and-starter-pals.md)
 
 ## Current neutral exports and identity crosswalk
 
@@ -14,7 +16,7 @@ Every original profile below has all three core expressions approved for both fo
 
 | Alias | Profile / export slug | Species ID | Approved Base | Approved Grown |
 | --- | --- | --- | --- | --- |
-| A | Luma / `luma` | Unassigned | [Base](../../../public/jems-pals/luma/base/neutral-93fde3101e62.webp) | [Grown](../../../public/jems-pals/luma/mature/neutral-6b3ffa07f571.webp) |
+| A (retired) | Luma / `luma` | Unassigned | [Base](../../../public/jems-pals/luma/base/neutral-93fde3101e62.webp) | [Grown](../../../public/jems-pals/luma/mature/neutral-6b3ffa07f571.webp) |
 | B | Nook / `nook` | Unassigned | [Base](../../../public/jems-pals/nook/base/neutral-458c3fb0fc44.webp) | [Grown](../../../public/jems-pals/nook/mature/neutral-be860de47216.webp) |
 | D | Mizzle / `mizzle` | Unassigned | [Base](../../../public/jems-pals/mizzle/base/neutral-37e57f8937e6.webp) | [Grown](../../../public/jems-pals/mizzle/mature/neutral-e978474ddffa.webp) |
 | E | Tumble / `tumble` | Unassigned | [Base](../../../public/jems-pals/tumble/base/neutral-a75baf959eda.webp) | [Grown](../../../public/jems-pals/tumble/mature/neutral-8279cc081987.webp) |
@@ -35,7 +37,7 @@ Every original profile below has all three core expressions approved for both fo
 | T | Chimi / `chimi` | GP-S020 | [Base](../../../public/jems-pals/chimi/base/neutral-2dc6024a8f92.webp) | [Grown](../../../public/jems-pals/chimi/mature/neutral-839afb70a7e3.webp) |
 | U | Pleeko / `pleeko` | GP-S021 | [Base](../../../public/jems-pals/pleeko/base/neutral-acf9007b0389.webp) | [Grown](../../../public/jems-pals/pleeko/mature/neutral-3c0b43f73d21.webp) |
 | V | Talli / `talli` | GP-S022 | [Base](../../../public/jems-pals/talli/base/neutral-e86fa909bb99.webp) | [Grown](../../../public/jems-pals/talli/mature/neutral-0785af1c21ae.webp) |
-| W | Zippa / `zippa` | GP-S023 | [Base](../../../public/jems-pals/zippa/base/neutral-b0f8aca344a3.webp) | [Grown](../../../public/jems-pals/zippa/mature/neutral-df295181dbce.webp) |
+| W (retired) | Zippa / `zippa` | GP-S023 | [Base](../../../public/jems-pals/zippa/base/neutral-b0f8aca344a3.webp) | [Grown](../../../public/jems-pals/zippa/mature/neutral-df295181dbce.webp) |
 | X | Whorl / `whorl` | GP-S024 | [Base](../../../public/jems-pals/whorl/base/neutral-6c3dfbd80b7c.webp) | [Grown](../../../public/jems-pals/whorl/mature/neutral-bcca0e4f1289.webp) |
 | brio | Brio / `brio` | GP-S025 | [Base](characters/brio/initial.png) | [Grown](characters/brio/growth.png) |
 

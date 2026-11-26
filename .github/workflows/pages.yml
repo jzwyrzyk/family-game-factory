@@ -31,6 +31,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Read current protected Pages delivery policy
+        id: delivery
+        run: python3 scripts/beta/pages-policy.py
       - name: Verify immutable merged application source and public destinations
         env:
           REVIEWED_SOURCE_SHA: ${{ inputs.source_sha }}
@@ -60,12 +63,34 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        if: steps.delivery.outputs.mode == 'household'
+      - name: Prepare the approved public-only retirement site
+        if: steps.delivery.outputs.mode == 'welcome-only'
+        env:
+          APPROVED_HUB: ${{ steps.delivery.outputs.hub }}
+          ADULT_CONTACT: ${{ steps.delivery.outputs.contact }}
+          REVIEWED_SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          node --import tsx scripts/beta/prepare-public.ts dist "$APPROVED_HUB" "$ADULT_CONTACT"
+          python3 - <<'PYTHON'
+          import json, os
+          from pathlib import Path
+          allowed={'.nojekyll','index.html','404.html','entry.css','sw.js','welcome-assets/jems-logo.svg',
+                   'welcome-assets/fonts/jems/Nunito-Variable.woff','welcome-assets/fonts/jems/Inter-Variable.woff'}
+          allowed.update('welcome-assets/art/mind-your-jems/'+n+'.webp' for n in ('scene-sky','rock-expressions','miner-poses','cart-empty'))
+          root=Path('dist')
+          if any(p.is_symlink() for p in root.rglob('*')) or {p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file()} != allowed:
+              raise SystemExit('PUBLIC_ASSET_INVENTORY_REJECTED')
+          (root/'jems-release.json').write_text(json.dumps({'sourceSha':os.environ['REVIEWED_SOURCE_SHA'],'delivery':'welcome-only'})+'\n')
+          PYTHON
       - name: Configure reviewed public service URLs
+        if: steps.delivery.outputs.mode == 'household'
         run: node --import tsx scripts/deployment/site-config.ts
         env:
           FACTORY_PUBLIC_GATEWAY: ${{ inputs.gateway_origin }}
           FACTORY_PUBLIC_PREVIEW: ${{ inputs.preview_origin }}
       - name: Stamp immutable release source
+        if: steps.delivery.outputs.mode == 'household'
         env:
           REVIEWED_SOURCE_SHA: ${{ inputs.source_sha }}
         run: |

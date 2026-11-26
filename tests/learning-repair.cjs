@@ -1,3 +1,4 @@
+const {authorizeLearningParent}=require('./learning-parent-fixture.cjs');
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 
@@ -16,7 +17,8 @@ const assert=require('node:assert/strict');
   await page.getByRole('button',{name:'Grown-ups',exact:true}).click();
   await page.locator('[data-parent-tab="settings"]').click();
   assert.equal(await page.locator('#parentFacts').isDisabled(),true);
-  await page.selectOption('#parentGrade','3');
+  await authorizeLearningParent(page);
+    await page.selectOption('#parentGrade','3');
   await page.selectOption('#parentIntensity','balanced');
   await page.fill('#parentFacts','8x7');
   await page.click('#saveParent');

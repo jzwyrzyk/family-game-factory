@@ -1,7 +1,7 @@
 import { adultStorageKey, adultWorkspaceId } from '../adult-pilot/storage';
 import { StudioNotebook } from '../studio/notebook';
 import { CreationStore } from '../creation/storage';
-import { emptyRewardsSummary, REWARDS_LIMITS, rewardFactId, type RewardGrant, type RewardsSummary } from './model';
+import { emptyRewardsSummary, REWARDS_LIMITS, rewardFactId, type RewardGrant, type RewardsSummary, type RewardFact } from './model';
 import { REWARDS_DB_NAME, RewardsStore } from './store';
 import { assertRewardSourceWritable, rewardSourceWritable, setRewardSourceMaintenance } from './write-guard';
 import {hasPendingRewardBackup} from './backup';
@@ -20,6 +20,20 @@ export interface RewardsController {
   summary(): Promise<RewardsSummary>;
 }
 let installed: RewardsController | undefined;
+export interface NotebookRewardSource {
+  pendingRewards(owner:string):RewardFact[]|Promise<RewardFact[]>;
+  acknowledgeRewards(owner:string,ids:string[]):void|Promise<void>;
+}
+let notebookSource:((owner:string,adult:string|null)=>Promise<NotebookRewardSource|null>)|undefined;
+let creationSource:typeof notebookSource;
+/** The activated async authority supplies its own persisted outbox. Rejection
+ * fails closed; only an explicit null selects the pre-migration source. */
+export function installNotebookRewardSource(resolve:typeof notebookSource):()=>void {
+  notebookSource=resolve;return ()=>{if(notebookSource===resolve)notebookSource=undefined;};
+}
+export function installCreationRewardSource(resolve:typeof creationSource):()=>void {
+  creationSource=resolve;return ()=>{if(creationSource===resolve)creationSource=undefined;};
+}
 
 /** A trusted host save wakes the projector. It never supplies an award amount. */
 export function notifyRewardSourceSaved(owner: string): void { installed?.sourceSaved(owner); }
@@ -57,8 +71,10 @@ export function installRewards(): RewardsController {
         // Read only persisted outboxes. An in-memory attempt whose source save
         // failed cannot become a reward through an unrelated later UI action.
         if (rewardSourceWritable()) {
-          const storage = storageFor(captured), notebook = new StudioNotebook(storage), creation = new CreationStore(storage, () => captured.owner);
-          const facts = [...FG.store.pendingRewards(captured.owner), ...notebook.pendingRewards(captured.owner), ...creation.pendingRewards(captured.owner)];
+          const storage = storageFor(captured), notebook = await notebookSource?.(captured.owner,captured.adult)??new StudioNotebook(storage), creation = await creationSource?.(captured.owner,captured.adult)??new CreationStore(storage, () => captured.owner);
+          if(!current(captured))return summary;
+          const facts = [...FG.store.pendingRewards(captured.owner), ...await notebook.pendingRewards(captured.owner), ...await creation.pendingRewards(captured.owner)];
+          if(!current(captured))return summary;
           for (let offset=0;offset<facts.length;offset+=REWARDS_LIMITS.outbox) {
             const batch=facts.slice(offset,offset+REWARDS_LIMITS.outbox);
             const result = await ledger.project(captured.owner, batch);
@@ -68,8 +84,9 @@ export function installRewards(): RewardsController {
             // A failed acknowledgement leaves the source receipt available for
             // a quiet retry. The committed ledger will not count it twice.
             FG.store.acknowledgeRewards(captured.owner, ids);
-            notebook.acknowledgeRewards(captured.owner, ids);
-            creation.acknowledgeRewards(captured.owner, ids);
+            await notebook.acknowledgeRewards(captured.owner, ids);
+            if(!current(captured))return summary;
+            await creation.acknowledgeRewards(captured.owner, ids);
           }
         }
         if (current(captured)) { state = { summary, loading: false }; emit(options.celebrate ? grants : []); }

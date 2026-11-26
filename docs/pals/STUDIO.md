@@ -14,6 +14,10 @@
 | [Empty character-record template](templates/character-record.template.json) | Starting a missing record while preserving the established index schema |
 | [Repository skill](../../skills/gem-pal-studio/SKILL.md) | A short assistant workflow that retrieves these canonical guides |
 
+## Current roster
+
+Use Nook and Navi for free starter briefs. Luma and Zippa are permanently retired from creation, selection and promotional work. Their prior approvals remain historical. [Roster and migration decision](../decisions/2026-11-25-journey-cards-and-starter-pals.md)
+
 ## Resolve the current character record
 
 Use one existing character-reference index. Its established repository path is `docs/pals/art/character-references.json`; this guide does not create a competing `CHARACTER_REGISTRY.json` or copy a stale roster into the method.

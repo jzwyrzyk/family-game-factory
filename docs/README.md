@@ -1,10 +1,18 @@
 # jems documentation map
 
+For current release status and the evidence for each gate, start with [delivery state](../DELIVERY-STATE.md). The [November 24 cutover](operations/PRODUCTION_ACTIVATION.md) records the prior household release. Private preview, integrated TEST and production follow the [environment contract](development/DEV-TEST-PROD.md).
+
+Private family operating procedures are in the [owner guide](family-beta/OWNER.md) and the [consolidated activation and rollback checklist](family-beta/ACTIVATION.md).
+
+[Private family beta architecture and trust boundaries](family-beta/ARCHITECTURE.md) covers the household baseline, independent family accounts, protected browser delivery, approved entry artwork and the synthetic browser acceptance contract.
+
 CI and validation: [architecture, complete workflow audit, coverage, benchmarks and evidence reuse](evidence/README.md#ci-architecture-and-performance).
 
 Start with the canonical references below. Feature documents remain the detailed contracts; this index keeps them discoverable without copying all of their content into an engineering handbook.
 
 The current four-experience release is consolidated in [PR134](https://github.com/jzwyrzyk/family-game-factory/pull/134). Its scope combines the Bubble Gum, Mining, Factory and first-learner Coding contracts below with shared navigation, profile settings, reading and Notifications. Source-PR histories are preserved; read delivery state for the current integration gates and release evidence.
+
+The [standalone UI review](ui-review/README.md) packages the real UI for offline acceptance, with synthetic data, a coverage checklist and local findings exports.
 
 ## Canonical references
 
@@ -49,8 +57,8 @@ The current four-experience release is consolidated in [PR134](https://github.co
 | Gem Pal species, growth, expressions and character revisions | [Art reference library](pals/art/README.md), [character index](pals/art/character-references.json), [Gem Pal Studio](pals/STUDIO.md), [growth](pals/GROWTH_GUIDE.md), [Brio review](pals/art/characters/brio/README.md) | Package 2.9: 23 original profiles with 46 approved neutrals and 138 expressions; Brio adds two approved neutrals and six in-review expressions. The canonical index preserves exact identities and prior reference history |
 | Making levels, evolving characters and achievement popups | [Making-journey contract](brand/GEM_PROGRESS.md), [cosmetic-progress decision](decisions/0008-cosmetic-making-journey.md), [artwork and review images](brand/achievement-art/README.md) | `src/brand/gem-progress.ts`, `src/brand/maker-identity.ts`, `src/brand/journey.ts`, Studio notebook/hooks, `public/jems-journey/`, `tests/gem-progress.test.ts`, `tests/gem-journey-browser.cjs`; cosmetic making evidence, not learning mastery |
 | Lifetime gems, rewards and cross-activity milestones | [Rewards contract](rewards/README.md), [lifetime-rewards decision](decisions/0010-lifetime-gems-and-shared-rewards.md) | `src/rewards/`, source outboxes in learning/Studio/Creation, `tests/rewards*`; nonspendable engagement totals, separate maker ranks, local recovery and backup |
-| Approved Gem Pal expression artwork and motion pilot | [Versioned expression contract](pals/EXPRESSIONS.md), [implementation decision](decisions/2026-11-20-pal-expression-runtime.md) | `src/pals/artwork.ts`, `src/pals/expressions.ts`, `src/pals/expression-explorer.ts`, `public/jems-pals/`; 23 original profiles, 184 exact approved frames, 180 ms Wink Base pilot, read-only preview (not saved Pal reassignment) |
-| Collectible companions, funny encouragement and playable Pal scenes | [Jem Pals contract](pals/README.md), [companion decision](decisions/0012-pals-from-earned-activity.md), [two-form compatibility](decisions/0013-two-form-pals-and-current-main.md) | `src/pals/`, Creation owned-Pal shortcuts, `tests/pals*`; shared-ledger unlocks, activity growth, editable starter programs, local collection recovery and provisional artwork |
+| Approved Gem Pal expression artwork and motion pilot | [Versioned expression contract](pals/EXPRESSIONS.md), [implementation decision](decisions/2026-11-20-pal-expression-runtime.md) | `src/pals/artwork.ts`, `src/pals/expressions.ts`, `src/pals/expression-explorer.ts`, `public/jems-pals/`; 21 active original profiles and 168 frames, plus two approved Brio neutrals, 180 ms Wink Base pilot, read-only preview (not saved Pal reassignment) |
+| Collectible companions, funny encouragement and playable Pal scenes | [Jem Pals contract](pals/README.md), [companion decision](decisions/0012-pals-from-earned-activity.md), [two-form compatibility](decisions/0013-two-form-pals-and-current-main.md) | `src/pals/`, Creation owned-Pal shortcuts, `tests/pals*`; Nook and Navi starters, lifetime-threshold unlocks, two-form growth and [retired-Pal compatibility](decisions/2026-11-25-journey-cards-and-starter-pals.md) |
 | Authentication, reconnect, parent/device operations | [Trusted family devices](auth/TRUSTED_FAMILY_DEVICES.md) | `server/trusted-devices.ts`, `server/sessions.ts`, gateway and paid-admission handlers |
 | Temporary adult profile and guardian privacy | [Accepted one-site development decision](decisions/0005-temporary-adult-profile.md), [adult release and removal](adult-pilot/VOICE_RELEASE_AND_UAT.md), [parent privacy](privacy/PARENT_CONSENT_AND_ADULT_PILOT.md), [integration review](privacy/ADULT_CHILD_RELEASE_INTEGRATION.md) | `src/adult-pilot/`, `server/adult-pilot.ts`, `server/privacy/`, `src/builder/privacy.ts`, `tests/adult-*`, `tests/parent-privacy*`; accepted scope and branch implementation are separate from deployment |
 | Private coach and speech | [Tap-to-dictate contract](issue-28/PUSH_TO_TALK_MVP.md), [private-service plan](issue-28/CLOUD_RUN_OWNER_PLAN.md), [speech release](issue-28/PRIVATE_SPEECH_RELEASE.md), [security/release](issue-28/SECURE_INFERENCE_AND_RELEASE.md) | `server/coach/`, `src/studio/`, dedicated coach image and deployment scripts |
@@ -69,3 +77,9 @@ The expression package joins code and asset evidence. Review `public/jems-pals/*
 The [original charter](factory-v2-implementation-charter.md), [Assignment 001 traceability](requirements-traceability.md), [early gap analysis](gap-analysis.md), [Assignment 002](assignment-002/README.md), [owner pilot handoff](assignment-005/OWNER-PILOT.md) and [repair completion report](repair-program/COMPLETION.md) are valuable history. Their old branch statuses, pins and "current live" statements must not be used as today's inventory. Use [delivery state](../DELIVERY-STATE.md) and verify its observation date.
 
 Prefer a link to the detailed contract over a copied version. Add new feature families to this index and to the [review registry](context/registry.json). Keep ephemeral execution logs in scoped evidence directories; preserve decisions and outcomes instead of dumping entire chats into the repository.
+
+## Storage reliability and scalable persistence
+
+[PR166 storage report](storage/README.md) · [complete source inventory](storage/INVENTORY.md) · [migration, retention and activation boundaries](storage/ROLLOUT.md). Integrated local recovery is distinct from the disabled indexed/cloud preparation and remaining application migration.
+
+For private family operations, use the [owner guide](family-beta/OWNER.md) and [privacy review](family-beta/PRIVACY.md).

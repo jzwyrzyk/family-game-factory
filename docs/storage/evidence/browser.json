@@ -1,0 +1,55 @@
+{
+  "scope": "Synthetic Chromium; renderer termination, not power-loss or physical-device acceptance",
+  "results": [
+    {
+      "device": "desktop",
+      "rendererBoundaries": 6,
+      "writerLock": true,
+      "indexed": [
+        "stale rejected",
+        "atomic rollback",
+        "profile revoked"
+      ]
+    },
+    {
+      "device": "tablet",
+      "rendererBoundaries": 6,
+      "writerLock": true,
+      "indexed": [
+        "stale rejected",
+        "atomic rollback",
+        "profile revoked"
+      ]
+    },
+    {
+      "device": "phone",
+      "rendererBoundaries": 6,
+      "writerLock": true,
+      "indexed": [
+        "stale rejected",
+        "atomic rollback",
+        "profile revoked"
+      ]
+    }
+  ],
+  "benchmark": [
+    {
+      "records": 1000,
+      "page100MedianMs": 7.400000000372529,
+      "page100P95Ms": 18.399999999906868,
+      "saveMs": 2.1999999997206032
+    },
+    {
+      "records": 10000,
+      "page100MedianMs": 4.199999999720603,
+      "page100P95Ms": 5.399999999906868,
+      "saveMs": 1.2999999998137355
+    },
+    {
+      "records": 50000,
+      "page100MedianMs": 4.199999999720603,
+      "page100P95Ms": 5.5,
+      "saveMs": 1.3999999999068677
+    }
+  ]
+}

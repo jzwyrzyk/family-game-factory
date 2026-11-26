@@ -438,3 +438,13 @@ After merging Gem Pal expression assets and the learning-surface fixes, the exac
 ## Premium completion evidence
 
 [PR139 completion](../game-intelligence/premium-benchmark/COMPLETION.md) retains all existing premium suites and adds offline fault injection to the same contract/browser lanes. The Game Intelligence workflow adds a clean unpublished sandbox build and actual-byte/legacy/premium envelope proof. This is separate from the stable Arcade aggregates and from production gVisor/paid-provider acceptance. Source fingerprints and full CI evidence include the added scripts; no existing command is omitted.
+
+The early learner stack uses synthetic profiles, both subject engines and bounded scene traces. Browser prompt delivery and declared adult reading have separate provenance. Keep native gameplay, isolated preview fixtures, rendered viewport inspection, real-device acceptance and educational efficacy as separate receipts.
+
+The [early learner verification guide](early-learning/README.md) covers the five synthetic viewport journeys, the two-subject native matrix and the isolated reviewed game fixture.
+
+## Current-main family and storage continuation
+
+The required storage shard now expands the actual native/notebook/scene, original-recovery, scoped sync/conflict/removal, guided-interruption and all-domain preparation journeys. The private-family security workflow additionally runs their supported WebKit variants and distinct synthetic HTTPS family origins, with native Firestore emulator checks. The original Arcade groups and independent security, parent, visual, image, environment and documentation gates remain required. [The combined requirement register](../family-beta/COMPLETION.md) records current-head acceptance and failures separately from historical PR evidence. Browser emulation is not physical-device or owner acceptance.
+
+The November 25 child-experience candidate adds `test:child-modernization` through the existing navigation suite. Recursive creative-group coverage increases from 63 to 64 commands; original command identities, failure behavior and full-selection policy remain unchanged. The strict count fixture was updated to reflect the additional required browser check. [Candidate evidence](child-modernization/README.md).

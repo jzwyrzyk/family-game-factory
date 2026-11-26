@@ -6,7 +6,7 @@ import './pals.css';
 
 interface PalsHost {
   controller: PalsController;
-  enter(): boolean;
+  enter(): boolean|Promise<boolean>;
   home(): void;
   create(id: PalId): void;
   refreshCreation(): void;
@@ -23,8 +23,8 @@ export function installPalsInterface(host: PalsHost) {
   let toastTimer: ReturnType<typeof setTimeout> | undefined, pending: PalsNotice | null = null;
   let pendingOwner = '', quip = 0, lastEncouragementAt = 0;
   const action = (work: () => void | Promise<void>) => { try { void Promise.resolve(work()).catch(() => {}); } catch { /* Controller renders its scoped failure. */ } };
-  function open() {
-    try { if (!host.enter()) return; }
+  async function open() {
+    try { if (!await host.enter()) return; }
     catch (error) {
       const status = document.getElementById('studioGlobalStatus');
       if (status) { status.hidden = false; status.textContent = error instanceof Error ? error.message : 'Your current work could not be saved. Try again before opening My Pals.'; status.classList.add('is-error'); }
@@ -47,11 +47,8 @@ export function installPalsInterface(host: PalsHost) {
   const journeyNav = document.getElementById('studioNavJourney');
   (document.getElementById('studioNavRewards') ?? journeyNav)?.after(nav);
 
-  const widget = createPalsWidget({ state: pals.state, onOpen: open, onCreate: host.create });
+  const widget = createPalsWidget({ state: pals.state, onOpen: open });
   widget.element.id = 'studioPalsEntry';
-  // Keep the first playable game in the mobile viewport. The collection follows
-  // the game shelf and the existing Create & code entrance.
-  (document.getElementById('studioScenes') ?? document.getElementById('studioFavoritesSection'))?.after(widget.element);
   const cameo = createPalCameo({ state: pals.state, onOpen: open, onHelp: host.help });
   cameo.element.id = 'studioPalCameo';
   document.getElementById('studioGameHost')?.after(cameo.element);
@@ -162,7 +159,7 @@ export function installPalsInterface(host: PalsHost) {
   // method is exposed to generated games or their message handlers.
   FG.pals = { version: 1, open, view: () => pals.state.profile ? structuredClone(pals.state.profile) : null };
   if (new URLSearchParams(location.search).get('pals') === '1') open();
-  return { open, get isOpen() { return openNow; }, dispose() {
+  return { open, dashboardCard: widget.element, get isOpen() { return openNow; }, dispose() {
     clear(); unsubscribe(); page.dispose(); widget.dispose(); cameo.dispose();
     nav.remove(); parent.remove(); toastHost.remove();
     window.removeEventListener('factory-page', onPage); window.removeEventListener('factory-profile', onProfile);

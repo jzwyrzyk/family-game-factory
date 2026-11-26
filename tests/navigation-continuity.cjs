@@ -122,15 +122,22 @@ async function collectionJourney(browser,base,device,viewport){
   assert.equal(await page.locator('.studio-nav > button:visible').count(),3,'the compact shell has three primary actions');
   for(const id of NAV)assert.equal(await page.locator('#'+id).count(),1,id+' retains one authoritative route control');
   if(device==='phone'){
-   const firstGame=await page.locator('#studioStarters [data-starter]').first().boundingBox();
+   await page.evaluate(()=>document.fonts.ready);
+   const firstCard=page.locator('#studioStarters [data-starter]').first();
+   await firstCard.evaluate(node=>node.scrollIntoView({block:'center',behavior:'instant'}));
+   const firstGame=await firstCard.boundingBox();
    assert.ok(firstGame&&firstGame.y>=0&&firstGame.y+firstGame.height<=viewport.height,
-     'restoring saved collections must not move the first complete playable game below the phone viewport');
+     `the approved destination-first hierarchy keeps a complete playable game reachable by scrolling: ${JSON.stringify(firstGame)}`);
+   assert.equal(await firstCard.evaluate(node=>{
+     const box=node.getBoundingClientRect();
+     return [box.top+5,box.bottom-5].every(y=>node.contains(document.elementFromPoint(box.left+box.width/2,y)));
+   }),true,'fixed navigation does not cover the playable card');
   }
   for(const id of NAV.slice(0,2))assert.equal(await page.locator('#'+id).isVisible(),true,id+' stays in the primary navigation');
   await page.click('#studioNavMenu');
-  for(const id of NAV.slice(2))assert.equal(await page.locator('#'+id).isVisible(),true,id+' is discoverable in Menu');
+  for(const id of NAV.slice(2))assert.equal(await page.locator('#'+id).isVisible(),['studioNavScenes','studioNavJourney'].includes(id),id+' uses its canonical menu destination or nested Journey section');
   await page.click('#studioMenuClose');
-  const entry=page.getByRole('button',{name:'My Creations',exact:true});
+  const entry=page.getByRole('button',{name:'Saved ideas & versions',exact:true});
   assert.equal(await entry.getAttribute('id'),'studioSavedIdeas');
   const target=await entry.boundingBox();assert.ok(target&&target.height>=44,'collection entry is a touch-sized target');
   await entry.focus();await page.keyboard.press('Enter');
@@ -282,7 +289,7 @@ async function notebookCapacityJourney(browser,base){
   const before=await page.evaluate(({book,games})=>[localStorage.getItem(book),localStorage.getItem(games)],{book:NOTEBOOK,games:WORKSPACE});
   await openRetainedGame(page,'dragon');
   assert.deepEqual(await page.evaluate(({book,games})=>[localStorage.getItem(book),localStorage.getItem(games)],{book:NOTEBOOK,games:WORKSPACE}),before,'full notebook fails before writing an orphan native game');
-  await page.locator('#studioCollectionBack').click();
+  assert.equal(await page.locator('#page-studio-library').isVisible(),true,'failed retained-game entry stays on My Games');
   await page.locator('#studioArchived summary').click();await page.getByRole('button',{name:'Bring back Saved idea 0',exact:true}).click();
   const full=await notebook();assert.equal(full.sessions.length,80);assert.equal(full.sessions.filter(s=>!s.archived).length,1);
   await page.locator('#studioNotebookCapacity summary').click();assert.match(await page.textContent('#studioNotebookCapacity'),/80 of 80.*1 open jems, 79 put-away jems/s);

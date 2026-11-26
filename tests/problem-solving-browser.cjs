@@ -1,3 +1,4 @@
+const {authorizeLearningParent}=require('./learning-parent-fixture.cjs');
 /* Production-dist journeys. Explicit fixtures cover storage faults, checkpoint
  * pacing and a mocked narration transport/playback policy; no live provider. */
 const {chromium}=require('playwright');
@@ -5,7 +6,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {once}=require('node:events');
 const {start}=require('./browser-server.cjs');
-const {exploreWelcome,openProfiles}=require('./studio-entry.cjs');
+const {exploreWelcome,navigate,openProfiles}=require('./studio-entry.cjs');
 const KEY='family-game-factory-problem-solving-v1';
 
 async function narrationJourney(browser,url){
@@ -79,6 +80,11 @@ async function narrationJourney(browser,url){
   assert.equal((await draft()).episode.observations.some(item=>item.responseId==='narration:interpret'),false,'waiting audio cannot credit the former profile');
   assert.equal(await page.evaluate(()=>window.__psAudio.every(audio=>audio.paused&&audio.src==='')),true);
   assert.equal(await page.evaluate(()=>window.__psRevoked.length),4,'completion, Stop, phase change and profile change release their audio');
+  // Host entry now awaits durable scene/notebook writes. A rejected async
+  // flush stays a visible save failure rather than an unhandled page exception.
+  await page.evaluate(async()=>{await FG.studio.flushDraft();window.__restorePracticeFlush=FG.creation.flush;FG.creation.flush=async()=>{throw Error('Synthetic scene flush did not save');};FG.problemSolving.open();});
+  await page.waitForFunction(()=>document.getElementById('psStatus').textContent==='Synthetic scene flush did not save');
+  await page.evaluate(()=>{FG.creation.flush=window.__restorePracticeFlush;delete window.__restorePracticeFlush;});
   assert.equal(requests.length,4);assert.equal(statuses,4);assert.deepEqual(unexpected,[]);assert.deepEqual(errors,[]);
   console.log('PASS APS mocked narration: explicit Read/Play/Stop, one synthesis per read, actual-start evidence, visible hint and phase/profile cleanup');
   return {device:'touch-narration-fixture',status:'passed',syntheticNarrationRequests:requests.length,liveProviderCalls:0};
@@ -100,7 +106,7 @@ async function narrationJourney(browser,url){
    await page.route('**/factory-config.json',r=>r.fulfill({contentType:'application/json',body:JSON.stringify({version:1,mode:'unavailable'})}));
    const activate=async s=>{
     const l=typeof s==='string'?page.locator(s):s;
-    if(typeof s==='string'&&/^#(?:studioNav(?:Scenes|Journey|Rewards|Pals|Powers|ProblemSolving)|jemsRewardsWidget|studioJourneyHelp)$/.test(s)&&!await l.isVisible())await activate('#studioNavMenu');
+    if(typeof s==='string'&&/^#(?:studioNav(?:Scenes|Journey|Rewards|Pals|Powers|ProblemSolving)|jemsRewardsWidget|studioJourneyHelp)$/.test(s)&&!await l.isVisible()){await navigate(page,s);return;}
     device==='touch'?await l.tap():await l.click();
    };
    const phase=()=>page.locator('#page-problem-solving').getAttribute('data-phase');
@@ -132,7 +138,10 @@ async function narrationJourney(browser,url){
     await activate('#studioNavScenes');await onlyPage('page-creation');
     await activate('#studioNavProblemSolving');await onlyPage('page-problem-solving');
     assert.equal(await page.evaluate(()=>document.body.classList.contains('creation-open')),false);
-    assert.equal(await page.evaluate(()=>JSON.stringify(FG.studio.exportNotebook())),notebookBefore,'navigation cannot earn or rewrite making evidence');
+    const afterNavigation=await page.evaluate(()=>FG.studio.exportNotebook()),beforeNavigation=JSON.parse(notebookBefore);
+    assert.deepEqual(afterNavigation.guidance,{player1:{welcomeDismissed:false,dismissedTips:['studio-intro']}},'explicit Skip records only its owner-scoped presentation preference');
+    delete afterNavigation.guidance;delete beforeNavigation.guidance;
+    assert.deepEqual(afterNavigation,beforeNavigation,'navigation cannot earn or rewrite making evidence');
     if(device==='touch'){
       await page.setViewportSize({width:320,height:740});await overflow();
       const buttons=await page.locator('.studio-nav > button').evaluateAll(nodes=>nodes.map(node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};}));
@@ -156,6 +165,7 @@ async function narrationJourney(browser,url){
     // Set the older sibling's grade deliberately; fresh profiles now all start
     // at Grade 1. Leaving must still preserve the first learner's unfinished work.
     await pick(1);await parent();await activate('[data-parent-tab="settings"]');
+    await authorizeLearningParent(page);
     await page.selectOption('#parentGrade','3');await activate('#saveParent');
     assert.equal(await page.evaluate(()=>FG.store.current().grade),3);
     await activate('#studioNavProblemSolving');assert.equal(await page.locator('[data-ps-task="robot-stop-g3-4"]').count(),1);assert.equal((await saved()).length,0);

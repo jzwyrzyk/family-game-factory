@@ -3,7 +3,7 @@ import type { GameId, Mechanics, PlayOutcome } from '../runtime/types';
 import { assertRewardSourceWritable } from '../rewards/write-guard';
 export const WORKSPACE_KEY = 'family-game-factory-workspace-v2';
 export interface Revision { id: string; projectId: string; parentId: string | null; sourceRevisionId?: string; drawingRigId?: string; config: Mechanics; label: string; hypothesis: string; createdAt: string; state: 'private' }
-export interface Project { id: string; owner: string; game: GameId; name: string; headId: string; keptId?:string }
+export interface Project { id: string; owner: string; game: GameId; name: string; headId: string; keptId?:string; archived?:boolean }
 export interface PlayRecord { id: string; revisionId: string; outcome: PlayOutcome; reflection: string }
 export interface Workspace { version: 2; projects: Project[]; revisions: Revision[]; plays: PlayRecord[] }
 export interface StoragePort { getItem(key: string): string | null; setItem(key: string, value: string): void }
@@ -27,28 +27,50 @@ function checkHead(project: Project, expectedHeadId?: string): void {
 export function validateWorkspace(value: unknown): Workspace {
   const d = value as Workspace;
   if (!d || d.version !== 2 || !Array.isArray(d.projects) || !Array.isArray(d.revisions) || !Array.isArray(d.plays) || d.projects.length > 50 || d.revisions.length > 500 || d.plays.length > 1000) throw Error('This workspace backup is not supported.');
+  return validateWorkspaceGraph(d);
+}
+/** Prepared libraries admit records independently. Their reviewed owner-scoped
+ * recovery source keeps the same graph checks without imposing legacy whole-key
+ * count limits. Each record is validated and cloned separately; callers still
+ * enforce their bounded archive and atomic-transaction byte limits. */
+export function validateIndexedNativeWorkspace(value:unknown,owner:string):Workspace {
+  const d=value as Workspace;
+  if(!text(owner,100)||!owner||!d||d.version!==2||!Array.isArray(d.projects)||!Array.isArray(d.revisions)||!Array.isArray(d.plays)||d.projects.some(p=>!p||p.owner!==owner))throw Error('Prepared library belongs to another player or needs recovery.');
+  return validateWorkspaceGraph(d,true);
+}
+function validateWorkspaceGraph(d:Workspace,perRecord=false):Workspace {
   const unique = (items: {id:string}[]) => items.every(x=>x && text(x.id,100) && x.id.length>0) && new Set(items.map(x=>x.id)).size===items.length;
   if (!unique(d.projects) || !unique(d.revisions) || !unique(d.plays)) throw Error('Workspace identifiers are invalid.');
+  const projects=new Map(d.projects.map(p=>[p.id,p]));
+  const revisions=new Map(d.revisions.map(r=>[r.id,r]));
+  const historiesChecked=new Set<string>();
   for (const p of d.projects) {
-    if (!text(p.owner,100) || !text(p.name,60) || !isGameId(p.game) || !d.revisions.some(r=>r.id===p.headId && r.projectId===p.id)) throw Error('Invalid game project.');
-    if(p.keptId&&!d.revisions.some(r=>r.id===p.keptId&&r.projectId===p.id))throw Error('Invalid kept version.');
+    if (!text(p.owner,100) || !text(p.name,60) || !isGameId(p.game) || revisions.get(p.headId)?.projectId!==p.id || p.archived!==undefined&&typeof p.archived!=='boolean') throw Error('Invalid game project.');
+    if(p.keptId&&revisions.get(p.keptId)?.projectId!==p.id)throw Error('Invalid kept version.');
   }
   for (const r of d.revisions) {
-    const project = d.projects.find(p=>p.id===r.projectId);
+    const project = projects.get(r.projectId);
     if (!project || r.state!=='private' || !text(r.label,300) || !text(r.hypothesis,300) || !text(r.createdAt,40) || !Number.isFinite(Date.parse(r.createdAt))) throw Error('Invalid revision.');
     validateConfig(project.game, r.config);
     if (r.drawingRigId !== undefined && (project.game !== 'hill' || typeof r.drawingRigId !== 'string' || !/^[\w-]{1,100}$/.test(r.drawingRigId))) throw Error('Invalid saved drawing version.');
-    if (r.sourceRevisionId && !d.revisions.some(x=>x.id===r.sourceRevisionId)) throw Error('Missing fork source.');
-    const seen = new Set([r.id]); let parent = r.parentId;
-    while (parent !== null) { const next = d.revisions.find(x=>x.id===parent && x.projectId===r.projectId); if (!next || seen.has(next.id)) throw Error('Invalid revision history.'); seen.add(next.id); parent = next.parentId; }
+    if (r.sourceRevisionId && !revisions.has(r.sourceRevisionId)) throw Error('Missing fork source.');
+    const seen = new Set<string>(); let node:Revision|undefined=r;
+    while(node&&!historiesChecked.has(node.id)){
+      if(seen.has(node.id)||node.projectId!==r.projectId)throw Error('Invalid revision history.');
+      seen.add(node.id);if(node.parentId===null)break;
+      const parent=revisions.get(node.parentId);
+      if(!parent||parent.projectId!==r.projectId)throw Error('Invalid revision history.');
+      node=parent;
+    }
+    for(const id of seen)historiesChecked.add(id);
   }
   for (const play of d.plays) {
-    const revision=d.revisions.find(r=>r.id===play.revisionId), project=d.projects.find(p=>p.id===revision?.projectId), out=play.outcome;
+    const revision=revisions.get(play.revisionId), project=revision?projects.get(revision.projectId):undefined, out=play.outcome;
     if (!revision || !project || !out || out.game!==project.game || typeof out.won!=='boolean' || !Number.isInteger(out.level) || out.level<1 || !Number.isFinite(out.durationMs) || out.durationMs<0 || !text(out.title,300) || !text(out.description,1000) || !text(out.at,40) || !text(play.reflection,300)) throw Error('Invalid play evidence.');
     const playedConfig=validateConfig(out.game, out.config);
     if (Object.entries(playedConfig).some(([key,value])=>validateConfig(project.game,revision.config)[key]!==value)) throw Error('Play evidence does not match its revision.');
   }
-  return copy(d);
+  return perRecord?{version:2,projects:d.projects.map(copy),revisions:d.revisions.map(copy),plays:d.plays.map(copy)}:copy(d);
 }
 // A documented, local-only pre-release schema: each v1 game becomes a root revision.
 export function migrateWorkspace(value: unknown): Workspace {
@@ -66,15 +88,19 @@ export function migrateWorkspace(value: unknown): Workspace {
 export class RevisionStore {
   private data: Workspace;
   private raw: string | null;
-  constructor(private storage: StoragePort) {
+  /** Only isolated in-memory compound staging selects this path, after the
+   * caller has established the current indexed authority and exact owner. */
+  static forIndexedStaging(storage:StoragePort,owner:string){return new RevisionStore(storage,{indexedOwner:owner});}
+  constructor(private storage: StoragePort,private readonly staging?:{indexedOwner:string}) {
     this.raw=storage.getItem(WORKSPACE_KEY);
     // Never silently replace corrupt data: caller can keep playing the original arcade.
-    this.data=this.raw===null?empty():migrateWorkspace(JSON.parse(this.raw));
+    this.data=this.parse(this.raw===null?empty():JSON.parse(this.raw));
   }
+  private parse(value:unknown):Workspace{return this.staging?validateIndexedNativeWorkspace(value,this.staging.indexedOwner):migrateWorkspace(value);}
   private read(): Workspace {
     const raw = this.storage.getItem(WORKSPACE_KEY);
     if (raw !== this.raw) {
-      const next = raw === null ? empty() : migrateWorkspace(JSON.parse(raw));
+      const next = this.parse(raw === null ? empty() : JSON.parse(raw));
       this.data = next;
       this.raw = raw;
     }
@@ -83,7 +109,7 @@ export class RevisionStore {
   }
   snapshot(): Workspace { return copy(this.read()); }
   private save(next: Workspace): void {
-    const checked = validateWorkspace(next);
+    const checked = this.staging?validateIndexedNativeWorkspace(next,this.staging.indexedOwner):validateWorkspace(next);
     const raw = JSON.stringify(checked);
     try { this.storage.setItem(WORKSPACE_KEY,raw); } catch { throw Error('Could not save on this device. Your last working version is safe. Free some space and try again.'); }
     this.data = checked;
@@ -124,6 +150,6 @@ export class RevisionStore {
   restore(raw:string):void {
     assertRewardSourceWritable();
     // Explicit replacement may recover corrupt source bytes; ordinary edits may not.
-    this.save(migrateWorkspace(JSON.parse(raw)));
+    this.save(this.parse(JSON.parse(raw)));
   }
 }

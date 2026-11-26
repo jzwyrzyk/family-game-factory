@@ -95,7 +95,7 @@ window.rewardsFixture={page,widget,state,empty,showToast(){const toast=createRew
     assert.match(await page.locator('#jemsRewardsPracticeBonus').textContent(), /18 more activities.*20 gems/);
     await page.locator('#jemsRewardsPlay').focus(); await page.keyboard.press('Enter');
     await page.locator('#jemsRewardsCreate').click();
-    await page.locator('#jemsRewardsJourney').click();
+    await page.locator('#jemsRewardsMakerAction').click();
     await page.locator('#jemsRewardsWidget').click();
     assert.deepEqual(await page.evaluate(() => window.rewardActions), ['play', 'create', 'journey', 'open']);
     assert.match(await page.locator('#jemsRewardsExplanation').textContent(), /gems add up.*maker level grows/i);

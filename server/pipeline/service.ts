@@ -101,6 +101,8 @@ export class JobService {
   return this.repo.transaction(s=>{
    assertActiveTrustedDevice(s,session);
    if(this.options.adultPilotMode?!adultPilotAllowed(s,session):!!(session.adultSessionId||session.adultProfileId))throw Error('ADULT_PILOT_ACCESS_REQUIRED');
+   if(s.betaScopes&&!verifiedParentScope(s,session.familyId,'generation'))throw Error('GUARDIAN_CONSENT_REQUIRED');
+   if(s.revisions.some(revision=>revision.familyId===session.familyId&&revision.adultPilotProfileId===session.adultProfileId&&revision.recoveryProvenance?.playbackOnly&&(revision.id===r.localRevisionId||revision.projectId===r.localRevisionId)))throw Error('RECOVERY_PLAYBACK_ONLY');
    const scope=session.adultProfileId?`${session.familyId}:${session.adultProfileId}`:session.familyId;
    const id='seed-'+createHash('sha256').update(scope+':'+r.localRevisionId).digest('hex'),existing=s.revisions.find(x=>x.id===id);
    if(existing){requireResourceAudience(s,session,existing);if(JSON.stringify(existing.config)!==JSON.stringify(config))throw Error('IDEMPOTENCY_CONFLICT');}
@@ -133,6 +135,9 @@ export class JobService {
    }
    const base=r.baseRevisionId?s.revisions.find(x=>x.id===r.baseRevisionId):undefined;
    if(r.baseRevisionId){if(!base)throw Error('NOT_FOUND');requireResourceAudience(s,session,base);}else if(r.gameId!=='new')throw Error('INVALID_REQUEST');
+   // A mapped recovery receives new IDs but no new premium allowance. It is
+   // playable evidence, never a fresh paid lineage. Reject before any reserve.
+   if(base?.recoveryProvenance?.playbackOnly)throw Error('RECOVERY_PLAYBACK_ONLY');
    // O4: reject unsupported or contradictory forms BEFORE reserving an
    // allowance or acknowledging an asynchronous paid build. This uses only
    // server-owned, family-authorized revision data; the private worker
@@ -274,7 +279,24 @@ export class JobService {
   finally{if(timeout)clearTimeout(timeout);this.controllers.delete(id);}
  }
  async revision(session:VerifiedSession,id:string){const state=await this.repo.snapshot(),r=state.revisions.find(r=>r.id===id&&r.game);if(!r)throw Error('NOT_FOUND');requireResourceAudience(state,session,r);return r;}
- async fork(session:VerifiedSession,id:string,name:string){if(typeof name!=='string'||name.trim().length<1||name.length>60)throw Error('INVALID_REQUEST');return this.repo.transaction(s=>{const source=s.revisions.find(r=>r.id===id&&r.game);if(!source)throw Error('NOT_FOUND');requireResourceAudience(s,session,source);const revision={...source,id:uuid(),projectId:uuid(),parentId:null,sourceRevisionId:source.id,name:name.trim()};s.revisions.push(revision);s.active[revision.projectId]=revision.id;return {revisionId:revision.id};});}
+ async forkReceipt(session:VerifiedSession,id:string,requestId:string){
+  if(!safeId(requestId))throw Error('INVALID_REQUEST');
+  const state=await this.repo.snapshot(),source=state.revisions.find(r=>r.id===id&&r.game);
+  if(!source)throw Error('NOT_FOUND');requireResourceAudience(state,session,source);
+  const result=state.revisions.find(r=>r.copyRequestId===requestId&&r.sourceRevisionId===id&&r.familyId===source.familyId&&r.adultPilotProfileId===source.adultPilotProfileId);
+  if(!result)return null;requireResourceAudience(state,session,result);return {revisionId:result.id};
+ }
+ async fork(session:VerifiedSession,id:string,name:string,requestId?:string){
+  if(typeof name!=='string'||name.trim().length<1||name.length>60||requestId!==undefined&&!safeId(requestId))throw Error('INVALID_REQUEST');
+  return this.repo.transaction(s=>{
+   const source=s.revisions.find(r=>r.id===id&&r.game);if(!source)throw Error('NOT_FOUND');requireResourceAudience(s,session,source);
+   if(source.recoveryProvenance?.playbackOnly)throw Error('RECOVERY_PLAYBACK_ONLY');
+   if(requestId){const prior=s.revisions.find(r=>r.copyRequestId===requestId&&r.familyId===source.familyId&&r.adultPilotProfileId===source.adultPilotProfileId);
+    if(prior){requireResourceAudience(s,session,prior);if(prior.sourceRevisionId!==id||prior.name!==name.trim())throw Error('IDEMPOTENCY_CONFLICT');return {revisionId:prior.id};}}
+   if(s.betaScopes&&!verifiedParentScope(s,session.familyId,'generation'))throw Error('GUARDIAN_CONSENT_REQUIRED');
+   const revision={...source,id:uuid(),projectId:uuid(),parentId:null,sourceRevisionId:source.id,name:name.trim(),copyRequestId:requestId};s.revisions.push(revision);s.active[revision.projectId]=revision.id;return {revisionId:revision.id};
+  });
+ }
  async keep(session:VerifiedSession,id:string){await this.repo.transaction(s=>{const r=s.revisions.find(r=>r.id===id&&r.game);if(!r)throw Error('NOT_FOUND');requireResourceAudience(s,session,r);s.active[r.projectId]=id;return true;});return {revisionId:id};}
  async undo(session:VerifiedSession,id:string){const r=await this.revision(session,id);if(!r.parentId)throw Error('NO_PREVIOUS_VERSION');const parent=await this.revision(session,r.parentId);await this.keep(session,parent.id);return {revisionId:parent.id};}
  async list(session:VerifiedSession){requireFamily(session,{id:'list',familyId:session.familyId});const s=await this.repo.snapshot();assertActiveTrustedDevice(s,session);if((session.adultSessionId||session.adultProfileId)&&!adultPilotAllowed(s,session))throw Error('FORBIDDEN');return s.revisions.filter(r=>r.familyId===session.familyId&&r.adultPilotProfileId===session.adultProfileId&&s.active[r.projectId]===r.id);}

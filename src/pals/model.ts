@@ -1,6 +1,6 @@
 import { isPalId, PAL_CATALOG, palDefinition, type PalId, type PalForm } from './catalog';
 
-export const PALS_POLICY_VERSION = 1 as const;
+export const PALS_POLICY_VERSION = 2 as const;
 export const PALS_LIMITS = Object.freeze({ owners: 80, receiptsPerOwner: 25_000, selectionsPerOwner: 25_000, characters: 16_000_000 });
 export const PRACTICE_PER_ADVENTURE = 5;
 // Preserve the first earned transition. Older draft profiles store receipts,
@@ -53,7 +53,7 @@ export function validatePalPreferences(value: unknown): PalPreferences {
 }
 export function emptyPalProfile(owner: string): PalProfile {
   if (!isPalOwner(owner)) invalid();
-  return { owner, policyVersion: 1, starterId: null, activeId: null, owned: [], unlockedIds: [], selections: [], assignments: [],
+  return { owner, policyVersion: PALS_POLICY_VERSION, starterId: null, activeId: null, owned: [], unlockedIds: [], selections: [], assignments: [],
     preferences: { showCompanion: true, encouragement: true } };
 }
 export function emptyPalsWorkspace(): PalsWorkspace { return { schema: 'jems.pals.workspace.v1', profiles: [] }; }
@@ -69,51 +69,88 @@ export function validatePalRewardSnapshot(value: unknown, owner?: string): PalRe
   }
   return copyPals(value as unknown as PalRewardSnapshot);
 }
+type StoredId = PalId | 'glim' | 'zippa';
+type StoredOwnership = Omit<OwnedPal, 'id'> & { id: StoredId };
+type StoredProfile = Pick<PalProfile, 'owner' | 'preferences'> & {
+  starterId: 'glim' | 'kip' | null; activeId: StoredId | null; owned: StoredOwnership[];
+  unlockedIds: StoredId[]; selections: { palId: StoredId; from: string }[];
+  assignments: (PalActivity & { palId: StoredId | null })[];
+};
+
+// v1 used nonspendable lifetime milestones. Even source='gems' recorded
+// eligibility only. There is no debit to reverse or refund receipt to issue.
+function migrateLegacyProfile(profile: StoredProfile): PalProfile {
+  const replace = (id: StoredId): PalId => {
+    if (id === 'glim') return 'navi';
+    if (id === 'zippa') return profile.starterId === 'glim' ? 'kip' : 'navi';
+    return id;
+  };
+  const starterId = profile.starterId && replace(profile.starterId);
+  const owned = new Map<PalId, OwnedPal>();
+  for (const pal of profile.owned) {
+    const id = replace(pal.id), prior = owned.get(id);
+    if (!prior || pal.joinedAt < prior.joinedAt) {
+      owned.set(id, { id, joinedAt: pal.joinedAt, source: id === starterId ? 'starter' : 'gems' });
+    }
+  }
+  return { owner: profile.owner, preferences: { ...profile.preferences }, policyVersion: PALS_POLICY_VERSION,
+    starterId, activeId: profile.activeId && replace(profile.activeId), owned: [...owned.values()],
+    unlockedIds: [...new Set(profile.unlockedIds.filter(id => id !== 'zippa' || profile.owned.some(pal => pal.id === id)).map(replace))],
+    selections: profile.selections.map(selection => ({ ...selection, palId: replace(selection.palId) })),
+    assignments: profile.assignments.map(activity => ({ ...activity, palId: activity.palId && replace(activity.palId) })),
+  };
+}
 export function validatePalsWorkspace(value: unknown): PalsWorkspace {
   if (!exact(value, ['schema', 'profiles']) || value.schema !== 'jems.pals.workspace.v1' ||
       !Array.isArray(value.profiles) || value.profiles.length > PALS_LIMITS.owners) invalid();
+  if (JSON.stringify(value).length > PALS_LIMITS.characters) throw Error('This Pal collection is full. Export a backup before continuing. Existing Pals are safe.');
   const owners = new Set<string>();
+  const profiles: PalProfile[] = [];
   for (const profile of value.profiles) {
+    const legacy = profile?.policyVersion === 1;
+    const validId = (id: unknown): id is StoredId => isPalId(id) || legacy && (id === 'glim' || id === 'zippa');
+    const validStarter = (id: unknown): id is StoredId => legacy ? id === 'kip' || id === 'glim' : isPalId(id) && palDefinition(id).starter;
+    const rosterSize = PAL_CATALOG.length + (legacy ? 2 : 0);
     if (!exact(profile, ['owner', 'policyVersion', 'starterId', 'activeId', 'owned', 'unlockedIds', 'selections', 'assignments', 'preferences']) ||
-        !isPalOwner(profile.owner) || owners.has(profile.owner) || profile.policyVersion !== 1 ||
-        !(profile.starterId === null || isPalId(profile.starterId) && palDefinition(profile.starterId).starter) ||
-        !(profile.activeId === null || isPalId(profile.activeId)) ||
-        !Array.isArray(profile.owned) || profile.owned.length > PAL_CATALOG.length ||
-        !Array.isArray(profile.unlockedIds) || profile.unlockedIds.length > PAL_CATALOG.length ||
+        !isPalOwner(profile.owner) || owners.has(profile.owner) || !legacy && profile.policyVersion !== PALS_POLICY_VERSION ||
+        !(profile.starterId === null || validStarter(profile.starterId)) ||
+        !(profile.activeId === null || validId(profile.activeId)) ||
+        !Array.isArray(profile.owned) || profile.owned.length > rosterSize ||
+        !Array.isArray(profile.unlockedIds) || profile.unlockedIds.length > rosterSize ||
         !Array.isArray(profile.selections) || profile.selections.length > PALS_LIMITS.selectionsPerOwner ||
         !Array.isArray(profile.assignments) || profile.assignments.length > PALS_LIMITS.receiptsPerOwner) invalid();
     owners.add(profile.owner); validatePalPreferences(profile.preferences);
-    const owned = new Map<PalId, OwnedPal>(), unlocked = new Set<PalId>();
-    for (const id of profile.unlockedIds) { if (!isPalId(id) || unlocked.has(id)) invalid(); unlocked.add(id); }
+    const owned = new Map<StoredId, StoredOwnership>(), unlocked = new Set<StoredId>();
+    for (const id of profile.unlockedIds) { if (!validId(id) || unlocked.has(id)) invalid(); unlocked.add(id); }
     for (const pal of profile.owned) {
-      if (!exact(pal, ['id', 'joinedAt', 'source']) || !isPalId(pal.id) || owned.has(pal.id) ||
+      if (!exact(pal, ['id', 'joinedAt', 'source']) || !validId(pal.id) || owned.has(pal.id) ||
           !unlocked.has(pal.id) || !isPalTimestamp(pal.joinedAt) || !['starter', 'gems'].includes(pal.source as string) ||
           (pal.source === 'starter') !== (pal.id === profile.starterId)) invalid();
-      owned.set(pal.id, pal as unknown as OwnedPal);
+      owned.set(pal.id, pal as unknown as StoredOwnership);
     }
     if (profile.starterId === null) {
       if (profile.activeId !== null || owned.size || unlocked.size || profile.selections.length) invalid();
-    } else if (!owned.has(profile.starterId) || !isPalId(profile.activeId) || !owned.has(profile.activeId) || !profile.selections.length) invalid();
+    } else if (!owned.has(profile.starterId) || !validId(profile.activeId) || !owned.has(profile.activeId) || !profile.selections.length) invalid();
     let previous = '';
     for (const selection of profile.selections) {
-      if (!exact(selection, ['palId', 'from']) || !isPalId(selection.palId) || !isPalTimestamp(selection.from) ||
+      if (!exact(selection, ['palId', 'from']) || !validId(selection.palId) || !isPalTimestamp(selection.from) ||
           !owned.has(selection.palId) || selection.from < previous || selection.from < owned.get(selection.palId)!.joinedAt) invalid();
       previous = selection.from;
     }
     if (profile.selections.length && (profile.selections[0].palId !== profile.starterId ||
-        profile.selections[0].from !== owned.get(profile.starterId as PalId)!.joinedAt ||
+        profile.selections[0].from !== owned.get(profile.starterId as StoredId)!.joinedAt ||
         profile.selections.at(-1).palId !== profile.activeId)) invalid();
     const ids = new Set<string>();
     for (const assignment of profile.assignments) {
       if (!exact(assignment, ['id', 'kind', 'occurredAt', 'palId']) || !receiptId(assignment.id) || ids.has(assignment.id) ||
           !activityKinds.includes(assignment.kind as PalActivityKind) || !isPalTimestamp(assignment.occurredAt) ||
-          !(assignment.palId === null || isPalId(assignment.palId) && owned.has(assignment.palId) &&
+          !(assignment.palId === null || validId(assignment.palId) && owned.has(assignment.palId) &&
             assignment.occurredAt >= owned.get(assignment.palId)!.joinedAt)) invalid();
       ids.add(assignment.id);
     }
+    profiles.push(legacy ? migrateLegacyProfile(profile as unknown as StoredProfile) : copyPals(profile as unknown as PalProfile));
   }
-  if (JSON.stringify(value).length > PALS_LIMITS.characters) throw Error('This Pal collection is full. Export a backup before continuing. Existing Pals are safe.');
-  return copyPals(value as unknown as PalsWorkspace);
+  return { schema: 'jems.pals.workspace.v1', profiles };
 }
 export function validatePalsBackup(value: unknown, namespace?: string): PalsBackup {
   if (!exact(value, ['schema', 'namespace', 'data']) || value.schema !== 'jems.pals.backup.v1' ||

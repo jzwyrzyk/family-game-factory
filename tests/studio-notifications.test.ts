@@ -68,6 +68,16 @@ test('projection is owner scoped, deduplicated and excludes archives, empty star
   assert.deepEqual(deriveStudioNotifications(sources, 'another-child'), []);
 });
 
+test('pending copy is discoverable after reload without exposing its workshop or replaying work',()=>{
+ const source=session('copy-source',{pendingCopy:{requestId:'copy-request',sourceRevisionId:'original',name:'Saved copy',api:'https://private-workshop.test'}});
+ const before=JSON.stringify(source),notice=item(source);
+ assert.equal(notice.kind,'unknown');assert.equal(notice.title,'Your copy needs a check');assert.equal(notice.pending,true);
+ assert.equal(JSON.stringify(notice).includes(source.pendingCopy!.api),false);
+ assert.equal(JSON.stringify(source),before);assert.deepEqual(deriveStudioNotifications([source],OTHER),[]);
+ const prefs=acknowledgeStudioNotificationItems(freshStudioNotificationPreferences(),OWNER,[notice],false);
+ assert.equal(item(source,prefs).unread,false);assert.equal(item(source,prefs).pending,true);
+});
+
 test('default project names retain distinct child-authored idea reminders within their owner', () => {
   const first = ready('first', { name: 'My new idea', draft: '  A cat\n who rides a comet.  ' });
   const second = ready('second', { name: 'My new idea', messages: [

@@ -213,7 +213,10 @@ test('temporary adult mode can use the existing GitHub Pages origin and routes p
     maxInputTokens:1000,maxOutputTokens:1000,priceReviewedOn:new Date().toISOString().slice(0,10)},
    maxJobMicroUsd:1000,workspace:familyId,localFile:join(directory,'state.json')};
   await assert.rejects(createGateway({...config,maxJobMicroUsd:1_000_001,premiumMaxJobMicroUsd:5_000_000}),/JOB_BUDGET_REQUIRED/);
+  await assert.rejects(createGateway({...config,householdRecovery:{enabled:true,domains:[]}}),/HOUSEHOLD_RECOVERY_CONFIG_REQUIRED/);
+  await assert.rejects(createGateway({...config,householdRecovery:{enabled:'true' as unknown as boolean,domains:[]}}),/HOUSEHOLD_RECOVERY_CONFIG_REQUIRED/);
   const gateway=await createGateway(config),listener=await listen((req,res)=>void gateway.handler(req,res));server=listener.server;
+  for(const route of ['/v1/recovery/generated/capture','/v1/recovery/adult/mappings']){const disabled=await fetch(listener.url+route,{headers:{Origin:origin}});assert.equal(disabled.status,503);assert.deepEqual(await disabled.json(),{error:'GENERATED_RECOVERY_DISABLED'});}
   const response=await fetch(listener.url+'/v1/sessions/adult/unlock',{method:'POST',
    headers:{Origin:origin,'Content-Type':'application/json','X-Factory-Request':'1'},body:JSON.stringify({parentPassphrase:'synthetic test passphrase'})});
   assert.equal(response.status,401,'route exists and requires a genuine trusted family session');

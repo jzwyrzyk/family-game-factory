@@ -9,6 +9,13 @@
 !src/runtime/manifests.ts
 !src/builder/
 !src/builder/submission.ts
+!src/storage/
+!src/storage/record-contract.ts
+!src/storage/sync-contract.ts
+!src/storage/cloud-recovery.ts
+!src/storage/recovery-format.ts
+!src/learning/
+!src/learning/grades.ts
 !src/studio/
 !src/studio/design.ts
 !src/studio/creation-readiness.ts
@@ -19,6 +26,7 @@
 !src/pals/
 !src/pals/catalog.ts
 !src/pals/catalog-artwork.generated.ts
+!src/pals/historical-scene-art.json
 server/**/node_modules
 server/**/.env*
 server/**/*.pem

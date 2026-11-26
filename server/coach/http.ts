@@ -27,6 +27,6 @@ export function coachHandler(service:CoachService,config:{appOrigin:string;sessi
    if(path!=='/v1/coach'||req.method!=='POST')return send(404,{errorCode:'NOT_FOUND'});
    if(req.headers['x-factory-request']!=='1'||!req.headers['content-type']?.startsWith('application/json'))throw Error('FORBIDDEN');
    send(200,await service.respond(session,await readJsonBody(req,50000)));
-  }catch(err){const c=(err as Error).message;const permitted=['FORBIDDEN','ADULT_PILOT_ACCESS_REQUIRED','UNAUTHENTICATED','COACH_UNAVAILABLE','SPENDING_CUTOFF','RATE_LIMIT','IDEMPOTENCY_CONFLICT','COACH_REQUEST_EXISTS','COACH_REFUSED','PRIVATE_INFORMATION','COACH_HISTORY_FULL','INVALID_REQUEST'];send(c==='UNAUTHENTICATED'?401:c==='FORBIDDEN'||c==='ADULT_PILOT_ACCESS_REQUIRED'?403:c==='COACH_UNAVAILABLE'?503:400,{errorCode:permitted.includes(c)?c:'COACH_UNAVAILABLE'});}
+  }catch(err){const c=(err as Error).message;const permitted=['FORBIDDEN','ADULT_PILOT_ACCESS_REQUIRED','LEARNER_REQUIRED','LEARNER_SETTINGS_REQUIRED','PARENT_GUIDANCE_REQUIRED','GUARDIAN_CONSENT_REQUIRED','UNAUTHENTICATED','COACH_UNAVAILABLE','SPENDING_CUTOFF','RATE_LIMIT','IDEMPOTENCY_CONFLICT','COACH_REQUEST_EXISTS','COACH_REFUSED','PRIVATE_INFORMATION','COACH_HISTORY_FULL','INVALID_REQUEST'];send(c==='UNAUTHENTICATED'?401:['FORBIDDEN','ADULT_PILOT_ACCESS_REQUIRED','LEARNER_REQUIRED','LEARNER_SETTINGS_REQUIRED','PARENT_GUIDANCE_REQUIRED','GUARDIAN_CONSENT_REQUIRED'].includes(c)?403:c==='COACH_UNAVAILABLE'?503:400,{errorCode:permitted.includes(c)?c:'COACH_UNAVAILABLE'});}
  };
 }

@@ -4,11 +4,19 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/service-image-contracts.yml'
+      - 'infra/nonproduction/family-beta/**'
+      - 'scripts/beta/**'
+      - 'src/family-beta/**'
       - '.dockerignore'
       - 'package.json'
       - 'package-lock.json'
       - 'server/**'
       - 'src/runtime/types.ts'
+      - 'src/storage/record-contract.ts'
+      - 'src/storage/sync-contract.ts'
+      - 'src/storage/cloud-recovery.ts'
+      - 'src/storage/recovery-format.ts'
+      - 'src/learning/grades.ts'
       - 'src/runtime/manifests.ts'
       - 'src/studio/design.ts'
       - 'src/studio/creation-readiness.ts'
@@ -17,16 +25,25 @@ on:
       - 'src/creation/projects.ts'
       - 'src/pals/catalog.ts'
       - 'src/pals/catalog-artwork.generated.ts'
+      - 'src/pals/historical-scene-art.json'
       - 'scripts/deployment/build.py'
       - 'scripts/deployment/test_build.py'
   pull_request:
     paths:
       - '.github/workflows/service-image-contracts.yml'
+      - 'infra/nonproduction/family-beta/**'
+      - 'scripts/beta/**'
+      - 'src/family-beta/**'
       - '.dockerignore'
       - 'package.json'
       - 'package-lock.json'
       - 'server/**'
       - 'src/runtime/types.ts'
+      - 'src/storage/record-contract.ts'
+      - 'src/storage/sync-contract.ts'
+      - 'src/storage/cloud-recovery.ts'
+      - 'src/storage/recovery-format.ts'
+      - 'src/learning/grades.ts'
       - 'src/runtime/manifests.ts'
       - 'src/studio/design.ts'
       - 'src/studio/creation-readiness.ts'
@@ -35,6 +52,7 @@ on:
       - 'src/creation/projects.ts'
       - 'src/pals/catalog.ts'
       - 'src/pals/catalog-artwork.generated.ts'
+      - 'src/pals/historical-scene-art.json'
       - 'scripts/deployment/build.py'
       - 'scripts/deployment/test_build.py'
 permissions:
@@ -108,3 +126,13 @@ jobs:
               await import("/app/private-executor.mjs");
               console.log("Packaged private coach imports passed as non-root");
             '
+      - name: Build and inspect the authenticated family gateway image
+        run: |
+          docker build --file infra/nonproduction/family-beta/Dockerfile --tag jems-family-gateway:ci .
+          docker run --rm --network none --entrypoint node jems-family-gateway:ci --import tsx --input-type=module -e '
+            import {existsSync} from "node:fs";
+            if(process.getuid()===0 || !existsSync("dist-family-beta/beta-build.json") ||
+               !existsSync("dist-family-beta/entry/household-vault.js") || existsSync("server/coach/private-provider.ts"))
+              throw Error("Private gateway image contents rejected");
+            await import("./server/gateway.ts");
+          '

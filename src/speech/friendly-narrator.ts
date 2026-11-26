@@ -60,6 +60,7 @@ export function configureNaturalNarration(provider: NaturalNarrationProvider | n
 interface ReadingCallbacks {
   /** Records support only once, when actual audio starts. */
   onStarted?(): void;
+  onDelivered?(): void;
   onFinished?(): void;
   onUnavailable?(reason: 'voice' | 'audio'): void;
   onMode?(mode: 'natural' | 'device'): void;
@@ -119,6 +120,10 @@ export function createFriendlyNarrator(canSpeak: () => boolean) {
       if (current()) callbacks.onUnavailable?.(reason);
       request.cancel();
     }
+    function delivered() {
+      if(current()&&started)callbacks.onDelivered?.();
+      cleanUp();
+    }
     function onStarted() {
       if (!current()) { request.cancel(); return; }
       if (timer) clearTimeout(timer);
@@ -167,7 +172,7 @@ export function createFriendlyNarrator(canSpeak: () => boolean) {
       } catch { fail('audio'); return; }
       const queued = utterance;
       queued.onstart = () => { if (queued === utterance && !waitingForGesture) onStarted(); };
-      queued.onend = () => { if (queued === utterance && !waitingForGesture) cleanUp(); };
+      queued.onend = () => { if (queued === utterance && !waitingForGesture) delivered(); };
       queued.onerror = error => {
         if (queued !== utterance || waitingForGesture) return;
         if (!started && isPlaybackDenied(error)) requireDeviceGesture(); else fail('audio');
@@ -209,7 +214,7 @@ export function createFriendlyNarrator(canSpeak: () => boolean) {
         if (!current()) { request.cancel(); return; }
         media = new Audio(); media.preload = 'auto';
         mediaUrl = URL.createObjectURL(audio); media.src = mediaUrl;
-        media.onplaying = onStarted; media.onended = cleanUp; media.onerror = () => fail('audio');
+        media.onplaying = onStarted; media.onended = delivered; media.onerror = () => fail('audio');
         callbacks.onMode?.('natural');
         await playMedia();
       } catch { if (current()) fail('audio'); else request.cancel(); }

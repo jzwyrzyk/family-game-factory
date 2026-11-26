@@ -9,7 +9,6 @@ const uid = () => crypto.randomUUID();
 export const isCreationPalId = isPalId;
 
 const tapLines: Readonly<Partial<Record<CreationPalId, string>>> = Object.freeze({
-  glim: 'A discovery! My dance has corners.',
   kip: 'Test complete. Wobble levels: excellent.',
   riff: 'Plot twist: I can dance!',
 });

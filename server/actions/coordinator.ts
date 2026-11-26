@@ -77,6 +77,7 @@ export class ActionCoordinator {
  }
  async enqueue(id:string){await this.repo.transaction(s=>{const j=s.jobs.find(x=>x.id===id);if(j?.status==='queued'&&!j.execution){j.execution={attempt:0,dispatchPending:true,queuedAt:Date.now()};this.initializeLease(s,j);}return true;});}
  private permissionError(s:PipelineState,j:Job):string|undefined {
+  if(s.platformSpendingStopped)return 'SPENDING_CUTOFF';
   if(j.premiumPolicy){
    if(!this.adultPilotMode)return 'ADULT_PILOT_ACCESS_REQUIRED';
    try{requirePinnedPremium(j,this.premiumPilot);}catch(error){return (error as Error).message;}

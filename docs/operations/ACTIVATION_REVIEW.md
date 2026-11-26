@@ -1,5 +1,7 @@
 # Review the remaining Jems access setup
 
+The November 24 cutover is complete. The production workflow definitions merged in #126, the Gateway promotion completed in #152 and the Pages publication was recorded in #161. The temporary candidate route was removed. Candidate-specific authenticated chat remained unverified. The historical cutover exception applied only to that source. Use the current release record for a new promotion, its exact-source acceptance and rollback requirements. [November 24 observation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45508931546) · [November 26 serving metadata](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45728127526) · [Current release gates](../../DELIVERY-STATE.md)
+
 **Current production handoff:** use [Production activation and exact-source release](PRODUCTION_ACTIVATION.md). The owner has authorized the cutover but has explicitly withheld approval of the additional IAM/provider activation scope until fresh live IAM evidence and an exact diff are reviewed. The new collector is read-only; the release operator supplies one immutable, tested Cloud Shell command. Do not run the historical placeholder command or old PR107 apply pathway below as the current production procedure.
 
 ## Historical PR107 preparation

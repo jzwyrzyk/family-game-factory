@@ -1,0 +1,7 @@
+# Private family beta trust boundary
+
+**Proposed for owner review.** The private family beta assignment authorizes repository preparation. Hosting, provider activation, household migration and production traffic require separate release evidence.
+
+One gateway authenticates each family inside a dedicated first-party browser origin, derives a server-owned workspace and enforces local entitlements, verified processing consent, provider evidence and atomic spending reservations. The owner household retains its original workspace and Adult Private authorization. An explicit mapping joins its accounting to the same global ceiling. A signed IAP subject and separate recent operator credential protect administration. A separate preview origin verifies the family, device and play grant before reading the approved revision.
+
+A wildcard family origin adds a certificate and routing prerequisite while keeping the browser's built-in localStorage, IndexedDB, cache and cookie boundaries aligned with workspace ownership. It avoids reusing a single origin containing multiple families' notebook, art and learning records. A dedicated authenticated household host permits the existing trusted device and adult controls to continue after public Pages retirement. The existing isolated worker remains private. Public welcome assets and separately protected application bytes have different delivery rules. See the [architecture](../family-beta/ARCHITECTURE.md) and [owner activation and rollback checklist](../family-beta/ACTIVATION.md).

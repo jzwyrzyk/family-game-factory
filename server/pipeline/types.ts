@@ -1,3 +1,4 @@
+import type {GuidedProvenance} from '../beta/guidance';
 import type {PremiumPolicyPin,PremiumUsage} from './premium-policy';
 import type {CoachReceipt} from '../coach/service';
 import type {FamilyCoachConsent} from '../coach/consent';
@@ -29,6 +30,9 @@ export interface AgentAdapter {
 }
 export interface BuildRequest { gameId:string; baseRevisionId:string|null; prompt:string; clientRequestId:string; retryOf?:string }
 export interface Job extends BuildRequest {
+ /** Beta-only server attribution; client BuildRequest cannot supply these fields. */
+ learnerId?:string;
+ guidedCreation?:GuidedProvenance;
  /** Server-owned acceptance policy. Public submissions cannot set or disable it. */
  qualityRequired?:'game-quality-v1';
  /** Pinned at transactional admission. Absence preserves the legacy worker contract. */
@@ -50,12 +54,13 @@ export interface Job extends BuildRequest {
   id:string;familyId:string;status:JobStatus;adapter:'mock'|'metered-api'|'codex-subscription'|'local-rule';
   maxUnits:number;usedUnits:number;attempts?:number;phase?:string;revisionId?:string;errorCode?:string;retryCount:number;
 }
-export interface BuiltRevision { id:string;familyId:string;parentId:string|null;game:PlayableGame|null;projectId:string;sourceGame?:string;config?:Record<string,number|boolean>;name?:string;sourceRevisionId?:string;adapter?:string;adultPilotProfileId?:string }
+export interface RecoveryProvenance {sourceOrigin:string;sourceAudience:string;sourceRevisionId:string;sourceProjectId:string;sourceHash:string;playbackOnly:true}
+export interface BuiltRevision { id:string;familyId:string;parentId:string|null;game:PlayableGame|null;projectId:string;sourceGame?:string;config?:Record<string,number|boolean>;name?:string;sourceRevisionId?:string;copyRequestId?:string;adapter?:string;adultPilotProfileId?:string;recoveryProvenance?:RecoveryProvenance }
 export interface AuditEvent {
  jobId:string;familyId:string;status:JobStatus;at:string;code?:string;
  /** Allowance accounting only; never request, response or recording content. */
  usage?:{kind:'coach'|'audio'|'narration';month:string;reservedMicroUsd:number;usedMicroUsd:number;outcome:'settled'|'interrupted'};
 }
 export interface Ledger { allowance:number;used:number;reserved:number;paidEnabled:boolean;month:string }
-export interface PipelineState { narrationReceipts?:NarrationReceipt[]; parentPrivacyChoices?:ParentPrivacyChoice[]; adultPilotPermits?:AdultPilotPermit[]; adultPilotSessions?:AdultPilotSession[]; coachReceipts?:CoachReceipt[]; audioReceipts?:AudioReceipt[]; coachConsent?:FamilyCoachConsent[]; invitations?:Invitation[]; devices?:TrustedDevice[]; parentAuth?:Record<string,FamilyParentAuth>; version:1;jobs:Job[];revisions:BuiltRevision[];active:Record<string,string>;ledgers:Record<string,Ledger>;audit:AuditEvent[] }
+export interface PipelineState { platformSpendingStopped?:boolean; /** Computed by the beta repository on every read. Never persisted. */ betaScopes?:Record<'conversation'|'generation'|'remoteSpeech',boolean>; narrationReceipts?:NarrationReceipt[]; parentPrivacyChoices?:ParentPrivacyChoice[]; adultPilotPermits?:AdultPilotPermit[]; adultPilotSessions?:AdultPilotSession[]; coachReceipts?:CoachReceipt[]; audioReceipts?:AudioReceipt[]; coachConsent?:FamilyCoachConsent[]; invitations?:Invitation[]; devices?:TrustedDevice[]; parentAuth?:Record<string,FamilyParentAuth>; version:1;jobs:Job[];revisions:BuiltRevision[];active:Record<string,string>;ledgers:Record<string,Ledger>;audit:AuditEvent[] }
 export interface Repository { transaction<T>(update:(state:PipelineState)=>T):Promise<T>; snapshot():Promise<PipelineState> }

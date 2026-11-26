@@ -1,0 +1,2400 @@
+{
+  "schema": "jems.storage.application-benchmark.v1",
+  "observedAt": "2026-11-25T15:43:24.398Z",
+  "source": "0f459f5b29fa3a72c5caf1fa69051475421861f9",
+  "gitTree": "1c17844c1db1b8f842cb94001ff7209fd6663c7f",
+  "scope": "Synthetic data generated with actual application RevisionStore/StudioNotebook, built Jems UI, real Chromium localStorage/IndexedDB; desktop emulation on one shared Linux host. No network provider or cloud data. Native record operations use the production source classes. Legacy export/restore timing excludes originals, rewards, Pals and cloud; full backup is measured separately.",
+  "instrumentation": "Synchronous JSON and localStorage instrumentation adds overhead; byte counters are UTF-16 code units, separately exported UTF-8 bytes. Startup includes browser navigation and readiness wait. Process metrics are CDP observations, not isolated CPU or physical-device memory. Samples share warm HTTP cache and accumulate one retained revision per sample.",
+  "browser": "156.0.8078.79",
+  "samples": 5,
+  "rows": [
+    {
+      "scenario": "small",
+      "projects": 5,
+      "revisionsPerProject": 1,
+      "initialRevisions": 5,
+      "sessions": 5,
+      "messagesPerSession": 20,
+      "artwork": {
+        "originalCount": 2,
+        "pixels": 256,
+        "originalBytes": 336612,
+        "previewBytes": 336612
+      },
+      "metrics": {
+        "readyMs": {
+          "median": 918.475594,
+          "p95": 2511.663778,
+          "samples": [
+            918.475594,
+            2511.663778,
+            2340.1848709999995,
+            884.8943409999993,
+            862.2962310000003
+          ]
+        },
+        "libraryMs": {
+          "median": 134.8335270000007,
+          "p95": 490.3673940000008,
+          "samples": [
+            134.8335270000007,
+            490.3673940000008,
+            123.46810699999878,
+            139.35493700000006,
+            100.82002499999726
+          ]
+        },
+        "openMs": {
+          "median": 364.65484600000036,
+          "p95": 629.3257150000009,
+          "samples": [
+            364.65484600000036,
+            387.5345469999993,
+            629.3257150000009,
+            286.6775669999988,
+            218.48890000000029
+          ]
+        }
+      },
+      "runs": [
+        {
+          "readyMs": 918.475594,
+          "libraryMs": 134.8335270000007,
+          "openMs": 364.65484600000036,
+          "startup": {
+            "counters": {
+              "getCalls": 60,
+              "getCodeUnits": 786611,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 384,
+              "parseCodeUnits": 1537623,
+              "parseMs": 7.100000000093132,
+              "stringifyCalls": 390,
+              "stringifyCodeUnits": 785432,
+              "stringifyMs": 2.400000000023283
+            },
+            "heapBytes": 13209098,
+            "domNodes": 2308
+          },
+          "operations": {
+            "list": {
+              "ms": 0.7000000000698492,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 27480,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 51433,
+                "parseMs": 0.10000000009313226,
+                "stringifyCalls": 12,
+                "stringifyCodeUnits": 26586,
+                "stringifyMs": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.2999999999301508,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 2633,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 292,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 292,
+                "stringifyMs": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 2.400000000023283,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 24847,
+                "setCalls": 1,
+                "setCodeUnits": 24876,
+                "parseCalls": 36,
+                "parseCodeUnits": 111458,
+                "parseMs": 0.4000000001396984,
+                "stringifyCalls": 36,
+                "stringifyCodeUnits": 111487,
+                "stringifyMs": 0.4999999998835847
+              }
+            },
+            "saveRevision": {
+              "ms": 0.6999999999534339,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 7899,
+                "setCalls": 1,
+                "setCodeUnits": 2994,
+                "parseCalls": 5,
+                "parseCodeUnits": 6487,
+                "parseMs": 0.10000000009313226,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 9481,
+                "stringifyMs": 0.09999999997671694
+              }
+            },
+            "legacyExport": {
+              "ms": 0.9000000000232831,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 27870,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 53441,
+                "parseMs": 0.19999999995343387,
+                "stringifyCalls": 13,
+                "stringifyCodeUnits": 57601,
+                "stringifyMs": 0.09999999997671694
+              },
+              "utf8Bytes": 29042
+            },
+            "legacyRestoreValidation": {
+              "ms": 1,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 27870,
+                "parseCalls": 15,
+                "parseCodeUnits": 63589,
+                "parseMs": 0.30000000004656613,
+                "stringifyCalls": 16,
+                "stringifyCodeUnits": 62423,
+                "stringifyMs": 0.2000000000698492
+              }
+            },
+            "artExport": {
+              "ms": 1045.5999999999767,
+              "utf8Bytes": 449388
+            },
+            "artRestore": {
+              "ms": 716.0999999999767
+            },
+            "artwork": {
+              "count": 2,
+              "uniqueHashes": 2,
+              "originalBytes": 336612
+            },
+            "localStorage": {
+              "keys": 3,
+              "utf8Bytes": 29004,
+              "codeUnits": 28998
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.388877
+            },
+            {
+              "name": "TaskDuration",
+              "value": 2.227907
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 9634276
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 21020672
+            }
+          ]
+        },
+        {
+          "readyMs": 2511.663778,
+          "libraryMs": 490.3673940000008,
+          "openMs": 387.5345469999993,
+          "startup": {
+            "counters": {
+              "getCalls": 64,
+              "getCodeUnits": 892100,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 434,
+              "parseCodeUnits": 1742774,
+              "parseMs": 5.500000000582077,
+              "stringifyCalls": 438,
+              "stringifyCodeUnits": 889700,
+              "stringifyMs": 4.400000000023283
+            },
+            "heapBytes": 23159441,
+            "domNodes": 2308
+          },
+          "operations": {
+            "list": {
+              "ms": 0.40000000002328306,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 27845,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 51441,
+                "parseMs": 0.10000000009313226,
+                "stringifyCalls": 12,
+                "stringifyCodeUnits": 26590,
+                "stringifyMs": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 2994,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 6.099999999976717,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 24851,
+                "setCalls": 1,
+                "setCodeUnits": 24876,
+                "parseCalls": 36,
+                "parseCodeUnits": 111470,
+                "parseMs": 4.6999999998370185,
+                "stringifyCalls": 36,
+                "stringifyCodeUnits": 111495,
+                "stringifyMs": 0.39999999990686774
+              }
+            },
+            "saveRevision": {
+              "ms": 0.5,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 8982,
+                "setCalls": 1,
+                "setCodeUnits": 3355,
+                "parseCalls": 5,
+                "parseCodeUnits": 7277,
+                "parseMs": 0.19999999995343387,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 10632,
+                "stringifyMs": 0.09999999997671694
+              }
+            },
+            "legacyExport": {
+              "ms": 0.6999999999534339,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 28231,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 53802,
+                "parseMs": 0.2999999999301508,
+                "stringifyCalls": 13,
+                "stringifyCodeUnits": 58323,
+                "stringifyMs": 0.2999999999301508
+              },
+              "utf8Bytes": 29403
+            },
+            "legacyRestoreValidation": {
+              "ms": 1.2999999999301508,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 28231,
+                "parseCalls": 15,
+                "parseCodeUnits": 65033,
+                "parseMs": 0.40000000002328306,
+                "stringifyCalls": 16,
+                "stringifyCodeUnits": 63867,
+                "stringifyMs": 0.39999999990686774
+              }
+            },
+            "artExport": {
+              "ms": 1004.5999999999767,
+              "utf8Bytes": 449388
+            },
+            "artRestore": {
+              "ms": 345.19999999995343
+            },
+            "artwork": {
+              "count": 2,
+              "uniqueHashes": 2,
+              "originalBytes": 336612
+            },
+            "localStorage": {
+              "keys": 3,
+              "utf8Bytes": 29365,
+              "codeUnits": 29359
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.261773
+            },
+            {
+              "name": "TaskDuration",
+              "value": 1.857428
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 15894208
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 32399360
+            }
+          ]
+        },
+        {
+          "readyMs": 2340.1848709999995,
+          "libraryMs": 123.46810699999878,
+          "openMs": 629.3257150000009,
+          "startup": {
+            "counters": {
+              "getCalls": 64,
+              "getCodeUnits": 897515,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 439,
+              "parseCodeUnits": 1745906,
+              "parseMs": 23.599999999976717,
+              "stringifyCalls": 470,
+              "stringifyCodeUnits": 892979,
+              "stringifyMs": 7.900000000023283
+            },
+            "heapBytes": 21306484,
+            "domNodes": 2525
+          },
+          "operations": {
+            "list": {
+              "ms": 0.19999999995343387,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 28206,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 51441,
+                "parseMs": 0,
+                "stringifyCalls": 12,
+                "stringifyCodeUnits": 26590,
+                "stringifyMs": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 3355,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 1,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 24851,
+                "setCalls": 1,
+                "setCodeUnits": 24876,
+                "parseCalls": 36,
+                "parseCodeUnits": 111470,
+                "parseMs": 0.10000000009313226,
+                "stringifyCalls": 36,
+                "stringifyCodeUnits": 111495,
+                "stringifyMs": 0.30000000004656613
+              }
+            },
+            "saveRevision": {
+              "ms": 0.19999999995343387,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 10065,
+                "setCalls": 1,
+                "setCodeUnits": 3716,
+                "parseCalls": 5,
+                "parseCodeUnits": 7999,
+                "parseMs": 0.09999999997671694,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 11715,
+                "stringifyMs": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 0.5,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 28592,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 54163,
+                "parseMs": 0.10000000009313226,
+                "stringifyCalls": 13,
+                "stringifyCodeUnits": 59045,
+                "stringifyMs": 0.2999999999301508
+              },
+              "utf8Bytes": 29764
+            },
+            "legacyRestoreValidation": {
+              "ms": 0.6999999999534339,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 28592,
+                "parseCalls": 15,
+                "parseCodeUnits": 66477,
+                "parseMs": 0.09999999997671694,
+                "stringifyCalls": 16,
+                "stringifyCodeUnits": 65311,
+                "stringifyMs": 0
+              }
+            },
+            "artExport": {
+              "ms": 1601.5999999999767,
+              "utf8Bytes": 449388
+            },
+            "artRestore": {
+              "ms": 237.19999999995343
+            },
+            "artwork": {
+              "count": 2,
+              "uniqueHashes": 2,
+              "originalBytes": 336612
+            },
+            "localStorage": {
+              "keys": 3,
+              "utf8Bytes": 29726,
+              "codeUnits": 29720
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.3883
+            },
+            {
+              "name": "TaskDuration",
+              "value": 2.432038
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 9491848
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 27901952
+            }
+          ]
+        },
+        {
+          "readyMs": 884.8943409999993,
+          "libraryMs": 139.35493700000006,
+          "openMs": 286.6775669999988,
+          "startup": {
+            "counters": {
+              "getCalls": 60,
+              "getCodeUnits": 803526,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 384,
+              "parseCodeUnits": 1546136,
+              "parseMs": 4.899999999906868,
+              "stringifyCalls": 390,
+              "stringifyCodeUnits": 790026,
+              "stringifyMs": 2.1000000002095476
+            },
+            "heapBytes": 15580398,
+            "domNodes": 2308
+          },
+          "operations": {
+            "list": {
+              "ms": 0.40000000002328306,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 28567,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 51441,
+                "parseMs": 0.2000000000698492,
+                "stringifyCalls": 12,
+                "stringifyCodeUnits": 26590,
+                "stringifyMs": 0
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 3716,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 1.599999999976717,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 24851,
+                "setCalls": 1,
+                "setCodeUnits": 24876,
+                "parseCalls": 36,
+                "parseCodeUnits": 111470,
+                "parseMs": 0.30000000004656613,
+                "stringifyCalls": 36,
+                "stringifyCodeUnits": 111495,
+                "stringifyMs": 0.5
+              }
+            },
+            "saveRevision": {
+              "ms": 0.6999999999534339,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 11148,
+                "setCalls": 1,
+                "setCodeUnits": 4077,
+                "parseCalls": 5,
+                "parseCodeUnits": 8721,
+                "parseMs": 0.09999999997671694,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 12798,
+                "stringifyMs": 0.09999999997671694
+              }
+            },
+            "legacyExport": {
+              "ms": 0.5,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 28953,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 54524,
+                "parseMs": 0.19999999995343387,
+                "stringifyCalls": 13,
+                "stringifyCodeUnits": 59767,
+                "stringifyMs": 0.2000000000698492
+              },
+              "utf8Bytes": 30125
+            },
+            "legacyRestoreValidation": {
+              "ms": 0.5999999999767169,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 28953,
+                "parseCalls": 15,
+                "parseCodeUnits": 67921,
+                "parseMs": 0.19999999995343387,
+                "stringifyCalls": 16,
+                "stringifyCodeUnits": 66755,
+                "stringifyMs": 0.09999999997671694
+              }
+            },
+            "artExport": {
+              "ms": 2058,
+              "utf8Bytes": 449388
+            },
+            "artRestore": {
+              "ms": 1261.4000000000233
+            },
+            "artwork": {
+              "count": 2,
+              "uniqueHashes": 2,
+              "originalBytes": 336612
+            },
+            "localStorage": {
+              "keys": 3,
+              "utf8Bytes": 30087,
+              "codeUnits": 30081
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.518695
+            },
+            {
+              "name": "TaskDuration",
+              "value": 3.503206
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 10109596
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 27713536
+            }
+          ]
+        },
+        {
+          "readyMs": 862.2962310000003,
+          "libraryMs": 100.82002499999726,
+          "openMs": 218.48890000000029,
+          "startup": {
+            "counters": {
+              "getCalls": 64,
+              "getCodeUnits": 908345,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 434,
+              "parseCodeUnits": 1750355,
+              "parseMs": 7.6999999998370185,
+              "stringifyCalls": 438,
+              "stringifyCodeUnits": 894032,
+              "stringifyMs": 2.099999999976717
+            },
+            "heapBytes": 27478009,
+            "domNodes": 2308
+          },
+          "operations": {
+            "list": {
+              "ms": 1.6999999999534339,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 28928,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 51441,
+                "parseMs": 0.30000000004656613,
+                "stringifyCalls": 12,
+                "stringifyCodeUnits": 26590,
+                "stringifyMs": 1.099999999976717
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.40000000002328306,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 4077,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0.30000000004656613
+              }
+            },
+            "saveDraft": {
+              "ms": 1.400000000023283,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 24851,
+                "setCalls": 1,
+                "setCodeUnits": 24876,
+                "parseCalls": 36,
+                "parseCodeUnits": 111470,
+                "parseMs": 0.39999999990686774,
+                "stringifyCalls": 36,
+                "stringifyCodeUnits": 111495,
+                "stringifyMs": 0.4000000001396984
+              }
+            },
+            "saveRevision": {
+              "ms": 0.5999999999767169,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 12231,
+                "setCalls": 1,
+                "setCodeUnits": 4438,
+                "parseCalls": 5,
+                "parseCodeUnits": 9443,
+                "parseMs": 0,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 13881,
+                "stringifyMs": 0
+              }
+            },
+            "legacyExport": {
+              "ms": 0.19999999995343387,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 29314,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 13,
+                "parseCodeUnits": 54885,
+                "parseMs": 0.09999999997671694,
+                "stringifyCalls": 13,
+                "stringifyCodeUnits": 60489,
+                "stringifyMs": 0.09999999997671694
+              },
+              "utf8Bytes": 30486
+            },
+            "legacyRestoreValidation": {
+              "ms": 0.5,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 29314,
+                "parseCalls": 15,
+                "parseCodeUnits": 69365,
+                "parseMs": 0.09999999997671694,
+                "stringifyCalls": 16,
+                "stringifyCodeUnits": 68199,
+                "stringifyMs": 0
+              }
+            },
+            "artExport": {
+              "ms": 1227.9000000000233,
+              "utf8Bytes": 449388
+            },
+            "artRestore": {
+              "ms": 1518.3000000000466
+            },
+            "artwork": {
+              "count": 2,
+              "uniqueHashes": 2,
+              "originalBytes": 336612
+            },
+            "localStorage": {
+              "keys": 3,
+              "utf8Bytes": 30448,
+              "codeUnits": 30442
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.337609
+            },
+            {
+              "name": "TaskDuration",
+              "value": 2.776004
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 7548400
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 43966464
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": "medium",
+      "projects": 25,
+      "revisionsPerProject": 4,
+      "initialRevisions": 100,
+      "sessions": 25,
+      "messagesPerSession": 100,
+      "artwork": {
+        "originalCount": 5,
+        "pixels": 512,
+        "originalBytes": 3146610,
+        "previewBytes": 684427
+      },
+      "metrics": {
+        "readyMs": {
+          "median": 766.3765829999975,
+          "p95": 1309.185504999994,
+          "samples": [
+            922.171747999997,
+            761.2597700000042,
+            637.8660930000042,
+            766.3765829999975,
+            1309.185504999994
+          ]
+        },
+        "libraryMs": {
+          "median": 145.03152299999783,
+          "p95": 159.01231100000587,
+          "samples": [
+            145.03152299999783,
+            117.02942800000164,
+            152.00639100000262,
+            98.30928899999708,
+            159.01231100000587
+          ]
+        },
+        "openMs": {
+          "median": 335.96658000000025,
+          "p95": 467.59155699999974,
+          "samples": [
+            467.59155699999974,
+            335.96658000000025,
+            333.42455699999846,
+            324.7691930000001,
+            405.2664650000006
+          ]
+        }
+      },
+      "runs": [
+        {
+          "readyMs": 922.171747999997,
+          "libraryMs": 145.03152299999783,
+          "openMs": 467.59155699999974,
+          "startup": {
+            "counters": {
+              "getCalls": 60,
+              "getCodeUnits": 17581166,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 1584,
+              "parseCodeUnits": 34336230,
+              "parseMs": 67.0999999998603,
+              "stringifyCalls": 1590,
+              "stringifyCodeUnits": 17252648,
+              "stringifyMs": 34.999999999883585
+            },
+            "heapBytes": 20500280,
+            "domNodes": 2631
+          },
+          "operations": {
+            "list": {
+              "ms": 3.599999999976717,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 606597,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1139438,
+                "parseMs": 1.5,
+                "stringifyCalls": 52,
+                "stringifyCodeUnits": 574071,
+                "stringifyMs": 0.5999999999767169
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.09999999997671694,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 41230,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 357,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 357,
+                "stringifyMs": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 12.900000000023283,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 565367,
+                "setCalls": 1,
+                "setCodeUnits": 565396,
+                "parseCalls": 156,
+                "parseCodeUnits": 2317078,
+                "parseMs": 2.7999999998137355,
+                "stringifyCalls": 156,
+                "stringifyCodeUnits": 2317107,
+                "stringifyMs": 4.900000000139698
+              }
+            },
+            "saveRevision": {
+              "ms": 3.099999999976717,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 123690,
+                "setCalls": 1,
+                "setCodeUnits": 41591,
+                "parseCalls": 5,
+                "parseCodeUnits": 83746,
+                "parseMs": 0.2000000000698492,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 125337,
+                "stringifyMs": 0.40000000002328306
+              }
+            },
+            "legacyExport": {
+              "ms": 5.5,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 606987,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1175858,
+                "parseMs": 1.2000000000698492,
+                "stringifyCalls": 53,
+                "stringifyCodeUnits": 1218615,
+                "stringifyMs": 2.8999999999068677
+              },
+              "utf8Bytes": 608159
+            },
+            "legacyRestoreValidation": {
+              "ms": 13,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 606987,
+                "parseCalls": 55,
+                "parseCodeUnits": 1301797,
+                "parseMs": 2.4999999998835847,
+                "stringifyCalls": 56,
+                "stringifyCodeUnits": 1300631,
+                "stringifyMs": 3.5000000001164153
+              }
+            },
+            "artExport": {
+              "ms": 841,
+              "utf8Bytes": 4196777
+            },
+            "artRestore": {
+              "ms": 1181.1999999999534
+            },
+            "artwork": {
+              "count": 5,
+              "uniqueHashes": 5,
+              "originalBytes": 3146610
+            },
+            "localStorage": {
+              "keys": 3,
+              "utf8Bytes": 608121,
+              "codeUnits": 608115
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.388408
+            },
+            {
+              "name": "TaskDuration",
+              "value": 2.596194
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 40609844
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 87474176
+            }
+          ]
+        },
+        {
+          "readyMs": 761.2597700000042,
+          "libraryMs": 117.02942800000164,
+          "openMs": 335.96658000000025,
+          "startup": {
+            "counters": {
+              "getCalls": 60,
+              "getCodeUnits": 17587251,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 1584,
+              "parseCodeUnits": 34339689,
+              "parseMs": 43,
+              "stringifyCalls": 1590,
+              "stringifyCodeUnits": 17254354,
+              "stringifyMs": 21.20000000006985
+            },
+            "heapBytes": 65842265,
+            "domNodes": 2631
+          },
+          "operations": {
+            "list": {
+              "ms": 2.800000000046566,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 606962,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1139446,
+                "parseMs": 1.2000000000698492,
+                "stringifyCalls": 52,
+                "stringifyCodeUnits": 574075,
+                "stringifyMs": 0.6000000000931323
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.09999999997671694,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 41591,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 13.800000000046566,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 565371,
+                "setCalls": 1,
+                "setCodeUnits": 565396,
+                "parseCalls": 156,
+                "parseCodeUnits": 2317090,
+                "parseMs": 2.400000000023283,
+                "stringifyCalls": 156,
+                "stringifyCodeUnits": 2317115,
+                "stringifyMs": 5.500000000116415
+              }
+            },
+            "saveRevision": {
+              "ms": 1.6999999999534339,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 124773,
+                "setCalls": 1,
+                "setCodeUnits": 41952,
+                "parseCalls": 5,
+                "parseCodeUnits": 84471,
+                "parseMs": 0.19999999995343387,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 126423,
+                "stringifyMs": 0.2999999999301508
+              }
+            },
+            "legacyExport": {
+              "ms": 4.200000000069849,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 607348,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1176219,
+                "parseMs": 1.3000000000465661,
+                "stringifyCalls": 53,
+                "stringifyCodeUnits": 1219337,
+                "stringifyMs": 2.0000000001164153
+              },
+              "utf8Bytes": 608520
+            },
+            "legacyRestoreValidation": {
+              "ms": 9.70000000006985,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 607348,
+                "parseCalls": 55,
+                "parseCodeUnits": 1303241,
+                "parseMs": 2.099999999976717,
+                "stringifyCalls": 56,
+                "stringifyCodeUnits": 1302075,
+                "stringifyMs": 2
+              }
+            },
+            "artExport": {
+              "ms": 882.7999999999302,
+              "utf8Bytes": 4196777
+            },
+            "artRestore": {
+              "ms": 784.6999999999534
+            },
+            "artwork": {
+              "count": 5,
+              "uniqueHashes": 5,
+              "originalBytes": 3146610
+            },
+            "localStorage": {
+              "keys": 3,
+              "utf8Bytes": 608482,
+              "codeUnits": 608476
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.295223
+            },
+            {
+              "name": "TaskDuration",
+              "value": 2.164362
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 8449968
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 81252352
+            }
+          ]
+        },
+        {
+          "readyMs": 637.8660930000042,
+          "libraryMs": 152.00639100000262,
+          "openMs": 333.42455699999846,
+          "startup": {
+            "counters": {
+              "getCalls": 64,
+              "getCodeUnits": 19854150,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 1799,
+              "parseCodeUnits": 38879793,
+              "parseMs": 45.10000000020955,
+              "stringifyCalls": 1805,
+              "stringifyCodeUnits": 19532641,
+              "stringifyMs": 24.29999999993015
+            },
+            "heapBytes": 62049603,
+            "domNodes": 2631
+          },
+          "operations": {
+            "list": {
+              "ms": 4.300000000046566,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 607323,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1139446,
+                "parseMs": 1.5,
+                "stringifyCalls": 52,
+                "stringifyCodeUnits": 574075,
+                "stringifyMs": 0.5
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.09999999997671694,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 41952,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 14,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 565371,
+                "setCalls": 1,
+                "setCodeUnits": 565396,
+                "parseCalls": 156,
+                "parseCodeUnits": 2317090,
+                "parseMs": 3.3000000001629815,
+                "stringifyCalls": 156,
+                "stringifyCodeUnits": 2317115,
+                "stringifyMs": 5.699999999953434
+              }
+            },
+            "saveRevision": {
+              "ms": 1.599999999976717,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 125856,
+                "setCalls": 1,
+                "setCodeUnits": 42313,
+                "parseCalls": 5,
+                "parseCodeUnits": 85193,
+                "parseMs": 0.2000000000698492,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 127506,
+                "stringifyMs": 0.19999999995343387
+              }
+            },
+            "legacyExport": {
+              "ms": 4,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 607709,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1176580,
+                "parseMs": 1.400000000023283,
+                "stringifyCalls": 53,
+                "stringifyCodeUnits": 1220059,
+                "stringifyMs": 1.7999999999301508
+              },
+              "utf8Bytes": 608881
+            },
+            "legacyRestoreValidation": {
+              "ms": 8.199999999953434,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 607709,
+                "parseCalls": 55,
+                "parseCodeUnits": 1304685,
+                "parseMs": 2.6999999998370185,
+                "stringifyCalls": 56,
+                "stringifyCodeUnits": 1303519,
+                "stringifyMs": 1.7000000000698492
+              }
+            },
+            "artExport": {
+              "ms": 743.5,
+              "utf8Bytes": 4196777
+            },
+            "artRestore": {
+              "ms": 601
+            },
+            "artwork": {
+              "count": 5,
+              "uniqueHashes": 5,
+              "originalBytes": 3146610
+            },
+            "localStorage": {
+              "keys": 3,
+              "utf8Bytes": 608843,
+              "codeUnits": 608837
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.272253
+            },
+            {
+              "name": "TaskDuration",
+              "value": 1.873086
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 21320924
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 93843456
+            }
+          ]
+        },
+        {
+          "readyMs": 766.3765829999975,
+          "libraryMs": 98.30928899999708,
+          "openMs": 324.7691930000001,
+          "startup": {
+            "counters": {
+              "getCalls": 60,
+              "getCodeUnits": 17598081,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 1584,
+              "parseCodeUnits": 34344743,
+              "parseMs": 73.09999999962747,
+              "stringifyCalls": 1590,
+              "stringifyCodeUnits": 17257242,
+              "stringifyMs": 32.79999999993015
+            },
+            "heapBytes": 99295339,
+            "domNodes": 2631
+          },
+          "operations": {
+            "list": {
+              "ms": 3.299999999930151,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 607684,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1139446,
+                "parseMs": 1.6999999999534339,
+                "stringifyCalls": 52,
+                "stringifyCodeUnits": 574075,
+                "stringifyMs": 0.7000000000698492
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.10000000009313226,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 42313,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 12.29999999993015,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 565371,
+                "setCalls": 1,
+                "setCodeUnits": 565396,
+                "parseCalls": 156,
+                "parseCodeUnits": 2317090,
+                "parseMs": 2.5999999998603016,
+                "stringifyCalls": 156,
+                "stringifyCodeUnits": 2317115,
+                "stringifyMs": 5.099999999860302
+              }
+            },
+            "saveRevision": {
+              "ms": 1.5,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 126939,
+                "setCalls": 1,
+                "setCodeUnits": 42674,
+                "parseCalls": 5,
+                "parseCodeUnits": 85915,
+                "parseMs": 0.20000000018626451,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 128589,
+                "stringifyMs": 0.4999999998835847
+              }
+            },
+            "legacyExport": {
+              "ms": 4.700000000069849,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 608070,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1176941,
+                "parseMs": 1.5,
+                "stringifyCalls": 53,
+                "stringifyCodeUnits": 1220781,
+                "stringifyMs": 2.3000000001629815
+              },
+              "utf8Bytes": 609242
+            },
+            "legacyRestoreValidation": {
+              "ms": 9.899999999906868,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 608070,
+                "parseCalls": 55,
+                "parseCodeUnits": 1306129,
+                "parseMs": 2.599999999976717,
+                "stringifyCalls": 56,
+                "stringifyCodeUnits": 1304963,
+                "stringifyMs": 2
+              }
+            },
+            "artExport": {
+              "ms": 1927.1999999999534,
+              "utf8Bytes": 4196777
+            },
+            "artRestore": {
+              "ms": 2233.4000000000233
+            },
+            "artwork": {
+              "count": 5,
+              "uniqueHashes": 5,
+              "originalBytes": 3146610
+            },
+            "localStorage": {
+              "keys": 3,
+              "utf8Bytes": 609204,
+              "codeUnits": 609198
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.647799
+            },
+            {
+              "name": "TaskDuration",
+              "value": 4.312734
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 12444768
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 83038208
+            }
+          ]
+        },
+        {
+          "readyMs": 1309.185504999994,
+          "libraryMs": 159.01231100000587,
+          "openMs": 405.2664650000006,
+          "startup": {
+            "counters": {
+              "getCalls": 60,
+              "getCodeUnits": 17603496,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 1584,
+              "parseCodeUnits": 34347270,
+              "parseMs": 115.59999999997672,
+              "stringifyCalls": 1590,
+              "stringifyCodeUnits": 17258686,
+              "stringifyMs": 49.300000000046566
+            },
+            "heapBytes": 63791136,
+            "domNodes": 2631
+          },
+          "operations": {
+            "list": {
+              "ms": 4.5,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 608045,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1139446,
+                "parseMs": 1.599999999976717,
+                "stringifyCalls": 52,
+                "stringifyCodeUnits": 574075,
+                "stringifyMs": 0.8000000000465661
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.09999999997671694,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 42674,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 16.5,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 565371,
+                "setCalls": 1,
+                "setCodeUnits": 565396,
+                "parseCalls": 156,
+                "parseCodeUnits": 2317090,
+                "parseMs": 3.1000000000931323,
+                "stringifyCalls": 156,
+                "stringifyCodeUnits": 2317115,
+                "stringifyMs": 7.300000000046566
+              }
+            },
+            "saveRevision": {
+              "ms": 3.300000000046566,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 128022,
+                "setCalls": 1,
+                "setCodeUnits": 43035,
+                "parseCalls": 5,
+                "parseCodeUnits": 86637,
+                "parseMs": 0.5999999999767169,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 129672,
+                "stringifyMs": 1
+              }
+            },
+            "legacyExport": {
+              "ms": 7.599999999976717,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 608431,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 53,
+                "parseCodeUnits": 1177302,
+                "parseMs": 2.299999999930151,
+                "stringifyCalls": 53,
+                "stringifyCodeUnits": 1221503,
+                "stringifyMs": 3.4000000001396984
+              },
+              "utf8Bytes": 609603
+            },
+            "legacyRestoreValidation": {
+              "ms": 7.299999999930151,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 608431,
+                "parseCalls": 55,
+                "parseCodeUnits": 1307573,
+                "parseMs": 1.7999999999301508,
+                "stringifyCalls": 56,
+                "stringifyCodeUnits": 1306407,
+                "stringifyMs": 1.900000000023283
+              }
+            },
+            "artExport": {
+              "ms": 2062.20000000007,
+              "utf8Bytes": 4196777
+            },
+            "artRestore": {
+              "ms": 786.4000000000233
+            },
+            "artwork": {
+              "count": 5,
+              "uniqueHashes": 5,
+              "originalBytes": 3146610
+            },
+            "localStorage": {
+              "keys": 3,
+              "utf8Bytes": 609565,
+              "codeUnits": 609559
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 0.495127
+            },
+            {
+              "name": "TaskDuration",
+              "value": 3.297489
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 40431120
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 90329088
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": "large",
+      "projects": 50,
+      "revisionsPerProject": 9,
+      "initialRevisions": 450,
+      "sessions": 70,
+      "messagesPerSession": 200,
+      "artwork": {
+        "originalCount": 8,
+        "pixels": 640,
+        "originalBytes": 9260556,
+        "previewBytes": 1517028
+      },
+      "metrics": {
+        "readyMs": {
+          "median": 1283.3482179999992,
+          "p95": 1361.8317459999962,
+          "samples": [
+            1009.4255869999979,
+            1283.3482179999992,
+            1229.1079069999978,
+            1353.2264339999965,
+            1361.8317459999962
+          ]
+        },
+        "libraryMs": {
+          "median": 314.6085690000036,
+          "p95": 415.94632399998954,
+          "samples": [
+            244.6519380000027,
+            300.76294999999664,
+            415.94632399998954,
+            314.6085690000036,
+            327.0380609999993
+          ]
+        },
+        "openMs": {
+          "median": 1018.7079440000089,
+          "p95": 1101.8441630000016,
+          "samples": [
+            1008.6292670000039,
+            1037.1488699999973,
+            969.2747939999972,
+            1101.8441630000016,
+            1018.7079440000089
+          ]
+        }
+      },
+      "runs": [
+        {
+          "readyMs": 1009.4255869999979,
+          "libraryMs": 244.6519380000027,
+          "openMs": 1008.6292670000039,
+          "startup": {
+            "counters": {
+              "getCalls": 60,
+              "getCodeUnits": 96760091,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 4286,
+              "parseCodeUnits": 189784172,
+              "parseMs": 247.3000000002794,
+              "stringifyCalls": 4374,
+              "stringifyCodeUnits": 95153523,
+              "stringifyMs": 181.00000000034925
+            },
+            "heapBytes": 103102058,
+            "domNodes": 3254
+          },
+          "operations": {
+            "list": {
+              "ms": 16.600000000093132,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3313625,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6294064,
+                "parseMs": 6.600000000093132,
+                "stringifyCalls": 142,
+                "stringifyCodeUnits": 3157130,
+                "stringifyMs": 4.799999999930151
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.09999999997671694,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 176691,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 357,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 357,
+                "stringifyMs": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 81.30000000004657,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 3136934,
+                "setCalls": 1,
+                "setCodeUnits": 3136963,
+                "parseCalls": 426,
+                "parseCodeUnits": 12666311,
+                "parseMs": 19.899999999790452,
+                "stringifyCalls": 426,
+                "stringifyCodeUnits": 12666340,
+                "stringifyMs": 34.09999999997672
+              }
+            },
+            "saveRevision": {
+              "ms": 15.900000000023283,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 530073,
+                "setCalls": 1,
+                "setCodeUnits": 177052,
+                "parseCalls": 5,
+                "parseCodeUnits": 354668,
+                "parseMs": 0.6999999999534339,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 531720,
+                "stringifyMs": 1.400000000023283
+              }
+            },
+            "legacyExport": {
+              "ms": 32,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3314015,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6460708,
+                "parseMs": 7.299999999930151,
+                "stringifyCalls": 143,
+                "stringifyCodeUnits": 6638926,
+                "stringifyMs": 19.5
+              },
+              "utf8Bytes": 3315187
+            },
+            "legacyRestoreValidation": {
+              "ms": 64.19999999995343,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 3314015,
+                "parseCalls": 145,
+                "parseCodeUnits": 6993030,
+                "parseMs": 13.500000000116415,
+                "stringifyCalls": 146,
+                "stringifyCodeUnits": 6991864,
+                "stringifyMs": 13.099999999860302
+              }
+            },
+            "artExport": {
+              "ms": 1824.4000000000233,
+              "utf8Bytes": 12349426
+            },
+            "artRestore": {
+              "ms": 1474.6000000000931
+            },
+            "artwork": {
+              "count": 8,
+              "uniqueHashes": 8,
+              "originalBytes": 9260556
+            },
+            "localStorage": {
+              "keys": 3,
+              "utf8Bytes": 3315149,
+              "codeUnits": 3315143
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 1.053828
+            },
+            {
+              "name": "TaskDuration",
+              "value": 4.810676
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 37319924
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 92553216
+            }
+          ]
+        },
+        {
+          "readyMs": 1283.3482179999992,
+          "libraryMs": 300.76294999999664,
+          "openMs": 1037.1488699999973,
+          "startup": {
+            "counters": {
+              "getCalls": 57,
+              "getCodeUnits": 87355362,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 3858,
+              "parseCodeUnits": 170936709,
+              "parseMs": 206.7999999994645,
+              "stringifyCalls": 3927,
+              "stringifyCodeUnits": 85713334,
+              "stringifyMs": 158.29999999981374
+            },
+            "heapBytes": 134806582,
+            "domNodes": 3254
+          },
+          "operations": {
+            "list": {
+              "ms": 14.400000000023283,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3313990,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6294072,
+                "parseMs": 6.399999999906868,
+                "stringifyCalls": 142,
+                "stringifyCodeUnits": 3157134,
+                "stringifyMs": 3.800000000046566
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.09999999997671694,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 177052,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0.09999999997671694,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 70.29999999993015,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 3136938,
+                "setCalls": 1,
+                "setCodeUnits": 3136963,
+                "parseCalls": 426,
+                "parseCodeUnits": 12666323,
+                "parseMs": 14.899999999906868,
+                "stringifyCalls": 426,
+                "stringifyCodeUnits": 12666348,
+                "stringifyMs": 27.00000000023283
+              }
+            },
+            "saveRevision": {
+              "ms": 12.70000000006985,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 531156,
+                "setCalls": 1,
+                "setCodeUnits": 177413,
+                "parseCalls": 5,
+                "parseCodeUnits": 355393,
+                "parseMs": 1.1999999999534339,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 532806,
+                "stringifyMs": 0.8000000000465661
+              }
+            },
+            "legacyExport": {
+              "ms": 28.79999999993015,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3314376,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6461069,
+                "parseMs": 8.199999999837019,
+                "stringifyCalls": 143,
+                "stringifyCodeUnits": 6639648,
+                "stringifyMs": 16.400000000023283
+              },
+              "utf8Bytes": 3315548
+            },
+            "legacyRestoreValidation": {
+              "ms": 60.29999999993015,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 3314376,
+                "parseCalls": 145,
+                "parseCodeUnits": 6994474,
+                "parseMs": 13.49999999976717,
+                "stringifyCalls": 146,
+                "stringifyCodeUnits": 6993308,
+                "stringifyMs": 10.800000000046566
+              }
+            },
+            "artExport": {
+              "ms": 2084.9000000000233,
+              "utf8Bytes": 12349426
+            },
+            "artRestore": {
+              "ms": 1607
+            },
+            "artwork": {
+              "count": 8,
+              "uniqueHashes": 8,
+              "originalBytes": 9260556
+            },
+            "localStorage": {
+              "keys": 3,
+              "utf8Bytes": 3315510,
+              "codeUnits": 3315504
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 1.169742
+            },
+            {
+              "name": "TaskDuration",
+              "value": 5.265434
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 47071756
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 95752192
+            }
+          ]
+        },
+        {
+          "readyMs": 1229.1079069999978,
+          "libraryMs": 415.94632399998954,
+          "openMs": 969.2747939999972,
+          "startup": {
+            "counters": {
+              "getCalls": 57,
+              "getCodeUnits": 87360777,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 3858,
+              "parseCodeUnits": 170939236,
+              "parseMs": 203.29999999981374,
+              "stringifyCalls": 3927,
+              "stringifyCodeUnits": 85714778,
+              "stringifyMs": 110.90000000002328
+            },
+            "heapBytes": 138663996,
+            "domNodes": 3254
+          },
+          "operations": {
+            "list": {
+              "ms": 16.800000000046566,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3314351,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6294072,
+                "parseMs": 6.1999999998370185,
+                "stringifyCalls": 142,
+                "stringifyCodeUnits": 3157134,
+                "stringifyMs": 4.200000000069849
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.09999999997671694,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 177413,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0.09999999997671694,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 71.09999999997672,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 3136938,
+                "setCalls": 1,
+                "setCodeUnits": 3136963,
+                "parseCalls": 426,
+                "parseCodeUnits": 12666323,
+                "parseMs": 16.999999999883585,
+                "stringifyCalls": 426,
+                "stringifyCodeUnits": 12666348,
+                "stringifyMs": 28.5999999998603
+              }
+            },
+            "saveRevision": {
+              "ms": 13.300000000046566,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 532239,
+                "setCalls": 1,
+                "setCodeUnits": 177774,
+                "parseCalls": 5,
+                "parseCodeUnits": 356115,
+                "parseMs": 0.4999999998835847,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 533889,
+                "stringifyMs": 1.8000000001629815
+              }
+            },
+            "legacyExport": {
+              "ms": 26.599999999976717,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3314737,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6461430,
+                "parseMs": 9.199999999953434,
+                "stringifyCalls": 143,
+                "stringifyCodeUnits": 6640370,
+                "stringifyMs": 12.400000000139698
+              },
+              "utf8Bytes": 3315909
+            },
+            "legacyRestoreValidation": {
+              "ms": 60.20000000006985,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 3314737,
+                "parseCalls": 145,
+                "parseCodeUnits": 6995918,
+                "parseMs": 12.900000000023283,
+                "stringifyCalls": 146,
+                "stringifyCodeUnits": 6994752,
+                "stringifyMs": 10.20000000006985
+              }
+            },
+            "artExport": {
+              "ms": 2012.5999999999767,
+              "utf8Bytes": 12349426
+            },
+            "artRestore": {
+              "ms": 1470.2999999999302
+            },
+            "artwork": {
+              "count": 8,
+              "uniqueHashes": 8,
+              "originalBytes": 9260556
+            },
+            "localStorage": {
+              "keys": 3,
+              "utf8Bytes": 3315871,
+              "codeUnits": 3315865
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 1.106434
+            },
+            {
+              "name": "TaskDuration",
+              "value": 5.144212
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 56638728
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 99000320
+            }
+          ]
+        },
+        {
+          "readyMs": 1353.2264339999965,
+          "libraryMs": 314.6085690000036,
+          "openMs": 1101.8441630000016,
+          "startup": {
+            "counters": {
+              "getCalls": 57,
+              "getCodeUnits": 87366192,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 3858,
+              "parseCodeUnits": 170941763,
+              "parseMs": 227.89999999990687,
+              "stringifyCalls": 3927,
+              "stringifyCodeUnits": 85716222,
+              "stringifyMs": 126.79999999993015
+            },
+            "heapBytes": 62907824,
+            "domNodes": 3254
+          },
+          "operations": {
+            "list": {
+              "ms": 28,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3314712,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6294072,
+                "parseMs": 17,
+                "stringifyCalls": 142,
+                "stringifyCodeUnits": 3157134,
+                "stringifyMs": 5.399999999906868
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.09999999997671694,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 177774,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 116.19999999995343,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 3136938,
+                "setCalls": 1,
+                "setCodeUnits": 3136963,
+                "parseCalls": 426,
+                "parseCodeUnits": 12666323,
+                "parseMs": 22.499999999883585,
+                "stringifyCalls": 426,
+                "stringifyCodeUnits": 12666348,
+                "stringifyMs": 54.29999999993015
+              }
+            },
+            "saveRevision": {
+              "ms": 44.09999999997672,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 533322,
+                "setCalls": 1,
+                "setCodeUnits": 178135,
+                "parseCalls": 5,
+                "parseCodeUnits": 356837,
+                "parseMs": 2.299999999930151,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 534972,
+                "stringifyMs": 1.5000000001164153
+              }
+            },
+            "legacyExport": {
+              "ms": 126.70000000006985,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3315098,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6461791,
+                "parseMs": 30.599999999976717,
+                "stringifyCalls": 143,
+                "stringifyCodeUnits": 6641092,
+                "stringifyMs": 83.59999999997672
+              },
+              "utf8Bytes": 3316270
+            },
+            "legacyRestoreValidation": {
+              "ms": 121.40000000002328,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 3315098,
+                "parseCalls": 145,
+                "parseCodeUnits": 6997362,
+                "parseMs": 25.800000000046566,
+                "stringifyCalls": 146,
+                "stringifyCodeUnits": 6996196,
+                "stringifyMs": 16.499999999883585
+              }
+            },
+            "artExport": {
+              "ms": 10046.300000000047,
+              "utf8Bytes": 12349426
+            },
+            "artRestore": {
+              "ms": 1900.5999999999767
+            },
+            "artwork": {
+              "count": 8,
+              "uniqueHashes": 8,
+              "originalBytes": 9260556
+            },
+            "localStorage": {
+              "keys": 3,
+              "utf8Bytes": 3316232,
+              "codeUnits": 3316226
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 2.019169
+            },
+            {
+              "name": "TaskDuration",
+              "value": 12.727682
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 44749348
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 100737024
+            }
+          ]
+        },
+        {
+          "readyMs": 1361.8317459999962,
+          "libraryMs": 327.0380609999993,
+          "openMs": 1018.7079440000089,
+          "startup": {
+            "counters": {
+              "getCalls": 57,
+              "getCodeUnits": 87371607,
+              "setCalls": 0,
+              "setCodeUnits": 0,
+              "parseCalls": 3860,
+              "parseCodeUnits": 170944394,
+              "parseMs": 214.9000000001397,
+              "stringifyCalls": 3930,
+              "stringifyCodeUnits": 85717822,
+              "stringifyMs": 134.29999999969732
+            },
+            "heapBytes": 102855167,
+            "domNodes": 3254
+          },
+          "operations": {
+            "list": {
+              "ms": 16.599999999976717,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3315073,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6294072,
+                "parseMs": 6.899999999906868,
+                "stringifyCalls": 142,
+                "stringifyCodeUnits": 3157134,
+                "stringifyMs": 4
+              }
+            },
+            "openSavedRecord": {
+              "ms": 0.2999999999301508,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 178135,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 1,
+                "parseCodeUnits": 360,
+                "parseMs": 0,
+                "stringifyCalls": 1,
+                "stringifyCodeUnits": 360,
+                "stringifyMs": 0
+              }
+            },
+            "saveDraft": {
+              "ms": 66.40000000002328,
+              "counters": {
+                "getCalls": 1,
+                "getCodeUnits": 3136938,
+                "setCalls": 1,
+                "setCodeUnits": 3136963,
+                "parseCalls": 426,
+                "parseCodeUnits": 12666323,
+                "parseMs": 16.099999999976717,
+                "stringifyCalls": 426,
+                "stringifyCodeUnits": 12666348,
+                "stringifyMs": 26.19999999983702
+              }
+            },
+            "saveRevision": {
+              "ms": 10.70000000006985,
+              "counters": {
+                "getCalls": 3,
+                "getCodeUnits": 534405,
+                "setCalls": 1,
+                "setCodeUnits": 178496,
+                "parseCalls": 5,
+                "parseCodeUnits": 357559,
+                "parseMs": 0.6999999999534339,
+                "stringifyCalls": 6,
+                "stringifyCodeUnits": 536055,
+                "stringifyMs": 1.1000000000931323
+              }
+            },
+            "legacyExport": {
+              "ms": 24.599999999976717,
+              "counters": {
+                "getCalls": 2,
+                "getCodeUnits": 3315459,
+                "setCalls": 0,
+                "setCodeUnits": 0,
+                "parseCalls": 143,
+                "parseCodeUnits": 6462152,
+                "parseMs": 6.900000000023283,
+                "stringifyCalls": 143,
+                "stringifyCodeUnits": 6641814,
+                "stringifyMs": 13.900000000023283
+              },
+              "utf8Bytes": 3316631
+            },
+            "legacyRestoreValidation": {
+              "ms": 150.59999999997672,
+              "counters": {
+                "getCalls": 0,
+                "getCodeUnits": 0,
+                "setCalls": 2,
+                "setCodeUnits": 3315459,
+                "parseCalls": 145,
+                "parseCodeUnits": 6998806,
+                "parseMs": 10.200000000186265,
+                "stringifyCalls": 146,
+                "stringifyCodeUnits": 6997640,
+                "stringifyMs": 9.300000000046566
+              }
+            },
+            "artExport": {
+              "ms": 1804.5,
+              "utf8Bytes": 12349426
+            },
+            "artRestore": {
+              "ms": 1577.5
+            },
+            "artwork": {
+              "count": 8,
+              "uniqueHashes": 8,
+              "originalBytes": 9260556
+            },
+            "localStorage": {
+              "keys": 3,
+              "utf8Bytes": 3316593,
+              "codeUnits": 3316587
+            }
+          },
+          "processMetrics": [
+            {
+              "name": "ScriptDuration",
+              "value": 1.098666
+            },
+            {
+              "name": "TaskDuration",
+              "value": 5.075202
+            },
+            {
+              "name": "JSHeapUsedSize",
+              "value": 55540780
+            },
+            {
+              "name": "JSHeapTotalSize",
+              "value": 98934784
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -43,3 +43,5 @@ Each host-owned checkpoint gets a shared-budget receipt. If a child leaves a **c
 ## Opt-in subject switching in the Studio-first UI
 
 A grown-up may select **Both — child can switch**. The stored `learningSubject: math | language` remains unchanged for backward compatibility; the additional optional boolean `allowSubjectSwitch` controls whether children may change the active subject between questions. Existing saved profiles/backups without that flag remain single-subject until a grown-up opts in. A child cannot grant permission through a game-design prompt. Active activities cannot be switched away; invalid or failed saves keep the prior subject. The child-facing selector changes only future activities, not completed grades, separate Math/ELA evidence histories, shared mandatory-checkpoint pacing, game code or archived versions. Parent reports show both sets of evidence.
+
+Early picture and letter choices mount in the trusted host. Print stimuli are validated against the saved pack. Hearing the instruction is an access accommodation. Declared grown-up reading is recorded as support. No microphone participates in an answer.

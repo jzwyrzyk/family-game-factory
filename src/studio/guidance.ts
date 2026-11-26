@@ -2,7 +2,7 @@ import type { Experiment } from './design';
 import type { StudioSession } from './notebook';
 
 /** Small, optional explanations. These IDs are presentation preferences, never achievements. */
-export const GUIDE_TIP_IDS = ['idea', 'waiting', 'ready', 'play', 'improve', 'keep', 'saved', 'scenes', 'practice', 'progress'] as const;
+export const GUIDE_TIP_IDS = ['idea', 'waiting', 'ready', 'play', 'improve', 'keep', 'saved', 'scenes', 'practice', 'progress', 'studio-intro'] as const;
 export type GuideTipId = typeof GUIDE_TIP_IDS[number];
 export type GuidePreferences = { welcomeDismissed: boolean; dismissedTips: GuideTipId[] };
 export type GuideCopy = { title: string; description: string };
@@ -17,6 +17,7 @@ export const GUIDE_TIPS: Readonly<Record<GuideTipId, GuideCopy>> = {
   scenes: { title: 'Make a little story', description: 'Give a character actions, then press Play. The blocks change this scene; a linked game keeps its own saved version.' },
   practice: { title: 'Watch, try, make it yours', description: 'Watch the scene, try your own instructions, and check what happens. Hints are here whenever you need them.' },
   progress: { title: 'Different ways to grow', description: 'Gems celebrate completed activities. Your maker level follows your creations. My Powers shows what you have been practicing.' },
+  'studio-intro': {title:'Your first steps',description:'Choose arrows and play to see your instructions move a character.'},
 };
 
 export const isGuideTipId = (value: unknown): value is GuideTipId =>

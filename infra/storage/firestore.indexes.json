@@ -1,0 +1,4 @@
+{
+  "indexes": [],
+  "fieldOverrides": [{"collectionGroup":"continuityRecordsV1","fieldPath":"value","indexes":[]}]
+}
