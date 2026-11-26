@@ -741,10 +741,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:55.850Z",
-      "sourceDigest": "3c42ed09d4394afe0c109b5a6fa6d9d87f119c2474a5101fb24cafd81bf20c81",
+      "reviewedAt": "2026-11-26T03:13:36.892Z",
+      "sourceDigest": "0892ac493840a0ab15b14e3b134b3d1fbca59f242f7dac9dbf431666a9e73414",
       "reviewOutcome": "updated",
-      "reviewReason": "Scene authoring uses active Pal IDs. The ADR and scene rendering contract cover reading saved generated versions through the historical asset resolver.",
+      "reviewReason": "Documented how the local review adapter binds compiled 2D output to a sanitized sprite without delivering private artwork to any model or production game.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -899,10 +899,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:06:15.971Z",
-      "sourceDigest": "d3ee69b44d711cd709ce46c2855a7454a1b54e18e4655859b4881d1888f6443d",
-      "reviewOutcome": "updated",
-      "reviewReason": "The new synthetic browser and container checks verify exact byte admission, metadata rejection, owner changes and digest-only authorization.",
+      "reviewedAt": "2026-11-26T03:13:37.453Z",
+      "sourceDigest": "b203cefe655522dddd7bf1a2ce0b3fb09cdb13f8b08c6cf1ed6489d4f629cf05",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The existing generated-art CI command now also exercises an offline qualified actor slot, byte isolation and revocation using synthetic pixels.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1143,10 +1143,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:06:16.162Z",
-      "sourceDigest": "d1a2a0bdbf766f8b99256225ed6b5feae3af6991caa35a0b3a828f8b4127c5f7",
-      "reviewOutcome": "updated",
-      "reviewReason": "The family security workflow exercises original-byte admission and the release record distinguishes the production baseline from the proposed development.",
+      "reviewedAt": "2026-11-26T03:13:38.015Z",
+      "sourceDigest": "37b46ede69fef75ff1ae12425ffe45004d4cadc008cd8cf9ed8cfaab2df8401f",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The production preview entry and worker pin stay on their existing release path. The isolated review adapter only runs in a local synthetic fixture.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
