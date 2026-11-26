@@ -63,10 +63,16 @@ def protected(relative):
             Path(relative).suffix.lower() in ('.key', '.pem', '.p12', '.pfx', '.sqlite', '.db', '.log', '.tf'))
 
 
+def allowed_name(name):
+    # Explicit families with bounded generated suffixes, not an unrestricted jems-* glob.
+    return name == 'jems-releases' or bool(re.fullmatch(
+        r'jems-(?:access-review|gateway-repair-tool|service-release)(?:[.-][A-Za-z0-9][A-Za-z0-9_.-]{0,63})?', name))
+
+
 def allowed_root(root, home):
     root, home = safe_path(root), safe_path(home)
     require(root != home and home in root.parents, 'ROOT_OUTSIDE_APPROVED_HOME')
-    require(root.relative_to(home).parts[0] in ROOT_NAMES, 'ROOT_NOT_ALLOWLISTED')
+    require(allowed_name(root.relative_to(home).parts[0]), 'ROOT_NOT_ALLOWLISTED')
     require(root != TOOL_ROOT and root not in TOOL_ROOT.parents, 'ACTIVE_TOOL_CHECKOUT_FORBIDDEN')
     require(root != Path.cwd() and root not in Path.cwd().parents, 'CURRENT_WORKING_DIRECTORY_FORBIDDEN')
     require((root / '.git').is_dir() and not (root / '.git').is_symlink(), 'LINKED_OR_NONSTANDARD_GIT_DIR_PRESERVED')
@@ -136,8 +142,12 @@ def repo_plan(root, home, proof=remote_proof):
 
 
 def discover(home):
-    for name in ROOT_NAMES:
-        base = safe_path(home / name)
+    for name in sorted(p.name for p in home.iterdir() if allowed_name(p.name)):
+        base = home / name
+        if base.is_symlink():
+            yield base
+            continue
+        base = safe_path(base)
         if not base.exists(): continue
         for folder, dirs, _ in os.walk(base, followlinks=False):
             path = Path(folder)
@@ -151,7 +161,7 @@ def discover(home):
 
 def private_dir(path, home):
     path = safe_path(path)
-    require(not any(path == home / n or home / n in path.parents for n in ROOT_NAMES), 'RECEIPT_INSIDE_CLEANUP_SCOPE')
+    require(not (home in path.parents and allowed_name(path.relative_to(home).parts[0])), 'RECEIPT_INSIDE_CLEANUP_SCOPE')
     path.mkdir(parents=True, exist_ok=True, mode=0o700)
     require(path.stat().st_mode & 0o077 == 0, 'RECEIPT_DIRECTORY_MUST_BE_PRIVATE')
     return path

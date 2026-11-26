@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Verify this file's checksum from the reviewed handoff before executing.
-# Usage: bash operations-bootstrap.sh SOURCE_SHA {broker-build|broker-setup|nonprod|github|cleanup} ARGS...
+# Usage: bash operations-bootstrap.sh SOURCE_SHA {broker-build|broker-setup|nonprod|github|cleanup|capacity|recovery} ARGS...
 set -euo pipefail
 [[ $# -ge 2 && "$1" =~ ^[0-9a-f]{40}$ ]] || { echo 'Expected immutable source SHA and lane.' >&2; exit 2; }
 operations_sha="$1"
@@ -12,6 +12,8 @@ case "$operations_lane" in
   nonprod) operations_script=setup_nonproduction.py ;;
   github) operations_script=github_operations.py ;;
   cleanup) operations_script=cleanup_historical_checkouts.py ;;
+  capacity) operations_script=recover_checkout_space.py ;;
+  recovery) operations_script=operational_recovery.py ;;
   *) echo 'Unsupported operations lane.' >&2; exit 2 ;;
 esac
 # Recovery metadata contains only fixed enums, source/build IDs and approval hashes.
@@ -89,7 +91,7 @@ git -C "$operations_checkout" fetch --quiet --filter=blob:none --depth=1 origin 
 git -C "$operations_checkout" checkout --quiet --detach FETCH_HEAD
 [[ "$(git -C "$operations_checkout" rev-parse HEAD)" == "$operations_sha" ]]
 operations_child_started=true
-if [[ "$operations_lane" == github || "$operations_lane" == cleanup ]]; then
+if [[ "$operations_lane" == github || "$operations_lane" == cleanup || "$operations_lane" == capacity ]]; then
   python3 "$operations_checkout/scripts/ops/$operations_script" "$@"
 else
   python3 "$operations_checkout/scripts/ops/$operations_script" --source-sha "$operations_sha" "$@"

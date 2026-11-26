@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T15:28:51.222Z",
-      "sourceDigest": "0ca35beb0116aec5a70b1da3495863c5e117f6885e99e353ccb904e318188619",
+      "reviewedAt": "2026-11-26T16:02:51.261Z",
+      "sourceDigest": "57c0f639a0abf17f2077bfa7a4399790d73f65ee04029b27b32c61e042da671b",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded administrator evidence isolating Cloud Run's unstructured absence message; documented exact-service HTTP-404 confirmation with in-memory token, TLS/no-redirect controls, fail-closed alternatives and preserved image/Terraform approvals.",
+      "reviewReason": "Reviewed consolidated recovery: partial apply/audit evidence, POST view IAM and provider metadata, suffixed roots, unchanged broker/Terraform bytes, exact-pack preservation, private off-disk archive integrity and separate approvals; no live recovery or storage savings claimed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

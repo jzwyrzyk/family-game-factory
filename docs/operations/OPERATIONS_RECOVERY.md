@@ -3,6 +3,103 @@
 November 26, 2026. This supplements [permanent setup](PERMANENT_CLOUD_SETUP.md).
 It does not approve deletion or regenerate any saved Terraform plan.
 
+## Consolidated partial-activation and disk recovery
+
+Use the current reviewed immutable tooling SHA and its launcher checksum from the
+PR #222 handoff. The `recovery` lane performs only reads and private local receipt
+writes. It independently collects:
+
+- The exact view's recent CreateView Admin Activity failures, plus matching existing
+  gcloud error lines. Exact messages stay private; output contains redacted diagnostic
+  vocabulary, hints and hashes, never whole logs, credentials or request payloads.
+- Fresh source/build/registry and infrastructure checks. Successful inventory reuses
+  only exact accounts/role/pool/provider/binding configurations and prepares the
+  remaining actions. The prior INVALID_ARGUMENT remains an explicit apply blocker;
+  a new plan hash alone is not permission to repeat creation.
+- The existing source-file cleanup dry-run, now including bounded suffixed checkout
+  names; and a separate capacity plan for Git packs/dependencies.
+- Integrity of the original nonproduction binding, saved binary plan and approval
+  hash, without invoking Terraform or modifying state. Supply `--nonprod-state-dir`
+  if the original durable directory differs from `$HOME/work/jems-nonprod-state`.
+
+```sh
+bash "$p" "$r" recovery --home-dir "$HOME" \
+  --receipt-dir "$HOME/work/jems-recovery-review"
+```
+
+The first six provisioning commands returned success before log-view creation
+failed. The next inventory must verify them; preserve all partial resources. Google
+[flexible-filter documentation](https://docs.cloud.google.com/logging/docs/logs-views#filters)
+and the older [REST filter description](https://docs.cloud.google.com/logging/docs/reference/v2/rest/v2/projects.locations.buckets.views)
+differ. Do not infer that dropping OR, labels or service restrictions is permitted.
+No log view, bucket or sink is created as a syntax experiment. Keep the original
+image unless actual provider evidence establishes that its embedded exact-filter
+contract must change; such a change needs a reviewed source diff, new build
+approval and complete new immutable-image qualification.
+
+Log-view [getIamPolicy](https://docs.cloud.google.com/logging/docs/reference/v2/rest/v2/projects.locations.buckets.views/getIamPolicy)
+is POST with a JSON options body, not GET. setIamPolicy remains POST with fresh
+etag/exact grants. Cloud Run uses service-level min/max annotations separately
+from revision-level minimum/CPU-throttling annotations; readiness also requires
+observed generation and intended traffic. These tooling corrections do not rebuild
+the broker.
+
+## Capacity recovery beyond source files
+
+The `capacity` lane creates private exact plans and does nothing destructive by
+itself. It recognizes only `jems-releases` and the known `jems-access-review`,
+`jems-gateway-repair-tool`, `jems-service-release` families with bounded generated
+suffixes. Symlink roots, Git locks, linked worktrees, submodules, alternate object
+stores and the active checkout remain blocked.
+
+**Low-space option:** byte-identical Git pack/index/reverse-index files on the same
+filesystem can share a private canonical inode. This retains every object byte,
+including unpushed commits, stashes and dangling objects; it never runs GC/prune or
+changes refs, reflogs, index, configuration, worktree files or credentials. The
+private object vault must be retained. Plans compare hashes, identities, modes and
+Git metadata again before mutation; captures and replacements are journaled.
+
+After reviewing the actual plan, stop all processes using those historical checkouts
+and give explicit approval for that exact hash:
+
+```sh
+bash "$p" "$r" capacity --home-dir "$HOME" --receipt-dir "$CAPACITY_RECEIPTS" \
+  --dedup-plan "$EXACT_DEDUP_PLAN" --approve-plan-sha256 "$APPROVED_DEDUP_HASH" --confirm-inactive
+```
+
+**If verified duplicates are insufficient:** prepare a separately reviewed archive
+plan with `capacity --archive-dir "$PRIVATE_OFF_DISK_DIRECTORY"`. It must be a
+private same-owner existing storage destination on another filesystem, outside
+source paths and known volatile directories. No storage resource or network upload
+is created. Approve its destination, privacy and any storage cost separately. Git
+objects can contain historical sensitive data. Named credentials, journals,
+Terraform and recovery records stay in place. Dependency bytes are archived as-is;
+a lockfile is not a reproducibility proof.
+
+```sh
+# Separate archive approval: stream directly off-disk, verify every member/hash;
+# source files remain in place. No home-directory archive-sized staging copy.
+bash "$p" "$r" capacity --home-dir "$HOME" --receipt-dir "$CAPACITY_RECEIPTS" \
+  --create-archive "$EXACT_ARCHIVE_PLAN" --approve-plan-sha256 "$APPROVED_ARCHIVE_HASH" --confirm-inactive
+# Only after reviewing the verified archive receipt, separately approve deletion.
+bash "$p" "$r" capacity --home-dir "$HOME" --receipt-dir "$CAPACITY_RECEIPTS" \
+  --delete-archived "$EXACT_ARCHIVE_PLAN" --archive-receipt "$VERIFIED_ARCHIVE_RECEIPT" \
+  --approve-plan-sha256 "$SEPARATE_DELETION_HASH" --confirm-inactive
+```
+
+Archived repositories/dependencies can be unusable until restored. Preserve the
+archive and private plan/receipt. `--restore-archive PLAN --archive-receipt RECEIPT`
+restores missing files only, preferring captured local content and never overwriting
+new files. `--restore-dedup PLAN` recovers interrupted captures. A STARTED-only
+journal is uncertain: no automatic replay. Keep existing files and captured unique
+bytes for review when both are present.
+
+The target is 2 GiB where safe evidence supports it. Report the actual capacity
+shortfall; do not invent savings, sum alternative plans or loosen preservation
+rules to meet it. Filesystem block-sharing and concurrent activity can affect net
+free space, so post-apply free-space observations are distinct from plan estimates.
+
+
 ## Existing broker build: exact fault and narrow correction
 
 Build `7fcac19a-8444-4c17-955a-1a381006069e` used original source

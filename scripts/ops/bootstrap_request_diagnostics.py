@@ -305,7 +305,7 @@ def preflight(spec, cloud=None, logging=None, progress=None, service_absence=Non
     cloud('artifacts', 'docker', 'images', 'describe', image)
     plan = Plan('request-diagnostics', spec)
     def add(label, *args):
-        plan.add(label, {'gcloud': list(args), 'project': PROJECT}, lambda: progress.call('APPLY_ACTION', reader, *args))
+        plan.add(label, {'gcloud': list(args), 'project': PROJECT}, lambda: progress.call('CREATE_LOG_VIEW' if args[:3] == ('logging', 'views', 'create') else 'APPLY_ACTION', reader, *args))
     for email in (BROKER, CALLER):
         existing = cloud('iam', 'service-accounts', 'describe', email, missing_ok=True)
         if existing is None:
@@ -377,12 +377,12 @@ def preflight(spec, cloud=None, logging=None, progress=None, service_absence=Non
         view_policy = {}
     else:
         exact(view, {'name': VIEW, 'filter': broker.VIEW_FILTER, 'description': MARKER}, 'view')
-        view_policy = progress.call('LOG_VIEW_IAM', logging.call, 'GET', 'v2/' + VIEW + ':getIamPolicy?options.requestedPolicyVersion=3')
+        view_policy = progress.call('LOG_VIEW_IAM', logging.call, 'POST', 'v2/' + VIEW + ':getIamPolicy', {'options': {'requestedPolicyVersion': 3}})
     expected = {(ROLE, 'serviceAccount:' + BROKER)}
     if not grants(view_policy, expected, 'log view'):
         def bind_view():
             # Fresh etag read: never overwrite concurrent changes or existing unexpected grants.
-            current = logging.call('GET', 'v2/' + VIEW + ':getIamPolicy?options.requestedPolicyVersion=3')
+            current = logging.call('POST', 'v2/' + VIEW + ':getIamPolicy', {'options': {'requestedPolicyVersion': 3}})
             if not grants(current, expected, 'log view'):
                 current['bindings'] = [{'role': ROLE, 'members': ['serviceAccount:' + BROKER]}]
                 current['version'] = 3
@@ -421,6 +421,12 @@ def validate_service(value, image):
     require(annotations.get('run.googleapis.com/invoker-iam-disabled', 'false') == 'false' and
             annotations.get('run.googleapis.com/ingress') == 'all', 'BROKER_AUTHENTICATION_OR_INGRESS_MISMATCH')
     template = spec.get('template', {})
+    revision_annotations = template.get('metadata', {}).get('annotations', {})
+    require(revision_annotations.get('run.googleapis.com/cpu-throttling', 'true') == 'true' and
+            revision_annotations.get('autoscaling.knative.dev/minScale', '0') == '0',
+            'BROKER_REVISION_BILLING_OR_MINIMUM_MISMATCH')
+    require(annotations.get('run.googleapis.com/scalingMode', 'automatic') == 'automatic' and
+            not annotations.get('run.googleapis.com/manualInstanceCount'), 'BROKER_MANUAL_SCALING_UNEXPECTED')
     runtime = template.get('spec', {})
     containers = runtime.get('containers', [])
     require(runtime.get('serviceAccountName') == BROKER and len(containers) == 1 and
@@ -438,9 +444,13 @@ def validate_service(value, image):
     status = value.get('status', {})
     require(any(c.get('type') == 'Ready' and c.get('status') == 'True' for c in status.get('conditions', [])),
             'BROKER_NOT_READY')
+    require(meta.get('generation') is not None and
+            str(meta['generation']) == str(status.get('observedGeneration')), 'BROKER_NOT_RECONCILED')
+    require(bool(status.get('latestReadyRevisionName')), 'BROKER_REVISION_MISSING')
     require(status.get('latestReadyRevisionName') == status.get('latestCreatedRevisionName') and
             sum(t.get('percent', 0) for t in status.get('traffic', [])
-                if t.get('revisionName') == status.get('latestReadyRevisionName')) == 100,
+                if t.get('revisionName') == status.get('latestReadyRevisionName') or
+                   (not t.get('revisionName') and t.get('latestRevision') is True)) == 100,
             'BROKER_TRAFFIC_MISMATCH')
 
 

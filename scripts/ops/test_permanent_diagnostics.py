@@ -314,13 +314,13 @@ class BootstrapTests(unittest.TestCase):
 
     def test_complete_setup_is_idempotent_and_runtime_override_stops(self):
         spec = self.spec()
-        service = {'metadata': {'name': setup.SERVICE, 'labels': {'jems-diagnostics': 'pr153'},
+        service = {'metadata': {'generation': 1, 'name': setup.SERVICE, 'labels': {'jems-diagnostics': 'pr153'},
                                'annotations': {'run.googleapis.com/ingress': 'all', 'run.googleapis.com/maxScale': '1'}},
                    'spec': {'template': {'spec': {'serviceAccountName': setup.BROKER,
                             'containerConcurrency': 1, 'timeoutSeconds': 60,
                             'containers': [{'image': IMAGE, 'env': [{'name': 'JEMS_LOG_BUCKET_LOCATION', 'value': 'global'}],
                                             'resources': {'limits': {'cpu': '1', 'memory': '256Mi'}}}]}}},
-                   'status': {'conditions': [{'type': 'Ready', 'status': 'True'}],
+                   'status': {'observedGeneration': 1, 'conditions': [{'type': 'Ready', 'status': 'True'}],
                               'latestReadyRevisionName': 'broker-00001-abc', 'latestCreatedRevisionName': 'broker-00001-abc',
                               'traffic': [{'revisionName': 'broker-00001-abc', 'percent': 100}]}}
         def policy(role, member): return {'bindings': [{'role': role, 'members': [member]}]}
@@ -351,6 +351,14 @@ class BootstrapTests(unittest.TestCase):
         logging = Mock()
         logging.call.return_value = policy(setup.ROLE, 'serviceAccount:' + setup.BROKER)
         self.assertEqual(setup.preflight(spec, cloud=cloud, logging=logging).actions, [])
+        logging.call.assert_called_once_with('POST', 'v2/' + setup.VIEW + ':getIamPolicy',
+                                              {'options': {'requestedPolicyVersion': 3}})
+        service['status']['traffic'] = [{'latestRevision': True, 'percent': 100}]
+        self.assertEqual(setup.preflight(spec, cloud=cloud, logging=logging).actions, [])
+        service['status']['observedGeneration'] = 0
+        with self.assertRaisesRegex(SetupError, 'NOT_RECONCILED'):
+            setup.preflight(spec, cloud=cloud, logging=logging)
+        service['status']['observedGeneration'] = 1
         service['spec']['template']['spec']['containers'][0]['command'] = ['unreviewed']
         with self.assertRaises(SetupError): setup.preflight(spec, cloud=cloud, logging=logging)
 

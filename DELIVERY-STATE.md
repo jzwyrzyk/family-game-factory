@@ -16,20 +16,19 @@ without mutation. All three operational environments are now main-only (read bac
 Administrator reports nonproduction project `jems-jzw-nonprod`/`1092405124984` ACTIVE,
 billing verified, and the original 28-resource Terraform plan intact/unapplied.
 
-Existing successful broker build `7fcac19a-8444-4c17-955a-1a381006069e` failed only the
-old blanket rejection of `artifacts`; the administrator probe confirmed an exact
-`artifacts.images` mirror. The correction accepts only that mirror and retains all
-other checks. The administrator subsequently returned `BUILD_VERIFIED_NOT_DEPLOYED`,
-including registry verification of image digest `4373d65a…19659c3e`; the exact source,
-build and full digest are in the linked ledger. All eight candidate workflows passed
-on attempt 1 (30 checks succeeded, one intentional skip) at `7867b4e…`. No build
-was resubmitted. The subsequent read-only broker inventory stopped with a generic
-validation error before producing a plan. Instrumented readback identified Cloud Run's
-unstructured “Cannot find service” response. The correction requires an authoritative
-HTTP 404 for that exact broker before proposing creation; live confirmation remains
-pending. Guarded cleanup, quarantine restoration and durable handoff journals
-are implemented; no historical files or Terraform state were deleted. No resource
-apply, deployment or paid request occurred in this follow-up.
+The existing broker build/image was qualified without rebuilding. Administrator
+apply at `9072b7d…` then completed six account/role/federation commands and stopped
+with `INVALID_ARGUMENT` creating the filtered log view. No broker deployment or
+request-evidence acceptance is established. Preserve partial state; the consolidated
+recovery handoff reads provider/audit evidence and verifies the existing resources
+before a fresh remaining-actions review. View-IAM POST and Cloud Run metadata
+contract corrections preserve the original image/filter and narrow permissions.
+
+The previous cleanup dry-run proposed only 430,985 bytes (one eligible, three
+blocked repositories). Expanded suffix discovery, exact Git-pack deduplication and
+separately approved private off-disk archival target 2 GiB where safely feasible.
+No historical deletion or archival has been performed. DEV/TEST's original saved
+28-resource plan remains independent and must not be regenerated for these tools.
 
 [Exact ledger and prior Coach HTTP 200 evidence](docs/operations/PERMANENT_CLOUD_LEDGER.md) ·
 [Executable setup](docs/operations/PERMANENT_CLOUD_SETUP.md) ·

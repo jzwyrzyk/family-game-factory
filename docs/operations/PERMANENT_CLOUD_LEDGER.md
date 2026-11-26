@@ -1,5 +1,64 @@
 # Permanent cloud operations delivery ledger
 
+## November 26, 2026 — partial broker apply and expanded disk recovery
+
+Administrator evidence from executable source `9072b7d5fe280eb10ffdfe6c3a5ae414ab47c245`
+and approval hash `60902e596762643d6d7a1223a3ba95d681d95321ca143ea86c99796cf49098c8`
+shows six commands returned successfully: two keyless accounts, exact custom role,
+dedicated pool, exact provider and caller federation binding. The next operation,
+creating `jems-production-requests`, failed with `INVALID_ARGUMENT`. The view IAM
+binding, broker deployment and invoker binding were not reached. Completion of six
+commands is administrator evidence, not independent readback or effective-IAM
+acceptance. Preserve these resources and the verified image; do not replay the old
+apply/hash. Fresh inventory must validate existing settings and propose only the
+remaining actions.
+
+Google's November 25 [flexible-filter guide](https://docs.cloud.google.com/logging/docs/logs-views#filters)
+permits OR and resource labels; its [LogView REST reference](https://docs.cloud.google.com/logging/docs/reference/v2/rest/v2/projects.locations.buckets.views)
+still describes the older conjunction-only subset. Documentation alone does not
+identify this project's rejection. The consolidated read-only recovery command
+collects bounded CreateView Admin Activity evidence and the corresponding existing
+local gcloud error, preserving exact messages privately and printing only redacted
+vocabulary/hints. No alternative view is created to probe syntax.
+
+The downstream API review corrected log-view getIamPolicy to POST with
+`options.requestedPolicyVersion=3`, preserving setIamPolicy POST/etag and narrow
+view-only grants. Cloud Run validation distinguishes service and revision scaling,
+checks request-based CPU billing, generation reconciliation and latest-revision
+traffic representation. The original four broker files and immutable image are
+unchanged. The broker embeds the exact view filter: changing even equivalent filter
+syntax requires reviewed broker source, a newly authorized build/digest and full
+qualification; widening access or removing service/region clauses is not authorized.
+
+The administrator's earlier cleanup dry-run proposed only **430,985 bytes**, with
+one eligible repository and three blocked repositories; no deletion was reported.
+Discovery now recognizes bounded generated suffixes on the known checkout families.
+The additional capacity lane inventories exact duplicate Git pack files (including
+unreachable/local-commit objects) for low-space, byte-preserving hardlink deduplication.
+Unique object files and local records are never discarded. A separate off-home-
+filesystem private archive path can preserve selected Git-object/dependency bytes,
+including local modifications, with full round-trip hashes before a separately
+approved deletion. Credentials, Terraform and operational records remain in place;
+opaque Git objects may contain historical sensitive material, so archival has its
+own explicit privacy/storage approval. A lockfile alone never proves dependencies
+reproducible. No archive/upload/deletion has run on Cloud Shell.
+
+The target is **2 GiB (2,147,483,648 bytes)** where inventory supports it, not a
+promised reclaimed amount. Allocated-byte estimates may exceed actual gains on an
+already-sharing filesystem; alternative plans must not be summed. Exact private
+plans, changed-file refusal, capture-before-unlink journals, inactive-checkout
+confirmation and no-overwrite restoration guard destructive phases. The verified
+image, original DEV/TEST source/plan/state and frozen activation dependencies remain
+unchanged. Live provider failure details, existing-resource verification, recoverable
+capacity and saved-plan integrity remain pending the consolidated administrator read.
+
+Validation: operations regressions cover the partial six-resource inventory, four
+remaining actions, POST view IAM/etag behavior, archive integrity and approval
+separation, dirty/unpublished Git contents, changed-file captures and restoration.
+Local CI/documentation/environment checks also passed; earlier application-browser
+timeouts retain their separate scope. No actual cloud/storage acceptance is inferred.
+
+
 ## November 26, 2026 — actual inventory blocker identified
 
 The administrator reran the instrumented check at `9e598d7…`. It stopped at
