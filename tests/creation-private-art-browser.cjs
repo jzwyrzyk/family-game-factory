@@ -49,6 +49,12 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     const rig=(await records(page,'rigs','player1'))[0];assert.ok(rig);
     await page.locator('.drawing-lab [data-close]').click();
     await page.waitForSelector('.drawing-lab',{state:'detached'});
+    await page.evaluate(() => FG.artStudio.open());
+    await page.locator('[data-art-id="'+source.id+'"]').click();
+    await page.getByLabel('What is it?', {exact:false}).fill('Moon pebble');
+    await page.getByLabel('Artwork collection',{exact:true}).selectOption('prop');
+    await page.getByRole('button',{name:'Save details',exact:true}).click();
+    await page.waitForFunction(()=>document.querySelector('#artStatus')?.textContent==='Artwork details saved.');
     const firstId=await page.evaluate(selection=>FG.creation.openArt(selection),{drawingId:source.id,rigId:rig.id});
     await page.locator('#creationWorkspace').waitFor({state:'visible'});
     await page.waitForFunction(()=>document.querySelector('#creationActors canvas'));
@@ -69,10 +75,31 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     // A second scene reuses the same immutable version through the visible picker.
     await page.locator('#creationBack').click();await page.locator('#creationFreeMode').click();await page.locator('[data-creation-starter="blank"]').click();
     await page.locator('#creationAddActor').click();
+    const filters=page.locator('#creationActorArtFilters');
+    await filters.getByRole('searchbox').fill('nothing like this');
+    await page.getByText('No art found. Try another name or collection.',{exact:true}).waitFor();
+    await filters.getByRole('searchbox').fill('moon pebble');
+    await filters.getByLabel('Art collection').selectOption('prop');
+    assert.equal(await page.locator('#creationPrivateActorChoices [data-private-art]').count(),2);
+    await page.locator('#creationActorDialog').screenshot({path:'test-results/creative-asset-picker-'+device+'.png'});
     await page.locator('#creationPrivateActorChoices [data-private-art]').filter({hasText:'Latest saved cutout design'}).click();
     await page.waitForFunction(()=>FG.creation.scene()?.actors.length===2);
     const second=await page.evaluate(()=>FG.creation.scene());
     assert.equal(second.actors[1].assetId,first.actors[0].assetId);assert.notEqual(second.id,firstId);
+    await page.locator('#creationFullMode').click();
+    await page.locator('#creationSceneOptions > summary').click();
+    await page.getByLabel('Role in this scene').selectOption('decoration');
+    await page.waitForFunction(()=>FG.creation.scene().actors[1].role==='decoration');
+    await page.getByRole('button',{name:'Choose art version'}).click();
+    await page.locator('#creationVersionArtChoices button').filter({hasText:'Original artwork'}).click();
+    await page.waitForFunction(()=>FG.creation.scene().actors[1].assetId.startsWith('art:image:'));
+    const replaced=await page.evaluate(()=>FG.creation.scene());
+    assert.equal(replaced.actors[1].role,'decoration');
+    assert.deepEqual(replaced.programs,second.programs);
+    assert.equal(replaced.actors[1].id,second.actors[1].id);
+    await page.locator('#creationUndo').click();
+    await page.waitForFunction(pin=>FG.creation.scene().actors[1].assetId===pin, second.actors[1].assetId);
+    await page.locator('#creationSimpleMode').click();
     await page.locator('[data-add-block="say"]').click();await page.locator('#creationKeep').click();
     const retained=await page.evaluate(id=>FG.creation.export().revisions.filter(revision=>revision.projectId===id),firstId);
     assert.equal(retained[0].scene.actors.length,1);assert.equal(retained[0].scene.actors[0].assetId,first.actors[0].assetId);
@@ -81,6 +108,8 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     const file=await downloaded,path=await file.path(),bundle=JSON.parse(fs.readFileSync(path,'utf8'));
     assert.equal(bundle.schema,'jems.scene-art.v1');assert.equal(bundle.art.drawings[0].sha256,source.sha256);
     assert.equal(bundle.art.rigs[0].id,rig.id);assert.equal(Object.hasOwn(bundle.art.drawings[0],'owner'),false);
+    assert.equal(bundle.art.drawings[0].semanticIdentity,'Moon pebble');
+    assert.equal(bundle.scene.actors[1].role,'decoration');
     assert.equal(bundle.scene.actors[1].assetId,first.actors[0].assetId);
 
     // Private artwork added to a game-derived scene must preserve the route

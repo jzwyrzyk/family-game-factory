@@ -11,7 +11,7 @@
 #page-creation :is(button,summary) { cursor:pointer; touch-action:manipulation; }
 #page-creation button:disabled { cursor:default; opacity:1; color:#58647b; background:#edf0f6; border-color:#d6dce7; box-shadow:none; }
 #page-creation :is(button,input,select,summary):focus-visible,#creationCanvas:focus-visible { outline:3px solid var(--jems-blue,#2e6bff); outline-offset:3px; }
-#page-creation :is(h1,h2,h3) { font-family:var(--jems-round,system-ui); color:var(--creation-ink); line-height:1.2; }
+#page-creation :is(h1,h2,h3):not(:where(#creationLearning *)) { font-family:var(--jems-round,system-ui); color:var(--creation-ink); line-height:1.2; }
 #page-creation :is(p,li,small,label,.creation-eyebrow) { font-size:var(--jems-child-label,18px); }
 #page-creation :is(input,select) { min-height:48px; border:1px solid #adb9d3; border-radius:12px; padding:9px 12px; color:var(--creation-ink); background:white; max-width:100%; }
 .creation-heading { display:flex; align-items:center; justify-content:space-between; gap:20px; margin:0 0 22px; }
@@ -99,7 +99,8 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
 .creation-stage-heading>span { background:#ffffffee; color:#253957; border-radius:10px; padding:6px 10px; font-weight:750; }
 #creationClock { display:none; }#page-creation[data-tools=full] #creationClock { display:block; }
 #creationFullscreen { margin-left:auto; pointer-events:auto; background:#fffffff0; color:#253957; box-shadow:0 2px 6px #172b4d14; }
-.creation-canvas-wrap { position:relative; flex:1; min-height:0; min-width:0; display:grid; place-items:center; overflow:hidden; background:linear-gradient(#bee7f4,#e9f1df 72%,#8ac1a6); }
+.creation-canvas-wrap.illustrated-stage { background:#292943; }
+.creation-canvas-wrap { position:relative; flex:1; min-height:0; min-width:0; display:grid; place-items:center; overflow:hidden; background:#eeeaf4; }
 #creationCanvas { display:block; max-width:100%; max-height:100%; border-radius:12px; touch-action:none; }
 .creation-playbar { flex:none; display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:8px 14px; background:#ffffff; border-top:1px solid #dbe4ee; }
 #creationTapSlot { display:flex; }
@@ -327,11 +328,37 @@ body.creation-editing .site-header.studio-practice-navigation,body.creation-edit
 }
 
 .creation-action-pose img{display:none}
-[data-graphical=true] .creation-action-pose{position:relative;display:inline-block;width:1.1em;height:1em;text-align:right}
-[data-graphical=true] .creation-action-pose img{display:block;position:absolute;left:-.15em;bottom:0;width:1em;height:1em;object-fit:contain;pointer-events:none}
+[data-graphical=true] .creation-action-pose img{display:block;width:1em;height:1em;object-fit:contain;pointer-events:none}
+[data-graphical=true] .creation-pose-jump{display:inline-flex;align-items:center;gap:4px;flex:none}
+[data-graphical=true] .creation-jump-arrow{font-size:.65em}
+[data-graphical=true] .creation-pose-dance{position:relative;display:inline-block;width:1.1em;height:1em;text-align:right}
+[data-graphical=true] .creation-pose-dance img{position:absolute;left:-.15em;bottom:0}
 @media(prefers-reduced-motion:no-preference){
  [data-graphical=true] button:focus-visible .creation-pose-jump img{animation:creation-small-hop .55s ease-out}
  [data-graphical=true] button:focus-visible .creation-pose-dance img{animation:creation-small-dance .6s ease-in-out}
  @keyframes creation-small-hop{50%{transform:translateY(-20%)}}
  @keyframes creation-small-dance{35%{transform:rotate(-12deg)}70%{transform:rotate(12deg)}}
 }
+
+/* Keep the open settings disclosure reachable beside Done, including when
+   the panel extends across its normal position on a short viewport. */
+#creationSceneOptions[open] > summary {
+  position: fixed;
+  z-index: 56;
+  top: 135px;
+  right: 34px;
+  border-radius: 12px;
+  background: white;
+}
+@media (max-width: 760px) {
+  #creationSceneOptions[open] > summary { top: 185px; right: 28px; }
+}
+@media (max-height: 600px) and (min-width: 600px) {
+  #creationSceneOptions[open] > summary { top: 72px; right: 24px; }
+}
+#creationSceneOptions details > summary {
+  min-block-size: 48px;
+  align-content: center;
+  cursor: pointer;
+}
+.creation-scene-options:not([open]) > div { display: none; }

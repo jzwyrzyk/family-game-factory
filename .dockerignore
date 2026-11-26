@@ -23,6 +23,10 @@
 !src/creation/
 !src/creation/model.ts
 !src/creation/projects.ts
+!src/creation/illustrated-art.ts
+!src/creation/movement-worlds.ts
+!src/drawing/
+!src/drawing/animation-path.ts
 !src/pals/
 !src/pals/catalog.ts
 !src/pals/catalog-artwork.generated.ts

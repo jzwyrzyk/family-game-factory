@@ -1,15 +1,28 @@
+import {catalogueChoices,listPickerChoices,mountCreativeAssetPicker} from './asset-collection';
+import {createPickerArtwork} from './picker-create';
+import {creationAsset} from '../creation/projects';
+import {createPalPortrait} from '../pals/ui';
+import type {PalsView} from '../pals/model';
+import {openAnimationEditor} from './animation-editor';
+import {usesOriginalSprite} from './motion';
+import {selectedCreativeImage} from '../assets/creative-library';
+import {roleLabels,roleQuestion,type GameArtPin,type GameArtRole} from '../game-art/bindings';
 import {drawing,drawingPage,drawingBlob,saveDrawing,updateDrawing,deleteArtwork,type Drawing,type DrawingCategory} from '../assets/private-drawings';
 import {artUsages,ART_LIMITS,type DrawingMetadata} from './library';
 import {listRigs,loadDrawingDraft,type SavedRig} from './store';
 import {exportArtBundle,importArtBundle,restoreArtBundle} from './transfer';
 import {openDrawingLab} from './lab';
+import {editMotionPath} from './motion-editor';
 import {drawOnTablet} from './paint';
-import {editPicture} from './picture';
+import {hasCrayonSource} from './crayon-source';
+import {editLegacyCrayons} from './legacy-crayon-editor';
+import {readSketch,verifySketchPixels} from './sketch';
+import {editPicture, visiblePicturePng} from './picture';
 import {createIcon,iconMarkup,setIconLabel,type IconName} from '../brand/icons';
 import {assertRewardSourceWritable} from '../rewards/write-guard';
 import './studio.css';
 
-type Host={enter():boolean|Promise<boolean>;home():void;openCar(rigId:string,current:()=>boolean):Promise<void>;openScene(art:{drawingId:string;rigId?:string}):Promise<void>};
+type Host={planGame(pin:GameArtPin,current:()=>boolean):Promise<void>;enter():boolean|Promise<boolean>;home():void;openCar(rigId:string,current:()=>boolean):Promise<void>;openScene(art:{drawingId:string;rigId?:string},kind?:'picture-hunt'):Promise<void>};
 const categories:Record<DrawingCategory,string>={character:'Characters',vehicle:'Vehicles',prop:'Things',world:'Worlds',other:'Other art'};
 const node=<K extends keyof HTMLElementTagNameMap>(tag:K,className='',text='')=>{const e=document.createElement(tag);e.className=className;e.textContent=text;return e;};
 
@@ -21,12 +34,12 @@ export function installArtStudio(host:Host){
   <header class="art-heading"><div><span class="art-eyebrow">My Art</span><h1 id="artStudioHeading" tabindex="-1">You drew it. <span>Now let’s play.</span></h1><p>Your characters, curious inventions, and worlds. Ready for their next adventure.</p></div><button id="artHome" class="art-button">${iconMarkup('arrow','jems-icon--back')} My Games</button></header>
   <p id="artStatus" class="art-status" role="status" aria-live="polite"></p>
   <section class="art-welcome" aria-labelledby="artStartTitle"><div class="art-welcome-copy"><span class="art-eyebrow">FROM YOUR IMAGINATION</span><h2 id="artStartTitle">Every great character<br> starts somewhere.</h2><p>A doodle on paper. A scribble on screen.<br> Bring yours in and see what it can do.</p><div class="art-steps" aria-label="Your art journey"><span><b>1</b> Make some art</span><span><b>2</b> Give it movement</span><span><b>3</b> Put it in play</span></div></div><img class="art-helper" src="./jems-art/character_spark_wave.webp" alt="" aria-hidden="true"><div class="art-starts"><button id="artUploadButton" class="art-start art-start-upload">${iconMarkup('add')}<span><strong>Upload a drawing</strong><small>A PNG or JPEG from this device</small></span>${iconMarkup('arrow')}</button><button id="artCameraButton" class="art-start">${iconMarkup('grid')}<span><strong>Take a photo</strong><small>Bring a paper drawing to life</small></span>${iconMarkup('arrow')}</button><button id="artDrawButton" class="art-start">${iconMarkup('edit')}<span><strong>Draw here</strong><small>A fresh page and a few crayons</small></span>${iconMarkup('arrow')}</button></div></section>
-  <section class="art-collection" aria-labelledby="artLibraryHeading"><div class="art-collection-heading"><div><span class="art-eyebrow">MADE BY YOU</span><h2 id="artLibraryHeading">My art <span id="artCount" class="art-count">0</span></h2><p>Make it once. Bring it into more adventures.</p></div><div class="art-library-tools"><label class="art-search">${iconMarkup('search')}<input id="artSearch" type="search" placeholder="Find my art" aria-label="Find my art" maxlength="60"></label><details class="art-library-more"><summary>${iconMarkup('menu')} Library tools</summary><div><button id="artExport">${iconMarkup('download')} Download my art library</button><button id="artImportButton">${iconMarkup('book')} Open an art library</button><button id="artShowArchive">${iconMarkup('clock')} Show archived art</button></div></details></div></div><div id="artFilters" class="art-filters" role="group" aria-label="Filter my art"><button data-category="all" aria-pressed="true">All my art</button>${Object.entries(categories).map(([key,label])=>`<button data-category="${key}" aria-pressed="false">${label}</button>`).join('')}</div><div class="art-library-layout"><div><div id="artGrid" class="art-grid"></div><div id="artEmpty" class="art-empty"><img src="./jems-art/spot_first_idea.webp" alt="" aria-hidden="true"><h3>Your ideas belong here.</h3><p>Add your first drawing above. We’ll keep the original while you experiment.</p></div></div><aside id="artDetails" class="art-details" aria-label="Selected artwork" hidden></aside></div></section>
+  <section class="art-collection" aria-labelledby="artLibraryHeading"><div class="art-collection-heading"><div><span class="art-eyebrow">MADE BY YOU</span><h2 id="artLibraryHeading">My art <span id="artCount" class="art-count">0</span></h2><p>Make it once. Bring it into more adventures.</p></div><div class="art-library-tools"><button type="button" id="artBrowseAssets" class="art-button">Choose artwork</button><label class="art-search">${iconMarkup('search')}<input id="artSearch" type="search" placeholder="Find my art" aria-label="Find my art" maxlength="60"></label><details class="art-library-more"><summary>${iconMarkup('menu')} Library tools</summary><div><button id="artBrowseMotion">Choose art to move</button><button id="artExport">${iconMarkup('download')} Download my art library</button><button id="artImportButton">${iconMarkup('book')} Open an art library</button><button id="artShowArchive">${iconMarkup('clock')} Show archived art</button></div></details></div></div><div id="artFilters" class="art-filters" role="group" aria-label="Filter my art"><button data-category="all" aria-pressed="true">All my art</button>${Object.entries(categories).map(([key,label])=>`<button data-category="${key}" aria-pressed="false">${label}</button>`).join('')}</div><div class="art-library-layout"><div><div id="artGrid" class="art-grid"></div><div id="artEmpty" class="art-empty"><img src="./jems-art/spot_first_idea.webp" alt="" aria-hidden="true"><h3>Your ideas belong here.</h3><p>Add your first drawing above. We’ll keep the original while you experiment.</p></div></div><aside id="artDetails" class="art-details" aria-label="Selected artwork" hidden></aside></div></section>
   <section class="art-next"><div>${iconMarkup('grid')}<h2>What will your art do?</h2></div><p>Make a character move and talk in <strong>Creative Studio</strong>. Give a drawn car real wheels in <strong>Junkyard Rally</strong>. Keep trying new versions—your saved adventures keep the art you chose.</p><p class="art-small">Saved privately for this player on this device. Download your art library to keep a portable copy. Pictures are never sent to a model by these tools.</p></section>
   <input id="artUpload" type="file" accept="image/png,image/jpeg" hidden><input id="artCamera" type="file" accept="image/png,image/jpeg" capture="environment" hidden><input id="artImport" type="file" accept="application/json,.json" hidden>`;
   document.querySelector('main')!.append(page);
   const $=<T extends HTMLElement=HTMLElement>(id:string)=>page.querySelector<T>('#'+id)!;
-  let visible=false,epoch=0,refreshRun=0,selected='',category='all',archive=false,items:DrawingMetadata[]=[],rigs:SavedRig[]=[],urls:string[]=[],nextPage:[string,string]|null=null,total=0;
+  let visible=false,epoch=0,refreshRun=0,detailsRun=0,selected='',category='all',archive=false,items:DrawingMetadata[]=[],rigs:SavedRig[]=[],urls:string[]=[],nextPage:[string,string]|null=null,total=0;
   const status=(text:string,error=false)=>{$('artStatus').textContent=text;$('artStatus').classList.toggle('is-error',error);$('artStatus').setAttribute('role',error?'alert':'status');};
   const release=()=>{urls.forEach(URL.revokeObjectURL);urls=[];};
   const imageUrl=(item:Drawing|DrawingMetadata,thumbnail=false)=>{const url=URL.createObjectURL(thumbnail&&item.preview?new Blob([item.preview],{type:'image/png'}):'bytes' in item?drawingBlob(item):new Blob([],{type:'image/png'}));urls.push(url);return url;};
@@ -37,7 +50,7 @@ export function installArtStudio(host:Host){
     if(pane.hidden||!title)return;
     // Drawing and picture tools call onSaved before closing their modal. Let
     // that close finish before moving focus into the newly selected artwork.
-    const editor=document.querySelector<HTMLDialogElement>('dialog.art-picture[open],dialog.drawing-paint[open]');
+    const editor=document.querySelector<HTMLDialogElement>('dialog.art-picture[open],dialog.drawing-paint[open],dialog.motion-path[open]');
     if(editor){editor.addEventListener('close',()=>queueMicrotask(()=>focusSelectedArtwork(artId,capturedOwner,capturedEpoch)),{once:true});return;}
     if(innerWidth<850)pane.scrollIntoView({behavior:'auto',block:'start'});
     title.focus({preventScroll:true});
@@ -59,7 +72,7 @@ export function installArtStudio(host:Host){
   }
   function renderGrid(){
     release();const grid=$('artGrid');grid.replaceChildren();const query=$<HTMLInputElement>('artSearch').value.trim().toLowerCase();
-    const found=items.filter(item=>Boolean(item.archived)===archive&&(category==='all'||(item.category??'other')===category)&&(!query||item.name.toLowerCase().includes(query)));
+    const found=items.filter(item=>Boolean(item.archived)===archive&&(category==='all'||(item.category??'other')===category)&&(!query||item.name.toLowerCase().includes(query)||(item.semanticIdentity??'').toLowerCase().includes(query)));
     $('artCount').textContent=String(total);
     $('artEmpty').hidden=found.length>0;
     $('artEmpty').querySelector('h3')!.textContent=archive?'Your archived art':items.length?'No art matches yet.':'Your ideas belong here.';
@@ -70,43 +83,214 @@ export function installArtStudio(host:Host){
       const versions=rigs.filter(r=>r.assembly.sourceId===item.id),copy=node('div','art-card-copy');
       copy.append(node('span','art-card-category',categories[item.category??'other']),node('strong','',item.name));
       const meta=node('span','art-card-meta',versions.length?`${versions.length} movement ${versions.length===1?'version':'versions'}`:item.sourceId?'Edited picture · original kept':'Original picture');
-      copy.append(meta);card.append(preview,copy);card.onclick=()=>void action(async()=>{const captured=owner(),run=epoch;selected=item.id;renderGrid();await details(item.id);focusSelectedArtwork(item.id,captured,run);});grid.append(card);
+      copy.append(meta);card.append(preview,copy);
+      card.onclick=()=>void action(async()=>{
+        const captured=owner(),run=epoch,pane=$('artDetails');
+        if(selected!==item.id || pane.hidden || pane.dataset.drawingId!==item.id || !pane.querySelector('#artDetailTitle')){
+          selected=item.id;
+          renderGrid();
+          await details(item.id);
+        }
+        focusSelectedArtwork(item.id,captured,run);
+      });
+      grid.append(card);
     }
     if(nextPage){const more=button('Show more art','arrow',async()=>{const captured=owner(),at=epoch,after=nextPage;if(!after)return;const page=await drawingPage(captured,{limit:24,after,archived:archive,...(category==='all'?{}:{category:category as DrawingCategory}),search:$<HTMLInputElement>('artSearch').value});if(!current(captured,at))return;items.push(...page.items);nextPage=page.next;renderGrid();});more.id='artLoadMore';grid.append(more);}
     for(const filter of $('artFilters').querySelectorAll<HTMLButtonElement>('button'))filter.setAttribute('aria-pressed',String(filter.dataset.category===category));
     setIconLabel($('artShowArchive'),'clock',archive?'Show current art':'Show archived art');
   }
   async function details(id:string){
-    const captured=owner(),run=epoch;if(!items.some(item=>item.id===id)||!current(captured,run))return;const item=await drawing(captured,id);if(!current(captured,run)||selected!==id)return;
-    const pane=$('artDetails');pane.replaceChildren();pane.hidden=false;
+    const captured=owner(),run=epoch,request=++detailsRun;
+    const valid=()=>current(captured,run) && selected===id && request===detailsRun;
+    if(!items.some(item=>item.id===id)||!valid())return;
+    const item=await drawing(captured,id);if(!valid())return;
+    const pane=$('artDetails');pane.replaceChildren();pane.dataset.drawingId=id;pane.hidden=false;
     const heading=node('div','art-detail-heading'),title=node('h2','',item.name);title.id='artDetailTitle';title.tabIndex=-1;
     const close=button('Close','close',()=>{selected='';pane.hidden=true;renderGrid();});close.setAttribute('aria-label','Close artwork details');heading.append(title,close);pane.append(heading);
     const preview=node('div','art-detail-image art-checker'),img=node('img');img.src=imageUrl(item);img.alt=item.name;preview.append(img);pane.append(preview);
     const metadata=node('form','art-metadata'),label=node('label','','Name'),name=node('input');name.value=item.name;name.maxLength=60;name.setAttribute('aria-label','Artwork name');label.append(name);
+    const subjectLabel=node('label','','What is it? (optional)'),subject=node('input');subject.value=item.semanticIdentity??'';subject.maxLength=60;subjectLabel.append(subject);
     const kindLabel=node('label','','Collection'),kind=node('select');kind.setAttribute('aria-label','Artwork collection');for(const [key,text]of Object.entries(categories)){const option=node('option','',text);option.value=key;kind.append(option);}kind.value=item.category??'other';kindLabel.append(kind);
-    const metadataSave=button('Save details','check',async()=>{await updateDrawing(captured,id,{name:name.value,category:kind.value as DrawingCategory},()=>current(captured,run));if(!current(captured,run)||!await refresh())return;status('Artwork details saved.');notify(captured);});metadata.append(label,kindLabel,metadataSave);metadata.onsubmit=e=>{e.preventDefault();metadataSave.click();};pane.append(metadata);
+    const metadataSave=button('Save details','check',async()=>{await updateDrawing(captured,id,{name:name.value,category:kind.value as DrawingCategory,semanticIdentity:subject.value.trim()},()=>current(captured,run));if(!current(captured,run)||!await refresh())return;status('Artwork details saved.');notify(captured);});metadata.append(label,subjectLabel,kindLabel,metadataSave);metadata.onsubmit=e=>{e.preventDefault();metadataSave.click();};pane.append(metadata);
     const versions=rigs.filter(r=>r.assembly.sourceId===id),versionLabel=node('label','art-version-label','Movement version'),choice=node('select');choice.id='artVersion';choice.setAttribute('aria-label','Movement version');
     const original=node('option','','Original picture');original.value='';choice.append(original);
-    for(const [i,rig]of versions.entries()){const count=rig.assembly.pieces.length,option=node('option','',`${versions.length-i} · ${rig.assembly.kind} · ${count} ${count===1?'part':'parts'}`);option.value=rig.id;choice.append(option);}if(versions.length)choice.value=versions[0].id;versionLabel.append(choice);pane.append(versionLabel);
+    for(const [i,rig]of versions.entries()){const count=rig.assembly.pieces.length,option=node('option','',rig.assembly.motion ? `Version ${rig.assembly.revision} · animation path` : `${versions.length-i} · ${rig.assembly.kind} · ${count} ${count===1?'part':'parts'}`);option.value=rig.id;choice.append(option);}if(versions.length)choice.value=versions[0].id;versionLabel.append(choice);pane.append(versionLabel);
     const actions=node('div','art-detail-actions');
-    const editMovement=async(rigId?:string)=>{const editor=await openDrawingLab(captured,item,savedId=>host.openCar(savedId,()=>current(captured,run)),{...(rigId?{rigId}:{}),isCurrent:()=>current(captured,run),onSaved:async()=>{if(current(captured,run)&&await refresh()){status('Movement saved. Choose where it goes next.');notify(captured);}}});editor?.addEventListener('close',()=>{if(current(captured,run))void refresh();},{once:true});};
-    const openEditor=button(versions.length?'Edit movement':'Make it move','play',()=>editMovement(choice.value||undefined),true);openEditor.id='artEditMovement';
+    const sketch=item.mime==='image/png'?readSketch(item.bytes):null;
+    if(sketch || (item.mime==='image/png' && hasCrayonSource(item.bytes)))actions.append(button('Keep drawing','edit',async()=>{
+      const active=()=>current(captured,run) && selected===id && !pane.hidden;
+      const saved=(result:Drawing)=>showKeptDrawing(result,captured,run);
+      if(!active())return;
+      if(sketch){
+        await verifySketchPixels(item.bytes,sketch);
+        if(active())await drawOnTablet(captured,saved,()=>current(captured,run),{item,sketch});
+      }else await editLegacyCrayons(captured,item,saved,active);
+    }));
+    const editMovement=async(rigId?:string)=>{const editor=await openDrawingLab(captured,item,savedId=>host.openCar(savedId,()=>current(captured,run)),{startWithParts:true,...(rigId && !usesOriginalSprite(versions.find(r=>r.id===rigId)?.assembly.motion)?{rigId}:{}),isCurrent:()=>current(captured,run),onSaved:async()=>{if(current(captured,run)&&await refresh()){status('Movement saved. Choose where it goes next.');notify(captured);}}});editor?.addEventListener('close',()=>{if(current(captured,run))void refresh();},{once:true});};
+    const openEditor=button('Bring its parts to life','edit',()=>editMovement(choice.value||undefined));openEditor.id='artEditMovement';
+    const animate=button('Make it move','play',async()=>{
+      const valid=()=>current(captured,run)&&selected===id;
+      await openAnimationEditor(captured,item,versions.find(r=>r.id===choice.value),valid,async savedId=>{
+        if(!valid()||!await refresh())return;
+        const version=$<HTMLSelectElement>('artVersion');version.value=savedId;version.dispatchEvent(new Event('change'));
+        status('Animation saved. Try it in Creative Studio.');notify(captured);focusSelectedArtwork(id,captured,run);
+      },async()=>{await action(()=>editMovement(choice.value||undefined));});
+    },true);animate.id='artAnimatePath';
+    const openPath=(useSteps:boolean)=>editMotionPath(captured,item,choice.value||undefined,()=>current(captured,run),async saved=>{
+      if(!await refresh())throw Error('Reopen My Art to find your saved path.');
+      const version=$<HTMLSelectElement>('artVersion');version.value=saved.id;version.dispatchEvent(new Event('change'));
+      status('Path saved. Choose Use in Creative Studio to play it.');notify(captured);focusSelectedArtwork(item.id,captured,run);
+    },{create:useSteps,editParts:()=>void action(()=>editMovement(choice.value||undefined))});
+    const path=button('Draw a path','edit',()=>openPath(false));path.id='artDrawPath';
+    const steps=button('Plot a path with arrows','edit',()=>openPath(true));steps.id='artStepPath';
     const scene=button('Use in Creative Studio','grid',async()=>{await host.openScene({drawingId:item.id,...(choice.value?{rigId:choice.value}:{})});});scene.id='artUseScene';
+    const hunt=button('Make a picture hunt','play',()=>host.openScene({drawingId:item.id,...(choice.value?{rigId:choice.value}:{})},'picture-hunt'));
+    hunt.id='artPictureHunt';
     const car=button('Make a Rally game','arrow',async()=>{const at=epoch;await host.openCar(choice.value,()=>current(captured,at));});car.id='artUseRally';
-    const updateCar=()=>{car.hidden=!versions.some(r=>r.id===choice.value&&r.assembly.kind==='car');};choice.onchange=updateCar;updateCar();actions.append(openEditor,scene,car);pane.append(actions);
+    const updateCar=()=>{car.hidden=!versions.some(r=>r.id===choice.value&&r.assembly.kind==='car');};choice.onchange=updateCar;updateCar();actions.append(animate,openEditor,path,steps,scene,hunt,car);pane.append(actions);
+    if(!item.archived){
+      const roleLabel=node('label','art-version-label','In my game, this picture is a…');
+      const role=node('select');role.id='artGameRole';
+      const prompt=node('option','','Choose a role');prompt.value='';role.append(prompt);
+      for(const [value,label] of Object.entries(roleLabels))role.append(new Option(label,value));
+      roleLabel.append(role);
+      const ideaLabel=node('label','art-version-label'),question=node('span'),idea=node('input');
+      idea.maxLength=160;idea.placeholder='My idea (optional)';ideaLabel.append(question,idea);ideaLabel.hidden=true;
+      const plan=button('Make a game with it','add',async()=>{
+        const isCurrent=()=>current(captured,run)&&selected===id;
+        if(!isCurrent()||!Object.hasOwn(roleLabels,role.value))return;
+        const picture=await selectedCreativeImage(captured,id);
+        if(!isCurrent())return;
+        if(picture.archived||picture.sha256!==item.sha256)throw Error('Choose an available picture from My Art.');
+        const {logicalId,originalSha256,drawingId,sha256,semanticIdentity}=picture;
+        await host.planGame({role:role.value as GameArtRole,logicalId,originalSha256,drawingId,sha256,
+          name:picture.label,...(semanticIdentity?{semanticIdentity}:{}),...(idea.value.trim()?{intent:idea.value.trim()}:{})},isCurrent);
+      });
+      plan.id='artPlanGame';plan.disabled=true;role.onchange=()=>{
+        plan.disabled=!role.value;ideaLabel.hidden=!role.value;question.textContent=roleQuestion[role.value as GameArtRole]??'';
+      };
+      const gamePlan=node('section','art-game-plan');gamePlan.id='artGamePlan';
+      gamePlan.append(roleLabel,ideaLabel,plan);pane.append(gamePlan);
+    }
     const hint=node('p','art-small','This choice is copied into the new game or scene. Earlier adventures keep their chosen version.');pane.append(hint);
     const tools=node('details','art-detail-tools'),summary=node('summary','','Picture & storage tools');tools.append(summary);
     tools.append(button('Trim, turn & clean up','edit',async()=>{await editPicture(captured,item,async result=>{if(!current(captured,run))return;selected=result.id;if(!await refresh())return;status('New picture saved. Your original is still in My art.');notify(captured);focusSelectedArtwork(result.id,captured,run);},()=>current(captured,run));}));
-    tools.append(button('Download original picture','download',()=>download(drawingBlob(item),'my-drawing.'+(item.mime==='image/png'?'png':'jpg'))));
+    const canDownload=()=>current(captured,run) && selected===item.id;
+    tools.append(button('Download original picture','download',async()=>{
+      const lineage=await selectedCreativeImage(captured,item.id);
+      if(!canDownload())return;
+      const original=lineage.originalId===item.id ? item : await drawing(captured,lineage.originalId);
+      if(original.sha256!==lineage.originalSha256)throw Error('Restore the exact original picture from your art backup.');
+      if(canDownload())download(drawingBlob(original),'my-original.'+(original.mime==='image/png'?'png':'jpg'));
+    }));
+    if(item.sourceId)tools.append(button('Download this picture version','download',()=>{
+      if(canDownload())download(drawingBlob(item),'my-drawing.'+(item.mime==='image/png'?'png':'jpg'));
+    }));
+    tools.append(button('Download visible picture','download',async()=>{
+      const visible=await visiblePicturePng(item);
+      if(canDownload())download(visible,'my-picture.png');
+    }));
     tools.append(button(item.archived?'Restore to My art':'Archive picture','clock',async()=>{await updateDrawing(captured,id,{archived:!item.archived},()=>current(captured,run));if(!current(captured,run))return;selected='';if(!await refresh())return;status(item.archived?'Picture returned to My art.':'Picture archived. Saved games and scenes can still use it.');notify(captured);}));
     tools.append(button('Delete unused picture','trash',async()=>{if(!confirm('Delete this picture and its movement versions from this device? Download your art library first to keep a copy. Pictures used by saved work cannot be deleted.'))return;await deleteArtwork(captured,id,()=>current(captured,run));if(!current(captured,run))return;selected='';if(!await refresh())return;status('Unused picture deleted.');notify(captured);}));
     if(item.sourceId)tools.append(node('p','art-small','This is an edited copy. The original picture remains saved separately.'));
     pane.append(tools);
-    const [draft,usage]=await Promise.all([loadDrawingDraft(captured,id),artUsages(captured,id)]);if(!current(captured,run)||selected!==id)return;
-    if(draft){const note=node('div','art-draft-note');note.append(node('p','','You have an unfinished movement design.'),button('Resume unfinished design','edit',()=>editMovement()));note.querySelector('button')!.id='artResumeDraft';actions.before(note);}
+    const [draft,usage]=await Promise.all([loadDrawingDraft(captured,id),artUsages(captured,id)]);if(!valid())return;
+    if(draft){const note=node('div','art-draft-note');note.append(node('p','','You have an unfinished movement design.'),button('Resume unfinished design','edit',()=>draft.assembly.kind==='picture' || draft.assembly.motion && 'stops' in draft.assembly.motion ? openPath(true) : editMovement()));note.querySelector('button')!.id='artResumeDraft';actions.before(note);}
     if(usage.length){const count=new Set(usage.map(item=>item.targetKind+':'+item.targetId)).size;pane.append(node('p','art-small',`Used in ${count} saved ${count===1?'creation':'creations'}. Archiving keeps those adventures working.`));}
   }
+  async function showKeptDrawing(saved:Drawing, captured:string, run:number) {
+    if (!current(captured,run)) return;
+    selected=saved.id; archive=false; category='all'; $<HTMLInputElement>('artSearch').value='';
+    if (!await refresh() || !current(captured,run) || selected!==saved.id) return;
+    const pane=$('artDetails'), preview=pane.querySelector('.art-detail-image');
+    if (!preview) return;
+    const options=node('section','art-kept-options');
+    options.setAttribute('aria-label','Your saved drawing');
+    const move=$<HTMLButtonElement>('artDrawPath'), scene=$<HTMLButtonElement>('artUseScene');
+    setIconLabel(move,'play','Make it move');
+    setIconLabel($('artEditMovement'),'settings','Edit parts and joints');
+    setIconLabel(scene,'grid','Make a scene');
+    const game=node('details','art-kept-game'), summary=node('summary','','Make a game with it');
+    const picturePlan=$('artGamePlan');
+    if(picturePlan){setIconLabel($('artPlanGame'),'add','Use this picture in my game idea');game.append(summary,picturePlan);}
+    else game.append(summary);
+    game.append(node('p','','Give your picture wheels to drive it in Rally.'),button('Build a Rally car','edit',()=>{
+      if(current(captured,run) && selected===saved.id) $<HTMLButtonElement>('artEditMovement').click();
+    }));
+    options.append(move,scene,game,button('Keep it in My Art','check',async()=>{
+      if(!current(captured,run)) return;
+      selected=''; pane.hidden=true; renderGrid();
+      const card=Array.from($('artGrid').querySelectorAll<HTMLButtonElement>('[data-art-id]')).find(card=>card.dataset.artId===saved.id);
+      card?.focus();
+    }));
+    preview.after(options);
+    status('Saved in My Art.'); notify(captured); focusSelectedArtwork(saved.id,captured,run);
+  }
   async function open(id?:string){if(!await host.enter())return;visible=true;selected=id??selected;status('');await refresh(true);}
+  let picker: HTMLDialogElement | undefined;
+  async function browseArtwork(motion: boolean) {
+    const captured = owner(), run = epoch, dialog = node('dialog','creative-picker-dialog');
+    picker?.close(); picker = dialog;
+    dialog.setAttribute('aria-label', motion ? 'Choose art to move' : 'Choose artwork');
+    const box = node('div'), close = node('button','art-button','Back');
+    close.type = 'button'; close.onclick = () => dialog.close();
+    dialog.append(node('h2','',motion ? 'Choose art to move' : 'Choose artwork'), box, close);
+    page.append(dialog); dialog.showModal();
+    let releasePicker: (() => void) | undefined;
+    const allowed = () => current(captured,run) && dialog.open && picker === dialog;
+    dialog.addEventListener('close', () => { releasePicker?.(); dialog.remove(); if (picker === dialog) picker = undefined; }, {once:true});
+    const use = async (item: {drawingId:string;rigId?:string}) => {
+      if (!allowed()) return;
+      const original = await drawing(captured,item.drawingId);
+      if (!allowed()) return;
+      dialog.close();
+      archive = false; category = 'all'; selected = original.id;
+      // Searching the exact name ensures an older selected picture is visible
+      // even when it is beyond the first shelf page.
+      $<HTMLInputElement>('artSearch').value = original.name;
+      if (!await refresh() || !current(captured,run)) return;
+      if (!items.some(picture => picture.id === original.id)) {
+        const {bytes,...metadata} = original;
+        items.push({...metadata,originalBytes:bytes.byteLength});
+        selected = original.id; renderGrid(); await details(selected);
+      }
+      if (!current(captured,run) || selected !== original.id) return;
+      const version = $<HTMLSelectElement>('artVersion');
+      version.value = item.rigId ?? ''; version.dispatchEvent(new Event('change'));
+      if (motion) $('artEditMovement').click(); else focusSelectedArtwork(original.id,captured,run);
+    };
+    try {
+      const choices = await listPickerChoices(captured,allowed);
+      if (!allowed()) return;
+      const pals = FG.pals?.view() as PalsView | null;
+      const catalogue = catalogueChoices(pals?.owner === captured ? pals.owned : []);
+      releasePicker = mountCreativeAssetPicker(box,choices,{
+        catalogue,
+        cataloguePreview: item => {
+          const asset = creationAsset(item.assetId);
+          if (asset?.palId && asset.palForm) return createPalPortrait(asset.palId,asset.palForm === 'mature' ? 2 : 1);
+          const image = node('img'); image.alt = ''; image.src = item.imageUrl; return image;
+        },
+        catalogueCompatibility: () => motion ? 'Choose one of your drawings to edit its parts.' : undefined,
+        onChooseCatalogue: item => {
+          if (!allowed()) return;
+          const start = button('Use '+item.label+' in a new scene','play',async () => {
+            if (!allowed()) return;
+            dialog.close(); await FG.creation.openCatalogue(item.assetId);
+          });
+          box.querySelector('[data-catalogue-action]')?.remove();
+          start.dataset.catalogueAction = ''; box.append(start); start.focus();
+        },
+        onChoose: item => void action(() => use(item)),
+        onCreate: () => void action(async () => {
+          const saved = await createPickerArtwork(captured,allowed);
+          if (saved && allowed()) await use({drawingId:saved.id});
+        }),
+      });
+    } catch(error) { if (allowed()) box.textContent = (error as Error).message; }
+  }
+  $('artBrowseAssets').onclick = () => void action(() => browseArtwork(false));
+  $('artBrowseMotion').onclick = () => void action(() => browseArtwork(true));
   $('artHome').onclick=()=>void action(()=>host.home());
   $('artUploadButton').onclick=()=>$<HTMLInputElement>('artUpload').click();$('artCameraButton').onclick=()=>$<HTMLInputElement>('artCamera').click();
   const upload=async(input:HTMLInputElement)=>{const file=input.files?.[0],id=owner(),run=epoch;if(!file)return;
@@ -115,7 +299,7 @@ export function installArtStudio(host:Host){
     finally{input.value='';controls.forEach(b=>b.disabled=false);}
   };
   for(const id of ['artUpload','artCamera'])$<HTMLInputElement>(id).onchange=()=>void action(()=>upload($<HTMLInputElement>(id)));
-  $('artDrawButton').onclick=()=>void action(()=>{const id=owner(),run=epoch;return drawOnTablet(id,async saved=>{if(!current(id,run))return;selected=saved.id;archive=false;category='all';$<HTMLInputElement>('artSearch').value='';if(!await refresh())return;status('Drawing saved. Let’s see what it can do.');notify(id);focusSelectedArtwork(saved.id,id,run);},()=>current(id,run));});
+  $('artDrawButton').onclick=()=>void action(async()=>{const id=owner(),run=epoch;await drawOnTablet(id,saved=>showKeptDrawing(saved,id,run),()=>current(id,run));});
   $('artSearch').oninput=()=>{void action(async()=>{await refresh();});};
   $('artFilters').onclick=e=>{const target=(e.target as HTMLElement).closest<HTMLButtonElement>('[data-category]');if(!target)return;category=target.dataset.category!;void action(async()=>{await refresh();});};
   $('artShowArchive').onclick=()=>{archive=!archive;selected='';$('artDetails').hidden=true;void action(async()=>{await refresh();});};
@@ -130,8 +314,8 @@ export function installArtStudio(host:Host){
   restoreInput.onchange=()=>void action(async()=>{const file=restoreInput.files?.[0],id=owner(),run=epoch;if(!file)return;
     try{if(file.size>ART_LIMITS.bundleBytes)throw Error('Choose an art library smaller than 64 MB.');status('Checking the original art versions…');const raw=await file.text();if(!current(id,run))return;const result=await restoreArtBundle(id,raw,()=>current(id,run));if(!current(id,run))return;selected=result.drawings[0]?.id??'';archive=false;category='all';if(!await refresh())return;status('Original art versions restored for this player. Their saved games and scenes can use them again.');notify(id);}finally{restoreInput.value='';}
   });
-  window.addEventListener('factory-profile',()=>{++epoch;selected='';items=[];rigs=[];release();$('artGrid').replaceChildren();$('artDetails').replaceChildren();$('artDetails').hidden=true;status('');visible=false;});
-  window.addEventListener('factory-page',event=>{const destination=(event as CustomEvent).detail;if(destination!=='art-studio'){visible=false;++epoch;release();$('artGrid').replaceChildren();$('artDetails').replaceChildren();}else visible=true;});
+  window.addEventListener('factory-profile',()=>{picker?.close();++epoch;selected='';items=[];rigs=[];release();$('artGrid').replaceChildren();$('artDetails').replaceChildren();$('artDetails').hidden=true;status('');visible=false;});
+  window.addEventListener('factory-page',event=>{const destination=(event as CustomEvent).detail;if(destination!=='art-studio'){picker?.close();visible=false;++epoch;release();$('artGrid').replaceChildren();$('artDetails').replaceChildren();}else visible=true;});
   const api={open,refresh:()=>visible?refresh():Promise.resolve(),version:1};FG.artStudio=api;
   const parentBackup=document.getElementById('importData');
   if(parentBackup){const note=node('section','art-parent-note');note.id='artParentBackup';note.append(node('h3','','Pictures & movement designs'),node('p','muted fine','Download this player’s art library as well as the family progress file when moving devices. Restore progress first, select the matching player, then choose My Art → Library tools → Restore art for saved games. A scene can also travel on its own: Download scene & artwork includes its characters.'));

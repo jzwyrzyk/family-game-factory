@@ -1,9 +1,11 @@
+import {artFootprint, checkReservedArtRoom, clearSketchRecord, pendingSketchRecord} from './sketch-keep-record';
 import {assertRewardSourceLockHeld} from '../rewards/write-guard';
 /** Portable private art: validate all bytes and references before one additive transaction. */
+import { normalizeDrawingLabel, validSemanticIdentity } from '../assets/art-lineage';
 import { type Drawing, DRAWING_CATEGORIES, prepareDrawing } from '../assets/private-drawings';
 import { type SavedRig, type DrawingDraft } from './store';
 import { validateAssembly, type DrawingAssembly } from './model';
-import { ART_LIMITS, artOwner, artRequest, saveDrawingMetadata, assertArtWrite, checkArtCapacity, withArtTransaction, type ArtGuard } from './library';
+import { ART_LIMITS, artOwner, artRequest, saveDrawingMetadata, ownerArtRecords, assertArtWrite, checkArtCapacity, withArtTransaction, type ArtGuard } from './library';
 
 export type PortableDrawing = Omit<Drawing, 'owner' | 'bytes' | 'preview'> & { data: string };
 export type PortableRig = Omit<SavedRig, 'owner'>;
@@ -58,10 +60,10 @@ function validateLinks(drawings: Drawing[], rigs: PortableRig[], drafts: Portabl
 async function validateAndPrepare(input: unknown, owner: string) {
   const bundle = parse(input), originals: Drawing[] = [], ids = new Set<string>();
   for (const item of bundle.drawings) {
-    if (!object(item, ['id', 'name', 'mime', 'sha256', 'createdAt', 'sourceId', 'sourceSha256', 'category', 'archived', 'updatedAt', 'data']) || !identifier(item.id) || ids.has(item.id) || typeof item.name !== 'string' || !item.name.trim() || item.name.length > 60 || !['image/png', 'image/jpeg'].includes(item.mime) || !hash(item.sha256) || !date(item.createdAt) || item.sourceId !== undefined && !identifier(item.sourceId) || item.sourceSha256 !== undefined && !hash(item.sourceSha256) || item.category !== undefined && !DRAWING_CATEGORIES.includes(item.category) || item.archived !== undefined && typeof item.archived !== 'boolean' || item.updatedAt !== undefined && !date(item.updatedAt)) fail();
+    if (!object(item, ['id', 'name', 'mime', 'sha256', 'createdAt', 'sourceId', 'sourceSha256', 'category', 'semantic', 'semanticName', 'semanticIdentity', 'archived', 'updatedAt', 'data']) || !identifier(item.id) || ids.has(item.id) || typeof item.name !== 'string' || !item.name.trim() || item.name.length > 60 || !['image/png', 'image/jpeg'].includes(item.mime) || !hash(item.sha256) || !date(item.createdAt) || item.sourceId !== undefined && !identifier(item.sourceId) || item.sourceSha256 !== undefined && !hash(item.sourceSha256) || item.semanticIdentity !== undefined && !validSemanticIdentity(item.semanticIdentity) || item.category !== undefined && !DRAWING_CATEGORIES.includes(item.category) || item.archived !== undefined && typeof item.archived !== 'boolean' || item.updatedAt !== undefined && !date(item.updatedAt)) fail();
     ids.add(item.id); const prepared = await prepareDrawing(owner, item.name, new Blob([decode(item.data)], { type: item.mime }));
     if (prepared.sha256 !== item.sha256) throw Error('An image in this backup does not match its saved fingerprint. Nothing was imported.');
-    const { data: _data, ...metadata } = item; originals.push({ ...prepared, ...metadata });
+    const { data: _data, ...metadata } = item; originals.push(normalizeDrawingLabel({ ...prepared, ...metadata }));
   }
   const rigs: PortableRig[] = []; ids.clear();
   for (const item of bundle.rigs) {
@@ -82,21 +84,28 @@ export async function validateArtBundle(input: unknown): Promise<ArtBundle> { re
 
 export async function exportArtBundle(owner: string, selection?: { drawingIds?: string[]; rigIds?: string[] }): Promise<ArtBundle> {
   artOwner(owner);
-  const snapshot = await withArtTransaction(['drawings', 'rigs', 'drafts'], 'readonly', async transaction => {
-    const originals = (await artRequest(transaction.objectStore('drawings').getAll()) as Drawing[]).filter(item => item.owner === owner);
-    const rigs = (await artRequest(transaction.objectStore('rigs').getAll()) as SavedRig[]).filter(item => item.owner === owner);
-    const drafts = (await artRequest(transaction.objectStore('drafts').getAll()) as DrawingDraft[]).filter(item => item.owner === owner);
-    return { originals, rigs, drafts };
+  const snapshot = await withArtTransaction(['drawings', 'rigs', 'drafts', 'meta'], 'readonly', async transaction => {
+    const [originals, rigs, drafts, pending] = await Promise.all([
+      ownerArtRecords<Drawing>(transaction, 'drawings', owner),
+      ownerArtRecords<SavedRig>(transaction, 'rigs', owner),
+      selection ? [] : ownerArtRecords<DrawingDraft>(transaction, 'drafts', owner),
+      selection ? undefined : pendingSketchRecord(transaction, owner),
+    ]);
+    if (pending) {
+      const alreadySaved = originals.find(drawing => drawing.id === pending.image.id);
+      if (alreadySaved && !sameImage(alreadySaved,pending.image)) throw Error('The unfinished save conflicts with a saved version.');
+      if (!alreadySaved) originals.push(pending.image);
+    }
+    return { originals: originals.map(normalizeDrawingLabel), rigs, drafts };
   });
   const selectedOriginals = new Set(selection ? selection.drawingIds || [] : snapshot.originals.map(item => item.id));
   const selectedRigs = new Set(selection ? selection.rigIds || [] : snapshot.rigs.map(item => item.id));
   if ([...selectedOriginals].some(id => !snapshot.originals.some(item => item.id === id)) || [...selectedRigs].some(id => !snapshot.rigs.some(item => item.id === id))) throw Error('Choose artwork or movement versions from this profile.');
-  for (const rig of snapshot.rigs) if (selectedOriginals.has(rig.assembly.sourceId)) selectedRigs.add(rig.id);
-  for (const draft of snapshot.drafts) if (selectedOriginals.has(draft.sourceId) && draft.parentId) selectedRigs.add(draft.parentId);
+  // A scene takes the selected versions and the ancestors they need.
+  // Drafts and sibling experiments belong only in a full library backup.
   let changed = true;
   while (changed) {
     const before = selectedRigs.size + selectedOriginals.size;
-    for (const draft of snapshot.drafts) if (selectedOriginals.has(draft.sourceId) && draft.parentId) selectedRigs.add(draft.parentId);
     for (const rig of snapshot.rigs) if (selectedRigs.has(rig.id)) { selectedOriginals.add(rig.assembly.sourceId); if (rig.parentId) selectedRigs.add(rig.parentId); }
     for (const item of snapshot.originals) if (selectedOriginals.has(item.id) && item.sourceId) selectedOriginals.add(item.sourceId);
     changed = before !== selectedRigs.size + selectedOriginals.size;
@@ -128,7 +137,7 @@ async function transferArt(owner: string, input: unknown, guard: ArtGuard | unde
   const assembly = (value: DrawingAssembly) => validateAssembly({ ...value, sourceId: drawingIds[value.sourceId] });
   const rigs: SavedRig[] = prepared.rigs.map(item => ({ ...item, owner, id: rigIds[item.id], parentId: item.parentId ? rigIds[item.parentId] : null, assembly: assembly(item.assembly) }));
   const drafts: DrawingDraft[] = prepared.drafts.map(item => ({ ...item, owner, id: JSON.stringify([owner, drawingIds[item.sourceId]]), sourceId: drawingIds[item.sourceId], parentId: item.parentId ? rigIds[item.parentId] : null, assembly: assembly(item.assembly) }));
-  return withArtTransaction(['drawings', 'rigs', 'drafts'], 'readwrite', async transaction => {
+  return withArtTransaction(['drawings', 'rigs', 'drafts', 'meta'], 'readwrite', async transaction => {
     const existingDrawings = await artRequest(transaction.objectStore('drawings').getAll()) as Drawing[];
     const existingRigs = await artRequest(transaction.objectStore('rigs').getAll()) as SavedRig[];
     const existingDrafts = await artRequest(transaction.objectStore('drafts').getAll()) as DrawingDraft[];
@@ -150,7 +159,13 @@ async function transferArt(owner: string, input: unknown, guard: ArtGuard | unde
     for (const item of drafts) if (!draftMap.has(item.id)) newDrafts.push(item);
     checkArtCapacity([...existingDrawings, ...newDrawings], [...existingRigs, ...newRigs]);
     if (new TextEncoder().encode(JSON.stringify([...existingDrafts, ...newDrafts])).byteLength > ART_LIMITS.designBytes) throw Error('There is not enough room for all the imported drafts. Nothing was imported.');
+    const pending = await pendingSketchRecord(transaction,owner);
+    const recovered = pending && drawings.find(drawing => drawing.id === pending.image.id);
+    if (recovered && !sameImage(recovered,pending!.image)) throw Error('This backup conflicts with an unfinished drawing.');
     assertArtWrite(owner, guard);
+    if (recovered) clearSketchRecord(transaction,owner);
+    await checkReservedArtRoom(transaction,[...existingDrawings,...newDrawings].map(artFootprint));
+    assertArtWrite(owner,guard);
     for (const item of newDrawings) {transaction.objectStore('drawings').add(item);saveDrawingMetadata(transaction,item);}
     for (const item of newRigs) transaction.objectStore('rigs').add(item);
     for (const item of newDrafts) transaction.objectStore('drafts').add(item);
@@ -171,16 +186,21 @@ export async function restoreFamilyArtBundles(bundles:{owner:string;bundle:ArtBu
   if(new Set(allowedOwners).size!==allowedOwners.length||allowedOwners.length<1||allowedOwners.length>6||new Set(bundles.map(x=>x.owner)).size!==bundles.length||bundles.some(x=>!allowedOwners.includes(x.owner)))throw Error('Choose artwork belonging to this recovery point.');
   const prepared=await Promise.all(bundles.map(async item=>({owner:item.owner,activeRigId:item.activeRigId,...await validateAndPrepare(item.bundle,item.owner)})));
   assertAuthorized();
-  await withArtTransaction(['drawings','rigs','drafts','active'],'readwrite',async tx=>{
+  await withArtTransaction(['drawings','rigs','drafts','active','meta'],'readwrite',async tx=>{
     const drawings=await artRequest(tx.objectStore('drawings').getAll()) as Drawing[],rigs=await artRequest(tx.objectStore('rigs').getAll()) as SavedRig[],drafts=await artRequest(tx.objectStore('drafts').getAll()) as DrawingDraft[];
     const images=new Map(drawings.map(x=>[x.id,x])),versions=new Map(rigs.map(x=>[x.id,x])),draftIds=new Set(drafts.map(x=>x.id));
     const addImages:Drawing[]=[],addVersions:SavedRig[]=[],addDrafts:DrawingDraft[]=[];
     for(const source of prepared){
+      const pending = await pendingSketchRecord(tx,source.owner);
+      const recovered = pending && source.originals.find(drawing => drawing.id === pending.image.id);
+      if (recovered && !sameImage(recovered,pending!.image)) throw Error('This recovery point conflicts with an unfinished drawing.');
+      if (recovered) clearSketchRecord(tx,source.owner);
       if(source.activeRigId!==undefined&&source.activeRigId!==null&&!source.rigs.some(rig=>rig.id===source.activeRigId))throw Error('A selected movement version is unavailable in this recovery point.');
       for(const image of source.originals){const prior=images.get(image.id);if(prior&&!sameImage(prior,image))throw Error('A saved picture conflicts with this recovery point. Your originals were not replaced.');if(!prior){images.set(image.id,image);addImages.push(image);}}
       for(const item of source.rigs){const rig={...item,owner:source.owner},prior=versions.get(rig.id);if(prior&&(prior.owner!==rig.owner||prior.parentId!==rig.parentId||!sameValue(prior.assembly,rig.assembly)))throw Error('A saved movement version conflicts with this recovery point.');if(!prior){versions.set(rig.id,rig);addVersions.push(rig);}}
       for(const item of source.drafts){const draft={...item,owner:source.owner,id:JSON.stringify([source.owner,item.sourceId])};if(!draftIds.has(draft.id)){draftIds.add(draft.id);addDrafts.push(draft);}}
     }
+    await checkReservedArtRoom(tx,[...drawings,...addImages].map(artFootprint));
     checkArtCapacity([...drawings,...addImages],[...rigs,...addVersions]);if(new TextEncoder().encode(JSON.stringify([...drafts,...addDrafts])).byteLength>ART_LIMITS.designBytes)throw Error('There is not enough room for the recovered artwork drafts.');
     assertRewardSourceLockHeld();assertAuthorized();for(const item of addImages){tx.objectStore('drawings').add(item);saveDrawingMetadata(tx,item);}for(const item of addVersions)tx.objectStore('rigs').add(item);for(const item of addDrafts)tx.objectStore('drafts').add(item);for(const source of prepared){if(source.activeRigId===null)tx.objectStore('active').delete(source.owner);else if(source.activeRigId!==undefined)tx.objectStore('active').put({owner:source.owner,id:source.activeRigId});}
   });

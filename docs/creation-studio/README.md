@@ -1,5 +1,15 @@
 # Creation Studio: make scenes and rebuild behavior
 
+## Illustrated worlds and your own backgrounds
+
+New free scenes, Pal playgrounds and rebuild stages use bundled illustrations from Mind Your Jems!, Gem Factory and the maker journey. Scene settings offers Waterfall islands, Gem Factory and Garden terrace. The existing classic worlds are still selectable. A saved scene without a world pin keeps its original background.
+
+**Scene settings → Use my artwork** opens the active profile’s image collection. Children can choose any original or edited picture without first categorizing it. A private background starts with **Show whole picture**. **Fill the stage** centers and crops the visible area while preserving aspect ratio. Undo restores the previous choice. In **More tools**, **Picture layer** moves a character or thing in front of or behind the other actors. Their programs follow their stable actor IDs. The stage draws scenery behind them, and recording uses the same canvas. Scenery has no program, hit target, movement or collision behavior.
+
+A scene revision retains an optional `world` with an exact `assetId` and `framing` choice. The bundled catalogue uses a content-specific ID. A new illustration version needs a new ID and path while the old file remains available. Private worlds use the same owner/hash-checked `art:image` references as actors. Scene-art transfers, complete backups, usage checks, and recovery remapping traverse both slots. The local scene editor can keep private worlds. Generated companion validation rejects them.
+
+The clean local build at `d30a36564dbcc736564ac163a1c99f18d8357964` passed 87 Creation tests and 29 art tests. The Chromium world journey selected bundled and synthetic private backgrounds, exercised fit/undo, changed a character’s layer while preserving its program, kept and reopened the scene, rejected an incomplete portable bundle, and imported an exact-image copy. No browser POST was observed. The screenshots show a 1366 × 900 desktop and a 390 × 844 phone viewport. Hosted qualification and physical-device acceptance are separate. [Illustrated stage](evidence/connected-worlds/creation-waterfall-islands.png) · [Phone stage](evidence/connected-worlds/creation-waterfall-phone.png) · [Fixture drawing used as a world](evidence/connected-worlds/creation-pencil-hills.png)
+
 ## Creative Studio entrances — November 25, 2026
 
 The landing page follows My Art: **Make it. Make it move.**, approved gem artwork, three action cards and My scenes. **Make a scene** reveals existing worlds and optional characters/Pals/art; **Rebuild a scene** opens existing deterministic challenges; **Try an experiment** opens authored reasoning practice and returns here. Scene files belong beside saved scenes. A first visit offers a skippable arrow-and-Play introduction using the real interpreter, with no project or evidence write. `studio-intro` lives in existing owner-scoped guidance. First steps, More tools, checks, hints, Keep, draft recovery and program semantics are unchanged. See the [modernization decision](../decisions/2026-11-25-child-experience-modernization.md). Earlier placement descriptions below are historical where they differ.
@@ -227,3 +237,11 @@ The introductory sequence starts with one step, follows with correcting a direct
 Sources reviewed November 25, 2026 include the [2026 CSTA PK–12 edition](https://csteachers.org/2026-csta-pk-12-computer-science-standards/), [Michigan's adopted K–12 CS standards](https://www.michigan.gov/mde/services/academic-standards/michigan-k-12-computer-science-standards) and [Boston College's Coding as Another Language Kindergarten ScratchJr curriculum](https://sites.bc.edu/codingasanotherlanguage/curricula/scratchjr-curricula/kindergarten-scratchjr/). The CSTA 2026 edition has grade-specific identifiers. Michigan's state framework retains its adopted K–2 identifiers.
 
 On the four early directional challenges, **Predict a move** accepts an optional tap before checking a specific scene. The bounded evaluator samples the first visible displacement. Equal diagonal movement, a hidden actor or an execution limit yields no directional observation. Changing the scene invalidates the pending choice. The saved check can contain a pair of direction labels for the parent. A correct scene or a Run click alone contributes no prediction response.
+
+### World versions and placements
+
+The four illustrated starters share the versioned artwork used by the player and thumbnails. The world settings retain the static whole-stage art slot and also support a separately selectable drawing backdrop with its own visibility and framing. A child can mix props from different worlds, duplicate a placement, change its layer and move it with the keyboard or the stage handle. Layer changes change the paint order within a plane and preserve the order used by simultaneous scripts.
+
+Use this world creates an independent project from the exact kept version inside the creation store transaction. The copy keeps its pinned artwork, actor IDs, programs and placement settings. Both the local and IndexedDB authorities check the owner and kept version before copying.
+
+[Creative Universe compatibility and local playback](../creative-universe/CONSOLIDATION.md)

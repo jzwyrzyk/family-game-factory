@@ -1,3 +1,9 @@
+import {gameArtReview} from '../game-art/review-mode';
+import {chooseGameArtwork} from './game-art-picker';
+import {loadDrawnCar} from '../drawing/rally';
+import {artChoice} from '../creation/private-art';
+import {artBuildHold,emptyArtPlan,roleLabels,selectGameArt,saveArtTest} from '../game-art/bindings';
+import {renderArtPlan} from '../game-art/plan-view';
 import { createPageHeader } from '../brand/page-header';
 import { createDashboardCard } from '../brand/dashboard-card';
 import {hasParentGuidance,installParentGuidance} from '../family-beta/guidance';
@@ -757,6 +763,38 @@ export async function installStudio(){
   if(achievement&&!FG.learning.active)celebrateProgress(achievement);
  }
  function current(){if(!activeId)throw Error('Choose a project first.');return notebook.get(activeId,owner());}
+ const artPlanBox=el('section','studio-art-plan');artPlanBox.id='studioArtPlan';artPlanBox.hidden=true;
+ $('studioPromptForm').before(artPlanBox);
+ function showArtPlan(s:StudioSession){
+  const authorized=creationAction();
+  const live=()=>authorized() && route==='studio' && activeId===s.id && owner()===s.owner && !FG.learning.active;
+  const active=()=>{if(!live())return null;const plan=current().gameArt;return plan?{owner:s.owner,game:s.id,plan}:null;};
+  const play=async(id:string)=>{
+   if(!gameArtReview||!live())return;
+   const {playArtTest}=await import('../game-art/review');
+   const view=epoch;
+   await playArtTest({origin:location.origin,owner:s.owner,game:s.id,version:id},()=>epoch===view?active():null,async()=>{
+    await notebook.update(s.id,s.owner,x=>{if(!live()||!x.gameArt?.tests.some(t=>t.id===id))throw Error('Reopen this test.');x.gameArt.kept=id;});
+    render();
+   });
+  };
+  artPlanBox.parentElement!.dataset.artGame=[s.owner,s.id,epoch,guidanceEpoch].join('/');
+  renderArtPlan(artPlanBox,s.gameArt,{
+   remove:role=>act(async()=>{if(!live())return;await notebook.update(s.id,s.owner,x=>{if(live()&&x.gameArt)x.gameArt.pins=x.gameArt.pins.filter(p=>p.role!==role);});render();}),
+   sample:faster=>act(async()=>{
+    if(!gameArtReview||!live())return;
+    const {sampleProgram}=await import('../game-art/review');
+    let id='';await notebook.update(s.id,s.owner,x=>{
+     if(!live()||!x.gameArt?.pins.length)throw Error('Choose a picture first.');
+     const plan=x.gameArt;
+     if(plan.tests.length!==s.gameArt?.tests.length || JSON.stringify(plan.pins)!==JSON.stringify(s.gameArt.pins))
+       throw Error('Your art plan changed. Open its latest test.');
+     id=saveArtTest(plan,sampleProgram(faster,plan.pins),plan.kept??plan.tests.at(-1)?.id??null).id;
+    });render();await play(id);
+   }),
+   play:id=>act(()=>play(id)),
+  });
+ }
  function refreshBuildAction(){
   if(!activeId)return;
   const s=current(),creating=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
@@ -765,6 +803,7 @@ export async function installStudio(){
   const pending=sending.has(s.id)||saving,uncertain=unknownJobs.has(s.id)||Boolean(s.pendingSubmission)||needsReadyRecovery(s);
   $<HTMLButtonElement>('studioSend').hidden=false;
   $<HTMLButtonElement>('studioSend').disabled=pending||!reflecting&&uncertain||creating&&(busy(s)||!readiness?.ready&&!draftCanReview)||!!coaching?.busy();
+  if(s.gameArt?.pins.length&&!reflecting)$<HTMLButtonElement>('studioSend').disabled=true;
   const hasIdea=s.messages.some(message=>message.role==='child');
   const reconnect=['limited','unavailable','sign-in'].includes(coachConnection);
   buildReason.textContent=creating?(pending?'Getting your build ready…':s.pendingSubmission?'The workshop has not confirmed this request. Your idea is safe.':uncertain?'Check your last build before starting another.':busy(s)?'Your game is already building.':readiness?.ready?'Your game idea is ready!':
@@ -772,7 +811,7 @@ export async function installStudio(){
    reconnect?'Chat needs to reconnect to check your idea.':readiness?.reason||'Let’s check your idea together.') : '';
   checkIdea.hidden=!creating||pending||busy(s)||uncertain||!!readiness?.ready||!coaching?.canReassess();
   setIconLabel(checkIdea,'retry',reconnect?'Reconnect chat':'Check my idea');
-  buildGuidance.hidden=!creating||(!buildReason.textContent&&checkIdea.hidden);
+  buildGuidance.hidden=!creating||!!s.gameArt?.pins.length||(!buildReason.textContent&&checkIdea.hidden);
  }
  const activeActions=new Set<Promise<void>>();let actionGeneration=0;
  function act(action:()=>void|Promise<void>){const actor=owner(),generation=++actionGeneration;try{const result=action();const pending=Promise.resolve(result).catch(error=>{if(owner()===actor&&generation===actionGeneration)status((error as Error).message,true);}).finally(()=>activeActions.delete(pending));activeActions.add(pending);}catch(error){if(owner()===actor&&generation===actionGeneration)status((error as Error).message,true);}}
@@ -1142,7 +1181,7 @@ export async function installStudio(){
   const creating=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
   const hasIdea=creating&&s.messages.some(m=>m.role==='child');
   page.classList.toggle('studio-creating',creating);
-  artEntries?.setCreating(creating);
+  artEntries?.setCreating(creating);showArtPlan(s);
   page.classList.toggle('studio-idea-unstarted',creating&&!hasIdea);
   page.classList.toggle('studio-idea-started',creating&&hasIdea);
   creationHero.hidden=!creating||hasIdea;
@@ -1280,6 +1319,7 @@ export async function installStudio(){
   if(unknownJobs.has(s.id)||s.pendingSubmission||needsReadyRecovery(s)){status('The last request is not confirmed. Your new thought is saved; no second build was sent.');return;}
   const mathRequest=interpretLearningRequest(prompt,FG.learning.subject);
   if(mathRequest){(await message(s,'child',prompt));(await notebook.update(s.id,s.owner,x=>{x.reflection=false;}));if(mathRequest.kind==='required'){(await message(s,'helper',mathRequest.message));}else{FG.learning.setMode(s.id,mathRequest.mode);(await message(s,'helper',`Learning format set to ${learningFormatLabel(FG.learning.subject,mathRequest.mode)}. It applies at the next safe learning moment; your game rules and learning history stay together.`));(await clearConsumedDraft());}render();return;}
+  if(s.gameArt?.pins.length){status(artBuildHold);return;}
   if(await coaching?.intercept(prompt,true))return;if(!sameView(s,started)||!authorized())return;
   const decision=coaching?.details()||{continueTest:false,parents:[],depth:'tune' as const,origin:'child' as const};
   const firstBuild=s.game==='new'&&!s.projectId&&!s.remoteId&&!s.candidate;
@@ -1326,6 +1366,7 @@ export async function installStudio(){
  async function build(s:StudioSession,prompt:string,continueTest=false){
   const authorized=creationAction();
   if(young()){handOff();return;}
+  if(notebook.get(s.id,s.owner).gameArt?.pins.length){status(artBuildHold);return;}
   sending.add(s.id);moreChoices.open=false;const identity=beginBuildHandoff(s,{phase:'sending'});render();status('Sending your idea…');
   const r=s.projectId?(await games.revision(s.projectId,s.owner)):null;
   if(!authorized()){sending.delete(s.id);return;}
@@ -1338,6 +1379,7 @@ export async function installStudio(){
    if(!authorized()||owner()!==s.owner||buildAttempts.get(s.id)?.attemptId!==identity.attemptId)throw Error('PROFILE_CHANGED');
    (await notebook.update(s.id,s.owner,x=>{
     if(!authorized())throw Error('The guided creation session ended.');
+    if(x.gameArt?.pins.length)throw Error(artBuildHold);
     if(x.pendingSubmission)throw Error('UNCONFIRMED_BUILD_RESPONSE');
     x.pendingSubmission={owner:s.owner,workspace:s.id,api:remote.apiBaseUrl!,request};
    }));
@@ -1376,6 +1418,7 @@ export async function installStudio(){
   if(sending.has(s.id)||saving)return;
   if(s.pendingSubmission){await recoverSubmission(s,true);return;}
   if(!s.job)return;
+  if(action==='retry'&&s.gameArt?.pins.length){status(artBuildHold);return;}
   if(action==='retry'&&s.job.status!=='failed')action='check';
   const retryBlock=retryBlocks.get(s.id);
   if(action==='retry'&&retryBlock?.jobId===s.job.id){status(retryBlock.reason,true);return;}
@@ -1879,7 +1922,32 @@ export async function installStudio(){
  const artStudio=installArtStudio({
   enter:async()=>{if(guardMath())return false;const origin=route==='studio'&&activeId?{owner:owner(),game:activeId}:document.body.classList.contains('creation-open')?{owner:owner(),scene:creation.scene()?.id,creative:true}:null;stopSpeech();await flushDraft();await creation.flush();artReturn=origin;setIconLabel($('artHome'),'arrow',origin?.game?'Back to my idea':origin?.scene?'Back to my scene':origin?.creative?'Back to Make a scene':'My Games','jems-icon--back');hideJourney();$<HTMLDialogElement>('studioCopyDialog').close();disposeGame();FG.app.page('art-studio');route='other';document.body.classList.remove('studio-designing','creation-open');setActiveNav('studioNavCreate');return true;},
   home:async()=>{const target=artReturn;artReturn=null;if(target?.owner===owner()){if(target.game){await open(target.game);return;}if(target.scene){await creation.open(target.scene);return;}if(target.creative){await creation.openMake();return;}}await home();},
-  openScene:async art=>{await creation.openArt(art);},
+  planGame:async(pin,isCurrent)=>{
+   if(guardMath()||!isCurrent())return;if(young()){handOff();return;}
+   const captured=owner(),authorized=creationAction(),target=artReturn?.owner===captured?artReturn.game:undefined;
+   const check=()=>{if(!authorized()||!isCurrent())throw Error('Reopen this picture in My Art.');};
+   const picture=await drawing(captured,pin.drawingId);check();
+   if(picture.archived||picture.sha256!==pin.sha256)throw Error('Choose an available picture in My Art.');
+   const previous=target?notebook.get(target,captured).gameArt?.pins.find(p=>p.role===pin.role):undefined;
+   if(previous && previous.drawingId!==pin.drawingId &&
+     !confirm('Use '+pin.name+' instead of '+previous.name+' as '+roleLabels[pin.role]+' in this plan? Your earlier art tests keep their pictures.'))return;
+   const attach=(x:StudioSession)=>{
+    check();if(busy(x)||x.pendingSubmission||x.pendingExperiment||sending.has(x.id)||unknownJobs.has(x.id))throw Error('Finish checking the current build before adding a picture.');
+    x.gameArt??=emptyArtPlan();
+    if(JSON.stringify(x.gameArt.pins.find(p=>p.role===pin.role))!==JSON.stringify(previous))throw Error('Your plan changed. Choose the picture again.');
+    selectGameArt(x.gameArt,pin);
+   };
+   let id=target;
+   if(id){await notebook.update(id,captured,attach);}
+   else{
+    const created=await saveLocalStudioProject(profileStorage(localStorage),FG,captured,(_games,book)=>{
+     check();const project=book.create(captured,'new','My game idea',null,{creationStandard:2});
+     return book.update(project.id,captured,attach);
+    },notifyRewardSourceSaved);id=created.id;
+   }
+   check();await open(id,false);if(authorized()&&activeId===id){await setTab('talk');artPlanBox.scrollIntoView({block:'nearest'});}
+  },
+  openScene:async (art,kind)=>{await creation.openArt(art,kind);},
   openCar:async(rigId,isCurrent)=>{
    if(!isCurrent()||guardMath())return;const capturedOwner=owner(),capturedEpoch=epoch;
    const stillCurrent=()=>isCurrent()&&owner()===capturedOwner&&epoch===capturedEpoch;
@@ -1907,7 +1975,35 @@ export async function installStudio(){
    await open(session.id);
   },
  });
- artEntries=installArtEntryPoints({homeAction:library.querySelector('.studio-home-action')!,libraryTools,open:()=>act(()=>artStudio.open())});
+ async function selectArtForGame(){
+  if(guardMath()||route!=='studio'||!activeId)return;
+  const session=current(),capturedEpoch=epoch;
+  const valid=()=>sameView(session,capturedEpoch)&&!FG.learning.active;
+  stopSpeech();await flushDraft();if(!valid())return;
+  const rally=session.game==='hill'&&!!session.projectId&&!session.remoteId;
+  if(rally&&(session.candidate||showing==='history')){
+    status('Open your main Rally game and finish your current experiment before choosing a new car.');return;
+  }
+  const base=rally?await games.revision(session.projectId!,session.owner):null;
+  if(!valid())return;
+  const choice=await chooseGameArtwork({owner:session.owner,current:valid,rally,existing:session.game!=='new'||!!session.remoteId});
+  if(!choice||!valid())return;
+  if(choice==='library'){await artStudio.open();return;}
+  const pin=await artChoice(session.owner,choice,valid);
+  if(pin.assetId!==choice.assetId)throw Error('Choose the saved version again.');
+  if(!valid())return;
+  if(!base){await creation.openArt(pin,'picture-hunt',session.id);return;}
+  if(!pin.rigId)throw Error('Choose a saved car design.');
+  await loadDrawnCar(session.owner,pin.rigId);
+  if(!valid())return;
+  await saveLocalStudioProject(profileStorage(localStorage),FG,session.owner,(staged,book)=>{
+    if(!valid()||book.get(session.id,session.owner).candidate)throw Error('Your game changed. Open its current version again.');
+    staged.keep(session.owner,session.projectId!,base.id,base.config,'Changed the Rally car','',base.id,pin.rigId);
+    return book.get(session.id,session.owner);
+  },notifyRewardSourceSaved,undefined,session.projectId!);
+  if(valid())await playWorking();
+ }
+ artEntries=installArtEntryPoints({homeAction:library.querySelector('.studio-home-action')!,libraryTools,open:()=>act(()=>artStudio.open()),chooseGameArt:()=>act(selectArtForGame)});
  installCreationProgress();
  const scenesNav=iconEl('button','','grid','Creative Studio') as HTMLButtonElement;scenesNav.id='studioNavScenes';scenesNav.type='button';scenesNav.onclick=()=>creation.open();$('studioNavCreate').after(scenesNav);
  const scenesEntry=el('button','studio-scene-entry') as HTMLButtonElement;scenesEntry.id='studioScenes';scenesEntry.type='button';

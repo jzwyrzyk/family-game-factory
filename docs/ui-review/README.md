@@ -41,7 +41,7 @@ Scenario scope is explicit: first-time/empty clear records, populated adds sampl
 
 `review:test` opens the HTML using `file://` in Chromium with no server. It checks route reachability, four live iframe viewport sizes, representative creation/build/play/learning, welcome, grades, adult profile, feedback downloads, toolbar visibility, broken images and unexpected network requests. It records overflow observations separately because the review must preserve product UI defects. Existing product tests are not replaced or reduced.
 
-A managed local browser can prohibit `file://` by administrator policy. `UI_REVIEW_INLINE_HARNESS=1 npm run review:test` is an explicit development fallback that fulfills one loopback navigation from memory (no server). That result is only DOM/interaction evidence, not proof that file navigation succeeded. GitHub Actions runs the actual `file://` check on stock Chromium and uploads the HTML, manifest and test evidence without deployment credentials.
+A managed local browser can prohibit `file://` by administrator policy. `UI_REVIEW_INLINE_HARNESS=1 npm run review:test` is an explicit development fallback that serves the single downloaded HTML file from a temporary loopback address. That result is only DOM/interaction evidence, not proof that file navigation succeeded. GitHub Actions runs the actual `file://` check on stock Chromium and uploads the HTML, manifest and test evidence without deployment credentials.
 
 The workflow is additive, read-only, and independent of production releases. It runs on relevant main changes and application/sandbox-tool PRs. Review findings never upload automatically. Real-device, Edge-specific, speech/audio, accessibility and owner acceptance remain separate evidence. The HTML's coverage dialog is the authoritative per-artifact list of known deviations.
 
@@ -62,3 +62,9 @@ The modernization candidate includes the consolidated My Journey sections, Make/
 Choose **My Journey** in the destination selector to inspect the three dashboard cards. Check **Empty** for starter selection and **Unlocked** for an equipped companion and earned gems. Follow each card into the corresponding live section, then return through My Journey.
 
 The Journey, Pals, rewards and Powers destinations render the shared production header and cards. Use the empty scenario to review the two starter choices. Compare the same application viewport on each page and use Shift+Tab from the announced heading to check the back action’s visible keyboard focus.
+
+For a smaller offline review of My Art, run `node tools/ui-review/build.mjs --drawing` and open `dist-review/jems-drawing-review.html`. It opens the production My Art workspace in a synthetic single-profile host and packages the exact drawing-page art, stamp images, icon sheet and fonts. Choose **Draw here**, keep a sketch, select **Keep drawing** and save a second version. This focused file retains its synthetic art library across reopening the same file in the same browser where local storage is available. Resetting demo data starts a new synthetic library. Other destinations belong in the full review file.
+
+The notebook flight review drives the original game with keyboard events and waits for processed simulation ticks. It checks the point awarded for the collectible, collision with the obstacle, the win and the kept notebook version. The full download decodes exact source assets using native base64 decoding where available and a byte-preserving fallback.
+
+In the mixed-grade family, the first learner uses the toolbar grade. The sibling uses Grade 4, or Grade 1 when the first learner uses Grade 4. Both profiles retain distinct, supported curriculum settings for the review.

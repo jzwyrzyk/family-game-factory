@@ -1,3 +1,4 @@
+import type {SceneCopyOptions} from '../creation/storage';
 import {IndexedRecords} from './indexed-records';
 import type {DurableRecord,RecordChange,RecordScope} from './record-contract';
 import {CreationStore,CREATION_KEY,CREATION_LIMITS,validateCreationWorkspace,type CreationWorkspace,type CreationEntry,type CreationRevision,type CreationDraft,type CreationAttempt} from '../creation/storage';
@@ -35,6 +36,7 @@ export class IndexedCreationStore {
  private async draft(id:string):Promise<CreationDraft|null>{const row=await this.row(D,id);if(!row||row.deleted)return null;const {sceneHash,...rest}=row.value as StoredDraft;return {...clone(rest),scene:await this.scene(sceneHash)};}
  async load(id:string){const project=await this.get(id),revision=await this.revision(project.headId,id);return {project,revision,scene:clone(revision.scene),draft:await this.draft(id)};}
  async historyPage(id:string,after:string|null=null,limit=24){await this.get(id);const rows=await this.records.page(history(id),after,limit+1),visible=rows.slice(0,limit),items:CreationRevision[]=[];for(const row of visible)items.push(await this.revision((row.value as any).id,id));return {items,next:rows.length>limit?visible.at(-1)!.id:null};}
+ async keptRevision(id:string){const project=await this.get(id);return project.keptId?this.revision(project.keptId,id):null;}
  async history(id:string){const items:CreationRevision[]=[];let after:string|null=null;do{const page=await this.historyPage(id,after,100);items.push(...page.items);after=page.next;}while(after);return items;}
  async attempts(id:string){await this.get(id);const rows=await this.all(attempts(id)),values:CreationAttempt[]=[];for(const pointer of rows){const row=await this.row(A,(pointer.value as any).id);if(row&&!row.deleted)values.push(clone(row.value) as CreationAttempt);}return values;}
  async recentChecks(limit=5){await this.ready();if(!Number.isInteger(limit)||limit<1||limit>50)throw Error('Choose a small recent-check page.');const result:{projectId:string;revisionId:string;title:string;challengeId:string;passed:boolean;hintUsed:boolean;checkedAt:string}[]=[];let after:string|null=null;while(result.length<limit){const rows=await this.records.page('creation-recent',after,limit-result.length);if(!rows.length)break;for(const pointer of rows){after=pointer.id;const p=await this.row(P,(pointer.value as any).projectId);if(!p||p.deleted)continue;const row=await this.row(A,(pointer.value as any).id);if(!row||row.deleted)continue;const a=row.value as CreationAttempt,r=await this.revision(a.revisionId,a.projectId);result.push({projectId:a.projectId,revisionId:a.revisionId,title:r.scene.title,challengeId:a.challengeId,passed:a.passed,hintUsed:a.hintUsed,checkedAt:a.checkedAt});}}return result;}
@@ -72,7 +74,7 @@ export class IndexedCreationStore {
  keep(id:string,head?:string){return this.edit(id,s=>s.keep(id,this.scope.profile,head));}
  autosave(id:string,scene:CreationProject,head:string){return this.edit(id,s=>s.autosave(id,this.scope.profile,scene,head));}
  discardDraft(id:string){return this.edit(id,s=>s.discardDraft(id,this.scope.profile));}
- copy(id:string,title?:string,options:{detachChallenge?:boolean}={}){return this.edit(id,s=>s.copy(id,this.scope.profile,title,options));}
+ copy(id:string,title?:string,options:SceneCopyOptions={}){return this.edit(id,s=>s.copy(id,this.scope.profile,title,options));}
  markHintUsed(id:string){return this.edit(id,s=>s.markHintUsed(id,this.scope.profile));}
  recordAttempt(id:string,head:string,result:{challengeId:string;passed:boolean;hintUsed:boolean;prediction?:MovementPrediction}){return this.edit(id,s=>s.recordAttempt(id,this.scope.profile,head,result));}
  async checkout(id:string,revisionId:string,expected?:string){const p=await this.get(id);if(expected!==undefined&&p.headId!==expected)throw Error('This scene changed elsewhere. Open its latest version.');const r=await this.revision(revisionId,id),row=await this.row(P,id);if((row?.value as CreationEntry).headId!==p.headId)throw Error('This scene changed elsewhere.');const next={...p,headId:r.id,title:r.scene.title,updatedAt:new Date().toISOString()};await this.records.commit({id:crypto.randomUUID(),scope:this.scope,changes:[{collection:P,id,value:next,expectedVersion:row!.version}]},{enqueue:false});return next;}

@@ -21,6 +21,33 @@ const {build}=require('esbuild'),{chromium}=require('playwright');
   await page.locator('[data-save]').click();await page.locator('.art-picture').waitFor({state:'detached'});
   assert.equal(await page.evaluate(async()=>{const d=await pictureTests.drawing('player1',window.testSource.id);return d.sha256===window.testSource.sha256&&window.testSaved.sourceId===d.id;}),true,'turning saves a derivative and preserves original identity');
   console.log('PASS picture tools: 1×4096 input, 1600×1 turn, exact original preserved');
+  await page.evaluate(async()=>{
+    const c=document.createElement('canvas');c.width=c.height=12;
+    const pen=c.getContext('2d');pen.fillStyle='#6a337a';pen.fillRect(3,3,6,6);
+    const file=await new Promise(ok=>c.toBlob(ok));window.cornerSource=await pictureTests.saveDrawing('player1','Cutout',file);
+    await pictureTests.editPicture('player1',window.cornerSource,async saved=>{window.cornerSaved=saved;},()=>true);
+  });
+  const pixels=()=>page.locator('[data-preview]').evaluate(c=>Array.from(c.getContext('2d').getImageData(0,0,c.width,c.height).data));
+  assert.equal(await page.locator('[data-smooth]').isChecked(),false);
+  const untouched=await pixels();
+  await page.locator('[data-smooth]').check();
+  const softened=await pixels();let softenedCount=0;
+  for(let i=3;i<softened.length;i+=4){
+    const diff=untouched[i]-softened[i];
+    assert.ok(diff===0||diff===8);
+    if(diff)softenedCount++;
+  }
+  assert.equal(softenedCount,4);
+  await page.locator('[data-undo]').click();assert.deepEqual(await pixels(),untouched);
+  await page.locator('[data-redo]').click();assert.deepEqual(await pixels(),softened);
+  await page.locator('[data-save]').click();await page.locator('.art-picture').waitFor({state:'detached'});
+  assert.equal(await page.evaluate(async()=>{
+    const original=await pictureTests.drawing('player1',window.cornerSource.id);
+    return original.sha256===window.cornerSource.sha256 && window.cornerSaved.sourceSha256===original.sha256
+      && window.cornerSaved.sha256!==original.sha256;
+  }),true);
+  console.log('PASS picture tools: opt-in corner smoothing, bounded alpha, undo/redo and immutable source');
+
 
   await page.evaluate(async()=>{window.beforeFailure=(await pictureTests.drawings('player1')).length;await pictureTests.editPicture('player1',window.testSource,async()=>{throw Error('Synthetic shelf refresh failed');},()=>window.testView);});
   await page.locator('[data-turn]').click();await page.locator('[data-save]').click();

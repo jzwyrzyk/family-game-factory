@@ -2,6 +2,18 @@
 
 The browser owns play, local creation and the learning host. The family gateway owns authorization and durable job admission. A separate preview origin runs generated content. The private worker and private coach have independent credentials, consent and spending boundaries. The family beta adds per-family workspaces and isolated origins. [Family architecture](docs/family-beta/ARCHITECTURE.md) · [Deployment and acceptance](DELIVERY-STATE.md)
 
+
+## Connected creative workspace
+
+The trusted My Art host stores one exact PNG per kept sketch revision in the existing private drawings database. Its private ancillary chunk carries the ordered, bounded paper document. The raster remains readable without that editor. Explicit Keep recovery uses the same database, owner and capacity controls. Existing image and rig pins remain the unit of saved playback. Drawing input and history can run without a store. [Drawing Workspace](docs/drawings/ART_STUDIO.md)
+
+Creative Studio reads the private library through its owner-scoped picker. The scene owns the actor role, pinned world and framing. A saved path can become editable movement actions. Generated V2 playback has a local synthetic qualification adapter with an explicit actor slot, bounded raster re-encoding and frame revocation. Production workers and generated clients have no route to My Art. [Creative Asset & World Design Standard](docs/creative-universe/STANDARD.md) · [Secure local game qualification](docs/game-intelligence/PREMIUM-BUILDER.md)
+
+
+Workstream E adds owner-notebook game-art plans and immutable local review tests on the existing My Art store. The synthetic review packager uses the archived premium worker and its trusted raster renderer. Online construction with selected art is held before dispatch. [Binding protocol](docs/game-art/README.md)
+
+The owner-scoped drawing, rig, native game and scene authorities implement separate parts of the [creative asset standard](docs/creative-universe/STANDARD.md). A family workshop's reviewed import verifies format, digest approval and the active profile before persisting the exact permitted PNG. Metadata-bearing files require another eligible file and exact operator review. Previously stored workshop reconstructions remain the recoverable copies available for those imports. The private game worker has no library access.
+
 ## Component and source map
 
 | Component | Responsibility and source of truth |

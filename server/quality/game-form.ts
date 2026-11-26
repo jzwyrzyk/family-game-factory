@@ -59,7 +59,8 @@ const patterns:readonly [GameFormSignal, readonly RegExp[]][]=[
   ['3d-looking-art', [
     /\b(?:3[\s-]?d|three[- ]dimensional)[- ](?:looking|style|art|graphics|appearance|effect)\b/gi,
     /\b(?:looks?|looking)\s+(?:like\s+)?3[\s-]?d\b/gi,
-    /\b(?:faux|fake)\s*3[\s-]?d\b/gi
+    /\b(?:faux|fake)\s*3[\s-]?d\b/gi,
+    /\b(?:picture|drawing|illustration|painting|sprite) of (?:a |the )?3[\s-]?d (?:model|mesh)\b/gi
   ]],
   ['3d-avoided',[
     /\b(?:no|without|avoid|skip) (?:a |any )?(?:free[- ]orbit camera|3d physics)\b/gi,
@@ -68,7 +69,7 @@ const patterns:readonly [GameFormSignal, readonly RegExp[]][]=[
   ['explicit-3d',[
     /\b(?:free[- ]orbit camera|orbit (?:the camera )?freely (?:around|in)|(?:free|unrestricted) flight (?:on|in) (?:all )?three axes|3d physics)\b/gi,
     /\b(?:true|real|full)\s*3[\s-]?d(?:imensional)?\b/gi,
-    /\b(?:3[\s-]?d|three[- ]dimensional)\s+(?:game|world|space|camera|environment|movement|navigation|maze)\b/gi,
+    /\b(?:3[\s-]?d|three[- ]dimensional)\s+(?:game|world|space|camera|environment|movement|navigation|maze|engine|mesh|model|asset[- ]conversion)\b/gi,
     /\b(?:fly|move|walk|navigate|travel)\s+(?:freely\s+)?(?:in|through)\s+(?:all\s+)?(?:three|3)\s+(?:dimensions|axes)\b/gi,
     /\b(?:move|fly|walk|navigate)\s+(?:forward|backward)\s+(?:in|through)\s+(?:depth|3d)\b/gi
   ]],

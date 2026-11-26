@@ -1,8 +1,12 @@
+import {sceneAssetSlots,sceneryPlacements,worldView,type CreationBlock,type CreationProject} from '../creation/model';
+import {retainedPins,validateGameArt} from '../game-art/bindings';
 /** One private transaction boundary for original art, physical versions and references. */
 import { assertRewardSourceWritable, rewardSourceWritable } from '../rewards/write-guard';
 import { validateAssembly } from './model';
 import type { Drawing } from '../assets/private-drawings';
 import type { SavedRig } from './store';
+import type { CreationWorkspace } from '../creation/storage';
+import type { Workspace } from '../factory/workspace';
 import { adultStorageKey } from '../adult-pilot/storage';
 
 export const ART_DB_NAME = 'family-private-drawings-v1';
@@ -10,7 +14,7 @@ export const ART_DB_VERSION = 3;
 export const ART_LIMITS = Object.freeze({ imageBytes: 5 * 1024 * 1024, imagePixels: 4096, storageBytes: 20 * 1024 * 1024, drawingsPerOwner: 100, rigsPerOwner: 200, designBytes: 8 * 1024 * 1024, bundleBytes: 64 * 1024 * 1024 });
 export type ArtGuard = () => boolean;
 export type ArtStoreName = 'drawings' | 'rigs' | 'active' | 'drafts' | 'usage' | 'meta' | 'drawingMetadata';
-export type ArtUsage = { id: string; owner: string; targetId: string; targetKind: 'scene' | 'game'; drawingId: string; rigId?: string };
+export type ArtUsage = { id: string; owner: string; targetId: string; targetKind: 'scene' | 'game'; drawingId: string; rigId?: string; title?:string; contexts?:string[]; usedAt?:string };
 const names: ArtStoreName[] = ['drawings', 'rigs', 'active', 'drafts', 'usage', 'meta', 'drawingMetadata'];
 
 export function artOwner(value: unknown): asserts value is string {
@@ -143,7 +147,7 @@ export async function registerArtUsage(owner: string, input: Omit<ArtUsage, 'id'
       if (!rig || rig.owner !== owner || rig.assembly.sourceId !== original.id || rig.assembly.sourceSha256 !== original.sha256) throw Error('Choose a saved movement version from this artwork.');
     }
     assertArtWrite(owner, guard);
-    const record: ArtUsage = { ...input, owner, id: JSON.stringify([owner, input.targetKind, input.targetId, input.drawingId, input.rigId || '']) };
+    const record: ArtUsage = { ...input, owner, usedAt:new Date().toISOString(), id: JSON.stringify([owner, input.targetKind, input.targetId, input.drawingId, input.rigId || '']) };
     transaction.objectStore('usage').put(record); return record;
   });
 }
@@ -154,21 +158,27 @@ export async function releaseArtUsage(owner: string, targetId: string, guard?: A
     assertArtWrite(owner, guard); for (const item of all) if (item.owner === owner && item.targetId === targetId) store.delete(item.id);
   });
 }
+function hasMotion(blocks: CreationBlock[]): boolean {
+  return blocks.some(block => ['move','jump','dance','animation'].includes(block.type)
+    || (block.type === 'repeat' && hasMotion(block.actions))
+    || (block.type === 'if' && (hasMotion(block.then) || hasMotion(block.else ?? []))));
+}
 /** Read the source histories as authority. A valid workspace can disprove an
  * obsolete index receipt; unavailable/corrupt source evidence cannot do so. */
-export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'owner'|'sha256'>[], rigs: SavedRig[], indexed: ArtUsage[]): ArtUsage[] {
+type PreparedHistories = {scene?: CreationWorkspace; game?: Workspace};
+export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'owner'|'sha256'>[], rigs: SavedRig[], indexed: ArtUsage[], prepared: PreparedHistories = {}): ArtUsage[] {
   const result = new Map<string, ArtUsage>(), known = new Set<ArtUsage['targetKind']>();
   const images = new Map(originals.filter(item => item.owner === owner).map(item => [item.id, item]));
   const versions = new Map(rigs.filter(item => item.owner === owner).map(item => [item.id, item]));
-  const add = (targetId: string, targetKind: ArtUsage['targetKind'], drawingId: string, rigId?: string) => {
+  const add = (targetId: string, targetKind: ArtUsage['targetKind'], drawingId: string, rigId?: string,title?:string,contexts:string[]=[]) => {
     const item: ArtUsage = { id: JSON.stringify([owner, targetKind, targetId, drawingId, rigId || '']), owner, targetId, targetKind, drawingId, ...(rigId ? { rigId } : {}) };
-    result.set(item.id, item);
+    if(title)item.title=title;
+    item.contexts=[...new Set([...(result.get(item.id)?.contexts ?? []),...contexts])];
+    result.set(item.id,item);
   };
   if (typeof localStorage !== 'undefined') for (const [kind, key] of [['scene', 'family-game-factory-creation-v1'], ['game', 'family-game-factory-workspace-v2']] as const) {
     try {
-      const raw = localStorage.getItem(adultStorageKey(key, owner.startsWith('adult:') ? owner : null));
-      if (!raw) continue;
-      const workspace = JSON.parse(raw);
+      const workspace = prepared[kind] ?? JSON.parse(localStorage.getItem(adultStorageKey(key, owner.startsWith('adult:') ? owner : null)) ?? 'null');
       if (!workspace || !Array.isArray(workspace.projects) || !Array.isArray(workspace.revisions) || kind === 'scene' && !Array.isArray(workspace.drafts)) continue;
       const owned = new Set(workspace.projects.filter((project: any) => project?.owner === owner && typeof project.id === 'string').map((project: any) => project.id));
       const allProjects = new Set(workspace.projects.map((project: any) => project?.id));
@@ -178,12 +188,19 @@ export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'own
         if (!owned.has(revision.projectId)) continue;
         if (kind === 'scene') {
           if (!revision.scene || !Array.isArray(revision.scene.actors)) { complete = false; continue; }
-          for (const actor of revision.scene.actors) {
+          for (const actor of sceneAssetSlots(revision.scene)) {
             if (typeof actor?.assetId !== 'string') { complete = false; continue; }
             const match = /^art:(image|rig):([A-Za-z0-9_-]{1,100}):([a-f0-9]{64})$/.exec(actor.assetId);
             if (!match) continue;
-            if (match[1] === 'image') { const image = images.get(match[2]); if (image?.sha256 === match[3]) add(revision.projectId, kind, image.id); }
-            else { const rig = versions.get(match[2]); if (rig && images.get(rig.assembly.sourceId)?.sha256 === rig.assembly.sourceSha256) add(revision.projectId, kind, rig.assembly.sourceId, rig.id); }
+            const scene=revision.scene as CreationProject, contexts=new Set<string>();
+            for(const placed of scene.actors.filter(a=>a.assetId===actor.assetId)){
+              contexts.add(placed.role ?? placed.creativeRole ?? (placed.layer==='backdrop'?'world background':'scene actor'));
+              if(scene.programs?.some(p=>p.actorId===placed.id && hasMotion(p.actions))) contexts.add('animation');
+            }
+            if(worldView(scene).assetId===actor.assetId)contexts.add('world background');
+            if(sceneryPlacements(scene).some(p=>p.assetId===actor.assetId))contexts.add('world decoration');
+            if (match[1] === 'image') { const image = images.get(match[2]); if (image?.sha256 === match[3]) add(revision.projectId, kind, image.id,undefined,scene.title,[...contexts]); }
+            else { const rig = versions.get(match[2]); if (rig && images.get(rig.assembly.sourceId)?.sha256 === rig.assembly.sourceSha256) add(revision.projectId, kind, rig.assembly.sourceId, rig.id,scene.title,[...contexts]); }
           }
         } else if (typeof revision.drawingRigId === 'string') {
           const rig = versions.get(revision.drawingRigId); if (rig && images.get(rig.assembly.sourceId)?.sha256 === rig.assembly.sourceSha256) add(revision.projectId, kind, rig.assembly.sourceId, rig.id);
@@ -192,16 +209,47 @@ export function deriveArtUsages(owner: string, originals: Pick<Drawing,'id'|'own
       if (complete) known.add(kind);
     } catch { /* Preserve indexed protection until the source is recoverable. */ }
   }
-  for (const item of indexed) if (item.owner === owner && !known.has(item.targetKind)) result.set(item.id, item);
+  if(typeof localStorage!=='undefined'){
+    const raw=localStorage.getItem(adultStorageKey('family-game-factory-studio-v1',owner.startsWith('adult:')?owner:null));
+    if(raw){
+      const notebook=JSON.parse(raw);
+      if(!Array.isArray(notebook.sessions))throw Error('Recover the studio notebook before checking picture usage.');
+      for(const session of notebook.sessions){
+        if(session?.owner!==owner||session.gameArt===undefined)continue;
+        validateGameArt(session.gameArt);
+        for(const pin of retainedPins(session.gameArt))add(session.id,'game',pin.drawingId);
+      }
+    }
+  }
+  for (const item of indexed) {
+    if (item.owner !== owner) continue;
+    const confirmed = result.get(item.id);
+    if (confirmed) {
+      if (typeof item.usedAt === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(item.usedAt) && Number.isFinite(Date.parse(item.usedAt))) {
+        confirmed.usedAt = item.usedAt;
+      }
+    } else if (!known.has(item.targetKind)) result.set(item.id, item);
+  }
   return [...result.values()];
 }
 export async function artUsages(owner: string, drawingId?: string): Promise<ArtUsage[]> {
   artOwner(owner);
+  const prepared: PreparedHistories = {};
+  if (import.meta.env?.MODE === 'storage-preview') {
+    const [{captureCreationRecovery}, {captureNativeRecovery}] = await Promise.all([import('../storage/creation-recovery'), import('../storage/native-recovery')]);
+    const check = () => {
+      if (String((window as any).FG.store.current().id) !== owner) throw Error('Open your art in your own profile.');
+    };
+    const [scenes, games] = await Promise.all([captureCreationRecovery([owner], check), captureNativeRecovery([owner], check)]);
+    check();
+    prepared.scene = scenes[0]?.workspace;
+    prepared.game = games[0]?.workspace;
+  }
   return withArtTransaction(['usage', 'drawingMetadata', 'rigs'], 'readonly', async transaction => {
     const indexed = await ownerArtRecords<ArtUsage>(transaction,'usage',owner);
     const originals = await ownerArtRecords<DrawingMetadata>(transaction,'drawingMetadata',owner);
     const rigs = await ownerArtRecords<SavedRig>(transaction,'rigs',owner);
-    return deriveArtUsages(owner, originals, rigs, indexed).filter(item => !drawingId || item.drawingId === drawingId);
+    return deriveArtUsages(owner, originals, rigs, indexed, prepared).filter(item => !drawingId || item.drawingId === drawingId);
   });
 }
 

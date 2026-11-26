@@ -2,8 +2,8 @@ import {drawingBlob, saveDrawing, type Drawing} from '../assets/private-drawings
 import {assertRewardSourceWritable} from '../rewards/write-guard';
 import {iconMarkup} from '../brand/icons';
 
-type PictureEdit = {left:number;top:number;right:number;bottom:number;turns:number;flip:boolean;paper:boolean};
-const initial = ():PictureEdit=>({left:0,top:0,right:0,bottom:0,turns:0,flip:false,paper:false});
+type PictureEdit = {left:number;top:number;right:number;bottom:number;turns:number;flip:boolean;paper:boolean;smooth:boolean};
+const initial = ():PictureEdit=>({left:0,top:0,right:0,bottom:0,turns:0,flip:false,paper:false,smooth:false});
 
 /** Remove connected near-white border paper only. Enclosed white details remain. */
 export function removeBorderPaper(image:ImageData):void {
@@ -14,6 +14,39 @@ export function removeBorderPaper(image:ImageData):void {
   while(start<end){const i=queue[start++],x=i%w;if(x>0)visit(i-1);if(x<w-1)visit(i+1);if(i>=w)visit(i-w);if(i<w*(h-1))visit(i+w);}
 }
 
+/** Soften exposed corners by at most eight alpha levels. Transparent pixels,
+ * fine lines, and the RGB of every mark stay exactly as they were. Read from a
+ * snapshot so a changed corner cannot grow into a neighboring pixel. */
+export function softenCutoutCorners(image: ImageData): void {
+  const {data, width, height} = image;
+  const alpha = new Uint8Array(width * height);
+  for (let i = 0; i < alpha.length; i++) alpha[i] = data[i * 4 + 3];
+  for (let y = 1; y + 1 < height; y++) {
+    for (let x = 1; x + 1 < width; x++) {
+      const i = y * width + x;
+      if (alpha[i] < 128) continue;
+      const horizontal = (alpha[i - 1] === 0 && alpha[i + 1] >= 128)
+        || (alpha[i + 1] === 0 && alpha[i - 1] >= 128);
+      const vertical = (alpha[i - width] === 0 && alpha[i + width] >= 128)
+        || (alpha[i + width] === 0 && alpha[i - width] >= 128);
+      if (horizontal && vertical) data[i * 4 + 3] = alpha[i] - 8;
+    }
+  }
+}
+
+/** Export visible pixels without private strokes or imported source metadata. */
+export async function visiblePicturePng(source:Drawing):Promise<Blob>{
+  const bitmap=await createImageBitmap(drawingBlob(source));
+  const canvas=document.createElement('canvas');
+  try{
+    canvas.width=bitmap.width;canvas.height=bitmap.height;
+    const ctx=canvas.getContext('2d');
+    if(!ctx)throw Error('This picture could not be downloaded.');
+    ctx.drawImage(bitmap,0,0);
+    return await new Promise<Blob>((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(Error('This picture could not be downloaded.')),'image/png'));
+  }finally{bitmap.close();canvas.width=canvas.height=1;}
+}
+
 /** Every picture edit creates a new local original derivative; never overwrites. */
 export async function editPicture(owner:string,source:Drawing,onSaved:(drawing:Drawing)=>Promise<void>,isCurrent:()=>boolean=()=>true){
   const FG=(window as any).FG,valid=()=>String(FG.store.current().id)===owner&&isCurrent();
@@ -21,7 +54,7 @@ export async function editPicture(owner:string,source:Drawing,onSaved:(drawing:D
   const bitmap=await createImageBitmap(drawingBlob(source));if(!valid()){bitmap.close();return;}
   const previous=document.activeElement as HTMLElement|null,dialog=document.createElement('dialog');dialog.className='art-picture';
   dialog.setAttribute('aria-labelledby','artPictureTitle');
-  dialog.innerHTML=`<header><div><span class="art-eyebrow">PICTURE TOOLS</span><h2 id="artPictureTitle">Get your picture ready</h2><p>Trim the edges. Turn it around. Keep your original.</p></div><button data-close class="art-button" aria-label="Close picture tools">${iconMarkup('close')}</button></header><div class="art-picture-layout"><div class="art-checker"><canvas data-preview aria-label="Preview of your edited picture" role="img"></canvas></div><div class="art-picture-tools"><label>New picture name<input data-name maxlength="60"></label><h3>Trim the edges</h3>${['left','top','right','bottom'].map(edge=>`<label>${edge[0].toUpperCase()+edge.slice(1)}<span><input data-edge="${edge}" type="range" min="0" max="45" value="0"><output data-value="${edge}">0%</output></span></label>`).join('')}<div class="art-action-row"><button data-turn class="art-button">${iconMarkup('retry')} Turn</button><button data-flip class="art-button" aria-pressed="false">${iconMarkup('arrow')} Flip</button></div><label class="art-check"><input type="checkbox" data-paper> Remove white paper around my drawing</label><p class="art-small">Best with plain white paper. White details inside a closed outline stay white.</p><div class="art-action-row"><button data-undo class="art-button">${iconMarkup('undo')} Undo</button><button data-redo class="art-button">${iconMarkup('undo','jems-icon--mirror')} Redo</button></div><button data-save class="art-button art-primary">${iconMarkup('save')} Save a new picture</button><p data-status role="status" aria-live="polite"></p></div></div>`;
+  dialog.innerHTML=`<header><div><span class="art-eyebrow">PICTURE TOOLS</span><h2 id="artPictureTitle">Get your picture ready</h2><p>Trim the edges. Turn it around. Keep your original.</p></div><button data-close class="art-button" aria-label="Close picture tools">${iconMarkup('close')}</button></header><div class="art-picture-layout"><div class="art-checker"><canvas data-preview aria-label="Preview of your edited picture" role="img"></canvas></div><div class="art-picture-tools"><label>New picture name<input data-name maxlength="60"></label><h3>Trim the edges</h3>${['left','top','right','bottom'].map(edge=>`<label>${edge[0].toUpperCase()+edge.slice(1)}<span><input data-edge="${edge}" type="range" min="0" max="45" value="0"><output data-value="${edge}">0%</output></span></label>`).join('')}<div class="art-action-row"><button data-turn class="art-button">${iconMarkup('retry')} Turn</button><button data-flip class="art-button" aria-pressed="false">${iconMarkup('arrow')} Flip</button></div><label class="art-check"><input type="checkbox" data-paper> Remove white paper around my drawing</label><p class="art-small">Best with plain white paper. White details inside a closed outline stay white.</p><label class="art-check"><input type="checkbox" data-smooth> Gently soften cutout corners</label><div class="art-action-row"><button data-undo class="art-button">${iconMarkup('undo')} Undo</button><button data-redo class="art-button">${iconMarkup('undo','jems-icon--mirror')} Redo</button></div><button data-save class="art-button art-primary">${iconMarkup('save')} Save a new picture</button><p data-status role="status" aria-live="polite"></p></div></div>`;
   document.body.append(dialog);
   const $=<T extends HTMLElement>(s:string)=>dialog.querySelector<T>(s)!;
   const canvas=$<HTMLCanvasElement>('[data-preview]'),ctx=canvas.getContext('2d')!,status=$<HTMLElement>('[data-status]');
@@ -32,9 +65,15 @@ export async function editPicture(owner:string,source:Drawing,onSaved:(drawing:D
   const paint=()=>{
     const x=Math.round(base.width*edit.left/100),y=Math.round(base.height*edit.top/100),w=Math.max(1,Math.round(base.width*(100-edit.left-edit.right)/100)),h=Math.max(1,Math.round(base.height*(100-edit.top-edit.bottom)/100));
     const cut=document.createElement('canvas');cut.width=w;cut.height=h;const c=cut.getContext('2d')!;c.drawImage(base,x,y,w,h,0,0,w,h);
-    if(edit.paper){const pixels=c.getImageData(0,0,w,h);removeBorderPaper(pixels);c.putImageData(pixels,0,0);}
+    if (edit.paper || edit.smooth) {
+      const pixels = c.getImageData(0,0,w,h);
+      if (edit.paper) removeBorderPaper(pixels);
+      if (edit.smooth) softenCutoutCorners(pixels);
+      c.putImageData(pixels,0,0);
+    }
     canvas.width=edit.turns%2?h:w;canvas.height=edit.turns%2?w:h;ctx.save();ctx.translate(canvas.width/2,canvas.height/2);ctx.rotate(edit.turns*Math.PI/2);ctx.scale(edit.flip?-1:1,1);ctx.drawImage(cut,-w/2,-h/2);ctx.restore();
     for(const key of ['left','top','right','bottom'] as const){$<HTMLInputElement>(`[data-edge="${key}"]`).value=String(edit[key]);$<HTMLOutputElement>(`[data-value="${key}"]`).value=edit[key]+'%';}
+    $<HTMLInputElement>('[data-smooth]').checked=edit.smooth;
     $<HTMLInputElement>('[data-paper]').checked=edit.paper;$<HTMLButtonElement>('[data-flip]').setAttribute('aria-pressed',String(edit.flip));$<HTMLButtonElement>('[data-undo]').disabled=!undo.length||busy;$<HTMLButtonElement>('[data-redo]').disabled=!redo.length||busy;
   };
   const change=(fn:(e:PictureEdit)=>void)=>{if(busy||closed||saved||!valid())return;undo.push({...edit});if(undo.length>30)undo.shift();redo=[];fn(edit);paint();};
@@ -42,6 +81,7 @@ export async function editPicture(owner:string,source:Drawing,onSaved:(drawing:D
   $<HTMLButtonElement>('[data-turn]').onclick=()=>change(e=>e.turns=(e.turns+1)%4);
   $<HTMLButtonElement>('[data-flip]').onclick=()=>change(e=>e.flip=!e.flip);
   $<HTMLInputElement>('[data-paper]').onchange=()=>change(e=>e.paper=$<HTMLInputElement>('[data-paper]').checked);
+  $<HTMLInputElement>('[data-smooth]').onchange=()=>change(e=>e.smooth=$<HTMLInputElement>('[data-smooth]').checked);
   $<HTMLButtonElement>('[data-undo]').onclick=()=>{if(busy||closed||saved||!valid()||!undo.length)return;redo.push({...edit});edit=undo.pop()!;paint();};
   $<HTMLButtonElement>('[data-redo]').onclick=()=>{if(busy||closed||saved||!valid()||!redo.length)return;undo.push({...edit});edit=redo.pop()!;paint();};
   $<HTMLButtonElement>('[data-save]').onclick=async()=>{
