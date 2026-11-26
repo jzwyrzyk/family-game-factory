@@ -128,3 +128,5 @@ The [review captures](previews/README.md) preserve the synthetic-profile [deskto
 The [local project journal](../storage/README.md) blocks ordinary source writes and family backup replacement while an intent remains. Startup reconciles it under the existing writer lock before reward projection; Adult recovery requires a fresh grant. Atomic Studio replies retain their reward outbox in the same source save. Earning amounts, lifetime receipt semantics, Pals progression and existing backup rollback formats are unchanged.
 
 Nook and Navi are the free starter choices. Welcoming an eligible Pal has always cost zero gems. Retiring Luma and Zippa therefore requires zero compensation and leaves the lifetime reward ledger intact. [Migration contract](../decisions/2026-11-25-journey-cards-and-starter-pals.md)
+
+Shared host presentation now consumes the [central design-system foundations](../design-system/README.md). Existing feature controllers, ownership, saves, original artwork, assessment and rewards remain authoritative; the [migration inventory](../design-system/INVENTORY.md) distinguishes adopted components from pending template work.

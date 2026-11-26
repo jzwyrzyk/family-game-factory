@@ -43,8 +43,8 @@ export function mountDesignSystemGallery(host: HTMLElement, navigate: (route: st
   const components=section('Components and states','ds-components');
   const actions=node('div','','ds-row');
   for(const variant of ['primary','secondary','quiet'] as const) actions.append(createAction({label:variant==='primary'?'Keep':variant==='secondary'?'Try again':'More choices',variant,onPress:()=>{notice.textContent='Synthetic action selected. No work was saved.';}}));
-  actions.append(createAction({label:'Building…',variant:'primary',disabled:true}),createAction({label:'Selected',icon:'check',onPress:()=>{}}));
-  actions.lastElementChild?.setAttribute('aria-pressed','true');
+  const selected=createAction({label:'Selected',icon:'check',onPress:()=>{selected.setAttribute('aria-pressed',String(selected.getAttribute('aria-pressed')!=='true'));}});selected.setAttribute('aria-pressed','true');
+  actions.append(createAction({label:'Building…',variant:'primary',disabled:true}),selected);
   const notice=node('p','Choose an example to inspect its interaction.');notice.setAttribute('role','status');
   components.append(actions,notice,node('p','Keyboard: Tab to a control, Enter or Space to activate. Native disabled controls do not activate. Focus remains visible.'));
   const cards=node('div','','jems-world-overview');
@@ -55,7 +55,7 @@ export function mountDesignSystemGallery(host: HTMLElement, navigate: (route: st
   const destinations=node('div','','jems-destinations');destinations.append(createDestinationCard('ds-art','My Art','Draw it. Make it yours.',hostArtworkPath('companionWave'),()=>navigate('art')),createDestinationCard('ds-creative','Creative Studio','Make scenes. Try ideas.',hostArtworkPath('workbench'),()=>navigate('coding')),createDestinationCard('ds-journey','My Journey','Pals, gems & your powers',hostArtworkPath('firstIdea'),()=>navigate('journey')));components.append(destinations);
   const navHost=node('div','','jems-world-page');navHost.append(createContextNavigation('Example Journey sections',[{key:'journey',label:'My Journey',onOpen:()=>navigate('journey')},{key:'pals',label:'My Pals',onOpen:()=>navigate('pals')},{key:'rewards',label:'Gems & achievements',onOpen:()=>navigate('rewards')}],'journey'));components.append(navHost);
   const dialog=node('dialog','','ds-dialog');const dialogTitle=node('h2','Example confirmation');dialogTitle.id='ds-confirm-title';dialog.setAttribute('aria-labelledby',dialogTitle.id);const dismiss=createAction({label:'Close',onPress:()=>dialog.close()});dialog.append(dialogTitle,node('p','This example does not alter a creation or profile.'),dismiss);
-  const open=createAction({label:'Open dialog',onPress:()=>{dialog.showModal();dismiss.focus();}});open.id='ds-open-dialog';dialog.addEventListener('close',()=>open.focus());const releaseFocus=containDialogFocus(dialog,dismiss);components.append(open,dialog);
+  const open=createAction({label:'Open dialog',onPress:()=>{dialog.showModal();dismiss.focus();}});open.id='ds-open-dialog';const releaseFocus=containDialogFocus(dialog,dismiss);components.append(open,dialog);
   const icons=node('details');icons.append(node('summary','Approved functional icons'));const iconGrid=node('div','','ds-icons');for(const name of ICON_NAMES){const label=node('span',name);label.prepend(createIcon(name));iconGrid.append(label);}icons.append(iconGrid);components.append(icons);
   const template=section('A page assembled from shared parts','ds-template');template.append(node('p','This collection uses the production page template and cards, with no page-specific stylesheet. Changing the shared header reaches Journey, Pals, Gems, Powers, My Creations, Notifications and this example.'));
   const sampleTitle=node('h2','My collection');const sampleDescription=node('p','Choose something to continue.');const sampleBody=node('div','','jems-world-overview');

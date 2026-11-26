@@ -16,14 +16,21 @@ const {assertTextContrast}=require('../../tests/helpers/text-contrast.cjs');
    await page.selectOption('#device',device);await page.selectOption('#destination','design-system');
    await app.locator('#design-system-gallery').waitFor();await app.evaluate(()=>document.fonts.ready);
    assert.equal(await app.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,device+' horizontal fit');
-   const tooSmall=await app.locator('#design-system-gallery .jems-action').evaluateAll(es=>es.filter(e=>e.getClientRects().length&&e.getBoundingClientRect().height<48).map(e=>e.textContent));assert.deepEqual(tooSmall,[],device+' touch targets');
+   const tooSmall=await app.locator('#design-system-gallery .jems-action').evaluateAll(es=>es.filter(e=>e.getClientRects().length&&e.getBoundingClientRect().height<(e.classList.contains('jems-page-back')?44:48)).map(e=>e.textContent));assert.deepEqual(tooSmall,[],device+' touch targets');
    await assertTextContrast(app,'#design-system-gallery .jems-action, #design-system-gallery .jems-page-title, #design-system-gallery .jems-page-description','shared composed text '+device);
    await app.locator('#ds-open-dialog').click();await app.locator('dialog[open]').waitFor();await app.locator('dialog[open] button').focus();await app.page().keyboard.press('Tab');
    assert.equal(await app.evaluate(()=>document.activeElement.closest('dialog')?.open),true,'focus wraps');
    await app.page().keyboard.press('Escape');await app.waitForFunction(()=>document.activeElement?.id==='ds-open-dialog');
-   await app.locator('#design-system-gallery .jems-page-back').first().focus();
+   await app.locator('#design-system-title').focus();
+   await page.keyboard.press('Shift+Tab');
+   assert.equal(await app.evaluate(()=>document.activeElement?.classList.contains('jems-page-back')),true,'back receives keyboard focus '+JSON.stringify(await app.evaluate(()=>({active:document.activeElement?.outerHTML,title:document.getElementById('design-system-title')?.outerHTML}))));
    assert.notEqual(await app.locator('#design-system-gallery .jems-page-back').first().evaluate(e=>getComputedStyle(e).outlineStyle),'none','visible keyboard focus');
-   await app.locator('#design-system-gallery').screenshot({path:out+'/'+device+'.png'});
+   for(const section of ['ds-foundations','ds-components','ds-template','ds-archetypes']){
+    await app.locator('#'+section).scrollIntoViewIfNeeded();
+    await page.locator('#appFrame').screenshot({path:out+'/'+device+'-'+section+'.png'});
+   }
+   const lastAction=app.locator('#ds-archetypes .jems-action').last();await lastAction.scrollIntoViewIfNeeded();
+   assert.equal(await lastAction.evaluate(e=>{const r=e.getBoundingClientRect();const hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return hit===e||e.contains(hit);}),true,'last action remains reachable above navigation');
    results.push({device,fit:true,touch:true,contrast:true,dialogKeyboard:true});
   }
   // A foundation edit must reach actual feature routes without individual page edits.

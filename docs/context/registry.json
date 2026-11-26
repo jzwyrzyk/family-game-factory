@@ -148,10 +148,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:38:12.735Z",
-      "sourceDigest": "6925af7797920346bfc5542e781245e8f039124dca019a6962d867f334a2a400",
+      "reviewedAt": "2026-11-26T05:09:19.897Z",
+      "sourceDigest": "33b6646b628d94e9223e619c980ffcadfc495666981c7a012357bcbee4ea394d",
       "reviewOutcome": "updated",
-      "reviewReason": "The first-creation contract now records single admission for repeated taps without changing saved-idea ownership or readiness rules.",
+      "reviewReason": "Recorded the owner-directed reuse principle and feature-authority boundaries; the inventory explicitly distinguishes accepted identity from pending integration and remaining archetypes.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -312,10 +312,10 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:37:55.191Z",
-      "sourceDigest": "9fc46a601c3012b0fd13afe7231ff32b111837e443a734f47bfa672e1a5056ce",
+      "reviewedAt": "2026-11-26T05:09:20.072Z",
+      "sourceDigest": "1a5b656592cc9c8a7d861d4eca61a9e7746f1c275bdbec4f53e57e6ca67e44f7",
       "reviewOutcome": "updated",
-      "reviewReason": "The first-creation contract records the per-idea Build gesture guard across async storage and review. Shared headings and navigation still use the guarded host routes.",
+      "reviewReason": "Reviewed the extracted header, destination, Journey cards, navigation focus loop and exact token substitutions against the existing child interface and current owner-directed reference. Documented six real template consumers and remaining specialist controls.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -412,10 +412,10 @@
         "tests/creation-*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fee0252694b94e3f1254485510ef5c6da2cbd6ca19ac18af19c0ec8e8e26b54d",
-      "reviewedAt": "2026-11-25T23:20:54.040Z",
+      "sourceDigest": "dcdd6ca93fbdd5188bbe3af992d78bd4775f3b31dd24bb9450d6caa71d091ea0",
+      "reviewedAt": "2026-11-26T05:09:20.598Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The scene rendering contract distinguishes legacy pinned tokens and neutral bytes from new active actor choices.",
+      "reviewReason": "Reviewed the Creation CSS diff: only exact color literals become aliases. Interpreter, Keep, challenges, learning and original artwork logic are unchanged; documented the separate selected Creative integration checkpoint.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -499,10 +499,10 @@
         "docs/rewards/previews/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "e44b2afc02a371f2c0a63299a8fb7d062b5048a1f6519daa31c05b5dd2056fad",
-      "reviewedAt": "2026-11-25T23:20:54.641Z",
+      "sourceDigest": "b60a852e6e0687f22ef896e7be47afd66a8f14114e0a89cc118322df19897ba0",
+      "reviewedAt": "2026-11-26T05:09:20.675Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed grant and Pal acquisition code. Original unlocks never spent lifetime gems, so policy conversion issues no refund or grant.",
+      "reviewReason": "Reviewed shared button construction, collection header imports and exact CSS aliases. The ledger, grant projection, saved receipts, eligibility and guarded callbacks are unchanged and remain feature-owned.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -893,10 +893,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:23:11.824Z",
-      "sourceDigest": "5f7b1ef674e2b84dd647d329848d15cf1839bc2b621d5472752fe3445bcdc3d3",
+      "reviewedAt": "2026-11-26T05:09:20.747Z",
+      "sourceDigest": "4cd0489667a77ad2c6d956e572e2b233703fd4563e73274d908c0000a0e47189",
       "reviewOutcome": "updated",
-      "reviewReason": "Delivery state records the failed hosted Pal reload and the visible onboarding path. The exact same regression commands, assertions, rendering code and timeouts remain in force, with two new pre-navigation persistence assertions.",
+      "reviewReason": "Added focused source negative tests and production gallery checks to the existing standalone chain. Retained full product tests and documented four-view coverage, keyboard, contrast and exact-source limits without claiming pipeline-wide enforcement.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1137,10 +1137,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T01:23:12.305Z",
-      "sourceDigest": "3a5ab9bfd335677e581d5e32600605a1c3cf253d9a45b9e0e271b77ea454684f",
+      "reviewedAt": "2026-11-26T05:09:20.863Z",
+      "sourceDigest": "2a47776af2742cf7a9343419690f4a73f24a85f1f747bb22eecf8b9a6d06d6d2",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the passing protected-main suite and the subsequent failed documentation-candidate Pal shard with its retained evidence and correction.",
+      "reviewReason": "Recorded this implementation as a non-deploying foundation increment on the frozen source; Learning, Creative and Phase 2 retain independent gates and no production or worker pin changed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1395,10 +1395,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:58.459Z",
-      "sourceDigest": "37c0c3f9ee5432f31d4741e23cb41fe2cc54569af18aec957152e780590aad46",
+      "reviewedAt": "2026-11-26T05:09:20.996Z",
+      "sourceDigest": "90fb888816066be30ebddc71bc48351cce00896eca74e0b62a3aabfab4817692",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the roster and Journey decision with companion contracts and updated the documentation index.",
+      "reviewReason": "Added canonical guide and inventory retrieval to AGENTS and the documentation registry, plus PR reuse evidence guidance. Existing review fingerprints and policy authority remain enforced.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1499,10 +1499,10 @@
         "tests/parent-dashboard*"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "6eec1383215c1abfc6281933bfd4372a504d5690ffdefb790d290486b8ab4f3f",
-      "reviewedAt": "2026-11-25T16:41:38.340Z",
+      "sourceDigest": "14eb7a52bfb7480a84f51d3ff6fb148a90c4a921ce023227abccbf0081dd00a2",
+      "reviewedAt": "2026-11-26T05:09:21.097Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented lazy Parent snapshots from the active scene authority, late-result owner/request fences and unavailable prepared-source errors; reporting remains read-only with existing learning interpretation.",
+      "reviewReason": "Reviewed native button delegation and exact color aliases in the Parent view. Reporting queries, retained evidence, grades, consent and profile access remain unchanged; documented presentation ownership.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-19T17:17:56.552Z",
@@ -1580,10 +1580,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "b2c55a9dc03986bb12d1396de7e56859273c25b444b57611e930bc3e6004534c",
-      "reviewedAt": "2026-11-25T23:20:59.505Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Character inventory marks Luma and Zippa as historical and records active profile counts. Nook and Navi retain their existing approved Base and Grown artwork.",
+      "sourceDigest": "20643dcb759698aff9798a5ceb54a91640ed70e530218315b201083d8f23a390",
+      "reviewedAt": "2026-11-26T05:09:21.164Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Only the Pal runtime contract now links shared presentation documentation. No original image, character design, selected form, art approval, expression or transparency algorithm was edited.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1619,10 +1619,10 @@
         "tests/picture-tools-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "467544c05466d8d0c1045244fa942dbfccf7b81e1e04635e8f5ecae1c0b62afc",
-      "reviewedAt": "2026-11-25T23:21:00.320Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "My Creations uses the shared header and retains the My Art action. The drawing library, private assets and editor use the inherited My Art contract.",
+      "sourceDigest": "48b08da349634e58e5a2a44cbad2cc552550db0a82ec378585f1b73c27b925a8",
+      "reviewedAt": "2026-11-26T05:09:21.498Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed Art CSS exact color substitutions against the preserved My Art composition. Original pixels, transforms, masks, metadata, movement revisions and recovery controllers are unchanged; workspace extraction remains a dependent checkpoint.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1664,10 +1664,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "ada2accbff6a1c4c26061297e83a2ab48bdb799664d38749f63d7cf76e56d403",
-      "reviewedAt": "2026-11-26T01:23:10.842Z",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The reload regression verifies the retained owner, active Navi and timestamp before and after the visible maker welcome. Starter rules, menu behavior and approved artwork are unchanged.",
+      "sourceDigest": "6b07e2cc4e3b803e6c90b4ea63acfe7d1c47c6716ac959f1cc41e88ec85fe59e",
+      "reviewedAt": "2026-11-26T05:09:21.587Z",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed header/action/card extraction and CSS token aliases. The catalog, ownership checks, two forms, source paths, transparency preparation and same-form error fallback retain their original implementations.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1724,10 +1724,10 @@
         "docs/design-system/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "0000000000000000000000000000000000000000000000000000000000000000",
-      "reviewedAt": "2026-11-26T00:00:00.000Z",
+      "sourceDigest": "f469c7c661c020e8eb3e35be668691a13ba751d3230458431097231d87df0531",
+      "reviewedAt": "2026-11-26T05:09:21.994Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Shared design foundations and actual collection consumers are documented with explicit pending feature integration and acceptance gates."
+      "reviewReason": "Documented narrow production interfaces, actual six-page adoption, gallery reuse, strict shared-source checks and scoped exceptions; retained explicit pending Learning/Creative integration, seven further archetypes and owner/device acceptance."
     }
   ]
 }
