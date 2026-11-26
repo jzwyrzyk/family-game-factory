@@ -422,7 +422,7 @@
       ],
       "reviewAfterDays": 30,
       "sourceDigest": "ccb1eee156f416b8a80f59aac740ad26056427bdd4974ca14aa4668ca520fcdc",
-      "reviewedAt": "2026-11-26T03:39:27.228Z",
+      "reviewedAt": "2026-11-26T03:44:26.790Z",
       "reviewOutcome": "updated",
       "reviewReason": "Architecture records the localhost-only launch beside actor appearance and saved joint controls in the merged scene editor.",
       "reviewHistory": [
@@ -745,7 +745,7 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:39:27.415Z",
+      "reviewedAt": "2026-11-26T03:44:26.982Z",
       "sourceDigest": "06ea1cfffc2016285163697abf332e57e44caac7908bc4d5ee74acb21c46864b",
       "reviewOutcome": "updated",
       "reviewReason": "Planning and coding require original child art and a 2D canvas within the established companion and premium budgets.",
@@ -903,10 +903,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:39:27.583Z",
-      "sourceDigest": "77e76ad02c4f821fc47cfa1783f351fe0ecf0da1fe2aaf28619b581462f8165a",
+      "reviewedAt": "2026-11-26T03:44:27.180Z",
+      "sourceDigest": "30d777e3766c9dc3e6441c77164c36f4238ba5083a3291891054e065f89b9dc0",
       "reviewOutcome": "updated",
-      "reviewReason": "The qualification contract and delivery record cover the isolated synthetic game, original silhouette, replay and learning interruption.",
+      "reviewReason": "Offline shell checks verify versioned static world files and exclude private routes; the separate review build exercises synthetic sprite gameplay.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1147,8 +1147,8 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:39:27.785Z",
-      "sourceDigest": "a2fc2e18f70c0c39493cc7f565f714ba151fddc19223b604ebfb908e504caf0b",
+      "reviewedAt": "2026-11-26T03:44:27.409Z",
+      "sourceDigest": "c463a838951862898344793bd26f8adfe6bb707ddf5a39aaeb1c0bdf051dd7e7",
       "reviewOutcome": "updated",
       "reviewReason": "The learner workflow exercises the dedicated local review build while ordinary game delivery remains independently gated.",
       "reviewHistory": [
