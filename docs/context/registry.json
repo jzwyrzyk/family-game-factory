@@ -903,10 +903,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:38:30.111Z",
-      "sourceDigest": "e752013d215d8d312af88bc777bd311d65fbd521da849f6a12dcbf6ae6415827",
+      "reviewedAt": "2026-11-26T03:44:04.033Z",
+      "sourceDigest": "6250f981436ceaa3a5cade8b53a75f54a098c4b896ae8b8fc4a1c201b1520e42",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded synthetic cross-library round trips, all seven independent artwork comparisons, three real playback recordings and the portrait and checkpoint regressions.",
+      "reviewReason": "Verified the 48 pinned public world assets and three offline-decoded scene layers alongside existing private endpoint, practice, storage and recovery checks; recorded results in the delivery record.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1147,10 +1147,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:38:30.314Z",
-      "sourceDigest": "2e34f4fbb53298a28e5b6763cccb518335a83757ed09f984973c14fbbc85a9b3",
+      "reviewedAt": "2026-11-26T03:44:04.231Z",
+      "sourceDigest": "7b9569db3b02a67e355fd5e1118879981ac71338d629a7262a0e2effe42b7120",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated the integrated input head, concurrent PR compatibility checks, release dependencies and local qualification boundaries.",
+      "reviewReason": "Recorded the final integrated input head, offline playback evidence and current parallel workstreams; protected and hosted release gates retain separate authority.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
