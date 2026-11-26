@@ -1,3 +1,8 @@
+import {createLearningWorkspace} from '../learning/workspace/shell';
+import {profileGrade} from '../learning/engine';
+import {decodingDescriptions,positionDescriptions} from './picture-access';
+import {mountTileBoard} from './tile-board';
+import {literacyInteraction, mountBeatCounter, mountPassage} from './reading-workspace';
 import {earlyInstruction} from '../learning/early/audio';
 import {picture,hasPicture} from '../learning/early/pictures';
 import {isEarlyGrade} from '../learning/grades';
@@ -26,66 +31,76 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
   let timer:ReturnType<typeof setTimeout>|undefined;
   const listeners=new AbortController();
   const on=(node:EventTarget,event:string,handler:EventListener)=>node.addEventListener(event,handler,{signal:listeners.signal});
-  const root=make('section','language-activity');
-  root.dataset.subject='language';root.dataset.skillId=item.skillId;root.dataset.kind=item.kind;
+  const interaction= literacyInteraction(item);
+  const titleText = interaction === 'punctuation' ? 'Which mark ends this sentence?' : item.question;
+  const shell=createLearningWorkspace({subject:'language',grade:profileGrade(options.profile),title:titleText,id:prefix+'-title',
+    owner:String(options.profile.id??''),gameId:options.context?.gameId,onLeave:options.onLeave,signal:listeners.signal});
+  const {root,title,work,feedback,helpPanel:hintPanel}=shell;
+  root.dataset.skillId=item.skillId;root.dataset.kind=item.kind;root.dataset.interaction=interaction;
   root.dataset.mode=mode;root.dataset.attemptId=attempt.id;
-  root.setAttribute('role','group');root.setAttribute('aria-labelledby',prefix+'-title');
-  const title=make('h2','language-question',item.question);title.id=prefix+'-title';title.tabIndex=-1;
-  if(options.onLeave){
-    const top=make('div','language-topbar');
-    const leave=button('Back to Games','language-leave','arrow','jems-icon--back');leave.dataset.action='leave-game';
-    on(leave,'click',()=>{if(!disposed&&!done)options.onLeave?.();});
-    top.append(leave);root.append(top);
-  }
-  root.append(title);
-  if(item.passage){
-    const story=make('section','language-passage');
-    story.setAttribute('aria-label','Read this passage');
-    const passageLabel=make('p','language-passage-label');setIconLabel(passageLabel,'book','READ THE CLUE');
-    story.append(passageLabel,make('p','language-story-text',item.passage));
-    root.append(story);
-  }
-  const early=isEarlyGrade(item.grade);root.classList.toggle('early-activity',early);
+  feedback.id=prefix+'-feedback';
+  if(item.passage && interaction!=='fill-gap') mountPassage(shell.stimulus,item,listeners.signal,submit);
+  const early=isEarlyGrade(item.grade);root.classList.toggle('early-activity',isEarlyGrade(profileGrade(options.profile)));root.classList.toggle('language-early-item',early);
   if(item.stimulus){
     const stimulus=make('span','early-word');
-    if(item.stimulus.startsWith('picture:'))stimulus.append(picture(item.stimulus.slice(8)));else stimulus.textContent=item.stimulus;
-    root.append(stimulus);
+    if(item.stimulus.startsWith('picture:')){
+      const name=item.stimulus.slice(8);
+      const illustration=picture(name);
+      if(interaction==='fill-gap')illustration.alt=decodingDescriptions[name];
+      stimulus.append(illustration);
+    } else {
+      stimulus.textContent=item.stimulus;
+      if(item.domain==='early-reading'){
+        stimulus.setAttribute('role','img');
+        stimulus.setAttribute('aria-label','Letters '+item.stimulus.toUpperCase().split('').join(', '));
+      }
+    }
+    shell.stimulus.append(stimulus);
   }
   const instruction=early?earlyInstruction(()=>item.question,String(options.profile.id),()=>!disposed&&!done&&!locked,
     mode=>{if(attempt.promptDelivery!=='grown-up')attempt.promptDelivery=mode;save();}):null;
+  const directions = interaction==='select-word' ? 'Tap the word in the sentence, then check it.' :
+    interaction==='evidence' ? 'Choose a line in the passage. Then check your evidence.' :
+    interaction==='creative' ? 'Write your own idea and save your writing.' :
+    interaction==='edit' ? 'Read the sentence. Write your corrected sentence, then check it.' :
+    item.tiles ? 'Tap the pieces in order. Then check your work.' :
+    interaction==='fill-gap'||interaction==='punctuation' ? titleText : 'Read the question and choose your answer.';
   const questionReading=instruction??createReadAloudControl({
-    text:()=> (item.passage?item.passage+'. ':'')+item.question+'. '+(item.choices||[]).map((choice,index)=>'Option '+(index+1)+': '+choice.label+'.').join(' '),
-    canRead:()=>!disposed&&!done&&!locked,
-    buttonClass:'language-secondary',
-    onStarted:()=>{recordLanguageReadAloud(options.profile,attempt.id);save();},
+    text:()=>directions, label:'Hear directions',canRead:()=>!disposed&&!done&&!locked,
   });
   questionReading.element.classList.add('language-reading-row');
-  questionReading.notice.classList.add('language-reading-notice');
-  root.append(questionReading.element);
-  const work=make('div','language-work');root.append(work);
-  const feedback=make('p','language-feedback');feedback.id=prefix+'-feedback';
-  feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');
-  root.append(feedback);
+  shell.header.append(questionReading.element);
   const helpControls=make('div','language-help-controls');
-  const hintButton=button('A little hint','language-secondary','help');
+  const hintButton=button('Help','language-secondary','help');
   hintButton.dataset.action='hint';
   const showButton=button('Show an example','language-secondary','book');
-  showButton.dataset.action='show-solution';helpControls.append(hintButton,showButton);root.append(helpControls);
-  const hintPanel=make('section','language-hint');hintPanel.hidden=true;
+  showButton.dataset.action='show-solution';helpControls.append(hintButton,showButton);shell.footer.append(helpControls);
+  const targetReading=early?null:createReadAloudControl({
+    text:()=> [item.question,item.passage,...(item.choices??[]).map(choice=>choice.label)]
+      .filter(Boolean).map(part => String(part).replace(/\b(ai|ay|ee|ea|oa|oo|sh|ch|th|wh)\b/gi,
+        letters=>'letters '+letters.toUpperCase().split('').join(', '))).join('. '),
+    label:'Read with me',canRead:()=>!disposed&&!done&&!locked,
+    onStarted:()=>{recordLanguageReadAloud(options.profile,attempt.id);save();},
+  });
+  if(targetReading){
+    targetReading.button.dataset.action='read-target';
+    targetReading.notice.classList.add('language-reading-notice');
+    shell.footer.append(targetReading.element);
+  }
+  shell.connectHelp(hintButton);
   const hintTitle=make('h3');hintTitle.id=prefix+'-hint-title';hintTitle.tabIndex=-1;
   const hintText=make('p');hintPanel.append(hintTitle,hintText);
   const hintReading=createReadAloudControl({text:()=>hintTitle.textContent+'. '+hintText.textContent,
     label:'Read the help',buttonClass:'language-secondary',canRead:()=>!disposed&&!done&&!locked&&!hintPanel.hidden});
   hintReading.button.dataset.action='read-help';
-  const stopReading=()=>{questionReading.stop();hintReading.stop();};
-  root.append(hintPanel);
+  const stopReading=()=>{questionReading.stop();targetReading?.stop();hintReading.stop();};
   const saving=make('p','language-save-warning','Practice could not be saved. Ask a grown-up before leaving this page.');
   saving.hidden=true;saving.setAttribute('role','alert');root.append(saving);
   target.replaceChildren(root);
   on(root,'keydown',event=>event.stopPropagation());
   on(root,'keyup',event=>event.stopPropagation());
   function save() {
-    try { const result=options.onSave(attempt) as unknown;if(result===false)saving.hidden=false; }
+    try { const result=options.onSave(attempt) as unknown;saving.hidden=result!==false; }
     catch {saving.hidden=false;}
   }
   save();
@@ -100,24 +115,25 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     const state=outcome==='explored'?'explored':outcome==='shown'?'shown':outcome==='incorrect'?'incorrect':'completed';
     finishLanguageAttempt(options.profile,attempt.id,state);save();
     root.querySelectorAll<HTMLButtonElement|HTMLInputElement|HTMLTextAreaElement>('button,input,textarea').forEach(n=>n.disabled=true);
-    stopReading();
+    stopReading();shell.dispose();
     options.onComplete({independent,outcome,attemptId:attempt.id,item,mode});
   }
   function showWorked(){
     if(disposed||done||locked)return;
-    stopReading();hintDepth=4;useLanguageHint(options.profile,attempt.id,4);save();
+    stopReading();shell.setHelpState(true);hintDepth=4;useLanguageHint(options.profile,attempt.id,4);save();
     hintPanel.hidden=false;hintTitle.textContent='Here is how to solve it';hintText.textContent=item.explanation;
     const go=button('Continue my game','language-primary','play');go.dataset.action='continue-supported';
     on(go,'click',()=>complete('shown',false));hintPanel.replaceChildren(hintTitle,hintText,go,hintReading.element);
     hintButton.disabled=true;showButton.disabled=true;
-    feedback.dataset.state='support';feedback.textContent='You explored this idea. You can try a new one another time.';
+    shell.setFeedback('support','You explored this idea.');
+    work.inert=true;shell.stimulus.inert=true;
     focus(hintTitle);
   }
   function hint(explicit=true){
     if(disposed||done||locked)return;
     if(hintDepth>=3){showWorked();return;}
-    stopReading();hintDepth++;useLanguageHint(options.profile,attempt.id,hintDepth);save();
-    hintPanel.hidden=false;hintTitle.textContent='Hint '+hintDepth+' of 3';
+    stopReading();shell.setHelpState(false);hintDepth++;useLanguageHint(options.profile,attempt.id,hintDepth);save();
+    root.dataset.languageHint=String(hintDepth);hintPanel.hidden=false;hintTitle.textContent='Hint '+hintDepth+' of 3';
     hintText.textContent=item.hints[hintDepth-1];hintPanel.replaceChildren(hintTitle,hintText,hintReading.element);
     setIconLabel(hintButton,'help',hintDepth>=3?'Show how':'Another hint');
     if(explicit)focus(hintTitle);
@@ -125,96 +141,84 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
   on(hintButton,'click',()=>hint());
   on(showButton,'click',showWorked);
   function submit(raw:string){
-    if(disposed||done||locked||instruction&&!instruction.ready())return;stopReading();
+    if(disposed||done||locked||hintDepth===4||instruction&&!instruction.ready())return;stopReading();
     const result=submitLanguageAnswer(options.profile,attempt.id,raw);save();
-    if(!result.valid){feedback.dataset.state='input';feedback.textContent=result.message||'Choose an answer first.';return;}
+    if(!result.valid){shell.setFeedback('input',result.message||'Choose an answer first.');return;}
     if(result.correct){
-      locked=true;feedback.dataset.state='correct';
-      setIconLabel(feedback,'check',result.attempt.independent?'You figured it out!':'Nice work exploring that with help!');
+      locked=true;shell.setFeedback('correct',result.attempt.independent?'You figured it out!':'You worked through it!');
       root.querySelectorAll<HTMLButtonElement|HTMLInputElement|HTMLTextAreaElement>('button,input,textarea').forEach(n=>n.disabled=true);
       timer=setTimeout(()=>complete('completed',result.attempt.independent),650);
       return;
     }
-    wrong++;feedback.dataset.state='incorrect';
-    feedback.textContent=wrong===1?'Not quite. Try looking at the clue again.':'Still learning! A hint can help.';
+    wrong++;shell.setFeedback('incorrect',wrong===1?'Try another way.':'A hint can help.');
     if(wrong>=3){showWorked();return;}
     if(options.profile.hints!==false)hint(false);
   }
-  if(item.kind==='choice'&&item.choices){
+  if(interaction==='sound-taps'){
+    mountBeatCounter(work,item,listeners.signal,submit);
+  } else if(interaction==='evidence'||interaction==='select-word'){
+    // The reviewable response is submitted directly from the visible passage.
+  } else if(item.kind==='choice'&&item.choices){
     const grid=make('div','language-choice-grid');grid.setAttribute('role','group');grid.setAttribute('aria-label','Choose an answer');
+    let slot:HTMLElement|undefined, check:HTMLButtonElement|undefined, selected='';
+    if(interaction==='fill-gap'||interaction==='punctuation'){
+      const text=interaction==='fill-gap'?item.passage!:item.question.split(': ').slice(1).join(': ')+'__';
+      const [first,rest]=text.split('__');
+      const pattern=make('p','language-pattern');slot=make('span','language-gap','…');
+      pattern.append(first,slot,rest??'');shell.stimulus.append(pattern);
+      check=button('Check','language-primary','check');check.disabled=true;
+      check.dataset.action='check-gap';
+      on(check,'click',()=>submit(selected));
+    }
     for(const choice of item.choices){
       const b=button(choice.label,'language-choice');
-      if(early&&hasPicture(choice.value))b.replaceChildren(picture(choice.value));
+      if(early&&hasPicture(choice.value)){
+        const illustration=picture(choice.value);
+        if(item.skillId==='k-ela-printed-word')illustration.alt=decodingDescriptions[choice.value];
+        b.replaceChildren(illustration);
+      }
       if(item.skillId==='k-ela-common-word'){
-        b.setAttribute('aria-label',choice.value);
+        b.setAttribute('aria-label',positionDescriptions[choice.value]);
         if(choice.value==='up'||choice.value==='down')b.textContent=choice.value==='up'?'↑':'↓';
         else {b.textContent='';const box=make('span','early-box');box.dataset.position=choice.value;box.append(picture('ball'));b.append(box);}
       }
-      b.dataset.value=choice.value;
+      b.dataset.value=choice.value;b.setAttribute('aria-pressed','false');
       on(b,'click',()=>{
         for(const other of grid.querySelectorAll('button'))other.setAttribute('aria-pressed',String(other===b));
-        submit(choice.value);
+        if(slot && check){selected=choice.value;slot.textContent=selected;check.disabled=false;}
+        else submit(choice.value);
       });
       grid.append(b);
     }
-    work.append(grid);
+    work.append(grid);if(check)work.append(check);
   } else if((item.kind==='picture-order'||item.kind==='word-tiles'||item.kind==='sentence-tiles')&&item.tiles){
-    const pictureOrder=item.kind==='picture-order';
-    const sentence=pictureOrder||item.kind==='sentence-tiles';
-    const selected:number[]=[];const tray=make('div','language-tile-tray');
-    const output=make('output','language-built');output.setAttribute('aria-live','polite');
-    output.setAttribute('aria-label',pictureOrder?'Pictures in your story':sentence?'Sentence you built':'Word you built');
-    const hint=make('p','language-tile-instruction',pictureOrder?'Tap the pictures in story order.':sentence?'Tap the words in the order they belong.':'Tap the letters to build the word.');
-    const tiles=item.tiles.map((token,i)=>{
-      const b=button(token,'language-tile');b.dataset.tile=String(i);
-      if(pictureOrder){b.replaceChildren(picture(token));b.setAttribute('aria-label',token);}
-      on(b,'click',()=>{if(locked||selected.includes(i))return;selected.push(i);redraw();});
-      tray.append(b);return b;
-    });
-    function assembled(){return selected.map(i=>item.tiles![i]).join(sentence?' ':'');}
-    function redraw(){
-      const text=assembled();output.textContent=text||'Your '+(sentence?'sentence':'word')+' will appear here';
-      if(pictureOrder){
-        output.replaceChildren(...selected.map(i=>picture(item.tiles![i])));
-        output.setAttribute('aria-label','Your story: '+selected.map(i=>item.tiles![i]).join(', '));
-      }
-      tiles.forEach((b,i)=>b.disabled=locked||selected.includes(i));
-      check.disabled=locked||selected.length===0;
-      undo.disabled=locked||selected.length===0;
-      clear.disabled=locked||selected.length===0;
-    }
-    const controls=make('div','language-tile-actions');
-    const undo=button('Undo last','language-secondary','undo'),clear=button('Clear','language-secondary','close');
-    const check=button(pictureOrder?'Check my story':'Check my '+(sentence?'sentence':'word'),'language-primary','check');
-    check.dataset.action='check-tiles';
-    on(undo,'click',()=>{selected.pop();redraw();});
-    on(clear,'click',()=>{selected.length=0;redraw();});
-    on(check,'click',()=>submit(assembled()));
-    controls.append(undo,clear,check);work.append(hint,output,tray,controls);redraw();
+    mountTileBoard(work,item,listeners.signal,()=>!locked&&!done&&!disposed,submit);
   } else if(item.kind==='edit'){
     const form=make('form','language-edit-form');form.noValidate=true;
     const label=make('label',undefined,'Write the corrected sentence');
-    const field=make('input','language-edit-input');field.id=prefix+'-edit';field.type='text';
+    const field=make('textarea','language-edit-input');field.id=prefix+'-edit';field.rows=3;field.spellcheck=false;field.autocapitalize='off';
     field.autocomplete='off';field.maxLength=200;field.setAttribute('aria-describedby',feedback.id);
     label.htmlFor=field.id;
+    // Only an explicit source sentence from the question may seed the revision.
+    const sourceSentence=item.question.split(': ')[1];
+    if(sourceSentence && sourceSentence!==item.answer)field.value=sourceSentence;
     const check=button('Check my sentence','language-primary','check');check.type='submit';
     on(form,'submit',ev=>{ev.preventDefault();submit(field.value);});
     form.append(label,field,check);work.append(form);
   } else if(item.kind==='creative'){
     helpControls.hidden=true;
     const form=make('form','language-creative-form');form.noValidate=true;
-    const label=make('label',undefined,'Write your idea (no grade)');
+    const label=make('label',undefined,'Your writing');
     const field=make('textarea','language-creative-input');field.id=prefix+'-write';
     field.maxLength=1200;field.rows=5;label.htmlFor=field.id;
-    const note=make('p','language-creative-note','There is no single right answer.');
     const go=button('Save my writing and keep playing','language-primary','save');go.type='submit';
     on(form,'submit',ev=>{
       ev.preventDefault();
       const result=saveCreativeDraft(options.profile,attempt.id,field.value);
-      if(!result.valid){feedback.dataset.state='input';feedback.textContent=result.message||'Write your idea first.';return;}
+      if(!result.valid){shell.setFeedback('input',result.message||'Write your idea first.');return;}
       save();complete('explored',false);
     });
-    form.append(label,field,note,go);work.append(form);
+    form.append(label,field,go);work.append(form);
   } else throw Error('Unsupported reviewed language interaction.');
   // Focus the question, not the input: no surprise software keyboard on tablets.
   focus(title);
@@ -223,7 +227,7 @@ export function mountLanguageActivity(target:HTMLElement,options:LanguageActivit
     dispose(reason:'interrupted'='interrupted'){
       if(disposed)return;disposed=true;
       if(timer)clearTimeout(timer);listeners.abort();
-      questionReading.dispose();hintReading.dispose();
+      questionReading.dispose();targetReading?.dispose();hintReading.dispose();shell.dispose();
       if(!done){finishLanguageAttempt(options.profile,attempt.id,reason);save();}
       root.remove();
     },

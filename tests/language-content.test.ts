@@ -98,3 +98,38 @@ test('word and sentence construction never print the complete correct answer in 
   assert.equal(plural.q.toLowerCase().includes(plural.a.toLowerCase()),false,
     'Plural-choice checkpoint should not print the correct choice in its question');
 });
+
+test('new local items remain admissible alongside archived IDs and unfilled construction',async()=>{
+  const {beginLanguageAttempt,validateLanguage}=await import('../src/language/engine');
+  const {passageLines,literacyInteraction}=await import('../src/language/reading-workspace');
+  const found=new Set<string>();
+  for(const skill of Object.keys(LANGUAGE_PACKS.v3)){
+    for(const tier of [0,1,2])for(let step=0;step<14;step++){
+      const item=generateLanguageItem(skill,{tier,random:()=>step/14});
+      const profile={grade:4 as const,skills:{},language:undefined};
+      beginLanguageAttempt(profile,item);
+      assert.ok(validateLanguage(structuredClone(profile.language)));
+      if(item.contentPack!=='v3')continue;
+      found.add(item.id);
+      if(literacyInteraction(item)==='evidence')assert.equal(passageLines(item).join(' '),item.passage);
+      if(literacyInteraction(item)==='select-word')for(const choice of item.choices!)assert.ok(item.passage!.split(/\W+/).includes(choice.value));
+      if(item.kind==='creative')assert.equal(item.answer,undefined);
+    }
+  }
+  assert.equal(found.size,Object.values(LANGUAGE_PACKS.v3).reduce((n,b)=>n+b.items.length,0));
+  for(const skill of LANGUAGE_SKILLS)for(const tier of [0,1,2]){
+    const item=generateLanguageItem(skill.id,{random:()=>.99999,tier});
+    if(item.tiles)assert.notEqual(item.tiles.join(item.kind==='word-tiles'?'':' '),item.answer);
+  }
+});
+
+test('decoding alternatives describe every pictured choice without naming its printed target',async()=>{
+  const {decodingDescriptions}=await import('../src/language/picture-access');
+  for(const item of LANGUAGE_PACKS.v2['k-ela-printed-word'].items){
+    for(const token of [item.a,...item.d!]){
+      assert.ok(decodingDescriptions[token],token);
+      assert.equal(decodingDescriptions[token].toLowerCase().split(/\W+/).includes(item.a),false,
+        'the picture descriptions must not simply repeat the assessed print');
+    }
+  }
+});

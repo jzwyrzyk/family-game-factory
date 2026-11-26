@@ -645,10 +645,10 @@
         "docs/adaptive-language/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:52:09.804Z",
-      "sourceDigest": "1f17499ea7d2259dcdaf7f57f535ee9a0b7a65bc37d772a2a0f6c4dd004b09cb",
+      "reviewedAt": "2026-11-26T01:53:23.533Z",
+      "sourceDigest": "27365f9674b56033af370fca73478bd7919e4b633a915127e686b60002e10d94",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified editable models use original item semantics, successful saves clear prior warnings, and abandoned counter drags preserve the child’s construction.",
+      "reviewReason": "The English integration and curriculum contracts document v3 authored responses, picture and passage interactions, isolated prompt delivery, and explicit target-reading assistance.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -891,10 +891,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:52:09.934Z",
-      "sourceDigest": "a1b90b416f634e1267b36c2eaf22bbb2ab8b495cf0b5e2290b5fd1f3043dbe1c",
+      "reviewedAt": "2026-11-26T01:53:23.830Z",
+      "sourceDigest": "330d74004c66843a246e99c2bc48ea378d2b7a5c6bd309600ee3c27b6b69879a",
       "reviewOutcome": "unchanged",
-      "reviewReason": "Real-browser regressions exercise visible counter bounds, rejected drops and the same tracked attempts through the established learning UI command.",
+      "reviewReason": "Existing language UI and integration suites now exercise repeated tiles and direct passage evidence within the same offline learning shard and CI structure.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
