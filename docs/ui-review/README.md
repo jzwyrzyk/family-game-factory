@@ -60,3 +60,7 @@ The modernization candidate includes the consolidated My Journey sections, Make/
 Choose **My Journey** in the destination selector to inspect the three dashboard cards. Check **Empty** for starter selection and **Unlocked** for an equipped companion and earned gems. Follow each card into the corresponding live section, then return through My Journey.
 
 The Journey, Pals, rewards and Powers destinations render the shared production header and cards. Use the empty scenario to review the two starter choices. Compare the same application viewport on each page and use Shift+Tab from the announced heading to check the back action’s visible keyboard focus.
+
+## Retained world compatibility
+
+After building the standalone review, run `node tools/ui-review/world-compatibility.cjs`. The test imports a synthetic transparent rock through My Art, selects the same saved image in a second scene, changes its legacy background, exercises undo and redo, checks a rendered pigment sample, compares the downloaded original bytes and reopens the first kept scene. It captures the retained stage and desktop, tablet and phone workspaces in `test-results/ui-review/world-compatibility/`. The inline harness can exercise the same HTML on machines with restricted local-file navigation. Identify the actual transport in the receipt. See the [world standard](../creative-universe/STANDARD.md).

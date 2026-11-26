@@ -36,6 +36,14 @@ For young children, begin with visible movement choices and a single playback ac
 
 New development uses 2D sprites, layered environments and compatible physics. Artwork, light, shadows and parallax can supply depth. Preserve legacy readers, retained games and historical staging. Introduce no 3D asset conversion. Pin illustrated world editions so later scenery changes cannot silently redesign a saved adventure. Review the rendered activity with the actor visible at phone and tablet sizes. Use approved Jems environment art or new Jems-specific illustrations created independently of private work. Keep controls, text and interactive subjects readable against the actual plate. [Game presentation](../game-intelligence/PRESENTATION-QUALITY.md) · [Brand library](../brand/LIBRARY_V1_2.md)
 
+### World composition
+
+The world chooser offers the four illustrated settings and a blank start. Match each preview to the same edition rendered in the stage. Recommend a world's complementing objects while keeping cross-world choices available. A child may also select an exact My Art landscape. Store its fit, crop and position on the scene. Preserve its aspect ratio and original bytes. Resolve backgrounds and placements through the same owner and reference checks as actors.
+
+Keep a background, an activity area and a foreground. Each placement has its own selection, position, size, rotation and draw order. Duplicating a placement shares its pinned asset. Tap, drag and keyboard controls use one history operation per edit. A clean Play view and export omit selection decorations. Geometry and interpreter decisions for retained scenes and reconstruction challenges stay tied to their saved versions. A foreground decoration grants no collision, platform behavior, rewards or learning evidence.
+
+Keep a world as a revision in the existing scene workspace. Starting another scene from it records the selected source revision and creates an independent editable project. For save, restore, archive and deletion checks, enumerate private backgrounds and placements across current revisions, drafts and retained history. A scene bundle must recover their exact originals and remap references together. The E adapter must declare which representations and behaviors it can deliver to a specific game revision.
+
 ## Generated games and privacy
 
 1. The trusted host checks the active owner, exact chosen image or design, digest, consent and intended game use. Read only that version. Stop if the owner changes or the digest fails.
