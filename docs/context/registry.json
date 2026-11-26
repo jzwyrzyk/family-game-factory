@@ -1175,10 +1175,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T23:45:11.135Z",
-      "sourceDigest": "b28d93c8eb14bacff30836bb6bf6fa007c1e3d64796b360f444c4d6bf2234484",
+      "reviewedAt": "2026-11-26T23:50:31.607Z",
+      "sourceDigest": "1ad59d933c8458b9afaf0b02b9479c994a51f8fa32f1cdf3259c753043e563c0",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed protected DEV policy compatibility, separate infrastructure ownership, exact approval chronology, image transport, website delivery and ordered rollback.",
+      "reviewReason": "Retained the full trusted-device acceptance gate and installed the pinned browser before the first browser-backed recovery exercise.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
