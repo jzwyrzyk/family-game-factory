@@ -85,6 +85,9 @@
     "docs/development/COSTS.md",
     "docs/decisions/2026-11-23-dev-test-prod.md",
     "docs/ui-review/README.md",
+    "docs/history/2026-11-26/PRODUCT-DOCTRINE.md",
+    "docs/history/2026-11-26/ARCHITECTURE-CURRENT.md",
+    "docs/history/2026-11-26/DELIVERY-STATE.md",
     "docs/learning/LEARNING_WORKSPACE_STANDARD.md",
     "docs/decisions/2026-11-26-unified-learning-workspace.md"
   ],
@@ -128,6 +131,8 @@
     "infra/nonproduction/*.md",
     "docs/development/evidence/*.md",
     "docs/storage/*.md",
+    "docs/history/2026-11-26/*.md",
+    "docs/evidence/DEVELOPMENT-VELOCITY.md",
     "docs/learning/*.md",
     "docs/evidence/learning-workspace/*.md"
   ],
@@ -150,10 +155,10 @@
         "docs/drawings/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:57:50.249Z",
-      "sourceDigest": "f6de9df1adbac3f7732d2e8501d12dc842cc854cd84a7c18f6485a809554918b",
+      "reviewedAt": "2026-11-26T06:30:14.023Z",
+      "sourceDigest": "716e4828f229a34d4fbf5148fae3070a545977ceadd777f3366280ea5bf71f03",
       "reviewOutcome": "updated",
-      "reviewReason": "The owner-approved shared learning presentation and evidence distinctions are recorded in the doctrine and the unified workspace decision.",
+      "reviewReason": "Reconciled the current doctrine and links to preserved Phase 2 historical records without changing learning ownership or release source.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -889,7 +894,8 @@
         "docs/game-intelligence/premium-benchmark/*.md",
         "docs/development/*.md",
         "infra/nonproduction/*.md",
-        "docs/ui-review/*.md"
+        "docs/ui-review/*.md",
+        "docs/evidence/DEVELOPMENT-VELOCITY.md"
       ],
       "sources": [
         "tests/**",
@@ -900,10 +906,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:19:04.299Z",
-      "sourceDigest": "2b49557c5a830a0fa7dd08291582d42db37ee5f6c44bd7dbdeee61a0c5498e22",
+      "reviewedAt": "2026-11-26T06:30:14.386Z",
+      "sourceDigest": "e77e2724a9c6235938b20a65c6d29e896839f30f756f0671fb57e6e003bf572b",
       "reviewOutcome": "updated",
-      "reviewReason": "The normal-entry regression checks focus, pointer hit testing and visible passage or working area on a phone and desktop.",
+      "reviewReason": "Retained each of the frozen Arcade leaf invocations separately and added the workspace cases to their original domains. The hosted owner download uses exact source assets.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1123,7 +1129,8 @@
         "docs/development/*.md",
         "infra/nonproduction/*.md",
         "docs/evidence/README.md",
-        "docs/ui-review/*.md"
+        "docs/ui-review/*.md",
+        "docs/evidence/DEVELOPMENT-VELOCITY.md"
       ],
       "sources": [
         ".github/workflows/**",
@@ -1144,10 +1151,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T02:11:52.882Z",
-      "sourceDigest": "1fdfe42a78932f956478f54b6520d34733492c55ca97dafac7ea2bcaff45db77",
+      "reviewedAt": "2026-11-26T06:30:14.769Z",
+      "sourceDigest": "39d99dd2494d3866d73a3f08937f82eaa2e999a2119ef05556660c321450057d",
       "reviewOutcome": "updated",
-      "reviewReason": "The integrated delivery record identifies the 66-command creative suite including the fullscreen checkpoint regression.",
+      "reviewReason": "Documented both the earlier immutable application release and the new Phase 2 engineering comparison base.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1402,10 +1409,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:59:42.842Z",
-      "sourceDigest": "06b6cdc9548a346c70109a13aef56cbafadaeadf996f89b49b34661052e14574",
+      "reviewedAt": "2026-11-26T06:30:15.353Z",
+      "sourceDigest": "4580ddf8813059abbc8ab609cdfb51b711d5c20c7e592379c7c0324964e0d608",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered learning standards, counter assets, family entry, theme contract tests and rendered evidence links. Updated the template and maintenance guide for future reviews.",
+      "reviewReason": "Reconciled current source routing, prior source histories and canonical document pointers.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1671,10 +1678,10 @@
         "public/jems-pals-extra/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "0b061b3f6905daab7524e43cefd5f49bd44ea9a4a57dbe225f4cc5c312458604",
-      "reviewedAt": "2026-11-26T01:45:24.381Z",
+      "sourceDigest": "05dbaad2e64a5681d23a1b796ed6f91a5ab3c66b3e1d25904cac43e353957e7e",
+      "reviewedAt": "2026-11-26T06:30:15.759Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The expression contract describes presentation of owned form-specific portraits for learning states and the existing subject hint action.",
+      "reviewReason": "Reviewed the Phase 2 atomic contrast read and retained the owned companion learning surface and original readability assertion.",
       "reviewHistory": [
         {
           "sourceCommit": "34eb40a27ce47a3a740d05cd0e8d6a00f98480bc",
@@ -1712,7 +1719,8 @@
       "sourceDigest": "381260b659e8d8ed26b7fdddb3c2182a49d2f8f9cffd808e7d167695f25bfb3a",
       "reviewedAt": "2026-11-26T00:23:36.006Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled merged F06 rollback limits with the owner-scoped Pal migration, retained readers and repeat restore contract."
+      "reviewReason": "Reconciled merged F06 rollback limits with the owner-scoped Pal migration, retained readers and repeat restore contract.",
+      "reviewHistory": []
     }
   ]
 }

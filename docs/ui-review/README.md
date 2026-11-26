@@ -53,6 +53,8 @@ Additional integration checks add a Jump block and run the real scene engine, up
 
 Review navigation waits for the real Parent page event before selecting a tab or submitting the synthetic unlock form. The application still saves pending work asynchronously and rejects a form submission from the previous view; the harness does not bypass that guard.
 
+Open the **Standalone UI review** run and expand **Open the interactive review while browser qualification runs**. Its notice links directly to the immutable download and names the represented SHA. The job summary links to the PR changes. Extract the archive and open `jems-ui-review.html`. Browser status at upload is pending. Record owner feedback against that SHA and check the final hosted statuses before integration.
+
 The primary download uploads immediately after the build, separately from browser evidence. Download availability does not by itself imply passing tests: check the run’s test step or the acceptance notes. Screenshot names use portable characters for Windows extraction.
 
 ## Child experience candidate, November 25

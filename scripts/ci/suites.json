@@ -60,8 +60,8 @@
         "npm run test:rewards",
         "npm run test:deployment",
         "node tests/journeys.cjs",
-        "node tests/live-remix.cjs",
-        "node --import tsx tests/builder-browser.ts"
+        "node --import tsx tests/builder-browser.ts",
+        "node tests/restored-games.cjs"
       ]
     },
     "browser-generated": {
@@ -71,14 +71,13 @@
         "npm run test:intent-playtest",
         "npm run test:intent-repair-browser",
         "npm run test:generated-art",
-        "npm run test:quality-capture"
+        "node tests/live-remix.cjs"
       ]
     },
     "browser-storage": {
       "group": "browser",
       "commands": [
         "node --import tsx tests/generated-worker-security.ts",
-        "node tests/restored-games.cjs",
         "node tests/offline-shell.cjs",
         "node tests/construction-touch.cjs",
         "node tests/private-drawings.cjs",
@@ -167,6 +166,12 @@
       "commands": [
         "npm run test:coach",
         "npm run test:child-journey"
+      ]
+    },
+    "browser-quality": {
+      "group": "browser",
+      "commands": [
+        "npm run test:quality-capture"
       ]
     }
   }

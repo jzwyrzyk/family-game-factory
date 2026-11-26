@@ -24,8 +24,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: mind-your-jems-shots-${{ github.head_ref || github.ref }}
-  cancel-in-progress: true
+  group: mind-your-jems-screenshots-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   screenshots:

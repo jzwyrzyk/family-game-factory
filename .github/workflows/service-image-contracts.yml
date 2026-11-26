@@ -60,8 +60,8 @@ permissions:
 # Validate each prospective PR merge once, then integrated main independently.
 # Superseded runs still cancel within the same event and source branch.
 concurrency:
-  group: service-images-${{ github.event_name }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
-  cancel-in-progress: true
+  group: service-image-contracts-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   service-images:
     runs-on: ubuntu-24.04

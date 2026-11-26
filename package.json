@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "vite --host 127.0.0.1",
+    "check:changed": "node scripts/ci/check-changed.mjs",
     "typecheck": "tsc --noEmit",
     "build": "npm run typecheck && vite build",
     "test:unit": "node --import tsx tests/unit.ts",
-    "test:learning-ui": "node --import tsx --test tests/learning-activity.test.ts tests/learning-support.test.ts tests/learning-geometry.test.ts tests/math-workspace.test.ts tests/theme-workspace.test.ts",
+    "test:learning-ui": "node --import tsx --test tests/learning-activity.test.ts && node --import tsx --test tests/learning-support.test.ts tests/learning-geometry.test.ts tests/math-workspace.test.ts tests/theme-workspace.test.ts",
     "test:learning-integration": "node --import tsx tests/learning-integration.ts && node --import tsx tests/parent-insights.test.ts && npm run test:parent-dashboard && npm run test:learning-profile-browser",
     "test:browser": "npm run test:quality && node tests/journeys.cjs && node tests/live-remix.cjs && node --import tsx tests/builder-browser.ts && node --import tsx tests/actions-e2e.ts && node --import tsx tests/generated-worker-security.ts && node tests/restored-games.cjs && node tests/learning-repair.cjs && node tests/offline-shell.cjs && node tests/construction-touch.cjs && node tests/private-drawings.cjs && npm run test:intent-playtest && npm run test:intent-repair-browser && npm run test:generated-art && npm run test:quality-capture && npm run test:storage-browser",
     "test": "npm run build && npm run test:unit && npm run test:learning-ui && npm run test:learning-integration && npm run test:parent-dashboard-browser && npm run test:language-ui && npm run test:language-integration && npm run test:deployment && npm run test:browser && npm run test:art && npm run test:art-browser && npm run test:creation && npm run test:creation-browser && npm run test:problem-solving && npm run test:problem-solving-browser && npm run test:studio && npm run test:studio-notifications && npm run test:coach && npm run test:child-journey && npm run test:gem-progress && npm run test:gem-journey && npm run test:navigation-continuity && npm run test:rewards && npm run test:rewards-browser && npm run test:real-agent && npm run test:pals && npm run test:pals-browser",

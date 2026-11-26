@@ -51,6 +51,7 @@ export function verifyCoverage(manifest, packageJSON) {
   const top = packageJSON.scripts.test.split('&&').map(s => s.trim());
   if (top.shift() !== 'npm run build') throw new Error('CI_BUILD_REQUIRED');
   const full = expandCommands(top, packageJSON.scripts).map(JSON.stringify).sort();
+  if (new Set([...all, ...excluded].map(JSON.stringify)).size !== all.length + excluded.length) throw new Error('CI_DUPLICATE_ACROSS_GROUPS');
   if (JSON.stringify([...all, ...excluded].map(JSON.stringify).sort()) !== JSON.stringify(full)) throw new Error('CI_NPM_TEST_COVERAGE_MISMATCH');
   return summary;
 }

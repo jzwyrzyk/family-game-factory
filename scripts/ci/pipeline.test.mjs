@@ -31,7 +31,17 @@ test('aggregates reject replaced or self-claimed plan bytes before parsing', () 
 });
 
 test('all original Arcade leaf commands occur exactly once in their original required group', () => {
-  assert.deepEqual(verifyCoverage(manifest, pkg), { notifications: 2, browser: 43, learning: 12, creative: 66 });
+  verifyCoverage(manifest, pkg);
+  const retained = readJSON(new URL('./retained-coverage.json', import.meta.url));
+  const all = new Set();
+  for (const [group, baseline] of Object.entries(retained.groups)) {
+    const actual = expandCommands(manifest.legacyGroups[group], pkg.scripts).map(JSON.stringify);
+    for (const command of baseline) assert.ok(actual.includes(JSON.stringify(parseCommand(command))), `Removed from ${group}: ${command}`);
+    for (const command of actual) {
+      assert.ok(!all.has(command), `Duplicate across groups: ${command}`);
+      all.add(command);
+    }
+  }
   const creation = expandCommands(manifest.shards['creation-art'].commands, pkg.scripts);
   assert.ok(creation.some(([runner, script]) => runner === 'node' && script === 'tests/creation-learning-workspace.cjs'),
     'the Creation Studio shard exercises fullscreen learning and game return');
@@ -41,6 +51,33 @@ test('all original Arcade leaf commands occur exactly once in their original req
   }
   const changed = structuredClone(pkg); changed.scripts.test += ' && node tests/new-required.cjs';
   assert.throws(() => verifyCoverage(manifest, changed), /CI_NPM_TEST_COVERAGE_MISMATCH/);
+});
+
+function assertPreviousLeaves(oldManifest, oldPackage, currentManifest, currentPackage) {
+  for (const [group, previous] of Object.entries(oldManifest.legacyGroups)) {
+    const assigned = Object.values(currentManifest.shards).filter(shard => shard.group === group)
+      .flatMap(shard => expandCommands(shard.commands, currentPackage.scripts));
+    const actual = new Set(assigned.map(JSON.stringify));
+    for (const command of expandCommands(previous, oldPackage.scripts)) {
+      assert.ok(actual.has(JSON.stringify(command)), 'Previous regression removed from ' + group + ': ' + command.join(' '));
+    }
+  }
+}
+
+test('newly integrated regressions survive coordinated changes to both npm and the assignment', () => {
+  const previous = structuredClone(pkg);
+  previous.scripts['test:gem-factory'] += ' && node tests/added-after-freeze.cjs';
+  assert.throws(() => assertPreviousLeaves(manifest, previous, manifest, pkg), /Previous regression removed/);
+  assertPreviousLeaves(manifest, pkg, manifest, previous);
+});
+
+test('retain the independent PR base or previous protected-push inventory', () => {
+  if (!['pull_request', 'push'].includes(process.env.GITHUB_EVENT_NAME)) return;
+  const event = readJSON(process.env.GITHUB_EVENT_PATH);
+  const base = process.env.GITHUB_EVENT_NAME === 'pull_request' ? event.pull_request.base.sha : event.before;
+  assert.match(base, /^[a-f0-9]{40}$/);
+  const readBase = path => JSON.parse(execFileSync('git', ['show', base + ':' + path], {encoding: 'utf8'}));
+  assertPreviousLeaves(readBase('scripts/ci/suites.json'), readBase('package.json'), manifest, pkg);
 });
 
 test('argv parser rejects executable shell expansion; hooks and recursive scripts require review', () => {

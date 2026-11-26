@@ -51,10 +51,34 @@ export function observeCommitRange(cwd, base, head) {
   for (const sha of [base, head]) if (!/^[a-f0-9]{40}$/.test(sha ?? '') || git('rev-parse', `${sha}^{commit}`).trim() !== sha) throw new Error('Exact source commits required');
   git('merge-base', '--is-ancestor', base, head);
   const changed = git('diff', '--name-only', '--no-renames', '-z', base, head).split('\0').filter(Boolean);
-  const read = sha => Object.fromEntries(git('ls-tree', '-rz', '--name-only', sha, '--', 'src', 'server').split('\0')
-    .filter(p => /\.(?:ts|tsx|js|css)$/.test(p)).map(p => [p, git('show', `${sha}:${p}`)]));
-  // Preserve removed dependencies and consumers from both sides of the change.
-  const before = dependencyObservation(read(base), changed), after = dependencyObservation(read(head), changed);
+  const blobs = new Map();
+  function readTree(sha) {
+    const files = {};
+    const entries = git('ls-tree', '-rz', sha, '--', 'src', 'server').split('\0').filter(Boolean)
+      .map(entry => /^\d+ blob ([a-f0-9]{40})\t([\s\S]+)$/.exec(entry))
+      .filter(entry => entry && /\.(?:ts|tsx|js|css)$/.test(entry[2]));
+    const missing = [...new Set(entries.map(entry => entry[1]).filter(id => !blobs.has(id)))];
+    // Git frames raw blob bytes by length. Parse before UTF-8 decoding so that
+    // filenames, Unicode and embedded newlines cannot shift the next record.
+    for (let i = 0; i < missing.length; i += 64) {
+      const ids = missing.slice(i, i + 64);
+      const bytes = execFileSync('git', ['cat-file', '--batch'], {cwd, input: ids.join('\n') + '\n', maxBuffer: 64 * 1024 * 1024});
+      let offset = 0;
+      for (const id of ids) {
+        const newline = bytes.indexOf(10, offset);
+        const header = /^(\w+) blob (\d+)$/.exec(bytes.toString('ascii', offset, newline));
+        if (!header || header[1] !== id) throw new Error('Invalid Git blob header');
+        const end = newline + 1 + Number(header[2]);
+        if (bytes[end] !== 10) throw new Error('Incomplete Git blob');
+        blobs.set(id, bytes.toString('utf8', newline + 1, end));
+        offset = end + 1;
+      }
+      if (offset !== bytes.length) throw new Error('Unexpected Git batch data');
+    }
+    for (const [, id, path] of entries) files[path] = blobs.get(id);
+    return files;
+  }
+  const before = dependencyObservation(readTree(base), changed), after = dependencyObservation(readTree(head), changed);
   return {...after, base, head, beforeChanges: before.changes};
 }
 

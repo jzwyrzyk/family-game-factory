@@ -3,14 +3,14 @@ name: Parent reporting and dashboard
 on:
   pull_request:
   push:
-    branches: [main, 'feature/jems-parent-progress-*']
+    branches: [main]
 
 permissions:
   contents: read
 
 concurrency:
-  group: parent-reporting-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: parent-reporting-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   parent-dashboard:

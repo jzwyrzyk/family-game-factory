@@ -55,6 +55,11 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /scripts/environments/
+            /ops/environments.json
+            /ops/github-main-ruleset.json
       - id: prepare
         name: Verify source, successful checks and artifact provenance
         env:
