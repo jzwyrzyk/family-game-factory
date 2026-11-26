@@ -49,19 +49,39 @@ def files_under(folder):
 
 
 def metadata(root):
-    # Hash every non-object Git record: local refs, reflogs, index, config, stash
-    # and recovery records. Never emit their contents.
-    return digest([(str(p.relative_to(root)), identity(p)['sha256']) for p in
-                   files_under(root / '.git') if '.git/objects/' not in str(p.relative_to(root))])
+    common = old.git_directory(root, '--git-common-dir')
+    records = [(str(p.relative_to(common)), identity(p)['sha256']) for p in files_under(common)
+               if 'objects' not in p.relative_to(common).parts[:1]]
+    if (root / '.git').is_file(): records.append(('worktree-pointer', identity(root / '.git')['sha256']))
+    return digest(records)
 
 
 def check_root(root, home):
     root = old.allowed_root(root, home)
-    require(not (root / '.git/objects').is_symlink(), 'EXTERNAL_OBJECT_STORE_PRESERVED')
-    require(not (root / '.git/objects/info/alternates').exists(), 'ALTERNATE_OBJECT_STORE_PRESERVED')
-    require(not (root / '.git/worktrees').exists(), 'LINKED_WORKTREES_PRESERVED')
-    require(not (root / '.git/modules').exists(), 'SUBMODULE_OBJECTS_PRESERVED')
+    common = old.git_directory(root, '--git-common-dir')
+    require(not (common / 'objects').is_symlink(), 'EXTERNAL_OBJECT_STORE_PRESERVED')
+    require(not (common / 'objects/info/alternates').exists(), 'ALTERNATE_OBJECT_STORE_PRESERVED')
+    require(not (common / 'modules').exists(), 'SUBMODULE_OBJECTS_PRESERVED')
     return root
+
+
+def blocked_usage(root, home):
+    """Stat only: quantify the shortfall without making blocked contents eligible."""
+    root = safe_path(root)
+    require(home in root.parents and old.allowed_name(root.relative_to(home).parts[0]), 'ROOT_NOT_ALLOWLISTED')
+    counts = {'git_metadata_and_objects_bytes': 0, 'dependency_bytes': 0, 'other_bytes': 0}
+    seen, examined = set(), 0
+    for path in files_under(root):
+        examined += 1
+        if examined > 200000: return {**counts, 'complete': False, 'recoverability': 'NOT_VERIFIED'}
+        info = path.lstat()
+        if not stat.S_ISREG(info.st_mode) or (info.st_dev, info.st_ino) in seen: continue
+        seen.add((info.st_dev, info.st_ino))
+        parts = path.relative_to(root).parts
+        category = ('git_metadata_and_objects_bytes' if '.git' in parts else
+                    'dependency_bytes' if 'node_modules' in parts else 'other_bytes')
+        counts[category] += info.st_blocks * 512
+    return {**counts, 'complete': True, 'recoverability': 'NOT_VERIFIED'}
 
 
 def inspect(home, folder):
@@ -83,13 +103,16 @@ def inspect(home, folder):
                     if path.parent == root / '.git/objects/pack' and PACK.fullmatch(path.name):
                         packs.setdefault((record['sha256'], record['stat'][2], record['stat'][5], record['stat'][0]), []).append(record)
             repositories.append({'root': str(root), 'metadata_sha256': metadata(root),
-                'head': old.git(root, 'rev-parse', 'HEAD').decode().strip(), 'files': records,
+                'head': old.git(root, 'rev-parse', 'HEAD').decode().strip(), 'git_layout': old.worktree_layout(root, home), 'files': records,
                 'preserved_files': skipped, 'lockfile_present': (root / 'package-lock.json').is_file()})
         except (old.CleanupError, OSError) as error:
-            blocked.append({'root': str(candidate), 'code': str(error) if isinstance(error, old.CleanupError) else 'LOCAL_READ_FAILED'})
+            record = {'root': str(candidate), 'code': str(error) if isinstance(error, old.CleanupError) else 'LOCAL_READ_FAILED'}
+            try: record['allocated_size_only'] = blocked_usage(candidate, home)
+            except (old.CleanupError, OSError): record['allocated_size_only'] = {'status': 'UNAVAILABLE'}
+            blocked.append(record)
     groups = [rows for rows in packs.values() if len(rows) > 1 and rows[0]['stat'][0] == folder.stat().st_dev]
     plan = {'schema': 2, 'operation': 'DEDUP_IDENTICAL_GIT_PACKS', 'home': str(home), 'vault': str(folder / 'object-vault'),
-            'repositories': [{k: r[k] for k in ('root', 'metadata_sha256', 'head')} for r in repositories],
+            'repositories': [{k: r[k] for k in ('root', 'metadata_sha256', 'head', 'git_layout')} for r in repositories],
             'groups': groups, 'requires_inactive_checkouts': True}
     recoverable = sum(sum(f['allocated_bytes'] for f in group[1:]) for group in groups)
     return plan, {'repositories': repositories, 'blocked': blocked,
@@ -135,6 +158,8 @@ def recheck(plan):
     home = safe_path(plan['home'])
     for repo in plan['repositories']:
         root = check_root(repo['root'], home)
+        if 'git_layout' in repo:
+            require(old.worktree_layout(root, home) == repo['git_layout'], 'WORKTREE_LAYOUT_CHANGED')
         require(metadata(root) == repo['metadata_sha256'], 'GIT_METADATA_CHANGED_REPLAN')
         require(old.git(root, 'rev-parse', 'HEAD').decode().strip() == repo['head'], 'HEAD_CHANGED_REPLAN')
     for entry in [f for g in plan.get('groups', []) for f in g] + plan.get('files', []):
@@ -202,7 +227,7 @@ def archive_plan(capacity, home, destination):
         require(Path(r['root']) not in destination.parents, 'ARCHIVE_INSIDE_SOURCE')
     return {'schema': 2, 'operation': 'PRIVATE_OFF_DISK_ARCHIVE', 'home': str(home),
         'destination': str(destination), 'destination_device': destination.stat().st_dev,
-        'repositories': [{k: r[k] for k in ('root', 'metadata_sha256', 'head')} for r in capacity['repositories']],
+        'repositories': [{k: r[k] for k in ('root', 'metadata_sha256', 'head', 'git_layout')} for r in capacity['repositories']],
         'files': [f for r in capacity['repositories'] for f in r['files']],
         'privacy': 'May include historical secrets inside Git objects. Private same-owner off-disk storage only; no network upload.',
         'effect_after_separate_deletion_approval': 'Repositories/dependencies may be unusable until restored; all selected bytes remain in verified archive.'}
@@ -349,7 +374,8 @@ def main(argv=None):
         print(json.dumps({'status': 'CAPACITY_DRY_RUN_NO_DELETION_OR_ARCHIVE', 'dedup_plan_sha256': code,
             **{k: v for k, v in capacity.items() if k not in ('repositories', 'blocked')},
             'repositories': [{'root': r['root'], 'git_object_bytes': sum(f['allocated_bytes'] for f in r['files'] if f['category'] == 'git_objects'),
-                              'dependency_bytes': sum(f['allocated_bytes'] for f in r['files'] if f['category'] == 'dependencies')} for r in capacity['repositories']],
+                              'dependency_bytes': sum(f['allocated_bytes'] for f in r['files'] if f['category'] == 'dependencies'),
+                              'related_worktrees': r['git_layout']['worktrees']} for r in capacity['repositories']],
             'blocked': capacity['blocked'], 'private_plans_directory': str(folder),
             'archive_plan_sha256': digest(archive) if a.archive_dir else None,
             'archive_requires_separate_approval': True,

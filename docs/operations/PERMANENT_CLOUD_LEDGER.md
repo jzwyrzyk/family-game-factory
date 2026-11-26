@@ -1,5 +1,48 @@
 # Permanent cloud operations delivery ledger
 
+## November 26, 2026 — administrator recovery readback and remaining blockers
+
+Administrator execution of source `057daa43ab9c2f4da5510f6987b0c3743e8cce98`
+returned `READ_ONLY_RECOVERY_REPORT_NOT_ACTIVATION`: zero cloud mutations,
+deletions or archive uploads. Fresh inventory verified all six prior account,
+role and federation resources/bindings and proposed exactly four remaining actions:
+create the restricted log view, bind the broker on that view, deploy the immutable
+broker, and grant its exact caller invoker access. Remaining-actions hash
+`942b23cac4948b74ef16025e9ca50b1eef00cf0add77f143a98506a5da963e07` is review evidence,
+**not permission to retry**: the previous view INVALID_ARGUMENT remains unresolved.
+Audit reading was unavailable and the bounded local search found no failure detail.
+The revised reader fixes projection through the protobuf Any field, exposes only a
+sanitized HTTP status on failure, and includes SDK JSON errors in the private probe.
+Actual provider diagnosis remains pending; neither OR nor resource labels are
+proven to be the rejected clause.
+
+Expanded source cleanup found **595,752,069 bytes**, three eligible repositories
+and three blocked repositories (plan `a903d733811456fa2734b87b6d98d21870e7be694e931b4f62bebf15ce7f3eb9`).
+Exact Git-pack deduplication found **zero** savings; then-eligible Git objects total
+598,904,832 bytes. The 2 GiB goal is not established. One repository has a Git lock,
+a historical primary/linked-worktree group was excluded, and another repository
+failed a Git read. New tooling validates closed historical worktree groups, captures
+all common metadata and counts common objects once; active/outside/missing members
+and locks still block cleanup. Stat-only blocked-directory sizing and specific Git
+read failure codes improve review without authorizing deletion or lock removal.
+No archive destination or archival/deletion approval has been supplied.
+
+The original nonproduction binary plan and source binding were actually checked:
+`SAVED_PLAN_INTEGRITY_VERIFIED`, original source `446a245e624f44c36e1e3847ae7779477272d899`,
+approval `821d722ee140ffdef4c8ae4ba4e1fed89307e6c997153b3a8597f726a8caaad6`.
+No apply-started marker was found, Terraform was not invoked and state was not
+modified. DEV/TEST apply preparation remains independent. Private detailed receipts
+and local paths stay in Cloud Shell; no production, credential or broker-image
+change was made.
+
+Correction validation: **335 operations tests** and **18 documentation tests**
+passed; documentation source review passed. New real-Git fixtures cover linked
+worktrees, shared-object counting, unique dirty contents, archive/delete/restore,
+active/outside/missing worktree refusal and preserved locks. Provider tests cover
+Any-field projection, fixed HTTP diagnostics and credential-redacted SDK errors.
+The original broker and nonproduction provisioning bytes remain unchanged. These
+are local fixture results; the revised administrator read is still required.
+
 ## November 26, 2026 — partial broker apply and expanded disk recovery
 
 Administrator evidence from executable source `9072b7d5fe280eb10ffdfe6c3a5ae414ab47c245`

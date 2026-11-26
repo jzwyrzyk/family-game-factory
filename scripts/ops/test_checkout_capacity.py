@@ -95,7 +95,7 @@ class CapacityTests(unittest.TestCase):
         _, result = self.inspect(); dest = self.home / 'simulated-external'; dest.mkdir(mode=0o700)
         plan = {'schema': 2, 'operation': 'PRIVATE_OFF_DISK_ARCHIVE', 'home': str(self.home),
                 'destination': str(dest), 'destination_device': dest.stat().st_dev,
-                'repositories': [{k:r[k] for k in ('root','metadata_sha256','head')} for r in result['repositories']],
+                'repositories': [{k:r[k] for k in ('root','metadata_sha256','head','git_layout')} for r in result['repositories']],
                 'files': [f for r in result['repositories'] for f in r['files']]}
         return plan
 
@@ -153,9 +153,67 @@ class CapacityTests(unittest.TestCase):
         (self.a / '.git/index.lock').write_text('busy')
         _, report = self.inspect()
         self.assertTrue(any(r['code'] == 'GIT_OPERATION_IN_PROGRESS' for r in report['blocked']))
+        blocked = next(r for r in report['blocked'] if r['root'] == str(self.a))
+        self.assertEqual(blocked['allocated_size_only']['recoverability'], 'NOT_VERIFIED')
+        self.assertGreater(blocked['allocated_size_only']['git_metadata_and_objects_bytes'], 0)
+        self.assertEqual((self.a / '.git/index.lock').read_text(), 'busy')
         (self.home / 'jems-service-release.alias').symlink_to(self.b, target_is_directory=True)
         _, report = self.inspect()
         self.assertTrue(any(r['code'] == 'SYMLINK_PATH_FORBIDDEN' for r in report['blocked']))
+
+    def linked_fixture(self):
+        linked = self.home / 'jems-releases/pr115/application'
+        linked.parent.mkdir(parents=True)
+        self.git(self.a, 'worktree', 'add', '--detach', str(linked), 'HEAD')
+        (linked / 'source.py').write_text('unique linked local change')
+        (linked / 'node_modules/package').mkdir(parents=True)
+        (linked / 'node_modules/package/index.js').write_text('unique linked dependency')
+        return linked
+
+    def test_registered_historical_worktrees_are_inspected_and_objects_counted_once(self):
+        linked = self.linked_fixture()
+        _, report = self.inspect()
+        self.assertEqual(report['blocked'], [])
+        rows = {r['root']: r for r in report['repositories']}
+        self.assertEqual(set(rows), {str(self.a), str(self.b), str(linked)})
+        self.assertEqual(rows[str(linked)]['git_layout']['common_dir'], str(self.a / '.git'))
+        self.assertFalse(any(f['category'] == 'git_objects' for f in rows[str(linked)]['files']))
+        self.assertTrue(any(f['category'] == 'dependencies' for f in rows[str(linked)]['files']))
+        # Source cleanup evaluates each worktree's own index, retaining its changes.
+        plan = old.repo_plan(linked, self.home, proof=lambda sha: None)
+        self.assertNotIn('source.py', [f['path'] for f in plan['files']])
+        self.assertEqual((linked / 'source.py').read_text(), 'unique linked local change')
+
+    def test_linked_worktrees_survive_verified_archive_deletion_and_restoration(self):
+        linked = self.linked_fixture()
+        metadata = space.metadata(linked)
+        self.test_archive_then_separate_deletion_and_no_overwrite_restoration()
+        self.git(linked, 'fsck', '--full')
+        self.assertEqual(space.metadata(linked), metadata)
+        self.assertEqual((linked / 'source.py').read_text(), 'unique linked local change')
+        self.assertEqual((linked / 'node_modules/package/index.js').read_text(), 'unique linked dependency')
+
+    def test_outside_active_missing_and_locked_worktrees_block_the_whole_group(self):
+        linked = self.linked_fixture()
+        with patch.object(Path, 'cwd', return_value=linked):
+            with self.assertRaisesRegex(old.CleanupError, 'ACTIVE_RELATED_WORKTREE'):
+                space.check_root(self.a, self.home)
+        lock = self.a / '.git/worktrees/application/index.lock'; lock.write_text('must preserve')
+        with self.assertRaisesRegex(old.CleanupError, 'GIT_OPERATION_IN_PROGRESS'):
+            space.check_root(self.a, self.home)
+        self.assertEqual(lock.read_text(), 'must preserve')
+        lock.unlink()  # Test fixture only; cleanup tools never remove Git locks.
+        outside = self.home / 'unapproved'
+        self.git(self.a, 'worktree', 'add', '--detach', str(outside), 'HEAD')
+        with self.assertRaisesRegex(old.CleanupError, 'WORKTREE_OUTSIDE_APPROVED_SCOPE'):
+            space.check_root(linked, self.home)
+        shutil.rmtree(outside)  # Simulate an absent registered worktree.
+        with self.assertRaisesRegex(old.CleanupError, 'WORKTREE_PATH_MISSING'):
+            space.check_root(linked, self.home)
+
+    def test_ambient_git_paths_cannot_redirect_repository_checks(self):
+        with patch.dict(os.environ, {'GIT_DIR': str(self.b / '.git'), 'GIT_WORK_TREE': str(self.b)}):
+            self.assertEqual(old.git(self.a, 'rev-parse', '--show-toplevel').decode().strip(), str(self.a))
 
 
 if __name__ == '__main__': unittest.main()

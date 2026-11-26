@@ -28,6 +28,8 @@ class RecoveryTests(unittest.TestCase):
             self.assertEqual(method, 'POST')
             self.assertIn('entries:list?fields=', path)
             self.assertNotIn('authenticationInfo', path)
+            self.assertIn('entries(timestamp,protoPayload)', path)
+            self.assertNotIn('protoPayload(', path)  # AuditLog is protobuf Any, not a LogEntry submessage schema.
             self.assertIn('cloudaudit.googleapis.com/activity', body['filter'])
             self.assertIn(setup.VIEW, body['filter'])
 
@@ -71,6 +73,30 @@ class RecoveryTests(unittest.TestCase):
         self.assertEqual(len(plan.actions), 4)
         self.assertEqual(plan.actions[0]['change']['gcloud'][:3], ['logging', 'views', 'create'])
         for c in reader.call_args_list: self.assertFalse(set(c.args) & {'create', 'create-oidc', 'deploy'})
+
+    def test_audit_unavailable_reports_only_trusted_http_status(self):
+        result = recovery.audit_failure(recovery.SetupError('POST https://logging.googleapis.com/v2/entries:list returned HTTP 403'))
+        self.assertEqual(result['http_status'], 403)
+        self.assertEqual(result['code'], 'AUDIT_HTTP_FAILED')
+        for error in (ValueError('PRIVATE returned HTTP 401'), recovery.SetupError('PRIVATE failed in transport or decoding')):
+            result = recovery.audit_failure(error)
+            self.assertIsNone(result['http_status'])
+            self.assertNotIn('PRIVATE', json.dumps(result))
+
+    def test_sdk_json_error_without_terminal_prefix_is_found_and_redacted(self):
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp); logs = home / '.config/gcloud/logs'; logs.mkdir(parents=True)
+            (logs / 'fixture.log').write_text('logging.views.create jems-production-requests\n' + json.dumps({
+                'error': {'status': 'INVALID_ARGUMENT', 'message': 'resource.labels OR unsupported PRIVATE-SENTINEL'},
+                'other': {'message': 'Bearer PRIVATE-TOKEN'}}))
+            result = recovery.local_cli_evidence(home, home)
+            self.assertEqual(len(result['failures']), 1)
+            self.assertIn('MENTIONS_RESOURCE_LABELS', result['failures'][0]['hints'])
+            self.assertNotIn('PRIVATE-SENTINEL', json.dumps(result))
+            self.assertNotIn('PRIVATE-TOKEN', json.dumps(result))
+            private = next(home.glob('provider-cli-*.json')).read_text()
+            self.assertIn('PRIVATE-SENTINEL', private)
+            self.assertNotIn('PRIVATE-TOKEN', private)
 
     def test_view_iam_uses_post_options_etag_and_rejects_concurrent_grants(self):
         from test_permanent_diagnostics import BootstrapTests

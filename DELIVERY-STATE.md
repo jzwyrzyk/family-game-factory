@@ -20,15 +20,18 @@ The existing broker build/image was qualified without rebuilding. Administrator
 apply at `9072b7d…` then completed six account/role/federation commands and stopped
 with `INVALID_ARGUMENT` creating the filtered log view. No broker deployment or
 request-evidence acceptance is established. Preserve partial state; the consolidated
-recovery handoff reads provider/audit evidence and verifies the existing resources
-before a fresh remaining-actions review. View-IAM POST and Cloud Run metadata
+recovery read at `057daa4` verified all six existing resources/bindings and left
+four actions. The precise view rejection remains unresolved; the new plan must not
+be applied unchanged. View-IAM POST and Cloud Run metadata
 contract corrections preserve the original image/filter and narrow permissions.
 
-The previous cleanup dry-run proposed only 430,985 bytes (one eligible, three
-blocked repositories). Expanded suffix discovery, exact Git-pack deduplication and
-separately approved private off-disk archival target 2 GiB where safely feasible.
+Expanded cleanup found 595,752,069 source bytes but no exact-pack deduplication
+savings. Verified historical worktree-group support and blocked-directory sizing
+advance the 2 GiB target, which remains unproven. Locks and unique contents stay
+protected; private off-disk archival needs separate approval.
 No historical deletion or archival has been performed. DEV/TEST's original saved
-28-resource plan remains independent and must not be regenerated for these tools.
+28-resource plan passed integrity readback at `057daa4`, remains independent and
+must not be regenerated for these tools.
 
 [Exact ledger and prior Coach HTTP 200 evidence](docs/operations/PERMANENT_CLOUD_LEDGER.md) ·
 [Executable setup](docs/operations/PERMANENT_CLOUD_SETUP.md) ·

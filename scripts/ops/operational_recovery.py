@@ -19,7 +19,7 @@ import bootstrap_request_diagnostics as broker
 import cleanup_historical_checkouts as cleanup
 import recover_checkout_space as capacity
 import setup_nonproduction as nonprod
-from admin_api import Http, command
+from admin_api import Http, SetupError, command
 
 BUILD = '7fcac19a-8444-4c17-955a-1a381006069e'
 BUILD_SOURCE = '446a245e624f44c36e1e3847ae7779477272d899'
@@ -65,7 +65,7 @@ def audit_evidence(api, folder):
         body = {'resourceNames': ['projects/' + broker.PROJECT], 'filter': query,
                 'orderBy': 'timestamp desc', 'pageSize': 20}
         if token: body['pageToken'] = token
-        result = api.call('POST', 'v2/entries:list?fields=nextPageToken,entries(timestamp,protoPayload(methodName,resourceName,status,request(parent,viewId,view(filter))))', body)
+        result = api.call('POST', 'v2/entries:list?fields=nextPageToken,entries(timestamp,protoPayload)', body)
         broker.require(isinstance(result, dict) and isinstance(result.get('entries', []), list), 'AUDIT_RESPONSE_INVALID')
         for entry in result.get('entries', []):
             payload = entry.get('protoPayload', {})
@@ -92,21 +92,38 @@ def audit_evidence(api, folder):
 def local_cli_evidence(home, folder):
     base = cleanup.safe_path(home / '.config/gcloud/logs')
     if not base.is_dir(): return {'status': 'NO_LOCAL_CLI_LOGS'}
-    candidates = sorted((p for p in base.rglob('*.log') if not p.is_symlink()), key=lambda p: p.stat().st_mtime, reverse=True)[:30]
-    messages = []
-    for path in candidates:
+    candidates = sorted((p for p in base.rglob('*.log') if not p.is_symlink()), key=lambda p: p.stat().st_mtime, reverse=True)
+    messages, inspected, skipped, total = [], 0, 0, 0
+    for path in candidates[:200]:
         cleanup.safe_path(path)
-        if path.stat().st_size > 4_000_000: continue
+        size = path.stat().st_size
+        if size > 4_000_000 or total + size > 32_000_000:
+            skipped += 1; continue
+        inspected += 1; total += size
         text = path.read_text(errors='replace')
         if 'jems-production-requests' not in text or 'logging.views.create' not in text: continue
+        # SDK debug logs often retain the JSON provider error without the terminal prefix.
+        if 'INVALID_ARGUMENT' in text:
+            for match in re.finditer(r'"message"\s*:\s*("(?:[^"\\]|\\.)*")', text):
+                messages.append(json.loads(match.group(1))[:4096])
         for line in text.splitlines():
             if '(gcloud.logging.views.create)' in line and ('INVALID_ARGUMENT' in line or 'Invalid argument' in line):
                 messages.append(line.split('(gcloud.logging.views.create)', 1)[1].strip()[:4096])
+    messages = list(dict.fromkeys(m for m in messages if not re.search(
+        r'Bearer|access_token|refresh_token|private_key|ya29\.', m, re.I)))[:20]
     receipt = {'kind': 'PRIVATE_LOCAL_CREATE_VIEW_FAILURE', 'messages': messages}
     capacity.write_json(folder / ('provider-cli-' + cleanup.digest(receipt) + '.json'), receipt)
     return {'status': 'MATCHED_FAILURES' if messages else 'NO_MATCHING_FAILURE_OBSERVED',
+            'inspected_log_files': inspected, 'skipped_or_outside_limit': skipped + max(0, len(candidates) - 200),
             'failures': [{'message_sha256': hashlib.sha256(m.encode()).hexdigest(), 'hints': hints(m), 'provider_message_redacted': redacted_message(m)} for m in messages],
             'exact_provider_message': 'RETAINED_PRIVATELY_NOT_PRINTED'}
+
+
+def audit_failure(error):
+    matched = re.search(r'returned HTTP ([0-9]{3})$', str(error)) if isinstance(error, SetupError) else None
+    return {'status': 'AUDIT_READ_UNAVAILABLE', 'absence_not_inferred': True,
+            'code': 'AUDIT_HTTP_FAILED' if matched else 'AUDIT_TRANSPORT_AUTH_OR_RESPONSE_FAILED',
+            'http_status': int(matched.group(1)) if matched else None}
 
 
 def saved_nonprod(folder):
@@ -134,7 +151,8 @@ def main(argv=None):
     try:
         token = command(['gcloud', 'auth', 'print-access-token', '--quiet'])
         report['provider_audit'] = audit_evidence(Http('https://logging.googleapis.com', token), folder)
-    except Exception: report['provider_audit'] = {'status': 'AUDIT_READ_UNAVAILABLE', 'absence_not_inferred': True}
+    except Exception as error:
+        report['provider_audit'] = audit_failure(error)
     try: report['local_provider_evidence'] = local_cli_evidence(home, folder)
     except Exception: report['local_provider_evidence'] = {'status': 'LOCAL_EVIDENCE_UNAVAILABLE'}
     with contextlib.redirect_stdout(io.StringIO()) as captured:

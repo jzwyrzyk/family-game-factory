@@ -27,8 +27,12 @@ bash "$p" "$r" recovery --home-dir "$HOME" \
   --receipt-dir "$HOME/work/jems-recovery-review"
 ```
 
-The first six provisioning commands returned success before log-view creation
-failed. The next inventory must verify them; preserve all partial resources. Google
+Administrator readback at `057daa43ab9c2f4da5510f6987b0c3743e8cce98` verified the
+first six resources/bindings and left four remaining actions. Preserve all partial
+resources. Audit reading was unavailable and local evidence did not identify the
+provider rejection. The revised reader selects the protobuf Any payload at its
+LogEntry boundary, reports sanitized HTTP failures, and also examines bounded SDK
+JSON errors. This is a diagnostic correction, not a confirmed failure diagnosis. Google
 [flexible-filter documentation](https://docs.cloud.google.com/logging/docs/logs-views#filters)
 and the older [REST filter description](https://docs.cloud.google.com/logging/docs/reference/v2/rest/v2/projects.locations.buckets.views)
 differ. Do not infer that dropping OR, labels or service restrictions is permitted.
@@ -49,8 +53,14 @@ the broker.
 The `capacity` lane creates private exact plans and does nothing destructive by
 itself. It recognizes only `jems-releases` and the known `jems-access-review`,
 `jems-gateway-repair-tool`, `jems-service-release` families with bounded generated
-suffixes. Symlink roots, Git locks, linked worktrees, submodules, alternate object
-stores and the active checkout remain blocked.
+suffixes. Registered linked-worktree groups can now be inventoried when the common
+Git directory and every registered checkout exist within the approved historical
+families. Their pointer/backpointer, registration and layout are checked; common
+objects are counted once and all indexes, refs and reflogs are preserved. A missing,
+active or out-of-scope group member blocks the group. Symlink roots, Git locks,
+submodules, alternate object stores and the active checkout remain blocked. Git
+locks are never removed or assumed stale. Blocked directories receive a bounded
+stat-only size inventory marked **recoverability not verified**, not a deletion plan.
 
 **Low-space option:** byte-identical Git pack/index/reverse-index files on the same
 filesystem can share a private canonical inode. This retains every object byte,
@@ -93,6 +103,12 @@ restores missing files only, preferring captured local content and never overwri
 new files. `--restore-dedup PLAN` recovers interrupted captures. A STARTED-only
 journal is uncertain: no automatic replay. Keep existing files and captured unique
 bytes for review when both are present.
+
+The administrator run at `057daa4` found 595,752,069 source bytes, zero exact-pack
+deduplication savings and 598,904,832 Git-object bytes in the then-eligible roots.
+The locked repository, registered historical worktree group and one Git-read
+failure were excluded. The newer closed-group inventory must be run before claiming
+additional savings. No private off-disk archive destination is approved.
 
 The target is 2 GiB where safe evidence supports it. Report the actual capacity
 shortfall; do not invent savings, sum alternative plans or loosen preservation
@@ -197,7 +213,7 @@ Only regular, singly linked tracked source files identical to both HEAD and the
 index can be proposed for deletion. Modified/staged files, all untracked/ignored
 content, Git metadata/objects/stashes/reflogs, credential/configuration files,
 journals, receipts, recovery records, state, Terraform and files with extended
-attributes are preserved. Symlink paths, linked worktrees, active Git locks,
+attributes are preserved. Symlink paths, unverified worktree groups, active Git locks,
 unrecoverable commits and the executing/current checkout stop that repository's
 cleanup. Permissions and content hashes are recorded privately. The utility does
 not delete dependency directories or Git packs merely because they look reproducible.

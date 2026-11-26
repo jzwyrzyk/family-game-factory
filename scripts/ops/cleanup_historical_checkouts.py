@@ -41,10 +41,15 @@ def digest(value):
 
 
 def git(root, *args):
-    env = {**os.environ, 'GIT_OPTIONAL_LOCKS': '0', 'GIT_NO_REPLACE_OBJECTS': '1', 'GIT_TERMINAL_PROMPT': '0'}
+    env = {**{k:v for k,v in os.environ.items() if k not in ('GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_INDEX_FILE')}, 'GIT_OPTIONAL_LOCKS': '0', 'GIT_NO_REPLACE_OBJECTS': '1', 'GIT_TERMINAL_PROMPT': '0'}
     result = subprocess.run(['git', '-c', 'core.fsmonitor=false', '-c', 'core.hooksPath=/dev/null',
                              '-C', str(root), *args], capture_output=True, env=env, timeout=120)
-    require(result.returncode == 0, 'GIT_READ_OR_REMOTE_PROOF_FAILED')
+    labels = {('rev-parse', '--show-toplevel'): 'GIT_TOPLEVEL_READ_FAILED',
+              ('rev-parse', '--absolute-git-dir'): 'GIT_DIRECTORY_READ_FAILED',
+              ('rev-parse', '--git-common-dir'): 'GIT_COMMON_DIRECTORY_READ_FAILED',
+              ('rev-parse', 'HEAD'): 'GIT_HEAD_READ_FAILED', ('remote', 'get-url'): 'GIT_ORIGIN_READ_FAILED',
+              ('worktree', 'list'): 'GIT_WORKTREE_INVENTORY_FAILED'}
+    require(result.returncode == 0, labels.get(tuple(args[:2]), 'GIT_READ_OR_REMOTE_PROOF_FAILED'))
     return result.stdout
 
 
@@ -69,14 +74,44 @@ def allowed_name(name):
         r'jems-(?:access-review|gateway-repair-tool|service-release)(?:[.-][A-Za-z0-9][A-Za-z0-9_.-]{0,63})?', name))
 
 
+def git_directory(root, flag):
+    raw = Path(git(root, 'rev-parse', flag).decode().strip())
+    return safe_path(raw if raw.is_absolute() else root / raw)
+
+
+def worktree_layout(root, home):
+    gitdir = git_directory(root, '--absolute-git-dir')
+    common = git_directory(root, '--git-common-dir')
+    owner = common.parent
+    require(common.name == '.git' and common.is_dir() and home in owner.parents and
+            allowed_name(owner.relative_to(home).parts[0]), 'COMMON_GIT_DIR_OUTSIDE_SCOPE')
+    require(owner != TOOL_ROOT and owner not in TOOL_ROOT.parents and
+            owner != Path.cwd() and owner not in Path.cwd().parents, 'ACTIVE_COMMON_REPOSITORY_FORBIDDEN')
+    require(not any(common.rglob('*.lock')), 'GIT_OPERATION_IN_PROGRESS')
+    roots = []
+    for field in git(root, 'worktree', 'list', '--porcelain', '-z').split(b'\0'):
+        if not field.startswith(b'worktree '): continue
+        path = safe_path(os.fsdecode(field[len(b'worktree '):]))
+        require(path.is_dir(), 'WORKTREE_PATH_MISSING')
+        require(home in path.parents and allowed_name(path.relative_to(home).parts[0]), 'WORKTREE_OUTSIDE_APPROVED_SCOPE')
+        require(path != TOOL_ROOT and path not in TOOL_ROOT.parents and path != Path.cwd() and
+                path not in Path.cwd().parents, 'ACTIVE_RELATED_WORKTREE_FORBIDDEN')
+        roots.append(str(path))
+    require(str(root) in roots and str(owner) in roots, 'WORKTREE_REGISTRATION_MISMATCH')
+    if gitdir != common:
+        require(common / 'worktrees' in gitdir.parents and (root / '.git').is_file(), 'NONSTANDARD_WORKTREE_PRESERVED')
+        require(safe_path((gitdir / 'gitdir').read_text().strip()) == root / '.git', 'WORKTREE_BACKPOINTER_MISMATCH')
+    return {'git_dir': str(gitdir), 'common_dir': str(common), 'worktrees': sorted(roots)}
+
+
 def allowed_root(root, home):
     root, home = safe_path(root), safe_path(home)
     require(root != home and home in root.parents, 'ROOT_OUTSIDE_APPROVED_HOME')
     require(allowed_name(root.relative_to(home).parts[0]), 'ROOT_NOT_ALLOWLISTED')
     require(root != TOOL_ROOT and root not in TOOL_ROOT.parents, 'ACTIVE_TOOL_CHECKOUT_FORBIDDEN')
     require(root != Path.cwd() and root not in Path.cwd().parents, 'CURRENT_WORKING_DIRECTORY_FORBIDDEN')
-    require((root / '.git').is_dir() and not (root / '.git').is_symlink(), 'LINKED_OR_NONSTANDARD_GIT_DIR_PRESERVED')
-    require(not any((root / '.git').rglob('*.lock')), 'GIT_OPERATION_IN_PROGRESS')
+    require((root / '.git').exists() and not (root / '.git').is_symlink(), 'NONSTANDARD_GIT_DIR_PRESERVED')
+    worktree_layout(root, home)
     require(git(root, 'rev-parse', '--show-toplevel').decode().strip() == str(root), 'REPOSITORY_ROOT_MISMATCH')
     require(git(root, 'remote', 'get-url', 'origin').decode().strip() == REMOTE, 'REMOTE_NOT_APPROVED')
     return root
@@ -137,7 +172,7 @@ def repo_plan(root, home, proof=remote_proof):
         files.append({'path': relative, **identity})
     info = root.stat()
     return {'root': str(root), 'root_identity': [info.st_dev, info.st_ino], 'source_sha': sha,
-            'remote': REMOTE, 'files': files, 'bytes': sum(f['stat'][2] for f in files),
+            'remote': REMOTE, 'git_layout': worktree_layout(root, home), 'files': files, 'bytes': sum(f['stat'][2] for f in files),
             'preserved_tracked_files': preserved, 'git_and_all_untracked_ignored_files': 'PRESERVED'}
 
 
@@ -179,6 +214,8 @@ def validate_snapshot(plan, proof):
         require([info.st_dev, info.st_ino] == repo['root_identity'], 'ROOT_CHANGED')
         require(git(root, 'rev-parse', 'HEAD').decode().strip() == repo['source_sha'], 'HEAD_CHANGED')
         proof(repo['source_sha'])
+        if 'git_layout' in repo:
+            require(worktree_layout(root, home) == repo['git_layout'], 'WORKTREE_LAYOUT_CHANGED')
         current = {f['path']: f for f in repo_plan(root, home, proof=lambda sha: None)['files']}
         for entry in repo['files']:
             require(current.get(entry['path']) == entry, 'FILE_OR_INDEX_CHANGED_REPLAN')
