@@ -139,6 +139,7 @@ export function installCreationStudio(host: Host) {
   $('creationStarters').before(palShelf);
   const palTools = node('div', 'creation-pal-tools'); palTools.id = 'creationPalTools';
   $('creationPalSlot').append(palTools);
+  let cleanPreview = false;
   let scene: CreationProject | null = null, entryId = '', revisionId = '', sceneOwner = '', selectedActor = '', selectedProgram = '';
   let predictionReader:ReturnType<typeof createReadAloudControl>|null=null;
   let prediction:{choice:MovementChoice;scene:CreationProject}|null=null;
@@ -228,7 +229,7 @@ export function installCreationStudio(host: Host) {
   function paint() {
     if (!scene || !engine) return;
     const snapshot = engine.snapshot();
-    stage.render(targetMode && targetProject ? targetProject : scene, snapshot, targetMode || recording || page.dataset.workspaceView === 'play' || snapshot.status !== 'idle' ? '' : selectedActor);
+    stage.render(targetMode && targetProject ? targetProject : scene, snapshot, targetMode || recording || cleanPreview || snapshot.status !== 'idle' ? '' : selectedActor, !challengeId);
     $('creationClock').textContent = (snapshot.timeMs / 1000).toFixed(1) + ' s';
     $('creationRunStatus').textContent = snapshot.status === 'limit' ? snapshot.reason || 'Try fewer repeats.' : snapshot.status === 'running' ? 'Follow your blocks' : snapshot.status === 'paused' ? 'Paused' : snapshot.status === 'completed' ? 'Try a change, or tap a character' : 'Ready to try';
     const words = [...snapshot.actors.filter(actor => actor.visible && actor.speech).map(actor => `${actor.name}: ${actor.speech}`),
@@ -292,7 +293,7 @@ export function installCreationStudio(host: Host) {
     const before = clone(scene!), next = clone(scene!),selectionBefore={selectedActor,selectedProgram,insert,expandedBlockId};
     try{change(next); validateCreationProject(next);await (await store()).autosave(entryId, sceneOwner, next, revisionId);}
     catch(error){selectedActor=selectionBefore.selectedActor;selectedProgram=selectionBefore.selectedProgram;insert=selectionBefore.insert;expandedBlockId=selectionBefore.expandedBlockId;throw error;}
-    undo.push(before); if (undo.length > 60) undo.shift(); redo = []; scene = next; dirty = true;
+    undo.push(before); if (undo.length > 60) undo.shift(); redo = []; scene = next; cleanPreview = false; dirty = true;
     $('creationSaveState').textContent = 'Draft saved · keep when you’re ready';
     freshEngine(); if (rerender) renderEditor(); updateUndo();
     if (rerender && active && !active.isConnected) {
@@ -1053,6 +1054,7 @@ export function installCreationStudio(host: Host) {
   $('creationMoreScenes').onclick = async () => await act(async () => { $<HTMLDetailsElement>('creationMore').open = false; await shelf(); });
   function setWorkspaceView(view: 'code' | 'play') {
     page.dataset.workspaceView = view;
+    cleanPreview = view === 'play';
     $('creationCodeView').setAttribute('aria-pressed', String(view === 'code'));
     $('creationPlayView').setAttribute('aria-pressed', String(view === 'play'));
   }
@@ -1194,7 +1196,22 @@ export function installCreationStudio(host: Host) {
       }); box.append(b);
     }
   }
-  let drag: { id: string; x: number; y: number; moved: boolean } | null = null;
+  type PlacementDrag = {
+    id:string; pointer:number; view:number; origin:{x:number;y:number};
+    start:{x:number;y:number}; size:number; resizing:boolean; moved:boolean;
+  };
+  let drag: PlacementDrag | null = null;
+  function dragTransform(gesture:PlacementDrag, point:{x:number;y:number}, project:CreationProject) {
+    if (gesture.resizing) {
+      const from = Math.max(1, Math.hypot(gesture.start.x-gesture.origin.x, gesture.start.y-gesture.origin.y));
+      const to = Math.hypot(point.x-gesture.origin.x, point.y-gesture.origin.y);
+      return {size:Math.max(16,Math.min(240,Math.round(gesture.size*to/from)))};
+    }
+    return {
+      x:Math.max(0,Math.min(project.width, gesture.origin.x + point.x - gesture.start.x)),
+      y:Math.max(0,Math.min(project.height, gesture.origin.y + point.y - gesture.start.y)),
+    };
+  }
   const canvas = $<HTMLCanvasElement>('creationCanvas');
   // Size the actual canvas element, not a letterboxed CSS content area. Pointer
   // positions therefore keep the exact same mapping as the saved scene.
@@ -1207,15 +1224,43 @@ export function installCreationStudio(host: Host) {
   };
   new ResizeObserver(fitStage).observe(canvasWrap);
   canvas.onpointerdown = async event => {
-    if (!isCurrent() || locked() || targetMode) return; const point = stage.point(event), id = stage.hit(point.x, point.y); if (!id) return;
+    if (!event.isPrimary || !isCurrent() || locked() || targetMode) return; const point = stage.point(event), grip = stage.resizeHit(point.x,point.y), id = grip || stage.hit(point.x, point.y); if (!id) return;
     if (recoveryPending) { status(recoveryMessage, true); return; }
     if (engine?.snapshot().status === 'running' || engine?.snapshot().status === 'completed') { await act(() => learningThen(() => { engine!.resume(); engine!.tap(id); animate(); })); return; }
-    selectedActor = id; selectedProgram = scene!.programs.find(p => p.actorId === id)?.id || ''; insert = null; renderEditor(); paint();
-    if (!challengeId) { drag = { id, ...point, moved: false }; canvas.setPointerCapture(event.pointerId); }
+    cleanPreview = false; selectedActor = id; selectedProgram = scene!.programs.find(p => p.actorId === id)?.id || ''; insert = null; renderEditor(); paint();
+    if (!challengeId) {
+      const placed = scene!.actors.find(actor => actor.id === id)!;
+      drag = {id, pointer:event.pointerId, view:viewEpoch, start:point, origin:{x:placed.x,y:placed.y},
+        size:placed.size ?? 100, resizing:!!grip, moved:false};
+      canvas.setPointerCapture(event.pointerId);
+    }
   };
-  canvas.onpointermove = event => { if (!drag || !scene || !engine) return; const point = stage.point(event); if (Math.hypot(point.x - drag.x, point.y - drag.y) < 3 && !drag.moved) return; drag.moved = true; const snapshot = engine.snapshot(); const actor = snapshot.actors.find(a => a.id === drag!.id)!; actor.x = Math.max(0, Math.min(scene.width, point.x)); actor.y = Math.max(0, Math.min(scene.height, point.y)); stage.render(scene, snapshot, selectedActor); };
-  canvas.onpointerup = async event => { const moving = drag; drag = null; if (!moving?.moved) return; const point = stage.point(event); await act(async () => await mutation(project => { const actor = project.actors.find(a => a.id === moving.id)!; actor.x = Math.max(0, Math.min(project.width, point.x)); actor.y = Math.max(0, Math.min(project.height, point.y)); })); };
-  canvas.onpointercancel = () => { drag = null; paint(); };
+  canvas.onpointermove = event => {
+    if (!drag || drag.pointer !== event.pointerId || drag.view !== viewEpoch || !scene || !engine) return;
+    const point = stage.point(event);
+    if (!drag.moved && Math.hypot(point.x - drag.start.x, point.y - drag.start.y) < 3) return;
+    drag.moved = true;
+    const snapshot = engine.snapshot(), actor = snapshot.actors.find(a => a.id === drag!.id);
+    if (actor) Object.assign(actor,dragTransform(drag,point,scene));
+    stage.render(scene,snapshot,selectedActor,true);
+  };
+  canvas.onpointerup = event => {
+    const gesture = drag;
+    if (gesture?.pointer !== event.pointerId) return;
+    drag = null;
+    if (!gesture.moved || gesture.view !== viewEpoch) return;
+    const point = stage.point(event);
+    void act(async () => {
+      if (gesture.view !== viewEpoch) return;
+      await mutation(project => {
+        const placed = project.actors.find(a => a.id === gesture.id);
+        if (placed) Object.assign(placed,dragTransform(gesture,point,project));
+      });
+    });
+  };
+  canvas.onpointercancel = canvas.onlostpointercapture = event => {
+    if (drag?.pointer === event.pointerId) { drag = null; paint(); }
+  };
   page.addEventListener('click',event=>{
     const target = event.target as HTMLElement;
     if (!target.closest('.jems-read-aloud')) stopReading();

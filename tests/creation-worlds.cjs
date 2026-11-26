@@ -70,6 +70,18 @@ async function buildMixedWorld(page) {
   const original = (await scene(page)).actors.find(a => a.assetId === rocket);
   assert.ok(!(await scene(page)).programs.some(p => p.actorId === original.id), 'new decoration is inert');
 
+  const canvas = page.locator('#creationCanvas');
+  await canvas.scrollIntoViewIfNeeded();
+  const rect = await canvas.boundingBox();
+  const project = await scene(page);
+  const sx = rect.width / project.width, sy = rect.height / project.height;
+  const gripX = rect.x + (original.x + original.size * .58) * sx;
+  const gripY = rect.y + (original.y + original.size * .57) * sy;
+  await page.mouse.move(gripX, gripY); await page.mouse.down();
+  await page.mouse.move(gripX + 25*sx, gripY + 25*sy, {steps:5}); await page.mouse.up();
+  await page.waitForFunction(id => FG.creation.scene().actors.find(a => a.id === id).size > 110, original.id);
+  await page.locator('#creationUndo').click();
+  await page.waitForFunction(id => FG.creation.scene().actors.find(a => a.id === id).size === 110, original.id);
   await settings(page);
   const placement = page.locator('.creation-placement-controls');
   await placement.getByRole('button',{name:'Duplicate'}).click();
