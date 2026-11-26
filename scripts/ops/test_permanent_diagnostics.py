@@ -15,6 +15,144 @@ IMAGE = f'us-east5-docker.pkg.dev/{setup.PROJECT}/factory-services/request-broke
 
 
 class BootstrapTests(unittest.TestCase):
+    def test_gcloud_structured_failures_and_strict_absence(self):
+        from types import SimpleNamespace
+        cases = [
+            (1, '', 'private-token-marker PERMISSION_DENIED', 'GCLOUD_COMMAND_FAILED', ('PERMISSION_DENIED',)),
+            (1, '', 'NOT_FOUND PERMISSION_DENIED private-token-marker', 'GCLOUD_COMMAND_FAILED', ('NOT_FOUND', 'PERMISSION_DENIED')),
+            (1, '', 'unrecognized CLI argument private-token-marker', 'GCLOUD_COMMAND_FAILED', ()),
+            (0, 'private-token-marker', '', 'GCLOUD_JSON_INVALID', ()),
+            (0, 'null', '', 'GCLOUD_RESPONSE_INVALID', ())]
+        for status, stdout, stderr, code, codes in cases:
+            with self.subTest(code=code, status=status), patch.object(setup.subprocess, 'run',
+                 return_value=SimpleNamespace(returncode=status, stdout=stdout, stderr=stderr)):
+                with self.assertRaises(setup.ProviderReadError) as caught:
+                    setup.run('iam', 'service-accounts', 'describe', setup.BROKER, missing_ok=True)
+                self.assertEqual(caught.exception.code, code)
+                self.assertEqual(caught.exception.provider_codes, codes)
+                self.assertNotIn('private-token-marker', str(caught.exception))
+        with patch.object(setup.subprocess, 'run', return_value=SimpleNamespace(
+                returncode=1, stdout='', stderr='NOT_FOUND private-token-marker')):
+            self.assertIsNone(setup.run('iam', 'service-accounts', 'describe', setup.BROKER, missing_ok=True))
+
+    def test_cli_absence_hint_does_not_authorize_creation(self):
+        from types import SimpleNamespace
+        for text, category in [('Cannot find service [private-token-marker]', 'CANNOT_FIND_SERVICE_MESSAGE'),
+                               ('unrecognized arguments: private-token-marker', 'UNRECOGNIZED_ARGUMENTS'),
+                               ('Invalid choice: private-token-marker', 'INVALID_COMMAND_CHOICE')]:
+            with patch.object(setup.subprocess, 'run', return_value=SimpleNamespace(
+                    returncode=1, stdout='', stderr=text)):
+                with self.assertRaises(setup.ProviderReadError) as caught:
+                    setup.run('run', 'services', 'describe', setup.SERVICE, missing_ok=True)
+                report = setup.failure(caught.exception, setup.Progress())
+                self.assertEqual(report['cli_category'], category)
+                self.assertEqual(report['provider_codes'], [])
+                self.assertNotIn('private-token-marker', json.dumps(report))
+
+    def test_gcloud_unavailable_and_timeout_have_safe_codes(self):
+        for error, code in [(FileNotFoundError('private-token-marker'), 'GCLOUD_UNAVAILABLE'),
+                            (setup.subprocess.TimeoutExpired('private-token-marker', 60), 'GCLOUD_TIMEOUT')]:
+            with patch.object(setup.subprocess, 'run', side_effect=error):
+                with self.assertRaises(setup.ProviderReadError) as caught:
+                    setup.run('projects', 'describe', setup.PROJECT)
+                self.assertEqual(caught.exception.code, code)
+                self.assertNotIn('private-token-marker', str(caught.exception))
+
+    def invoke_inventory(self, cloud=None, **overrides):
+        import contextlib
+        import io
+        with contextlib.ExitStack() as stack:
+            for target, name, value in [
+                (setup, 'source', {}),
+                (setup.publication, 'source_archive', b'archive'),
+                (setup.publication, 'qualify', {'image': IMAGE})]:
+                options = {'side_effect': value} if isinstance(value, Exception) else {'return_value': value}
+                if name in overrides:
+                    options = {'side_effect': overrides[name]}
+                stack.enter_context(patch.object(target, name, **options))
+            stack.enter_context(patch.object(setup.publication.publication, 'run',
+                side_effect=lambda args, root: (root / args[2].split(':', 1)[1]).read_bytes()))
+            token = stack.enter_context(patch.object(setup, 'command', return_value='private-token-marker'))
+            reader = stack.enter_context(patch.object(setup, 'run', side_effect=cloud or self.cloud))
+            output = stack.enter_context(contextlib.redirect_stdout(io.StringIO()))
+            result = setup.main(['--source-sha', 'a' * 40, '--image', IMAGE, '--check',
+                                 '--build-source-sha', 'b' * 40,
+                                 '--build-id', '7fcac19a-8444-4c17-955a-1a381006069e'])
+        self.assertNotIn('private-token-marker', output.getvalue())
+        return result, json.loads(output.getvalue()), reader, token
+
+    def test_inventory_cli_read_failure_identifies_stage_without_private_text(self):
+        def cloud(*args, **kwargs):
+            if args[:3] == ('iam', 'service-accounts', 'describe'):
+                raise setup.ProviderReadError('private-token-marker', code='GCLOUD_COMMAND_FAILED',
+                                           provider_codes=['PERMISSION_DENIED', 'private-token-marker'])
+            return self.cloud(*args, **kwargs)
+        code, report, reader, token = self.invoke_inventory(cloud)
+        self.assertEqual(code, 2)
+        self.assertEqual(report['stage'], 'BROKER_ACCOUNT_METADATA')
+        self.assertEqual(report['code'], 'GCLOUD_COMMAND_FAILED')
+        self.assertEqual(report['provider_codes'], ['PERMISSION_DENIED'])
+        self.assertEqual(len(report['completed_reads']), 4)
+        self.assertNotIn('plan', report)
+        self.assertNotIn('approve_plan_sha256', report)
+        self.assertEqual(reader.call_count, 5)
+
+    def test_inventory_cli_missing_resources_create_plan_but_never_execute(self):
+        code, report, reader, token = self.invoke_inventory()
+        self.assertEqual(code, 0)
+        self.assertEqual(len(report['plan']['actions']), 10)
+        self.assertEqual(len(report['approve_plan_sha256']), 64)
+        for call in reader.call_args_list:
+            self.assertFalse(set(call.args) & {'create', 'create-oidc', 'deploy', 'add-iam-policy-binding'})
+
+    def test_inventory_shape_errors_fail_closed_with_fixed_stage(self):
+        for value in ('private-token-marker', [None], [{'config': 'private-token-marker'}]):
+            def cloud(*args, **kwargs):
+                return value if args[:2] == ('services', 'list') else self.cloud(*args, **kwargs)
+            code, report, _, _ = self.invoke_inventory(cloud)
+            self.assertEqual(code, 2)
+            self.assertEqual(report['stage'], 'ENABLED_APIS')
+            self.assertIn(report['code'], {'INVENTORY_RESPONSE_SHAPE_INVALID', 'RESPONSE_OR_SOURCE_SHAPE_INVALID'})
+            self.assertNotIn('plan', report)
+
+    def test_inventory_missing_status_is_not_verified_permission_denial(self):
+        progress = setup.Progress()
+        setup.preflight(self.spec(), cloud=self.cloud, progress=progress)
+        records = {record['stage']: record['status'] for record in progress.reads}
+        self.assertEqual(records['BROKER_ACCOUNT_METADATA'], 'NOT_PROVISIONED')
+        self.assertEqual(records['CALLER_ACCOUNT_METADATA'], 'NOT_PROVISIONED')
+        self.assertEqual(records['PROJECT_IAM'], 'READ_OK')
+
+    def test_source_and_provenance_failures_stop_before_admin_token(self):
+        cases = [('source', FileNotFoundError('private-token-marker'), 'SOURCE_VALIDATION', 'LOCAL_FILE_MISSING'),
+                 ('source_archive', RuntimeError('private-token-marker'), 'SOURCE_ARCHIVE', 'SOURCE_COMMAND_FAILED'),
+                 ('qualify', setup.publication.BuildVerificationError('BUILD_ARTIFACTS_UNEXPECTED'),
+                  'BUILD_QUALIFICATION', 'BUILD_ARTIFACTS_UNEXPECTED')]
+        for name, error, stage, expected in cases:
+            code, report, reader, token = self.invoke_inventory(**{name: error})
+            self.assertEqual(code, 2)
+            self.assertEqual((report['stage'], report['code']), (stage, expected))
+            reader.assert_not_called()
+            token.assert_not_called()
+
+    def test_policy_failure_has_specific_predicate_and_no_mutation(self):
+        def cloud(*args, **kwargs):
+            if args[:2] == ('projects', 'get-iam-policy'):
+                return {'bindings': [{'members': ['allUsers'], 'role': 'private-token-marker'}]}
+            return self.cloud(*args, **kwargs)
+        code, report, reader, _ = self.invoke_inventory(cloud)
+        self.assertEqual(code, 2)
+        self.assertEqual((report['stage'], report['code']), ('PROJECT_IAM', 'PUBLIC_PROJECT_GRANTS_PRESENT'))
+        self.assertEqual(reader.call_count, 3)
+
+    def test_unexpected_exception_and_admin_errors_do_not_expose_text(self):
+        for error in (SetupError('private-token-marker'), Exception('private-token-marker'),
+                      setup.ProviderReadError('private-token-marker', code='private-token-marker')):
+            code, report, _, _ = self.invoke_inventory(lambda *a, **kw: (_ for _ in ()).throw(error))
+            self.assertEqual(code, 2)
+            self.assertEqual(report['stage'], 'PROJECT_METADATA')
+            self.assertNotIn('private-token-marker', json.dumps(report))
+
     def test_existing_image_source_cannot_hide_changed_broker_bytes(self):
         import contextlib
         import io

@@ -1,5 +1,33 @@
 # Permanent cloud operations delivery ledger
 
+## November 26, 2026 — broker inventory stopped before a plan
+
+The administrator ran `broker-setup --check` from tooling `7867b4e…` against the
+already qualified image, build ID and original source recorded below. It returned
+`STOPPED` with the generic `Source or response validation failed` message. No plan
+or approval hash was produced. This read-only invocation did not deploy resources;
+the private recovery receipt stays in Cloud Shell. The result alone cannot establish
+which local operation, provider read or response validation failed. The prior image
+qualification remains valid for its observed source and digest; inventory acceptance
+remains incomplete.
+
+The corrective setup tool now emits fixed `stage`, `code`, allowlisted
+`provider_codes` and `cli_category` fields plus completed read statuses. It suppresses
+exception text, credentials and provider bodies. `READ_OK` means the read completed,
+not that all subsequent validations or effective IAM checks passed. Explicit missing
+resources are `NOT_PROVISIONED`; CLI text hints, denied access, malformed JSON and
+successful `null` responses do not authorize treating resources as absent.
+No inventory predicate, provenance rule or approval requirement was relaxed.
+The broker-local CLI adapter preserves the frozen diagnostic/activation dependency
+bytes. The original broker image files and nonproduction Terraform inputs remain
+unchanged. A checksum-verified administrator read must identify the actual failed
+stage before any evidence-based repair or infrastructure approval can proceed.
+
+Local validation: **311 operations tests passed**, including CLI failures, strict
+absence, malformed provider responses, source/provenance stops, read-only planning
+and redaction. The actual administrator inventory remains unqualified.
+
+
 ## November 26, 2026 — existing broker image qualified by administrator
 
 The owner supplied the corrected verifier's **BUILD_VERIFIED_NOT_DEPLOYED** result

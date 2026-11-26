@@ -47,7 +47,19 @@ older build. Changing an image's source label to a newer tool SHA is forbidden.
 
 ## Next broker inventory (read-only)
 
-Keep the executable tooling pinned to the qualified recovery commit for this plan:
+The initial inventory invocation below stopped with a generic validation error;
+it produced no plan or approval hash. Use the corrective immutable tooling SHA from
+the latest reviewed PR #222 handoff for the next read. Keep the original build/image
+identities below unchanged. The launcher checksum is unchanged.
+
+The corrective error output includes `stage`, `code`, allowlisted `provider_codes`,
+`cli_category` and completed read statuses. `READ_OK` records a completed read only;
+`NOT_PROVISIONED` identifies explicit absence, never verified permission denial.
+CLI message hints are diagnostic only and cannot authorize resource creation.
+Raw errors, token values and provider bodies remain suppressed. No new plan exists
+until the complete check succeeds.
+
+Initial inventory command (superseded tooling pin; see the reviewed handoff):
 
 ```sh
 (

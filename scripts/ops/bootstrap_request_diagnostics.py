@@ -12,11 +12,12 @@ import json
 from pathlib import Path
 import re
 import sys
+import subprocess
 
 import build_request_broker as publication
 
-from admin_api import Http, Plan, SetupError, command, require
-from bootstrap_diagnostics import BootstrapError, gcloud as run
+from admin_api import Http, Plan, SetupError, command
+from bootstrap_diagnostics import BootstrapError
 
 ROOT = Path(__file__).resolve().parents[2]
 PROJECT = 'family-game-factory-jzw'
@@ -49,21 +50,144 @@ broker = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(broker)
 
 
+class ProviderReadError(BootstrapError):
+    def __init__(self, message, *, code='GCLOUD_COMMAND_FAILED', provider_codes=(), cli_category=None):
+        super().__init__(message)
+        self.code = code
+        self.provider_codes = tuple(provider_codes)
+        self.cli_category = cli_category
+
+
+def run(*args, missing_ok=False):
+    """Broker-local adapter; preserve frozen activation dependencies and strict absence."""
+    command = ['gcloud', *args, f'--project={PROJECT}', '--quiet', '--format=json']
+    try:
+        result = subprocess.run(command, capture_output=True, text=True, timeout=60,
+                                check=False, stdin=subprocess.DEVNULL)
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise ProviderReadError('CLI unavailable', code='GCLOUD_TIMEOUT' if isinstance(
+            error, subprocess.TimeoutExpired) else 'GCLOUD_UNAVAILABLE') from None
+    if result.returncode:
+        codes = sorted(set(re.findall(
+            r'\b(?:NOT_FOUND|PERMISSION_DENIED|UNAUTHENTICATED|SERVICE_DISABLED|INVALID_ARGUMENT|'
+            r'FAILED_PRECONDITION|RESOURCE_EXHAUSTED|UNAVAILABLE|DEADLINE_EXCEEDED)\b', result.stderr)))
+        if missing_ok and codes == ['NOT_FOUND']:
+            return None
+        # These hints aid diagnosis only. Never turn an English CLI message into absence.
+        category = next((name for text, name in [
+            ('unrecognized arguments:', 'UNRECOGNIZED_ARGUMENTS'),
+            ('Invalid choice:', 'INVALID_COMMAND_CHOICE'),
+            ('Cannot find service [', 'CANNOT_FIND_SERVICE_MESSAGE')]
+            if text in result.stderr), None)
+        raise ProviderReadError('CLI read failed', provider_codes=codes, cli_category=category)
+    try:
+        value = json.loads(result.stdout) if result.stdout.strip() else {}
+    except ValueError:
+        raise ProviderReadError('Invalid JSON', code='GCLOUD_JSON_INVALID') from None
+    if value is None:
+        raise ProviderReadError('Null without NOT_FOUND', code='GCLOUD_RESPONSE_INVALID')
+    return value
+
+
+class BrokerValidationError(SetupError):
+    def __init__(self, code):
+        self.code = code
+        super().__init__(code)
+
+
+def require(condition, code):
+    if not condition:
+        raise BrokerValidationError(code)
+
+
+class Progress:
+    """Fixed stage names only; never stores provider bodies, tokens or command output."""
+    def __init__(self):
+        self.stage = 'ARGUMENT_VALIDATION'
+        self.reads = []
+
+    def call(self, stage, operation, *args, **kwargs):
+        self.stage = stage
+        return operation(*args, **kwargs)
+
+
+def read_stage(args):
+    # Keys are executable source constants, not returned provider strings.
+    operations = {
+        ('projects', 'describe'): ('PROJECT_METADATA', dict),
+        ('services', 'list'): ('ENABLED_APIS', list),
+        ('projects', 'get-iam-policy'): ('PROJECT_IAM', dict),
+        ('artifacts', 'docker', 'images', 'describe'): ('IMAGE_METADATA', dict),
+        ('iam', 'service-accounts', 'describe'): ('ACCOUNT_METADATA', dict),
+        ('iam', 'service-accounts', 'keys', 'list'): ('ACCOUNT_KEYS', list),
+        ('iam', 'service-accounts', 'get-iam-policy'): ('ACCOUNT_IAM', dict),
+        ('iam', 'roles', 'describe'): ('VIEW_ROLE', dict),
+        ('iam', 'workload-identity-pools', 'describe'): ('POOL_METADATA', dict),
+        ('iam', 'workload-identity-pools', 'providers', 'list'): ('PROVIDER_LIST', list),
+        ('iam', 'workload-identity-pools', 'providers', 'describe'): ('PROVIDER_METADATA', dict),
+        ('logging', 'buckets', 'describe'): ('LOG_BUCKET', dict),
+        ('logging', 'views', 'describe'): ('LOG_VIEW', dict),
+        ('run', 'services', 'describe'): ('BROKER_SERVICE', dict),
+        ('run', 'services', 'get-iam-policy'): ('BROKER_SERVICE_IAM', dict),
+    }
+    for prefix, (stage, shape) in operations.items():
+        if args[:len(prefix)] == prefix:
+            if stage.startswith('ACCOUNT_'):
+                stage = ('BROKER_' if BROKER in args or '--iam-account=' + BROKER in args else 'CALLER_') + stage
+            return stage, shape
+    raise BrokerValidationError('UNEXPECTED_INVENTORY_OPERATION')
+
+
+def failure(error, progress):
+    # Do not infer status by parsing arbitrary exception text or emit that text.
+    code = 'UNEXPECTED_SETUP_ERROR'
+    provider_codes = []
+    if isinstance(error, (BrokerValidationError, publication.BuildVerificationError)):
+        code = error.code
+    elif isinstance(error, ProviderReadError):
+        allowed = {'GCLOUD_TIMEOUT', 'GCLOUD_UNAVAILABLE', 'GCLOUD_COMMAND_FAILED',
+                   'GCLOUD_RESPONSE_INVALID', 'GCLOUD_JSON_INVALID', 'BOOTSTRAP_FAILED'}
+        code = error.code if error.code in allowed else 'BOOTSTRAP_FAILED'
+        provider_codes = sorted(set(error.provider_codes) & {
+            'NOT_FOUND', 'PERMISSION_DENIED', 'UNAUTHENTICATED', 'SERVICE_DISABLED',
+            'INVALID_ARGUMENT', 'FAILED_PRECONDITION', 'RESOURCE_EXHAUSTED',
+            'UNAVAILABLE', 'DEADLINE_EXCEEDED'})
+    elif isinstance(error, BootstrapError):
+        code = 'BOOTSTRAP_FAILED'
+    elif isinstance(error, SetupError):
+        code = 'ADMIN_COMMAND_OR_POLICY_FAILED'
+    elif isinstance(error, FileNotFoundError):
+        code = 'LOCAL_FILE_MISSING'
+    elif isinstance(error, OSError):
+        code = 'LOCAL_IO_FAILED'
+    elif isinstance(error, (ValueError, TypeError, KeyError, AttributeError, IndexError)):
+        code = 'RESPONSE_OR_SOURCE_SHAPE_INVALID'
+    elif isinstance(error, RuntimeError):
+        code = 'SOURCE_COMMAND_FAILED'
+    return {'status': 'STOPPED', 'stage': progress.stage, 'code': code,
+            'provider_codes': provider_codes,
+            'cli_category': error.cli_category if isinstance(error, ProviderReadError) and
+                error.cli_category in {'UNRECOGNIZED_ARGUMENTS', 'INVALID_COMMAND_CHOICE',
+                                       'CANNOT_FIND_SERVICE_MESSAGE'} else None,
+            'completed_reads': progress.reads,
+            'resubmit': False, 'recovery': 'Preserve partial state; rerun --check'}
+
+
 def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
 
 
 def source(sha):
-    require(re.fullmatch('[0-9a-f]{40}', sha or ''), 'Use a full immutable source SHA')
-    require(command(['git', '-C', str(ROOT), 'rev-parse', 'HEAD']) == sha, 'Source HEAD differs')
+    require(re.fullmatch('[0-9a-f]{40}', sha or ''), 'SOURCE_SHA_INVALID')
+    require(command(['git', '-C', str(ROOT), 'rev-parse', 'HEAD']) == sha, 'SOURCE_HEAD_MISMATCH')
     require(not command(['git', '-C', str(ROOT), 'status', '--porcelain', '--untracked-files=all']),
-            'Source must be a clean checkout; keep evidence outside it')
+            'SOURCE_CHECKOUT_DIRTY')
     return {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in FILES}
 
 
 def config(image):
     require(re.fullmatch(re.escape(publication.IMAGE) + r'@sha256:[0-9a-f]{64}', image or ''),
-            'An approved request-broker digest in factory-services is required')
+            'IMAGE_DIGEST_INVALID')
     return {'image': image, 'service': SERVICE, 'runtime': BROKER, 'bucket_location': 'global',
             'min_instances': 0, 'max_instances': 1, 'concurrency': 1, 'timeout_seconds': 60,
             'memory': '256Mi', 'cpu': '1', 'authentication': 'required',
@@ -91,41 +215,48 @@ def proposed(image, sha, hashes):
 
 def exact(value, expected, label):
     require(isinstance(value, dict) and all(value.get(k) == v for k, v in expected.items()),
-            'Conflicting ' + label + '; no automatic repair')
+            'RESOURCE_CONFIGURATION_CONFLICT')
 
 
 def grants(policy, allowed, label):
     found = set()
     for binding in policy.get('bindings', []):
-        require(not binding.get('condition'), 'Conditional policy needs review: ' + label)
+        require(not binding.get('condition'), 'CONDITIONAL_POLICY_UNEXPECTED')
         found.update((binding['role'], member) for member in binding['members'])
-    require(found <= allowed, 'Unexpected grants: ' + label)
+    require(found <= allowed, 'IAM_GRANTS_UNEXPECTED')
     return found
 
 
-def preflight(spec, cloud=run, logging=None):
+def preflight(spec, cloud=None, logging=None, progress=None):
     """Complete read-only inventory before constructing any executable mutation."""
-    reader, inventory = cloud, []
+    reader, inventory = cloud or run, []
+    progress = progress or Progress()
     def cloud(*args, **kwargs):
-        value = reader(*args, **kwargs)
+        stage, shape = read_stage(args)
+        value = progress.call(stage, reader, *args, **kwargs)
+        require((value is None and kwargs.get('missing_ok')) or isinstance(value, shape),
+                'INVENTORY_RESPONSE_SHAPE_INVALID')
+        if isinstance(value, list):
+            require(all(isinstance(item, dict) for item in value), 'INVENTORY_RESPONSE_SHAPE_INVALID')
+        progress.reads.append({'stage': stage, 'status': 'NOT_PROVISIONED' if value is None else 'READ_OK'})
         inventory.append({"read": list(args), "sha256": digest(value)})
         return value
     exact(cloud('projects', 'describe', PROJECT),
           {'projectId': PROJECT, 'projectNumber': NUMBER, 'lifecycleState': 'ACTIVE'}, 'project')
     enabled = {s.get('config', {}).get('name') for s in cloud('services', 'list', '--enabled')}
-    require(APIS <= enabled, 'Required APIs missing; bootstrap will not enable them')
+    require(APIS <= enabled, 'REQUIRED_APIS_MISSING')
     policy = cloud('projects', 'get-iam-policy', PROJECT)
     require(not any(set(b.get('members', [])) & {'serviceAccount:' + CALLER, 'serviceAccount:' + BROKER}
-                    for b in policy.get('bindings', [])), 'Diagnostic identity has project grants')
+                    for b in policy.get('bindings', [])), 'DIAGNOSTIC_PROJECT_GRANTS_PRESENT')
     require(not any(set(b.get('members', [])) & {'allUsers', 'allAuthenticatedUsers'}
                     for b in policy.get('bindings', [])),
-            'Public project grants require effective broker ingress review')
+            'PUBLIC_PROJECT_GRANTS_PRESENT')
     # Owner must review build provenance; this confirms the referenced immutable artifact exists.
     image = spec['configuration']['image']
     cloud('artifacts', 'docker', 'images', 'describe', image)
     plan = Plan('request-diagnostics', spec)
     def add(label, *args):
-        plan.add(label, {'gcloud': list(args), 'project': PROJECT}, lambda: cloud(*args))
+        plan.add(label, {'gcloud': list(args), 'project': PROJECT}, lambda: progress.call('APPLY_ACTION', reader, *args))
     for email in (BROKER, CALLER):
         existing = cloud('iam', 'service-accounts', 'describe', email, missing_ok=True)
         if existing is None:
@@ -134,9 +265,9 @@ def preflight(spec, cloud=run, logging=None):
             account_policy = {}
         else:
             exact(existing, {'email': email, 'description': MARKER}, 'service account')
-            require(not existing.get('disabled'), 'Account disabled; inspect before reuse')
+            require(not existing.get('disabled'), 'ACCOUNT_DISABLED')
             require(not cloud('iam', 'service-accounts', 'keys', 'list', '--iam-account=' + email,
-                              '--managed-by=user'), 'User-managed keys found')
+                              '--managed-by=user'), 'USER_MANAGED_KEYS_PRESENT')
             account_policy = cloud('iam', 'service-accounts', 'get-iam-policy', email)
         allowed = {('roles/iam.workloadIdentityUser', PRINCIPAL)} if email == CALLER else set()
         present = grants(account_policy, allowed, email)
@@ -153,7 +284,7 @@ def preflight(spec, cloud=run, logging=None):
     else:
         exact(role, {'name': ROLE, 'description': MARKER, 'stage': 'GA'}, 'view role')
         require(not role.get('deleted') and sorted(role.get('includedPermissions', [])) == PERMISSIONS,
-                'Unexpected view permissions')
+                'VIEW_ROLE_PERMISSIONS_UNEXPECTED')
     pool = cloud('iam', 'workload-identity-pools', 'describe', POOL, '--location=global', missing_ok=True)
     pool_args = ['--workload-identity-pool=' + POOL, '--location=global']
     if pool is None:
@@ -163,9 +294,9 @@ def preflight(spec, cloud=run, logging=None):
     else:
         exact(pool, {'name': POOL_NAME, 'state': 'ACTIVE', 'description': MARKER}, 'pool')
         require(not pool.get('disabled') and not pool.get('inlineTrustConfig') and
-                not pool.get('inlineCertificateIssuanceConfig'), 'Unexpected pool configuration')
+                not pool.get('inlineCertificateIssuanceConfig'), 'POOL_CONFIGURATION_UNEXPECTED')
         providers = cloud('iam', 'workload-identity-pools', 'providers', 'list', *pool_args)
-        require(all(p.get('name') == PROVIDER_NAME for p in providers), 'Dedicated pool has other providers')
+        require(all(p.get('name') == PROVIDER_NAME for p in providers), 'POOL_OTHER_PROVIDERS_PRESENT')
         provider = cloud('iam', 'workload-identity-pools', 'providers', 'describe', PROVIDER,
                          *pool_args, missing_ok=True)
     condition = spec['resources']['provider_condition']
@@ -181,13 +312,13 @@ def preflight(spec, cloud=run, logging=None):
                          'oidc': {'issuerUri': 'https://token.actions.githubusercontent.com',
                                   'allowedAudiences': ['https://iam.googleapis.com/' + PROVIDER_NAME]}}, 'provider')
         require(not any(provider.get(k) for k in ('disabled', 'saml', 'aws', 'x509', 'actorProviders')),
-                'Unexpected provider configuration')
+                'PROVIDER_CONFIGURATION_UNEXPECTED')
     if caller_binding_missing:
         add('Bind exact GitHub subject', 'iam', 'service-accounts', 'add-iam-policy-binding', CALLER,
             '--role=roles/iam.workloadIdentityUser', '--member=' + PRINCIPAL, '--condition=None')
     bucket = cloud('logging', 'buckets', 'describe', '_Default', '--location=global')
     require(bucket.get('lifecycleState') == 'ACTIVE' and not bucket.get('restrictedFields'),
-            'Bucket unavailable or restricted; do not change shared restrictions')
+            'LOG_BUCKET_UNAVAILABLE_OR_RESTRICTED')
     view = cloud('logging', 'views', 'describe', 'jems-production-requests', '--bucket=_Default',
                  '--location=global', missing_ok=True)
     if view is None:
@@ -197,7 +328,7 @@ def preflight(spec, cloud=run, logging=None):
         view_policy = {}
     else:
         exact(view, {'name': VIEW, 'filter': broker.VIEW_FILTER, 'description': MARKER}, 'view')
-        view_policy = logging.call('GET', 'v2/' + VIEW + ':getIamPolicy?options.requestedPolicyVersion=3')
+        view_policy = progress.call('LOG_VIEW_IAM', logging.call, 'GET', 'v2/' + VIEW + ':getIamPolicy?options.requestedPolicyVersion=3')
     expected = {(ROLE, 'serviceAccount:' + BROKER)}
     if not grants(view_policy, expected, 'log view'):
         def bind_view():
@@ -236,32 +367,32 @@ def preflight(spec, cloud=run, logging=None):
 def validate_service(value, image):
     meta, spec = value.get('metadata', {}), value.get('spec', {})
     require(meta.get('name') == SERVICE and meta.get('labels', {}).get('jems-diagnostics') == 'pr153',
-            'Unrecognized broker service')
+            'BROKER_SERVICE_UNRECOGNIZED')
     annotations = meta.get('annotations', {})
     require(annotations.get('run.googleapis.com/invoker-iam-disabled', 'false') == 'false' and
-            annotations.get('run.googleapis.com/ingress') == 'all', 'Broker authentication/ingress differs')
+            annotations.get('run.googleapis.com/ingress') == 'all', 'BROKER_AUTHENTICATION_OR_INGRESS_MISMATCH')
     template = spec.get('template', {})
     runtime = template.get('spec', {})
     containers = runtime.get('containers', [])
     require(runtime.get('serviceAccountName') == BROKER and len(containers) == 1 and
             containers[0].get('image') == image and not runtime.get('volumes') and
-            not any(containers[0].get(k) for k in ('command', 'args', 'volumeMounts')), 'Broker runtime differs')
+            not any(containers[0].get(k) for k in ('command', 'args', 'volumeMounts')), 'BROKER_RUNTIME_MISMATCH')
     require(runtime.get('containerConcurrency') == 1 and runtime.get('timeoutSeconds') == 60,
-            'Broker concurrency/timeout differs')
+            'BROKER_CONCURRENCY_OR_TIMEOUT_MISMATCH')
     limits = containers[0].get('resources', {}).get('limits', {})
-    require(limits.get('memory') == '256Mi' and limits.get('cpu') in ('1', '1000m'), 'Broker limits differ')
+    require(limits.get('memory') == '256Mi' and limits.get('cpu') in ('1', '1000m'), 'BROKER_LIMITS_MISMATCH')
     env = containers[0].get('env', [])
     require(env == [{'name': 'JEMS_LOG_BUCKET_LOCATION', 'value': 'global'}],
-            'Broker environment differs; preserve separately reviewed coverage settings and stop')
+            'BROKER_ENVIRONMENT_MISMATCH')
     require(annotations.get('run.googleapis.com/maxScale') == '1' and
-            annotations.get('run.googleapis.com/minScale', '0') == '0', 'Broker service scaling differs')
+            annotations.get('run.googleapis.com/minScale', '0') == '0', 'BROKER_SCALING_MISMATCH')
     status = value.get('status', {})
     require(any(c.get('type') == 'Ready' and c.get('status') == 'True' for c in status.get('conditions', [])),
-            'Broker not ready; inspect partial deployment before retry')
+            'BROKER_NOT_READY')
     require(status.get('latestReadyRevisionName') == status.get('latestCreatedRevisionName') and
             sum(t.get('percent', 0) for t in status.get('traffic', [])
                 if t.get('revisionName') == status.get('latestReadyRevisionName')) == 100,
-            'Broker traffic not on reviewed revision')
+            'BROKER_TRAFFIC_MISMATCH')
 
 
 def main(argv=None):
@@ -275,39 +406,39 @@ def main(argv=None):
     modes.add_argument('--apply', action='store_true')
     p.add_argument('--approve-plan-sha256')
     args = p.parse_args(argv)
+    progress = Progress()
     try:
         require(not args.build_source_sha or args.build_id, 'BUILD_SOURCE_REQUIRES_EXISTING_BUILD')
-        spec = proposed(args.image, args.source_sha, source(args.source_sha))
+        spec = proposed(args.image, args.source_sha, progress.call('SOURCE_VALIDATION', source, args.source_sha))
         if not args.check and not args.apply:
             print(json.dumps(spec, indent=2)); return 0
-        require(args.build_id, 'Source-bound Cloud Build ID required for live inventory/apply')
+        require(args.build_id, 'BUILD_ID_REQUIRED')
         build_source = args.build_source_sha or args.source_sha
-        archive = publication.source_archive(args.source_sha, build_source)
+        archive = progress.call('SOURCE_ARCHIVE', publication.source_archive, args.source_sha, build_source)
+        progress.stage = 'BROKER_SOURCE_COMPARISON'
         for name in publication.FILES:
             original = publication.publication.run(['git', 'show', build_source + ':ops/request-broker/' + name], ROOT)
             require(original == (ROOT / 'ops/request-broker' / name).read_bytes(), 'BUILD_SOURCE_BROKER_FILES_DIFFER')
-        receipt = publication.qualify(args.build_id, build_source, hashlib.sha256(archive).hexdigest())
-        require(receipt['image'] == args.image, 'Build receipt image differs')
+        receipt = progress.call('BUILD_QUALIFICATION', publication.qualify, args.build_id, build_source, hashlib.sha256(archive).hexdigest())
+        require(receipt['image'] == args.image, 'BUILD_RECEIPT_IMAGE_MISMATCH')
         spec['verified_build'] = receipt
-        token = command(['gcloud', 'auth', 'print-access-token', '--quiet'])
+        token = progress.call('ADMIN_ACCESS_TOKEN', command, ['gcloud', 'auth', 'print-access-token', '--quiet'])
         logging = Http('https://logging.googleapis.com', token)
-        plan = preflight(spec, logging=logging)
+        plan = preflight(spec, logging=logging, progress=progress)
         if args.apply:
-            plan.execute(args.approve_plan_sha256)
-            remaining = preflight(spec, logging=logging)
-            require(not remaining.actions, 'Partial setup remains; run a fresh check')
+            progress.call('APPLY_PLAN', plan.execute, args.approve_plan_sha256)
+            remaining = preflight(spec, logging=logging, progress=progress)
+            require(not remaining.actions, 'PARTIAL_SETUP_REMAINS')
             print(json.dumps({'status': 'CONFIGURED_NOT_ACCEPTED', 'effective_iam': 'unverified',
                               'request_evidence': 'unverified', 'recurring_execution': False}))
         else:
             print(json.dumps({'plan': plan.describe(), 'approve_plan_sha256': plan.review_code()}, indent=2))
         return 0
-    except publication.BuildVerificationError as error:
-        print(json.dumps({'status': 'STOPPED', 'code': error.code, 'resubmit': False})); return 2
-    except (SetupError, BootstrapError, OSError, ValueError, TypeError, KeyError, RuntimeError) as error:
-        # Never print upstream bodies, arbitrary metadata or local file contents.
-        print(json.dumps({'status': 'STOPPED', 'reason': str(error) if isinstance(error, SetupError)
-                          else 'Source or response validation failed', 'recovery': 'Preserve partial state; rerun --check'}))
+    except Exception as error:
+        # Fixed codes/stages only, including unforeseen provider response shapes.
+        print(json.dumps(failure(error, progress)))
         return 2
+
 
 
 if __name__ == '__main__':
