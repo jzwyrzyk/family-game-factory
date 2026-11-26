@@ -94,9 +94,33 @@ const {start}=require('./browser-server.cjs');
     await page.locator('#creationEditWorld').click();await dialog.locator('[data-saved]').click();
     await dialog.getByRole('button',{name:first.title,exact:true}).click();
     await page.waitForFunction(id=>FG.creation.scene().world.decorations[1]?.assetId===id,rock.assetId);
+    // Keep the thumbnail's load callback pending, so each exit must release
+    // the object URL itself. Only this synthetic world's thumbnails are held.
+    await page.evaluate(()=>{
+      window.heldWorldPreviews=new Set();
+      document.addEventListener('load',event=>{
+        const image=event.target;
+        if(image instanceof HTMLImageElement && image.closest('.creation-world-dialog .creative-picker') && image.src.startsWith('blob:')){
+          event.stopImmediatePropagation();window.heldWorldPreviews.add(image.src);
+        }
+      },true);
+      const revoke=URL.revokeObjectURL.bind(URL);
+      URL.revokeObjectURL=url=>{window.heldWorldPreviews.delete(url);revoke(url);};
+    });
+    await dialog.locator('[data-private-prop]').click();
+    await page.waitForFunction(()=>window.heldWorldPreviews.size>0);
+    await dialog.locator('[data-saved]').click();
+    await page.waitForFunction(()=>window.heldWorldPreviews.size===0);
+    await dialog.locator('[data-private-prop]').click();
+    await page.waitForFunction(()=>window.heldWorldPreviews.size>0);
+    await dialog.locator('[data-done]').click();
+    await page.waitForFunction(()=>window.heldWorldPreviews.size===0);
+    await page.locator('#creationEditWorld').click();
     await dialog.locator('[data-backdrop]').click();
+    await page.waitForFunction(()=>window.heldWorldPreviews.size>0);
     await dialog.locator('[data-private-art]').first().click();
     await page.waitForFunction(id=>FG.creation.scene().world.backdrop===id,rock.assetId);
+    await page.waitForFunction(()=>window.heldWorldPreviews.size===0);
     assert.equal(await page.evaluate(()=>FG.creation.scene().world.fit),'contain');
     await shot('F','my-art-backdrop',dialog);
     await dialog.locator('[data-done]').click();

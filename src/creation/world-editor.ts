@@ -11,7 +11,7 @@ interface Host {
   scene():CreationProject|null;
   mutate(change:Change):Promise<void>;
   privateArt:PrivateArtResolver;
-  chooseArt(container:HTMLElement, current:()=>boolean, use:(id:string,label:string)=>Promise<void>):Promise<void>;
+  chooseArt(container:HTMLElement, current:()=>boolean, use:(id:string,label:string)=>Promise<void>):Promise<(()=>void)|undefined>;
   savedWorlds(current:()=>boolean, after:string|null):Promise<{items:{title:string;world:SceneWorld}[];next:string|null}>;
   current():boolean;
 }
@@ -55,13 +55,20 @@ export function createWorldEditor(host:Host) {
   propCollection.onchange=renderProps;
   const speaker=createReadAloudControl({text:()=>['Make your world. Choose a backdrop. Add a decoration, then tap the picture to place it.',get('[data-status]').textContent].filter(Boolean).join(' '),canRead:()=>dialog.open&&host.current()});
   get('header').insertBefore(speaker.element,get('[data-done]'));
+  let disposePicker:(()=>void)|undefined;
+  function clearPicker() {
+    pickerEpoch++;
+    disposePicker?.(); disposePicker=undefined;
+    get('[data-library]').replaceChildren(); get('[data-choices]').hidden=true;
+  }
   function close() {
-    epoch++; pickerEpoch++; dialog.close(); dialog.removeAttribute('aria-busy'); stage.clear(); selected=''; lastBackdrop=''; busy=false; speaker.stop();
+    epoch++; clearPicker(); dialog.close(); dialog.removeAttribute('aria-busy'); stage.clear(); selected=''; lastBackdrop=''; busy=false; speaker.stop();
     get('[data-selected]').replaceChildren(); canvas.setAttribute('aria-label','World preview');
     get('[data-placement]').hidden=get('[data-hint]').hidden=true;
-    get('[data-library]').replaceChildren(); get('[data-choices]').hidden=true;get('[data-status]').textContent='';
+    get('[data-status]').textContent='';
   }
   dialog.addEventListener('cancel',e=>{e.preventDefault();close();});
+  dialog.addEventListener('close',()=>{if(!dialog.open && !get('[data-choices]').hidden)clearPicker();});
   get('[data-done]').onclick=close;
   function refresh(){
     const scene=host.scene();if(!dialog.open||!scene)return;
@@ -107,7 +114,7 @@ export function createWorldEditor(host:Host) {
     if(backdrop)b.dataset.backdropId=asset.id;else b.dataset.propId=asset.id;
     const img=document.createElement('img');img.src=asset.url;img.alt='';
     const label=document.createElement('span');label.textContent=asset.label;b.append(img,label);
-    b.onclick=()=>void edit(world=>{if(backdrop){world.backdrop=asset.id;world.fit='cover';delete world.middle;delete world.foreground;}else add(world,asset.id,asset.label);});
+    b.onclick=()=>{clearPicker();void edit(world=>{if(backdrop){world.backdrop=asset.id;world.fit='cover';delete world.middle;delete world.foreground;}else add(world,asset.id,asset.label);});};
     return b;
   }
   get('[data-worlds]').append(...PAINTED_BACKDROPS.map(asset=>imageButton(asset,true)));
@@ -132,11 +139,12 @@ export function createWorldEditor(host:Host) {
     d.y=Math.max(0,Math.min(100,Math.round((e.clientY-bounds.top)/bounds.height*100)));
   });};
   async function choose(kind:'backdrop'|'decoration'|'saved') {
-    const ticket=++pickerEpoch,current=()=>ticket===pickerEpoch&&dialog.open&&host.current();
-    const box=get('[data-library]');box.replaceChildren();
+    clearPicker();
+    const ticket=pickerEpoch,current=()=>ticket===pickerEpoch&&dialog.open&&host.current();
+    const box=get('[data-library]');
     get('[data-choice-title]').textContent=kind==='saved'?'Use a saved world':kind==='backdrop'?'Choose your backdrop':'Choose a decoration';
     get('[data-choices]').hidden=false;
-    const hide=()=>{if(current()){get('[data-choices]').hidden=true;box.replaceChildren();pickerEpoch++;}};
+    const hide=()=>{if(current())clearPicker();};
     try{
       if(kind==='saved') {
         let cursor:string|null=null;
@@ -154,14 +162,18 @@ export function createWorldEditor(host:Host) {
         };
         more.onclick=()=>void page().catch(error=>{if(current()){more.disabled=false;get('[data-status]').textContent=error.message;}});
         await page();
-      } else await host.chooseArt(box,current,async(id,name)=>{
-        if(!current())return;
-        await edit(world=>{if(kind==='backdrop'){world.backdrop=id;world.fit='contain';delete world.middle;delete world.foreground;}else add(world,id,name);});hide();
-      });
+      } else {
+        const dispose=await host.chooseArt(box,current,async(id,name)=>{
+          if(!current())return;
+          await edit(world=>{if(kind==='backdrop'){world.backdrop=id;world.fit='contain';delete world.middle;delete world.foreground;}else add(world,id,name);});hide();
+        });
+        if(current())disposePicker=dispose;
+        else dispose?.();
+      }
     }catch(error){if(current())get('[data-status]').textContent=(error as Error).message;}
   }
   get('[data-saved]').onclick=()=>void choose('saved');
   get('[data-backdrop]').onclick=()=>void choose('backdrop');
   get('[data-private-prop]').onclick=()=>void choose('decoration');
-  return {dialog,close,open(){if(!dialog.open){dialog.showModal();refresh();}}};
+  return {dialog,close,open(){if(!dialog.open){clearPicker();dialog.showModal();refresh();}}};
 }

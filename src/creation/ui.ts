@@ -1,3 +1,4 @@
+import {originalDrawing} from '../assets/private-drawings';
 import {createWorldEditor} from './world-editor';
 import {classicBackground, classicWorldId, starterWorldIds, worldAsset} from './world-assets';
 import { createPalPortrait } from '../pals/ui';
@@ -224,7 +225,7 @@ export function installCreationStudio(host: Host) {
       const captured=owner(),items=await listArtChoices(captured,current);
       if(!current())return;
       const showError=(error:unknown)=>{if(current())container.querySelector('[role=status]')!.textContent=(error as Error).message;};
-      mountCreativeAssetPicker(container,items,{onChoose:(item)=>{if(current())void use(item.assetId,item.label).catch(showError);},
+      return mountCreativeAssetPicker(container,items,{onChoose:(item)=>{if(current())void use(item.assetId,item.label).catch(showError);},
         onCreate:()=>void (async()=>{
           const saved=await createPickerArtwork(captured,current);
           if(!saved||!current())return;
@@ -1124,7 +1125,18 @@ export function installCreationStudio(host: Host) {
       if (!current()) return;
       message.textContent = replaceActor ? 'Choose the picture for this actor.' : 'Choose the picture that joins your scene.';
       const catalogue = catalogueChoices(challengeId ? [] : ownedPals().map(id => ({id,form:ownedPalForm(id)})));
+      const priorPin = replaceActor && scene?.actors.find(actor => actor.id === replaceActor)?.assetId;
+      let relatedCreativeId = items.find(item => item.assetId === priorPin)?.creativeId;
+      // An archived version still resolves; its visible descendants may be offered.
+      if (priorPin && !relatedCreativeId && parsePrivateArtId(priorPin)) {
+        try {
+          const prior = await privateArt.load(priorPin);
+          relatedCreativeId = (await originalDrawing(capturedOwner,prior.drawingId)).id;
+        } catch { /* Missing old art can still be explicitly replaced from the full collection. */ }
+        if (!current()) return;
+      }
       retireActorPicker = mountCreativeAssetPicker(choices, items, {
+        relatedCreativeId,
         preview: item => art(item.assetId),
         onChoose: item => actAsync(() => use(item)),
         onCreate: () => actAsync(async () => {
