@@ -5,6 +5,7 @@ import { ART_LIMITS } from '../drawing/library';
 function installReviewedArtwork(file: HTMLInputElement) {
   const status = document.getElementById('familyExitStatus')!;
   const pass = document.querySelector<HTMLInputElement>('#reviewedArtPassphrase')!;
+  const prepare = document.querySelector<HTMLInputElement>('#prepareReviewedArt');
   const currentOwner = () => (window as any).FG?.store?.current()?.id;
   let selection = 0;
   let copyUrl: string | undefined;
@@ -21,12 +22,25 @@ function installReviewedArtwork(file: HTMLInputElement) {
     copyLink = undefined;
     status.textContent = '';
   }
-  window.addEventListener('factory-profile-changing', clearSelection);
-  window.addEventListener('factory-profile', clearSelection);
-  window.addEventListener('pagehide', clearSelection);
+  function resetProfile() {
+    if (prepare) prepare.checked = false;
+    clearSelection();
+  }
+  function offerCopy(blob:Blob, label:string) {
+    copyUrl = URL.createObjectURL(blob);
+    copyLink = document.createElement('a');
+    copyLink.href = copyUrl;
+    copyLink.download = 'workshop-picture.png';
+    copyLink.textContent = label;
+    status.after(copyLink);
+  }
+  window.addEventListener('factory-profile-changing', resetProfile);
+  window.addEventListener('factory-profile', resetProfile);
+  window.addEventListener('pagehide', resetProfile);
 
   file.onchange = async () => {
     const owner = currentOwner(), image = file.files?.[0], passphrase = pass.value;
+    const prepareCopy = prepare?.checked;
     clearSelection();
     const attempt = selection;
     const current = () => attempt === selection && owner === currentOwner();
@@ -35,7 +49,7 @@ function installReviewedArtwork(file: HTMLInputElement) {
       if (!owner || !image || image.type !== 'image/png' || image.size > ART_LIMITS.imageBytes)
         throw Error('Choose a reviewed PNG up to 5 MB.');
       const bytes = await image.arrayBuffer();
-      await checkReviewedPng(bytes);
+      const reviewed = await checkReviewedPng(bytes);
       const digest = await drawingHash(bytes);
       if (!current()) return;
       const headers = { 'Content-Type': 'application/json', 'X-Factory-Request': '1' };
@@ -50,18 +64,23 @@ function installReviewedArtwork(file: HTMLInputElement) {
       if (!current()) return;
       if (!approval.ok) throw Error('Ask the operator to review and approve this exact PNG for your family.');
 
+      if (prepareCopy) {
+        const copy = await reviewed.prepareImageOnlyCopy();
+        if (!current()) return;
+        if (copy.size > ART_LIMITS.imageBytes) throw Error('The prepared picture is over the file size limit.');
+        status.textContent = 'Download your image-only copy. Have its exact file approved, then choose it here.';
+        offerCopy(copy, 'Download prepared PNG');
+        if (prepare) prepare.checked = false;
+        return;
+      }
       await saveDrawing(owner, 'Reviewed workshop artwork', new Blob([bytes], { type: 'image/png' }), undefined, current);
       if (current()) status.textContent = 'Your reviewed drawing is ready.';
     } catch (error) {
       if (!current()) return;
       status.textContent = (error as Error).message;
       if (error instanceof SuggestedPaletteError) {
-        copyUrl = URL.createObjectURL(error.imageOnlyCopy);
-        copyLink = document.createElement('a');
-        copyLink.href = copyUrl;
-        copyLink.download = 'workshop-picture.png';
-        copyLink.textContent = 'Download image-only PNG for separate review';
-        status.after(copyLink);
+        offerCopy(error.imageOnlyCopy, 'Download image-only PNG for separate review');
+        if (prepare) prepare.checked = false;
       }
     } finally {
       if (current()) file.disabled = false;

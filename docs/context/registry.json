@@ -320,8 +320,8 @@
         "src/family-beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:07:05.481Z",
-      "sourceDigest": "86d7e16f1c8f6062f4ac8a7b458d97760ff2b9add6fbd601d5d87624db7e3a21",
+      "reviewedAt": "2026-11-26T06:19:58.717Z",
+      "sourceDigest": "f740f6d49d532881f707f2ecd8314f001a89ebb86178a3a67926ff86052a6ae5",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed whole-picture, arrow and articulated editing via the established child-facing surfaces.",
       "reviewHistory": [
@@ -695,10 +695,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:58:56.326Z",
-      "sourceDigest": "a0be9070db1755553326aa1b2f69e7969a6bc7e82cdc74eb95a1e9c65ca1221e",
+      "reviewedAt": "2026-11-26T06:19:59.740Z",
+      "sourceDigest": "8aec10f384d09c1592dc6758e68333d58d254f0da000b4131c63ef65b4a6fdd0",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the restricted family build and explicit, static service-validator source scope.",
+      "reviewReason": "Reviewed exact validator and restricted family build dependencies.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -912,8 +912,8 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:07:06.724Z",
-      "sourceDigest": "1cb67d2ea2f7d78dda24b7d0658fbf0b7effea83a00dcd7058c4170120b4f62d",
+      "reviewedAt": "2026-11-26T06:20:00.109Z",
+      "sourceDigest": "dac969387a8a799e89dbaf2fc363dff681401a33228380430e61a700ca741083",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed integrated CI leaves and source assertions for original admissions, game binding, movement and recovery.",
       "reviewHistory": [

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
+import {inflateSync} from 'node:zlib';
 import type {Page} from 'playwright';
 import {rgbaPng} from '../server/agent/sprite-sheet';
 import {crc32} from '../server/agent/game-assets.cjs';
@@ -24,10 +25,22 @@ export async function reviewedArtworkBrowser(page: Page, approve: (digest: strin
   page.on('request', request => {
     if (new URL(request.url()).pathname === '/entry/review-art') requests.push(request.postDataJSON());
   });
-  const reviewed = image;
+  // This valid original deliberately uses two image chunks. The optional
+  // prepared file retains every decoded sample and has its own byte identity.
+  const at = image.indexOf('IDAT') - 4;
+  const length = image.readUInt32BE(at);
+  function idat(payload:Buffer) {
+    const result=Buffer.alloc(payload.length+12);
+    result.writeUInt32BE(payload.length); result.write('IDAT',4); payload.copy(result,8);
+    result.writeUInt32BE(crc32(result,4,result.length-4),result.length-4);
+    return result;
+  }
+  const reviewed = Buffer.concat([image.subarray(0,at), idat(image.subarray(at+8,at+10)), idat(image.subarray(at+10,at+8+length)), image.subarray(at+12+length)]);
+
   await select(withMetadata);
-  await page.getByText('Ask a grown-up for a reviewed PNG without embedded file details.').waitFor();
+  await page.getByText('Ask a grown-up for a reviewed PNG saved without extra file information.').waitFor();
   assert.deepEqual(requests, []);
+  await page.locator('#prepareReviewedArt').check();
   await select(reviewed);
   await page.getByText('Ask the operator to review and approve this exact PNG for your family.').waitFor();
   assert.equal(await page.getByRole('link', {name:'Download prepared PNG'}).count(), 0);
@@ -42,6 +55,10 @@ export async function reviewedArtworkBrowser(page: Page, approve: (digest: strin
   const clean = await readFile((await (await downloaded).path())!);
   assert.equal(clean.includes(text), false);
   assert.notEqual(digest(clean), digest(reviewed));
+  assert.deepEqual(clean.subarray(0,33), image.subarray(0,33));
+  const cleanAt=clean.indexOf('IDAT')-4;
+  assert.deepEqual(inflateSync(clean.subarray(cleanAt+8,cleanAt+8+clean.readUInt32BE(cleanAt))),inflateSync(image.subarray(at+8,at+8+length)));
+  assert.equal(await page.locator('#prepareReviewedArt').isChecked(),false);
 
   await select(clean);
   await page.getByText('Ask the operator to review and approve this exact PNG for your family.').waitFor();

@@ -61,3 +61,12 @@ test('the optional-palette copy retains every other byte and needs its own diges
     await check(copy);
   }
 });
+
+test('a row with an unknown PNG filter is refused even when a suggested palette can be removed',async()=>{
+  const illegal=Buffer.from(pixels);illegal[0]=5;
+  for(const extras of [[],[chunk('PLTE',Buffer.from([1,2,3]))]]){
+    const error=await check(picture(illegal,6,extras)).then(()=>undefined,cause=>cause);
+    assert.match(error.message,/reviewed PNG/);
+    assert.equal(error instanceof SuggestedPaletteError,false);
+  }
+});
