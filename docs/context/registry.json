@@ -138,7 +138,8 @@
       "documents": [
         "PRODUCT-DOCTRINE.md",
         "docs/decisions/*.md",
-        "docs/pals/art/README.md"
+        "docs/pals/art/README.md",
+        "docs/creative-universe/STANDARD.md"
       ],
       "sources": [
         "docs/design-coach/GOLD_STANDARD.md",
@@ -148,13 +149,14 @@
         "docs/rewards/*.md",
         "docs/problem-solving/*.md",
         "docs/pals/*.md",
-        "docs/drawings/*.md"
+        "docs/drawings/*.md",
+        "docs/creative-universe/STANDARD.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:29:13.672Z",
-      "sourceDigest": "7eea159f540c7b43f95d3023a594be7b60378647c7a46d7f0135a06be24803c1",
+      "reviewedAt": "2026-11-26T03:32:06.419Z",
+      "sourceDigest": "de61f34b424d4fc2ea4ee57db00c230b0d52b9c153708ef6714869ed35db083b",
       "reviewOutcome": "updated",
-      "reviewReason": "The canonical standard now specifies child-authored tools, on-device replay, interrupted Keeps and next-activity choices alongside the permanent generation prohibition.",
+      "reviewReason": "The canonical Creative Asset and World Standard records the approved paper, exact replay, interruption recovery and activity choices and now routes directly to product review.",
       "reviewHistory": [
         {
           "sourceCommit": "c57d2c818736abae66e4dadb7bbbc2093685417a",
@@ -1405,10 +1407,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:29:15.524Z",
-      "sourceDigest": "15119f45728141cd3b8d59fd099d5c4cd66c4fe5c5ba47e2a0000d0e6ff6cdb3",
+      "reviewedAt": "2026-11-26T03:32:07.107Z",
+      "sourceDigest": "0c3f52df1a9dad75774ebd91df4ae718c319c5c7c88c42f245832f5f5d463238",
       "reviewOutcome": "updated",
-      "reviewReason": "The documentation registry now routes the shared private source, world catalogue and local game qualification to the relevant feature owners and requires the workstream acceptance receipt.",
+      "reviewReason": "Registered the workstream acceptance receipt and routed shared creative policy, source, picker, world and isolated game checks to their domain owners.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
