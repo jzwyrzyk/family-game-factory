@@ -85,12 +85,19 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     await picker.getByLabel('Collection').selectOption('');
     assert.equal(await picker.locator('[data-private-art]').count(),2);
     await page.locator('#creationActorDialog').screenshot({path:'test-results/creative-picker-'+device+'.png'});
+    if(device==='desktop'){
+      await page.setViewportSize({width:390,height:844});
+      assert.ok(await page.locator('#creationActorDialog').evaluate(dialog=>dialog.scrollWidth<=dialog.clientWidth+1));
+      assert.ok(await picker.getByLabel('Collection').evaluate(field=>field.getBoundingClientRect().height>=44));
+      await page.locator('#creationActorDialog').screenshot({path:'test-results/creative-picker-phone.png'});
+      await page.setViewportSize(viewport);
+    }
     await page.locator('#creationPrivateActorChoices [data-private-art]').filter({hasText:'Latest saved cutout design'}).click();
     await page.waitForFunction(()=>FG.creation.scene()?.actors.length===2);
     const second=await page.evaluate(()=>FG.creation.scene());
     assert.equal(second.actors[1].assetId,first.actors[0].assetId);assert.notEqual(second.id,firstId);
     await page.locator('#creationFullMode').click();
-    await page.locator('#creationSceneOptions summary').click();
+    await page.locator('#creationSceneOptions > summary').click();
     await page.getByLabel('Role in this scene').selectOption('collectible');
     await page.waitForFunction(()=>FG.creation.scene().actors[1].creativeRole==='collectible');
     const change=page.getByRole('button',{name:'Choose another version',exact:true});
@@ -102,6 +109,7 @@ async function ready(page){await page.waitForFunction(()=>window.FG?.creation?.o
     await page.locator('.creative-picker-dialog [data-private-art]').filter({hasText:'Latest saved cutout design'}).click();
     await page.waitForFunction(id=>FG.creation.scene().actors[1].assetId===id,first.actors[0].assetId);
     assert.equal((await page.evaluate(()=>FG.creation.scene())).actors[1].creativeRole,'collectible');
+    await page.locator('#creationSceneOptions > summary').click();
     await page.locator('#creationSimpleMode').click();
     await page.locator('[data-add-block="say"]').click();await page.locator('#creationKeep').click();
     const retained=await page.evaluate(id=>FG.creation.export().revisions.filter(revision=>revision.projectId===id),firstId);

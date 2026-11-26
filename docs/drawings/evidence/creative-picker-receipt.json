@@ -1,0 +1,61 @@
+{
+  "runtimeSource": "72118d4122dd2fd969ff466ff128fbe8518156d3",
+  "dirty": false,
+  "browser": "Chromium 156.0.8078.79 built on Debian GNU/Linux 13 (trixie)",
+  "build": "npm run build",
+  "unit": {
+    "command": "npm run test:art",
+    "passed": 26,
+    "failed": 0
+  },
+  "journey": {
+    "command": "CHROMIUM_PATH=/usr/bin/chromium node tests/creation-private-art-browser.cjs",
+    "desktop": [
+      1440,
+      1000
+    ],
+    "tablet": [
+      820,
+      1180
+    ],
+    "phonePicker": [
+      390,
+      844
+    ],
+    "checks": [
+      "Optional semantic identity and collection search",
+      "Actual image and cutout previews",
+      "Contextual role persists across explicit pinned version switches",
+      "Programs and other retained scenes preserve their selections",
+      "Saved scene and artwork re-import, corrupt pin rejection, video capture",
+      "Late decode canceled on profile switch; zero POSTs or uncaught browser errors"
+    ]
+  },
+  "screenshots": [
+    {
+      "path": "creative-picker-desktop.png",
+      "pixels": [
+        760,
+        900
+      ],
+      "sha256": "536e2e03649df514dfbefe341ba7ebb1ed90d0f7bd866126fb421b7bef0b65d5"
+    },
+    {
+      "path": "creative-picker-phone.png",
+      "pixels": [
+        348,
+        760
+      ],
+      "sha256": "924480a9c3cf7bb18b7ddd62a0ba24c83855196dc23bb068821385e0d7660890"
+    },
+    {
+      "path": "creative-picker-tablet.png",
+      "pixels": [
+        760,
+        1062
+      ],
+      "sha256": "dd75841ec455a9aa017d340dd4db6ed8caa4858d3ff39ae13aac5662cb988c44"
+    }
+  ],
+  "scope": "Synthetic local offline-compatible scenarios. Phone is a resized desktop Chromium viewport. Owner DEV acceptance, hosted TEST, physical device qualification, production release and family activation are outstanding for this source."
+}
