@@ -33,6 +33,6 @@ export async function seedCreativeFixtures(){
     renderStrokes(canvas.getContext('2d')!,fixture.strokes,true);
     const png=await new Promise<Blob>((ok,no)=>canvas.toBlob(value=>value?ok(value):no(Error('Review picture unavailable.')),'image/png'));
     const picture=await saveDrawing(owner,fixture.name,includeCrayonSource(png,{transparent:true,strokes:fixture.strokes}));
-    await updateDrawing(owner,picture.id,{category:fixture.category,semantic:fixture.semantic});
+    await updateDrawing(owner,picture.id,{category:fixture.category,semanticIdentity:fixture.semantic});
   }
 }

@@ -6,7 +6,10 @@ const root=process.cwd(),out=path.resolve(process.env.UI_REVIEW_OUT||'dist-revie
 await fs.mkdir(out,{recursive:true});
 const drawingOnly=process.argv.includes('--drawing');
 const sha=process.env.UI_REVIEW_BASE_SHA||execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
-execFileSync('git',['diff','--exit-code',sha,'--','src','public','index.html','tests/parent-dashboard-fixture.ts',...(drawingOnly?['tools/ui-review']:[])],{stdio:'pipe'});
+const sourcePaths=['src','public','index.html','tests/parent-dashboard-fixture.ts','tools/ui-review','tools/design-system'];
+execFileSync('git',['diff','--exit-code',sha,'--',...sourcePaths],{stdio:'pipe'});
+const untracked=execFileSync('git',['ls-files','--others','--exclude-standard','--',...sourcePaths],{encoding:'utf8'}).trim();
+if(untracked)throw Error('Review source contains untracked files: '+untracked);
 const manifest=JSON.parse(await fs.readFile('tools/ui-review/coverage.json','utf8'));
 manifest.excludedPRs=JSON.parse(await fs.readFile('tools/ui-review/excluded-prs.json','utf8'));
 const files=drawingOnly?JSON.parse(await fs.readFile('tools/ui-review/drawing-assets.json','utf8')):await fs.readdir('public',{recursive:true});
@@ -42,6 +45,7 @@ const js=result.outputFiles.find(x=>x.path.endsWith('.js')).text,css=result.outp
 let html=await fs.readFile(drawingOnly?'tools/ui-review/drawing.html':'index.html','utf8');
 html=html.replace(/<script[^>]*src=[^>]+><\/script>/g,'').replace(/<link[^>]+>/g,'');
 manifest.assetPackaging=exact?'Exact original bytes':'Gem Pal images: same artwork, maximum 768px WebP quality 90; other assets exact';
+if(exact)manifest.gaps=manifest.gaps.filter(gap=>!gap.startsWith('Gem Pal artwork is packaged as maximum-768px'));
 const sourceKind=process.env.UI_REVIEW_SOURCE_KIND || (execFileSync('git',['branch','--show-current'],{encoding:'utf8'}).trim()==='main'?'merged main':'candidate branch');
 const payload={sha,sourceKind,builtAt:new Date().toISOString(),manifest,assets,html,css,js,bootstrap:await fs.readFile('tools/ui-review/bootstrap.js','utf8')};
 const esc=s=>JSON.stringify(s).replaceAll('<','\\u003c');

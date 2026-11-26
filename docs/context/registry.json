@@ -912,8 +912,8 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:56:55.990Z",
-      "sourceDigest": "d64c9e9c33c7d7c22f0ea96c0575545ddd63daabc5241c406415aa1ced97b051",
+      "reviewedAt": "2026-11-26T05:57:49.498Z",
+      "sourceDigest": "142dc652723520b9d516f36d1f016e4daa9f5c95a68e4cb3577918e320bf943f",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed integrated CI leaves and source assertions for original admissions, game binding, movement and recovery.",
       "reviewHistory": [
@@ -1156,8 +1156,8 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T05:56:57.355Z",
-      "sourceDigest": "ea3ab2cbf8914960e3dc4f7647b3777800de8a25c5953feb964ba767a4efc467",
+      "reviewedAt": "2026-11-26T05:57:49.878Z",
+      "sourceDigest": "2ea2d6d731573de4a01fb115810f83d43468d0b2c266fa64b5517caee3bccd81",
       "reviewOutcome": "updated",
       "reviewReason": "Reviewed unchanged release pins and the disabled general hosted-art boundary.",
       "reviewHistory": [
