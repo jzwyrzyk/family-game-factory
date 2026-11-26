@@ -654,10 +654,10 @@
         "tests/theme-workspace.test.ts"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:57:56.196Z",
-      "sourceDigest": "040042348768a127cd17b9dc3691a738f278f22e62f608b9c130089fbba9f801",
+      "reviewedAt": "2026-11-26T01:59:38.817Z",
+      "sourceDigest": "82acc836b21962e9f6102ad37bd1d3f253f94f2b1cb39e591905960990a8d82d",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed curriculum routing, preserved older packs, transient editing, constructed response evidence, listening delivery and theme boundaries against the new skill matrices and subject integrations.",
+      "reviewReason": "Verified model routing, new versioned literacy responses, narration evidence, restricted host entry and reviewed counter assets against the standard and skill-family matrices.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-20T19:05:57.591Z",
@@ -1402,10 +1402,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T01:58:01.069Z",
-      "sourceDigest": "a905dbb7af78d1da0803177bef1de6f88175e9ea9e95f412c2d3bdb8763a0817",
+      "reviewedAt": "2026-11-26T01:59:42.842Z",
+      "sourceDigest": "06b6cdc9548a346c70109a13aef56cbafadaeadf996f89b49b34661052e14574",
       "reviewOutcome": "updated",
-      "reviewReason": "Registered the new learning standard and decision, checked relative links in the rendered evidence, and added learning-specific responsibilities to the maintenance guide and PR template.",
+      "reviewReason": "Registered learning standards, counter assets, family entry, theme contract tests and rendered evidence links. Updated the template and maintenance guide for future reviews.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

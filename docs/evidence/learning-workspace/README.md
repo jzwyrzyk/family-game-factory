@@ -36,6 +36,8 @@ Chromium 156.0.8078.79 opened all 36 samples at application revision `b7dd0cbe6c
 
 Across 45 synthetic openings the synchronous learning-host mount measured a median of 14.6 ms and a nearest-rank 95th percentile of 91.9 ms on this runner. This interval includes the local host and DOM work until mount returns. It ends before browser painting and image decoding. The comparison does not measure ordinary game frame rate or physical-device latency.
 
+The existing standalone review smoke program also reached all 16 application pages and checked four viewport presets, with no overflow observations or uncaught errors. The deeper journeys added a coding instruction and ran the scene, saved a local PNG, exercised a synthetic guardian invitation, and decoded every embedded image. Managed Chromium blocked direct file navigation in this environment, so the runs used the in-memory transport described below.
+
 ## Reproduce
 
 After building the artifact, run `node tools/ui-review/learning-browser.cjs`. Set `CHROMIUM_PATH` to use an installed Chromium binary. The runner opens the offline HTML through a local in-memory route for browsers that disable file URLs. It writes unmodified viewport screenshots and its JSON receipt under `test-results/learning-workspace`. Use `UI_REVIEW_FILE` or `UI_REVIEW_EVIDENCE` to select a different artifact or output location.
