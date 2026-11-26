@@ -42,7 +42,7 @@
     "docs:review": "node scripts/check-docs.mjs refresh",
     "test:docs": "node --test scripts/tests/check-docs.test.mjs",
     "test:gem-factory": "node tests/gem-factory-browser.cjs",
-    "test:generated-art": "node --import tsx tests/generated-art-browser.ts",
+    "test:generated-art": "node --import tsx tests/generated-art-browser.ts && node --import tsx tests/generated-private-slot-browser.ts",
     "test:quality-capture": "node --import tsx tests/quality-capture-browser.ts && node --import tsx tests/premium-capture-browser.ts && node --import tsx tools/premium-quality-benchmark.ts --fixture test-results/premium-benchmark && node --import tsx tools/premium-art-benchmark.ts && node --import tsx tools/premium-evidence-prototype.ts",
     "test:creation": "node --import tsx --test tests/creation-engine.test.ts tests/creation-motion-path.test.ts tests/creation-challenges.test.ts tests/creation-storage.test.ts tests/creation-generated.test.ts tests/creation-generation-budget.test.ts tests/creation-learner-controls.test.ts",
     "test:creation-browser": "node tests/creation-browser.cjs && node tests/creation-motion-browser.cjs && node tests/creation-recovery-browser.cjs && npm run test:creation-learner",

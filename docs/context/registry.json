@@ -76,6 +76,7 @@
     "docs/decisions/2026-11-21-profile-play-and-reading.md",
     "docs/bubble-gum-builders/README.md",
     "docs/decisions/2026-11-22-bubble-gum-assembly.md",
+    "docs/game-intelligence/PRIVATE-SPRITE-QUALIFICATION.md",
     "docs/game-intelligence/PREMIUM-BUILDER.md",
     "docs/game-intelligence/premium-benchmark/README.md",
     "docs/decisions/2026-11-23-premium-builder.md",
@@ -736,15 +737,16 @@
         "server/sandbox/**",
         "server/testing/**",
         "docs/game-intelligence/*.md",
+        "tools/qualification/private-art-slot.ts",
         "tools/premium-*",
         "docs/game-intelligence/premium-benchmark/*.md",
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:55.850Z",
-      "sourceDigest": "3c42ed09d4394afe0c109b5a6fa6d9d87f119c2474a5101fb24cafd81bf20c81",
+      "reviewedAt": "2026-11-26T03:11:28.263Z",
+      "sourceDigest": "2f438d9162a56e683be1166296809e9b6336fa2cb68e68a5fb80bc5014c22144",
       "reviewOutcome": "updated",
-      "reviewReason": "Scene authoring uses active Pal IDs. The ADR and scene rendering contract cover reading saved generated versions through the historical asset resolver.",
+      "reviewReason": "Documented exact slot, digest and profile checks in an offline compositor receiving only captured v2 frame commands. Production preview, worker and paid operations remain outside the experiment.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -899,10 +901,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:06:15.971Z",
-      "sourceDigest": "d3ee69b44d711cd709ce46c2855a7454a1b54e18e4655859b4881d1888f6443d",
+      "reviewedAt": "2026-11-26T03:11:30.494Z",
+      "sourceDigest": "fbdc9555545a55850a72a2d4a3c47a3b4294b528d8e2cdc86f38ae4ba9b7fa1a",
       "reviewOutcome": "updated",
-      "reviewReason": "The new synthetic browser and container checks verify exact byte admission, metadata rejection, owner changes and digest-only authorization.",
+      "reviewReason": "The generated-art suite now runs a synthetic immutable-sprite slot after its existing desktop, tablet, phone and negative checks. This adds local scope, pin and revocation coverage.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1143,10 +1145,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:06:16.162Z",
-      "sourceDigest": "d1a2a0bdbf766f8b99256225ed6b5feae3af6991caa35a0b3a828f8b4127c5f7",
-      "reviewOutcome": "updated",
-      "reviewReason": "The family security workflow exercises original-byte admission and the release record distinguishes the production baseline from the proposed development.",
+      "reviewedAt": "2026-11-26T03:11:32.489Z",
+      "sourceDigest": "793d6e866130ac01e32634111bc85996ec9b10c3f48d7437620df271cad5bbf6",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Only a local qualification command and its evidence changed. There is no application route, service, release workflow or environment activation in this branch.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1401,10 +1403,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:09:46.541Z",
-      "sourceDigest": "bd7a3c55e5817607328a7345dde6b20c938ff17bfd42d7d942a1f7be9130ac44",
+      "reviewedAt": "2026-11-26T03:11:58.404Z",
+      "sourceDigest": "4352b43b5f05ed18db64d490ebdd766ac27aa8c4977c62611d31cd56dfdd9ab8",
       "reviewOutcome": "updated",
-      "reviewReason": "The maintenance guide, registry and review template now share one standard while preserving both concurrent PR documentation paths.",
+      "reviewReason": "Registered the private slot qualification contract and mapped its offline compositor to the generation area. Other document routing remains intact.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
