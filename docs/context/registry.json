@@ -421,10 +421,10 @@
         "tests/creative-world-art.test.ts"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "556b0bccfe3630c9850068e0ad3c3c60a3d59e2e635872b445426789fc055561",
-      "reviewedAt": "2026-11-26T03:15:06.595Z",
+      "sourceDigest": "923c7f34435ddd149c27453009fc5adeb37d185235156c4609ce318971bea52a",
+      "reviewedAt": "2026-11-26T03:35:35.213Z",
       "reviewOutcome": "updated",
-      "reviewReason": "The scene catalogue and manifest record immutable WebP identities, scale, alpha, intended uses and matching worlds for the host renderer.",
+      "reviewReason": "The scene contract records portrait playback spacing and the active learning question’s own foreground color.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -903,10 +903,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:16:21.879Z",
-      "sourceDigest": "dedced7ca1216427fb9dcd7dab0dfe66155e6e247badac489bfa291d715f1f82",
-      "reviewOutcome": "updated",
-      "reviewReason": "The real PNG fixtures exercise legal transparency, palette bounds, compressed raster lengths, metadata rejection and exact bytes through the reviewed family importer.",
+      "reviewedAt": "2026-11-26T03:36:37.746Z",
+      "sourceDigest": "96d797c4f8bd3a847bcef41eb2b53d2e1024659fb377d3d627f08634c3b15db3",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The CI inventory explicitly checks the already-registered creative test leaves and the existing checkpoint journey checks the Math heading against the documented 4.5:1 minimum. Test commands, production gates and scope stay as documented.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
