@@ -1,5 +1,9 @@
 # Jems delivery state
 
+## November 26 consolidated release preparation
+
+Use the [consolidated candidate handoff](docs/operations/CONSOLIDATED-CANDIDATE.md) and [active draft #223](https://github.com/jzwyrzyk/family-game-factory/pull/223) for the proposed integration. The individual workstream records below retain their original source and evidence. The protected engineering base includes #219. The household Pages marker remains aa56b60a. [Read-only revision observation](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45904862225)
+
 
 ## November 26, 2026 — unified learning workspace candidate
 

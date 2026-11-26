@@ -84,3 +84,5 @@ Choose **Design system** under Page or journey state to inspect real production 
 The exact-source build guard now includes `tools/ui-review` and `tools/design-system` alongside application source and assets, and rejects untracked files in those source paths. A locally edited gallery cannot be labelled with an unrelated clean commit SHA. Documentation/evidence outside those build inputs retains its own commit identity.
 
 The collection gallery shares the standalone file reader with the Learning and Creative checks. The managed-browser loopback mode streams the full original file without duplicating its payload in a browser automation message. Hosted acceptance opens the file directly.
+
+The gallery and drawing checks allow two minutes to open the full original-asset download. The notebook flight uses the toolbar’s full-size play view for its pointer start and arrow-key round. The separate gallery and learning checks cover fitted viewports and zoom.

@@ -929,10 +929,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T22:19:00.924Z",
-      "sourceDigest": "a10466d427ebdc9662b504a316b4197ea79782413991f785f1177d75cc338d1a",
+      "reviewedAt": "2026-11-26T22:35:32.999Z",
+      "sourceDigest": "62a93630c83508e452c3c6bc433b38f0fcab5a826f922457d5ee660d5c025ba2",
       "reviewOutcome": "updated",
-      "reviewReason": "The exact gallery now uses the existing streaming file transport; all original viewport, focus, contrast, and route assertions still execute.",
+      "reviewReason": "The standalone review guide records the full-size notebook pointer journey and the navigation budget used to open the exact download.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1174,10 +1174,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T22:19:01.170Z",
-      "sourceDigest": "d80be7ce5b60f7af35e8a18a2e5aaa5d9ee897da31171b08c3787decbe36fa47",
+      "reviewedAt": "2026-11-26T22:35:33.293Z",
+      "sourceDigest": "c33452d055868eeec7b810391f107d1aaab7ed0e6f0c90934aa70720734d4e85",
       "reviewOutcome": "updated",
-      "reviewReason": "Review workflow covers gallery-only changes and the recovery journal uses a durable private Cloud Shell path.",
+      "reviewReason": "The delivery record now directs owners to the combined draft and current household revision observation while preserving each historic receipt.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1671,10 +1671,10 @@
         "tests/game-art/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "26271a703ffdbcdd73b55a73cc516bc791b767e0717d284cbb064f103627d213",
-      "reviewedAt": "2026-11-26T22:12:18.869Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Reviewed drawing CSS substitutions while retaining drawing controls, owner-specific library and image revisions.",
+      "sourceDigest": "75da86ee38ffd413983144a65841797ae3cad93bdfb260fc95862a556ce3eb29",
+      "reviewedAt": "2026-11-26T22:35:33.549Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Verified that the drawing smoke still saves and reloads original art with identical privacy, artwork and revision contracts after adjusting the full-size download timeout.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -1777,10 +1777,10 @@
         "docs/design-system/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "16a2856538533b93010ebdacdfad7eef4c732f4da2d28b05dcdb0b93bcd915ce",
-      "reviewedAt": "2026-11-26T22:19:01.372Z",
-      "reviewOutcome": "updated",
-      "reviewReason": "Qualified the gallery with its canonical single-file reader using the 301 MB consolidated offline package."
+      "sourceDigest": "24c504229b55fea76793800475979e6fa914fb599a8351aa7d617cbce7882c77",
+      "reviewedAt": "2026-11-26T22:35:33.762Z",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "Only the time allowed to load the original source assets changed. The collection views, composed contrast, focus and touch assertions keep their documented behavior."
     }
   ]
 }
