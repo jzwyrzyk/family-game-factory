@@ -46,6 +46,16 @@ class SourceInspectionTests(unittest.TestCase):
         self.assertEqual(result['qualification'], 'NOT_GRANTED')
         self.assertEqual(result['archive_files_written'], 0)
 
+    def test_inspection_decodes_gcloud_urlsafe_provenance_hash(self):
+        expected = archive()
+        value = build(expected)
+        row = next(iter(value['sourceProvenance']['fileHashes'].values()))['fileHash'][0]
+        row['value'] = base64.urlsafe_b64encode(hashlib.sha256(expected).digest()).decode()
+        result = source.inspect(value, expected, BUCKET, read=Mock(return_value=expected))
+        self.assertTrue(result['staged_matches_provider_hash'])
+        self.assertTrue(result['compressed_bytes_equal'])
+        self.assertEqual(result['qualification'], 'NOT_GRANTED')
+
     def test_changed_source_bytes_and_wrong_provider_hash_remain_visible(self):
         expected, actual = archive(), archive(changed=True)
         result = source.inspect(build(expected), expected, BUCKET, read=Mock(return_value=actual))

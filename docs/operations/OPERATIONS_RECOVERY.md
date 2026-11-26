@@ -19,6 +19,18 @@ stopped at `SOURCE_ARCHIVE_HASH_MISMATCH`. Every other reported build predicate
 passed. Registry qualification and live acceptance remain incomplete. **Do not
 submit another build or reuse the historical image to bypass this failure.**
 
+The first inspection at `6f0fd94` stopped before object download because the
+strict parser rejected the provider's hash encoding. Google's [documented gcloud
+build output](https://docs.cloud.google.com/build/docs/view-build-results#view_build_results)
+uses URL-safe base64; the original verifier compared only standard base64 text.
+The approved hash has `/` in standard form and `_` in URL-safe form, while the
+historical hash uses neither differing character. The corrected shared parser
+accepts only canonical padded standard or URL-safe base64 representing exactly
+32 bytes. It rejects mixed alphabets, whitespace, extra/missing padding,
+noncanonical trailing bits, duplicate SHA256 records and changed digests.
+This corrects representation compatibility, not source identity. Actual provider
+qualification remains pending the corrected readback.
+
 After downloading/checksumming the current launcher from the reviewed handoff,
 inspect only the existing generation-pinned source object:
 

@@ -6,7 +6,7 @@ Offline by default. --check only inventories. --submit requires the plan hash;
 No credentials, deployment, IAM edits or raw build logs in output.
 """
 import argparse
-import base64
+from cloudbuild_hash import exact_sha256
 import gzip
 import hashlib
 import importlib.util
@@ -131,10 +131,8 @@ def predicates(build, sha, archive_hash):
         checks['SOURCE_PROVENANCE_MISMATCH'] = set(source) == {'storageSource'} and all(
             source['storageSource'].get(k) == storage.get(k) for k in ('bucket', 'object'))
         checks['SOURCE_ARCHIVE_HASH_COUNT_INVALID'] = len(hashes) == 1
-        expected_hash = base64.b64encode(bytes.fromhex(archive_hash)).decode()
-        checks['SOURCE_ARCHIVE_HASH_MISMATCH'] = len(hashes) == 1 and any(
-            h == {'type': 'SHA256', 'value': expected_hash}
-            for h in next(iter(hashes.values())).get('fileHash', []))
+        checks['SOURCE_ARCHIVE_HASH_MISMATCH'] = len(hashes) == 1 and exact_sha256(
+            next(iter(hashes.values())).get('fileHash', []), archive_hash)
         checks['BUILD_RESULT_IMAGE_MISMATCH'] = len(images) == 1 and images[0].get('name') == expected['images'][0]
         checks['BUILD_RESULT_DIGEST_INVALID'] = len(images) == 1 and bool(re.fullmatch('sha256:[a-f0-9]{64}', images[0].get('digest', '')))
         return checks

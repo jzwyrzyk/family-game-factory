@@ -20,6 +20,25 @@ def receipt():
 
 
 class PublicationTests(unittest.TestCase):
+    def test_standard_and_gcloud_urlsafe_hashes_preserve_exact_digest(self):
+        actual = '2f450c0d49fb975326dd0c78c93b8edc20fb36fb4d832a7a73da677b1ffdf4f2'
+        for encoder in (base64.b64encode, base64.urlsafe_b64encode):
+            value = receipt()
+            row = next(iter(value['sourceProvenance']['fileHashes'].values()))
+            row['fileHash'][0]['value'] = encoder(bytes.fromhex(actual)).decode()
+            self.assertTrue(build.predicates(value, SHA, actual)['SOURCE_ARCHIVE_HASH_MISMATCH'])
+            self.assertFalse(build.predicates(value, SHA, '0' * 64)['SOURCE_ARCHIVE_HASH_MISMATCH'])
+            row['fileHash'] *= 2
+            self.assertFalse(build.predicates(value, SHA, actual)['SOURCE_ARCHIVE_HASH_MISMATCH'])
+
+    def test_malformed_hash_encodings_and_noncanonical_bits_fail_closed(self):
+        from cloudbuild_hash import sha256_bytes
+        valid = base64.urlsafe_b64encode(bytes.fromhex('ff' * 32)).decode()
+        for value in ('ff' * 32, valid.rstrip('='), valid + '=', valid + '\n',
+                      valid[:-2] + '9=', valid.replace('_', '/', 1),
+                      base64.b64encode(b'x' * 31).decode(), 'PRIVATE'):
+            with self.assertRaises(ValueError): sha256_bytes(value)
+
     def test_exact_predicate_codes_and_no_provider_value_leakage(self):
         value = receipt()
         value['artifacts'] = {'images': build.configuration(SHA)['images']}

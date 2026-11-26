@@ -1,5 +1,25 @@
 # Permanent cloud operations delivery ledger
 
+## November 26, 2026 — strict gcloud hash-encoding compatibility
+
+The administrator's `6f0fd94` source probe stopped before archive download with
+`PROVENANCE_SHA256_ENCODING_INVALID`. Review of Google's documented gcloud output
+identified URL-safe base64 serialization, whereas the verifier expected standard
+base64 text. The approved archive hash includes a character that differs between
+these encodings; the historical archive hash did not. This explains the observed
+failure pattern but corrected provider readback remains required.
+
+The publisher and inspector now share a strict SHA-256 decoder for canonical,
+padded standard or URL-safe base64 only. Equality remains exact 32-byte digest
+equality; malformed, ambiguous, duplicate or changed digests fail closed. No
+compression normalization or source-hash bypass was added. **360 operations tests
+passed**, including both encodings and rejection cases. Earlier `6f0fd94` hosted
+operations, environment and documentation checks passed, and its fresh remote
+checkout passed source-only preflight; these are not live identity/activation
+claims. The corrected tooling still needs existing-build qualification and fresh
+remaining-actions review. No new build or cloud mutation is authorized.
+
+
 ## November 26, 2026 — replacement build succeeded; archive qualification blocked
 
 Administrator continuation at `5d98d675510645de26601fcb7b805c0e0f44bfca`

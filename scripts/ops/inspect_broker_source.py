@@ -1,5 +1,5 @@
 """Read one generation-pinned build archive in memory; never qualify, extract or persist it."""
-import base64
+from cloudbuild_hash import sha256_bytes
 import hashlib
 import io
 import re
@@ -44,7 +44,7 @@ def reference(build, bucket):
     values = next(iter(hashes.values())).get('fileHash', [])
     sha256 = [v.get('value') for v in values if v.get('type') == 'SHA256']
     require(len(sha256) == 1 and isinstance(sha256[0], str), 'PROVENANCE_SHA256_AMBIGUOUS')
-    try: raw = base64.b64decode(sha256[0], validate=True)
+    try: raw = sha256_bytes(sha256[0])
     except (ValueError, TypeError): raise SourceError('PROVENANCE_SHA256_ENCODING_INVALID') from None
     require(len(raw) == 32, 'PROVENANCE_SHA256_ENCODING_INVALID')
     return name, generation, raw.hex()
