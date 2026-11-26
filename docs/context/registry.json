@@ -899,8 +899,8 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:17:09.356Z",
-      "sourceDigest": "50c1d5a2eb6415a7e4c91660858b3e61512464d2b16cba64053831b6941115b2",
+      "reviewedAt": "2026-11-26T03:17:40.335Z",
+      "sourceDigest": "60e912b478eeb8793cd5aec0c13ce70a9a8b2cd1411e5e3f77171ee26b703bef",
       "reviewOutcome": "updated",
       "reviewReason": "The delivery entry identifies local drawing, scene and synthetic game evidence along with physical-device, provider and hosted qualification limits.",
       "reviewHistory": [
