@@ -3,7 +3,8 @@
 const host=parent.__jemsReview, cfg=host.config, nativeURL=window.URL, nativeFetch=window.fetch.bind(window);
 window.__reviewConfig=cfg;
 const log=(type,detail)=>parent.postMessage({type:'review-event',kind:type,detail},'*');
-const keyFor=value=>{try{const u=new nativeURL(String(value),document.baseURI);for(const key of host.assetKeys)if(u.pathname.endsWith('/'+key))return key;}catch{}return null;};
+const packagedKeys=new Set(host.assetKeys);
+const keyFor=value=>{const direct=String(value).replace(/^(?:\.\/|\/)/,'');if(packagedKeys.has(direct))return direct;try{const u=new nativeURL(String(value),document.baseURI);for(const key of host.assetKeys)if(u.pathname.endsWith('/'+key))return key;}catch{}return null;};
 const resolve=value=>{if(!value||String(value).startsWith('data:')||String(value).startsWith('blob:')||String(value).startsWith('#'))return value;const key=keyFor(value);return key?host.asset(key):value;};
 const rewrite=text=>String(text).replace(/((?:src|href)\s*=\s*["'])([^"']+)(["'])/gi,(m,a,v,b)=>a+resolve(v)+b).replace(/url\(\s*(["']?)([^)"']+)\1\s*\)/g,(m,q,v)=>`url("${resolve(v)}")`);
 class ReviewURL extends nativeURL {constructor(value,base){super(resolve(value),base);}}
