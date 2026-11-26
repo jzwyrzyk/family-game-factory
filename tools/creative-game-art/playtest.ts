@@ -41,7 +41,9 @@ export async function openDrawingPlaytest(
   const width = art.image.width * scale, height = art.image.height * scale;
   // Leave transparent margins around the authentic silhouette. Raster export
   // discards PNG metadata, names, editable strokes, masks and original bytes.
-  canvas.getContext('2d')!.drawImage(art.image, (canvas.width - width) / 2, (canvas.height - height) / 2, width, height);
+  const graphics = canvas.getContext('2d')!;
+  graphics.imageSmoothingEnabled = false;
+  graphics.drawImage(art.image, (canvas.width - width) / 2, (canvas.height - height) / 2, width, height);
   const png = canvas.toDataURL('image/png');
   if (!png.startsWith('data:image/png;base64,') || png.length > 1500000) throw Error('Choose a smaller sprite.');
   const documentCopy = new DOMParser().parseFromString(html, 'text/html');

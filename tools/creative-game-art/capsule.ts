@@ -31,7 +31,7 @@ export function prepareReviewCapsule(candidate: GeneratedGame, slot: SpriteSlot)
   const artifactId = hash(JSON.stringify([compiled.sourceHash, compiled.codeHash, compiled.runtimeHash, compiled.assetsHash]));
   const {client, config} = prepareGeneratedV2(game, artifactId, 'local-art-review');
   const slotImage = config.assets.find((asset: {id: string}) => asset.id === slot.assetId);
-  Object.assign(slotImage, {width: slot.width, height: slot.height, mime: 'image/png', data: ''});
+  Object.assign(slotImage, {width: slot.width, height: slot.height, mime: 'image/png', sampling: 'pixelated', data: ''});
   const serialized = JSON.stringify(config).replace(/</g, '\\u003c');
   // The trusted client decodes one raster. Its already-compiled worker sees
   // only its original public image-slot IDs, input, and simulation ticks.
