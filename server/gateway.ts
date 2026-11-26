@@ -26,7 +26,7 @@ import {FirestoreBackupScheduleLedger} from './storage/recovery-scheduler';
 import {createServer} from 'node:http';
 import {loadGatewayConfig} from './private-config';
 import {startBootstrap} from './bootstrap';
-import {Firestore} from '@google-cloud/firestore';
+import {databaseFor} from './storage/database';
 import {createRemoteJWKSet,jwtVerify} from 'jose';
 import {JobService} from './pipeline/service';
 import {FirestoreRepository} from './pipeline/firestore';
@@ -96,10 +96,10 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
  if(config.householdBudgetBinding){
   const b=config.householdBudgetBinding;
   if(tenantRepo||config.localFile||b.familyId!==config.familyId||b.workspace!==config.workspace||!config.projectId)throw Error('HOUSEHOLD_MAPPING_REQUIRED');
-  mapped=mappedHouseholdRepository(firestoreStore(new Firestore({projectId:config.projectId})),b,
+  mapped=mappedHouseholdRepository(firestoreStore(databaseFor(config)),b,
    config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,b.workspace):undefined,encoding);
  }
- const repo=tenantRepo??mapped??(config.localFile?await FileRepository.open(config.localFile):new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace,config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,config.workspace):undefined,encoding));
+ const repo=tenantRepo??mapped??(config.localFile?await FileRepository.open(config.localFile):new FirestoreRepository(databaseFor(config),config.workspace,config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,config.workspace):undefined,encoding));
  await reconcilePaidReceipts(repo);
  const agent={kind:'metered-api' as const,available:paidEnabled,generate:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}};
  const service=new JobService(repo,agent,{test:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}},{allowMock:false,maxUnits:config.maxJobMicroUsd,premiumMaxJobMicroUsd:config.premiumMaxJobMicroUsd,timeoutMs:900000,maxRetries:2,requireVerifiedParentPrivacy:!adult.enabled,adultPilotMode:adult.enabled,premiumPilot,premiumConfigured:!!config.premiumApproval,premiumUnavailable});
@@ -124,7 +124,7 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
  const householdRecovery=(()=>{
   if(!config.householdRecovery?.enabled)return undefined;
-  const db=new Firestore({projectId:config.projectId}),store=firestoreStore(db),artifacts=new GcsPrivateArtifacts(config.artifactBucket!,config.workspace);
+  const db=databaseFor(config),store=firestoreStore(db),artifacts=new GcsPrivateArtifacts(config.artifactBucket!,config.workspace);
   return createHouseholdRecovery(config,store,artifacts,(audience,authorize)=>new FirestoreBackupScheduleLedger(db,config.workspace,audience,{
    put:async(bytes,options)=>{await store.run(authorize,true);return artifacts.put(bytes,options);},
    get:async ref=>{await store.run(authorize,true);return artifacts.get(ref);}
@@ -155,7 +155,7 @@ export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){
     config.gatewayOrigin!==beta.hubOrigin||config.localFile||!config.projectId||!config.artifactBucket||
     new URL(config.previewOrigin).hostname.endsWith('.'+new URL(beta.hubOrigin).hostname)||
     (config.active&&!beta.workerRoute)||config.sessionKey.length<32||config.previewKey.length<32||config.sessionKey===config.previewKey)throw Error('BETA_CONFIGURATION_REQUIRED');
- const db=new Firestore({projectId:config.projectId});
+ const db=databaseFor(config);
  const d=new FamilyDirectory(firestoreStore(db),beta,workspace=>new GcsPrivateArtifacts(config.artifactBucket!,workspace),artifactEncoding(config));
  cloudBackupSchedule(d); // Validate separate, default-off backup configuration.
  const runtimes=new Map<string,ReturnType<typeof createGateway>>();

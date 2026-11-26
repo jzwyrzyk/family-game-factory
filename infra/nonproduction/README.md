@@ -170,3 +170,7 @@ plan/receipt/marker, and prepares a private successor state. Budget user ADC quo
 is explicitly `jems-jzw-nonprod` on an alias used only by the budget. No existing
 resource update, replacement, deletion, project IAM grant or federation activation
 is permitted. See [provider requirements and exact guards](../../docs/operations/NONPRODUCTION_RECOVERY.md).
+
+## Integrated TEST candidate
+
+The separate [family TEST Terraform root](family-beta/terraform) reuses the recovered project's deployer, UAT identity and existing protected environment controllers. Its own state owns a named Firestore database, private bucket, identities, image repository, signed-worker trust and four services. The [phased operating notes](family-beta/TEST.md) describe plan inputs, audience binding, secret handling, isolation, cost, negative controls and recovery. Static TEST and the partial-apply recovery maintain their separate state and receipts.

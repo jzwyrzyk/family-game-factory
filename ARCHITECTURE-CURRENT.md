@@ -27,6 +27,10 @@ unchanged. The IAP controller retains per-service invocation grants. Source
 implementation and actual cloud acceptance remain separate.
 [Recovery contract](docs/operations/NONPRODUCTION_RECOVERY.md)
 
+## Integrated TEST release infrastructure
+
+The isolated TEST candidate connects the existing family gateway, household, untrusted preview and private Coach to dedicated service identities, the named Firestore database `jems-test`, a versioned private bucket and an independent signed-sandbox worker. Gateway, preview, recovery and household administration select the named database only for its exact TEST project/bucket. The existing release controller qualifies the same numeric configuration versions, immutable images and protected routes. An approved funded window adds expiring private Coach permissions and separately enrolled adult spending admission. Infrastructure, identity and authenticated UAT receipts remain live acceptance gates. [Plan phases and operating boundaries](infra/nonproduction/family-beta/TEST.md)
+
 ## Operational access and recovery
 
 The PR #222 source candidate keeps direct managed identity qualification fail-closed

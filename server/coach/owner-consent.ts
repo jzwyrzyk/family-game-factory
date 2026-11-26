@@ -3,11 +3,11 @@
  * trusted operator utility cannot authenticate the adult or supply a receipt.
  */
 import {readFile} from 'node:fs/promises';
-import {Firestore} from '@google-cloud/firestore';
+import {databaseFor} from '../storage/database';
 import {FirestoreRepository} from '../pipeline/firestore';
 import {FileRepository} from '../pipeline/repository';
 import {setOwnerCoachConsent} from './consent';
-interface OwnerConfig {familyId:string;workspace:string;projectId?:string;localFile?:string}
+interface OwnerConfig {familyId:string;workspace:string;projectId?:string;artifactBucket?:string;localFile?:string}
 async function main(){
  if(!process.env.FACTORY_PRIVATE_CONFIG||process.env.GITHUB_ACTIONS||process.env.K_SERVICE)
   throw Error('TRUSTED_OWNER_MACHINE_REQUIRED');
@@ -20,7 +20,7 @@ async function main(){
  if(!config||!/^[A-Za-z0-9_-]{1,100}$/.test(config.familyId)||!/^[A-Za-z0-9_-]{1,100}$/.test(config.workspace))
   throw Error('OWNER_FAMILY_OR_WORKSPACE_REQUIRED');
  const repo=config.localFile?await FileRepository.open(config.localFile):
-  new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace);
+  new FirestoreRepository(databaseFor(config),config.workspace);
  const revoke=args.has('--revoke');
  if(revoke&&(args.has('--allow-model')||args.has('--allow-audio')||args.has('--allow-narration')))throw Error('INVALID_CONSENT_COMMAND');
  if(revoke){

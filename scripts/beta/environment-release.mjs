@@ -1,4 +1,5 @@
 import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import {hostingPlan} from './prepare-hosting.mjs';
@@ -21,7 +22,8 @@ function verifyRuntime(spec,desired){
  const container=spec?.containers?.[0],approved=desired.containers[0];
  requireState(spec?.serviceAccountName===desired.serviceAccountName&&spec.containers?.length===1&&container&&!container.command?.length&&!container.args?.length,'Runtime identity or command differs.');
  requireState(spec.containerConcurrency===desired.containerConcurrency&&spec.timeoutSeconds===desired.timeoutSeconds&&
-  JSON.stringify(container.ports)===JSON.stringify(approved.ports)&&container.resources?.limits?.cpu===approved.resources.limits.cpu&&container.resources?.limits?.memory===approved.resources.limits.memory,
+  container.ports?.length===1&&container.ports[0].containerPort===approved.ports[0].containerPort&&
+  (!container.ports[0].name||container.ports[0].name==='http1')&&(!container.ports[0].protocol||container.ports[0].protocol==='TCP')&&container.resources?.limits?.cpu===approved.resources.limits.cpu&&container.resources?.limits?.memory===approved.resources.limits.memory,
   'Runtime capacity or listener differs.');
  const env=container.env??[];
  requireState(env.length===approved.env.length&&approved.env.every(e=>env.some(row=>row.name===e.name&&row.value===e.value&&!row.valueFrom)),'Runtime environment differs.');
@@ -71,6 +73,17 @@ export function verifyBackend(backend,role,c,io){
   neg.cloudRun?.service===c.services[serviceRole].name&&!neg.cloudRun.urlMask&&!neg.cloudRun.tag&&
   !neg.appEngine&&!neg.cloudFunction,'Backend does not target the exact reviewed Cloud Run service.');
 }
+export function candidateRevisionSuffix(c,role,source,service){
+ const image=service.spec.template.spec.containers[0].image;
+ const prefix='b-'+source.slice(0,10)+'-'+image.slice(-6);
+ if(c.project!=='jems-jzw-nonprod'||c.environment!=='test')return prefix;
+ // A reviewed secret version or spending policy change needs a new immutable
+ // revision even when both source and container image stayed identical.
+ const policy=structuredClone(service.spec.template);
+ policy.spec.containers[0].env.sort((a,b)=>a.name.localeCompare(b.name));
+ const digest=createHash('sha256').update(JSON.stringify([role,source,policy])).digest('hex');
+ return prefix+'-'+digest.slice(0,12);
+}
 export async function environmentRelease(release,controller,options,io=cloud){
  const {descriptor:c,source,builds}=release,plan=hostingPlan(c),env=options.environment,mode=options.mode;
  requireState(['dev','test'].includes(env)&&env===c.environment&&['verify','stage'].includes(mode)&&/^[a-f\d]{40}$/.test(source)&&source===options.source,'Explicit DEV/TEST source and operation required.');
@@ -89,7 +102,7 @@ export async function environmentRelease(release,controller,options,io=cloud){
  for(const role of roles)before[role]=verifyService(service(role),plan[role]);
  for(const role of roles){
   const serviceName=c.services[role].name,image=plan[role].spec.template.spec.containers[0].image;
-  const suffix='b-'+source.slice(0,10)+'-'+image.slice(-6),revision=serviceName+'-'+suffix;
+  const suffix=candidateRevisionSuffix(c,role,source,plan[role]),revision=serviceName+'-'+suffix;
   requireState(revision.length<=63,'Shorter reviewed service name required for an immutable revision.');
   const revisions=()=>io(['run','revisions','list','--service',serviceName,...common]);
   let candidate=revisions().find(r=>r.metadata.name===revision);

@@ -1,7 +1,7 @@
 // Account-owner-only setup on a trusted machine with authorized ADC. Never run in Actions logs.
 import {randomBytes,createHash} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
-import {Firestore} from '@google-cloud/firestore';
+import {databaseFor} from './storage/database';
 import {FirestoreRepository} from './pipeline/firestore';
 import {FileRepository} from './pipeline/repository';
 import {GcsPrivateArtifacts} from './storage/artifacts';
@@ -21,7 +21,7 @@ async function main(){
  if(!process.env.FACTORY_PRIVATE_CONFIG||process.env.GITHUB_ACTIONS)throw Error('TRUSTED_OWNER_MACHINE_REQUIRED');
  const config=JSON.parse(await readFile(process.env.FACTORY_PRIVATE_CONFIG,'utf8')) as OwnerConfig;
  if(process.env.K_SERVICE&&config.localFile)throw Error('CLOUD_RUN_REQUIRES_DURABLE_FIRESTORE');
- const repo=config.localFile?await FileRepository.open(config.localFile):new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace,config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,config.workspace):undefined);
+ const repo=config.localFile?await FileRepository.open(config.localFile):new FirestoreRepository(databaseFor(config),config.workspace,config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,config.workspace):undefined);
  const token=await prepareOwnerAccess(config,Number(process.argv[2]),repo);
  console.log('One-use invitation (expires in 10 minutes). Enter only in the Grown-ups connection form. Do not share publicly:');console.log(token);
 }

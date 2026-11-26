@@ -711,10 +711,10 @@
         "server/beta/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T06:19:59.740Z",
-      "sourceDigest": "8aec10f384d09c1592dc6758e68333d58d254f0da000b4131c63ef65b4a6fdd0",
+      "reviewedAt": "2026-11-26T23:29:19.687Z",
+      "sourceDigest": "173ee01a6a2ceafe28dc61b493dd8fbeda453f8b5b08fb7071d8f8b295a86248",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed exact validator and restricted family build dependencies.",
+      "reviewReason": "Integrated TEST binds gateway, household and preview to dedicated identities, bucket and named database; runtime, owner setup and recovery share one scoped resolver.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -802,10 +802,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:56.441Z",
-      "sourceDigest": "50bb0b9c9ee3b6c2cf7a3d58319542761c1cc7287ec38b7594787b37b1398837",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The integrated UI candidate preserves its saved-concept build surface. These refinements change neither coach admission nor model prompts outside the active asset catalog.",
+      "reviewedAt": "2026-11-26T23:29:19.846Z",
+      "sourceDigest": "93d7e0271b24d52946fd7563dbf33f1e89ff723244141b69f24aa6ae4d4547e1",
+      "reviewOutcome": "updated",
+      "reviewReason": "The funded TEST plan adds exact expiry-limited household invocation and numeric Secret Manager access for the private Coach; historical acceptance receipts stay scoped to their original release.",
       "reviewHistory": [
         {
           "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
@@ -866,10 +866,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "254e5bc24519e6d068053d488e6e6483060cfde1884a725987ff7ed7f6109c48",
-      "reviewedAt": "2026-11-25T17:33:43.991Z",
+      "sourceDigest": "42bb41aa28afe027b83dc046d34b7c7c8879ccdfbd050033fca60d23d33314af",
+      "reviewedAt": "2026-11-26T23:29:19.951Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled fresh source-to-target Adult mapping and grant, original-audience retained-source capture, durable reviewed attempts, stale workspace UI clearing and playback-only remote copies; no credentials, jobs, spending or private authority transfer.",
+      "reviewReason": "TEST uses separate IAP assertion audiences and a dedicated synthetic adult enrollment. Existing permit, passphrase, device and privacy checks still govern owner access.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -929,10 +929,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T22:35:32.999Z",
-      "sourceDigest": "62a93630c83508e452c3c6bc433b38f0fcab5a826f922457d5ee660d5c025ba2",
+      "reviewedAt": "2026-11-26T23:29:20.094Z",
+      "sourceDigest": "36290a38ff33db01cb34c1646bdf650d815940a50b4d0cdce0ef82f9f1c9e9ea",
       "reviewOutcome": "updated",
-      "reviewReason": "The standalone review guide records the full-size notebook pointer journey and the navigation budget used to open the exact download.",
+      "reviewReason": "Dedicated Google provider plan, mocked phases, SDK routing and renderer regression tests cover integrated TEST configuration without creating any cloud resource.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1174,10 +1174,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T22:35:33.293Z",
-      "sourceDigest": "c33452d055868eeec7b810391f107d1aaab7ed0e6f0c90934aa70720734d4e85",
+      "reviewedAt": "2026-11-26T23:29:20.251Z",
+      "sourceDigest": "38cd6d3d3a7f8f5e7827ccc07c39372dddf72af9745dd7dbe616427a7bdbb9fe",
       "reviewOutcome": "updated",
-      "reviewReason": "The delivery record now directs owners to the combined draft and current household revision observation while preserving each historic receipt.",
+      "reviewReason": "The integrated TEST handoff specifies private phased Terraform state, protected build identities, authenticated UAT, optional spending, rollback and live evidence gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1754,10 +1754,10 @@
         "scripts/storage/**"
       ],
       "reviewAfterDays": 30,
-      "sourceDigest": "fd13e01d23d4398e1a1ff78632fe1662399c9981965d7cc2003b863e500cc6e0",
-      "reviewedAt": "2026-11-26T07:32:37.407Z",
+      "sourceDigest": "fe45a4e157b029f47352dcf88663fa34956d5de7cae67a3f19b3aac8dd0c5b37",
+      "reviewedAt": "2026-11-26T23:29:20.478Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Existing private and native storage authorities retain the exact artwork and scene revisions while scratchpaper stays transient.",
+      "reviewReason": "Named TEST Firestore and a versioned private artifact bucket bind every SDK caller, including recovery and administrator tools, without touching the household deployment.",
       "reviewHistory": []
     },
     {
