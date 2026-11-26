@@ -15,6 +15,21 @@ IMAGE = f'us-east5-docker.pkg.dev/{setup.PROJECT}/factory-services/request-broke
 
 
 class BootstrapTests(unittest.TestCase):
+    def test_existing_image_source_cannot_hide_changed_broker_bytes(self):
+        import contextlib
+        import io
+        with patch.object(setup, 'source', return_value={}), \
+             patch.object(setup.publication, 'source_archive', return_value=b'archive'), \
+             patch.object(setup.publication.publication, 'run', return_value=b'private-unexpected-source'), \
+             patch.object(setup.publication, 'qualify') as qualify, contextlib.redirect_stdout(io.StringIO()) as output:
+            code = setup.main(['--source-sha', 'a' * 40, '--image', IMAGE, '--check',
+                               '--build-source-sha', 'b' * 40,
+                               '--build-id', '7fcac19a-8444-4c17-955a-1a381006069e'])
+            self.assertEqual(code, 2)
+            qualify.assert_not_called()
+            self.assertIn('BUILD_SOURCE_BROKER_FILES_DIFFER', output.getvalue())
+            self.assertNotIn('private-unexpected-source', output.getvalue())
+
     def cloud(self, *args, **kwargs):
         if args[:2] == ('projects', 'describe'):
             return dict(projectId=setup.PROJECT, projectNumber=setup.NUMBER, lifecycleState='ACTIVE')

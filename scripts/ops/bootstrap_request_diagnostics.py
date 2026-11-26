@@ -268,6 +268,7 @@ def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--source-sha', required=True)
     p.add_argument('--image', required=True)
+    p.add_argument('--build-source-sha', help='Original source of an already successful build; broker files must match current source')
     p.add_argument('--build-id', help='Required for live check/apply; source provenance reverified from Cloud Build')
     modes = p.add_mutually_exclusive_group()
     modes.add_argument('--check', action='store_true')
@@ -275,12 +276,17 @@ def main(argv=None):
     p.add_argument('--approve-plan-sha256')
     args = p.parse_args(argv)
     try:
+        require(not args.build_source_sha or args.build_id, 'BUILD_SOURCE_REQUIRES_EXISTING_BUILD')
         spec = proposed(args.image, args.source_sha, source(args.source_sha))
         if not args.check and not args.apply:
             print(json.dumps(spec, indent=2)); return 0
         require(args.build_id, 'Source-bound Cloud Build ID required for live inventory/apply')
-        receipt = publication.qualify(args.build_id, args.source_sha,
-                                      hashlib.sha256(publication.archive(args.source_sha)).hexdigest())
+        build_source = args.build_source_sha or args.source_sha
+        archive = publication.source_archive(args.source_sha, build_source)
+        for name in publication.FILES:
+            original = publication.publication.run(['git', 'show', build_source + ':ops/request-broker/' + name], ROOT)
+            require(original == (ROOT / 'ops/request-broker' / name).read_bytes(), 'BUILD_SOURCE_BROKER_FILES_DIFFER')
+        receipt = publication.qualify(args.build_id, build_source, hashlib.sha256(archive).hexdigest())
         require(receipt['image'] == args.image, 'Build receipt image differs')
         spec['verified_build'] = receipt
         token = command(['gcloud', 'auth', 'print-access-token', '--quiet'])
@@ -295,6 +301,8 @@ def main(argv=None):
         else:
             print(json.dumps({'plan': plan.describe(), 'approve_plan_sha256': plan.review_code()}, indent=2))
         return 0
+    except publication.BuildVerificationError as error:
+        print(json.dumps({'status': 'STOPPED', 'code': error.code, 'resubmit': False})); return 2
     except (SetupError, BootstrapError, OSError, ValueError, TypeError, KeyError, RuntimeError) as error:
         # Never print upstream bodies, arbitrary metadata or local file contents.
         print(json.dumps({'status': 'STOPPED', 'reason': str(error) if isinstance(error, SetupError)

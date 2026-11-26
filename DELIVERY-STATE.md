@@ -19,8 +19,22 @@ supports a read-only all-predicate probe with the original build source. No buil
 was resubmitted, no provenance check relaxed, and no image accepted. This task has
 no attached Google identity; exact live failure attribution needs the administrator
 probe. Existing GitHub release observation does not authorize arbitrary build reads.
-Cloud Shell storage recovery is being prepared separately; no historical file,
-credential, journal, receipt, recovery record or Terraform state has been deleted.
+The administrator's one bounded probe returned the exact sole failed predicate:
+`BUILD_ARTIFACTS_UNEXPECTED`, with `artifacts_is_exact_images_mirror:true` and no
+other artifact fields. All source/build/security predicates passed; source archive
+SHA256 is `3b61c3cc67b59f96019796fdd3979870c3f576926f7010cdcc4920bf56cdedb1`.
+The correction accepts only that exact provider image-list mirror, not arbitrary
+artifacts. Registry digest verification remains unperformed in this task.
+
+Guarded historical-source cleanup and durable lightweight handoff journals are now
+implemented with regression coverage. Cleanup defaults to a private dry-run, verifies
+remote recoverability, preserves Git/unique/local/operational/Terraform content,
+requires explicit deletion approval, captures then rehashes files before unlinking,
+and supports no-overwrite restoration. Sparse temporary handoffs remove clean source
+and retain unexpected local changes. No historical file, credential, journal,
+receipt, recovery record or Terraform state has been deleted. The original 28-resource
+Terraform files and plan binding remain unchanged; broker verification does not gate
+their independently approved apply. [Recovery handoff](docs/operations/OPERATIONS_RECOVERY.md).
 
 ## November 26, 2026 — operational priority realignment and live GitHub observation
 

@@ -17,6 +17,7 @@ import re
 import sys
 import tarfile
 import tempfile
+from operation_journal import record
 
 ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location('existing_service_build', ROOT / 'scripts/deployment/build.py')
@@ -68,6 +69,17 @@ def archive(sha, *, require_head=True):
     return output.getvalue()
 
 
+def source_archive(tool_sha, build_source):
+    data = archive(tool_sha)
+    if build_source != tool_sha:
+        require(re.fullmatch('[a-f0-9]{40}', build_source), 'SOURCE_SHA_INVALID')
+        # Recover the exact committed source without changing checkout or using a new image tag.
+        publication.run(['git', 'fetch', '--quiet', '--filter=blob:none', '--depth=1',
+                         'https://github.com/jzwyrzyk/family-game-factory.git', build_source], ROOT)
+        data = archive(build_source, require_head=False)
+    return data
+
+
 def configuration(sha):
     image = IMAGE + ':' + sha
     return {'steps': [{'name': 'gcr.io/cloud-builders/docker', 'args': [
@@ -82,7 +94,8 @@ def configuration(sha):
 def predicates(build, sha, archive_hash):
     """Evaluate all original verification predicates; emit only fixed names/booleans.
 
-    Deliberately no compatibility relaxation without the actual provider evidence.
+    Cloud Build may mirror top-level images in artifacts.images; only the exact
+    same list is accepted. No other artifact fields or destinations are allowed.
     This function is also used by the bounded administrator probe.
     """
     expected = configuration(sha)
@@ -107,7 +120,8 @@ def predicates(build, sha, archive_hash):
             ('env', 'secretEnv', 'volumes', 'automapSubstitutions', 'dynamicSubstitutions', 'pool'))
         checks['BUILD_SECRETS_UNEXPECTED'] = not any(build.get(k) for k in ('secrets', 'availableSecrets'))
         checks['BUILD_SUBSTITUTIONS_UNEXPECTED'] = not build.get('substitutions')
-        checks['BUILD_ARTIFACTS_UNEXPECTED'] = not build.get('artifacts')
+        checks['BUILD_ARTIFACTS_UNEXPECTED'] = (not build.get('artifacts') or
+            build.get('artifacts') == {'images': expected['images']})
         checks['BUILD_DEPENDENCIES_UNEXPECTED'] = not build.get('dependencies')
         checks['BUILD_EXECUTABLE_STEPS_MISMATCH'] = [
             {k: v for k, v in step.items() if k not in metadata} for step in build.get('steps', [])] == expected['steps']
@@ -158,6 +172,7 @@ def qualify(build_id, sha, archive_hash):
     image = verify(build, sha, archive_hash)
     artifact = cloud_read('REGISTRY_METADATA_READ_FAILED', 'artifacts', 'docker', 'images', 'describe', image)
     require(artifact.get('image_summary', {}).get('digest') == image.split('@')[1], 'REGISTRY_DIGEST_MISMATCH')
+    record('BUILD_VERIFIED', source_sha=sha, archive_sha256=archive_hash, build_id=build_id, image=image)
     return {'status': 'BUILD_VERIFIED_NOT_DEPLOYED', 'source_sha': sha, 'archive_sha256': archive_hash,
             'build_id': build_id, 'builder': BUILDER, 'image': image}
 
@@ -175,13 +190,8 @@ def main(argv=None):
     a = p.parse_args(argv)
     require(not a.build_source_sha or a.build_id, 'BUILD_SOURCE_REQUIRES_EXISTING_BUILD')
     require(not a.diagnose or a.build_id, 'DIAGNOSTIC_REQUIRES_EXISTING_BUILD')
-    data = archive(a.source_sha)
     build_source = a.build_source_sha or a.source_sha
-    if build_source != a.source_sha:
-        require(re.fullmatch('[a-f0-9]{40}', build_source), 'SOURCE_SHA_INVALID')
-        # Read-only fetch of the exact existing commit; never checkout or change the operator's files.
-        publication.run(['git', 'fetch', '--quiet', '--filter=blob:none', '--depth=1', 'https://github.com/jzwyrzyk/family-game-factory.git', build_source], ROOT)
-        data = archive(build_source, require_head=False)
+    data = source_archive(a.source_sha, build_source)
     archive_hash = hashlib.sha256(data).hexdigest()
     plan = {'source_sha': a.source_sha, 'archive_sha256': archive_hash, 'source_bucket': BUCKET,
             'build': configuration(a.source_sha), 'cost': 'One build, at most 10 minutes; storage/logging extra',
@@ -197,6 +207,7 @@ def main(argv=None):
         publication.preflight(REGION, BUCKET)
     if a.submit:
         require(a.approve_plan_sha256 == digest(plan), 'BUILD_PLAN_APPROVAL_MISMATCH')
+        record('BUILD_SUBMISSION_INTENT', source_sha=a.source_sha, archive_sha256=archive_hash)
         with tempfile.TemporaryDirectory(prefix='jems-broker-build-') as folder:
             source = Path(folder) / 'source.tgz'
             config = Path(folder) / 'build.json'
@@ -206,6 +217,7 @@ def main(argv=None):
                 '--region', REGION, '--gcs-source-staging-dir', 'gs://' + BUCKET + '/source', '--async')
         build_id = result.get('id')
         require(re.fullmatch('[a-f0-9-]{36}', build_id or ''), 'BUILD_SUBMISSION_UNCERTAIN_NO_RETRY')
+        record('BUILD_SUBMITTED', source_sha=a.source_sha, build_id=build_id)
         print(json.dumps({'status': 'SUBMITTED_NOT_VERIFIED', 'build_id': build_id,
                           'source_sha': a.source_sha, 'recovery': 'Use --build-id; never repeat --submit'})); return
     print(json.dumps({'plan': plan, 'approve_plan_sha256': digest(plan),

@@ -24,8 +24,10 @@ class PublicationTests(unittest.TestCase):
         value = receipt()
         value['artifacts'] = {'images': build.configuration(SHA)['images']}
         result = build.diagnostic(value, SHA, HASH)
-        self.assertEqual(result['first_failed_predicate'], 'BUILD_ARTIFACTS_UNEXPECTED')
+        self.assertIsNone(result['first_failed_predicate'])
         self.assertTrue(result['provider_shape']['artifacts_is_exact_images_mirror'])
+        self.assertEqual(build.verify(value, SHA, HASH), build.IMAGE + '@sha256:' + HASH)
+        value['artifacts']['objects'] = {'location': 'gs://unexpected'}
         with self.assertRaisesRegex(build.BuildVerificationError, '^BUILD_ARTIFACTS_UNEXPECTED$'):
             build.verify(value, SHA, HASH)
         value['serviceAccount'] = 'private-token-marker'
@@ -50,6 +52,9 @@ class PublicationTests(unittest.TestCase):
         changes = [lambda v: v.update(serviceAccount='owner'),
                    lambda v: v['steps'][0].update(env=['TOKEN=bad']),
                    lambda v: v.update(secrets=[{}]),
+                   lambda v: v.update(artifacts={'images': [build.IMAGE + ':wrong']}),
+                   lambda v: v.update(artifacts={'images': build.configuration(SHA)['images'], 'npmPackages': []}),
+                   lambda v: v.update(artifacts={'images': build.configuration(SHA)['images'] * 2}),
                    lambda v: v['sourceProvenance'].update(fileHashes={}),
                    lambda v: v['sourceProvenance']['resolvedStorageSource'].update(bucket='other'),
                    lambda v: v['sourceProvenance']['resolvedStorageSource'].pop('generation'),

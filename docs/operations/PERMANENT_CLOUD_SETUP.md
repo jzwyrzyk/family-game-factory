@@ -26,7 +26,11 @@ with a newer verifier to retain the actual image's original source, labels and a
 The new launcher fetches sparse, blob-filtered operations source to reduce temporary
 disk usage. Current task access has no Google identity or Cloud Build reader; one
 administrator probe is required to identify the actual failed provider predicate.
-No check has been relaxed merely because the build is marked successful.
+The administrator probe identified only `BUILD_ARTIFACTS_UNEXPECTED`: an exact
+provider mirror of the approved images list. The verifier now accepts only that
+mirror and still rejects every additional artifact field or destination. Registry
+verification remains pending. [Recovery and guarded cleanup](OPERATIONS_RECOVERY.md)
+preserves the original build and unapplied Terraform plan; no rebuild is required.
 
 ## One verified launcher
 
@@ -36,7 +40,7 @@ The reviewed handoff supplies the full `OPS_SHA` for this candidate. Download on
 
 ```sh
 curl -fsSL "https://raw.githubusercontent.com/jzwyrzyk/family-game-factory/$OPS_SHA/scripts/ops/handoffs/operations-bootstrap.sh" -o /tmp/jems-operations.sh
-printf '%s  %s\n' 2cb995775480ae526c3ff1a0fdef245a695985e6221a942081875175e2e13d0a /tmp/jems-operations.sh | sha256sum -c -
+printf '%s  %s\n' fdfefd869abeb1876102e9086ceba26998725ef0cc9a856a43adc7900fb6ddb4 /tmp/jems-operations.sh | sha256sum -c -
 bash /tmp/jems-operations.sh "$OPS_SHA" github --check
 bash /tmp/jems-operations.sh "$OPS_SHA" broker-build --check
 bash /tmp/jems-operations.sh "$OPS_SHA" nonprod --inventory

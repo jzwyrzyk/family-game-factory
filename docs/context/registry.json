@@ -1135,10 +1135,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T14:18:52.890Z",
-      "sourceDigest": "3948c637a2dfbabe8869159d92d4bfeb8cf12eb38bc0c26d06908cff434b9be5",
+      "reviewedAt": "2026-11-26T14:29:43.476Z",
+      "sourceDigest": "23d0a6cf7180e9a60cf9ab5b82d33feca776b38f1ed867a3c738aaf4de1028ac",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded administrator GitHub/project/billing/Terraform/build checkpoint, preserved original unapplied plan source/hash, and documented specific sanitized build predicates and sparse source recovery.",
+      "reviewReason": "Recorded exact provider artifacts.images mirror diagnosis and narrowly compatible verification; reviewed recoverability-based deletion, quarantine recovery, durable sanitized journals, sparse cleanup and original Terraform plan independence.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
