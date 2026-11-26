@@ -741,10 +741,10 @@
         "tools/premium-art/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-25T23:20:55.850Z",
-      "sourceDigest": "3c42ed09d4394afe0c109b5a6fa6d9d87f119c2474a5101fb24cafd81bf20c81",
+      "reviewedAt": "2026-11-26T03:20:35.240Z",
+      "sourceDigest": "7e10a95c1479397bd6add2fd7f8495b884db8de2f6c96be2ccf1b7b8fb4e4391",
       "reviewOutcome": "updated",
-      "reviewReason": "Scene authoring uses active Pal IDs. The ADR and scene rendering contract cover reading saved generated versions through the historical asset resolver.",
+      "reviewReason": "The isolated binding preserves a child sprite's edges when fitting and painting, independently of scenery filtering in the reviewed runtime.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -899,10 +899,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T03:06:15.971Z",
-      "sourceDigest": "d3ee69b44d711cd709ce46c2855a7454a1b54e18e4655859b4881d1888f6443d",
-      "reviewOutcome": "updated",
-      "reviewReason": "The new synthetic browser and container checks verify exact byte admission, metadata rejection, owner changes and digest-only authorization.",
+      "reviewedAt": "2026-11-26T03:20:36.726Z",
+      "sourceDigest": "1c0e75cedbd8e6e7fc38768b553af58741ea7467db3f2542b33f865873b12048",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The isolated game fixture verifies edge sampling and updates its synthetic screenshot; the production admission and hosted qualification gates are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1143,10 +1143,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T03:06:16.162Z",
-      "sourceDigest": "d1a2a0bdbf766f8b99256225ed6b5feae3af6991caa35a0b3a828f8b4127c5f7",
-      "reviewOutcome": "updated",
-      "reviewReason": "The family security workflow exercises original-byte admission and the release record distinguishes the production baseline from the proposed development.",
+      "reviewedAt": "2026-11-26T03:13:38.015Z",
+      "sourceDigest": "37b46ede69fef75ff1ae12425ffe45004d4cadc008cd8cf9ed8cfaab2df8401f",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The production preview entry and worker pin stay on their existing release path. The isolated review adapter only runs in a local synthetic fixture.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

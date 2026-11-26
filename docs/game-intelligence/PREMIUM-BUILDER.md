@@ -86,3 +86,22 @@ The following sequence is for a future authorized release. Keep the premium poli
 ### Disabled storage preparation in PR166
 
 The [optional private payload manifest](../storage/ROLLOUT.md#assets-and-revisions) shares unchanged artwork and compiled code across stored revisions. Encoding remains off by default; decoded game objects, source/art hashes, premium provenance, sandbox/runtime contracts and model/accounting policy are unchanged. Original art is not recompressed or deleted. New-format readers must precede any separately approved write activation.
+
+## Local qualification of a drawing in a generated 2D game
+
+New plans and code prompts specify 2D games. Sprites, layered scenery, lighting and parallax can express visual depth. A spatial action the runtime cannot deliver still requires the creator's choice. The generator has no private drawing input. A professional illustration of the same subject cannot stand in for the child's drawing.
+
+A local review tool runs one synthetic rock through a playable game in the generated-module-v2 worker. Open the generated HTML in an isolated browser profile, choose **Try the rock**, then **Play!** and use the arrows. **Close playtest** destroys the frame. The runner uses the existing drawing database schema in a separate synthetic namespace, the immutable image or rig pin, the archived runtime and the illustrated Gem Factory background. The input fixture and its drawing are synthetic. [Rendered activity](evidence/connected-art/workshop-rock.png)
+
+```sh
+node --import tsx tools/creative-game-art/review.ts /tmp/jems-local-art-review.html
+npm run test:generated-art
+```
+
+The review operator chooses one existing actor image slot and verifies its display aspect ratio throughout a specific game's code. The qualification identity covers its source, compiled code, archived runtime and original asset-pack hashes, the executable preview document, and the slot identity and geometry. The host binds the selected art pin to that identity. An owner change or page exit cancels the view. A mismatched revision, missing drawing or invalid content hash blocks play. The rendered sprite fits the reviewed rectangle with transparent margins. The review slot disables additional edge smoothing during fitting and runtime drawing, including in a smoothly sampled environment. Selecting an actor slot leaves movement, collision and scoring under the game's existing contract.
+
+Only the trusted client in the ephemeral opaque-origin frame receives the bounded PNG raster. The private art resolver verifies the exact image bytes and resolves saved cutout masks locally before re-encoding. The original, embedded editing metadata, owner, name, library identifier and immutable art pin stay outside the frame. Generated worker code sees its existing public slot IDs and ordinary game inputs. The frame has script-only sandbox permissions and a deny-network CSP. The build tool reads a trusted code fixture from the repository. Its digest identifies that fixture and cannot authorize code supplied by an untrusted caller.
+
+No product UI, gateway, model stage, remote preview, artifact archive or production configuration imports the review tool. The runner stores no gameplay revision and uses no paid model operation. An editable source snapshot in a PNG must never pass through the generated-game delivery interface. Independent qualification of actual slot geometry, host authorization and revocation, family consent, persistent revision history, remote delivery, and learning-host integration is required before enabling general generated-game asset reuse. A new runtime or asset revision needs its own qualification. Existing production games keep their exact archived runtime and original asset pack.
+
+The qualified child sprite uses its own pixel sampling during fitting and display. A smooth environment setting cannot alter that selection.
