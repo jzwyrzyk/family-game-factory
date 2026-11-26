@@ -57,3 +57,10 @@ Background coach/builder availability reads are cancelled on document `pagehide`
 Household migration retains the source when an inventoried database cannot be opened or read; it does not skip failed databases. Errors identify the database and read stage. Synthetic browser failures retain inventory versions, native database lifecycle events and source/target screenshots so an aborted creation probe can be distinguished from a failed existing-data read.
 
 The browser runner collects entry, origin isolation, early guidance, operator, generic migration, application migration and preview results independently for each required engine. Each entry fixture owns its own family and proves both invitation and recovery. `browser-results.json` records every stage and the hosted source identity; any failed stage still produces a nonzero run result. A failure does not hide unrelated migration or preview evidence.
+
+### Reviewed artwork admission
+
+The family browser computes the SHA-256 of the selected PNG, obtains a fresh guardian unlock and asks the family gateway to authorize that digest. It decodes reviewed files only. Before admission, a fresh raster re-encode must match the reviewed bytes. PNG metadata or editable-source attachments cause the mismatch path to offer a neutral local download. The operator can review and approve the resulting exact file for a subsequent selection. Every profile change cancels the outstanding selection and revokes the download URL.
+
+The synthetic Chromium entry test selected an unapproved file, downloaded a reviewed metadata-free copy, verified that its new digest needed approval, interrupted an unlock by reselecting the profile and compared the admitted original's IndexedDB bytes with the reviewed file. The gateway received only the expected digest for each artwork review. [Prepared copy on the family device](evidence/reviewed-png-preparation.png)
+
