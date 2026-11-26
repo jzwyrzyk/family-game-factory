@@ -3,6 +3,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const {chromium}=require('playwright');
 const {standaloneInput}=require('./standalone-input.cjs');
+const {holdGameKey}=require('../../tests/game-art/hold-key.cjs');
 
 (async()=>{
   const input=await standaloneInput(path.resolve('dist-review/jems-ui-review.html'));
@@ -31,11 +32,11 @@ const {standaloneInput}=require('./standalone-input.cjs');
     assert.deepEqual(await field.evaluate(c=>Array.from(c.getContext('2d').getImageData(100,12,1,1).data)),[198,226,237,255]);
     fs.mkdirSync('test-results/ui-review',{recursive:true});
     await field.screenshot({path:'test-results/ui-review/notebook-flight.png'});
-    const hold=async(key,ms)=>{await page.keyboard.down(key);try{await page.waitForTimeout(ms);}finally{await page.keyboard.up(key);}};
-    await hold('ArrowRight',2350);
+    const hold=(key,steps)=>holdGameKey(page,field,key,steps);
+    await hold('ArrowRight',141);
     await flight.getByText('Score: 1',{exact:true}).waitFor();
     assert.equal(await flight.locator('#status').getAttribute('data-state'),'playing');
-    await hold('ArrowUp',650);await hold('ArrowRight',1600);
+    await hold('ArrowUp',39);await hold('ArrowRight',96);
     await flight.getByText('You did it!',{exact:true}).waitFor();
     await app.getByRole('button',{name:'Keep this art test'}).click();
     await app.getByText('This art test is kept.',{exact:true}).waitFor();

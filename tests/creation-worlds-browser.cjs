@@ -44,8 +44,13 @@ const {exploreWelcome,navigate}=require('./studio-entry.cjs');
     await page.locator('[data-creation-starter="dragon"]').click();
     const options=page.locator('#creationSceneOptions');
     const settings=async()=>{
-      if(!await options.isVisible())await page.locator('#creationCharacterTools').click();
+      await page.locator('#creationWorkspace').waitFor();
+      const tools=page.locator('#creationCharacterTools');
+      if(await tools.isVisible() && await tools.getAttribute('aria-expanded')==='false')await tools.click();
       if(!await options.evaluate(el=>el.open))await options.locator(':scope > summary').click();
+      // The open panel is positioned independently of its disclosure wrapper.
+      // Wait for the child's actual control, which it must be possible to use.
+      await page.locator('#creationBackground').waitFor();
     };
     fs.mkdirSync('test-results',{recursive:true});
     for (const key of ['forest','cloud','workshop','moon']) {

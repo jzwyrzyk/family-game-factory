@@ -51,6 +51,7 @@ export interface CreativePickerOptions {
   catalogueCompatibility?: (item: CatalogueChoice) => string | undefined;
   onChooseCatalogue?: (item: CatalogueChoice) => void;
   roleLabel?: string;
+  showRecent?: boolean;
   relatedCreativeId?: string;
   layout?:{controls:HTMLElement;results:HTMLElement;status:HTMLElement};
   card?:(item:PickerChoice)=>HTMLButtonElement;
@@ -97,7 +98,7 @@ export function mountCreativeAssetPicker(container: HTMLElement, choices: readon
   const search = element('input'), group = element('select');
   search.type = 'search'; search.placeholder = 'Find my art'; search.setAttribute('aria-label',options.layout?'Find my art':'Find artwork'); search.maxLength = 60;
   group.setAttribute('aria-label', 'Art collection');
-  const names = {...(options.layout?{'':'All my art'}:{recent:'Recent art'}), ...(options.relatedCreativeId ? {family:'Versions of this picture'} : {}), ...categoryNames, other:'Other art', motion:'Moving creations', versions:'Saved versions',
+  const names = {...(options.layout?{'':'All my art'}:{}), ...(!options.layout||options.showRecent?{recent:'Recent art'}:{}), ...(options.relatedCreativeId ? {family:'Versions of this picture'} : {}), ...categoryNames, other:'Other art', motion:'Moving creations', versions:'Saved versions',
     ...(options.catalogue ? {pal:'My Pals', jems:'Jems artwork'} : {})};
   for (const [id, title] of Object.entries(names)) group.add(new Option(title, id));
   tools.append(search, group);
@@ -137,6 +138,11 @@ export function mountCreativeAssetPicker(container: HTMLElement, choices: readon
       if (collection in categoryNames && item.category !== collection && !(!options.layout && collection === 'prop' && item.category === 'other')) return false;
       return !query || [item.label, item.semanticIdentity ?? '', item.detail, item.logicalName].some(text => text.toLowerCase().includes(query));
     });
+    // Using an older movement again changes its recency, never its place in
+    // the saved-version order shown by the scene's full collection.
+    if (options.showRecent && collection === '') {
+      items.sort((a,b)=>b.savedAt.localeCompare(a.savedAt) || b.assetId.localeCompare(a.assetId));
+    }
     count.textContent = items.length ? `${items.length} saved ${items.length === 1 ? 'choice' : 'choices'}` : choices.length ? 'No art found. Try another name or collection.' : empty || 'No pictures here yet.';
     for (const item of items.slice(0, limit)) {
       if(options.card){results.append(options.card(item));continue;}

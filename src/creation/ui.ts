@@ -1390,6 +1390,7 @@ export function installCreationStudio(host: Host) {
         });
         return choice;
       },replaceActorId?{}:{
+        showRecent:true,
         catalogue:catalogueChoices(ownedPals().map(id=>({id,form:ownedPalForm(id)}))),
         cataloguePreview:item=>art(item.assetId),
         onChooseCatalogue:item=>{

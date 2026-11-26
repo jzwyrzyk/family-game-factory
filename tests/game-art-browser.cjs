@@ -4,6 +4,7 @@ const path=require('node:path');
 const {chromium}=require('playwright');
 const {createHash}=require('node:crypto');
 const {start}=require('./browser-server.cjs');
+const {holdGameKey}=require('./game-art/hold-key.cjs');
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 
 async function main(){
@@ -29,7 +30,16 @@ async function main(){
     if(upload)await page.setInputFiles('#artUpload',{name:name+'.png',mimeType:'image/png',buffer:fs.readFileSync(path.join(__dirname,'game-art',name+'.png'))});
     else await page.locator('#artGrid .art-card').filter({has:page.getByText(name,{exact:true})}).click();
     await page.waitForFunction(name=>document.querySelector('#artDetailTitle')?.textContent===name,name);
-    await page.selectOption('#artGameRole',role);if(role==='collectible')await page.getByPlaceholder('My idea (optional)').fill('Give me one point');await page.click('#artPlanGame');
+    await page.selectOption('#artGameRole',role);
+    if(role==='collectible'){
+      const idea=page.getByPlaceholder('My idea (optional)');
+      await idea.fill('Give me one point');
+      await page.locator('#artGrid .art-card[aria-pressed="true"]').click();
+      await page.waitForFunction(()=>document.activeElement?.id==='artDetailTitle');
+      assert.equal(await page.locator('#artGameRole').inputValue(),role,'Reselecting the current picture preserves its role');
+      assert.equal(await idea.inputValue(),'Give me one point','Reselecting the current picture preserves the child’s intent');
+    }
+    await page.click('#artPlanGame');
     await page.locator('#studioArtPlan').waitFor().catch(async error=>{console.error(await page.locator('main .page:not(.hidden)').innerText(),errors);throw error;});await page.waitForFunction(role=>window.FG.studio.exportNotebook().sessions.some(s=>s.gameArt?.pins.some(p=>p.role===role)),role);
   };
   const picker=async()=>{
@@ -72,14 +82,14 @@ async function main(){
   const sample=()=>canvas.evaluate(c=>Array.from(c.getContext('2d').getImageData(100,12,1,1).data));
   assert.deepEqual(await sample(),[198,226,237,255],'The selected background contributes actual canvas pixels');
   await canvas.screenshot({path:path.join(evidence,'valley-first-round.png')});
-  const hold=async(key,ms)=>{await page.keyboard.down(key);await page.waitForTimeout(ms);await page.keyboard.up(key);};
-  await hold('ArrowRight',2350);await frame.getByText('Score: 1',{exact:true}).waitFor();
+  const hold=(key,steps)=>holdGameKey(page,frame.locator('#game'),key,steps);
+  await hold('ArrowRight',141);await frame.getByText('Score: 1',{exact:true}).waitFor();
   assert.equal(await frame.locator('#status').getAttribute('data-state'),'playing','the larger rock blocks travel');
-  await hold('ArrowUp',650);await hold('ArrowRight',1600);await frame.getByText('You did it!',{exact:true}).waitFor();
+  await hold('ArrowUp',39);await hold('ArrowRight',96);await frame.getByText('You did it!',{exact:true}).waitFor();
   await page.getByRole('button',{name:'Keep this art test'}).click();
   await page.getByText('This art test is kept.',{exact:true}).waitFor();await page.getByRole('button',{name:'Back to my idea',exact:true}).click();
   const kept=(await session()).gameArt;assert.equal(kept.kept,kept.tests[0].id);
-  frame=await play('Try faster flight');await hold('ArrowUp',370);await hold('ArrowRight',420);await frame.locator('#game').screenshot({path:path.join(evidence,'valley-improved-round.png')});
+  frame=await play('Try faster flight');await hold('ArrowUp',22);await hold('ArrowRight',25);await frame.locator('#game').screenshot({path:path.join(evidence,'valley-improved-round.png')});
   const improved=(await session()).gameArt;
   assert.deepEqual(improved.tests[1].pins,kept.tests[0].pins);assert.equal(improved.tests[1].parent,kept.kept);assert.notEqual(improved.tests[1].program,kept.tests[0].program);assert.equal(improved.kept,kept.kept);
   await page.getByRole('button',{name:'Back to my idea',exact:true}).click();

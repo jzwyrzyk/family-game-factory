@@ -4,8 +4,8 @@ const {createServer} = require('node:http');
 const {once} = require('node:events');
 const {pathToFileURL} = require('node:url');
 
-async function standaloneInput(file) {
-  if (process.env.UI_REVIEW_INLINE_HARNESS !== '1') return {url:pathToFileURL(file).href, close:async()=>{}};
+async function standaloneInput(file, {loopback = process.env.UI_REVIEW_INLINE_HARNESS === '1'} = {}) {
+  if (!loopback) return {url:pathToFileURL(file).href, close:async()=>{}};
   const server = createServer((req,res) => {
     if (req.method !== 'GET' || req.url !== '/') {
       res.writeHead(404).end();

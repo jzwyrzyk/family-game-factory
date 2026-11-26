@@ -39,7 +39,7 @@ export function installArtStudio(host:Host){
   <input id="artUpload" type="file" accept="image/png,image/jpeg" hidden><input id="artCamera" type="file" accept="image/png,image/jpeg" capture="environment" hidden><input id="artImport" type="file" accept="application/json,.json" hidden>`;
   document.querySelector('main')!.append(page);
   const $=<T extends HTMLElement=HTMLElement>(id:string)=>page.querySelector<T>('#'+id)!;
-  let visible=false,epoch=0,refreshRun=0,selected='',category='all',archive=false,items:DrawingMetadata[]=[],rigs:SavedRig[]=[],urls:string[]=[],nextPage:[string,string]|null=null,total=0;
+  let visible=false,epoch=0,refreshRun=0,detailsRun=0,selected='',category='all',archive=false,items:DrawingMetadata[]=[],rigs:SavedRig[]=[],urls:string[]=[],nextPage:[string,string]|null=null,total=0;
   const status=(text:string,error=false)=>{$('artStatus').textContent=text;$('artStatus').classList.toggle('is-error',error);$('artStatus').setAttribute('role',error?'alert':'status');};
   const release=()=>{urls.forEach(URL.revokeObjectURL);urls=[];};
   const imageUrl=(item:Drawing|DrawingMetadata,thumbnail=false)=>{const url=URL.createObjectURL(thumbnail&&item.preview?new Blob([item.preview],{type:'image/png'}):'bytes' in item?drawingBlob(item):new Blob([],{type:'image/png'}));urls.push(url);return url;};
@@ -83,14 +83,27 @@ export function installArtStudio(host:Host){
       const versions=rigs.filter(r=>r.assembly.sourceId===item.id),copy=node('div','art-card-copy');
       copy.append(node('span','art-card-category',categories[item.category??'other']),node('strong','',item.name));
       const meta=node('span','art-card-meta',versions.length?`${versions.length} movement ${versions.length===1?'version':'versions'}`:item.sourceId?'Edited picture · original kept':'Original picture');
-      copy.append(meta);card.append(preview,copy);card.onclick=()=>void action(async()=>{const captured=owner(),run=epoch;selected=item.id;renderGrid();await details(item.id);focusSelectedArtwork(item.id,captured,run);});grid.append(card);
+      copy.append(meta);card.append(preview,copy);
+      card.onclick=()=>void action(async()=>{
+        const captured=owner(),run=epoch,pane=$('artDetails');
+        if(selected!==item.id || pane.hidden || pane.dataset.drawingId!==item.id || !pane.querySelector('#artDetailTitle')){
+          selected=item.id;
+          renderGrid();
+          await details(item.id);
+        }
+        focusSelectedArtwork(item.id,captured,run);
+      });
+      grid.append(card);
     }
     if(nextPage){const more=button('Show more art','arrow',async()=>{const captured=owner(),at=epoch,after=nextPage;if(!after)return;const page=await drawingPage(captured,{limit:24,after,archived:archive,...(category==='all'?{}:{category:category as DrawingCategory}),search:$<HTMLInputElement>('artSearch').value});if(!current(captured,at))return;items.push(...page.items);nextPage=page.next;renderGrid();});more.id='artLoadMore';grid.append(more);}
     for(const filter of $('artFilters').querySelectorAll<HTMLButtonElement>('button'))filter.setAttribute('aria-pressed',String(filter.dataset.category===category));
     setIconLabel($('artShowArchive'),'clock',archive?'Show current art':'Show archived art');
   }
   async function details(id:string){
-    const captured=owner(),run=epoch;if(!items.some(item=>item.id===id)||!current(captured,run))return;const item=await drawing(captured,id);if(!current(captured,run)||selected!==id)return;
+    const captured=owner(),run=epoch,request=++detailsRun;
+    const valid=()=>current(captured,run) && selected===id && request===detailsRun;
+    if(!items.some(item=>item.id===id)||!valid())return;
+    const item=await drawing(captured,id);if(!valid())return;
     const pane=$('artDetails');pane.replaceChildren();pane.dataset.drawingId=id;pane.hidden=false;
     const heading=node('div','art-detail-heading'),title=node('h2','',item.name);title.id='artDetailTitle';title.tabIndex=-1;
     const close=button('Close','close',()=>{selected='';pane.hidden=true;renderGrid();});close.setAttribute('aria-label','Close artwork details');heading.append(title,close);pane.append(heading);
@@ -181,7 +194,7 @@ export function installArtStudio(host:Host){
     tools.append(button('Delete unused picture','trash',async()=>{if(!confirm('Delete this picture and its movement versions from this device? Download your art library first to keep a copy. Pictures used by saved work cannot be deleted.'))return;await deleteArtwork(captured,id,()=>current(captured,run));if(!current(captured,run))return;selected='';if(!await refresh())return;status('Unused picture deleted.');notify(captured);}));
     if(item.sourceId)tools.append(node('p','art-small','This is an edited copy. The original picture remains saved separately.'));
     pane.append(tools);
-    const [draft,usage]=await Promise.all([loadDrawingDraft(captured,id),artUsages(captured,id)]);if(!current(captured,run)||selected!==id)return;
+    const [draft,usage]=await Promise.all([loadDrawingDraft(captured,id),artUsages(captured,id)]);if(!valid())return;
     if(draft){const note=node('div','art-draft-note');note.append(node('p','','You have an unfinished movement design.'),button('Resume unfinished design','edit',()=>draft.assembly.kind==='picture' || draft.assembly.motion && 'stops' in draft.assembly.motion ? openPath(true) : editMovement()));note.querySelector('button')!.id='artResumeDraft';actions.before(note);}
     if(usage.length){const count=new Set(usage.map(item=>item.targetKind+':'+item.targetId)).size;pane.append(node('p','art-small',`Used in ${count} saved ${count===1?'creation':'creations'}. Archiving keeps those adventures working.`));}
   }
