@@ -1,5 +1,11 @@
 # Jems delivery state
 
+## Native diagnostic permission checks
+
+The November 27 nonproduction recovery closed at 27 resources with a zero-change plan and disabled federation. The administrator verified 73 expected IAM outcomes across two runs. Four token-creation checks remain unknown. The administrator's issuance preflight stopped with zero credential requests.
+
+This integration takes the diagnostic controller, private broker source, packaging and workflow contract tests from reviewed [operations PR #227](https://github.com/jzwyrzyk/family-game-factory/pull/227) at `bca6b5c383ed741e252793e468776921e32ff67f`. The manual native operation checks the GitHub caller and broker runtime against two fixed service accounts. Live qualification requires the verified broker image, before-and-after account inventory, the exact protected run and all 77 current checks. Settled request coverage requires separate evidence. [Operator procedure](https://github.com/jzwyrzyk/family-game-factory/blob/bca6b5c383ed741e252793e468776921e32ff67f/docs/operations/NONPRODUCTION_RECOVERY.md#administrator-preflight-and-native-controller)
+
 ## Current source and next integration
 
 The frozen application candidate is `bc602f1ede502f398308ad56f973c4bf7997ff08`. Its protected-main full regression passed on attempt one with 122 commands. The earlier accepted offline UI candidate is `d5c2cfaff8e3941667fdc6d4d5426c341ab009ad`. Engineering changes after the freeze have a separate source identity. Resolve current engineering main with `git ls-remote origin refs/heads/main`. [Freeze PR](https://github.com/jzwyrzyk/family-game-factory/pull/182) · [Frozen full run](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45736843451)

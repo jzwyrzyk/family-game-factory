@@ -67,6 +67,26 @@ class RequestEvidenceWorkflowTests(unittest.TestCase):
             self.assertIn(field + "\n", self.steps)
         self.assertNotIn("continue-on-error:", self.steps)
 
+    def test_native_oauth_only_on_manual_operation_after_source_and_broker_auth(self):
+        self.assertIn("options: [request-evidence, token-boundary]\n        default: request-evidence", self.trigger)
+        start = self.steps.index("      - name: Obtain a five-minute IAM credential")
+        end = self.steps.index("      - name: Test the four native token permissions")
+        step = self.steps[start:end]
+        self.assertGreater(start,self.steps.index('gh api repos/jzwyrzyk/family-game-factory/git/ref/heads/main'))
+        self.assertGreater(start,self.steps.index('id_token_include_email: true'))
+        self.assertIn("if: steps.operation.outputs.mode == 'token-boundary'", step)
+        self.assertIn("access_token_lifetime: 300s",step)
+        self.assertIn("access_token_scopes: https://www.googleapis.com/auth/iam",step)
+        self.assertIn("service_account: jems-github-log-reader@family-game-factory-jzw.iam.gserviceaccount.com",step)
+        self.assertIn("create_credentials_file: false",step)
+        self.assertIn("export_environment_variables: false",step)
+
+    def test_empty_revision_dispatch_remains_service_wide(self):
+        # GitHub applies the workflow default even to an explicitly empty string.
+        # A historical nonempty default silently narrowed the accepted API dispatch.
+        revision = self.trigger.split("      revision:\n")[1].split("      start_utc:\n")[0]
+        self.assertIn("        default: ''\n", revision)
+
     def test_wif_condition_is_a_conjunction_of_signed_github_claims(self):
         condition = (ROOT / "ops/request-diagnostics-provider.cel").read_text().strip()
         subject = (f"repo:jzwyrzyk@{oidc_claims.OWNER}/family-game-factory@{oidc_claims.REPO_ID}"
@@ -85,6 +105,7 @@ class RequestEvidenceWorkflowTests(unittest.TestCase):
         actions = re.findall(r"uses: (\S+)", self.steps)
         self.assertEqual(actions, [
             "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+            "google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed",
             "google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed",
             "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
         ])
