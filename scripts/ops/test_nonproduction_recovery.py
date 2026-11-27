@@ -44,6 +44,15 @@ def fixture():
     return plan, recorded, variables
 
 
+def iap_state():
+    email = 'service-1092405124984@gcp-sa-iap.iam.gserviceaccount.com'
+    attributes = {'id': 'projects/jems-jzw-nonprod/services/iap.googleapis.com', 'project': 'jems-jzw-nonprod',
+                  'service': 'iap.googleapis.com', 'email': email, 'member': 'serviceAccount:' + email}
+    return {'resources': [{'mode': 'managed', 'type': 'google_project_service_identity', 'name': 'iap',
+                           'provider': 'provider["registry.terraform.io/hashicorp/google-beta"]',
+                           'instances': [{'attributes': attributes}]}]}
+
+
 class RecoveryTests(unittest.TestCase):
     def guard(self, plan=None, imports=None):
         default, recorded, variables = fixture()
@@ -198,9 +207,23 @@ class RecoveryTests(unittest.TestCase):
                    'original_files': {}, 'inputs': {name: recovery.sha((folder/name).read_bytes()) for name in
                        ('main.tf', '.terraform.lock.hcl', 'terraform.tfvars.json', 'terraform.tfstate')},
                    'plan_sha256': recovery.sha(b'plan bytes'), 'plan_identity': recovery.plan_identity(plan),
-                   'inventory': observed, 'state_lineage': 'lineage', 'state_serial': 25}
+                   'inventory': observed, 'recorded_iap_identity': recovery.recorded_iap_identity(iap_state()),
+                   'live_iap_acceptance': 'REQUIRED_BEFORE_DEV', 'state_lineage': 'lineage', 'state_serial': 25}
         recovery.write_new(folder / 'reviewed-recovery.json', receipt)
         return original, folder, plan, recorded, variables, observed, receipt
+
+    def test_apply_revalidates_recorded_identity_against_original_before_planning(self):
+        with tempfile.TemporaryDirectory() as temp:
+            original, folder, _, recorded, variables, _, receipt = self.transaction(temp)
+            receipt['recorded_iap_identity']['email'] = 'wrong'
+            (folder / 'reviewed-recovery.json').write_text(json.dumps(receipt))
+            with patch.object(recovery, 'source_identity', return_value=receipt['source_files']), \
+                 patch.object(recovery, 'original_evidence', return_value=({}, variables, iap_state(), recorded)), \
+                 patch.object(recovery, 'tf') as tf:
+                with self.assertRaisesRegex(recovery.Stop, 'IAP_STATE_RECEIPT_MISMATCH'):
+                    recovery.execute(original, folder, 'a'*40, recovery.digest(receipt), None)
+                tf.assert_not_called()
+                self.assertFalse((original / 'partial-recovery/apply-started').exists())
 
     def test_plan_tampering_during_network_recheck_stops_before_marker(self):
         for filename in ('main.tf', 'remaining.tfplan'):
@@ -210,7 +233,7 @@ class RecoveryTests(unittest.TestCase):
                     (folder / filename).write_bytes(b'changed during recheck')
                     return plan, []
                 with patch.object(recovery, 'source_identity', return_value=receipt['source_files']), \
-                     patch.object(recovery, 'original_evidence', return_value=({}, variables, {}, recorded)), \
+                     patch.object(recovery, 'original_evidence', return_value=({}, variables, iap_state(), recorded)), \
                      patch.object(recovery, 'evidence_hashes', return_value={}), \
                      patch.object(recovery, 'command', return_value=b'{"terraform_version":"1.13.5"}'), \
                      patch.object(recovery, 'reconcile', return_value=observed), \
@@ -227,7 +250,7 @@ class RecoveryTests(unittest.TestCase):
                 if args[0] == 'apply': raise recovery.Stop('TERRAFORM_APPLY_TIMEOUT_UNCERTAIN')
                 return b''
             with patch.object(recovery, 'source_identity', return_value=receipt['source_files']), \
-                 patch.object(recovery, 'original_evidence', return_value=({}, variables, {}, recorded)), \
+                 patch.object(recovery, 'original_evidence', return_value=({}, variables, iap_state(), recorded)), \
                  patch.object(recovery, 'evidence_hashes', return_value={}), \
                  patch.object(recovery, 'command', return_value=b'{"terraform_version":"1.13.5"}'), \
                  patch.object(recovery, 'reconcile', return_value=observed), \
@@ -249,10 +272,12 @@ class RecoveryTests(unittest.TestCase):
         }
         base.update(changes or {})
         def call(host, method, path, body=None, **kwargs):
-            if (host, path) in base: return base[(host,path)]
+            if (host, path) in base:
+                value = base[(host, path)]
+                if isinstance(value, Exception): raise value
+                return value
             if path.endswith(':testIamPermissions'): return {'permissions': body['permissions']}
             if host == 'serviceusage': return {'state': 'ENABLED'}
-            if '/serviceAccounts/' in path: return {'email': f'service-{recovery.NUMBER}@gcp-sa-iap.iam.gserviceaccount.com'}
             if path.startswith('v1/' + recovery.POOL_NAME + '/providers?'): return {'workloadIdentityPoolProviders': []}
             if host == 'billingbudgets': return {'budgets': []}
             raise AssertionError((host,method,path))
@@ -267,6 +292,48 @@ class RecoveryTests(unittest.TestCase):
             self.assertTrue(method == 'GET' or path.endswith((':testIamPermissions', ':getIamPolicy')))
         denied = Mock(); denied.call.side_effect = recovery.Stop('READ_PERMISSION_DENIED')
         with self.assertRaisesRegex(recovery.Stop, 'PERMISSION_DENIED'): recovery.reconcile(denied, variables)
+
+    def test_google_managed_identity_is_verified_from_preserved_record(self):
+        evidence = recovery.recorded_iap_identity(iap_state())
+        self.assertEqual(evidence['address'], 'google_project_service_identity.iap')
+        self.assertEqual(evidence['evidence'], 'original_terraform_state')
+        api = self.cloud_reader()
+        self.assertTrue(recovery.reconcile(api, fixture()[2])['iap_api_enabled'])
+        paths = [c.args[2] for c in api.call.call_args_list]
+        self.assertIn('v1/projects/1092405124984/services/iap.googleapis.com', paths)
+        self.assertFalse(any('serviceAccounts/' in p or 'generateServiceIdentity' in p for p in paths))
+
+    def test_mismatched_or_missing_service_identity_attributes_stop(self):
+        for field in ('id', 'project', 'service', 'email', 'member'):
+            for absent in (True, False):
+                state = iap_state()
+                attrs = state['resources'][0]['instances'][0]['attributes']
+                if absent: del attrs[field]
+                else: attrs[field] = 'wrong'
+                with self.subTest(field=field, absent=absent), self.assertRaisesRegex(recovery.Stop, 'IAP_STATE_IDENTITY_MISMATCH'):
+                    recovery.recorded_iap_identity(state)
+
+    def test_missing_or_substituted_state_evidence_stops_before_remote_reads(self):
+        record = iap_state()['resources'][0]
+        for resources in ([], [record, record], [dict(record, module='module.other')], [dict(record, mode='data')],
+                          [dict(record, provider='different')], [dict(record, instances=[])],
+                          [dict(record, instances=[dict(record['instances'][0], index_key=0)])],
+                          [dict(record, instances=[dict(record['instances'][0], status='tainted')])]):
+            with self.subTest(resources=resources), patch.object(recovery, 'audit') as read:
+                with self.assertRaisesRegex(recovery.Stop, 'IAP_STATE_RECORD'):
+                    recovery.prepare(None, None, None, None, None, {'resources': resources}, None, None)
+                read.assert_not_called()
+
+    def test_disabled_iap_and_permission_denials_remain_blockers(self):
+        iap = ('serviceusage', 'v1/projects/1092405124984/services/iap.googleapis.com')
+        budgets = ('billingbudgets', 'v1/billingAccounts/AAAAAA-BBBBBB-CCCCCC/budgets?pageSize=100')
+        for key, reply, code in ((iap, {'state': 'DISABLED'}, 'REQUIRED_API_DISABLED'),
+                                 (iap, recovery.Stop('READ_PERMISSION_DENIED'), 'READ_PERMISSION_DENIED'),
+                                 (budgets, recovery.Stop('READ_PERMISSION_DENIED'), 'READ_PERMISSION_DENIED'),
+                                 (('cloudbilling', 'v1/billingAccounts/AAAAAA-BBBBBB-CCCCCC:testIamPermissions'),
+                                  {'permissions': ['billing.budgets.list']}, 'REQUIRED_PERMISSION_MISSING')):
+            with self.subTest(key=key), self.assertRaisesRegex(recovery.Stop, code):
+                recovery.reconcile(self.cloud_reader({key: reply}), fixture()[2])
 
     def test_existing_obsolete_binding_or_enabled_pool_stops_without_deletion(self):
         for changes, code in [

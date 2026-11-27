@@ -30,6 +30,7 @@ ORIGINAL_APPROVAL = '821d722ee140ffdef4c8ae4ba4e1fed89307e6c997153b3a8597f726a8c
 PROVIDER = 'google_iam_workload_identity_pool_provider.github'
 BUDGET = 'google_billing_budget.nonproduction'
 OBSOLETE = 'google_project_iam_member.iap_agent'
+IAP_IDENTITY = 'google_project_service_identity.iap'
 REMAINING = {PROVIDER, BUDGET}
 POOL_NAME = f'projects/{NUMBER}/locations/global/workloadIdentityPools/jems-nonproduction'
 PROVIDER_NAME = POOL_NAME + '/providers/github-main'
@@ -167,6 +168,27 @@ def state_addresses(state):
     return addresses
 
 
+def recorded_iap_identity(state):
+    """Read the singleton Google Beta service identity from preserved Terraform state."""
+    records = [r for r in state['resources'] if r.get('type') == 'google_project_service_identity'
+               and r.get('name') == 'iap' and not r.get('module') and r.get('mode') == 'managed']
+    need(len(records) == 1, 'IAP_STATE_RECORD_MISSING_OR_AMBIGUOUS')
+    record = records[0]
+    instances = record.get('instances')
+    need(record.get('provider') == 'provider["registry.terraform.io/hashicorp/google-beta"]'
+         and isinstance(instances, list) and len(instances) == 1, 'IAP_STATE_RECORD_INVALID')
+    instance = instances[0]
+    need(isinstance(instance, dict) and 'index_key' not in instance and not instance.get('deposed')
+         and instance.get('status') in (None, 'ready'), 'IAP_STATE_RECORD_INVALID')
+    email = f'service-{NUMBER}@gcp-sa-iap.iam.gserviceaccount.com'
+    attributes = {'id': f'projects/{PROJECT}/services/iap.googleapis.com', 'project': PROJECT,
+                  'service': 'iap.googleapis.com', 'email': email, 'member': 'serviceAccount:' + email}
+    stored = instance.get('attributes')
+    need(isinstance(stored, dict) and all(stored.get(k) == v for k, v in attributes.items()),
+         'IAP_STATE_IDENTITY_MISMATCH')
+    return {'address': IAP_IDENTITY, 'evidence': 'original_terraform_state', **attributes}
+
+
 def original_evidence(folder):
     hashes = evidence_hashes(folder)
     for name in ('binding.json', 'reviewed.json', 'reviewed.tfplan', 'recheck.tfplan',
@@ -271,9 +293,6 @@ def reconcile(api, variables):
         imports[PROVIDER] = PROVIDER_NAME
     policy = api.call('cloudresourcemanager', 'POST', 'v1/projects/' + PROJECT + ':getIamPolicy', {'options': {'requestedPolicyVersion': 3}})
     need(not any(b.get('role') == 'roles/iap.serviceAgent' for b in policy.get('bindings', [])), 'OBSOLETE_IAP_BINDING_EXISTS')
-    agent = f'service-{NUMBER}@gcp-sa-iap.iam.gserviceaccount.com'
-    identity = api.call('iam', 'GET', f'v1/projects/{PROJECT}/serviceAccounts/{agent}')
-    need(identity.get('email') == agent and not identity.get('disabled'), 'IAP_AGENT_UNVERIFIED')
     budgets = page_list(api, 'billingbudgets', 'v1/' + account + '/budgets', 'budgets')
     matches = [b for b in budgets if b.get('displayName') == BUDGET_DISPLAY or
                'projects/' + NUMBER in b.get('budgetFilter', {}).get('projects', [])]
@@ -285,7 +304,7 @@ def reconcile(api, variables):
     # No API mutation or import here. Terraform import blocks must yield no-op.
     return {'project_number': NUMBER, 'billing_account': variables['billing_account'], 'imports': imports,
             'provider_absent': not providers, 'budget_absent': not matches,
-            'iap_project_binding_absent': True, 'pool_disabled': True, 'permissions_verified': True}
+            'iap_api_enabled': True, 'iap_project_binding_absent': True, 'pool_disabled': True, 'permissions_verified': True}
 
 
 def audit(api, original, destination):
@@ -417,6 +436,7 @@ def make_plan(folder, filename, recorded, variables, imports):
 
 
 def prepare(original, destination, expected, hashes, variables, state, recorded, api):
+    iap_record = recorded_iap_identity(state)
     version = json.loads(command(['terraform', 'version', '-json'], phase='TERRAFORM_VERSION'))
     need(version.get('terraform_version') == '1.13.5', 'TERRAFORM_VERSION_MISMATCH')
     # Review prior actual diagnostics before any execution approval is produced.
@@ -449,7 +469,8 @@ def prepare(original, destination, expected, hashes, variables, state, recorded,
                'source_files': source_identity(expected), 'original_dir': str(original), 'original_files': hashes,
                'state_lineage': state['lineage'], 'state_serial': state['serial'], 'inputs': inputs,
                'plan_sha256': sha((destination / 'remaining.tfplan').read_bytes()), 'plan_identity': plan_identity(plan),
-               'inventory': observed, 'diagnosis': audit_result, 'actions': actions,
+               'inventory': observed, 'recorded_iap_identity': iap_record, 'live_iap_acceptance': 'REQUIRED_BEFORE_DEV',
+               'diagnosis': audit_result, 'actions': actions,
                'existing_resources': sorted(recorded), 'destruction': 0, 'replacement': 0,
                'existing_modification': 0, 'federation_enabled': False, 'live_ai': False,
                'retired_uncreated_address': OBSOLETE}
@@ -463,8 +484,10 @@ def execute(original, folder, expected, approval, api):
     receipt = read_json(private_path(folder / 'reviewed-recovery.json'))
     need(re.fullmatch(r'[a-f0-9]{64}', approval or '') and approval == digest(receipt), 'APPROVAL_HASH_MISMATCH')
     need(receipt['source_sha'] == expected and receipt['source_files'] == source_identity(expected), 'SOURCE_CHANGED')
-    hashes, variables, _, recorded = original_evidence(original)
+    hashes, variables, original_state, recorded = original_evidence(original)
     need(str(original) == receipt['original_dir'] and hashes == receipt['original_files'], 'ORIGINAL_EVIDENCE_CHANGED')
+    need(receipt.get('recorded_iap_identity') == recorded_iap_identity(original_state)
+         and receipt.get('live_iap_acceptance') == 'REQUIRED_BEFORE_DEV', 'IAP_STATE_RECEIPT_MISMATCH')
     expected_inputs = {'main.tf', '.terraform.lock.hcl', 'terraform.tfvars.json', 'terraform.tfstate'}
     if receipt['inventory']['imports']: expected_inputs.add('imports.tf.json')
     need(set(receipt['inputs']) == expected_inputs, 'RECOVERY_INPUT_SCOPE_MISMATCH')
@@ -503,6 +526,7 @@ def execute(original, folder, expected, approval, api):
     post = reconcile(api, variables)
     need(set(post['imports']) == REMAINING and post['pool_disabled'], 'POST_APPLY_INVENTORY_MISMATCH')
     final_state = read_json(private_path(folder / 'terraform.tfstate'))
+    need(recorded_iap_identity(final_state) == receipt['recorded_iap_identity'], 'IAP_SUCCESSOR_STATE_CHANGED')
     need(state_addresses(final_state) == recorded | REMAINING, 'POST_APPLY_STATE_MISMATCH')
     need(final_state['lineage'] == receipt['state_lineage'] and final_state['serial'] >= receipt['state_serial'],
          'POST_APPLY_STATE_LINEAGE_MISMATCH')
@@ -517,6 +541,7 @@ def execute(original, folder, expected, approval, api):
     result = {'status': 'RECOVERED_DISABLED_NOT_ACTIVATED', 'approval': approval,
               'state_instances': 27, 'successor_state': str(folder / 'terraform.tfstate'),
               'original_state_preserved': True, 'federation_enabled': False, 'live_ai': False,
+              'live_iap_acceptance': 'REQUIRED_BEFORE_DEV',
               'post_apply_plan': 'NO_CHANGES'}
     write_new(folder / 'completed.json', result)
     return result

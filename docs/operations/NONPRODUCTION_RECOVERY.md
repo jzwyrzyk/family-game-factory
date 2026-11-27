@@ -63,6 +63,16 @@ safe to share. It requires actual matching name-limit and unsupported-role error
 before offering an executable plan approval. The budget finding is a documented
 ADC requirement; an actual budget error has not been supplied or observed.
 
+## IAP evidence and DEV activation
+
+The November 27 operator observed a 404 when IAM looked up the IAP service agent in the consumer project. Google hosts this agent. Recovery validates the single root managed `google_project_service_identity.iap` in the original state, including the Google Beta provider, resource ID, project, service, email and IAM member. Its evidence is bound to the original state hash and the recovery receipt. Live reads independently verify the active project ID and number, IAP API enablement and the absence of the obsolete project grant. The pinned provider implements service identity refresh as a no-op. [Service agents](https://docs.cloud.google.com/iam/docs/service-account-types) · [Google Beta 7.46.2 implementation](https://github.com/hashicorp/terraform-provider-google-beta/blob/v7.46.2/google-beta/services/resourcemanager/resource_project_service_identity.go)
+
+**Release blocker.** Recovery must produce the scoped plan from the preserved state. DEV activation separately requires verification on the actual Cloud Run service of IAP enforcement, the exact agent's service-level `roles/run.invoker`, the approved IAP accessor policy, unauthenticated denial, and a successful audience-bound UAT invocation returning the expected source and bundle. Keep DEV acceptance pending until the existing [service policy checks](../../scripts/environments/cloud.py) and [deployed browser gate](../../.github/workflows/jems-environments.yml) pass and access denials are verified. The recovery receipt records this requirement as `REQUIRED_BEFORE_DEV`.
+
+**Nonblocking limitation.** Service Usage v1beta1 `GenerateServiceIdentity` can create the agent and requires separate approval if ever needed. It produces no Service Usage audit log. Recovery does not invoke it or request a creation log. The existing audit checks concern the historical workload-provider and project-policy errors. [Service Usage audit logging](https://docs.cloud.google.com/service-usage/docs/audit-logging)
+
+The remaining read contracts were checked against Google REST discovery on November 27. Logging v2 lists scoped entries. Resource Manager v1 reads the project, tests permissions and retrieves the version-3 allow policy. Cloud Billing v1 reads the project billing link and account, and tests account permissions. Service Usage v1 reads individual service states. IAM v1 gets the pool and pages providers with deleted entries included. Billing Budgets v1 pages account budgets using the billing account parent, `pageSize`, `pageToken` and `nextPageToken`. Required permissions and complete inventory remain mandatory.
+
 ## One executable handoff, two guarded modes
 
 Use the checksum-verified `operations-bootstrap.sh` from the final reviewed
@@ -80,7 +90,7 @@ new private `partial-recovery/attempt-*` directory and writes only new files.
 Original state, configuration, receipts, plans and marker remain unchanged.
 
 Live reconciliation reads the exact project/billing, APIs, permissions, disabled
-pool/provider, IAP identity/policy and all budget pages. Permission denial never
+pool/provider, project IAM policy and all budget pages. Permission denial never
 means absence. Plan-time imports avoid blind duplicate creates. Full refreshed
 Terraform plans must contain every existing address as a no-op, no detected
 resource drift, passing checks, no deferred reads, and only the two exact allowed
