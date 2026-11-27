@@ -897,10 +897,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-27T19:42:39.599Z",
+      "reviewedAt": "2026-11-27T19:48:27.570Z",
       "sourceDigest": "33455ca47335184e0ff58ece067c45bad1c22027f6dcbd72dd29677e82e213e3",
       "reviewOutcome": "updated",
-      "reviewReason": "Verified the identical held-source trust record and 150-command checks after incorporating the protected main diagnostics integration.",
+      "reviewReason": "Checked the #228 diagnostics overlap and retained the exact held command-policy and hosted evidence gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T19:42:40.144Z",
-      "sourceDigest": "b994beac091c4f96f0ee2c77baeb96a77b90dc7928ec48f385a0a1e3acf46135",
+      "reviewedAt": "2026-11-27T19:48:27.043Z",
+      "sourceDigest": "bc6a72d8b12923b16c7b06195eefe09bbda19b226725b9f47b96b2c6ca019a85",
       "reviewOutcome": "updated",
-      "reviewReason": "Preserved the protected diagnostics integration and exact-source DEV policy while reconciling their delivery registry.",
+      "reviewReason": "Bound the three overlapping diagnostics files to the exact accepted protected blobs and retained both delivery histories in the held source resolution.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

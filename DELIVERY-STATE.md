@@ -1,10 +1,10 @@
 # Jems delivery state
 
-## Native diagnostic permission checks
+## Native diagnostic acceptance
 
-The November 27 nonproduction recovery closed at 27 resources with a zero-change plan and disabled federation. The administrator verified 73 expected IAM outcomes across two runs. Four token-creation checks remain unknown. The administrator's issuance preflight stopped with zero credential requests.
+The administrator verified 27 nonproduction resources and a zero-change recovery plan. The GitHub diagnostics workflow on protected main verified four native permissions in [run 46056038814](https://github.com/jzwyrzyk/family-game-factory/actions/runs/46056038814). The complete IAM audit passed all 77 checks. The private broker serves `jems-request-evidence-c-b51ec464f42c61a4c8ad` using image digest `sha256:9b4ea06f03b0725182fa123898d8ab536dcabebe604affee88aaefe23e983143`. The preceding native broker and original rollback revision are retained.
 
-This integration takes the diagnostic controller, private broker source, packaging and workflow contract tests from reviewed [operations PR #227](https://github.com/jzwyrzyk/family-game-factory/pull/227) at `bca6b5c383ed741e252793e468776921e32ff67f`. The manual native operation checks the GitHub caller and broker runtime against two fixed service accounts. Live qualification requires the verified broker image, before-and-after account inventory, the exact protected run and all 77 current checks. Settled request coverage requires separate evidence. [Operator procedure](https://github.com/jzwyrzyk/family-game-factory/blob/bca6b5c383ed741e252793e468776921e32ff67f/docs/operations/NONPRODUCTION_RECOVERY.md#administrator-preflight-and-native-controller)
+Dated coverage for November 24, 15:20–16:20 UTC returned 31 Gateway, two Preview and two Coach requests. The protected first-attempt artifacts matched independent Cloud Monitoring counts. The attestation expires December 4 at 19:43:43 UTC. The nonproduction federation and DEV deployment require separate activation. [Gateway](https://github.com/jzwyrzyk/family-game-factory/actions/runs/46058772393) · [Preview](https://github.com/jzwyrzyk/family-game-factory/actions/runs/46058840373) · [Coach](https://github.com/jzwyrzyk/family-game-factory/actions/runs/46058902514)
 
 ## Current source and next integration
 
