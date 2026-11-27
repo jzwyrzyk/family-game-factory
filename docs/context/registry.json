@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T18:26:47.735Z",
-      "sourceDigest": "9f692fff23a47fd9a914048a65ff802d83139cc30f30566d00b90163a57cccf0",
+      "reviewedAt": "2026-11-27T18:37:02.779Z",
+      "sourceDigest": "e00e0a23f4d1237fbc5bf573941c4d3e1393ecd10cbba1c99b261b24f5efd0d4",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded verified Terraform closure, the 65 passing broker IAM checks, and the read-only qualification for the remaining 12.",
+      "reviewReason": "Recorded eight live secret denials and the four unresolved token checks. Documented the optional operator-approved direct IAM check, credential boundaries and separate coverage gate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

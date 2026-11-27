@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Operator-side finite effective IAM audit. Read-only Policy Troubleshooter calls.
+"""Operator-side finite effective IAM audit. Default mode only reads policy evidence.
 
 The operator credential stays in Cloud Shell. CAN_ACCESS/CANNOT_ACCESS are the
 only accepted outcomes; API failure, missing resources or unknown state never
@@ -7,6 +7,7 @@ pass. This is a finite tuple audit, not proof of a universal privilege ceiling.
 """
 import argparse
 from collections import Counter
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
@@ -15,6 +16,7 @@ import sys
 import time
 import urllib.error
 import uuid
+import broker_token_check
 import production_activation as review
 from admin_api import Http, SetupError, command
 import bootstrap_request_diagnostics as setup
@@ -171,6 +173,9 @@ def policy_detail(result):
         for binding in policy.get('bindingExplanations', []):
             if binding.get('rolePermission') == 'ROLE_PERMISSION_NOT_INCLUDED':
                 continue
+            if ('condition' in binding and
+                    binding.get('combinedMembership', {}).get('membership') != 'MEMBERSHIP_NOT_MATCHED'):
+                states.add('CONDITIONAL_ALLOW_REQUIRES_RUNTIME_CONTEXT')
             for member, info in binding.get('memberships', {}).items():
                 if info.get('membership') not in ('MEMBERSHIP_UNKNOWN_INFO', 'MEMBERSHIP_UNKNOWN_UNSUPPORTED'):
                     continue
@@ -181,6 +186,10 @@ def policy_detail(result):
             for state in (binding.get('rolePermission'), binding.get('combinedMembership', {}).get('membership')):
                 if state in permitted:
                     states.add(state)
+    for resource in deny.get('explainedResources', []):
+        for policy in resource.get('explainedPolicies', []):
+            if any('condition' in rule for rule in policy.get('ruleExplanations', [])):
+                states.add('CONDITIONAL_DENY_REQUIRES_RUNTIME_CONTEXT')
     return sorted(states)
 
 
@@ -191,16 +200,21 @@ def boundary(row):
             row['fullResourceName'].split('/')[-1] != setup.BROKER)
 
 
-def audit(api, exists=lambda resource: False, *, unresolved_first=False):
+def audit(api, exists=lambda resource: False, *, unresolved_first=False, subject_check=None):
     rows, cache = [], {}
     stopped = None
     roster = list(enumerate(tuples(), 1))
-    priority_size = sum(boundary(row) for _, row in roster)
-    if unresolved_first:
-        roster.sort(key=lambda item: not boundary(item[1]))
+    credential_check = {}
+    priority = broker_token_check.eligible_tuple if subject_check else boundary
+    priority_size = sum(priority(row) for _, row in roster)
+    if unresolved_first or subject_check:
+        roster.sort(key=lambda item: not priority(item[1]))
     for index, row in roster:
-        if unresolved_first and len(rows) == priority_size and any(not r['passed'] for r in rows):
-            break
+        if len(rows) == priority_size and (unresolved_first or subject_check):
+            if subject_check:
+                credential_check = {'credential_check': subject_check(rows)}
+            if any(not r['passed'] for r in rows):
+                break
         provenance = {}
         resource = row['fullResourceName']
         stage = 'resource_get'
@@ -245,7 +259,7 @@ def audit(api, exists=lambda resource: False, *, unresolved_first=False):
     complete = len(rows) == len(roster) and all(r['passed'] for r in rows)
     return {'status': 'FINITE_POLICY_CHECKS_PASSED' if complete else 'NOT_ACCEPTED',
             'checks': rows, 'limit': 'Finite permission checks. Private invocation and broker coverage need separate evidence.',
-            'mutations': 0}
+            'mutations': 0, **credential_check}
 
 
 def summary(report):
@@ -259,6 +273,7 @@ def summary(report):
         group = groups.setdefault(json.dumps(detail, sort_keys=True), {**detail, 'rows': []})
         group['rows'].append(row.get('row', index))
     return {'broker_iam': report['status'], 'checks': len(rows), 'passed': sum(r['passed'] for r in rows),
+            **({'credential_check': report['credential_check']} if 'credential_check' in report else {}),
             'observed': dict(Counter(r['observed'] for r in rows)), 'failures': list(groups.values()),
             **({'reason': report['reason']} if 'reason' in report else {})}
 
@@ -268,17 +283,22 @@ def main():
     p.add_argument('--source-sha')
     p.add_argument('--unresolved-first', action='store_true',
                    help='Check the 12 outstanding boundaries first. Continue to all 77 only if they pass.')
+    p.add_argument('--check-as-diagnostic-accounts', action='store_true',
+                   help='Preflight existing authority and prompt on the terminal before short-lived credential issuance.')
     args = p.parse_args()
     try:
         token = command(['gcloud', 'auth', 'print-access-token', '--quiet'])
         api = review.Troubleshooter(token, lambda _: None, time.monotonic() + 780)
-        report = audit(api, lambda resource: read_target(resource, token), unresolved_first=args.unresolved_first)
+        report = audit(api, lambda resource: read_target(resource, token), unresolved_first=args.unresolved_first,
+                       subject_check=(lambda rows: broker_token_check.verify(rows, token))
+                       if args.check_as_diagnostic_accounts else None)
     except SetupError:
         report = {'status': 'NOT_ACCEPTED', 'mutations': 0, 'reason': 'OPERATOR_AUTH_UNAVAILABLE'}
     if args.source_sha:
         # The pinned operations bootstrap sets this journal and checks the checkout.
         journal = Path(os.environ['JEMS_OPERATION_JOURNAL'])
-        report.update(source_sha=args.source_sha, quota_project=setup.PROJECT)
+        report.update(source_sha=args.source_sha, quota_project=setup.PROJECT,
+                      completed_at_utc=datetime.now(timezone.utc).isoformat())
         path = journal.parent / ('effective-iam-' + uuid.uuid4().hex + '.json')
         review.private_json(path, report)
         print(json.dumps({**summary(report), 'private_report': path.name}))

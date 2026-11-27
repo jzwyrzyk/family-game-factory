@@ -72,6 +72,12 @@ There is no additional log-routing sink, raw log copy or retention extension in 
 
 Use **IAM & Admin → Policy Troubleshooter** under the operator's authority. For each tuple check the **overall** effective result, including inherited access, conditions and deny policies. An invisible ancestor, unsupported resource, indeterminate group/condition, simulated input, or unsigned role list cannot establish a denial. Record the UTC observation, principal, tuple and outcome only. [Policy Troubleshooter](https://docs.cloud.google.com/policy-intelligence/docs/troubleshoot-access)
 
+For the four native service-account token checks where Troubleshooter reports
+unsupported individual principal membership, the operator can obtain a separate
+live result from IAM under the actual subject identity. Preserve both observations.
+This requires explicit approval for credential issuance and existing operator
+authority. [Finite token permission qualification](NONPRODUCTION_RECOVERY.md#four-outstanding-access-token-checks)
+
 | Principal | Resource and effective permission to check |
 | --- | --- |
 | Broker | Allow `logging.views.get` and `logging.views.access` on the new view. Deny access on both built-in views and on `cloud-run-errors`. Deny `logging.logEntries.list` on the project and `logging.fields.access` on restricted fields. |

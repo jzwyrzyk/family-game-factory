@@ -199,6 +199,33 @@ their own evidence after the finite audit passes.
 [Cloud Run secret references](https://docs.cloud.google.com/run/docs/configuring/services/secrets) ·
 [Policy Troubleshooter v3](https://docs.cloud.google.com/policy-intelligence/docs/reference/policytroubleshooter/rest/v3/iam/troubleshoot)
 
+### Four outstanding access-token checks
+
+The next administrator run confirmed eight secret denials. The four remaining
+rows (29, 35, 65 and 71) returned `UNKNOWN_INFO` with unsupported individual
+principal membership. The summaries contain 73 matching observations across two
+runs. They cannot be combined into a current acceptance receipt.
+
+The optional `broker-iam --check-as-diagnostic-accounts` mode verifies these
+four first. If the same membership limitation persists, it verifies the four
+account identities and the operator's existing issuance authority on each needed
+diagnostic identity. The terminal asks for explicit approval before requesting
+up to two five-minute IAM-scoped bearer tokens. Credentials stay in process
+memory. Each actual diagnostic identity calls IAM `testIamPermissions` on the
+verified numeric IDs of the release and managed diagnostics accounts. The only
+permission queried is `iam.serviceAccounts.getAccessToken`. Each API response
+must be valid and each target must retain its identity. A reported grant stops
+the audit immediately. The private report retains the original Troubleshooter
+outcome and records the basis for the independent determination.
+
+Declining the prompt, missing existing authority, another unresolved policy
+condition, or a failed API request keeps qualification open. Successful checks
+continue through the remaining 73 tuples in the same invocation. The result is
+scoped to the observed accounts, permissions, time and request context. Broker
+runtime invocation and settled coverage still require separate acceptance.
+[Google IAM permission check](https://docs.cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts/testIamPermissions) ·
+[Short-lived credential issuance](https://docs.cloud.google.com/iam/docs/reference/credentials/rest/v1/projects.serviceAccounts/generateAccessToken)
+
 ## Fixed failure codes
 
 | Code | Meaning |
