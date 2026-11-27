@@ -2,6 +2,15 @@ name: Jems production request diagnostics
 on:
   workflow_dispatch:
     inputs:
+      operation:
+        description: Diagnostic operation
+        type: choice
+        options: [request-evidence, token-boundary]
+        default: request-evidence
+      challenge:
+        description: Single-use qualification identifier for the token boundary operation
+        type: string
+        required: false
       service:
         description: Cloud Run request log service
         type: choice
@@ -67,7 +76,11 @@ jobs:
               print(f"INPUT_START_UTC={start:%Y-%m-%dT%H:%M:%SZ}", file=env)
               print(f"INPUT_END_UTC={end:%Y-%m-%dT%H:%M:%SZ}", file=env)
           PY
+      - name: Select diagnostic operation
+        id: operation
+        run: python3 scripts/ops/native_broker_probe.py select
       - name: Validate diagnostic scope
+        if: steps.operation.outputs.mode == 'request-evidence'
         id: scope
         run: python3 scripts/ops/request_evidence.py validate
       - name: Verify current main before requesting a Google credential
@@ -93,15 +106,35 @@ jobs:
           id_token_include_email: true
           create_credentials_file: false
           export_environment_variables: false
+      - name: Obtain a five-minute IAM credential for the GitHub caller
+        id: caller
+        if: steps.operation.outputs.mode == 'token-boundary'
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2.1.13
+        with:
+          project_id: family-game-factory-jzw
+          workload_identity_provider: projects/1054529152893/locations/global/workloadIdentityPools/jems-github-diagnostics/providers/github-main
+          service_account: jems-github-log-reader@family-game-factory-jzw.iam.gserviceaccount.com
+          token_format: access_token
+          access_token_lifetime: 300s
+          access_token_scopes: https://www.googleapis.com/auth/iam
+          create_credentials_file: false
+          export_environment_variables: false
+      - name: Test the four native token permissions
+        id: boundary
+        if: steps.operation.outputs.mode == 'token-boundary'
+        env:
+          CALLER_IAM_TOKEN: ${{ steps.caller.outputs.access_token }}
+          DIAGNOSTICS_ID_TOKEN: ${{ steps.auth.outputs.id_token }}
+        run: python3 scripts/ops/native_broker_probe.py probe
       - name: Read sanitized request evidence
         if: >-
-          !cancelled() && steps.source.outcome == 'success' &&
+          !cancelled() && steps.operation.outputs.mode == 'request-evidence' && steps.source.outcome == 'success' &&
           (steps.auth.outcome == 'success' || steps.auth.outcome == 'failure')
         env:
           DIAGNOSTICS_ID_TOKEN: ${{ steps.auth.outcome == 'success' && steps.auth.outputs.id_token || '' }}
         run: python3 scripts/ops/request_evidence.py query
       - name: Retain the sanitized report
-        if: ${{ !cancelled() && (steps.scope.outcome == 'success' || steps.scope.outcome == 'failure') }}
+        if: ${{ !cancelled() && (steps.scope.outcome == 'success' || steps.scope.outcome == 'failure' || steps.boundary.outcome == 'success' || steps.boundary.outcome == 'failure') }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: jems-request-evidence-${{ github.run_id }}-${{ github.run_attempt }}

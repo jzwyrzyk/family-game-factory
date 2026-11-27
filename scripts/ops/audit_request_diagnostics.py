@@ -285,13 +285,25 @@ def main():
                    help='Check the 12 outstanding boundaries first. Continue to all 77 only if they pass.')
     p.add_argument('--check-as-diagnostic-accounts', action='store_true',
                    help='Preflight existing authority and prompt on the terminal before short-lived credential issuance.')
+    p.add_argument('--native-controller', nargs=2, metavar=('APPROVED_MAIN_SHA','APPROVED_BROKER_DIGEST'),
+                   help='Use a single protected GitHub dispatch and the serving broker identity for the four checks.')
     args = p.parse_args()
+    if args.native_controller and (args.check_as_diagnostic_accounts or not os.environ.get('JEMS_OPERATION_JOURNAL')):
+        p.error('Native verification requires the pinned launcher and a single credential mode.')
     try:
         token = command(['gcloud', 'auth', 'print-access-token', '--quiet'])
-        api = review.Troubleshooter(token, lambda _: None, time.monotonic() + 780)
+        subject_check = None
+        if args.native_controller:
+            import native_broker_acceptance
+            folder = Path(os.environ['JEMS_OPERATION_JOURNAL']).parent
+            def subject_check(rows):
+                return native_broker_acceptance.verify(rows, token, *args.native_controller, folder)
+        elif args.check_as_diagnostic_accounts:
+            def subject_check(rows):
+                return broker_token_check.verify(rows, token)
+        api = review.Troubleshooter(token, lambda _: None, time.monotonic() + (1220 if args.native_controller else 780))
         report = audit(api, lambda resource: read_target(resource, token), unresolved_first=args.unresolved_first,
-                       subject_check=(lambda rows: broker_token_check.verify(rows, token))
-                       if args.check_as_diagnostic_accounts else None)
+                       subject_check=subject_check)
     except SetupError:
         report = {'status': 'NOT_ACCEPTED', 'mutations': 0, 'reason': 'OPERATOR_AUTH_UNAVAILABLE'}
     if args.source_sha:

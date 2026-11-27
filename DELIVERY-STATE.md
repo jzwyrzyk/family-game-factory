@@ -12,7 +12,9 @@ The administrator verified all 27 successor resources and a zero-change plan.
 Federation remains disabled. The subsequent broker IAM audit confirmed all
 three expected grants and 62 expected denials. A subsequent focused run confirmed all eight Gateway and Coach secret denials.
 Four token-creation checks still returned unknown for unsupported principal membership.
-The 73 matching outcomes span two runs. A fresh 77-check pass remains outstanding. Broker coverage and production canary qualification remain
+The administrator's credential preflight stopped before issuance. The protected
+controller and private broker need a separately approved update for native
+permission checks. The 73 matching outcomes span two runs. A fresh 77-check pass remains outstanding. Broker coverage and production canary qualification remain
 open. [Exact outstanding IAM checks](docs/operations/NONPRODUCTION_RECOVERY.md#broker-iam-follow-up)
 
 ## Permanent operations — November 26 recovery checkpoint

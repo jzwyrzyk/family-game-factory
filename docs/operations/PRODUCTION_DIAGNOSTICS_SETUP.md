@@ -75,8 +75,9 @@ Use **IAM & Admin → Policy Troubleshooter** under the operator's authority. Fo
 For the four native service-account token checks where Troubleshooter reports
 unsupported individual principal membership, the operator can obtain a separate
 live result from IAM under the actual subject identity. Preserve both observations.
-This requires explicit approval for credential issuance and existing operator
-authority. [Finite token permission qualification](NONPRODUCTION_RECOVERY.md#four-outstanding-access-token-checks)
+The operator-issuance path requires explicit approval and existing authority.
+The native controller uses the existing GitHub caller and Cloud Run broker identities
+after approved workflow and broker activation. [Finite token permission qualification](NONPRODUCTION_RECOVERY.md#four-outstanding-access-token-checks)
 
 | Principal | Resource and effective permission to check |
 | --- | --- |

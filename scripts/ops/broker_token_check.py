@@ -59,18 +59,26 @@ def check_result(reply):
     raise SetupError('PERMISSION_RESPONSE_INVALID')
 
 
-def verify(rows, operator_token, *, approve=consent):
-    """Keep raw Troubleshooter observations. Never accept HTTP failures or missing targets."""
+def eligibility(rows):
     if len(rows) != 4 or not all(eligible_tuple(r) for r in rows) or len({
             (r['principal'], r['fullResourceName']) for r in rows}) != 4:
-        return {'status': 'TUPLES_UNVERIFIED', 'issuance_requests': 0}
+        return 'TUPLES_UNVERIFIED'
     pending = [r for r in rows if not r['passed']]
     for r in pending:
         if (r['observed'] != 'UNKNOWN' or r['stage'] != 'troubleshooter' or
                 r.get('error_status') != 'UNKNOWN_INFO' or set(r.get('policy_states', [])) != {
                     'ALLOW_ACCESS_STATE_UNKNOWN_INFO', 'DENY_ACCESS_STATE_NOT_DENIED',
                     'MEMBERSHIP_UNKNOWN_UNSUPPORTED', 'UNRESOLVED_MEMBER_PRINCIPAL'}):
-            return {'status': 'OTHER_IAM_RESULT', 'issuance_requests': 0}
+            return 'OTHER_IAM_RESULT'
+    return None
+
+
+def verify(rows, operator_token, *, approve=consent):
+    """Keep raw Troubleshooter observations. Never accept HTTP failures or missing targets."""
+    problem = eligibility(rows)
+    if problem:
+        return {'status': problem, 'issuance_requests': 0}
+    pending = [r for r in rows if not r['passed']]
     if not pending:
         return {'status': 'DIRECT_CHECK_UNNEEDED', 'issuance_requests': 0}
     sources = sorted({r['principal'] for r in pending})

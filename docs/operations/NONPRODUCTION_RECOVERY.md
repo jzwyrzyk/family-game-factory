@@ -226,6 +226,62 @@ runtime invocation and settled coverage still require separate acceptance.
 [Google IAM permission check](https://docs.cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts/testIamPermissions) ·
 [Short-lived credential issuance](https://docs.cloud.google.com/iam/docs/reference/credentials/rest/v1/projects.serviceAccounts/generateAccessToken)
 
+### Administrator preflight and native controller
+
+The administrator returned `ADMIN_ISSUANCE_AUTHORITY_ABSENT` with zero issuance
+requests. The preflight stopped on the first missing permission. All four target
+checks remain unknown. The one-time Terraform approval has already been consumed.
+
+An operator who already has issuance authority on both diagnostic identities can
+use the preceding direct check. That lane needs an authenticated account, a private
+receipt directory and the immutable launcher. It has no dependency on the Terraform
+directory. No such alternative operator has been verified.
+
+The draft native route uses the existing protected `jems-production-diagnostics`
+workflow and private `jems-request-evidence` service. Only a manual
+`token-boundary` dispatch can select the fixed probes. GitHub uses the existing
+log-reader federation for a five-minute IAM-scoped caller credential and the
+broker's audience-bound invocation token. The broker verifies its runtime email
+and uses its own metadata credential. Both clients test the sole permission
+`iam.serviceAccounts.getAccessToken` on the release and managed diagnostics
+accounts. Empty permission sets require independent account inventory before
+and after the run. The native report alone cannot qualify a denial.
+
+**Activation requiring separate approval**
+
+1. Review the protected workflow, its `scripts/ops/native_broker_probe.py`,
+   `scripts/ops/request_evidence.py`, `scripts/ops/diagnose.py` and the broker's
+   `ops/request-broker/main.py` at the selected source. Integrate the reviewed
+   controller on protected main. The operator checks the five blob identities.
+2. Use the existing `broker-build` publication lane's exact-source plan and
+   approval for one new build. Verify the completed build ID, source archive,
+   builder, repository and immutable result digest. The previous verified build
+   and rollback revision remain historical assets. See [publication cost and
+   verification](PERMANENT_CLOUD_SETUP.md).
+3. Read back the serving broker revision, digest, configuration, traffic and
+   IAM. Record the rollback revision. Stage the verified new digest on the
+   existing broker with zero traffic. Compare service account, invocation IAM,
+   environment, ingress, resource limits and scaling with the baseline.
+   With explicit broker traffic approval, route to the candidate, then verify
+   the single 100% serving revision and authenticated invocation. If verification
+   fails, restore the captured traffic assignment to the old revision.
+4. For initial acceptance use one operator session with the existing Cloud
+   metadata reader and authorized GitHub dispatch/readback. Supply the reviewed
+   protected commit and verified new broker digest to the pinned operations
+   bootstrap. After steps 1–3 the command is
+   `bash "$launcher" "$ops_sha" broker-iam --native-controller "$approved_main" "$broker_digest"`,
+   where the digest is `sha256:` plus 64 hex digits. The operator verifies
+   account IDs, broker runtime identity, single serving revision and digest,
+   records a private challenge, and dispatches once. It checks the exact run,
+   first attempt, source, required steps, artifact hash, challenge and observation
+   time. It repeats the cloud inventory before accepting the four results and
+   completing all 77 current checks. A lost dispatch response retains the
+   challenge for run reconciliation. An unexpected grant, stale result or
+   incomplete run leaves acceptance open.
+5. The protected workflow can perform subsequent native observations directly
+   from GitHub. A separate settled-source and request-count receipt is required
+   before the broker supplies production canary coverage.
+
 ## Fixed failure codes
 
 | Code | Meaning |

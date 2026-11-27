@@ -102,9 +102,8 @@ def validate_inputs(inputs):
     return {**inputs, 'revision': revision or None}
 
 
-def retrieve(run_id, expected_sha, inputs, reader=api, downloaded_zip=None):
+def read_attempt(run_id, expected_sha, required_steps, reader, downloaded_zip=None):
     require(re.fullmatch('[1-9][0-9]{0,19}', run_id), 'Run ID required')
-    scope = validate_inputs(inputs)
     run = reader('GET', PREFIX + 'actions/runs/' + run_id)
     require(str(run.get('id')) == run_id and run.get('head_sha') == expected_sha and
             run.get('head_branch') == 'main' and run.get('event') == 'workflow_dispatch' and
@@ -130,9 +129,8 @@ def retrieve(run_id, expected_sha, inputs, reader=api, downloaded_zip=None):
                 files[0].file_size <= evidence.MAX_BYTES and (files[0].external_attr >> 16) & 0o170000 != 0o120000,
                 'Artifact archive layout unsafe')
         report = json.loads(archive.read(files[0]), object_pairs_hook=evidence.unique_keys)
-    require(report.get('workflow') == {'run_id': run_id, 'attempt': attempt, 'workflow_source_sha': expected_sha}
-            and report.get('scope') == scope, 'Report source/run/scope differs')
-    classified = triage(report)
+    require(report.get('workflow') == {'run_id': run_id, 'attempt': attempt, 'workflow_source_sha': expected_sha},
+            'Report source/run differs')
     # Inspect this exact attempt, never the mutable latest-attempt jobs endpoint.
     jobs = reader('GET', PREFIX + 'actions/runs/' + run_id + '/attempts/' + attempt + '/jobs?per_page=100')
     require(isinstance(jobs, dict) and jobs.get('total_count') == 1 and
@@ -143,14 +141,24 @@ def retrieve(run_id, expected_sha, inputs, reader=api, downloaded_zip=None):
             str(job.get('run_id')) == run_id and job.get('head_sha') == expected_sha,
             'Diagnostic job provenance differs or incomplete')
     steps = job.get('steps', [])
-    required = {name: [s for s in steps if s.get('name') == name] for name in ACCEPTANCE_STEPS}
+    required = {name: [s for s in steps if s.get('name') == name] for name in required_steps}
     successful_steps = all(len(matches) == 1 and matches[0].get('status') == 'completed' and
                            matches[0].get('conclusion') == 'success' for matches in required.values())
     job_verified = job.get('conclusion') == 'success' and successful_steps
-    return {'run_id': run_id, 'source_sha': expected_sha, 'artifact_sha256': artifact['digest'],
-            'workflow_conclusion': run.get('conclusion'), 'triage': classified,
-            'job_verified': job_verified,
-            'live_acceptance': run.get('conclusion') == 'success' and job_verified and classified['status'] == 'COMPLETE'}
+    return report, {'run_id': run_id, 'attempt': attempt, 'source_sha': expected_sha,
+                    'artifact_sha256': artifact['digest'], 'workflow_conclusion': run.get('conclusion'),
+                    'job_verified': job_verified}
+
+
+def retrieve(run_id, expected_sha, inputs, reader=api, downloaded_zip=None):
+    scope = validate_inputs(inputs)
+    report, receipt = read_attempt(run_id, expected_sha, ACCEPTANCE_STEPS, reader, downloaded_zip)
+    require(report.get('scope') == scope, 'Report source/run/scope differs')
+    classified = triage(report)
+    return {**receipt, 'triage': classified,
+            'live_acceptance': receipt['workflow_conclusion'] == 'success' and receipt['job_verified']
+                               and classified['status'] == 'COMPLETE'}
+
 
 
 def main(argv=None):

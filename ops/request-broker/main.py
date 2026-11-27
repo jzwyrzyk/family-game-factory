@@ -4,7 +4,7 @@ Deploy only with the per-view IAM role and authenticated invocation described in
 the setup guide. No raw entry, token, API error or input is logged or returned.
 """
 from datetime import datetime, timedelta, timezone
-from http.client import HTTPConnection, HTTPSConnection
+from http.client import HTTPConnection, HTTPException, HTTPSConnection
 import json
 import os
 import re
@@ -300,6 +300,61 @@ def evaluate(query, env, now, reader_factory=Logging):
     return result
 
 
+TOKEN_TARGETS = ("jems-cloud-run-release", "jems-codex-diagnostics")
+TOKEN_PERMISSION = "iam.serviceAccounts.getAccessToken"
+
+
+def token_permissions(bearer):
+    """Observe two fixed IAM permission sets. An empty set still needs independent target inventory."""
+    def unique(fields):
+        record = dict(fields)
+        if len(record) != len(fields):
+            raise ValueError("Duplicate permission result field")
+        return record
+
+    result = dict.fromkeys(TOKEN_TARGETS, "UNKNOWN")
+    if not isinstance(bearer, str) or not re.fullmatch(r"[a-zA-Z0-9_./+=-]{16,16384}", bearer):
+        return result
+    for target in TOKEN_TARGETS:
+        connection = HTTPSConnection("iam.googleapis.com", timeout=8)
+        try:
+            path = f"/v1/projects/{PROJECT}/serviceAccounts/{target}@{PROJECT}.iam.gserviceaccount.com:testIamPermissions"
+            connection.request("POST", path, json.dumps({"permissions": [TOKEN_PERMISSION]}).encode(),
+                               {"Authorization": "Bearer " + bearer, "Content-Type": "application/json"})
+            response = connection.getresponse()
+            if response.status != 200:
+                continue
+            raw = response.read(2049)
+            if len(raw) > 2048:
+                continue
+            data = json.loads(raw, object_pairs_hook=unique)
+            if data == {} or data == {"permissions": []}:
+                result[target] = "NOT_RETURNED"
+            elif data == {"permissions": [TOKEN_PERMISSION]}:
+                result[target] = "PRESENT"
+                break
+        except (ValueError, OSError, HTTPException):
+            pass
+        finally:
+            connection.close()
+    return result
+
+
+def runtime_token_boundary():
+    result = dict.fromkeys(TOKEN_TARGETS, "UNKNOWN")
+    revision = os.environ.get("K_REVISION", "")
+    if re.fullmatch(r"jems-request-evidence-[a-z0-9-]{1,40}", revision):
+        try:
+            reader = Logging(None)
+            reader.connect()
+            result = token_permissions(reader.bearer)
+        except (Failure, ValueError, OSError, HTTPException):
+            pass
+    else:
+        revision = None
+    return {"operation": "token-boundary", "revision": revision, "permissions": result}
+
+
 def request_evidence(request):
     query = None
     try:
@@ -308,6 +363,7 @@ def request_evidence(request):
             query = json.loads(request.stream.read(1025))
     except Exception:
         pass
-    result = evaluate(query, os.environ, datetime.now(timezone.utc))
+    result = (runtime_token_boundary() if query == {"operation": "token-boundary"} else
+              evaluate(query, os.environ, datetime.now(timezone.utc)))
     return (json.dumps(result, separators=(",", ":")), 200,
             {"Content-Type": "application/json", "Cache-Control": "no-store"})
