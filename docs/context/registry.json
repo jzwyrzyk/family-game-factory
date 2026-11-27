@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T16:59:11.574Z",
-      "sourceDigest": "2fe470da82bf460b5ec9135d6309d8c8045102129b183346dc57509fe3fe01ad",
+      "reviewedAt": "2026-11-27T16:59:30.097Z",
+      "sourceDigest": "6bb84c0554a57c076c34e31bc496e1035e9a0edfe86b82193cf221ac8e3f3497",
       "reviewOutcome": "updated",
-      "reviewReason": "Recovery binds the Google-managed IAP service identity to original state and separates it from live DEV invocation evidence.",
+      "reviewReason": "Pin the state-bound IAP recovery implementation in the existing guarded Cloud Shell launcher.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
