@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T17:22:37.675Z",
-      "sourceDigest": "5e672d9c799c71b416c7862301e0b496e96f157b801280f0b046e25f4303990b",
+      "reviewedAt": "2026-11-27T17:22:54.893Z",
+      "sourceDigest": "bc7e1d571ff2ea01a67603de2688f96202776641340383cb7ccb0f8f62496d92",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the bounded refresh proof, including verification of the direct runtime policy on both plan and pre-apply recheck.",
+      "reviewReason": "The existing immutable launcher selects the operator that verifies the two observed refresh fields in both planning phases.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
