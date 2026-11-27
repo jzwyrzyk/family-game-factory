@@ -897,10 +897,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:28:56.850Z",
+      "reviewedAt": "2026-11-27T19:42:39.599Z",
       "sourceDigest": "33455ca47335184e0ff58ece067c45bad1c22027f6dcbd72dd29677e82e213e3",
       "reviewOutcome": "updated",
-      "reviewReason": "Added negative tests for public owner lists, uninstalled public config, and changed installed code beneath a pinned resolution.",
+      "reviewReason": "Verified the identical held-source trust record and 150-command checks after incorporating the protected main diagnostics integration.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T23:28:42.821Z",
-      "sourceDigest": "1d51ff4a9d82d487d32fe7af3aea036338454621984b2d0a47aa4cf946bf5ddf",
+      "reviewedAt": "2026-11-27T19:42:40.144Z",
+      "sourceDigest": "b994beac091c4f96f0ee2c77baeb96a77b90dc7928ec48f385a0a1e3acf46135",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled the activation order with distinct site identities and protected membership binding before fresh source and merge evidence.",
+      "reviewReason": "Preserved the protected diagnostics integration and exact-source DEV policy while reconciling their delivery registry.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
