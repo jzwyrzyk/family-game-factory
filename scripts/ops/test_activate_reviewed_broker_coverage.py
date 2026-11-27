@@ -13,6 +13,8 @@ class AttestationTests(unittest.TestCase):
         class Client:
             def call(self,method,path,body):
                 self.request=body
+                if 'protoPayload(' in path:
+                    raise a.SetupError('POST limited read returned HTTP 400')
                 return self.response
         client=Client()
         events=[{'timestamp':stamp,'protoPayload':{'methodName':'google.logging.v2.ConfigServiceV2.CreateView',
@@ -20,9 +22,15 @@ class AttestationTests(unittest.TestCase):
                 [('2026-11-26T15:37:05.390435979Z',3),('2026-11-26T17:20:23.557065071Z',0)]]
         client.response={'entries':events}
         a.reviewed_events(client,a.coverage.instant('2026-11-27T19:35:00Z'))
-        events[0]['protoPayload']['methodName']='google.logging.v2.ConfigServiceV2.UpdateSink'
-        with self.assertRaisesRegex(a.SetupError,'ROUTING_EVENT_CHANGED'):
+        self.assertIn('protoPayload.methodName="google.logging.v2.ConfigServiceV2.CreateView"', client.request['filter'])
+        self.assertIn('protoPayload.resourceName="'+a.op.broker.VIEW+'"', client.request['filter'])
+        events.pop()
+        with self.assertRaisesRegex(a.SetupError,'ROUTING_HISTORY_CHANGED'):
             a.reviewed_events(client,a.coverage.instant('2026-11-27T19:35:00Z'))
+
+    def test_public_failure_reports_only_phase_and_canonical_status(self):
+        self.assertEqual(a.stop_detail(a.SetupError('POST https://private-target returned HTTP 400')), 'HTTP_400')
+        self.assertEqual(a.stop_detail(a.SetupError('arbitrary provider detail')), 'SetupError')
 
     def test_exact_tuple_stage_promote_verify_and_restore_on_incomplete_readback(self):
         from contextlib import ExitStack

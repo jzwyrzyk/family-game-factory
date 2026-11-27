@@ -26,6 +26,26 @@ COUNTS = {'factory-gateway':31,'factory-preview':2,'factory-coach-private':2}
 NATIVE_DIGEST = 'sha256:cb01648cc090948f68c1132b749db669b993deea68a94cd258b25865d87720ad'
 
 
+PHASE = 'startup'
+
+
+def phase(name):
+    global PHASE
+    PHASE = name
+
+
+def stop_detail(exc):
+    message = str(exc)
+    if re.fullmatch('[A-Z][A-Z0-9_]{2,80}', message):
+        return message
+    http = re.search(r'(?:returned HTTP |failed \()([1-5][0-9]{2})\)?$', message)
+    if http:
+        return 'HTTP_' + http[1]
+    if isinstance(exc, SetupError) and 'GitHub operation failed' in message:
+        return 'GITHUB_API_FAILED'
+    return type(exc).__name__
+
+
 def verify_source(evidence, accepted):
     require(evidence.get('operator_source') == '377f58966e585eea4e21dec783b7593bd0070b85' and
             evidence.get('accepted') == accepted and accepted['image'] == IMAGE and accepted['serving_revision'] == PREVIOUS
@@ -84,16 +104,18 @@ def reviewed_events(log, now):
     clause = (f'logName="{project}/logs/cloudaudit.googleapis.com%2Factivity" AND timestamp>="{START}" '
               f'AND timestamp<="{coverage.utc(now)}" AND protoPayload.serviceName="logging.googleapis.com" AND '
               'protoPayload.methodName=~"(Create|Update|Delete|Undelete)(Sink|Bucket|View|Exclusion)"')
-    response = log.call('POST','v2/entries:list?fields=nextPageToken,entries(timestamp,protoPayload(methodName,resourceName,status(code)))',
-                        {'resourceNames':[project], 'filter':clause,'pageSize':20})
-    events = []
-    for row in response.get('entries', []):
-        payload = row['protoPayload']
-        require(payload['methodName']=='google.logging.v2.ConfigServiceV2.CreateView' and
-                payload['resourceName']==op.broker.VIEW,'ROUTING_EVENT_CHANGED')
-        events.append((row['timestamp'],payload.get('status',{}).get('code',0)))
-    require(not response.get('nextPageToken') and sorted(events)==[
-        ('2026-11-26T15:37:05.390435979Z',3),('2026-11-26T17:20:23.557065071Z',0)],'ROUTING_HISTORY_CHANGED')
+    failed = '2026-11-26T15:37:05.390435979Z'
+    succeeded = '2026-11-26T17:20:23.557065071Z'
+    # protoPayload is a protobuf Any. Filter its AuditLog fields in the query,
+    # then request only the typed top-level timestamp in the REST partial response.
+    clause += (f' AND protoPayload.methodName="google.logging.v2.ConfigServiceV2.CreateView"'
+               f' AND protoPayload.resourceName="{op.broker.VIEW}" AND '
+               f'((timestamp="{failed}" AND protoPayload.status.code=3) OR '
+               f'(timestamp="{succeeded}" AND (NOT protoPayload.status.code:* OR protoPayload.status.code=0)))')
+    response = log.call('POST','v2/entries:list?fields=nextPageToken,entries(timestamp)',
+                        {'resourceNames':[project], 'filter':clause, 'pageSize':20})
+    require(not response.get('nextPageToken') and sorted(row['timestamp'] for row in response.get('entries',[]))
+            == [failed,succeeded], 'ROUTING_HISTORY_CHANGED')
 
 
 def read_service(baseline):
@@ -117,14 +139,17 @@ def switch(baseline, origin, destination, candidate, config):
 
 def run(folder, source):
     from datetime import timedelta
+    phase('protected-main')
     op.integrated(MAIN)
     accepted = op.saved(folder,'accepted.json')
     evidence = op.saved(folder,RECEIPT)
+    phase('private-source-receipt')
     verify_source(evidence,accepted)
     baseline = op.saved(folder,'rollback.json')
     lane = folder/'dated-coverage-nov24-1520'
     lane.mkdir(mode=0o700,exist_ok=True)
     now = datetime.now(timezone.utc).replace(microsecond=0)
+    phase('broker-service-and-policy')
     current = read_service(baseline)
     if (lane/'complete.json').exists():
         receipt = op.saved(lane,'complete.json')
@@ -135,14 +160,18 @@ def run(folder, source):
     require(op.release.traffic(current)=={PREVIOUS:100} and current['latestCreatedRevision']==op.BASE+'/revisions/'+PREVIOUS
             and op.release.image(current['template'])==IMAGE and
             op.release.fingerprint(current['template'])==baseline['configuration'],'ACCEPTED_BROKER_CHANGED')
+    phase('accepted-revision')
     revision(PREVIOUS,IMAGE,baseline['configuration'])
     token = command(['gcloud','auth','print-access-token','--quiet'])
     log = coverage.Http('https://logging.googleapis.com',token,{'x-goog-user-project':op.broker.PROJECT})
+    phase('dated-view-events')
     reviewed_events(log,now)
+    phase('independent-source-readback')
     live = coverage.collect(token,now,interval=(coverage.instant(START),coverage.instant(END)))
     require(live['routing_checks']==evidence['routing_checks'] and live['routing']==evidence['routing']
             and live['counts_by_revision_status']==evidence['counts_by_revision_status'] and
             live['services']==evidence['services'],'COVERAGE_SOURCE_CHANGED')
+    phase('routing-history-readback')
     require(coverage.routing_history(log,live,now)==evidence['routing_history'],'ROUTING_HISTORY_CHANGED')
     expiry = min(now+timedelta(days=7),coverage.instant(START)+timedelta(days=30))
     require(expiry > now+timedelta(hours=1),'RETENTION_EXPIRES_TOO_SOON')
@@ -155,20 +184,25 @@ def run(folder, source):
     candidate = op.SERVICE+'-c-'+op.review.digest(dates)[:20]
     template['revision'] = candidate
     config = op.release.fingerprint(template)
+    phase('record-stage-intent')
     op.keep(lane,'stage-intent.json',{'source':source,'native':accepted,'dates':dates,'coverage_receipt':RECEIPT,
                                       'candidate':candidate,'fingerprint':config,'rollback':PREVIOUS})
     try:
+        phase('stage-dated-revision')
         stage = op.release.cloud_api(token)
         stage('PATCH',op.BASE+'?updateMask=template,traffic',
               {'etag':current['etag'],'template':template,'traffic':target(PREVIOUS)})
+        phase('verify-staged-revision')
         staged = read_service(baseline)
         require(op.release.traffic(staged)=={PREVIOUS:100} and
                 staged['latestCreatedRevision']==op.BASE+'/revisions/'+candidate and
                 op.release.fingerprint(staged['template'])==config,'STAGE_UNVERIFIED')
         revision(candidate,IMAGE,config)
+        phase('select-single-target')
         switch(baseline,PREVIOUS,candidate,candidate,config)
         runs = {}
         for service in COUNTS:
+            phase('github-readback-' + service)
             runs[service] = read_run(lane,service,evidence['counts_by_revision_status'][service])
         op.integrated(MAIN)
         require(op.release.traffic(read_service(baseline))=={candidate:100},'SERVING_REVISION_CHANGED')
@@ -202,7 +236,5 @@ if __name__=='__main__':
             fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
             print(json.dumps(run(folder,args.source_sha)),flush=True)
     except (Exception,KeyboardInterrupt) as exc:
-        message=str(exc)
-        code=message if re.fullmatch('[A-Z][A-Z0-9_]{2,80}',message) else type(exc).__name__
-        print(json.dumps({'status':'ATTESTATION_STOPPED','code':code,'automatic_retry':False}),flush=True)
+        print(json.dumps({'status':'ATTESTATION_STOPPED','phase':PHASE,'code':stop_detail(exc),'automatic_retry':False}),flush=True)
         sys.exit(2)

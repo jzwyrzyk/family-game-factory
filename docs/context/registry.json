@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T19:39:37.305Z",
-      "sourceDigest": "17d95b7d899b1cd98627d6152b76312b9825923679d97c43929ff6444f31f78a",
-      "reviewOutcome": "updated",
-      "reviewReason": "Recorded the dated source evidence, scoped attestation and separate unapplied federation plan.",
+      "reviewedAt": "2026-11-27T19:42:20.141Z",
+      "sourceDigest": "00eac72e67140278805a9191fd3a22abd2001174d82c454006858880d6c232ba",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The historical audit read now uses a typed timestamp projection and reports the failing phase. The evidence, approved revision configuration and acceptance gates are identical.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
