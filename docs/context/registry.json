@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T18:03:53.616Z",
-      "sourceDigest": "af029fcd887a3bb7b2613c62b1a4a2329db98758ddaa2335d40fb62d3535201d",
+      "reviewedAt": "2026-11-27T18:10:55.809Z",
+      "sourceDigest": "54924f35ddb0cb64cee586a81ce31204f2e4d34b2c1a6ef7b308f2ef8f43e1b1",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the exact saved-plan finish gate and the separately reported finite broker audit.",
+      "reviewReason": "Recorded the completed administrator recovery, the separate inconclusive 77-check audit and the pinned standalone read-only IAM follow-up.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

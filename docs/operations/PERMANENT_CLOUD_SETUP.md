@@ -8,7 +8,14 @@ managed proxy or broaden IAM. That limitation does not gate the independent lane
 below. Frozen application source `bc602f1ede502f398308ad56f973c4bf7997ff08`, release
 identities and production services are unchanged.
 
-## Administrator checkpoint and recovery
+## November 27 successor checkpoint
+
+The administrator closed the nonproduction recovery with 27 instances, a
+zero-change plan and disabled federation. The next live gate is the standalone
+read-only broker IAM audit. The original 28-resource plan and the intermediate
+checkpoints below are historical. [Successor evidence and IAM follow-up](NONPRODUCTION_RECOVERY.md#broker-iam-follow-up)
+
+## Earlier administrator checkpoint and recovery
 
 The administrator reports the six GitHub restrictions applied (independently read
 back), project `jems-jzw-nonprod` ACTIVE with number `1092405124984`, matching approved

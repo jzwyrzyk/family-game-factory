@@ -167,6 +167,25 @@ The optional `--audit-broker` runs the existing finite read-only IAM audit as a
 separate step after receipt verification and saves its detailed output privately.
 Broker coverage, federation activation and deployment retain their own gates.
 
+The administrator subsequently reported `RECOVERED_DISABLED_NOT_ACTIVATED`,
+27 instances, `NO_CHANGES` and disabled federation. The successor's private
+completion receipt closes the Terraform recovery. The separate broker audit
+returned `NOT_ACCEPTED` with all 77 checks failed or unknown.
+
+## Broker IAM follow-up
+
+Use the standalone `broker-iam` operations-bootstrap lane for the next
+administrator read. It checks the same 77 tuples for the production broker
+and caller using the release collector's paced v3 client and explicit quota
+project. The full report stays with the Cloud Shell journals. The summary
+distinguishes a missing or unreadable resource, a troubleshooting request error,
+an indeterminate policy response and an evaluated permission mismatch. If a
+request-wide authentication or consumer error stops the collection, remaining
+rows are marked unattempted and the gate stays closed. Each invocation writes
+a fresh report; the recovery receipt and prior audit stay available. A passing
+finite audit still requires separate service access and broker coverage evidence.
+[Policy Troubleshooter v3](https://cloud.google.com/policy-intelligence/docs/reference/policytroubleshooter/rest/v3/iam/troubleshoot)
+
 ## Fixed failure codes
 
 | Code | Meaning |
