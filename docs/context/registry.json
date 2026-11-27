@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T05:28:44.476Z",
-      "sourceDigest": "2a3f91df028a7a8f3038f80e187a1c4b9ade3c706824ffdfd0e1b9b320b27e98",
+      "reviewedAt": "2026-11-27T18:52:39.476Z",
+      "sourceDigest": "3051c274c160a176962543ee99f34920a494fb2ea314291efb9ac8f3b995e386",
       "reviewOutcome": "updated",
-      "reviewReason": "Linked the concurrent review-only Creative Universe integration and retained separate Learning, engineering and frozen application sources.",
+      "reviewReason": "Recorded the exact diagnostic integration and outstanding live broker identity and coverage gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
