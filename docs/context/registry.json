@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T17:07:40.591Z",
-      "sourceDigest": "2486912a63aeb7faa1d1f8bc424a23422c72121cf09326ad9300fa8ba9496614",
+      "reviewedAt": "2026-11-27T17:08:20.712Z",
+      "sourceDigest": "85c4ba84ff3ccb16600f1a871bc60bb6cbdceb03a0cc81c29a9deff68a06d32d",
       "reviewOutcome": "updated",
-      "reviewReason": "Separate exact saved-plan WIF display-name evidence from historical failure attribution while retaining the IAP audit and all apply guards.",
+      "reviewReason": "Pin the verified display-name evidence correction for the existing two-phase recovery operator.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
