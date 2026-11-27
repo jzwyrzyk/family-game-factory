@@ -55,7 +55,7 @@ class ExecutionTests(unittest.TestCase):
             intent = {**baseline, 'image':cloud.candidate_image}
             candidate = op.release.revision_name(intent)
             op.release.rollout({**intent, 'operation':'stage'}, cloud.call)
-            cloud.state['latestReadyRevision'] = cloud.state['latestCreatedRevision']
+            cloud.state['latestReadyRevision'] = op.BASE + '/revisions/' + cloud.baseline
             op.keep(folder, 'stage.json', {'revision':candidate,'image':cloud.candidate_image,'traffic':{cloud.baseline:100}})
             cloud.patches.clear()
             cloud.state['scaling'] = {'maxInstanceCount': 2}

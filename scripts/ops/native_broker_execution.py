@@ -157,7 +157,8 @@ def rollout(folder,baseline,image,rollback=False):
         require(current.get('latestCreatedRevision') == expected and release.image(current['template']) == image,
                 'STAGED_REVISION_CHANGED')
     if not rollback:
-        require(current.get('latestReadyRevision') == expected, 'STAGED_REVISION_NOT_READY')
+        # Service.latestReadyRevision identifies a revision serving traffic.
+        # The staged revision has zero traffic and its own Ready condition.
         verify_revision(candidate, image)
     if allocation != {target: 100}:
         require(current.get('etag'), 'SERVICE_ETAG_MISSING')

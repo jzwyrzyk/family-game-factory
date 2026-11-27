@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T19:18:01.168Z",
-      "sourceDigest": "f1558c8eaa46f7204610d0fa83f39babaca0827db720a85ff04446082b7334e1",
+      "reviewedAt": "2026-11-27T19:19:08.853Z",
+      "sourceDigest": "937ce0cc0d47cf19cb97952098bbdb50c0058cc6d5e1be2bdcd4df9a66bddd18",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented recovery from the service-cap error and checked the native acceptance receipt against the authenticated GitHub artifact digest representation.",
+      "reviewReason": "Recorded the pre-promotion stop, verified revision-level readiness for zero traffic and matched the GitHub digest contract.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

@@ -20,7 +20,11 @@ reports `SetupError` and verifies 100% traffic on `jems-request-evidence-00001-n
 The stage receipt confirms zero-traffic staging. Cloud Run rejected the two-target
 traffic update because the service-level maximum is one instance. Native
 qualification had not started. The pinned resume operator rechecks the staged
-digest and uses a single traffic target under the existing cap. Preserve the verified
+digest and uses a single traffic target under the existing cap. The first
+resume stopped before promotion on a check of the service-level serving
+revision. The corrected operator verifies the staged revision's own Ready
+condition, digest and configuration. The earlier resume also expected a bare
+artifact hash. Acceptance uses GitHub's verified `sha256:` digest format. Preserve the verified
 build and original receipts. No native acceptance run is visible at that main
 SHA. The four outstanding checks, a fresh 77-check report and settled request
 coverage remain open. The nonproduction provider is disabled. [Exact outstanding IAM checks](docs/operations/NONPRODUCTION_RECOVERY.md#broker-iam-follow-up)
