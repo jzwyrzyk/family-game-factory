@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T19:33:00.174Z",
-      "sourceDigest": "310f6404ab39b445d17ca8ff500e7d8a80cba5f834f1f9718e625190c567354a",
+      "reviewedAt": "2026-11-27T19:39:37.305Z",
+      "sourceDigest": "17d95b7d899b1cd98627d6152b76312b9825923679d97c43929ff6444f31f78a",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the accepted 77-check receipt, independent archive verification and coverage-only observation of a populated settled hour.",
+      "reviewReason": "Recorded the dated source evidence, scoped attestation and separate unapplied federation plan.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

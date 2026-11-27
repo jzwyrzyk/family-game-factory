@@ -292,6 +292,10 @@ In the same Cloud Shell receipt directory, use the corrected pinned launcher's `
 
 The accepted run passed 77 of 77 checks. Its first settled hour had no independent samples for the three services. Use the pinned `broker-coverage` lane for the next read. It verifies the saved acceptance identity, searches the last seven settled days of Cloud Monitoring and compares the selected hour by service, revision and response code. The documented November 24 canary hour has priority when all three services have positive samples. It saves a separate private receipt and checks dated routing changes and ingestion delay. The initial lane collected an hour of settled counts from the existing log view and Cloud Monitoring. A coverage decision requires matching independent traffic and dated evidence of routing, exclusions, retention and availability. The [source verification procedure](PRODUCTION_DIAGNOSTICS_SETUP.md) governs the dated attestation and its end-to-end verification. The nonproduction provider remains disabled through these checks.
 
+The November 24, 15:20–16:20 UTC source receipt matched 31 Gateway, two Preview and two Coach requests. Its two later audit events created the filtered view after one unsuccessful attempt. The private broker attestation lane revalidates this receipt and the existing native IAM binding. It stages the same image with four dated environment values and zero traffic, selects the single target, and verifies three successful first-attempt protected GitHub artifacts against the independent per-revision counts. On verification failure it restores the accepted native broker. The previous build and original rollback revision are retained. Its seven-day verification expiry also respects bucket retention.
+
+After `DATED_BROKER_COVERAGE_ACCEPTED`, the `federation-plan` lane uses a private copy of the marked successor inputs, exact completed state and locked provider. It produces an unapplied plan for separate review. Preserve the authoritative successor for future execution and recheck the exact plan and trusted controller before enabling either federation resource.
+
 ## Fixed failure codes
 
 | Code | Meaning |

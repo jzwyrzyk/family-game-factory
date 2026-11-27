@@ -14,6 +14,8 @@ All 77 effective IAM checks passed, including three expected grants and 74 expec
 
 The November 27 18:08–19:08 UTC interval returned zero log entries and no independent samples on Gateway, Preview or Coach. Current routing checks passed, the bucket retains 30 days, and dated request coverage remains unverified. The coverage-only observation selects a populated interval using independent Monitoring data, then reads the existing log view and routing evidence. The original receipt is retained. [Coverage procedure](docs/operations/PRODUCTION_DIAGNOSTICS_SETUP.md)
 
+The historical observation for November 24, 15:20–16:20 UTC matched Cloud Logging to independent Cloud Monitoring by revision and response code. Gateway had 31 requests, Preview two and private Coach two. Maximum observed ingestion delay was 2.957 seconds. Both configuration events were November 26 `CreateView` attempts on the same view, with status 3 and success. There were zero sink errors. This qualifies the source evidence for that dated hour. Live broker readback and federation activation remain separate gates.
+
 ## Permanent operations — November 26 recovery checkpoint
 
 The owner reports the original and pre-apply Terraform plans matched exactly,
