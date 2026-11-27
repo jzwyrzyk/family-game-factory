@@ -315,3 +315,5 @@ After `DATED_BROKER_COVERAGE_ACCEPTED`, the `federation-plan` lane uses a privat
 Federation, registry cleanup, application deployment, live AI and production
 infrastructure remain outside this recovery. Tests and source review do not
 substitute for the missing private-state/cloud reconciliation receipt.
+
+The successful private planning run used operator `ad994d5306a1aeb6fe281fad1c7ab339f052c9c1`. The administrator verified plan SHA-256 `d4802a183aa00c9bb6891a7a4a73bf38cab3946e0e52916c83e6c09ccfd6a1b4` against the saved binary. It changes only the two existing federation disabled fields from true to false, with 25 managed no-ops. The entire budget refresh equals its previously accepted three-field null-to-empty-array normalization. The failed planning directory contains 86,288 KiB of provider cache. Before applying, obtain approval for this exact plan, preserve the recovery snapshots, verify authoritative durable state and capacity, and record the active configuration for subsequent zero-change readback. The protected website controller remains separately gated.

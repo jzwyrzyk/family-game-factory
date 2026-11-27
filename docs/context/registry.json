@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T19:50:13.536Z",
-      "sourceDigest": "2fe9e97830189082ce350cb5c85008080df073e34c734317e25aaa77847f173e",
+      "reviewedAt": "2026-11-27T20:01:29.918Z",
+      "sourceDigest": "05ab05363ad41eecbd79916542aeba3920b522d8ee1298db95edecad03b16cd1",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded three accepted dated request artifacts and isolated temporary federation planning after home disk exhaustion.",
+      "reviewReason": "Recorded the checksum-verified two-update federation plan, exact budget refresh and durable state requirement following the three accepted native readbacks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
