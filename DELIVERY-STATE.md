@@ -12,10 +12,18 @@ The administrator verified all 27 successor resources and a zero-change plan.
 Federation remains disabled. The subsequent broker IAM audit confirmed all
 three expected grants and 62 expected denials. A subsequent focused run confirmed all eight Gateway and Coach secret denials.
 Four token-creation checks still returned unknown for unsupported principal membership.
-The administrator's credential preflight stopped before issuance. The protected
-controller and private broker need a separately approved update for native
-permission checks. The 73 matching outcomes span two runs. A fresh 77-check pass remains outstanding. Broker coverage and production canary qualification remain
-open. [Exact outstanding IAM checks](docs/operations/NONPRODUCTION_RECOVERY.md#broker-iam-follow-up)
+The protected [diagnostic integration](https://github.com/jzwyrzyk/family-game-factory/pull/228)
+passed all six required checks and merged at `7576543a68d92e78ab74884dbd34a78f84c46029`.
+The authorized operator reached rollout after verifying the broker image.
+The administrator's receipt `operation-51ac724346a0421e8a09a411ac30f919.jsonl`
+reports `SetupError` and verifies 100% traffic on `jems-request-evidence-00001-nqz`.
+The stage receipt confirms zero-traffic staging. Cloud Run rejected the two-target
+traffic update because the service-level maximum is one instance. Native
+qualification had not started. The pinned resume operator rechecks the staged
+digest and uses a single traffic target under the existing cap. Preserve the verified
+build and original receipts. No native acceptance run is visible at that main
+SHA. The four outstanding checks, a fresh 77-check report and settled request
+coverage remain open. The nonproduction provider is disabled. [Exact outstanding IAM checks](docs/operations/NONPRODUCTION_RECOVERY.md#broker-iam-follow-up)
 
 ## Permanent operations — November 26 recovery checkpoint
 

@@ -7,79 +7,79 @@ import native_broker_execution as op
 
 
 class ExecutionTests(unittest.TestCase):
-    def test_one_build_resume_and_uncertain_response(self):
+    def test_provider_error_retains_operation_and_status_only(self):
+        client = Mock()
+        client.call.side_effect = op.SetupError('PATCH private-target returned HTTP 400')
+        with self.assertRaisesRegex(op.SetupError, r'^BROKER_STAGE_HTTP_400$'):
+            op.run_request(client, 'STAGE', 'PATCH', 'private-target', {})
+        client.call.side_effect = op.SetupError('sensitive transport detail')
+        with self.assertRaisesRegex(op.SetupError, r'^BROKER_POLL_STAGE_RESPONSE_UNAVAILABLE$'):
+            op.run_request(client, 'POLL_STAGE', 'GET', 'private-operation')
+
+    def test_resume_only_reverifies_existing_build(self):
         build_id = 'ab123456-1234-1234-1234-1234567890ab'
-        proof = {'status':'BUILD_VERIFIED_NOT_DEPLOYED','source_sha':op.SOURCE,'archive_sha256':op.ARCHIVE,
-                 'build_id':build_id,'image':op.build.IMAGE+'@sha256:'+'d'*64}
-        plan = {'approve_plan_sha256':op.PLAN,'plan':{'source_sha':op.SOURCE,'archive_sha256':op.ARCHIVE},'inventory':'CHECKED'}
-        with tempfile.TemporaryDirectory() as tmp, patch.object(op.build.publication,'cloud',return_value=[]), \
-                patch.object(op.continuation,'invoke') as run, patch.object(op.continuation,'build_status',return_value='SUCCESS'):
+        proof = {'status':'BUILD_VERIFIED_NOT_DEPLOYED', 'source_sha':op.SOURCE, 'archive_sha256':op.ARCHIVE,
+                 'build_id':build_id, 'image':op.broker.publication.IMAGE+'@sha256:'+'d'*64}
+        with tempfile.TemporaryDirectory() as tmp, patch.object(op.continuation, 'invoke', return_value=proof) as run:
             folder = Path(tmp)
-            run.side_effect = [plan,{'status':'SUBMITTED_NOT_VERIFIED','source_sha':op.SOURCE,'build_id':build_id},proof,proof]
-            self.assertEqual(op.build_once(folder),proof)
-            self.assertEqual(op.build_once(folder),proof)
-            self.assertEqual(sum('--submit' in c.args[2] for c in run.call_args_list),1)
-            (folder/'build-id.json').unlink()
-            with self.assertRaisesRegex(op.SetupError,'UNCERTAIN_SUBMISSION_NO_RETRY'): op.build_once(folder)
-            self.assertEqual(run.call_count,4)
+            with self.assertRaisesRegex(op.SetupError, 'STAGED_BUILD_RECEIPTS_REQUIRED'):
+                op.verify_saved_build(folder)
+            run.assert_not_called()
+            for name, value in [('build-id.json', {'id':build_id}), ('verified-build.json', proof), ('stage.json', {})]:
+                op.keep(folder, name, value)
+            self.assertEqual(op.verify_saved_build(folder), proof)
+            run.assert_called_once_with(op.SOURCE, 'broker-build', ['--build-id', build_id], Path.home())
+            run.return_value = {**proof, 'image':'different-image'}
+            with self.assertRaisesRegex(op.SetupError, 'VERIFIED_BUILD_CHANGED'):
+                op.verify_saved_build(folder)
 
-    def test_staging_canary_promotion_and_rollback_are_broker_only(self):
-        baseline={'service':op.SERVICE,'baseline':op.SERVICE+'-abc','source':op.SOURCE}
-        image=op.build.IMAGE+'@sha256:'+'f'*64
-        revision=op.release.revision_name({**baseline,'image':image})
-        original={baseline['baseline']:100}
-        canary={baseline['baseline']:95,revision:5}
-        promoted={revision:100}
-        def current(allocation):
-            return {'trafficStatuses':[{'revision':k,'percent':v} for k,v in allocation.items()]}
-        with tempfile.TemporaryDirectory() as tmp, patch.object(op,'guard') as guard, patch.object(op.release,'rollout') as apply:
-            guard.side_effect=list(map(current,[original,original,canary,promoted,promoted,original]))
-            self.assertEqual(op.rollout(Path(tmp),baseline,image),revision)
-            op.rollout(Path(tmp),baseline,image,rollback=True)
-            self.assertEqual([c.args[0]['operation'] for c in apply.call_args_list],['stage','canary','promote','rollback'])
-            self.assertTrue(all(c.args[0]['service']==op.SERVICE for c in apply.call_args_list))
-            self.assertEqual(op.saved(Path(tmp),'stage.json')['traffic'],original)
-
-    def test_exact_service_controller_rehearsal(self):
+    def test_single_target_resume_and_rollback(self):
         from test_operations import CloudRunFixture
 
         class BrokerFixture(CloudRunFixture):
             service = op.SERVICE
             resource = op.BASE
-            baseline = op.SERVICE + '-00001-old'
-            baseline_image = op.build.IMAGE + '@sha256:' + '1' * 64
-            candidate_image = op.build.IMAGE + '@sha256:' + '2' * 64
+            baseline = op.ROLLBACK_REVISION
+            baseline_image = op.broker.publication.IMAGE + '@sha256:' + '1' * 64
+            candidate_image = op.broker.publication.IMAGE + '@sha256:' + '2' * 64
 
         cloud = BrokerFixture()
-        cloud.state.update(name=op.BASE, uid='existing-service')
+        cloud.state.update(name=op.BASE, uid='existing-service', scaling={'maxInstanceCount': 1})
         cloud.state['template']['serviceAccount'] = op.broker.BROKER
         cloud.revisions[cloud.baseline] = cloud.revision(cloud.baseline, cloud.state['template'])
         with tempfile.TemporaryDirectory() as tmp, patch.object(op, 'api', cloud.call), \
                 patch.object(op, 'service_policy', return_value='private-policy'):
+            folder = Path(tmp)
             baseline = op.release.inspect_service(op.SERVICE, op.api)
             baseline.update(source=op.SOURCE, service_uid='existing-service', policy_hash='private-policy')
-            candidate = op.rollout(Path(tmp), baseline, cloud.candidate_image)
-            op.rollout(Path(tmp), baseline, cloud.candidate_image, rollback=True)
-            self.assertEqual([p[0] for p in cloud.patches],
-                             [op.BASE + '?updateMask=template,traffic'] + [op.BASE + '?updateMask=traffic'] * 3)
-            self.assertEqual([sum(t['percent'] for t in patch['traffic'] if t['revision'] == candidate)
-                              for _, patch in cloud.patches], [0, 5, 100, 0])
-            self.assertEqual(op.release.traffic(cloud.state), {cloud.baseline:100})
-            self.assertIn(cloud.baseline, cloud.revisions)
-
-    def test_failed_stage_readback_never_promotes(self):
-        baseline={'service':op.SERVICE,'baseline':'old','source':op.SOURCE}
-        cur=lambda rev:{'trafficStatuses':[{'revision':rev,'percent':100}]}
-        with tempfile.TemporaryDirectory() as tmp, patch.object(op,'guard',side_effect=[cur('old'),cur('unknown')]), \
-                patch.object(op.release,'rollout') as apply:
-            with self.assertRaisesRegex(op.SetupError,'ZERO_TRAFFIC_STAGE_UNVERIFIED'):
-                op.rollout(Path(tmp),baseline,'image')
-            self.assertEqual(apply.call_count,1)
+            intent = {**baseline, 'image':cloud.candidate_image}
+            candidate = op.release.revision_name(intent)
+            op.release.rollout({**intent, 'operation':'stage'}, cloud.call)
+            cloud.state['latestReadyRevision'] = cloud.state['latestCreatedRevision']
+            op.keep(folder, 'stage.json', {'revision':candidate,'image':cloud.candidate_image,'traffic':{cloud.baseline:100}})
+            cloud.patches.clear()
+            cloud.state['scaling'] = {'maxInstanceCount': 2}
+            with self.assertRaisesRegex(op.SetupError, 'BROKER_CONFIGURATION_CHANGED'):
+                op.rollout(folder, baseline, cloud.candidate_image)
+            cloud.state['scaling'] = {'maxInstanceCount': 1}
+            cloud.revisions[candidate]['conditions'] = []
+            with self.assertRaisesRegex(op.SetupError, 'REVISION_PROOF_MISMATCH'):
+                op.rollout(folder, baseline, cloud.candidate_image)
+            self.assertEqual(cloud.patches, [])
+            cloud.revisions[candidate] = cloud.revision(candidate, cloud.state['template'])
+            self.assertEqual(op.rollout(folder, baseline, cloud.candidate_image), candidate)
+            self.assertEqual(op.rollout(folder, baseline, cloud.candidate_image), candidate)
+            cloud.revisions[candidate]['conditions'] = []
+            op.rollout(folder, baseline, cloud.candidate_image, rollback=True)
+            self.assertEqual([path for path, _ in cloud.patches], [op.BASE + '?updateMask=traffic'] * 2)
+            self.assertEqual([data['traffic'] for _, data in cloud.patches],
+                             [[op.release.traffic_target(name, 100)] for name in (candidate, cloud.baseline)])
+            self.assertEqual(cloud.state['scaling'], {'maxInstanceCount': 1})
 
     def test_unknown_native_result_rolls_back_and_prevents_second_dispatch(self):
-        baseline={'source':op.SOURCE,'service':op.SERVICE,'baseline':'prior','baselineImage':'old'}
+        baseline={'source':op.SOURCE,'service':op.SERVICE,'baseline':op.ROLLBACK_REVISION,'baselineImage':'old'}
         with tempfile.TemporaryDirectory() as tmp, patch.object(op,'integrated'), patch.object(op,'guard'), \
-                patch.object(op,'build_once',return_value={'image':'new@sha256:abc'}), patch.object(op,'command'), \
+                patch.object(op,'verify_saved_build',return_value={'image':'new@sha256:abc'}), patch.object(op,'command'), \
                 patch.object(op,'rollout',return_value='candidate') as apply, patch.object(op.subprocess,'run',return_value=Mock(returncode=2, stdout='{}')) as child:
             folder=Path(tmp)
             op.keep(folder,'rollback.json',baseline)

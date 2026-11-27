@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T19:06:34.312Z",
-      "sourceDigest": "d37e52467b507f93d21bbef55eccb55b2655467fc84452978b9c1801ed4484ad",
+      "reviewedAt": "2026-11-27T19:16:37.204Z",
+      "sourceDigest": "a8d7c6b8b52607f3c86ebc46acbc2d1d0021c0adcaab5a724a22f89c38d45fa8",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the protected diagnostics integration, source-bound single build, private rollback and finite IAM and coverage gates.",
+      "reviewReason": "Recorded the confirmed one-instance traffic constraint and verified revision identity before both traffic transitions.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
