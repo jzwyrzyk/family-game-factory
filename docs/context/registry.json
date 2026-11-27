@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T19:16:37.204Z",
-      "sourceDigest": "a8d7c6b8b52607f3c86ebc46acbc2d1d0021c0adcaab5a724a22f89c38d45fa8",
+      "reviewedAt": "2026-11-27T19:18:01.168Z",
+      "sourceDigest": "f1558c8eaa46f7204610d0fa83f39babaca0827db720a85ff04446082b7334e1",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the confirmed one-instance traffic constraint and verified revision identity before both traffic transitions.",
+      "reviewReason": "Documented recovery from the service-cap error and checked the native acceptance receipt against the authenticated GitHub artifact digest representation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

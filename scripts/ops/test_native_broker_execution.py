@@ -76,6 +76,31 @@ class ExecutionTests(unittest.TestCase):
                              [[op.release.traffic_target(name, 100)] for name in (candidate, cloud.baseline)])
             self.assertEqual(cloud.state['scaling'], {'maxInstanceCount': 1})
 
+    def test_77_passes_require_the_verified_github_artifact_digest(self):
+        import json
+        image = op.broker.publication.IMAGE + '@sha256:' + 'a' * 64
+        native = {'status':'NATIVE_PERMISSIONS_VERIFIED', 'workflow_source':'main', 'broker_digest':image.split('@')[1],
+                  'broker_revision':'candidate', 'run_id':'101'}
+        baseline = {'source':op.SOURCE, 'service':op.SERVICE, 'baseline':op.ROLLBACK_REVISION, 'baselineImage':'old'}
+        for digest, accepted in [('sha256:' + 'b'*64, True), ('b'*64, False), ('sha256:malformed', False)]:
+            with self.subTest(digest=digest), tempfile.TemporaryDirectory() as tmp, patch.object(op, 'integrated'), \
+                    patch.object(op, 'guard'), patch.object(op, 'verify_saved_build', return_value={'image':image,'build_id':'id'}), \
+                    patch.object(op, 'rollout', return_value='candidate') as apply, patch.object(op.subprocess, 'run') as child:
+                folder = Path(tmp)
+                op.keep(folder, 'rollback.json', baseline)
+                report = {'broker_iam':'FINITE_POLICY_CHECKS_PASSED','passed':77,'checks':77,'failures':[],
+                          'credential_check':{**native,'artifact_sha256':digest}}
+                child.return_value = Mock(returncode=0, stdout=json.dumps(report))
+                if accepted:
+                    self.assertEqual(op.execute('main', folder)['artifact_sha256'], digest)
+                    self.assertEqual(op.saved(folder, 'accepted.json')['native_run'], '101')
+                    apply.assert_called_once()
+                else:
+                    with self.assertRaisesRegex(op.SetupError, 'NATIVE_EVIDENCE_UNVERIFIED'):
+                        op.execute('main', folder)
+                    self.assertTrue(apply.call_args.kwargs['rollback'])
+                    self.assertFalse((folder/'accepted.json').exists())
+
     def test_unknown_native_result_rolls_back_and_prevents_second_dispatch(self):
         baseline={'source':op.SOURCE,'service':op.SERVICE,'baseline':op.ROLLBACK_REVISION,'baselineImage':'old'}
         with tempfile.TemporaryDirectory() as tmp, patch.object(op,'integrated'), patch.object(op,'guard'), \

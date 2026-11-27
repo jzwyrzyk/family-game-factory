@@ -202,7 +202,7 @@ def execute(main,folder):
         require(native.get('status') == 'NATIVE_PERMISSIONS_VERIFIED' and native.get('workflow_source') == main
                 and native.get('broker_digest') == proof['image'].split('@')[1]
                 and native.get('broker_revision') == revision and re.fullmatch('[1-9][0-9]*', native.get('run_id', ''))
-                and re.fullmatch('[0-9a-f]{64}', native.get('artifact_sha256', '')), 'NATIVE_EVIDENCE_UNVERIFIED')
+                and re.fullmatch('sha256:[0-9a-f]{64}', native.get('artifact_sha256', '')), 'NATIVE_EVIDENCE_UNVERIFIED')
         result = {'status':'BROKER_IAM_ACCEPTED_COVERAGE_PENDING','build_id':proof['build_id'],
                   'image':proof['image'],'serving_revision':revision,'rollback_revision':baseline['baseline'],
                   'native_run':native['run_id'], 'artifact_sha256':native['artifact_sha256']}
