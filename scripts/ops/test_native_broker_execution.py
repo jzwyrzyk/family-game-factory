@@ -147,3 +147,22 @@ class CoverageTests(unittest.TestCase):
         self.assertIn('httpRequest(status)',path)
         self.assertNotIn('requestUrl',path)
         self.assertEqual(body['resourceNames'],[c.setup.VIEW])
+
+    def test_population_uses_independent_samples_and_preserves_canary_preference(self):
+        import native_settled_coverage as c
+        from datetime import timedelta
+        first = c.instant('2026-11-24T02:19:00Z')
+        hour = timedelta(hours=1)
+        later = first + 24*hour
+        times = {s:[first+hour/2, later] for s in c.SERVICES}
+        self.assertEqual(c.select_interval(times,first,later), (first, first+hour))
+        times[c.SERVICES[0]] = [later]
+        self.assertEqual(c.select_interval(times,first,later), (later-hour,later))
+        times[c.SERVICES[0]] = []
+        self.assertIsNone(c.select_interval(times,first,later))
+
+    def test_sink_filter_sampling_or_unknown_expression_needs_review(self):
+        import native_settled_coverage as c
+        self.assertEqual(c.sink_includes_requests({'name':'_Default','filter':'NOT LOG_ID("other")'}), 'ONLY_OTHER_LOGS_EXCLUDED')
+        for expression in ('NOT LOG_ID("run.googleapis.com/requests")', 'sample(insertId, 0.5)', 'LOG_ID("other")'):
+            self.assertEqual(c.sink_includes_requests({'name':'_Default','filter':expression}), 'REVIEW_FILTER')

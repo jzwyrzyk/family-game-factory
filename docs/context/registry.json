@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T19:19:08.853Z",
-      "sourceDigest": "937ce0cc0d47cf19cb97952098bbdb50c0058cc6d5e1be2bdcd4df9a66bddd18",
+      "reviewedAt": "2026-11-27T19:33:00.174Z",
+      "sourceDigest": "310f6404ab39b445d17ca8ff500e7d8a80cba5f834f1f9718e625190c567354a",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the pre-promotion stop, verified revision-level readiness for zero traffic and matched the GitHub digest contract.",
+      "reviewReason": "Recorded the accepted 77-check receipt, independent archive verification and coverage-only observation of a populated settled hour.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

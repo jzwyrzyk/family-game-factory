@@ -8,26 +8,11 @@ The development-efficiency integration changes validation and session startup. S
 
 ## November 27 administrator readback
 
-The administrator verified all 27 successor resources and a zero-change plan.
-Federation remains disabled. The subsequent broker IAM audit confirmed all
-three expected grants and 62 expected denials. A subsequent focused run confirmed all eight Gateway and Coach secret denials.
-Four token-creation checks still returned unknown for unsupported principal membership.
-The protected [diagnostic integration](https://github.com/jzwyrzyk/family-game-factory/pull/228)
-passed all six required checks and merged at `7576543a68d92e78ab74884dbd34a78f84c46029`.
-The authorized operator reached rollout after verifying the broker image.
-The administrator's receipt `operation-51ac724346a0421e8a09a411ac30f919.jsonl`
-reports `SetupError` and verifies 100% traffic on `jems-request-evidence-00001-nqz`.
-The stage receipt confirms zero-traffic staging. Cloud Run rejected the two-target
-traffic update because the service-level maximum is one instance. Native
-qualification had not started. The pinned resume operator rechecks the staged
-digest and uses a single traffic target under the existing cap. The first
-resume stopped before promotion on a check of the service-level serving
-revision. The corrected operator verifies the staged revision's own Ready
-condition, digest and configuration. The earlier resume also expected a bare
-artifact hash. Acceptance uses GitHub's verified `sha256:` digest format. Preserve the verified
-build and original receipts. No native acceptance run is visible at that main
-SHA. The four outstanding checks, a fresh 77-check report and settled request
-coverage remain open. The nonproduction provider is disabled. [Exact outstanding IAM checks](docs/operations/NONPRODUCTION_RECOVERY.md#broker-iam-follow-up)
+The administrator verified all 27 successor resources and a zero-change plan. Nonproduction federation is disabled. The [protected diagnostic integration](https://github.com/jzwyrzyk/family-game-factory/pull/228) merged at `7576543a68d92e78ab74884dbd34a78f84c46029`. The one approved build `eba07745-30a0-4bcf-9aad-dd6cab8f48ea` produced broker digest `sha256:9b4ea06f03b0725182fa123898d8ab536dcabebe604affee88aaefe23e983143`. The private broker serves `jems-request-evidence-r-cf49775a5f0876047146` with the one-instance cap. Rollback retains `jems-request-evidence-00001-nqz`.
+
+All 77 effective IAM checks passed, including three expected grants and 74 expected denials. [Native run 46056038814](https://github.com/jzwyrzyk/family-game-factory/actions/runs/46056038814) verified the four outstanding checks. Its first-attempt archive was independently retrieved and hashed to `sha256:cb01648cc090948f68c1132b749db669b993deea68a94cd258b25865d87720ad`.
+
+The November 27 18:08–19:08 UTC interval returned zero log entries and no independent samples on Gateway, Preview or Coach. Current routing checks passed, the bucket retains 30 days, and dated request coverage remains unverified. The coverage-only observation selects a populated interval using independent Monitoring data, then reads the existing log view and routing evidence. The original receipt is retained. [Coverage procedure](docs/operations/PRODUCTION_DIAGNOSTICS_SETUP.md)
 
 ## Permanent operations — November 26 recovery checkpoint
 
