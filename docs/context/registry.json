@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T20:20:53.244Z",
-      "sourceDigest": "345c84bba1aa60a56b27c67124a4244abed74759ecc848fd2a2f26c2af6d806c",
+      "reviewedAt": "2026-11-27T20:26:08.437Z",
+      "sourceDigest": "45d9900ace36a6367e4a76a2af97ffa39c25cdb5c45690463e2ce4f2264f1fab",
       "reviewOutcome": "updated",
-      "reviewReason": "Record the verified federation apply, the durable state and zero-change plan digests, and the outstanding protected DEV decision.",
+      "reviewReason": "Record the verified protected DEV policy merge, exact qualified tree and separately gated private site binding draft.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
