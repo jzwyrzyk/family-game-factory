@@ -282,6 +282,14 @@ and after the run. The native report alone cannot qualify a denial.
    from GitHub. A separate settled-source and request-count receipt is required
    before the broker supplies production canary coverage.
 
+### One-time authorized broker execution
+
+The diagnostics-only integration from #227 passed all six required checks and entered protected main through [#228](https://github.com/jzwyrzyk/family-game-factory/pull/228). The integrated main is `7576543a68d92e78ab74884dbd34a78f84c46029`. The reviewed broker build source is `bca6b5c383ed741e252793e468776921e32ff67f`.
+
+Use the pinned operator launcher's `broker-execute PROTECTED_MAIN_SHA` lane in the existing authenticated administrator session. It records the serving revision, digest, traffic, and private invoker policy before the single bounded build. It verifies provenance, stages the digest with zero traffic, checks the 5% canary allocation, promotes, verifies a fresh protected GitHub run and all 77 permission checks, and restores the retained revision on a failed live qualification. Preserve its private receipts on a disconnect. A recorded submission intent prevents an uncertain build from being submitted again.
+
+After IAM acceptance the same lane collects an hour of settled counts from the existing log view and Cloud Monitoring. A coverage decision requires matching independent traffic and dated evidence of routing, exclusions, retention and availability. The [source verification procedure](PRODUCTION_DIAGNOSTICS_SETUP.md) governs the dated attestation and its end-to-end verification. The nonproduction provider remains disabled through these checks.
+
 ## Fixed failure codes
 
 | Code | Meaning |

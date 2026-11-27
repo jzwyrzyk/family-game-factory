@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T18:47:49.432Z",
-      "sourceDigest": "b8de539d0ab7047e938d396613a1c11859225046d071761f7d83db2466b58ffa",
+      "reviewedAt": "2026-11-27T19:06:34.312Z",
+      "sourceDigest": "d37e52467b507f93d21bbef55eccb55b2655467fc84452978b9c1801ed4484ad",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the administrator preflight, exact protected workflow and runtime probes, their negative controls, the serving identity/digest checks and the remaining approvals.",
+      "reviewReason": "Documented the protected diagnostics integration, source-bound single build, private rollback and finite IAM and coverage gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
