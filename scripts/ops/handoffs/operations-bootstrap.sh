@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Verify this file's checksum from the reviewed handoff before executing.
-# Usage: bash operations-bootstrap.sh SOURCE_SHA {broker-build|broker-setup|broker-continue|nonprod|nonprod-recover|github|cleanup|capacity|recovery} ARGS...
+# Usage: bash operations-bootstrap.sh SOURCE_SHA {broker-build|broker-setup|broker-continue|nonprod|nonprod-recover|nonprod-verify|github|cleanup|capacity|recovery} ARGS...
 set -euo pipefail
 [[ $# -ge 2 && "$1" =~ ^[0-9a-f]{40}$ ]] || { echo 'Expected immutable source SHA and lane.' >&2; exit 2; }
 operations_sha="$1"
@@ -12,6 +12,7 @@ case "$operations_lane" in
   broker-continue) operations_script=continue_broker_activation.py ;;
   nonprod) operations_script=setup_nonproduction.py ;;
   nonprod-recover) operations_script=recover_nonproduction.py ;;
+  nonprod-verify) operations_script=verify_nonproduction_completion.py ;;
   github) operations_script=github_operations.py ;;
   cleanup) operations_script=cleanup_historical_checkouts.py ;;
   capacity) operations_script=recover_checkout_space.py ;;

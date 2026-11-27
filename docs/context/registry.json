@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T17:46:25.510Z",
-      "sourceDigest": "e8d6def974f0048fddf1ea616913feb9c89f10f2402a6eb71692eee660816d9a",
+      "reviewedAt": "2026-11-27T18:03:53.616Z",
+      "sourceDigest": "af029fcd887a3bb7b2613c62b1a4a2329db98758ddaa2335d40fb62d3535201d",
       "reviewOutcome": "updated",
-      "reviewReason": "Pin the operator that can compare the blocked attempt locally and prepare a fresh review only on a proven metadata reorder.",
+      "reviewReason": "Recorded the exact saved-plan finish gate and the separately reported finite broker audit.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

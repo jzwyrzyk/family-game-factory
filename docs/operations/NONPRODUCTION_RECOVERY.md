@@ -148,6 +148,25 @@ an uncertain mutation or reuse an older attempt. Reconcile that successor state
 in a separately reviewed follow-up; this first-recovery operator intentionally
 refuses automatic replay.
 
+## Completion after the observed budget refresh
+
+The administrator reported 27 managed no-ops, three passing checks and no
+deferred actions, data changes or output changes in the saved post-apply plan.
+The budget refresh materialized empty `credit_types`, `resource_ancestors` and
+`subaccounts` lists. The applied operator stopped before its final original-file
+integrity check and completion receipt.
+
+The existing operations bootstrap accepts a `nonprod-verify` lane with the
+approved receipt digest and the diagnosed post-apply binary digest. It locks
+the same recovery operator, verifies the marked successor generation, original
+manifest and exact saved plan, and permits only those three null-to-empty
+changes with all 27 managed resources at no-op. It uses `terraform show` on the
+saved plan and writes the private `completed.json` once. Repeated verification
+checks an existing receipt for equality. The successor remains authoritative.
+The optional `--audit-broker` runs the existing finite read-only IAM audit as a
+separate step after receipt verification and saves its detailed output privately.
+Broker coverage, federation activation and deployment retain their own gates.
+
 ## Fixed failure codes
 
 | Code | Meaning |
