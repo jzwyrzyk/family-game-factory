@@ -897,10 +897,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T05:28:44.076Z",
-      "sourceDigest": "e91783b6abf2d59e1fc0f77b7a9d277e1a7143fc10223a2f251599b2adf80614",
+      "reviewedAt": "2026-11-27T19:48:27.570Z",
+      "sourceDigest": "33455ca47335184e0ff58ece067c45bad1c22027f6dcbd72dd29677e82e213e3",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded first-attempt hosted contrast failure, synchronous DOM measurement, initial runner evidence and source-bound startup byte counts in the execution guide.",
+      "reviewReason": "Checked the #228 diagnostics overlap and retained the exact held command-policy and hosted evidence gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T18:52:39.476Z",
-      "sourceDigest": "3051c274c160a176962543ee99f34920a494fb2ea314291efb9ac8f3b995e386",
+      "reviewedAt": "2026-11-27T19:48:27.043Z",
+      "sourceDigest": "bc6a72d8b12923b16c7b06195eefe09bbda19b226725b9f47b96b2c6ca019a85",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the exact diagnostic integration and outstanding live broker identity and coverage gates.",
+      "reviewReason": "Bound the three overlapping diagnostics files to the exact accepted protected blobs and retained both delivery histories in the held source resolution.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

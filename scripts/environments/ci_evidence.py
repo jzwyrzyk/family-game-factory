@@ -2,7 +2,8 @@
 
 Receipt contents are data. No candidate code, imports, shell or artifact payload
 executes here. A prospective merge can validate a PR-head preview only when the
-current GitHub merge commit has the exact head tree. Otherwise rebase and rerun.
+current GitHub merge commit has the exact head tree, or an installed protected
+policy proves the merge and exact head independently.
 The disconnected site bundle retains its separate derivation and smoke gates.
 """
 import base64
@@ -178,49 +179,52 @@ def read_receipt(api, run, source, tested_sha, now):
     return receipt, artifact
 
 
-def verify_full_ci(api, source, kind, pr_number=None, now=None):
-    """Return authenticated full fixture coverage; never production acceptance.
+def policy_digest(values):
+    encoded = json.dumps(values, sort_keys=True, separators=(',', ':')).encode()
+    return hashlib.sha256(encoded).hexdigest()
 
-    No legacy success-only fallback: installation without the reviewed receipt
-    producer/manifest requests a fresh integrated full run instead of guessing.
-    """
-    now = datetime.now(timezone.utc).timestamp() if now is None else now
-    source = sha(source)
-    branch = api.request(f'{PREFIX}/branches/main')
-    main = sha(branch.get('commit', {}).get('sha'))
-    require(branch.get('protected') is True, 'CI_MAIN_NOT_PROTECTED')
-    require(api.request(f'{PREFIX}/git/ref/heads/main').get('object', {}).get('sha') == main, 'CI_MAIN_MOVED')
-    current_pr = None
-    if kind == 'dev':
-        require(positive(pr_number), 'INVALID_CI_PR')
-        current_pr = api.request(f'{PREFIX}/pulls/{pr_number}')
-        require(current_pr.get('number') == pr_number and current_pr.get('state') == 'open'
-                and current_pr.get('head', {}).get('sha') == source and same_repo(current_pr['head'].get('repo'))
-                and current_pr.get('base', {}).get('ref') == 'main' and current_pr['base'].get('sha') == main
-                and same_repo(current_pr['base'].get('repo')), 'CI_PR_SOURCE_CHANGED')
-        tested = sha(current_pr.get('merge_commit_sha'))
-    else:
-        require(kind == 'test' and pr_number is None and source == main, 'CI_TEST_NOT_CURRENT_MAIN')
-        tested = source
-    tested_commit, source_commit = commit(api, tested), commit(api, source)
-    require(tested_commit['tree']['sha'] == source_commit['tree']['sha'], 'CI_MERGE_TREE_DIFFERS_REBASE_REQUIRED')
-    if current_pr:
-        require([p.get('sha') for p in tested_commit.get('parents', [])] == [main, source], 'CI_MERGE_PARENTS_MISMATCH')
-    trusted_tree, candidate_tree = tree(api, commit(api, main)), tree(api, tested_commit)
-    suites, manifest_digest = required_suites(api, trusted_tree, candidate_tree)
-    allowed = ('pull_request',) if kind == 'dev' else ('push', 'workflow_dispatch')
-    runs = api.pages(f'{PREFIX}/actions/workflows/test.yml/runs?head_sha={source}', 'workflow_runs')
-    eligible = [r for r in runs if r.get('event') in allowed]
+
+def reviewed_dev_policy(api, trusted_tree, candidate_tree, pr, source_commit):
+    """An exact release profile installed on protected main can qualify the held PR."""
+    path = 'scripts/environments/reviewed-dev-policy.json'
+    if path not in trusted_tree:
+        return None
+    profile, _ = policy_json(api, trusted_tree, path)
+    if (profile.get('pr'), profile.get('source')) != (pr['number'], source_commit['sha']):
+        return None
+    require(profile.get('schemaVersion') == 1 and profile.get('repository') == REPOSITORY
+            and profile.get('tree') == source_commit['tree']['sha'], 'CI_REVIEW_PROFILE_MISMATCH')
+    installed = {p: row for p, row in trusted_tree.items() if policy_path(p)}
+    reviewed = {p: row for p, row in candidate_tree.items() if policy_path(p)}
+    require(policy_digest(installed) == profile.get('installedPolicySha256')
+            and policy_digest(reviewed) == profile.get('reviewedPolicySha256'), 'CI_REVIEW_PROFILE_POLICY_DRIFT')
+    expected = installed.copy()
+    for name, entry in profile['reviewedBlobs'].items():
+        require(name in installed and len(entry) == 3 and entry[:2] == ['100644', 'blob'], 'CI_REVIEW_PROFILE_MISMATCH')
+        expected[name] = ('100644', 'blob', sha(entry[2]))
+    require(expected == reviewed, 'CI_REVIEW_PROFILE_POLICY_DRIFT')
+    return expected, profile['reviewedCommandsSha256']
+
+
+def latest_run(api, source, allowed):
+    rows = api.pages(f'{PREFIX}/actions/workflows/test.yml/runs?head_sha={source}', 'workflow_runs')
+    eligible = [r for r in rows if r.get('event') in allowed]
     require(eligible and all(positive(r.get('id')) for r in eligible), 'CI_FULL_RUN_MISSING')
-    run = max(eligible, key=lambda r: (r['id'], r.get('run_attempt', 0)))
+    return max(eligible, key=lambda r: (r['id'], r.get('run_attempt', 0)))
+
+
+def verify_run(api, run, source, tested_commit, current_pr, suites, manifest_digest, now):
+    tested = tested_commit['sha']
     require(run.get('head_sha') == source and run.get('path') == WORKFLOW and same_repo(run.get('repository'))
             and same_repo(run.get('head_repository')) and run.get('run_attempt') == 1
             and run.get('status') == 'completed' and run.get('conclusion') == 'success', 'CI_FULL_RUN_NOT_SUCCESSFUL')
-    if kind == 'test':
+    if current_pr is None:
         require(run.get('head_branch') == 'main', 'CI_FULL_RUN_NOT_MAIN')
+    elif run['event'] == 'workflow_dispatch':
+        require(run.get('head_branch') == current_pr['head'].get('ref'), 'CI_RUN_PR_MISMATCH')
     else:
-        matches = [p for p in run.get('pull_requests', []) if p.get('number') == pr_number
-                   and p.get('head', {}).get('sha') == source and p.get('base', {}).get('sha') == main]
+        matches = [p for p in run.get('pull_requests', []) if p.get('number') == current_pr['number']
+                   and p.get('head', {}).get('sha') == source and p.get('base', {}).get('sha') == current_pr['base']['sha']]
         require(len(matches) == 1 and run.get('head_branch') == current_pr['head'].get('ref'), 'CI_RUN_PR_MISMATCH')
     started, completed = timestamp(run.get('run_started_at')), timestamp(run.get('updated_at'))
     require(started <= completed <= now and now - started <= MAX_AGE_SECONDS, 'CI_RUN_EXPIRED')
@@ -250,16 +254,165 @@ def verify_full_ci(api, source, kind, pr_number=None, now=None):
         require(row.get('status') == 'success' and row.get('sourceSha') == tested and row.get('buildSha256') == receipt['buildSha256']
                 and isinstance(row.get('commands'), list) and all(isinstance(c, dict) for c in row['commands']) and [c.get('command') for c in row['commands']] == suites[row['id']]
                 and all(type(c.get('exitCode')) is int and c['exitCode'] == 0 for c in row['commands']), 'CI_RECEIPT_COMMAND_FAILURE')
-    newest = [r for r in api.pages(f'{PREFIX}/actions/workflows/test.yml/runs?head_sha={source}', 'workflow_runs') if r.get('event') in allowed]
-    require(newest and all(positive(r.get('id')) for r in newest)
-            and max(newest, key=lambda r: (r['id'], r.get('run_attempt', 0))) == run, 'CI_RUN_CHANGED_DURING_VERIFICATION')
-    require(api.request(f'{PREFIX}/git/ref/heads/main').get('object', {}).get('sha') == main, 'CI_MAIN_MOVED')
-    if current_pr:
-        latest = api.request(f'{PREFIX}/pulls/{pr_number}')
-        require(latest.get('state') == 'open' and latest.get('head', {}).get('sha') == source
-                and latest.get('base', {}).get('sha') == main and latest.get('merge_commit_sha') == tested, 'CI_PR_SOURCE_CHANGED')
     return {'scope': 'ci-fixtures-full-regression', 'sourceHeadSha': source, 'testedSha': tested,
             'sourceTree': tested_commit['tree']['sha'], 'runId': run['id'], 'runAttempt': 1,
             'receiptArtifactId': artifact['id'], 'receiptArchiveSha256': artifact['digest'],
             'buildSha256': receipt['buildSha256'], 'manifestSha256': manifest_digest,
             'derivedBundleValidated': False, 'productionAuthorized': False}
+
+
+def registry_policy(document):
+    # Both sources must agree on every governance field. Only the new review
+    # dates, explanations and recalculated source digests of the two affected
+    # areas are outside this comparison. The required documentation job verifies
+    # those digests against the resolved checkout.
+    for area in document['areas']:
+        if area['id'] in ('delivery', 'validation'):
+            for field in ('reviewedAt', 'sourceDigest', 'reviewOutcome', 'reviewReason'):
+                del area[field]
+    return document
+
+
+def verify_resolution_tree(api, profile, old, trusted_tree, source_tree, resolved):
+    for key in set(old) | set(trusted_tree) | set(source_tree) | set(resolved):
+        before, installed, application, actual = [t.get(key) for t in (old, trusted_tree, source_tree, resolved)]
+        if all(row is None or row[1] == 'tree' for row in (before, installed, application, actual)):
+            continue
+        if application == before or application == installed:
+            require(actual == installed, 'CI_RESOLUTION_TREE_MISMATCH')
+        elif installed == before:
+            require(actual == application, 'CI_RESOLUTION_TREE_MISMATCH')
+        elif key == 'docs/context/registry.json':
+            require(registry_policy(policy_json(api, resolved, key)[0])
+                    == registry_policy(policy_json(api, source_tree, key)[0]), 'CI_RESOLUTION_REGISTRY_CHANGED')
+        elif key == 'ops/environments.json':
+            # Only an already-installed, privately bound operational config can
+            # replace the held disabled template. The trusted deployer repeats
+            # this validation and verifies the protected secret before use.
+            import cloud
+            require(actual == installed and actual is not None, 'CI_RESOLUTION_CONFIG_CHANGED')
+            public_config, _ = policy_json(api, trusted_tree, key)
+            require(public_config.get('enabled') is True and public_config.get('ownerIapMembers') == []
+                    and isinstance(public_config.get('ownerIapBindingSha256'), str)
+                    and re.fullmatch(r'[a-f0-9]{64}', public_config['ownerIapBindingSha256']),
+                    'CI_RESOLUTION_PRIVATE_BINDING_REQUIRED')
+            cloud.validate_config(public_config, public_record=True)
+        else:
+            selected = profile['resolvedBlobs'].get(key, {})
+            require(installed is not None and installed[:2] == ('100644', 'blob')
+                    and installed[2] in selected.get('installed', [])
+                    and actual == ('100644', 'blob', selected.get('resolved')), 'CI_RESOLUTION_TREE_MISMATCH')
+
+
+def resolve_conflicted_pr(api, current_pr, main, trusted_tree, source_commit, source_tree, now):
+    path = 'scripts/environments/reviewed-dev-policy.json'
+    require(path in trusted_tree and current_pr.get('mergeable') is False
+            and current_pr.get('mergeable_state') == 'dirty', 'CI_PR_MERGE_UNAVAILABLE')
+    profile, _ = policy_json(api, trusted_tree, path)
+    expected = reviewed_dev_policy(api, trusted_tree, source_tree, current_pr, source_commit)
+    require(expected is not None, 'CI_REVIEW_PROFILE_MISMATCH')
+    source = source_commit['sha']
+    branch = profile['resolutionBranch']
+    require(re.fullmatch(r'ops/[a-z0-9-]+', branch), 'CI_REVIEW_PROFILE_MISMATCH')
+    endpoint = f'{PREFIX}/pulls?state=open&base=main&head=jzwyrzyk:{branch}'
+    rows = api.pages(endpoint)
+    require(len(rows) == 1 and positive(rows[0].get('number')), 'CI_RESOLUTION_PR_MISSING')
+    number = rows[0]['number']
+    companion = api.request(f'{PREFIX}/pulls/{number}')
+    require(companion.get('number') == number and companion.get('state') == 'open'
+            and same_repo(companion['head'].get('repo')) and same_repo(companion['base'].get('repo'))
+            and companion['head']['ref'] == branch and companion['base']['ref'] == 'main'
+            and companion['base']['sha'] == main, 'CI_RESOLUTION_PR_CHANGED')
+    resolution = commit(api, companion['head']['sha'])
+    require([p['sha'] for p in resolution['parents']] == [source, main], 'CI_RESOLUTION_PARENTS_MISMATCH')
+    merged = commit(api, companion['merge_commit_sha'])
+    require([p['sha'] for p in merged['parents']] == [main, resolution['sha']]
+            and merged['tree'] == resolution['tree'], 'CI_RESOLUTION_MERGE_CHANGED')
+    # A new file, omission, mode change or third set of runtime bytes is fatal.
+    # The protected baseline is the merge base used to review the policy patch.
+    old = tree(api, commit(api, profile['baseline']))
+    resolved = tree(api, resolution)
+    verify_resolution_tree(api, profile, old, trusted_tree, source_tree, resolved)
+    suites, manifest_digest = required_suites(api, expected[0], resolved)
+    require(policy_digest(suites) == expected[1], 'CI_REVIEW_PROFILE_COMMAND_DRIFT')
+    pr_run = latest_run(api, resolution['sha'], ('pull_request',))
+    proof = verify_run(api, pr_run, resolution['sha'], merged, companion, suites, manifest_digest, now)
+    head_run = latest_run(api, source, ('workflow_dispatch',))
+    require(timestamp(head_run.get('run_started_at')) >= timestamp(pr_run.get('run_started_at')),
+            'CI_HEAD_RUN_PREDATES_CURRENT_PR')
+    head_proof = verify_run(api, head_run, source, source_commit, current_pr, suites, manifest_digest, now)
+    require(latest_run(api, source, ('workflow_dispatch',)) == head_run
+            and latest_run(api, resolution['sha'], ('pull_request',)) == pr_run, 'CI_RUN_CHANGED_DURING_VERIFICATION')
+    fresh = api.request(f'{PREFIX}/pulls/{number}')
+    require(fresh['state'] == 'open' and fresh['head']['sha'] == resolution['sha']
+            and fresh['base']['sha'] == main and fresh['merge_commit_sha'] == merged['sha'], 'CI_RESOLUTION_PR_CHANGED')
+    head_proof.update(resolutionHeadSha=resolution['sha'], resolutionPr=number, prospectiveMerge=proof)
+    return head_proof
+
+
+def verify_full_ci(api, source, kind, pr_number=None, now=None):
+    """Return authenticated full fixture coverage; never production acceptance.
+
+    No legacy success-only fallback: installation without the reviewed receipt
+    producer/manifest requests a fresh integrated full run instead of guessing.
+    """
+    now = datetime.now(timezone.utc).timestamp() if now is None else now
+    source = sha(source)
+    branch = api.request(f'{PREFIX}/branches/main')
+    main = sha(branch.get('commit', {}).get('sha'))
+    require(branch.get('protected') is True, 'CI_MAIN_NOT_PROTECTED')
+    require(api.request(f'{PREFIX}/git/ref/heads/main').get('object', {}).get('sha') == main, 'CI_MAIN_MOVED')
+    current_pr = None
+    if kind == 'dev':
+        require(positive(pr_number), 'INVALID_CI_PR')
+        current_pr = api.request(f'{PREFIX}/pulls/{pr_number}')
+        require(current_pr.get('number') == pr_number and current_pr.get('state') == 'open'
+                and current_pr.get('head', {}).get('sha') == source and same_repo(current_pr['head'].get('repo'))
+                and current_pr.get('base', {}).get('ref') == 'main' and current_pr['base'].get('sha') == main
+                and same_repo(current_pr['base'].get('repo')), 'CI_PR_SOURCE_CHANGED')
+        if current_pr.get('mergeable') is False and current_pr.get('mergeable_state') == 'dirty':
+            source_commit = commit(api, source)
+            installed_tree = tree(api, commit(api, main))
+            proof = resolve_conflicted_pr(api, current_pr, main, installed_tree, source_commit, tree(api, source_commit), now)
+            latest = api.request(f'{PREFIX}/pulls/{pr_number}')
+            require(latest.get('state') == 'open' and latest['head']['sha'] == source
+                    and latest['base']['sha'] == main and latest.get('mergeable') is False
+                    and latest.get('mergeable_state') == 'dirty', 'CI_PR_SOURCE_CHANGED')
+            require(api.request(f'{PREFIX}/git/ref/heads/main').get('object', {}).get('sha') == main, 'CI_MAIN_MOVED')
+            return proof
+        tested = sha(current_pr.get('merge_commit_sha'))
+    else:
+        require(kind == 'test' and pr_number is None and source == main, 'CI_TEST_NOT_CURRENT_MAIN')
+        tested = source
+    tested_commit, source_commit = commit(api, tested), commit(api, source)
+    if current_pr:
+        require([p.get('sha') for p in tested_commit.get('parents', [])] == [main, source], 'CI_MERGE_PARENTS_MISMATCH')
+    trusted_tree, candidate_tree = tree(api, commit(api, main)), tree(api, tested_commit)
+    profile = reviewed_dev_policy(api, trusted_tree, candidate_tree, current_pr, source_commit) if current_pr else None
+    different_tree = tested_commit['tree']['sha'] != source_commit['tree']['sha']
+    require(not different_tree or profile is not None, 'CI_MERGE_TREE_DIFFERS_REBASE_REQUIRED')
+    expected = profile[0] if profile is not None else trusted_tree
+    suites, manifest_digest = required_suites(api, expected, candidate_tree)
+    if profile is not None:
+        require(policy_digest(suites) == profile[1], 'CI_REVIEW_PROFILE_COMMAND_DRIFT')
+    allowed = ('pull_request',) if current_pr else ('push', 'workflow_dispatch')
+    run = latest_run(api, source, allowed)
+    proof = verify_run(api, run, source, tested_commit, current_pr, suites, manifest_digest, now)
+    if different_tree:
+        # Each subject proves its own complete build. The PR run binds the current
+        # merge/base, and the manual run binds the exact bytes the site will serve.
+        required_suites(api, expected, tree(api, source_commit))
+        head_run = latest_run(api, source, ('workflow_dispatch',))
+        require(timestamp(head_run.get('run_started_at')) >= timestamp(run.get('run_started_at')),
+                'CI_HEAD_RUN_PREDATES_CURRENT_PR')
+        head_proof = verify_run(api, head_run, source, source_commit, current_pr, suites, manifest_digest, now)
+        require(latest_run(api, source, ('workflow_dispatch',)) == head_run, 'CI_RUN_CHANGED_DURING_VERIFICATION')
+        head_proof['prospectiveMerge'] = proof
+        proof = head_proof
+    require(latest_run(api, source, allowed) == run, 'CI_RUN_CHANGED_DURING_VERIFICATION')
+    require(api.request(f'{PREFIX}/git/ref/heads/main').get('object', {}).get('sha') == main, 'CI_MAIN_MOVED')
+    if current_pr:
+        latest = api.request(f'{PREFIX}/pulls/{pr_number}')
+        require(latest.get('state') == 'open' and latest.get('head', {}).get('sha') == source
+                and latest.get('base', {}).get('sha') == main and latest.get('merge_commit_sha') == tested, 'CI_PR_SOURCE_CHANGED')
+    return proof
