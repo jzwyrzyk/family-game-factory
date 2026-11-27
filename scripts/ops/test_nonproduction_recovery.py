@@ -40,8 +40,20 @@ def fixture():
                 'project': {'constant_value': recovery.PROJECT},
                 'billing_project': {'constant_value': recovery.PROJECT},
                 'user_project_override': {'constant_value': True}}}},
-                'root_module': {'resources': [{'address': recovery.BUDGET, 'provider_config_key': 'google.nonproduction_budget'}]}}}
+                'root_module': {'resources': [{'address': recovery.BUDGET, 'provider_config_key': 'google.nonproduction_budget',
+                    'expressions': {'budget_filter': [{'calendar_period': {'constant_value': 'MONTH'},
+                        'credit_types_treatment': {'constant_value': 'INCLUDE_ALL_CREDITS'},
+                        'projects': {'references': ['data.google_project.nonproduction.number', 'data.google_project.nonproduction']}}]}}]}}}
     return plan, recorded, variables
+
+
+def iap_state():
+    email = 'service-1092405124984@gcp-sa-iap.iam.gserviceaccount.com'
+    attributes = {'id': 'projects/jems-jzw-nonprod/services/iap.googleapis.com', 'project': 'jems-jzw-nonprod',
+                  'service': 'iap.googleapis.com', 'email': email, 'member': 'serviceAccount:' + email}
+    return {'resources': [{'mode': 'managed', 'type': 'google_project_service_identity', 'name': 'iap',
+                           'provider': 'provider["registry.terraform.io/hashicorp/google-beta"]',
+                           'instances': [{'attributes': attributes}]}]}
 
 
 class RecoveryTests(unittest.TestCase):
@@ -75,6 +87,107 @@ class RecoveryTests(unittest.TestCase):
         plan['resource_changes'].append({'address': 'data.google_project.nonproduction', 'mode': 'data', 'change': {'actions': ['read']}})
         with self.assertRaisesRegex(recovery.Stop, 'DEFERRED_DATA'): self.guard(plan)
 
+    def refresh_case(self):
+        plan, recorded, variables = fixture()
+        rows = {row['address']: row for row in plan['resource_changes']}
+        registry = rows[recovery.REGISTRY]
+        registry['change']['after'].update(project=recovery.PROJECT, location='us-east5',
+            repository_id='jems-environments', labels={}, effective_labels={'goog-terraform-provisioned': 'true'})
+        binding = {'address': recovery.RUNTIME_ACT_AS, 'mode': 'managed', 'type': 'google_service_account_iam_member',
+                   'change': {'actions': ['no-op'], 'after': {'etag': 'current', 'role': recovery.ACT_AS_ROLE,
+                              'member': recovery.DEPLOY_MEMBER, 'service_account_id': recovery.RUNTIME_ACCOUNT,
+                              'condition': []}}}
+        plan['resource_changes'].append(binding)
+        recorded.add(binding['address'])
+        plan['resource_drift'] = []
+        for row, field, old in ((registry, 'labels', None), (binding, 'etag', 'previous')):
+            row['change']['before'] = copy.deepcopy(row['change']['after'])
+            drift = copy.deepcopy(row)
+            drift['change']['actions'] = ['update']
+            drift['change']['before'][field] = old
+            plan['resource_drift'].append(drift)
+        policy = {'etag': 'current', 'version': 1, 'bindings': [
+            {'role': role, 'members': [recovery.DEPLOY_MEMBER]} for role in (recovery.INSPECT_ROLE, recovery.ACT_AS_ROLE)]}
+        api = Mock()
+        api.call.return_value = policy
+        return plan, recorded, variables, {}, api
+
+    def test_two_refresh_fields_require_no_ops_and_matching_direct_runtime_policy(self):
+        args = self.refresh_case()
+        self.assertEqual([r['actions'] for r in recovery.guard_plan(*args)], [['create'], ['create']])
+        args[-1].call.assert_called_once_with('iam', 'POST',
+            'v1/projects/jems-jzw-nonprod/serviceAccounts/jems-static-runtime@jems-jzw-nonprod.iam.gserviceaccount.com'
+            ':getIamPolicy?options.requestedPolicyVersion=3')
+
+    def test_policy_is_rechecked_before_creating_the_apply_marker(self):
+        plan, recorded, variables, _, api = self.refresh_case()
+        with tempfile.TemporaryDirectory() as temp:
+            original, folder, _, _, _, observed, receipt = self.transaction(temp)
+            receipt['plan_identity'] = recovery.plan_identity(plan)
+            (folder / 'reviewed-recovery.json').write_text(json.dumps(receipt))
+            api.call.return_value['etag'] = 'changed-since-review'
+            with patch.object(recovery, 'source_identity', return_value=receipt['source_files']), \
+                 patch.object(recovery, 'original_evidence', return_value=({}, variables, iap_state(), recorded)), \
+                 patch.object(recovery, 'command', return_value=b'{"terraform_version":"1.13.5"}'), \
+                 patch.object(recovery, 'reconcile', return_value=observed), \
+                 patch.object(recovery, 'tf', return_value=json.dumps(plan).encode()) as terraform:
+                with self.assertRaisesRegex(recovery.Stop, 'RUNTIME_POLICY_ETAG_MISMATCH'):
+                    recovery.execute(original, folder, 'a'*40, recovery.digest(receipt), api)
+            self.assertFalse((original / 'partial-recovery/apply-started').exists())
+            self.assertFalse(any('apply' in c.args for c in terraform.call_args_list))
+
+    def test_refresh_never_accepts_other_attributes_addresses_unknowns_moves_or_actions(self):
+        mutations = [
+            lambda rows: rows.append(copy.deepcopy(rows[0])),
+            lambda rows: rows[1].update(address='google_service_account_iam_member.runtime_inspect'),
+            lambda rows: rows[0]['change']['before'].pop('labels'),
+            lambda rows: rows[0]['change']['before'].update(effective_labels={}),
+            lambda rows: rows[1]['change']['before'].update(role='roles/owner'),
+            lambda rows: rows[1]['change'].update(after_unknown={'member': True}),
+            lambda rows: rows[1]['change'].update(importing={'id': 'other'}),
+            lambda rows: rows[1]['change'].update(actions=['delete']),
+            lambda rows: rows[0].update(previous_address='google_artifact_registry_repository.other'),
+        ]
+        for mutate in mutations:
+            args = self.refresh_case()
+            mutate(args[0]['resource_drift'])
+            with self.subTest(mutation=mutate), self.assertRaisesRegex(recovery.Stop, 'EXISTING_RESOURCE_DRIFT'):
+                recovery.guard_plan(*args)
+        for key, value in [('actions', ['update']), ('after', {'labels': {}}), ('before', {})]:
+            args = self.refresh_case()
+            args[0]['resource_changes'][3]['change'][key] = value
+            with self.subTest(key=key), self.assertRaises(recovery.Stop): recovery.guard_plan(*args)
+
+    def test_real_labels_and_changed_resource_identities_still_block(self):
+        for index, field, wrong in [(0, 'labels', {'new': 'true'}), (0, 'project', 'other'),
+                                    (0, 'repository_id', 'other'), (1, 'etag', 'previous'),
+                                    (1, 'role', 'roles/owner'), (1, 'member', 'allUsers'),
+                                    (1, 'service_account_id', 'other'), (1, 'condition', [{'title': 'conditional'}])]:
+            args = self.refresh_case()
+            row = args[0]['resource_drift'][index]
+            planned = next(r for r in args[0]['resource_changes'] if r['address'] == row['address'])
+            for attrs in (planned['change']['before'], planned['change']['after'], row['change']['after']):
+                attrs[field] = wrong
+            if field not in ('labels', 'etag'):
+                row['change']['before'][field] = wrong
+            with self.subTest(field=field), self.assertRaisesRegex(recovery.Stop, 'REFRESH_MISMATCH'):
+                recovery.guard_plan(*args)
+
+    def test_changed_runtime_policy_missing_grants_conditions_and_denial_block(self):
+        for mutate in [lambda policy: policy.update(etag='other'),
+                       lambda policy: policy['bindings'].pop(),
+                       lambda policy: policy['bindings'].append({'role': 'roles/owner', 'members': ['allUsers']}),
+                       lambda policy: policy['bindings'][0]['members'].append('allUsers'),
+                       lambda policy: policy['bindings'][1].update(condition={'expression': 'true'}),
+                       lambda policy: policy.update(version=2)]:
+            args = self.refresh_case()
+            mutate(args[-1].call.return_value)
+            with self.assertRaisesRegex(recovery.Stop, 'RUNTIME_POLICY_'): recovery.guard_plan(*args)
+        args = self.refresh_case()
+        args[-1].call.side_effect = recovery.Stop('READ_PERMISSION_DENIED')
+        with self.assertRaisesRegex(recovery.Stop, 'READ_PERMISSION_DENIED'): recovery.guard_plan(*args)
+        with self.assertRaisesRegex(recovery.Stop, 'EVIDENCE_REQUIRED'): recovery.guard_plan(*args[:-1])
+
     def test_import_only_exact_id_and_no_modification(self):
         plan, _, _ = fixture(); entry = plan['resource_changes'][0]
         entry['change']['actions'] = ['no-op']; entry['change']['importing'] = {'id': recovery.PROVIDER_NAME}
@@ -98,6 +211,57 @@ class RecoveryTests(unittest.TestCase):
             plan, _, _ = fixture(); plan['resource_changes'][index]['change']['after'][key] = value
             with self.subTest(key=key), self.assertRaises(recovery.Stop): self.guard(plan)
 
+    def test_locked_provider_month_default_keeps_budget_and_alias_checks(self):
+        plan, _, _ = fixture()
+        change = plan['resource_changes'][1]['change']
+        filt = change['after']['budget_filter'][0]
+        filt.update(calendar_period=None, custom_period=[], credit_types=None, resource_ancestors=None, subaccounts=None)
+        change['after_unknown']['budget_filter'] = [{'labels': True, 'services': True, 'projects': [False], 'custom_period': []}]
+        self.guard(plan)
+        for val in ('YEAR', 'QUARTER', '', 'CALENDAR_PERIOD_UNSPECIFIED'):
+            filt['calendar_period'] = val
+            with self.subTest(val=val), self.assertRaisesRegex(recovery.Stop, 'BUDGET_FILTER_CHANGED'): self.guard(plan)
+        del filt['calendar_period']
+        with self.assertRaisesRegex(recovery.Stop, 'BUDGET_FILTER_CHANGED'): self.guard(plan)
+        filt['calendar_period'] = None
+        for val in (True, [{'calendar_period': True}], [{'custom_period': True}]):
+            change['after_unknown']['budget_filter'] = val
+            with self.assertRaisesRegex(recovery.Stop, 'BUDGET_PERIOD_UNKNOWN'): self.guard(plan)
+        change['after_unknown'] = {}
+        filt['custom_period'] = [{'start_date': [{}]}]
+        with self.assertRaisesRegex(recovery.Stop, 'BUDGET_FILTER_CHANGED'): self.guard(plan)
+
+    def test_month_default_requires_explicit_exact_filter_configuration(self):
+        for key, wrong in [('calendar_period', None), ('calendar_period', {'constant_value': 'YEAR'}),
+                           ('calendar_period', {'references': ['var.period']}), ('custom_period', []),
+                           ('projects', {'references': ['var.other']}), ('services', {'constant_value': ['one']})]:
+            plan, _, _ = fixture()
+            plan['resource_changes'][1]['change']['after']['budget_filter'][0]['calendar_period'] = None
+            config = plan['configuration']['root_module']['resources'][0]['expressions']['budget_filter'][0]
+            if wrong is None:
+                del config[key]
+            else:
+                config[key] = wrong
+            with self.subTest(key=key), self.assertRaisesRegex(recovery.Stop, 'BUDGET_FILTER_CONFIG_CHANGED'):
+                self.guard(plan)
+
+    def test_live_budget_inventory_checks_effective_month_and_scope(self):
+        account = 'billingAccounts/AAAAAA-BBBBBB-CCCCCC'
+        key = ('billingbudgets', 'v1/' + account + '/budgets?pageSize=100')
+        budget = {'name': account + '/budgets/b1', 'displayName': recovery.BUDGET_DISPLAY}
+        for overrides, allowed in [({}, True), ({'calendarPeriod': 'MONTH'}, True),
+                ({'calendarPeriod': 'QUARTER'}, False), ({'customPeriod': {}}, False), ({'projects': []}, False),
+                ({'creditTypesTreatment': 'EXCLUDE_ALL_CREDITS'}, False), ({'services': ['services/one']}, False),
+                ({'labels': {'only': ['one']}}, False)]:
+            budget['budgetFilter'] = {'projects': ['projects/' + recovery.NUMBER], **overrides}
+            api = self.cloud_reader({key: {'budgets': [budget]}})
+            with self.subTest(overrides=overrides):
+                if allowed:
+                    self.assertEqual(recovery.reconcile(api, fixture()[2])['imports'][recovery.BUDGET], budget['name'])
+                else:
+                    with self.assertRaisesRegex(recovery.Stop, 'LIVE_BUDGET_FILTER_CHANGED'):
+                        recovery.reconcile(api, fixture()[2])
+
     def test_quota_project_and_alias_must_be_nonproduction(self):
         for key, value in (('project', 'family-game-factory-jzw'), ('billing_project', 'family-game-factory-jzw'), ('user_project_override', False)):
             plan, _, _ = fixture()
@@ -115,6 +279,48 @@ class RecoveryTests(unittest.TestCase):
             self.assertNotEqual(old, recovery.plan_identity(changed))
         changed = copy.deepcopy(plan); changed['resource_changes'][0]['change']['after_unknown']['id'] = True
         self.assertNotEqual(old, recovery.plan_identity(changed))
+
+    def test_only_the_outer_relevant_attribute_order_is_insignificant(self):
+        a = {'resource': 'a', 'attribute': ['first', 'second']}
+        b = {'resource': 'b', 'attribute': ['other']}
+        plan = {'relevant_attributes': [a, b, a], 'resource_changes': ['a', 'b']}
+        identity = recovery.plan_identity(plan)
+        self.assertEqual(identity, recovery.plan_identity(dict(plan, relevant_attributes=[b, a, a])))
+        for rows in ([a, b], [a, a, a], [a, b, dict(a, attribute=['second', 'first'])], [a, b, dict(a, resource='c')]):
+            self.assertNotEqual(identity, recovery.plan_identity(dict(plan, relevant_attributes=rows)))
+        self.assertNotEqual(identity, recovery.plan_identity(dict(plan, resource_changes=['b', 'a'])))
+        with self.assertRaisesRegex(recovery.Stop, 'RELEVANT_ATTRIBUTES_INVALID'):
+            recovery.plan_identity(dict(plan, relevant_attributes=[{'resource': 'a', 'attribute': 'first'}]))
+        self.assertEqual(plan['relevant_attributes'], [a, b, a])
+
+    def test_prior_attempt_comparison_requires_exact_receipt_binary_and_order_only(self):
+        rows = [{'resource': v, 'attribute': ['field']} for v in ('a', 'b')]
+        old = {'relevant_attributes': rows, 'prior_state': {'private': 'before'}}
+        fresh = dict(old, relevant_attributes=list(reversed(rows)))
+        with tempfile.TemporaryDirectory() as temp:
+            parent = Path(temp)
+            folder = parent / ('attempt-' + 'a'*32)
+            folder.mkdir(mode=0o700)
+            binary = b'reviewed plan'
+            recovery.write_new(folder / 'remaining.tfplan', binary)
+            recovery.write_new(folder / ('recheck-' + 'b'*32 + '.tfplan'), b'recheck')
+            receipt = {'source_sha': 'cb98b1dcc66ae588547d6e4ae31cffb23e48dc83', 'plan_sha256': recovery.sha(binary),
+                       'status': 'REVIEWED_REMAINING_ACTIONS_NOT_APPLIED', 'plan_identity': recovery.digest(old)}
+            recovery.write_new(folder / 'reviewed-recovery.json', receipt)
+            def verify(new, approval=recovery.digest(receipt)):
+                with patch.object(recovery, 'command', side_effect=[json.dumps(old), json.dumps(new)]) as run:
+                    result = recovery.verify_prior_recheck(parent, folder.name, approval)
+                    self.assertEqual([c.args[0][:3] for c in run.call_args_list], [['terraform', 'show', '-json']]*2)
+                    return result
+            self.assertEqual(verify(fresh)['basis'], 'ONLY_RELEVANT_ATTRIBUTES_REORDERED')
+            with self.assertRaisesRegex(recovery.Stop, '^PRIOR_PLAN_DRIFT_PRIOR_STATE$'):
+                verify(dict(fresh, prior_state={'private': 'after'}))
+            with self.assertRaisesRegex(recovery.Stop, 'PRIOR_DRIFT_NOT_REPRODUCED'): verify(old)
+            with self.assertRaisesRegex(recovery.Stop, 'PRIOR_RECEIPT_MISMATCH'): verify(fresh, '0'*64)
+            (folder / 'remaining.tfplan').write_bytes(b'changed')
+            with self.assertRaisesRegex(recovery.Stop, 'RECOVERY_PLAN_CHANGED'): verify(fresh)
+            recovery.write_new(folder / 'apply-started', b'marker')
+            with self.assertRaisesRegex(recovery.Stop, 'RECOVERY_ALREADY_STARTED'): verify(fresh)
 
     def test_errors_are_fixed_codes_numeric_3_does_not_prove_cause(self):
         self.assertEqual(recovery.failure_codes('INVALID_ARGUMENT code 3 private-user@example.com'), ['INVALID_ARGUMENT'])
@@ -198,9 +404,23 @@ class RecoveryTests(unittest.TestCase):
                    'original_files': {}, 'inputs': {name: recovery.sha((folder/name).read_bytes()) for name in
                        ('main.tf', '.terraform.lock.hcl', 'terraform.tfvars.json', 'terraform.tfstate')},
                    'plan_sha256': recovery.sha(b'plan bytes'), 'plan_identity': recovery.plan_identity(plan),
-                   'inventory': observed, 'state_lineage': 'lineage', 'state_serial': 25}
+                   'inventory': observed, 'recorded_iap_identity': recovery.recorded_iap_identity(iap_state()),
+                   'live_iap_acceptance': 'REQUIRED_BEFORE_DEV', 'state_lineage': 'lineage', 'state_serial': 25}
         recovery.write_new(folder / 'reviewed-recovery.json', receipt)
         return original, folder, plan, recorded, variables, observed, receipt
+
+    def test_apply_revalidates_recorded_identity_against_original_before_planning(self):
+        with tempfile.TemporaryDirectory() as temp:
+            original, folder, _, recorded, variables, _, receipt = self.transaction(temp)
+            receipt['recorded_iap_identity']['email'] = 'wrong'
+            (folder / 'reviewed-recovery.json').write_text(json.dumps(receipt))
+            with patch.object(recovery, 'source_identity', return_value=receipt['source_files']), \
+                 patch.object(recovery, 'original_evidence', return_value=({}, variables, iap_state(), recorded)), \
+                 patch.object(recovery, 'tf') as tf:
+                with self.assertRaisesRegex(recovery.Stop, 'IAP_STATE_RECEIPT_MISMATCH'):
+                    recovery.execute(original, folder, 'a'*40, recovery.digest(receipt), None)
+                tf.assert_not_called()
+                self.assertFalse((original / 'partial-recovery/apply-started').exists())
 
     def test_plan_tampering_during_network_recheck_stops_before_marker(self):
         for filename in ('main.tf', 'remaining.tfplan'):
@@ -210,7 +430,7 @@ class RecoveryTests(unittest.TestCase):
                     (folder / filename).write_bytes(b'changed during recheck')
                     return plan, []
                 with patch.object(recovery, 'source_identity', return_value=receipt['source_files']), \
-                     patch.object(recovery, 'original_evidence', return_value=({}, variables, {}, recorded)), \
+                     patch.object(recovery, 'original_evidence', return_value=({}, variables, iap_state(), recorded)), \
                      patch.object(recovery, 'evidence_hashes', return_value={}), \
                      patch.object(recovery, 'command', return_value=b'{"terraform_version":"1.13.5"}'), \
                      patch.object(recovery, 'reconcile', return_value=observed), \
@@ -227,7 +447,7 @@ class RecoveryTests(unittest.TestCase):
                 if args[0] == 'apply': raise recovery.Stop('TERRAFORM_APPLY_TIMEOUT_UNCERTAIN')
                 return b''
             with patch.object(recovery, 'source_identity', return_value=receipt['source_files']), \
-                 patch.object(recovery, 'original_evidence', return_value=({}, variables, {}, recorded)), \
+                 patch.object(recovery, 'original_evidence', return_value=({}, variables, iap_state(), recorded)), \
                  patch.object(recovery, 'evidence_hashes', return_value={}), \
                  patch.object(recovery, 'command', return_value=b'{"terraform_version":"1.13.5"}'), \
                  patch.object(recovery, 'reconcile', return_value=observed), \
@@ -249,10 +469,12 @@ class RecoveryTests(unittest.TestCase):
         }
         base.update(changes or {})
         def call(host, method, path, body=None, **kwargs):
-            if (host, path) in base: return base[(host,path)]
+            if (host, path) in base:
+                value = base[(host, path)]
+                if isinstance(value, Exception): raise value
+                return value
             if path.endswith(':testIamPermissions'): return {'permissions': body['permissions']}
             if host == 'serviceusage': return {'state': 'ENABLED'}
-            if '/serviceAccounts/' in path: return {'email': f'service-{recovery.NUMBER}@gcp-sa-iap.iam.gserviceaccount.com'}
             if path.startswith('v1/' + recovery.POOL_NAME + '/providers?'): return {'workloadIdentityPoolProviders': []}
             if host == 'billingbudgets': return {'budgets': []}
             raise AssertionError((host,method,path))
@@ -268,6 +490,48 @@ class RecoveryTests(unittest.TestCase):
         denied = Mock(); denied.call.side_effect = recovery.Stop('READ_PERMISSION_DENIED')
         with self.assertRaisesRegex(recovery.Stop, 'PERMISSION_DENIED'): recovery.reconcile(denied, variables)
 
+    def test_google_managed_identity_is_verified_from_preserved_record(self):
+        evidence = recovery.recorded_iap_identity(iap_state())
+        self.assertEqual(evidence['address'], 'google_project_service_identity.iap')
+        self.assertEqual(evidence['evidence'], 'original_terraform_state')
+        api = self.cloud_reader()
+        self.assertTrue(recovery.reconcile(api, fixture()[2])['iap_api_enabled'])
+        paths = [c.args[2] for c in api.call.call_args_list]
+        self.assertIn('v1/projects/1092405124984/services/iap.googleapis.com', paths)
+        self.assertFalse(any('serviceAccounts/' in p or 'generateServiceIdentity' in p for p in paths))
+
+    def test_mismatched_or_missing_service_identity_attributes_stop(self):
+        for field in ('id', 'project', 'service', 'email', 'member'):
+            for absent in (True, False):
+                state = iap_state()
+                attrs = state['resources'][0]['instances'][0]['attributes']
+                if absent: del attrs[field]
+                else: attrs[field] = 'wrong'
+                with self.subTest(field=field, absent=absent), self.assertRaisesRegex(recovery.Stop, 'IAP_STATE_IDENTITY_MISMATCH'):
+                    recovery.recorded_iap_identity(state)
+
+    def test_missing_or_substituted_state_evidence_stops_before_remote_reads(self):
+        record = iap_state()['resources'][0]
+        for resources in ([], [record, record], [dict(record, module='module.other')], [dict(record, mode='data')],
+                          [dict(record, provider='different')], [dict(record, instances=[])],
+                          [dict(record, instances=[dict(record['instances'][0], index_key=0)])],
+                          [dict(record, instances=[dict(record['instances'][0], status='tainted')])]):
+            with self.subTest(resources=resources), patch.object(recovery, 'audit') as read:
+                with self.assertRaisesRegex(recovery.Stop, 'IAP_STATE_RECORD'):
+                    recovery.prepare(None, None, None, None, None, {'resources': resources}, None, None)
+                read.assert_not_called()
+
+    def test_disabled_iap_and_permission_denials_remain_blockers(self):
+        iap = ('serviceusage', 'v1/projects/1092405124984/services/iap.googleapis.com')
+        budgets = ('billingbudgets', 'v1/billingAccounts/AAAAAA-BBBBBB-CCCCCC/budgets?pageSize=100')
+        for key, reply, code in ((iap, {'state': 'DISABLED'}, 'REQUIRED_API_DISABLED'),
+                                 (iap, recovery.Stop('READ_PERMISSION_DENIED'), 'READ_PERMISSION_DENIED'),
+                                 (budgets, recovery.Stop('READ_PERMISSION_DENIED'), 'READ_PERMISSION_DENIED'),
+                                 (('cloudbilling', 'v1/billingAccounts/AAAAAA-BBBBBB-CCCCCC:testIamPermissions'),
+                                  {'permissions': ['billing.budgets.list']}, 'REQUIRED_PERMISSION_MISSING')):
+            with self.subTest(key=key), self.assertRaisesRegex(recovery.Stop, code):
+                recovery.reconcile(self.cloud_reader({key: reply}), fixture()[2])
+
     def test_existing_obsolete_binding_or_enabled_pool_stops_without_deletion(self):
         for changes, code in [
             ({('cloudresourcemanager', 'v1/projects/' + recovery.PROJECT + ':getIamPolicy'): {'bindings': [{'role':'roles/iap.serviceAgent'}]}}, 'OBSOLETE_IAP_BINDING_EXISTS'),
@@ -280,6 +544,32 @@ class RecoveryTests(unittest.TestCase):
         self.assertIn('pageToken=next', api.call.call_args.args[2])
         api = Mock(); api.call.return_value = {'nextPageToken':'loop'}
         with self.assertRaisesRegex(recovery.Stop, 'PAGINATION_LOOP'): recovery.page_list(api, 'iam', 'path', 'providers')
+
+    def test_missing_provider_log_requires_exact_create_values_in_both_saved_plans(self):
+        diagnosis = {'name_error_confirmed': False, 'failures': [{'resource': 'project_iam'}]}
+        after = {'workload_identity_pool_provider_id': 'github-main', 'disabled': True,
+                 'display_name': 'Protected main environment controller'}
+        row = {'address': recovery.PROVIDER, 'type': 'google_iam_workload_identity_pool_provider', 'after': after}
+        evidence = recovery.provider_name_evidence(diagnosis, [row], [row])
+        self.assertEqual((evidence['length'], evidence['maximum'], evidence['provider_error_observed']), (37, 32, False))
+        for bad in ([], [row, row], [dict(row, address='other')], [dict(row, type='other')],
+                    [dict(row, after=dict(after, disabled=False))], [dict(row, after=dict(after, display_name='valid'))],
+                    [dict(row, after=dict(after, workload_identity_pool_provider_id='another'))]):
+            for pair in ((bad, [row]), ([row], bad)):
+                with self.subTest(pair=pair), self.assertRaisesRegex(recovery.Stop, 'PROVIDER_PLAN_EVIDENCE_MISMATCH'):
+                    recovery.provider_name_evidence(diagnosis, *pair)
+        diagnosis['failures'].append({'resource': recovery.PROVIDER})
+        with self.assertRaisesRegex(recovery.Stop, 'UNRESOLVED_PROVIDER_AUDIT_ERROR'):
+            recovery.provider_name_evidence(diagnosis, [row], [row])
+
+    def test_unconfirmed_iap_role_stops_before_plan_regardless_of_name_evidence(self):
+        with tempfile.TemporaryDirectory() as temp:
+            with patch.object(recovery, 'command', return_value=b'{"terraform_version":"1.13.5"}'), \
+                 patch.object(recovery, 'audit', return_value={'name_error_confirmed': True, 'iap_role_error_confirmed': False}), \
+                 patch.object(recovery, 'reconcile', return_value={}), patch.object(recovery, 'tf') as tf:
+                with self.assertRaisesRegex(recovery.Stop, 'IAP_ROLE_AUDIT_UNCONFIRMED'):
+                    recovery.prepare(Path(temp), Path(temp), None, {}, {}, iap_state(), set(), None)
+                tf.assert_not_called()
 
     def test_actual_audit_messages_are_correlated_and_only_fixed_fields_shared(self):
         with tempfile.TemporaryDirectory() as temp:

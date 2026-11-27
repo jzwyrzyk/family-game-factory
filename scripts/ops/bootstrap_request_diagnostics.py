@@ -46,7 +46,8 @@ FILES = ['ops/request-broker/main.py', 'ops/request-broker/requirements.txt',
          'ops/request-evidence.schema.json', 'scripts/ops/bootstrap_request_diagnostics.py',
          'scripts/ops/admin_api.py', 'scripts/ops/bootstrap_diagnostics.py',
          'scripts/ops/build_request_broker.py', 'scripts/deployment/build.py',
-         'ops/request-broker/Dockerfile', 'ops/request-broker/requirements.lock']
+         'ops/request-broker/Dockerfile', 'ops/request-broker/requirements.lock',
+         'scripts/ops/native_broker_probe.py', 'scripts/ops/request_evidence.py']
 SPEC = importlib.util.spec_from_file_location('diagnostic_broker', ROOT / FILES[0])
 broker = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(broker)

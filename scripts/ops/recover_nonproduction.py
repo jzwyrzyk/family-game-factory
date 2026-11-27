@@ -30,11 +30,19 @@ ORIGINAL_APPROVAL = '821d722ee140ffdef4c8ae4ba4e1fed89307e6c997153b3a8597f726a8c
 PROVIDER = 'google_iam_workload_identity_pool_provider.github'
 BUDGET = 'google_billing_budget.nonproduction'
 OBSOLETE = 'google_project_iam_member.iap_agent'
+IAP_IDENTITY = 'google_project_service_identity.iap'
 REMAINING = {PROVIDER, BUDGET}
 POOL_NAME = f'projects/{NUMBER}/locations/global/workloadIdentityPools/jems-nonproduction'
 PROVIDER_NAME = POOL_NAME + '/providers/github-main'
 DISPLAY = 'Jems protected main controller'
 BUDGET_DISPLAY = 'Jems nonproduction monthly USD 15'
+REGISTRY = 'google_artifact_registry_repository.static'
+RUNTIME_ACT_AS = 'google_service_account_iam_member.runtime_act_as'
+REFRESH_FIELDS = {REGISTRY: 'labels', RUNTIME_ACT_AS: 'etag'}
+RUNTIME_ACCOUNT = f'projects/{PROJECT}/serviceAccounts/jems-static-runtime@{PROJECT}.iam.gserviceaccount.com'
+DEPLOY_MEMBER = f'serviceAccount:jems-nonprod-deploy@{PROJECT}.iam.gserviceaccount.com'
+ACT_AS_ROLE = 'roles/iam.serviceAccountUser'
+INSPECT_ROLE = f'projects/{PROJECT}/roles/jemsStaticRuntimeInspector'
 PARTIAL_PLAN = 'partial-recovery-1795714051.tfplan'
 
 
@@ -167,6 +175,27 @@ def state_addresses(state):
     return addresses
 
 
+def recorded_iap_identity(state):
+    """Read the singleton Google Beta service identity from preserved Terraform state."""
+    records = [r for r in state['resources'] if r.get('type') == 'google_project_service_identity'
+               and r.get('name') == 'iap' and not r.get('module') and r.get('mode') == 'managed']
+    need(len(records) == 1, 'IAP_STATE_RECORD_MISSING_OR_AMBIGUOUS')
+    record = records[0]
+    instances = record.get('instances')
+    need(record.get('provider') == 'provider["registry.terraform.io/hashicorp/google-beta"]'
+         and isinstance(instances, list) and len(instances) == 1, 'IAP_STATE_RECORD_INVALID')
+    instance = instances[0]
+    need(isinstance(instance, dict) and 'index_key' not in instance and not instance.get('deposed')
+         and instance.get('status') in (None, 'ready'), 'IAP_STATE_RECORD_INVALID')
+    email = f'service-{NUMBER}@gcp-sa-iap.iam.gserviceaccount.com'
+    attributes = {'id': f'projects/{PROJECT}/services/iap.googleapis.com', 'project': PROJECT,
+                  'service': 'iap.googleapis.com', 'email': email, 'member': 'serviceAccount:' + email}
+    stored = instance.get('attributes')
+    need(isinstance(stored, dict) and all(stored.get(k) == v for k, v in attributes.items()),
+         'IAP_STATE_IDENTITY_MISMATCH')
+    return {'address': IAP_IDENTITY, 'evidence': 'original_terraform_state', **attributes}
+
+
 def original_evidence(folder):
     hashes = evidence_hashes(folder)
     for name in ('binding.json', 'reviewed.json', 'reviewed.tfplan', 'recheck.tfplan',
@@ -271,9 +300,6 @@ def reconcile(api, variables):
         imports[PROVIDER] = PROVIDER_NAME
     policy = api.call('cloudresourcemanager', 'POST', 'v1/projects/' + PROJECT + ':getIamPolicy', {'options': {'requestedPolicyVersion': 3}})
     need(not any(b.get('role') == 'roles/iap.serviceAgent' for b in policy.get('bindings', [])), 'OBSOLETE_IAP_BINDING_EXISTS')
-    agent = f'service-{NUMBER}@gcp-sa-iap.iam.gserviceaccount.com'
-    identity = api.call('iam', 'GET', f'v1/projects/{PROJECT}/serviceAccounts/{agent}')
-    need(identity.get('email') == agent and not identity.get('disabled'), 'IAP_AGENT_UNVERIFIED')
     budgets = page_list(api, 'billingbudgets', 'v1/' + account + '/budgets', 'budgets')
     matches = [b for b in budgets if b.get('displayName') == BUDGET_DISPLAY or
                'projects/' + NUMBER in b.get('budgetFilter', {}).get('projects', [])]
@@ -281,11 +307,18 @@ def reconcile(api, variables):
     if matches:
         name = matches[0].get('name', '')
         need(re.fullmatch(re.escape(account) + r'/budgets/[A-Za-z0-9-]+', name), 'BUDGET_ID_UNVERIFIED')
+        # This same inventory read qualifies an import and the post-apply result.
+        live_filter = matches[0].get('budgetFilter', {})
+        need(live_filter.get('projects') == ['projects/' + NUMBER]
+             and live_filter.get('calendarPeriod', 'MONTH') == 'MONTH' and 'customPeriod' not in live_filter
+             and live_filter.get('creditTypesTreatment', 'INCLUDE_ALL_CREDITS') == 'INCLUDE_ALL_CREDITS'
+             and not any(live_filter.get(k) for k in ('creditTypes', 'labels', 'resourceAncestors', 'services', 'subaccounts')),
+             'LIVE_BUDGET_FILTER_CHANGED')
         imports[BUDGET] = name
     # No API mutation or import here. Terraform import blocks must yield no-op.
     return {'project_number': NUMBER, 'billing_account': variables['billing_account'], 'imports': imports,
             'provider_absent': not providers, 'budget_absent': not matches,
-            'iap_project_binding_absent': True, 'pool_disabled': True, 'permissions_verified': True}
+            'iap_api_enabled': True, 'iap_project_binding_absent': True, 'pool_disabled': True, 'permissions_verified': True}
 
 
 def audit(api, original, destination):
@@ -323,19 +356,85 @@ def audit(api, original, destination):
     need(not token, 'AUDIT_INCOMPLETE')
     write_new(destination / 'provider-errors.private.json', rows)
     public = [{k: v for k, v in row.items() if k != 'message'} | {'message_sha256': sha(row['message'].encode())} for row in rows]
-    return {'failures': public, 'name_error_confirmed': any('WIF_DISPLAY_NAME_LIMIT' in r['codes'] for r in rows),
-            'iap_role_error_confirmed': any('IAP_PROJECT_ROLE_INVALID' in r['codes'] for r in rows),
+    return {'failures': public, 'name_error_confirmed': any(r['resource'] == PROVIDER and r['status_code'] == 3
+            and 'WIF_DISPLAY_NAME_LIMIT' in r['codes'] for r in rows),
+            'iap_role_error_confirmed': any(r['resource'] == 'project_iam' and r['status_code'] == 3
+            and 'IAP_PROJECT_ROLE_INVALID' in r['codes'] for r in rows),
             'budget_error': 'NOT_OBSERVED_CONFIGURATION_REQUIREMENT_CONFIRMED_FROM_PROVIDER_DOCUMENTATION'}
 
 
-def guard_plan(plan, recorded, variables, imports):
+def provider_name_evidence(diagnosis, original_creates, remaining_creates):
+    """Separate a documented input violation from an observed Google rejection."""
+    if diagnosis['name_error_confirmed']:
+        return {'basis': 'CORRELATED_PROVIDER_AUDIT_ERROR'}
+    need(not any(row['resource'] == PROVIDER for row in diagnosis['failures']),
+         'UNRESOLVED_PROVIDER_AUDIT_ERROR')
+    original_name = 'Protected main environment controller'
+    for creates in (original_creates, remaining_creates):
+        matches = [c for c in creates if c['address'] == PROVIDER]
+        need(len(matches) == 1 and matches[0]['type'] == 'google_iam_workload_identity_pool_provider',
+             'PROVIDER_PLAN_EVIDENCE_MISMATCH')
+        after = matches[0]['after']
+        need(isinstance(after, dict) and after.get('workload_identity_pool_provider_id') == 'github-main'
+             and after.get('disabled') is True and after.get('display_name') == original_name
+             and len(original_name) > 32, 'PROVIDER_PLAN_EVIDENCE_MISMATCH')
+    return {'basis': 'BOUND_PLANS_EXCEED_IAM_DISPLAY_NAME_LIMIT', 'original_display_name': original_name,
+            'length': len(original_name), 'maximum': 32, 'provider_error_observed': False}
+
+
+def verify_runtime_policy(api, etag):
+    # Each Terraform member stores the etag of the entire attached IAM policy.
+    policy = api.call('iam', 'POST', f'v1/{RUNTIME_ACCOUNT}:getIamPolicy?options.requestedPolicyVersion=3')
+    need(isinstance(policy, dict) and policy.get('etag') == etag, 'RUNTIME_POLICY_ETAG_MISMATCH')
+    bindings = policy.get('bindings')
+    expected = [{'role': role, 'members': [DEPLOY_MEMBER]} for role in (ACT_AS_ROLE, INSPECT_ROLE)]
+    need(type(policy.get('version', 0)) is int and policy.get('version', 0) in (0, 1, 3) and not policy.get('auditConfigs')
+         and isinstance(bindings, list) and len(bindings) == 2 and all(b in bindings for b in expected),
+         'RUNTIME_POLICY_BINDINGS_CHANGED')
+
+
+def verify_refresh(plan, entries, recorded, api):
+    seen = set()
+    for row in plan.get('resource_drift', []):
+        address = row.get('address')
+        need(address in REFRESH_FIELDS and address in recorded and address not in seen, 'EXISTING_RESOURCE_DRIFT')
+        seen.add(address)
+        planned = entries[address]
+        change = row['change']
+        for item in (row, planned):
+            need(item.get('mode') == 'managed' and item.get('type') == address.split('.')[0]
+                 and not any(key in item for key in ('previous_address', 'deposed', 'index', 'module_address'))
+                 and not any(item['change'].get(k) for k in ('replace_paths', 'importing', 'after_unknown'))
+                 and item['change'].get('before_identity') == item['change'].get('after_identity'),
+                 'EXISTING_RESOURCE_DRIFT')
+        before, after = change.get('before'), change.get('after')
+        field = REFRESH_FIELDS[address]
+        need(change['actions'] == ['update'] and planned['change']['actions'] == ['no-op']
+             and isinstance(before, dict) and isinstance(after, dict) and field in before and field in after
+             and digest({**before, field: after[field]}) == digest(after)
+             and digest(planned['change'].get('before')) == digest(after)
+             and digest(planned['change'].get('after')) == digest(after), 'EXISTING_RESOURCE_DRIFT')
+        if address == REGISTRY:
+            need(before[field] is None and after[field] == {} and after.get('project') == PROJECT
+                 and after.get('location') == 'us-east5' and after.get('repository_id') == 'jems-environments',
+                 'REGISTRY_LABEL_REFRESH_MISMATCH')
+        else:
+            need(all(isinstance(v, str) and v for v in (before[field], after[field]))
+                 and before[field] != after[field] and after.get('service_account_id') == RUNTIME_ACCOUNT
+                 and after.get('role') == ACT_AS_ROLE and after.get('member') == DEPLOY_MEMBER
+                 and not after.get('condition'), 'RUNTIME_MEMBER_REFRESH_MISMATCH')
+            need(api is not None, 'RUNTIME_POLICY_EVIDENCE_REQUIRED')
+            verify_runtime_policy(api, after[field])
+
+
+def guard_plan(plan, recorded, variables, imports, api=None):
     need(plan.get('errored', False) is False and not plan.get('deferred_changes')
          and plan.get('complete', True) is True, 'PLAN_INCOMPLETE')
-    need(not plan.get('resource_drift'), 'EXISTING_RESOURCE_DRIFT')
     need(all(c.get('status') == 'pass' for c in plan.get('checks', [])), 'TERRAFORM_CHECK_FAILED_OR_UNKNOWN')
     entries = {c['address']: c for c in plan.get('resource_changes', []) if c.get('mode') == 'managed'}
     need(len(entries) == len([c for c in plan.get('resource_changes', []) if c.get('mode') == 'managed'])
          and set(entries) == recorded | REMAINING and OBSOLETE not in entries, 'PLAN_ADDRESS_SCOPE_MISMATCH')
+    verify_refresh(plan, entries, recorded, api)
     for address, item in entries.items():
         change = item['change']; actions = change['actions']
         expected = ['no-op'] if address in recorded or address in imports else ['create']
@@ -367,9 +466,23 @@ def guard_plan(plan, recorded, variables, imports):
     budget = entries[BUDGET]['change']['after']
     need(budget.get('billing_account') == variables['billing_account'] and budget.get('display_name') == BUDGET_DISPLAY,
          'BUDGET_ACCOUNT_CHANGED')
+    resources = plan.get('configuration', {}).get('root_module', {}).get('resources', [])
+    configured = [r for r in resources if r.get('address') == BUDGET]
+    need(len(configured) == 1 and configured[0].get('provider_config_key') == 'google.nonproduction_budget',
+         'BUDGET_PROVIDER_ALIAS_UNVERIFIED')
+    expected_filter = {'calendar_period': {'constant_value': 'MONTH'},
+                       'credit_types_treatment': {'constant_value': 'INCLUDE_ALL_CREDITS'},
+                       'projects': {'references': ['data.google_project.nonproduction.number', 'data.google_project.nonproduction']}}
+    need(configured[0].get('expressions', {}).get('budget_filter') == [expected_filter], 'BUDGET_FILTER_CONFIG_CHANGED')
+    # The locked Google provider suppresses an explicit MONTH as its API default.
+    # A known null is distinct from an omitted or apply-time-unknown period.
+    unknown = entries[BUDGET]['change'].get('after_unknown', {}).get('budget_filter', [{}])
+    need(isinstance(unknown, list) and len(unknown) == 1 and isinstance(unknown[0], dict)
+         and unknown[0].get('calendar_period', False) is False
+         and unknown[0].get('custom_period', []) == [], 'BUDGET_PERIOD_UNKNOWN')
     filters = budget.get('budget_filter', [])
     need(len(filters) == 1 and filters[0].get('projects') == ['projects/' + NUMBER]
-         and filters[0].get('calendar_period') == 'MONTH'
+         and 'calendar_period' in filters[0] and filters[0]['calendar_period'] in ('MONTH', None)
          and filters[0].get('credit_types_treatment') == 'INCLUDE_ALL_CREDITS', 'BUDGET_FILTER_CHANGED')
     need(not any(filters[0].get(k) for k in ('credit_types', 'custom_period', 'labels', 'resource_ancestors',
                                            'services', 'subaccounts')), 'BUDGET_FILTER_CHANGED')
@@ -386,9 +499,6 @@ def guard_plan(plan, recorded, variables, imports):
     cfg = configs.get('google.nonproduction_budget', {}).get('expressions', {})
     need({k: cfg.get(k, {}).get('constant_value') for k in ('project', 'billing_project', 'user_project_override')} ==
          {'project': PROJECT, 'billing_project': PROJECT, 'user_project_override': True}, 'BUDGET_QUOTA_PROJECT_UNVERIFIED')
-    resources = plan.get('configuration', {}).get('root_module', {}).get('resources', [])
-    need(any(r.get('address') == BUDGET and r.get('provider_config_key') == 'google.nonproduction_budget' for r in resources),
-         'BUDGET_PROVIDER_ALIAS_UNVERIFIED')
     pool = entries['google_iam_workload_identity_pool.github']['change']['after']
     registry = entries['google_artifact_registry_repository.static']['change']['after']
     need(pool.get('disabled') is True and registry.get('cleanup_policy_dry_run') is True, 'ACTIVATION_FORBIDDEN')
@@ -403,20 +513,66 @@ def tf(folder, *args, ok=(0,)):
     return command(['terraform', *args], folder, 'TERRAFORM_' + args[0].upper(), folder, ok)
 
 
+def comparable_plan(plan):
+    material = {k: v for k, v in plan.items() if k != 'timestamp'}
+    if 'relevant_attributes' in material:
+        # Terraform describes the outer order as insignificant. Keep every row,
+        # its multiplicity and the exact order of each nested attribute path.
+        rows = material['relevant_attributes']
+        need(isinstance(rows, list) and all(isinstance(r, dict) and set(r) == {'resource', 'attribute'}
+             and isinstance(r['resource'], str) and isinstance(r['attribute'], list) for r in rows),
+             'RELEVANT_ATTRIBUTES_INVALID')
+        material['relevant_attributes'] = sorted(rows, key=lambda r: json.dumps(r, sort_keys=True))
+    return material
+
+
 def plan_identity(plan):
-    # Exclude only generation time. Includes all configuration, variables, prior
-    # state, output changes, unknowns, checks and the complete refreshed diff.
-    return digest({k: v for k, v in plan.items() if k != 'timestamp'})
+    return digest(comparable_plan(plan))
 
 
-def make_plan(folder, filename, recorded, variables, imports):
+def verify_prior_recheck(parent, attempt, receipt_hash):
+    # Read the closed pre-apply attempt without refreshing or editing its files.
+    need(re.fullmatch(r'attempt-[a-f0-9]{32}', attempt), 'PRIOR_ATTEMPT_INVALID')
+    folder = private_path(parent / attempt, directory=True)
+    need(not (folder / 'apply-started').exists(), 'RECOVERY_ALREADY_STARTED_INSPECT_SUCCESSOR_STATE')
+    receipt = read_json(private_path(folder / 'reviewed-recovery.json'))
+    need(digest(receipt) == receipt_hash and receipt.get('source_sha') == 'cb98b1dcc66ae588547d6e4ae31cffb23e48dc83'
+         and receipt.get('status') == 'REVIEWED_REMAINING_ACTIONS_NOT_APPLIED', 'PRIOR_RECEIPT_MISMATCH')
+    saved = private_path(folder / 'remaining.tfplan')
+    need(sha(saved.read_bytes()) == receipt['plan_sha256'], 'RECOVERY_PLAN_CHANGED')
+    rechecks = list(folder.glob('recheck-*.tfplan'))
+    need(len(rechecks) == 1 and re.fullmatch(r'recheck-[0-9a-f]{32}\.tfplan', rechecks[0].name),
+         'PRIOR_RECHECK_MISSING_OR_AMBIGUOUS')
+    def show(path):
+        return json.loads(command(['terraform', 'show', '-json', str(path)], folder, 'PRIOR_PLAN_SHOW'))
+    reviewed = show(saved)
+    actual = show(private_path(rechecks[0]))
+    def old_identity(plan):
+        return digest({k: v for k, v in plan.items() if k != 'timestamp'})
+    need(old_identity(reviewed) == receipt['plan_identity'], 'PRIOR_PLAN_IDENTITY_MISMATCH')
+    need(old_identity(actual) != receipt['plan_identity'], 'PRIOR_DRIFT_NOT_REPRODUCED')
+    before, after = comparable_plan(reviewed), comparable_plan(actual)
+    if digest(before) != digest(after):
+        # Report only Terraform's public top-level field names. Keep values private.
+        sections = sorted(k for k in before.keys() | after.keys()
+                          if k not in before or k not in after or digest(before[k]) != digest(after[k]))
+        safe = {'resource_changes', 'resource_drift', 'planned_values', 'prior_state', 'configuration',
+                'variables', 'output_changes', 'checks', 'relevant_attributes', 'deferred_changes',
+                'terraform_version', 'format_version', 'applyable', 'complete', 'errored'}
+        raise Stop('PRIOR_PLAN_DRIFT_' + '_'.join(k.upper() if k in safe else 'OTHER' for k in sections))
+    return {'basis': 'ONLY_RELEVANT_ATTRIBUTES_REORDERED', 'prior_receipt_sha256': receipt_hash,
+            'prior_plan_sha256': receipt['plan_sha256'], 'recheck_sha256': sha(rechecks[0].read_bytes())}
+
+
+def make_plan(folder, filename, recorded, variables, imports, api):
     tf(folder, 'plan', '-input=false', '-lock-timeout=30s', '-parallelism=1', '-out=' + filename)
     result = json.loads(tf(folder, 'show', '-json', filename))
-    actions = guard_plan(result, recorded, variables, imports)
+    actions = guard_plan(result, recorded, variables, imports, api)
     return result, actions
 
 
-def prepare(original, destination, expected, hashes, variables, state, recorded, api):
+def prepare(original, destination, expected, hashes, variables, state, recorded, api, prior_comparison=None):
+    iap_record = recorded_iap_identity(state)
     version = json.loads(command(['terraform', 'version', '-json'], phase='TERRAFORM_VERSION'))
     need(version.get('terraform_version') == '1.13.5', 'TERRAFORM_VERSION_MISMATCH')
     # Review prior actual diagnostics before any execution approval is produced.
@@ -424,7 +580,7 @@ def prepare(original, destination, expected, hashes, variables, state, recorded,
     write_new(destination / 'diagnosis.json', audit_result)
     observed = reconcile(api, variables)
     write_new(destination / 'inventory.json', observed)
-    need(audit_result['name_error_confirmed'] and audit_result['iap_role_error_confirmed'], 'AUDIT_DIAGNOSIS_UNCONFIRMED')
+    need(audit_result['iap_role_error_confirmed'], 'IAP_ROLE_AUDIT_UNCONFIRMED')
     for name in initial.FILES:
         write_new(destination / name, (ROOT / 'infra/nonproduction' / name).read_bytes())
     write_new(destination / 'terraform.tfvars.json', variables)
@@ -438,10 +594,13 @@ def prepare(original, destination, expected, hashes, variables, state, recorded,
     # Confirm the preserved plans themselves agree, not just the user report.
     old = json.loads(tf(destination, 'show', '-json', str(original / 'reviewed.tfplan')))
     recheck = json.loads(tf(destination, 'show', '-json', str(original / 'recheck.tfplan')))
-    need(initial.validate_plan(old) == initial.validate_plan(recheck), 'ORIGINAL_RECHECK_MISMATCH')
+    original_creates = initial.validate_plan(old)
+    need(original_creates == initial.validate_plan(recheck), 'ORIGINAL_RECHECK_MISMATCH')
     prior = json.loads(tf(destination, 'show', '-json', str(original / PARTIAL_PLAN)))
-    need({c['address'] for c in initial.validate_plan(prior)} == REMAINING | {OBSOLETE}, 'PARTIAL_PLAN_SCOPE_MISMATCH')
-    plan, actions = make_plan(destination, 'remaining.tfplan', recorded, variables, observed['imports'])
+    remaining_creates = initial.validate_plan(prior)
+    need({c['address'] for c in remaining_creates} == REMAINING | {OBSOLETE}, 'PARTIAL_PLAN_SCOPE_MISMATCH')
+    name_evidence = provider_name_evidence(audit_result, original_creates, remaining_creates)
+    plan, actions = make_plan(destination, 'remaining.tfplan', recorded, variables, observed['imports'], api)
     need(evidence_hashes(original) == hashes, 'ORIGINAL_EVIDENCE_CHANGED')
     inputs = {n: sha((destination / n).read_bytes()) for n in ('main.tf', '.terraform.lock.hcl', 'terraform.tfvars.json', 'terraform.tfstate')}
     if observed['imports']: inputs['imports.tf.json'] = sha((destination / 'imports.tf.json').read_bytes())
@@ -449,10 +608,15 @@ def prepare(original, destination, expected, hashes, variables, state, recorded,
                'source_files': source_identity(expected), 'original_dir': str(original), 'original_files': hashes,
                'state_lineage': state['lineage'], 'state_serial': state['serial'], 'inputs': inputs,
                'plan_sha256': sha((destination / 'remaining.tfplan').read_bytes()), 'plan_identity': plan_identity(plan),
-               'inventory': observed, 'diagnosis': audit_result, 'actions': actions,
+               'inventory': observed, 'recorded_iap_identity': iap_record, 'live_iap_acceptance': 'REQUIRED_BEFORE_DEV',
+               'verified_refresh_fields': {row['address']: REFRESH_FIELDS[row['address']]
+                                           for row in plan.get('resource_drift', [])},
+               'diagnosis': audit_result, 'provider_name_evidence': name_evidence, 'actions': actions,
                'existing_resources': sorted(recorded), 'destruction': 0, 'replacement': 0,
                'existing_modification': 0, 'federation_enabled': False, 'live_ai': False,
                'retired_uncreated_address': OBSOLETE}
+    if prior_comparison:
+        receipt['prior_recheck'] = prior_comparison
     write_new(destination / 'reviewed-recovery.json', receipt)
     return {'status': receipt['status'], 'receipt': str(destination / 'reviewed-recovery.json'),
             'approve_plan_sha256': digest(receipt), 'actions': actions,
@@ -463,8 +627,10 @@ def execute(original, folder, expected, approval, api):
     receipt = read_json(private_path(folder / 'reviewed-recovery.json'))
     need(re.fullmatch(r'[a-f0-9]{64}', approval or '') and approval == digest(receipt), 'APPROVAL_HASH_MISMATCH')
     need(receipt['source_sha'] == expected and receipt['source_files'] == source_identity(expected), 'SOURCE_CHANGED')
-    hashes, variables, _, recorded = original_evidence(original)
+    hashes, variables, original_state, recorded = original_evidence(original)
     need(str(original) == receipt['original_dir'] and hashes == receipt['original_files'], 'ORIGINAL_EVIDENCE_CHANGED')
+    need(receipt.get('recorded_iap_identity') == recorded_iap_identity(original_state)
+         and receipt.get('live_iap_acceptance') == 'REQUIRED_BEFORE_DEV', 'IAP_STATE_RECEIPT_MISMATCH')
     expected_inputs = {'main.tf', '.terraform.lock.hcl', 'terraform.tfvars.json', 'terraform.tfstate'}
     if receipt['inventory']['imports']: expected_inputs.add('imports.tf.json')
     need(set(receipt['inputs']) == expected_inputs, 'RECOVERY_INPUT_SCOPE_MISMATCH')
@@ -487,7 +653,7 @@ def execute(original, folder, expected, approval, api):
     observed = reconcile(api, variables)
     need(observed == receipt['inventory'], 'CLOUD_INVENTORY_CHANGED')
     recheck_name = 'recheck-' + uuid.uuid4().hex + '.tfplan'
-    plan, _ = make_plan(folder, recheck_name, recorded, variables, observed['imports'])
+    plan, _ = make_plan(folder, recheck_name, recorded, variables, observed['imports'], api)
     need(plan_identity(plan) == receipt['plan_identity'], 'FULL_PLAN_DRIFT')
     need(evidence_hashes(original) == hashes, 'ORIGINAL_EVIDENCE_CHANGED')
     # Network reads/replanning can take minutes. Rebind the bytes at the last
@@ -503,6 +669,7 @@ def execute(original, folder, expected, approval, api):
     post = reconcile(api, variables)
     need(set(post['imports']) == REMAINING and post['pool_disabled'], 'POST_APPLY_INVENTORY_MISMATCH')
     final_state = read_json(private_path(folder / 'terraform.tfstate'))
+    need(recorded_iap_identity(final_state) == receipt['recorded_iap_identity'], 'IAP_SUCCESSOR_STATE_CHANGED')
     need(state_addresses(final_state) == recorded | REMAINING, 'POST_APPLY_STATE_MISMATCH')
     need(final_state['lineage'] == receipt['state_lineage'] and final_state['serial'] >= receipt['state_serial'],
          'POST_APPLY_STATE_LINEAGE_MISMATCH')
@@ -517,6 +684,7 @@ def execute(original, folder, expected, approval, api):
     result = {'status': 'RECOVERED_DISABLED_NOT_ACTIVATED', 'approval': approval,
               'state_instances': 27, 'successor_state': str(folder / 'terraform.tfstate'),
               'original_state_preserved': True, 'federation_enabled': False, 'live_ai': False,
+              'live_iap_acceptance': 'REQUIRED_BEFORE_DEV',
               'post_apply_plan': 'NO_CHANGES'}
     write_new(folder / 'completed.json', result)
     return result
@@ -530,9 +698,11 @@ def main(argv=None):
     modes = p.add_mutually_exclusive_group(required=True)
     modes.add_argument('--plan', action='store_true')
     modes.add_argument('--apply-receipt', type=Path)
+    p.add_argument('--compare-recheck', nargs=2, metavar=('ATTEMPT', 'PRIOR_RECEIPT_SHA256'))
     p.add_argument('--approve-plan-sha256')
     a = p.parse_args(argv)
     try:
+        need(not a.compare_recheck or a.plan, 'RECHECK_COMPARISON_REQUIRES_PLANNING')
         source_identity(a.source_sha)
         original = private_path(a.state_dir, directory=True)
         need(ROOT not in original.parents and original != ROOT, 'STATE_INSIDE_CHECKOUT')
@@ -547,10 +717,15 @@ def main(argv=None):
             need(not (parent / 'apply-started').exists(), 'RECOVERY_ALREADY_STARTED_INSPECT_SUCCESSOR_STATE')
             if a.plan:
                 need(not a.approve_plan_sha256, 'PLAN_CANNOT_CONSUME_APPROVAL')
+                comparison = verify_prior_recheck(parent, *a.compare_recheck) if a.compare_recheck else None
                 destination = parent / ('attempt-' + uuid.uuid4().hex)
                 destination.mkdir(mode=0o700)
                 write_new(destination / 'original-evidence-manifest.json', hashes)
-                result = prepare(original, destination, a.source_sha, hashes, variables, state, recorded, Reader())
+                if comparison:
+                    write_new(destination / 'prior-recheck-comparison.json', comparison)
+                result = prepare(original, destination, a.source_sha, hashes, variables, state, recorded, Reader(), comparison)
+                if comparison:
+                    result['prior_recheck'] = comparison['basis']
             else:
                 receipt_path = private_path(a.apply_receipt)
                 folder = private_path(receipt_path.parent, directory=True)

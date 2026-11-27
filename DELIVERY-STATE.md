@@ -6,6 +6,17 @@ The frozen application candidate is `bc602f1ede502f398308ad56f973c4bf7997ff08`. 
 
 The development-efficiency integration changes validation and session startup. See [the engineering integration and protected push record](https://github.com/jzwyrzyk/family-game-factory/pull/219) for the tested source, measured results and activation. The Learning Workspace consolidation is tracked by [#218](https://github.com/jzwyrzyk/family-game-factory/pull/218). The review-only [Connected Creative Universe consolidation #220](https://github.com/jzwyrzyk/family-game-factory/pull/220) reconciles the overlapping source branches. Resolve current [open PR dependencies](https://github.com/jzwyrzyk/family-game-factory/pulls) before starting another branch.
 
+## November 27 administrator readback
+
+The administrator verified all 27 successor resources and a zero-change plan.
+Federation remains disabled. The subsequent broker IAM audit confirmed all
+three expected grants and 62 expected denials. A subsequent focused run confirmed all eight Gateway and Coach secret denials.
+Four token-creation checks still returned unknown for unsupported principal membership.
+The administrator's credential preflight stopped before issuance. The protected
+controller and private broker need a separately approved update for native
+permission checks. The 73 matching outcomes span two runs. A fresh 77-check pass remains outstanding. Broker coverage and production canary qualification remain
+open. [Exact outstanding IAM checks](docs/operations/NONPRODUCTION_RECOVERY.md#broker-iam-follow-up)
+
 ## Permanent operations — November 26 recovery checkpoint
 
 The owner reports the original and pre-apply Terraform plans matched exactly,
@@ -48,7 +59,7 @@ These are the last recorded observations from the frozen source. Reverify each v
 | Phase | Status | Completed work | Evidence | Blocker | Next action |
 | --- | --- | --- | --- | --- | --- |
 | Recovery preparation | Implemented in part | Protected observe job re-read all three services and the existing rollback revision. Pages release marker selects `aa56b60abe152e750f9f0b5e8949bdb44be53196`. | [Read-only receipt](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45728127526), [storage rollout](docs/storage/ROLLOUT.md) | Private settings, WIF trust, runner group and recovery readback | Capture effective settings and rehearse compatible restoration using synthetic copies. |
-| DEV provisioning | Partial apply reported: 25/28 | Original plan, state and apply marker retained; guarded two-resource recovery implemented. | [Recovery requirements](docs/operations/NONPRODUCTION_RECOVERY.md) | Private state access, actual provider-error correlation and fresh zero-drift plan/hash | Reconcile and review corrected remaining actions; never replay the original apply. |
+| DEV provisioning | Recovery complete, federation disabled | Administrator verified 27 state instances and a zero-change plan. | [Recovery and separate IAM gate](docs/operations/NONPRODUCTION_RECOVERY.md) | Scoped federation approval and service-level IAP acceptance | Preserve the recovered state and qualify activation separately. |
 | TEST provisioning | Externally blocked | Isolated TEST contract and private worker dependencies identified. | [Environment contract](docs/development/DEV-TEST-PROD.md) | Isolated project, backend and worker | Verify IAP and exact-source UAT after provisioning. |
 | Sandbox integration | Repository validated on #190 | Clean hosted packaging matched all 29 public source files and exercised legacy and premium protocols. | [Hosted package](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45732287681), [publication controller](https://github.com/jzwyrzyk/family-game-factory/pull/169) | Frozen pin, signed digest and publication approval | Reconcile the protected publication controller and qualify packaging on the final source. |
 | Worker integration | Repository validated on interim public pin | Combined #20, #21 and #19. Candidate and ephemeral DEV overlay passed 182 tests each. Separate DEV passed 23. Packaging verified 41 commands. Production main and execution tag still select `dddf53dbc76796be19782c1bb5bbb99b86e99909`. | [Private #22](https://github.com/family-game-factory-lab/family-game-factory-worker/pull/22), [hosted proof](https://github.com/family-game-factory-lab/family-game-factory-worker/actions/runs/45732371029) | Final public pin, runner/WIF readback and rotation authority | Requalify the candidate at the frozen source and rehearse coordinated recovery. |

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Reviewed implementation: ea971983131c6ee3142918bbdf0f8d17a565a7e5 (draft PR222).
+# Reviewed implementation: 14188d773e7792d3ece5bcf46cc775d99537f8d8 (scoped correction on PR222).
 # This file's SHA-256 is an integrity checksum, NOT a Terraform approval.
 # Approval hash: unavailable until the private-state/cloud planning checks pass.
 #
@@ -9,13 +9,16 @@
 #   user_project_override=true; preserve existing USD15/month scope/thresholds.
 # - Retire the uncreated project IAP binding; keep the existing controller's
 #   per-service roles/run.invoker grant. No project-wide replacement role.
+# - Verify the recorded Google-managed IAP identity and live API enablement.
+#   DEV still requires its service-level access and authenticated invocation gates.
 # Expected: 2 creates, 25 no-ops, no update/replace/destroy. Exact no-op imports
 # replace creations if uncertain prior operations already succeeded.
 # Preserve original state/plans/apply-started/receipts; use a new successor state.
 # Federation, registry cleanup, application deployment and live AI stay off.
 set -euo pipefail
 umask 077
-recovery_source=ea971983131c6ee3142918bbdf0f8d17a565a7e5
+export JEMS_OPERATIONS_RECEIPT_DIR="${JEMS_OPERATIONS_RECEIPT_DIR:-$HOME/work/jems-operations-recovery}"
+recovery_source=14188d773e7792d3ece5bcf46cc775d99537f8d8
 recovery_launcher_sha256=c0248cabdeb6ea195051b3b3c17eb0a30cf7e0567e9af5eff104a2c521620071
 if [[ ${1:-} == --help ]]; then
   cat <<'HELP'

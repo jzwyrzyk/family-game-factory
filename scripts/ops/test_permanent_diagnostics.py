@@ -369,6 +369,138 @@ class BootstrapTests(unittest.TestCase):
         self.assertEqual(result['status'], 'NOT_ACCEPTED')
         api.call.assert_not_called()
 
+    def test_broker_audit_reports_evaluated_mismatches_separately(self):
+        rows = audit.tuples()
+        self.assertEqual(len(rows), 77)
+        outcomes = {tuple(r[k] for k in ('principal', 'fullResourceName', 'permission')): r['expected'] for r in rows}
+        self.assertEqual(len(outcomes), 77)
+        def evaluate(method, path, body):
+            self.assertEqual((method, path), ('POST', 'v3/iam:troubleshoot'))
+            key = tuple(body['accessTuple'][k] for k in ('principal', 'fullResourceName', 'permission'))
+            return {'overallAccessState': outcomes[key]}
+        api = Mock()
+        api.call.side_effect = evaluate
+        self.assertEqual(audit.summary(audit.audit(api, lambda _: True))['passed'], 77)
+        first = next(iter(outcomes))
+        outcomes[first] = 'CANNOT_ACCESS'
+        report = audit.summary(audit.audit(api, lambda _: True))
+        self.assertEqual(report['passed'], 76)
+        self.assertEqual(report['failures'], [{'stage':'evaluated', 'expected':'CAN_ACCESS',
+                                               'observed':'CANNOT_ACCESS', 'rows':[1]}])
+
+    def test_request_wide_error_stops_remote_calls_and_accounts_for_all_rows(self):
+        api = Mock()
+        api.call.side_effect = audit.review.TroubleshootError(
+            {'http_status':403, 'error_status':'PERMISSION_DENIED', 'reasons':['SERVICE_DISABLED']})
+        report = audit.audit(api, lambda _: True)
+        self.assertEqual(len(report['checks']), 77)
+        self.assertEqual(api.call.call_count, 1)
+        self.assertEqual(report['checks'][0]['stage'], 'troubleshooter')
+        self.assertTrue(all(r['stage']=='not_attempted' and not r['passed'] for r in report['checks'][1:]))
+        self.assertEqual(audit.summary(report)['observed'], {'UNKNOWN':77})
+
+    def test_resource_error_cached_and_redacted_and_unknown_response_preserved(self):
+        view = audit.tuples()[0]['fullResourceName']
+        def exists(target):
+            if target == view:
+                raise audit.review.TroubleshootError({'http_status':404, 'reasons':[], 'error_status':'NOT_FOUND'})
+            return True
+        reader = Mock(side_effect=exists)
+        api = Mock()
+        api.call.return_value = {'overallAccessState':'UNKNOWN_INFO', 'private-response':'private marker'}
+        report = audit.audit(api, reader)
+        self.assertEqual(reader.call_count, len({r['fullResourceName'] for r in audit.tuples()}))
+        self.assertEqual((report['checks'][0]['stage'],report['checks'][0]['http_status']), ('resource_get',404))
+        self.assertEqual(report['checks'][2]['error_status'],'UNKNOWN_INFO')
+        self.assertNotIn('private marker', json.dumps(report))
+
+    def test_metadata_reads_use_quota_project_and_verified_project_number(self):
+        target = '//cloudresourcemanager.googleapis.com/projects/' + setup.PROJECT
+        self.assertIn(target, {r['fullResourceName'] for r in audit.tuples()})
+        with patch.object(audit, 'Http') as client:
+            client.return_value.call.return_value = {'name':'projects/'+setup.NUMBER}
+            self.assertTrue(audit.read_target(target, 'fixture-token'))
+            client.assert_called_once_with('https://cloudresourcemanager.googleapis.com', 'fixture-token',
+                                           {'x-goog-user-project':setup.PROJECT})
+            client.return_value.call.assert_called_once_with('GET', 'v3/projects/'+setup.NUMBER+'?fields=name')
+            client.return_value.call.return_value = {'name':'projects/other'}
+            self.assertFalse(audit.read_target(target, 'fixture-token'))
+
+    def test_unresolved_first_preserves_row_numbers_and_requires_fresh_full_pass(self):
+        api = Mock()
+        api.call.return_value = {'overallAccessState': 'UNKNOWN_INFO',
+            'allowPolicyExplanation': {'allowAccessState': 'ALLOW_ACCESS_STATE_UNKNOWN_INFO',
+                'explainedPolicies': [{'policy': 'private marker', 'bindingExplanations': [
+                    {'memberships': {'principalSet://private-id': {'membership':'MEMBERSHIP_UNKNOWN_UNSUPPORTED'}},
+                     'combinedMembership': {'membership': 'MEMBERSHIP_UNKNOWN_UNSUPPORTED'}}]}]}}
+        report = audit.audit(api, lambda _: True, unresolved_first=True)
+        failed = audit.summary(report)['failures'][0]
+        self.assertEqual(failed['rows'], [29,35,38,39,40,41,65,71,74,75,76,77])
+        self.assertEqual(failed['policy_states'], ['ALLOW_ACCESS_STATE_UNKNOWN_INFO', 'MEMBERSHIP_UNKNOWN_UNSUPPORTED',
+                                                  'UNRESOLVED_MEMBER_PRINCIPAL_SET'])
+        self.assertNotIn('private-id', json.dumps(report))
+        self.assertNotIn('private marker', json.dumps(report))
+        self.assertEqual(api.call.call_count, 12)
+        self.assertEqual(report['status'], 'NOT_ACCEPTED')
+        roster = audit.tuples()
+        def evaluate(method, path, body):
+            row = next(row for row in roster if all(row[k] == v for k,v in body['accessTuple'].items()))
+            return {'overallAccessState': row['expected']}
+        api.call.side_effect = evaluate
+        report = audit.audit(api, lambda _: True, unresolved_first=True)
+        self.assertEqual(report['status'], 'FINITE_POLICY_CHECKS_PASSED')
+        self.assertEqual([r['row'] for r in report['checks']], list(range(1,78)))
+
+    def test_secret_policy_tuple_matches_numeric_metadata_and_never_accesses_payload(self):
+        target = next(r['fullResourceName'] for r in audit.tuples() if 'secrets/factory-gateway' in r['fullResourceName'])
+        path = 'projects/' + setup.NUMBER + '/secrets/factory-gateway-private-config'
+        with patch.object(audit, 'metadata') as read:
+            read.return_value = {'name':path}
+            resolved = audit.read_target(target, 'token')
+            read.assert_called_once_with(audit.SECRET_HOST, 'v1/' + path + '?fields=name', 'token')
+            api = Mock()
+            api.call.return_value = {'overallAccessState':'UNKNOWN_INFO'}
+            report = audit.audit(api, lambda r: resolved if r == target else False, unresolved_first=True)
+            self.assertEqual(api.call.call_count, 4)
+            for call in api.call.call_args_list:
+                self.assertEqual(call.args[2]['accessTuple']['fullResourceName'], '//' + audit.SECRET_HOST + '/' + path)
+            self.assertFalse(any(r['passed'] for r in report['checks']))
+            read.return_value = {'name':path.replace(setup.NUMBER, 'other')}
+            with self.assertRaises(audit.review.TroubleshootError):
+                audit.read_target(target, 'token')
+
+    def test_coach_404_requires_unique_serving_revision_and_distinct_verified_secret(self):
+        target = next(r['fullResourceName'] for r in audit.tuples() if 'secrets/factory-coach' in r['fullResourceName'])
+        path = 'projects/' + setup.NUMBER + '/locations/us-east5/services/factory-coach-private'
+        revision = 'factory-coach-private-123'
+        secret = 'projects/' + setup.NUMBER + '/secrets/factory-coach-openai-key'
+        state = {'name':path, 'trafficStatuses':[{'percent':100, 'revision':revision}]}
+        detail = {'name':path + '/revisions/' + revision, 'containers':[{'env':[
+            {'valueSource':{'secretKeyRef':{'secret':secret}}}]}]}
+        missing = audit.review.TroubleshootError({'http_status':404})
+        with patch.object(audit, 'metadata', side_effect=[missing,state,detail,state,{'name':secret}]) as read:
+            self.assertEqual(audit.read_target(target, 'token'), {
+                'target':'//' + audit.SECRET_HOST + '/' + secret, 'serving_coach_revision':revision})
+            for call in read.call_args_list:
+                self.assertIn('?fields=', call.args[1])
+                self.assertNotIn('/versions/', call.args[1])
+            self.assertIn('containers(env(valueSource(secretKeyRef(secret))))', read.call_args_list[2].args[1])
+        for responses, code in [
+            ([audit.review.TroubleshootError({'http_status':403})], None),
+            ([missing, {**state, 'trafficStatuses':[]}], 'COACH_TRAFFIC_UNVERIFIED'),
+            ([missing,state,{'name':detail['name']}], 'COACH_NO_SERVING_SECRET_REFERENCE'),
+            ([missing,state,{**detail, 'volumes':[{'secret':{'secret':'second'}}]}], 'COACH_MULTIPLE_SERVING_SECRETS'),
+            ([missing,state,{**detail, 'volumes':[{'secret':{'secret':'projects/other/secrets/x'}}]}],
+             'COACH_SECRET_SCOPE_UNVERIFIED'),
+            ([missing,state,detail,{**state, 'trafficStatuses':[{'percent':100,'revision':revision+'x'}]}],
+             'COACH_TRAFFIC_CHANGED'),
+            ([missing,state,detail,state,{'name':'projects/other/secrets/wrong'}], 'CANONICAL_SECRET_NAME_UNVERIFIED')]:
+            with self.subTest(code=code), patch.object(audit, 'metadata', side_effect=responses) as read:
+                with self.assertRaises(audit.review.TroubleshootError) as caught:
+                    audit.read_target(target, 'token')
+                self.assertEqual(caught.exception.safe.get('error_status'), code)
+                self.assertEqual(read.call_count, len(responses))
+
     def test_unknown_policy_never_passes(self):
         api = Mock()
         api.call.return_value = {'overallAccessState': 'UNKNOWN_INFO_DENIED'}
