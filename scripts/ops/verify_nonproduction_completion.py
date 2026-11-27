@@ -17,17 +17,7 @@ APPLIED_SOURCE = '14188d773e7792d3ece5bcf46cc775d99537f8d8'
 FILTERS = ('credit_types', 'resource_ancestors', 'subaccounts')
 
 
-def verify_plan(plan, expected):
-    rows = plan.get('resource_changes', [])
-    managed = [row['address'] for row in rows if row.get('mode') == 'managed']
-    r.need(plan.get('terraform_version') == '1.13.5' and plan.get('complete') is True
-           and plan.get('errored') is False and not plan.get('deferred_changes')
-           and plan.get('checks') and all(c.get('status') == 'pass' for c in plan['checks'])
-           and len(managed) == len(expected) and set(managed) == expected
-           and all(row['change']['actions'] == ['no-op'] and not row['change'].get('importing')
-                   and not row.get('previous_address') for row in rows)
-           and all(o['actions'] == ['no-op'] for o in plan.get('output_changes', {}).values()), 'POST_APPLY_DRIFT')
-    drift = plan.get('resource_drift', [])
+def verify_budget_refresh(drift):
     r.need(len(drift) == 1 and drift[0]['address'] == r.BUDGET and drift[0].get('mode') == 'managed'
            and drift[0]['change']['actions'] == ['update'], 'UNEXPECTED_REFRESH')
     change = drift[0]['change']
@@ -39,6 +29,19 @@ def verify_plan(plan, expected):
     r.need(r.digest({**before, 'budget_filter': [normalized]}) == r.digest(after)
            and normalized.get('projects') == ['projects/' + r.NUMBER]
            and normalized.get('credit_types_treatment') == 'INCLUDE_ALL_CREDITS', 'BUDGET_FILTER_CHANGED')
+
+
+def verify_plan(plan, expected):
+    rows = plan.get('resource_changes', [])
+    managed = [row['address'] for row in rows if row.get('mode') == 'managed']
+    r.need(plan.get('terraform_version') == '1.13.5' and plan.get('complete') is True
+           and plan.get('errored') is False and not plan.get('deferred_changes')
+           and plan.get('checks') and all(c.get('status') == 'pass' for c in plan['checks'])
+           and len(managed) == len(expected) and set(managed) == expected
+           and all(row['change']['actions'] == ['no-op'] and not row['change'].get('importing')
+                   and not row.get('previous_address') for row in rows)
+           and all(o['actions'] == ['no-op'] for o in plan.get('output_changes', {}).values()), 'POST_APPLY_DRIFT')
+    verify_budget_refresh(plan.get('resource_drift', []))
     provider = next(row['change']['after'] for row in rows if row['address'] == r.PROVIDER)
     pool = next(row['change']['after'] for row in rows if row['address'] == 'google_iam_workload_identity_pool.github')
     r.need(provider['disabled'] is True and pool['disabled'] is True, 'FEDERATION_NOT_DISABLED')

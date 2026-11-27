@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T20:01:29.918Z",
-      "sourceDigest": "05ab05363ad41eecbd79916542aeba3920b522d8ee1298db95edecad03b16cd1",
+      "reviewedAt": "2026-11-27T20:14:07.005Z",
+      "sourceDigest": "7322927428c8e5a2c555845706e310ee24584d69d1e707227756bc96ac33a524",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the checksum-verified two-update federation plan, exact budget refresh and durable state requirement following the three accepted native readbacks.",
+      "reviewReason": "Bind the single approved federation apply to the verified private cache, saved plan and preserved state, and document the durable intent and post-apply readback.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
