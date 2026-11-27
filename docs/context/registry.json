@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T17:32:13.444Z",
-      "sourceDigest": "39ec8d6d545a292a8c426ab2cf6d46d5c23b43e0a74bd43b0e811c8d1d38aa72",
+      "reviewedAt": "2026-11-27T17:32:29.144Z",
+      "sourceDigest": "c5bae43440e2a50a006851b11b3f6a651e93f8d25e7ab007e71bba1de0445a1f",
       "reviewOutcome": "updated",
-      "reviewReason": "Documented the pinned provider monthly budget representation, exact configuration proof and live budget filter checks.",
+      "reviewReason": "The existing handoff now pins the operator qualified with the real locked provider budget plan.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
