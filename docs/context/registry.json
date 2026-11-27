@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T20:14:07.005Z",
-      "sourceDigest": "7322927428c8e5a2c555845706e310ee24584d69d1e707227756bc96ac33a524",
+      "reviewedAt": "2026-11-27T20:20:53.244Z",
+      "sourceDigest": "345c84bba1aa60a56b27c67124a4244abed74759ecc848fd2a2f26c2af6d806c",
       "reviewOutcome": "updated",
-      "reviewReason": "Bind the single approved federation apply to the verified private cache, saved plan and preserved state, and document the durable intent and post-apply readback.",
+      "reviewReason": "Record the verified federation apply, the durable state and zero-change plan digests, and the outstanding protected DEV decision.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
