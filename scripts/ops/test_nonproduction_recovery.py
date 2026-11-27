@@ -40,7 +40,10 @@ def fixture():
                 'project': {'constant_value': recovery.PROJECT},
                 'billing_project': {'constant_value': recovery.PROJECT},
                 'user_project_override': {'constant_value': True}}}},
-                'root_module': {'resources': [{'address': recovery.BUDGET, 'provider_config_key': 'google.nonproduction_budget'}]}}}
+                'root_module': {'resources': [{'address': recovery.BUDGET, 'provider_config_key': 'google.nonproduction_budget',
+                    'expressions': {'budget_filter': [{'calendar_period': {'constant_value': 'MONTH'},
+                        'credit_types_treatment': {'constant_value': 'INCLUDE_ALL_CREDITS'},
+                        'projects': {'references': ['data.google_project.nonproduction.number', 'data.google_project.nonproduction']}}]}}]}}}
     return plan, recorded, variables
 
 
@@ -207,6 +210,57 @@ class RecoveryTests(unittest.TestCase):
         for index, key, value in mutations:
             plan, _, _ = fixture(); plan['resource_changes'][index]['change']['after'][key] = value
             with self.subTest(key=key), self.assertRaises(recovery.Stop): self.guard(plan)
+
+    def test_locked_provider_month_default_keeps_budget_and_alias_checks(self):
+        plan, _, _ = fixture()
+        change = plan['resource_changes'][1]['change']
+        filt = change['after']['budget_filter'][0]
+        filt.update(calendar_period=None, custom_period=[], credit_types=None, resource_ancestors=None, subaccounts=None)
+        change['after_unknown']['budget_filter'] = [{'labels': True, 'services': True, 'projects': [False], 'custom_period': []}]
+        self.guard(plan)
+        for val in ('YEAR', 'QUARTER', '', 'CALENDAR_PERIOD_UNSPECIFIED'):
+            filt['calendar_period'] = val
+            with self.subTest(val=val), self.assertRaisesRegex(recovery.Stop, 'BUDGET_FILTER_CHANGED'): self.guard(plan)
+        del filt['calendar_period']
+        with self.assertRaisesRegex(recovery.Stop, 'BUDGET_FILTER_CHANGED'): self.guard(plan)
+        filt['calendar_period'] = None
+        for val in (True, [{'calendar_period': True}], [{'custom_period': True}]):
+            change['after_unknown']['budget_filter'] = val
+            with self.assertRaisesRegex(recovery.Stop, 'BUDGET_PERIOD_UNKNOWN'): self.guard(plan)
+        change['after_unknown'] = {}
+        filt['custom_period'] = [{'start_date': [{}]}]
+        with self.assertRaisesRegex(recovery.Stop, 'BUDGET_FILTER_CHANGED'): self.guard(plan)
+
+    def test_month_default_requires_explicit_exact_filter_configuration(self):
+        for key, wrong in [('calendar_period', None), ('calendar_period', {'constant_value': 'YEAR'}),
+                           ('calendar_period', {'references': ['var.period']}), ('custom_period', []),
+                           ('projects', {'references': ['var.other']}), ('services', {'constant_value': ['one']})]:
+            plan, _, _ = fixture()
+            plan['resource_changes'][1]['change']['after']['budget_filter'][0]['calendar_period'] = None
+            config = plan['configuration']['root_module']['resources'][0]['expressions']['budget_filter'][0]
+            if wrong is None:
+                del config[key]
+            else:
+                config[key] = wrong
+            with self.subTest(key=key), self.assertRaisesRegex(recovery.Stop, 'BUDGET_FILTER_CONFIG_CHANGED'):
+                self.guard(plan)
+
+    def test_live_budget_inventory_checks_effective_month_and_scope(self):
+        account = 'billingAccounts/AAAAAA-BBBBBB-CCCCCC'
+        key = ('billingbudgets', 'v1/' + account + '/budgets?pageSize=100')
+        budget = {'name': account + '/budgets/b1', 'displayName': recovery.BUDGET_DISPLAY}
+        for overrides, allowed in [({}, True), ({'calendarPeriod': 'MONTH'}, True),
+                ({'calendarPeriod': 'QUARTER'}, False), ({'customPeriod': {}}, False), ({'projects': []}, False),
+                ({'creditTypesTreatment': 'EXCLUDE_ALL_CREDITS'}, False), ({'services': ['services/one']}, False),
+                ({'labels': {'only': ['one']}}, False)]:
+            budget['budgetFilter'] = {'projects': ['projects/' + recovery.NUMBER], **overrides}
+            api = self.cloud_reader({key: {'budgets': [budget]}})
+            with self.subTest(overrides=overrides):
+                if allowed:
+                    self.assertEqual(recovery.reconcile(api, fixture()[2])['imports'][recovery.BUDGET], budget['name'])
+                else:
+                    with self.assertRaisesRegex(recovery.Stop, 'LIVE_BUDGET_FILTER_CHANGED'):
+                        recovery.reconcile(api, fixture()[2])
 
     def test_quota_project_and_alias_must_be_nonproduction(self):
         for key, value in (('project', 'family-game-factory-jzw'), ('billing_project', 'family-game-factory-jzw'), ('user_project_override', False)):

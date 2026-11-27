@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T17:22:54.893Z",
-      "sourceDigest": "bc7e1d571ff2ea01a67603de2688f96202776641340383cb7ccb0f8f62496d92",
+      "reviewedAt": "2026-11-27T17:32:13.444Z",
+      "sourceDigest": "39ec8d6d545a292a8c426ab2cf6d46d5c23b43e0a74bd43b0e811c8d1d38aa72",
       "reviewOutcome": "updated",
-      "reviewReason": "The existing immutable launcher selects the operator that verifies the two observed refresh fields in both planning phases.",
+      "reviewReason": "Documented the pinned provider monthly budget representation, exact configuration proof and live budget filter checks.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

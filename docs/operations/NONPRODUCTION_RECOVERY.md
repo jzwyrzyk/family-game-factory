@@ -103,6 +103,16 @@ values. Other drift stops recovery. The full refresh stays in the plan hash and
 the same checks run on the fresh pre-apply plan.
 [Google IAM service account policy read](https://cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts/getIamPolicy).
 
+The locked Google provider 7.46.2 can represent the configured monthly period
+as `calendar_period: null` in its create plan. Planning binds the three filter
+expressions in the saved configuration to the literal month, all credits and the
+verified project number. Both a known null and `MONTH` express the reviewed
+cadence. A missing or unknown planned period, another cadence, or a custom
+period stops recovery. Google Billing defaults an unset usage period to monthly.
+For an existing budget (including the post-apply inventory), the operator also
+checks the actual project, effective cadence, credits and absence of additional
+scope filters in the existing list response. [Pinned provider implementation](https://github.com/hashicorp/terraform-provider-google/blob/v7.46.2/google/services/billingbudgets/resource_billing_budget.go) · [Google Billing usage period contract](https://github.com/googleapis/googleapis/blob/master/google/cloud/billing/budgets/v1/budget_model.proto)
+
 The receipt includes complete remaining values, source/input
 hashes, state lineage/serial, inventory, private-evidence hashes and binary/full
 plan hashes. Its canonical SHA-256 is the **approval hash**.

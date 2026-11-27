@@ -307,6 +307,13 @@ def reconcile(api, variables):
     if matches:
         name = matches[0].get('name', '')
         need(re.fullmatch(re.escape(account) + r'/budgets/[A-Za-z0-9-]+', name), 'BUDGET_ID_UNVERIFIED')
+        # This same inventory read qualifies an import and the post-apply result.
+        live_filter = matches[0].get('budgetFilter', {})
+        need(live_filter.get('projects') == ['projects/' + NUMBER]
+             and live_filter.get('calendarPeriod', 'MONTH') == 'MONTH' and 'customPeriod' not in live_filter
+             and live_filter.get('creditTypesTreatment', 'INCLUDE_ALL_CREDITS') == 'INCLUDE_ALL_CREDITS'
+             and not any(live_filter.get(k) for k in ('creditTypes', 'labels', 'resourceAncestors', 'services', 'subaccounts')),
+             'LIVE_BUDGET_FILTER_CHANGED')
         imports[BUDGET] = name
     # No API mutation or import here. Terraform import blocks must yield no-op.
     return {'project_number': NUMBER, 'billing_account': variables['billing_account'], 'imports': imports,
@@ -459,9 +466,23 @@ def guard_plan(plan, recorded, variables, imports, api=None):
     budget = entries[BUDGET]['change']['after']
     need(budget.get('billing_account') == variables['billing_account'] and budget.get('display_name') == BUDGET_DISPLAY,
          'BUDGET_ACCOUNT_CHANGED')
+    resources = plan.get('configuration', {}).get('root_module', {}).get('resources', [])
+    configured = [r for r in resources if r.get('address') == BUDGET]
+    need(len(configured) == 1 and configured[0].get('provider_config_key') == 'google.nonproduction_budget',
+         'BUDGET_PROVIDER_ALIAS_UNVERIFIED')
+    expected_filter = {'calendar_period': {'constant_value': 'MONTH'},
+                       'credit_types_treatment': {'constant_value': 'INCLUDE_ALL_CREDITS'},
+                       'projects': {'references': ['data.google_project.nonproduction.number', 'data.google_project.nonproduction']}}
+    need(configured[0].get('expressions', {}).get('budget_filter') == [expected_filter], 'BUDGET_FILTER_CONFIG_CHANGED')
+    # The locked Google provider suppresses an explicit MONTH as its API default.
+    # A known null is distinct from an omitted or apply-time-unknown period.
+    unknown = entries[BUDGET]['change'].get('after_unknown', {}).get('budget_filter', [{}])
+    need(isinstance(unknown, list) and len(unknown) == 1 and isinstance(unknown[0], dict)
+         and unknown[0].get('calendar_period', False) is False
+         and unknown[0].get('custom_period', []) == [], 'BUDGET_PERIOD_UNKNOWN')
     filters = budget.get('budget_filter', [])
     need(len(filters) == 1 and filters[0].get('projects') == ['projects/' + NUMBER]
-         and filters[0].get('calendar_period') == 'MONTH'
+         and 'calendar_period' in filters[0] and filters[0]['calendar_period'] in ('MONTH', None)
          and filters[0].get('credit_types_treatment') == 'INCLUDE_ALL_CREDITS', 'BUDGET_FILTER_CHANGED')
     need(not any(filters[0].get(k) for k in ('credit_types', 'custom_period', 'labels', 'resource_ancestors',
                                            'services', 'subaccounts')), 'BUDGET_FILTER_CHANGED')
@@ -478,9 +499,6 @@ def guard_plan(plan, recorded, variables, imports, api=None):
     cfg = configs.get('google.nonproduction_budget', {}).get('expressions', {})
     need({k: cfg.get(k, {}).get('constant_value') for k in ('project', 'billing_project', 'user_project_override')} ==
          {'project': PROJECT, 'billing_project': PROJECT, 'user_project_override': True}, 'BUDGET_QUOTA_PROJECT_UNVERIFIED')
-    resources = plan.get('configuration', {}).get('root_module', {}).get('resources', [])
-    need(any(r.get('address') == BUDGET and r.get('provider_config_key') == 'google.nonproduction_budget' for r in resources),
-         'BUDGET_PROVIDER_ALIAS_UNVERIFIED')
     pool = entries['google_iam_workload_identity_pool.github']['change']['after']
     registry = entries['google_artifact_registry_repository.static']['change']['after']
     need(pool.get('disabled') is True and registry.get('cleanup_policy_dry_run') is True, 'ACTIVATION_FORBIDDEN')
