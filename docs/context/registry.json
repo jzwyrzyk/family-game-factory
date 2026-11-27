@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T20:26:08.437Z",
-      "sourceDigest": "45d9900ace36a6367e4a76a2af97ffa39c25cdb5c45690463e2ce4f2264f1fab",
+      "reviewedAt": "2026-11-27T20:38:31.968Z",
+      "sourceDigest": "1b60ddc1dccee9c587cf86af188dc69e65645290d14426aabe338ae59d5af83d",
       "reviewOutcome": "updated",
-      "reviewReason": "Record the verified protected DEV policy merge, exact qualified tree and separately gated private site binding draft.",
+      "reviewReason": "Record installed private site binding support, exact protected merge tree, disabled parameters and skipped deployment on the verified controller run.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
