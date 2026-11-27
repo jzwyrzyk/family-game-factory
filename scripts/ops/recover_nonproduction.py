@@ -342,9 +342,30 @@ def audit(api, original, destination):
     need(not token, 'AUDIT_INCOMPLETE')
     write_new(destination / 'provider-errors.private.json', rows)
     public = [{k: v for k, v in row.items() if k != 'message'} | {'message_sha256': sha(row['message'].encode())} for row in rows]
-    return {'failures': public, 'name_error_confirmed': any('WIF_DISPLAY_NAME_LIMIT' in r['codes'] for r in rows),
-            'iap_role_error_confirmed': any('IAP_PROJECT_ROLE_INVALID' in r['codes'] for r in rows),
+    return {'failures': public, 'name_error_confirmed': any(r['resource'] == PROVIDER and r['status_code'] == 3
+            and 'WIF_DISPLAY_NAME_LIMIT' in r['codes'] for r in rows),
+            'iap_role_error_confirmed': any(r['resource'] == 'project_iam' and r['status_code'] == 3
+            and 'IAP_PROJECT_ROLE_INVALID' in r['codes'] for r in rows),
             'budget_error': 'NOT_OBSERVED_CONFIGURATION_REQUIREMENT_CONFIRMED_FROM_PROVIDER_DOCUMENTATION'}
+
+
+def provider_name_evidence(diagnosis, original_creates, remaining_creates):
+    """Separate a documented input violation from an observed Google rejection."""
+    if diagnosis['name_error_confirmed']:
+        return {'basis': 'CORRELATED_PROVIDER_AUDIT_ERROR'}
+    need(not any(row['resource'] == PROVIDER for row in diagnosis['failures']),
+         'UNRESOLVED_PROVIDER_AUDIT_ERROR')
+    original_name = 'Protected main environment controller'
+    for creates in (original_creates, remaining_creates):
+        matches = [c for c in creates if c['address'] == PROVIDER]
+        need(len(matches) == 1 and matches[0]['type'] == 'google_iam_workload_identity_pool_provider',
+             'PROVIDER_PLAN_EVIDENCE_MISMATCH')
+        after = matches[0]['after']
+        need(isinstance(after, dict) and after.get('workload_identity_pool_provider_id') == 'github-main'
+             and after.get('disabled') is True and after.get('display_name') == original_name
+             and len(original_name) > 32, 'PROVIDER_PLAN_EVIDENCE_MISMATCH')
+    return {'basis': 'BOUND_PLANS_EXCEED_IAM_DISPLAY_NAME_LIMIT', 'original_display_name': original_name,
+            'length': len(original_name), 'maximum': 32, 'provider_error_observed': False}
 
 
 def guard_plan(plan, recorded, variables, imports):
@@ -444,7 +465,7 @@ def prepare(original, destination, expected, hashes, variables, state, recorded,
     write_new(destination / 'diagnosis.json', audit_result)
     observed = reconcile(api, variables)
     write_new(destination / 'inventory.json', observed)
-    need(audit_result['name_error_confirmed'] and audit_result['iap_role_error_confirmed'], 'AUDIT_DIAGNOSIS_UNCONFIRMED')
+    need(audit_result['iap_role_error_confirmed'], 'IAP_ROLE_AUDIT_UNCONFIRMED')
     for name in initial.FILES:
         write_new(destination / name, (ROOT / 'infra/nonproduction' / name).read_bytes())
     write_new(destination / 'terraform.tfvars.json', variables)
@@ -458,9 +479,12 @@ def prepare(original, destination, expected, hashes, variables, state, recorded,
     # Confirm the preserved plans themselves agree, not just the user report.
     old = json.loads(tf(destination, 'show', '-json', str(original / 'reviewed.tfplan')))
     recheck = json.loads(tf(destination, 'show', '-json', str(original / 'recheck.tfplan')))
-    need(initial.validate_plan(old) == initial.validate_plan(recheck), 'ORIGINAL_RECHECK_MISMATCH')
+    original_creates = initial.validate_plan(old)
+    need(original_creates == initial.validate_plan(recheck), 'ORIGINAL_RECHECK_MISMATCH')
     prior = json.loads(tf(destination, 'show', '-json', str(original / PARTIAL_PLAN)))
-    need({c['address'] for c in initial.validate_plan(prior)} == REMAINING | {OBSOLETE}, 'PARTIAL_PLAN_SCOPE_MISMATCH')
+    remaining_creates = initial.validate_plan(prior)
+    need({c['address'] for c in remaining_creates} == REMAINING | {OBSOLETE}, 'PARTIAL_PLAN_SCOPE_MISMATCH')
+    name_evidence = provider_name_evidence(audit_result, original_creates, remaining_creates)
     plan, actions = make_plan(destination, 'remaining.tfplan', recorded, variables, observed['imports'])
     need(evidence_hashes(original) == hashes, 'ORIGINAL_EVIDENCE_CHANGED')
     inputs = {n: sha((destination / n).read_bytes()) for n in ('main.tf', '.terraform.lock.hcl', 'terraform.tfvars.json', 'terraform.tfstate')}
@@ -470,7 +494,7 @@ def prepare(original, destination, expected, hashes, variables, state, recorded,
                'state_lineage': state['lineage'], 'state_serial': state['serial'], 'inputs': inputs,
                'plan_sha256': sha((destination / 'remaining.tfplan').read_bytes()), 'plan_identity': plan_identity(plan),
                'inventory': observed, 'recorded_iap_identity': iap_record, 'live_iap_acceptance': 'REQUIRED_BEFORE_DEV',
-               'diagnosis': audit_result, 'actions': actions,
+               'diagnosis': audit_result, 'provider_name_evidence': name_evidence, 'actions': actions,
                'existing_resources': sorted(recorded), 'destruction': 0, 'replacement': 0,
                'existing_modification': 0, 'federation_enabled': False, 'live_ai': False,
                'retired_uncreated_address': OBSOLETE}

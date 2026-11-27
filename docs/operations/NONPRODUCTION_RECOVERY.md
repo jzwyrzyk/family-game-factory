@@ -59,8 +59,7 @@ invalid display name but is insufficient by itself to confirm that cause.
 `SetIamPolicy` code 3 requires the actual message; code 10 is contention/aborted,
 not proof of an invalid role. The operator reads correlated administrative errors
 and retains messages privately. Fixed diagnostic codes and message hashes are
-safe to share. It requires actual matching name-limit and unsupported-role errors
-before offering an executable plan approval. The budget finding is a documented
+safe to share. The invalid project role requires a correlated code 3 role error. If no workload-provider failure was observed, the operator must independently verify the exact 37-character name for the disabled `github-main` provider create in the approved binary plan, its matching recheck and the saved partial plan. IAM permits 32 characters. The receipt records the confirmed invalid input and leaves the historical provider response unobserved. An unmatched provider error blocks this evidence path. The refreshed plan still must prove the exact correction and the full no-drift scope. [IAM provider field contract](https://docs.cloud.google.com/iam/docs/reference/rest/v1/projects.locations.workloadIdentityPools.providers#WorkloadIdentityPoolProvider) The budget finding is a documented
 ADC requirement; an actual budget error has not been supplied or observed.
 
 ## IAP evidence and DEV activation
@@ -124,7 +123,7 @@ refuses automatic replay.
 | `WIF_DISPLAY_NAME_LIMIT`, `IAP_PROJECT_ROLE_INVALID` | Actual provider error matched a specific reviewed cause. |
 | `ADC_QUOTA_PROJECT_REQUIRED_OR_DENIED`, `READ_PERMISSION_DENIED`, `REQUIRED_PERMISSION_MISSING` | ADC quota or resource permissions need diagnosis; never auto-grant. |
 | `IAM_POLICY_CONTENTION`, `ABORTED` | Concurrent policy change; re-read, never attribute to the role automatically. |
-| `AUDIT_DIAGNOSIS_UNCONFIRMED` | Correlated messages did not establish the proposed causes; private review required. |
+| `IAP_ROLE_AUDIT_UNCONFIRMED`, `UNRESOLVED_PROVIDER_AUDIT_ERROR`, `PROVIDER_PLAN_EVIDENCE_MISMATCH` | The required role audit, provider error diagnosis or exact saved provider inputs failed verification. Preserve the attempt for review. |
 | `EXISTING_RESOURCE_DRIFT`, `EXISTING_CHANGE_OR_UNEXPECTED_ACTION`, `FULL_PLAN_DRIFT` | Existing infrastructure or reviewed remaining actions changed; no apply. |
 | `BUDGET_INVENTORY_AMBIGUOUS`, `PROVIDER_CONFLICT_OR_SOFT_DELETED`, `OBSOLETE_IAP_BINDING_EXISTS` | Actual resources conflict; do not create, delete or adopt blindly. |
 | `APPROVAL_HASH_MISMATCH`, `RECOVERY_INPUT_CHANGED`, `RECOVERY_PLAN_CHANGED` | Approval or immutable material differs. |

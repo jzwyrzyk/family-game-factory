@@ -348,6 +348,32 @@ class RecoveryTests(unittest.TestCase):
         api = Mock(); api.call.return_value = {'nextPageToken':'loop'}
         with self.assertRaisesRegex(recovery.Stop, 'PAGINATION_LOOP'): recovery.page_list(api, 'iam', 'path', 'providers')
 
+    def test_missing_provider_log_requires_exact_create_values_in_both_saved_plans(self):
+        diagnosis = {'name_error_confirmed': False, 'failures': [{'resource': 'project_iam'}]}
+        after = {'workload_identity_pool_provider_id': 'github-main', 'disabled': True,
+                 'display_name': 'Protected main environment controller'}
+        row = {'address': recovery.PROVIDER, 'type': 'google_iam_workload_identity_pool_provider', 'after': after}
+        evidence = recovery.provider_name_evidence(diagnosis, [row], [row])
+        self.assertEqual((evidence['length'], evidence['maximum'], evidence['provider_error_observed']), (37, 32, False))
+        for bad in ([], [row, row], [dict(row, address='other')], [dict(row, type='other')],
+                    [dict(row, after=dict(after, disabled=False))], [dict(row, after=dict(after, display_name='valid'))],
+                    [dict(row, after=dict(after, workload_identity_pool_provider_id='another'))]):
+            for pair in ((bad, [row]), ([row], bad)):
+                with self.subTest(pair=pair), self.assertRaisesRegex(recovery.Stop, 'PROVIDER_PLAN_EVIDENCE_MISMATCH'):
+                    recovery.provider_name_evidence(diagnosis, *pair)
+        diagnosis['failures'].append({'resource': recovery.PROVIDER})
+        with self.assertRaisesRegex(recovery.Stop, 'UNRESOLVED_PROVIDER_AUDIT_ERROR'):
+            recovery.provider_name_evidence(diagnosis, [row], [row])
+
+    def test_unconfirmed_iap_role_stops_before_plan_regardless_of_name_evidence(self):
+        with tempfile.TemporaryDirectory() as temp:
+            with patch.object(recovery, 'command', return_value=b'{"terraform_version":"1.13.5"}'), \
+                 patch.object(recovery, 'audit', return_value={'name_error_confirmed': True, 'iap_role_error_confirmed': False}), \
+                 patch.object(recovery, 'reconcile', return_value={}), patch.object(recovery, 'tf') as tf:
+                with self.assertRaisesRegex(recovery.Stop, 'IAP_ROLE_AUDIT_UNCONFIRMED'):
+                    recovery.prepare(Path(temp), Path(temp), None, {}, {}, iap_state(), set(), None)
+                tf.assert_not_called()
+
     def test_actual_audit_messages_are_correlated_and_only_fixed_fields_shared(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp); recovery.write_new(root/'apply-started', b'marker')
