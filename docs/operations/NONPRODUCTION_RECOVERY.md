@@ -174,17 +174,30 @@ returned `NOT_ACCEPTED` with all 77 checks failed or unknown.
 
 ## Broker IAM follow-up
 
-Use the standalone `broker-iam` operations-bootstrap lane for the next
-administrator read. It checks the same 77 tuples for the production broker
-and caller using the release collector's paced v3 client and explicit quota
-project. The full report stays with the Cloud Shell journals. The summary
-distinguishes a missing or unreadable resource, a troubleshooting request error,
-an indeterminate policy response and an evaluated permission mismatch. If a
-request-wide authentication or consumer error stops the collection, remaining
-rows are marked unattempted and the gate stays closed. Each invocation writes
-a fresh report; the recovery receipt and prior audit stay available. A passing
-finite audit still requires separate service access and broker coverage evidence.
-[Policy Troubleshooter v3](https://cloud.google.com/policy-intelligence/docs/reference/policytroubleshooter/rest/v3/iam/troubleshoot)
+The administrator's second broker audit established all three expected grants
+and 62 expected denials. Twelve expected denials remained unknown. Rows
+29/35/65/71 concern access-token creation on the release and diagnostic service
+accounts. Rows 38/39/74/75 received HTTP 400 on the Gateway secret tuple.
+Rows 40/41/76/77 stopped at HTTP 404 on the historical Coach secret name.
+
+Use the standalone `broker-iam --unresolved-first` lane. It checks those 12
+rows first with the protected project's quota and the paced v3 client. If any
+remain unresolved or differ from expectation, it returns their original row
+numbers and stops. If they pass, it evaluates the other 65 during the same run.
+Only 77 current matching observations pass finite IAM qualification.
+
+Global secret tuples use the numeric project and exact name returned by Secret
+Manager metadata. If the historical Coach name returns 404, the operator checks
+the single 100%-serving Coach revision for a distinct same-project secret reference
+and checks the revision again. Missing or ambiguous targets keep the gate closed.
+The private report distinguishes the original selector, evaluated target and
+serving revision. A 404 supplies no permission evidence. The reader requests
+only reference metadata. Unknown policy results retain selected allow, deny
+and membership enums. Service invocation and settled broker coverage require
+their own evidence after the finite audit passes.
+[Google asset names](https://docs.cloud.google.com/asset-inventory/docs/asset-names) ·
+[Cloud Run secret references](https://docs.cloud.google.com/run/docs/configuring/services/secrets) ·
+[Policy Troubleshooter v3](https://docs.cloud.google.com/policy-intelligence/docs/reference/policytroubleshooter/rest/v3/iam/troubleshoot)
 
 ## Fixed failure codes
 

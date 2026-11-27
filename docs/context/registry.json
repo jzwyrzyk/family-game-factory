@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T18:10:55.809Z",
-      "sourceDigest": "54924f35ddb0cb64cee586a81ce31204f2e4d34b2c1a6ef7b308f2ef8f43e1b1",
+      "reviewedAt": "2026-11-27T18:26:47.735Z",
+      "sourceDigest": "9f692fff23a47fd9a914048a65ff802d83139cc30f30566d00b90163a57cccf0",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the completed administrator recovery, the separate inconclusive 77-check audit and the pinned standalone read-only IAM follow-up.",
+      "reviewReason": "Recorded verified Terraform closure, the 65 passing broker IAM checks, and the read-only qualification for the remaining 12.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
