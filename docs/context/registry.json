@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T19:42:20.141Z",
-      "sourceDigest": "00eac72e67140278805a9191fd3a22abd2001174d82c454006858880d6c232ba",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The historical audit read now uses a typed timestamp projection and reports the failing phase. The evidence, approved revision configuration and acceptance gates are identical.",
+      "reviewedAt": "2026-11-27T19:50:13.536Z",
+      "sourceDigest": "2fe9e97830189082ce350cb5c85008080df073e34c734317e25aaa77847f173e",
+      "reviewOutcome": "updated",
+      "reviewReason": "Recorded three accepted dated request artifacts and isolated temporary federation planning after home disk exhaustion.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

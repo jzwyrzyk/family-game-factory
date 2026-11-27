@@ -16,6 +16,8 @@ The November 27 18:08–19:08 UTC interval returned zero log entries and no inde
 
 The historical observation for November 24, 15:20–16:20 UTC matched Cloud Logging to independent Cloud Monitoring by revision and response code. Gateway had 31 requests, Preview two and private Coach two. Maximum observed ingestion delay was 2.957 seconds. Both configuration events were November 26 `CreateView` attempts on the same view, with status 3 and success. There were zero sink errors. This qualifies the source evidence for that dated hour. Live broker readback and federation activation remain separate gates.
 
+The dated broker revision `jems-request-evidence-c-b51ec464f42c61a4c8ad` passed all three [Gateway](https://github.com/jzwyrzyk/family-game-factory/actions/runs/46058772393), [Preview](https://github.com/jzwyrzyk/family-game-factory/actions/runs/46058840373), and [Coach](https://github.com/jzwyrzyk/family-game-factory/actions/runs/46058902514) readbacks. The three archives were independently downloaded, their digests and first-attempt jobs verified, and all 35 requests matched. Attestation expires at 2026-12-04T19:43:43Z. The earlier native broker serves as rollback. The initial federation plan attempt exhausted home storage before producing its binary. The provider and pool remain disabled.
+
 ## Permanent operations — November 26 recovery checkpoint
 
 The owner reports the original and pre-apply Terraform plans matched exactly,

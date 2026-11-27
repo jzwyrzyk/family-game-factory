@@ -34,7 +34,10 @@ def summarize(plan):
 def main():
     os.umask(0o077)
     directory = Path(os.environ['JEMS_OPERATION_JOURNAL']).parent
-    coverage = op.saved(directory/('native-broker-'+op.SOURCE)/'dated-coverage-nov24-1520','complete.json')
+    # Planning outputs may use a private /tmp directory when persistent home is
+    # full. The accepted administrative receipt always comes from its original home.
+    receipts = Path.home() / 'work/jems-operations-recovery'
+    coverage = op.saved(receipts/('native-broker-'+op.SOURCE)/'dated-coverage-nov24-1520','complete.json')
     require(coverage['status']=='DATED_BROKER_COVERAGE_ACCEPTED' and len(coverage['runs'])==3,
             'BROKER_ACCEPTANCE_REQUIRED')
     parent = Path.home()/'work/jems-nonprod-state/partial-recovery'
@@ -60,12 +63,14 @@ def main():
     def call(args,phase):
         return records.command(['terraform',*args],pending,phase,folder=pending)
     require(json.loads(call(['version','-json'],'VERSION'))['terraform_version']=='1.13.5','TERRAFORM_VERSION_DIFFERS')
-    call(['init','-input=false','-lockfile=readonly','-backend=false'],'FEDERATION_INIT')
+    mirror = successor/'.terraform/providers'
+    require(mirror.is_dir(), 'EXISTING_PROVIDER_DIRECTORY_MISSING')
+    call(['init','-input=false','-lockfile=readonly','-backend=false','-plugin-dir='+str(mirror)],'FEDERATION_INIT')
     binary=pending/'federation.tfplan'
     call(['plan','-input=false','-var=enable_federation=true','-out='+str(binary)],'FEDERATION_PLAN')
     plan=json.loads(call(['show','-json',str(binary)],'FEDERATION_SHOW'))
     result={'status':'FEDERATION_PLAN_AWAITING_REVIEW','applied':False,'plan_sha256':records.sha(binary.read_bytes()),
-            'private_plan':str(binary),**summarize(plan)}
+            'private_plan':str(binary),'successor_state_sha256':completed['successor_state_sha256'],**summarize(plan)}
     op.keep(pending,'review.json',result)
     print(json.dumps(result))
 
@@ -75,6 +80,7 @@ if __name__=='__main__':
         main()
     except Exception as exc:
         import re
-        code=str(exc)
+        import errno
+        code=errno.errorcode.get(exc.errno,'OS_ERROR') if isinstance(exc,OSError) else str(exc)
         print(json.dumps({'status':'FEDERATION_PLAN_STOPPED','code':code if re.fullmatch('[A-Z][A-Z_0-9]{2,80}',code) else type(exc).__name__,'applied':False}))
         raise SystemExit(2)
