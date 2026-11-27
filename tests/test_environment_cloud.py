@@ -1,5 +1,6 @@
 """Credential-free deployment/cleanup trust-boundary tests."""
 from copy import deepcopy
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -20,6 +21,7 @@ def config():
     project = "jems-nonprod-test"
     return dict(version=1, enabled=True, projectId=project, projectNumber="123456789012",
                 region="us-east5", runtimeServiceAccount=f"jems-static-runtime@{project}.iam.gserviceaccount.com",
+                testRuntimeServiceAccount=f"jems-test-runtime@{project}.iam.gserviceaccount.com",
                 deployServiceAccount=f"jems-nonprod-deploy@{project}.iam.gserviceaccount.com",
                 uatServiceAccount=f"jems-nonprod-uat@{project}.iam.gserviceaccount.com",
                 iapAudience="123456789012-example.apps.googleusercontent.com",
@@ -41,7 +43,7 @@ def service(pr=3, *, kind="dev", expiry=NOW + 3600):
                          "annotations": {"run.googleapis.com/iap-enabled": "true"}},
             "spec": {"template": {"metadata": {"annotations": {"autoscaling.knative.dev/minScale": "0",
                                                                 "autoscaling.knative.dev/maxScale": "1"}},
-                                  "spec": {"serviceAccountName": config()["runtimeServiceAccount"],
+                                  "spec": {"serviceAccountName": cloud.runtime_account(config(), kind),
                                            "containers": [{"image": image(), "env": [
                                                {"name": "JEMS_ENVIRONMENT", "value": kind},
                                                {"name": "JEMS_SOURCE_SHA", "value": SOURCE},
@@ -75,7 +77,7 @@ class FakeCloud:
         if args[:2] == ("organizations", "get-iam-policy"):
             return self.ancestor_policy
         if args[:3] == ("iam", "service-accounts", "describe"):
-            return {"email": config()["runtimeServiceAccount"]}
+            return {"email": args[3]}
         if args[:4] == ("iam", "service-accounts", "keys", "list"):
             return []
         if args[:3] == ("artifacts", "repositories", "describe"):
@@ -110,10 +112,40 @@ def deploy(fake, **kwargs):
 
 
 class CloudTrustTests(unittest.TestCase):
+    def test_private_audience_binding_for_protected_controller(self):
+        record = json.dumps({"nonce": "b" * 64, "members": ["user:adult@example.invalid"]})
+        public = {**config(), "ownerIapMembers": [],
+                  "ownerIapBindingSha256": hashlib.sha256(record.encode()).hexdigest()}
+        cloud.validate_config(public, public_record=True)
+        hydrated = cloud.bind_private_members(public, record)
+        self.assertEqual(hydrated["ownerIapMembers"], ["user:adult@example.invalid"])
+        self.assertEqual(public["ownerIapMembers"], [])
+        for value in (None, "", record.replace("adult", "other")):
+            with self.assertRaises(cloud.EnvironmentError):
+                cloud.bind_private_members(public, value)
+        with self.assertRaises(cloud.EnvironmentError):
+            cloud.Cloud(public)
+        with self.assertRaises(cloud.EnvironmentError):
+            cloud.validate_config(hydrated, public_record=True)
+        for members in ([], ["allUsers"], ["group:team@example.invalid"], ["user:a@b.test"] * 2):
+            bad = json.dumps({"nonce": "b" * 64, "members": members})
+            with self.assertRaises(cloud.EnvironmentError):
+                cloud.bind_private_members({**public, "ownerIapBindingSha256": hashlib.sha256(bad.encode()).hexdigest()}, bad)
+
+    def test_dev_and_test_cannot_share_runtime_or_use_other_lane_identity(self):
+        c = config()
+        c['testRuntimeServiceAccount'] = c['runtimeServiceAccount']
+        with self.assertRaisesRegex(cloud.EnvironmentError, 'SEPARATE_RUNTIME_REQUIRED'):
+            cloud.validate_config(c)
+        fake = FakeCloud([service(None, kind='test')])
+        fake.state['jems-test']['spec']['template']['spec']['serviceAccountName'] = config()['runtimeServiceAccount']
+        with self.assertRaisesRegex(cloud.EnvironmentError, 'RUNTIME_IDENTITY_DRIFT'):
+            cloud.inspect(config(), fake, kind='test', pr=None, source_sha=SOURCE, bundle_sha256=BUNDLE, image=image())
+
     def test_disabled_template_can_plan_but_cannot_access_cloud(self):
         c = config()
         c.update(enabled=False, ownerIapMembers=[])
-        for key in ("projectId", "projectNumber", "runtimeServiceAccount", "deployServiceAccount", "uatServiceAccount",
+        for key in ("projectId", "projectNumber", "runtimeServiceAccount", "testRuntimeServiceAccount", "deployServiceAccount", "uatServiceAccount",
                     "iapAudience", "wifProvider", "registry"):
             c[key] = None
         self.assertEqual(cloud.validate_config(c, require_enabled=False), c)

@@ -124,6 +124,7 @@ jobs:
         name: Publish immutable image and verify private service
         env:
           GH_TOKEN: ${{ github.token }}
+          JEMS_OWNER_IAP_BINDING: ${{ secrets.JEMS_OWNER_IAP_BINDING }}
         run: python3 scripts/environments/automation.py deploy
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -208,6 +209,7 @@ jobs:
       - name: Reconcile closed or expired owned previews
         env:
           GH_TOKEN: ${{ github.token }}
+          JEMS_OWNER_IAP_BINDING: ${{ secrets.JEMS_OWNER_IAP_BINDING }}
         run: python3 scripts/environments/automation.py cleanup
 
   private-family-candidate:

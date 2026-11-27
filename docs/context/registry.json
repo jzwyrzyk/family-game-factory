@@ -897,10 +897,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-27T19:48:27.570Z",
-      "sourceDigest": "33455ca47335184e0ff58ece067c45bad1c22027f6dcbd72dd29677e82e213e3",
+      "reviewedAt": "2026-11-27T19:51:47.133Z",
+      "sourceDigest": "d2edfb56bc21f88e581ca0398ce9bc685d3566d02d9d9475a9619780149c8d05",
       "reviewOutcome": "updated",
-      "reviewReason": "Checked the #228 diagnostics overlap and retained the exact held command-policy and hosted evidence gates.",
+      "reviewReason": "Rechecked the reviewed private site identity and directory support with the current trusted DEV profile.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T19:48:27.043Z",
-      "sourceDigest": "bc6a72d8b12923b16c7b06195eefe09bbda19b226725b9f47b96b2c6ca019a85",
+      "reviewedAt": "2026-11-27T19:51:48.141Z",
+      "sourceDigest": "6aeae627a038a5deba4781047da6d1c40ee89856ca5383b57ea340eb3a146e25",
       "reviewOutcome": "updated",
-      "reviewReason": "Bound the three overlapping diagnostics files to the exact accepted protected blobs and retained both delivery histories in the held source resolution.",
+      "reviewReason": "Rehearsed the existing private binding and directory support on the exact updated DEV policy with the nonproduction controller disabled.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
