@@ -513,10 +513,55 @@ def tf(folder, *args, ok=(0,)):
     return command(['terraform', *args], folder, 'TERRAFORM_' + args[0].upper(), folder, ok)
 
 
+def comparable_plan(plan):
+    material = {k: v for k, v in plan.items() if k != 'timestamp'}
+    if 'relevant_attributes' in material:
+        # Terraform describes the outer order as insignificant. Keep every row,
+        # its multiplicity and the exact order of each nested attribute path.
+        rows = material['relevant_attributes']
+        need(isinstance(rows, list) and all(isinstance(r, dict) and set(r) == {'resource', 'attribute'}
+             and isinstance(r['resource'], str) and isinstance(r['attribute'], list) for r in rows),
+             'RELEVANT_ATTRIBUTES_INVALID')
+        material['relevant_attributes'] = sorted(rows, key=lambda r: json.dumps(r, sort_keys=True))
+    return material
+
+
 def plan_identity(plan):
-    # Exclude only generation time. Includes all configuration, variables, prior
-    # state, output changes, unknowns, checks and the complete refreshed diff.
-    return digest({k: v for k, v in plan.items() if k != 'timestamp'})
+    return digest(comparable_plan(plan))
+
+
+def verify_prior_recheck(parent, attempt, receipt_hash):
+    # Read the closed pre-apply attempt without refreshing or editing its files.
+    need(re.fullmatch(r'attempt-[a-f0-9]{32}', attempt), 'PRIOR_ATTEMPT_INVALID')
+    folder = private_path(parent / attempt, directory=True)
+    need(not (folder / 'apply-started').exists(), 'RECOVERY_ALREADY_STARTED_INSPECT_SUCCESSOR_STATE')
+    receipt = read_json(private_path(folder / 'reviewed-recovery.json'))
+    need(digest(receipt) == receipt_hash and receipt.get('source_sha') == 'cb98b1dcc66ae588547d6e4ae31cffb23e48dc83'
+         and receipt.get('status') == 'REVIEWED_REMAINING_ACTIONS_NOT_APPLIED', 'PRIOR_RECEIPT_MISMATCH')
+    saved = private_path(folder / 'remaining.tfplan')
+    need(sha(saved.read_bytes()) == receipt['plan_sha256'], 'RECOVERY_PLAN_CHANGED')
+    rechecks = list(folder.glob('recheck-*.tfplan'))
+    need(len(rechecks) == 1 and re.fullmatch(r'recheck-[0-9a-f]{32}\.tfplan', rechecks[0].name),
+         'PRIOR_RECHECK_MISSING_OR_AMBIGUOUS')
+    def show(path):
+        return json.loads(command(['terraform', 'show', '-json', str(path)], folder, 'PRIOR_PLAN_SHOW'))
+    reviewed = show(saved)
+    actual = show(private_path(rechecks[0]))
+    def old_identity(plan):
+        return digest({k: v for k, v in plan.items() if k != 'timestamp'})
+    need(old_identity(reviewed) == receipt['plan_identity'], 'PRIOR_PLAN_IDENTITY_MISMATCH')
+    need(old_identity(actual) != receipt['plan_identity'], 'PRIOR_DRIFT_NOT_REPRODUCED')
+    before, after = comparable_plan(reviewed), comparable_plan(actual)
+    if digest(before) != digest(after):
+        # Report only Terraform's public top-level field names. Keep values private.
+        sections = sorted(k for k in before.keys() | after.keys()
+                          if k not in before or k not in after or digest(before[k]) != digest(after[k]))
+        safe = {'resource_changes', 'resource_drift', 'planned_values', 'prior_state', 'configuration',
+                'variables', 'output_changes', 'checks', 'relevant_attributes', 'deferred_changes',
+                'terraform_version', 'format_version', 'applyable', 'complete', 'errored'}
+        raise Stop('PRIOR_PLAN_DRIFT_' + '_'.join(k.upper() if k in safe else 'OTHER' for k in sections))
+    return {'basis': 'ONLY_RELEVANT_ATTRIBUTES_REORDERED', 'prior_receipt_sha256': receipt_hash,
+            'prior_plan_sha256': receipt['plan_sha256'], 'recheck_sha256': sha(rechecks[0].read_bytes())}
 
 
 def make_plan(folder, filename, recorded, variables, imports, api):
@@ -526,7 +571,7 @@ def make_plan(folder, filename, recorded, variables, imports, api):
     return result, actions
 
 
-def prepare(original, destination, expected, hashes, variables, state, recorded, api):
+def prepare(original, destination, expected, hashes, variables, state, recorded, api, prior_comparison=None):
     iap_record = recorded_iap_identity(state)
     version = json.loads(command(['terraform', 'version', '-json'], phase='TERRAFORM_VERSION'))
     need(version.get('terraform_version') == '1.13.5', 'TERRAFORM_VERSION_MISMATCH')
@@ -570,6 +615,8 @@ def prepare(original, destination, expected, hashes, variables, state, recorded,
                'existing_resources': sorted(recorded), 'destruction': 0, 'replacement': 0,
                'existing_modification': 0, 'federation_enabled': False, 'live_ai': False,
                'retired_uncreated_address': OBSOLETE}
+    if prior_comparison:
+        receipt['prior_recheck'] = prior_comparison
     write_new(destination / 'reviewed-recovery.json', receipt)
     return {'status': receipt['status'], 'receipt': str(destination / 'reviewed-recovery.json'),
             'approve_plan_sha256': digest(receipt), 'actions': actions,
@@ -651,9 +698,11 @@ def main(argv=None):
     modes = p.add_mutually_exclusive_group(required=True)
     modes.add_argument('--plan', action='store_true')
     modes.add_argument('--apply-receipt', type=Path)
+    p.add_argument('--compare-recheck', nargs=2, metavar=('ATTEMPT', 'PRIOR_RECEIPT_SHA256'))
     p.add_argument('--approve-plan-sha256')
     a = p.parse_args(argv)
     try:
+        need(not a.compare_recheck or a.plan, 'RECHECK_COMPARISON_REQUIRES_PLANNING')
         source_identity(a.source_sha)
         original = private_path(a.state_dir, directory=True)
         need(ROOT not in original.parents and original != ROOT, 'STATE_INSIDE_CHECKOUT')
@@ -668,10 +717,15 @@ def main(argv=None):
             need(not (parent / 'apply-started').exists(), 'RECOVERY_ALREADY_STARTED_INSPECT_SUCCESSOR_STATE')
             if a.plan:
                 need(not a.approve_plan_sha256, 'PLAN_CANNOT_CONSUME_APPROVAL')
+                comparison = verify_prior_recheck(parent, *a.compare_recheck) if a.compare_recheck else None
                 destination = parent / ('attempt-' + uuid.uuid4().hex)
                 destination.mkdir(mode=0o700)
                 write_new(destination / 'original-evidence-manifest.json', hashes)
-                result = prepare(original, destination, a.source_sha, hashes, variables, state, recorded, Reader())
+                if comparison:
+                    write_new(destination / 'prior-recheck-comparison.json', comparison)
+                result = prepare(original, destination, a.source_sha, hashes, variables, state, recorded, Reader(), comparison)
+                if comparison:
+                    result['prior_recheck'] = comparison['basis']
             else:
                 receipt_path = private_path(a.apply_receipt)
                 folder = private_path(receipt_path.parent, directory=True)

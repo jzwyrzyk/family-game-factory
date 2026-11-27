@@ -121,7 +121,21 @@ After reviewing that private receipt, invoke the same handoff with
 `--apply-receipt /absolute/path/to/reviewed-recovery.json --approve-plan-sha256 HASH`.
 An approval for the original 28-resource plan cannot approve this corrected plan.
 Apply rechecks the original evidence, source, input bytes, actual inventory and
-all refreshed plan fields except generation time. A global, durable O_EXCL marker
+all refreshed plan fields except generation time. For `relevant_attributes` it
+sorts the outer list only. Terraform 1.13.5 can reorder that list on otherwise
+identical plans. Entries, duplicates, nested path order, resource changes,
+state, and the approved binary checksum are all bound.
+[Terraform 1.13.5 plan serializer](https://github.com/hashicorp/terraform/blob/v1.13.5/internal/command/jsonplan/plan.go#L810-L816)
+
+For a pre-apply `FULL_PLAN_DRIFT` from operator `cb98b1dc`, run the new
+launcher in `--plan` mode with `--compare-recheck ATTEMPT PRIOR_RECEIPT_SHA256`.
+It verifies the old receipt and saved plan, then compares the unique recheck in
+that attempt. A difference beyond metadata order and generation time stops
+before cloud planning. An order-only difference permits a fresh reviewed plan
+in a new directory. The new receipt carries the comparison evidence and
+requires its own approval.
+
+A global, durable O_EXCL marker
 precedes the first mutation; parallel operators and repeated applies stop. It
 applies the approved binary once, using serial provider operations, then requires
 27 managed instances, disabled federation and a full zero-change plan.

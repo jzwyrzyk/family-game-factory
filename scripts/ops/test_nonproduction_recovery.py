@@ -280,6 +280,48 @@ class RecoveryTests(unittest.TestCase):
         changed = copy.deepcopy(plan); changed['resource_changes'][0]['change']['after_unknown']['id'] = True
         self.assertNotEqual(old, recovery.plan_identity(changed))
 
+    def test_only_the_outer_relevant_attribute_order_is_insignificant(self):
+        a = {'resource': 'a', 'attribute': ['first', 'second']}
+        b = {'resource': 'b', 'attribute': ['other']}
+        plan = {'relevant_attributes': [a, b, a], 'resource_changes': ['a', 'b']}
+        identity = recovery.plan_identity(plan)
+        self.assertEqual(identity, recovery.plan_identity(dict(plan, relevant_attributes=[b, a, a])))
+        for rows in ([a, b], [a, a, a], [a, b, dict(a, attribute=['second', 'first'])], [a, b, dict(a, resource='c')]):
+            self.assertNotEqual(identity, recovery.plan_identity(dict(plan, relevant_attributes=rows)))
+        self.assertNotEqual(identity, recovery.plan_identity(dict(plan, resource_changes=['b', 'a'])))
+        with self.assertRaisesRegex(recovery.Stop, 'RELEVANT_ATTRIBUTES_INVALID'):
+            recovery.plan_identity(dict(plan, relevant_attributes=[{'resource': 'a', 'attribute': 'first'}]))
+        self.assertEqual(plan['relevant_attributes'], [a, b, a])
+
+    def test_prior_attempt_comparison_requires_exact_receipt_binary_and_order_only(self):
+        rows = [{'resource': v, 'attribute': ['field']} for v in ('a', 'b')]
+        old = {'relevant_attributes': rows, 'prior_state': {'private': 'before'}}
+        fresh = dict(old, relevant_attributes=list(reversed(rows)))
+        with tempfile.TemporaryDirectory() as temp:
+            parent = Path(temp)
+            folder = parent / ('attempt-' + 'a'*32)
+            folder.mkdir(mode=0o700)
+            binary = b'reviewed plan'
+            recovery.write_new(folder / 'remaining.tfplan', binary)
+            recovery.write_new(folder / ('recheck-' + 'b'*32 + '.tfplan'), b'recheck')
+            receipt = {'source_sha': 'cb98b1dcc66ae588547d6e4ae31cffb23e48dc83', 'plan_sha256': recovery.sha(binary),
+                       'status': 'REVIEWED_REMAINING_ACTIONS_NOT_APPLIED', 'plan_identity': recovery.digest(old)}
+            recovery.write_new(folder / 'reviewed-recovery.json', receipt)
+            def verify(new, approval=recovery.digest(receipt)):
+                with patch.object(recovery, 'command', side_effect=[json.dumps(old), json.dumps(new)]) as run:
+                    result = recovery.verify_prior_recheck(parent, folder.name, approval)
+                    self.assertEqual([c.args[0][:3] for c in run.call_args_list], [['terraform', 'show', '-json']]*2)
+                    return result
+            self.assertEqual(verify(fresh)['basis'], 'ONLY_RELEVANT_ATTRIBUTES_REORDERED')
+            with self.assertRaisesRegex(recovery.Stop, '^PRIOR_PLAN_DRIFT_PRIOR_STATE$'):
+                verify(dict(fresh, prior_state={'private': 'after'}))
+            with self.assertRaisesRegex(recovery.Stop, 'PRIOR_DRIFT_NOT_REPRODUCED'): verify(old)
+            with self.assertRaisesRegex(recovery.Stop, 'PRIOR_RECEIPT_MISMATCH'): verify(fresh, '0'*64)
+            (folder / 'remaining.tfplan').write_bytes(b'changed')
+            with self.assertRaisesRegex(recovery.Stop, 'RECOVERY_PLAN_CHANGED'): verify(fresh)
+            recovery.write_new(folder / 'apply-started', b'marker')
+            with self.assertRaisesRegex(recovery.Stop, 'RECOVERY_ALREADY_STARTED'): verify(fresh)
+
     def test_errors_are_fixed_codes_numeric_3_does_not_prove_cause(self):
         self.assertEqual(recovery.failure_codes('INVALID_ARGUMENT code 3 private-user@example.com'), ['INVALID_ARGUMENT'])
         self.assertIn('WIF_DISPLAY_NAME_LIMIT', recovery.failure_codes('display_name must be at most 32 characters'))
