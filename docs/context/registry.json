@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T20:38:31.968Z",
-      "sourceDigest": "1b60ddc1dccee9c587cf86af188dc69e65645290d14426aabe338ae59d5af83d",
+      "reviewedAt": "2026-11-27T20:52:10.832Z",
+      "sourceDigest": "c1d589a056ce8e8564bb333e7a7432ba1108213699981b76e1bc90c8e9d370db",
       "reviewOutcome": "updated",
-      "reviewReason": "Record installed private site binding support, exact protected merge tree, disabled parameters and skipped deployment on the verified controller run.",
+      "reviewReason": "Document the single administrator session for the protected private DEV membership binding, with console client selection, existing-secret checks and deployment disabled.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
