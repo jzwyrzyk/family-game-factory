@@ -1,5 +1,11 @@
 # Jems delivery state
 
+## Native diagnostic acceptance
+
+The administrator verified 27 nonproduction resources and a zero-change recovery plan. The GitHub diagnostics workflow on protected main verified four native permissions in [run 46056038814](https://github.com/jzwyrzyk/family-game-factory/actions/runs/46056038814). The complete IAM audit passed all 77 checks. The private broker serves `jems-request-evidence-c-b51ec464f42c61a4c8ad` using image digest `sha256:9b4ea06f03b0725182fa123898d8ab536dcabebe604affee88aaefe23e983143`. The preceding native broker and original rollback revision are retained.
+
+Dated coverage for November 24, 15:20–16:20 UTC returned 31 Gateway, two Preview and two Coach requests. The protected first-attempt artifacts matched independent Cloud Monitoring counts. The attestation expires December 4 at 19:43:43 UTC. The nonproduction federation and DEV deployment require separate activation. [Gateway](https://github.com/jzwyrzyk/family-game-factory/actions/runs/46058772393) · [Preview](https://github.com/jzwyrzyk/family-game-factory/actions/runs/46058840373) · [Coach](https://github.com/jzwyrzyk/family-game-factory/actions/runs/46058902514)
+
 ## Current source and next integration
 
 The frozen application candidate is `bc602f1ede502f398308ad56f973c4bf7997ff08`. Its protected-main full regression passed on attempt one with 122 commands. The earlier accepted offline UI candidate is `d5c2cfaff8e3941667fdc6d4d5426c341ab009ad`. Engineering changes after the freeze have a separate source identity. Resolve current engineering main with `git ls-remote origin refs/heads/main`. [Freeze PR](https://github.com/jzwyrzyk/family-game-factory/pull/182) · [Frozen full run](https://github.com/jzwyrzyk/family-game-factory/actions/runs/45736843451)

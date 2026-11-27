@@ -897,10 +897,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:29:48.496Z",
+      "reviewedAt": "2026-11-27T19:51:47.133Z",
       "sourceDigest": "d2edfb56bc21f88e581ca0398ce9bc685d3566d02d9d9475a9619780149c8d05",
       "reviewOutcome": "updated",
-      "reviewReason": "Checked directory and private environment contract coverage including rejection of altered protected membership and distinct runtime credentials.",
+      "reviewReason": "Rechecked the reviewed private site identity and directory support with the current trusted DEV profile.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-26T23:29:47.709Z",
-      "sourceDigest": "6b41644bc4297907248414d9c0c6a0fc052d88d3125df5ae22a0a00a040c326e",
+      "reviewedAt": "2026-11-27T19:51:48.141Z",
+      "sourceDigest": "6aeae627a038a5deba4781047da6d1c40ee89856ca5383b57ea340eb3a146e25",
       "reviewOutcome": "updated",
-      "reviewReason": "Prepared the approved private owner membership binding and distinct DEV and TEST identities while retaining the existing household directory link.",
+      "reviewReason": "Rehearsed the existing private binding and directory support on the exact updated DEV policy with the nonproduction controller disabled.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

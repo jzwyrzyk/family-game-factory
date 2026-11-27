@@ -46,6 +46,30 @@
         "e222fa3e58f295791a1cdcdc3e45bb53ea86c785"
       ],
       "resolved": "6da5c046763979d40f46b4b3be719d1acf5b9eb2"
+    },
+    ".github/workflows/jems-production-diagnostics.yml": {
+      "installed": [
+        "0c3e0a7cf5c0779baeb24dedc01289ea816116d7"
+      ],
+      "resolved": "0c3e0a7cf5c0779baeb24dedc01289ea816116d7"
+    },
+    "ops/request-broker/main.py": {
+      "installed": [
+        "d098654cfa863e89a9658bc9fa05418d5714af0c"
+      ],
+      "resolved": "d098654cfa863e89a9658bc9fa05418d5714af0c"
+    },
+    "scripts/ops/test_request_evidence_workflow.py": {
+      "installed": [
+        "2764e83fa7877033ec591ea61b81302c63a36fd1"
+      ],
+      "resolved": "2764e83fa7877033ec591ea61b81302c63a36fd1"
+    },
+    "DELIVERY-STATE.md": {
+      "installed": [
+        "60b7c169fa1eb4b9abd69220bd58658d4c04e62a"
+      ],
+      "resolved": "edeb77341eab426cc8f90d025be76df0b0e85fbc"
     }
   }
 }
