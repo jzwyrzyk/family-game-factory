@@ -36,6 +36,13 @@ POOL_NAME = f'projects/{NUMBER}/locations/global/workloadIdentityPools/jems-nonp
 PROVIDER_NAME = POOL_NAME + '/providers/github-main'
 DISPLAY = 'Jems protected main controller'
 BUDGET_DISPLAY = 'Jems nonproduction monthly USD 15'
+REGISTRY = 'google_artifact_registry_repository.static'
+RUNTIME_ACT_AS = 'google_service_account_iam_member.runtime_act_as'
+REFRESH_FIELDS = {REGISTRY: 'labels', RUNTIME_ACT_AS: 'etag'}
+RUNTIME_ACCOUNT = f'projects/{PROJECT}/serviceAccounts/jems-static-runtime@{PROJECT}.iam.gserviceaccount.com'
+DEPLOY_MEMBER = f'serviceAccount:jems-nonprod-deploy@{PROJECT}.iam.gserviceaccount.com'
+ACT_AS_ROLE = 'roles/iam.serviceAccountUser'
+INSPECT_ROLE = f'projects/{PROJECT}/roles/jemsStaticRuntimeInspector'
 PARTIAL_PLAN = 'partial-recovery-1795714051.tfplan'
 
 
@@ -368,14 +375,59 @@ def provider_name_evidence(diagnosis, original_creates, remaining_creates):
             'length': len(original_name), 'maximum': 32, 'provider_error_observed': False}
 
 
-def guard_plan(plan, recorded, variables, imports):
+def verify_runtime_policy(api, etag):
+    # Each Terraform member stores the etag of the entire attached IAM policy.
+    policy = api.call('iam', 'POST', f'v1/{RUNTIME_ACCOUNT}:getIamPolicy?options.requestedPolicyVersion=3')
+    need(isinstance(policy, dict) and policy.get('etag') == etag, 'RUNTIME_POLICY_ETAG_MISMATCH')
+    bindings = policy.get('bindings')
+    expected = [{'role': role, 'members': [DEPLOY_MEMBER]} for role in (ACT_AS_ROLE, INSPECT_ROLE)]
+    need(type(policy.get('version', 0)) is int and policy.get('version', 0) in (0, 1, 3) and not policy.get('auditConfigs')
+         and isinstance(bindings, list) and len(bindings) == 2 and all(b in bindings for b in expected),
+         'RUNTIME_POLICY_BINDINGS_CHANGED')
+
+
+def verify_refresh(plan, entries, recorded, api):
+    seen = set()
+    for row in plan.get('resource_drift', []):
+        address = row.get('address')
+        need(address in REFRESH_FIELDS and address in recorded and address not in seen, 'EXISTING_RESOURCE_DRIFT')
+        seen.add(address)
+        planned = entries[address]
+        change = row['change']
+        for item in (row, planned):
+            need(item.get('mode') == 'managed' and item.get('type') == address.split('.')[0]
+                 and not any(key in item for key in ('previous_address', 'deposed', 'index', 'module_address'))
+                 and not any(item['change'].get(k) for k in ('replace_paths', 'importing', 'after_unknown'))
+                 and item['change'].get('before_identity') == item['change'].get('after_identity'),
+                 'EXISTING_RESOURCE_DRIFT')
+        before, after = change.get('before'), change.get('after')
+        field = REFRESH_FIELDS[address]
+        need(change['actions'] == ['update'] and planned['change']['actions'] == ['no-op']
+             and isinstance(before, dict) and isinstance(after, dict) and field in before and field in after
+             and digest({**before, field: after[field]}) == digest(after)
+             and digest(planned['change'].get('before')) == digest(after)
+             and digest(planned['change'].get('after')) == digest(after), 'EXISTING_RESOURCE_DRIFT')
+        if address == REGISTRY:
+            need(before[field] is None and after[field] == {} and after.get('project') == PROJECT
+                 and after.get('location') == 'us-east5' and after.get('repository_id') == 'jems-environments',
+                 'REGISTRY_LABEL_REFRESH_MISMATCH')
+        else:
+            need(all(isinstance(v, str) and v for v in (before[field], after[field]))
+                 and before[field] != after[field] and after.get('service_account_id') == RUNTIME_ACCOUNT
+                 and after.get('role') == ACT_AS_ROLE and after.get('member') == DEPLOY_MEMBER
+                 and not after.get('condition'), 'RUNTIME_MEMBER_REFRESH_MISMATCH')
+            need(api is not None, 'RUNTIME_POLICY_EVIDENCE_REQUIRED')
+            verify_runtime_policy(api, after[field])
+
+
+def guard_plan(plan, recorded, variables, imports, api=None):
     need(plan.get('errored', False) is False and not plan.get('deferred_changes')
          and plan.get('complete', True) is True, 'PLAN_INCOMPLETE')
-    need(not plan.get('resource_drift'), 'EXISTING_RESOURCE_DRIFT')
     need(all(c.get('status') == 'pass' for c in plan.get('checks', [])), 'TERRAFORM_CHECK_FAILED_OR_UNKNOWN')
     entries = {c['address']: c for c in plan.get('resource_changes', []) if c.get('mode') == 'managed'}
     need(len(entries) == len([c for c in plan.get('resource_changes', []) if c.get('mode') == 'managed'])
          and set(entries) == recorded | REMAINING and OBSOLETE not in entries, 'PLAN_ADDRESS_SCOPE_MISMATCH')
+    verify_refresh(plan, entries, recorded, api)
     for address, item in entries.items():
         change = item['change']; actions = change['actions']
         expected = ['no-op'] if address in recorded or address in imports else ['create']
@@ -449,10 +501,10 @@ def plan_identity(plan):
     return digest({k: v for k, v in plan.items() if k != 'timestamp'})
 
 
-def make_plan(folder, filename, recorded, variables, imports):
+def make_plan(folder, filename, recorded, variables, imports, api):
     tf(folder, 'plan', '-input=false', '-lock-timeout=30s', '-parallelism=1', '-out=' + filename)
     result = json.loads(tf(folder, 'show', '-json', filename))
-    actions = guard_plan(result, recorded, variables, imports)
+    actions = guard_plan(result, recorded, variables, imports, api)
     return result, actions
 
 
@@ -485,7 +537,7 @@ def prepare(original, destination, expected, hashes, variables, state, recorded,
     remaining_creates = initial.validate_plan(prior)
     need({c['address'] for c in remaining_creates} == REMAINING | {OBSOLETE}, 'PARTIAL_PLAN_SCOPE_MISMATCH')
     name_evidence = provider_name_evidence(audit_result, original_creates, remaining_creates)
-    plan, actions = make_plan(destination, 'remaining.tfplan', recorded, variables, observed['imports'])
+    plan, actions = make_plan(destination, 'remaining.tfplan', recorded, variables, observed['imports'], api)
     need(evidence_hashes(original) == hashes, 'ORIGINAL_EVIDENCE_CHANGED')
     inputs = {n: sha((destination / n).read_bytes()) for n in ('main.tf', '.terraform.lock.hcl', 'terraform.tfvars.json', 'terraform.tfstate')}
     if observed['imports']: inputs['imports.tf.json'] = sha((destination / 'imports.tf.json').read_bytes())
@@ -494,6 +546,8 @@ def prepare(original, destination, expected, hashes, variables, state, recorded,
                'state_lineage': state['lineage'], 'state_serial': state['serial'], 'inputs': inputs,
                'plan_sha256': sha((destination / 'remaining.tfplan').read_bytes()), 'plan_identity': plan_identity(plan),
                'inventory': observed, 'recorded_iap_identity': iap_record, 'live_iap_acceptance': 'REQUIRED_BEFORE_DEV',
+               'verified_refresh_fields': {row['address']: REFRESH_FIELDS[row['address']]
+                                           for row in plan.get('resource_drift', [])},
                'diagnosis': audit_result, 'provider_name_evidence': name_evidence, 'actions': actions,
                'existing_resources': sorted(recorded), 'destruction': 0, 'replacement': 0,
                'existing_modification': 0, 'federation_enabled': False, 'live_ai': False,
@@ -534,7 +588,7 @@ def execute(original, folder, expected, approval, api):
     observed = reconcile(api, variables)
     need(observed == receipt['inventory'], 'CLOUD_INVENTORY_CHANGED')
     recheck_name = 'recheck-' + uuid.uuid4().hex + '.tfplan'
-    plan, _ = make_plan(folder, recheck_name, recorded, variables, observed['imports'])
+    plan, _ = make_plan(folder, recheck_name, recorded, variables, observed['imports'], api)
     need(plan_identity(plan) == receipt['plan_identity'], 'FULL_PLAN_DRIFT')
     need(evidence_hashes(original) == hashes, 'ORIGINAL_EVIDENCE_CHANGED')
     # Network reads/replanning can take minutes. Rebind the bytes at the last

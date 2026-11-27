@@ -91,9 +91,19 @@ Original state, configuration, receipts, plans and marker remain unchanged.
 Live reconciliation reads the exact project/billing, APIs, permissions, disabled
 pool/provider, project IAM policy and all budget pages. Permission denial never
 means absence. Plan-time imports avoid blind duplicate creates. Full refreshed
-Terraform plans must contain every existing address as a no-op, no detected
-resource drift, passing checks, no deferred reads, and only the two exact allowed
-remaining resources. The receipt includes complete remaining values, source/input
+Terraform plans must contain every existing address as a no-op, passing
+checks, no deferred reads, and only the two exact allowed remaining resources.
+Two refresh differences can qualify on this preserved state. On the static
+registry, `labels` may go from null to an empty map. On the runtime act-as
+member, only the policy etag may change. The operator reads the named runtime
+account's policy with requested version 3, matches its etag and verifies the deployer is the
+sole member of both unconditional grants (Service Account User and the project
+runtime inspector). Both resources must have identical refreshed and planned
+values. Other drift stops recovery. The full refresh stays in the plan hash and
+the same checks run on the fresh pre-apply plan.
+[Google IAM service account policy read](https://cloud.google.com/iam/docs/reference/rest/v1/projects.serviceAccounts/getIamPolicy).
+
+The receipt includes complete remaining values, source/input
 hashes, state lineage/serial, inventory, private-evidence hashes and binary/full
 plan hashes. Its canonical SHA-256 is the **approval hash**.
 
@@ -125,6 +135,7 @@ refuses automatic replay.
 | `IAM_POLICY_CONTENTION`, `ABORTED` | Concurrent policy change; re-read, never attribute to the role automatically. |
 | `IAP_ROLE_AUDIT_UNCONFIRMED`, `UNRESOLVED_PROVIDER_AUDIT_ERROR`, `PROVIDER_PLAN_EVIDENCE_MISMATCH` | The required role audit, provider error diagnosis or exact saved provider inputs failed verification. Preserve the attempt for review. |
 | `EXISTING_RESOURCE_DRIFT`, `EXISTING_CHANGE_OR_UNEXPECTED_ACTION`, `FULL_PLAN_DRIFT` | Existing infrastructure or reviewed remaining actions changed; no apply. |
+| `REGISTRY_LABEL_REFRESH_MISMATCH`, `RUNTIME_MEMBER_REFRESH_MISMATCH`, `RUNTIME_POLICY_ETAG_MISMATCH`, `RUNTIME_POLICY_BINDINGS_CHANGED` | The reported metadata refresh could not be bound to the exact registry or runtime account policy. |
 | `BUDGET_INVENTORY_AMBIGUOUS`, `PROVIDER_CONFLICT_OR_SOFT_DELETED`, `OBSOLETE_IAP_BINDING_EXISTS` | Actual resources conflict; do not create, delete or adopt blindly. |
 | `APPROVAL_HASH_MISMATCH`, `RECOVERY_INPUT_CHANGED`, `RECOVERY_PLAN_CHANGED` | Approval or immutable material differs. |
 | `RECOVERY_ALREADY_STARTED_INSPECT_SUCCESSOR_STATE`, `TERRAFORM_APPLY_TIMEOUT_UNCERTAIN` | Preserve all evidence/state; no replay. |

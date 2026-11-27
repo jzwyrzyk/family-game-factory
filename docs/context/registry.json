@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T17:08:20.712Z",
-      "sourceDigest": "85c4ba84ff3ccb16600f1a871bc60bb6cbdceb03a0cc81c29a9deff68a06d32d",
+      "reviewedAt": "2026-11-27T17:22:37.675Z",
+      "sourceDigest": "5e672d9c799c71b416c7862301e0b496e96f157b801280f0b046e25f4303990b",
       "reviewOutcome": "updated",
-      "reviewReason": "Pin the verified display-name evidence correction for the existing two-phase recovery operator.",
+      "reviewReason": "Documented the bounded refresh proof, including verification of the direct runtime policy on both plan and pre-apply recheck.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

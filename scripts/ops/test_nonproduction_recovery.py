@@ -84,6 +84,107 @@ class RecoveryTests(unittest.TestCase):
         plan['resource_changes'].append({'address': 'data.google_project.nonproduction', 'mode': 'data', 'change': {'actions': ['read']}})
         with self.assertRaisesRegex(recovery.Stop, 'DEFERRED_DATA'): self.guard(plan)
 
+    def refresh_case(self):
+        plan, recorded, variables = fixture()
+        rows = {row['address']: row for row in plan['resource_changes']}
+        registry = rows[recovery.REGISTRY]
+        registry['change']['after'].update(project=recovery.PROJECT, location='us-east5',
+            repository_id='jems-environments', labels={}, effective_labels={'goog-terraform-provisioned': 'true'})
+        binding = {'address': recovery.RUNTIME_ACT_AS, 'mode': 'managed', 'type': 'google_service_account_iam_member',
+                   'change': {'actions': ['no-op'], 'after': {'etag': 'current', 'role': recovery.ACT_AS_ROLE,
+                              'member': recovery.DEPLOY_MEMBER, 'service_account_id': recovery.RUNTIME_ACCOUNT,
+                              'condition': []}}}
+        plan['resource_changes'].append(binding)
+        recorded.add(binding['address'])
+        plan['resource_drift'] = []
+        for row, field, old in ((registry, 'labels', None), (binding, 'etag', 'previous')):
+            row['change']['before'] = copy.deepcopy(row['change']['after'])
+            drift = copy.deepcopy(row)
+            drift['change']['actions'] = ['update']
+            drift['change']['before'][field] = old
+            plan['resource_drift'].append(drift)
+        policy = {'etag': 'current', 'version': 1, 'bindings': [
+            {'role': role, 'members': [recovery.DEPLOY_MEMBER]} for role in (recovery.INSPECT_ROLE, recovery.ACT_AS_ROLE)]}
+        api = Mock()
+        api.call.return_value = policy
+        return plan, recorded, variables, {}, api
+
+    def test_two_refresh_fields_require_no_ops_and_matching_direct_runtime_policy(self):
+        args = self.refresh_case()
+        self.assertEqual([r['actions'] for r in recovery.guard_plan(*args)], [['create'], ['create']])
+        args[-1].call.assert_called_once_with('iam', 'POST',
+            'v1/projects/jems-jzw-nonprod/serviceAccounts/jems-static-runtime@jems-jzw-nonprod.iam.gserviceaccount.com'
+            ':getIamPolicy?options.requestedPolicyVersion=3')
+
+    def test_policy_is_rechecked_before_creating_the_apply_marker(self):
+        plan, recorded, variables, _, api = self.refresh_case()
+        with tempfile.TemporaryDirectory() as temp:
+            original, folder, _, _, _, observed, receipt = self.transaction(temp)
+            receipt['plan_identity'] = recovery.plan_identity(plan)
+            (folder / 'reviewed-recovery.json').write_text(json.dumps(receipt))
+            api.call.return_value['etag'] = 'changed-since-review'
+            with patch.object(recovery, 'source_identity', return_value=receipt['source_files']), \
+                 patch.object(recovery, 'original_evidence', return_value=({}, variables, iap_state(), recorded)), \
+                 patch.object(recovery, 'command', return_value=b'{"terraform_version":"1.13.5"}'), \
+                 patch.object(recovery, 'reconcile', return_value=observed), \
+                 patch.object(recovery, 'tf', return_value=json.dumps(plan).encode()) as terraform:
+                with self.assertRaisesRegex(recovery.Stop, 'RUNTIME_POLICY_ETAG_MISMATCH'):
+                    recovery.execute(original, folder, 'a'*40, recovery.digest(receipt), api)
+            self.assertFalse((original / 'partial-recovery/apply-started').exists())
+            self.assertFalse(any('apply' in c.args for c in terraform.call_args_list))
+
+    def test_refresh_never_accepts_other_attributes_addresses_unknowns_moves_or_actions(self):
+        mutations = [
+            lambda rows: rows.append(copy.deepcopy(rows[0])),
+            lambda rows: rows[1].update(address='google_service_account_iam_member.runtime_inspect'),
+            lambda rows: rows[0]['change']['before'].pop('labels'),
+            lambda rows: rows[0]['change']['before'].update(effective_labels={}),
+            lambda rows: rows[1]['change']['before'].update(role='roles/owner'),
+            lambda rows: rows[1]['change'].update(after_unknown={'member': True}),
+            lambda rows: rows[1]['change'].update(importing={'id': 'other'}),
+            lambda rows: rows[1]['change'].update(actions=['delete']),
+            lambda rows: rows[0].update(previous_address='google_artifact_registry_repository.other'),
+        ]
+        for mutate in mutations:
+            args = self.refresh_case()
+            mutate(args[0]['resource_drift'])
+            with self.subTest(mutation=mutate), self.assertRaisesRegex(recovery.Stop, 'EXISTING_RESOURCE_DRIFT'):
+                recovery.guard_plan(*args)
+        for key, value in [('actions', ['update']), ('after', {'labels': {}}), ('before', {})]:
+            args = self.refresh_case()
+            args[0]['resource_changes'][3]['change'][key] = value
+            with self.subTest(key=key), self.assertRaises(recovery.Stop): recovery.guard_plan(*args)
+
+    def test_real_labels_and_changed_resource_identities_still_block(self):
+        for index, field, wrong in [(0, 'labels', {'new': 'true'}), (0, 'project', 'other'),
+                                    (0, 'repository_id', 'other'), (1, 'etag', 'previous'),
+                                    (1, 'role', 'roles/owner'), (1, 'member', 'allUsers'),
+                                    (1, 'service_account_id', 'other'), (1, 'condition', [{'title': 'conditional'}])]:
+            args = self.refresh_case()
+            row = args[0]['resource_drift'][index]
+            planned = next(r for r in args[0]['resource_changes'] if r['address'] == row['address'])
+            for attrs in (planned['change']['before'], planned['change']['after'], row['change']['after']):
+                attrs[field] = wrong
+            if field not in ('labels', 'etag'):
+                row['change']['before'][field] = wrong
+            with self.subTest(field=field), self.assertRaisesRegex(recovery.Stop, 'REFRESH_MISMATCH'):
+                recovery.guard_plan(*args)
+
+    def test_changed_runtime_policy_missing_grants_conditions_and_denial_block(self):
+        for mutate in [lambda policy: policy.update(etag='other'),
+                       lambda policy: policy['bindings'].pop(),
+                       lambda policy: policy['bindings'].append({'role': 'roles/owner', 'members': ['allUsers']}),
+                       lambda policy: policy['bindings'][0]['members'].append('allUsers'),
+                       lambda policy: policy['bindings'][1].update(condition={'expression': 'true'}),
+                       lambda policy: policy.update(version=2)]:
+            args = self.refresh_case()
+            mutate(args[-1].call.return_value)
+            with self.assertRaisesRegex(recovery.Stop, 'RUNTIME_POLICY_'): recovery.guard_plan(*args)
+        args = self.refresh_case()
+        args[-1].call.side_effect = recovery.Stop('READ_PERMISSION_DENIED')
+        with self.assertRaisesRegex(recovery.Stop, 'READ_PERMISSION_DENIED'): recovery.guard_plan(*args)
+        with self.assertRaisesRegex(recovery.Stop, 'EVIDENCE_REQUIRED'): recovery.guard_plan(*args[:-1])
+
     def test_import_only_exact_id_and_no_modification(self):
         plan, _, _ = fixture(); entry = plan['resource_changes'][0]
         entry['change']['actions'] = ['no-op']; entry['change']['importing'] = {'id': recovery.PROVIDER_NAME}
