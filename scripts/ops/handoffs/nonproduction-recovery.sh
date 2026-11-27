@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Reviewed implementation: cb98b1dcc66ae588547d6e4ae31cffb23e48dc83 (scoped correction on PR222).
+# Reviewed implementation: 14188d773e7792d3ece5bcf46cc775d99537f8d8 (scoped correction on PR222).
 # This file's SHA-256 is an integrity checksum, NOT a Terraform approval.
 # Approval hash: unavailable until the private-state/cloud planning checks pass.
 #
@@ -18,7 +18,7 @@
 set -euo pipefail
 umask 077
 export JEMS_OPERATIONS_RECEIPT_DIR="${JEMS_OPERATIONS_RECEIPT_DIR:-$HOME/work/jems-operations-recovery}"
-recovery_source=cb98b1dcc66ae588547d6e4ae31cffb23e48dc83
+recovery_source=14188d773e7792d3ece5bcf46cc775d99537f8d8
 recovery_launcher_sha256=c0248cabdeb6ea195051b3b3c17eb0a30cf7e0567e9af5eff104a2c521620071
 if [[ ${1:-} == --help ]]; then
   cat <<'HELP'

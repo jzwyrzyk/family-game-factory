@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T17:46:24.789Z",
-      "sourceDigest": "3a75461ed141771a2193ce10a1f5920514995d2ca9c4f7e7645d40a2bc7ad7ad",
+      "reviewedAt": "2026-11-27T17:46:25.510Z",
+      "sourceDigest": "e8d6def974f0048fddf1ea616913feb9c89f10f2402a6eb71692eee660816d9a",
       "reviewOutcome": "updated",
-      "reviewReason": "Document the observed order-only Terraform metadata difference, the private saved-plan comparison, and continued exact receipt approval.",
+      "reviewReason": "Pin the operator that can compare the blocked attempt locally and prepare a fresh review only on a proven metadata reorder.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
