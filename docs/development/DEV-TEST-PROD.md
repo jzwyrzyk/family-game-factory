@@ -85,7 +85,7 @@ This proof validates source-level fixture coverage, not byte equality with the d
 
 TEST must ultimately support Home/navigation, Ready to Play, My Creations, coaching, generation/modification, artwork, coding, Math/Language, parent/profile controls, rewards/progression, the adult workspace and safe saving/recovery. The initial static packaging and browser smoke cover only a subset and must retain that limitation in status.
 
-Reconcile PR106's separate backend and worker work with current main before activation. Preserve device enrollment, adult permits/tab proof, family/profile boundaries, model-keyless gateway, private coach credentials, generated-code sandboxing and authorization rechecks. Do not enable child processing by fabricating consent records for synthetic tests. Use authorized adult operators and explicitly synthetic profiles.
+The [persistent DEV port](DEV-WORKBENCH.md) reconciles PR106's separate backend and worker contracts with the current consolidated application. Qualify its exact source and deployment before activation. Preserve device enrollment, adult permits/tab proof, family/profile boundaries, model-keyless gateway, private coach credentials, generated-code sandboxing and authorization rechecks. Do not enable child processing by fabricating consent records for synthetic tests. Use authorized adult operators and explicitly synthetic profiles.
 
 The TEST gateway currently needs one exact application origin; arbitrary PR origins must not share it by bypassing that check. Frontend-only PRs do not need independent backends. A future authorized full-stack PR lane must provide actual tenant/session isolation or its own reviewed backend scope before connecting live services.
 

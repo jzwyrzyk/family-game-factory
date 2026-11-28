@@ -17,14 +17,16 @@ import {narrationApproved,narrationConfig,validateNarrationText,validateNarratio
 import {readNarrationRequest} from './narration-transport';
 import {adultPilotFlags} from '../adult-pilot';
 import {readJsonBody} from '../http-json';
+import {validateDevProject,devServiceOrigin,assertDevProjectBinding,type DevCloudTarget} from '../dev-access';
 
 import {syntheticCoachReply} from './synthetic-scenario';
 import {testGatewayPrincipal,testCoachOrigin,testHouseholdPrincipal,trialExpiry} from './test-identity';
 export type VerifyCaller=(token:string)=>Promise<boolean>;
 export function googleCallerVerifier(audience:string,approvedServiceAccount:string,env:NodeJS.ProcessEnv=process.env,keys?:JWTVerifyGetKey):VerifyCaller {
+ const development=devCoachTarget(env);
  const funded=env.K_SERVICE==='jems-test-coach'&&approvedServiceAccount===testHouseholdPrincipal;
  const expiresAt=funded?trialExpiry(env):Infinity;
- if(!/^https:\/\/[^/?#]+$/.test(audience)||(env.K_SERVICE==='jems-test-coach'?(audience!==testCoachOrigin(env)||!funded&&approvedServiceAccount!==testGatewayPrincipal):approvedServiceAccount!=='factory-gateway@family-game-factory-jzw.iam.gserviceaccount.com'))
+ if(!/^https:\/\/[^/?#]+$/.test(audience)||(development?(audience!==devServiceOrigin(development,'coach')||approvedServiceAccount!==`jems-dev-gateway@${development.projectId}.iam.gserviceaccount.com`):env.K_SERVICE==='jems-test-coach'?(audience!==testCoachOrigin(env)||!funded&&approvedServiceAccount!==testGatewayPrincipal):approvedServiceAccount!=='factory-gateway@family-game-factory-jzw.iam.gserviceaccount.com'))
   throw Error('PRIVATE_COACH_IDENTITY_REQUIRED');
  const googleKeys=keys??createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
  return async(token)=>{
@@ -200,12 +202,14 @@ function privateConfig(env:NodeJS.ProcessEnv):PrivateCoachConfig {
  * a dedicated scoped API key, current prices and the approved gateway identity.
  */
 export function dedicatedCoachRuntime(env:NodeJS.ProcessEnv){
+ const development=devCoachTarget(env);
  if(env.K_SERVICE==='jems-test-coach'&&(env.FACTORY_COACH_PRIVATE_AUDIENCE!==testCoachOrigin(env)||env.FACTORY_COACH_GATEWAY_SERVICE_ACCOUNT!==testGatewayPrincipal))throw Error('PRIVATE_COACH_IDENTITY_REQUIRED');
- if(!['factory-coach-private','jems-test-coach'].includes(env.K_SERVICE??'')||env.FACTORY_COACH_EXECUTION_ENV!=='dedicated-cloud-run')
+ if(!(development?['jems-dev-coach']:['factory-coach-private','jems-test-coach']).includes(env.K_SERVICE??'')||env.FACTORY_COACH_EXECUTION_ENV!=='dedicated-cloud-run')
   throw Error('DEDICATED_PRIVATE_CLOUD_RUN_REQUIRED');
  if(env.FACTORY_OPENAI_API_KEY||env.FACTORY_COACH_API_KEY)
   throw Error('GENERATION_OR_GATEWAY_KEY_FORBIDDEN_IN_PRIVATE_COACH');
  const config=privateConfig(env),audioConfig=speechConfig(env),readingConfig=narrationConfig(env);
+ if(development&&[audioConfig.projectId,readingConfig.projectId].some(p=>p&&p!==development.projectId))throw Error('DEV_SPEECH_PROJECT_REQUIRED');
  const requested=env.FACTORY_COACH_APPROVED==='true';
  const audioRequested=env.FACTORY_COACH_AUDIO_APPROVED==='true';
  const narrationRequested=env.FACTORY_NARRATION_APPROVED==='true';
@@ -225,15 +229,24 @@ export function dedicatedCoachRuntime(env:NodeJS.ProcessEnv){
  if(narrationRequested&&!narrationApproved(readingConfig))throw Error('NARRATION_APPROVAL_REQUIRED');
  const audience=env.FACTORY_COACH_PRIVATE_AUDIENCE||'';
  const caller=env.FACTORY_COACH_GATEWAY_SERVICE_ACCOUNT||'';
- if(privateCoachOrigin(audience,env)!==audience)throw Error('COACH_AUDIENCE_REQUIRED');
- return {config,enabled:requested,syntheticCaller,verifyCaller:googleCallerVerifier(audience,test?testHouseholdPrincipal:caller,env),
+ if(privateCoachOrigin(audience,env,development)!==audience)throw Error('COACH_AUDIENCE_REQUIRED');
+ return {config,enabled:requested,...(development?{maxConcurrent:1}:{}),syntheticCaller,verifyCaller:googleCallerVerifier(audience,test?testHouseholdPrincipal:caller,env),
   provider:new OpenAICoachProvider(config),
   audioConfig,
   narrationConfig:readingConfig,
   narration:narrationRequested?new GooglePrivateNarration(readingConfig):undefined,
   audio:audioRequested?new GooglePrivateSpeech(audioConfig.projectId):undefined};
 }
+export function devCoachTarget(env:NodeJS.ProcessEnv):DevCloudTarget|undefined{
+ const requested=env.FACTORY_ENVIRONMENT==='development'||env.FACTORY_DEV_PROJECT_ID!==undefined||env.FACTORY_DEV_PROJECT_NUMBER!==undefined||env.FACTORY_DEV_REGION!==undefined;
+ if(!requested)return undefined;
+ if(env.FACTORY_ENVIRONMENT!=='development')throw Error('DEV_ACCESS_CONFIG_REQUIRED');
+ const project=validateDevProject(env.FACTORY_DEV_PROJECT_ID||'',env.FACTORY_DEV_PROJECT_NUMBER||'');
+ const target={...project,region:env.FACTORY_DEV_REGION||''};devServiceOrigin(target,'coach');return target;
+}
 async function main(){
+ const development=devCoachTarget(process.env);
+ if(development)await assertDevProjectBinding(development);
  const runtime=dedicatedCoachRuntime(process.env);
  const handler=privateCoachHandler(runtime);
  const port=Number(process.env.PORT||8080);

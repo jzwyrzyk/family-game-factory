@@ -30,7 +30,7 @@ import {createServer} from 'node:http';
 import {loadGatewayConfig} from './private-config';
 import {startBootstrap} from './bootstrap';
 import {databaseFor} from './storage/database';
-import {createRemoteJWKSet,jwtVerify} from 'jose';
+import {createRemoteJWKSet,jwtVerify,type JWTVerifyGetKey} from 'jose';
 import {JobService} from './pipeline/service';
 import {FirestoreRepository} from './pipeline/firestore';
 import {FileRepository} from './pipeline/repository';
@@ -46,7 +46,9 @@ import type {PremiumPilot} from './pipeline/premium-policy';
 import {sessionHandler} from './sessions';
 import {verifyBrowserSession,trustedDeviceHandler} from './trusted-devices';
 import {adultPilotConfigured,adultPilotFlags} from './adult-pilot';
+import {validateDevAccess,DevIapVerifier,runWithDevAccess,assertDevProjectBinding,devCloudTarget,devServiceOrigin,type DevAccessConfig} from './dev-access';
 export interface GatewayConfig {
+ devAccess?:DevAccessConfig;
  testExecution?:TestExecution;
  testTrial?:TestTrialAuthorization;
  platformMode?:'HOUSEHOLD'|'PRIVATE_FAMILY_BETA'|'PUBLIC'; beta?:BetaConfig;householdPrivateHost?:HouseholdHost;householdBudgetBinding?:HouseholdBinding;
@@ -71,7 +73,9 @@ export function approvedPremiumPilot(config:GatewayConfig,requested:boolean,adul
  validatePremiumApproval(config.premiumApproval);
  return {approval:config.premiumApproval,workerSha:config.premiumWorkerApprovedSha};
 }
-export async function createGateway(config:GatewayConfig,tenantRepo?:Repository){
+export async function createGateway(config:GatewayConfig,tenantRepo?:Repository,fixtures?:{iapKeys?:JWTVerifyGetKey}){
+ if(fixtures?.iapKeys&&(!config.localFile||process.env.K_SERVICE))throw Error('DEV_TEST_KEYS_FORBIDDEN_IN_CLOUD');
+ if((config.devAccess||process.env.FACTORY_ENVIRONMENT==='development')&&(tenantRepo||config.testExecution||config.beta||config.householdBudgetBinding||config.householdPrivateHost||config.householdRecovery||platformMode(config.platformMode)!=='HOUSEHOLD'))throw Error('DEV_MIXED_ENVIRONMENT_FORBIDDEN');
  const policy=testExecution(config);
  const fixture=policy?.providerMode==='fixture'&&config.familyId===config.beta?.testReset?.familyId;
  const encoding=artifactEncoding(config);
@@ -80,17 +84,26 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
  for(const origin of [config.appOrigin,config.gatewayOrigin,config.previewOrigin]){const url=new URL(origin);if(url.origin!==origin||url.protocol!=='https:')throw Error('HTTPS_ORIGINS_REQUIRED');}
  if(new URL(config.previewOrigin).hostname===new URL(config.appOrigin).hostname||new URL(config.previewOrigin).hostname===new URL(config.gatewayOrigin).hostname)throw Error('SEPARATE_PREVIEW_HOST_REQUIRED');
  if(!/^[A-Za-z0-9_-]{1,100}$/.test(config.familyId)||['__proto__','constructor','prototype'].includes(config.familyId))throw Error('FAMILY_ID_REQUIRED');
+ const dev=config.devAccess!==undefined||process.env.FACTORY_ENVIRONMENT==='development'?
+  validateDevAccess(config.devAccess!,{projectId:config.projectId!,workspace:config.workspace,familyId:config.familyId,artifactBucket:config.artifactBucket,iapService:'jems-dev-app'}):undefined;
+ const devTarget=dev?devCloudTarget(dev):undefined;
+ if(devTarget){
+  if(config.appOrigin!==devServiceOrigin(devTarget,'app')||config.gatewayOrigin!==devServiceOrigin(devTarget,'gateway')||config.previewOrigin!==devServiceOrigin(devTarget,'preview'))throw Error('DEV_ORIGINS_REQUIRED');
+  if(config.sessionKey===config.previewKey||config.sessionKey.length<32||config.previewKey.length<32)throw Error('DEV_DISTINCT_KEYS_REQUIRED');
+  if([process.env.FACTORY_COACH_AUDIO_PROJECT,process.env.FACTORY_NARRATION_PROJECT].some(p=>p&&p!==devTarget.projectId))throw Error('DEV_SPEECH_PROJECT_REQUIRED');
+  if(config.schedulerEmail!==undefined&&config.schedulerEmail!==`jems-dev-scheduler@${devTarget.projectId}.iam.gserviceaccount.com`)throw Error('DEV_SCHEDULER_IDENTITY_REQUIRED');
+ }
  // Fail closed on misplaced model credentials. This gateway is deliberately
  // keyless: only the independently approved private generation environment
  // is permitted to execute model calls.
  if(process.env.FACTORY_COACH_API_KEY||process.env.FACTORY_OPENAI_API_KEY||process.env.FACTORY_COACH_PRIVATE_OPENAI_API_KEY)throw Error('MODEL_KEY_FORBIDDEN_IN_GATEWAY');
- const coachTarget=config.coachPrivateOrigin?privateCoachOrigin(config.coachPrivateOrigin):null;
+ const coachTarget=config.coachPrivateOrigin?privateCoachOrigin(config.coachPrivateOrigin,process.env,devTarget):null;
  if(coachTarget&&[config.appOrigin,config.gatewayOrigin,config.previewOrigin].includes(coachTarget))throw Error('COACH_EXECUTOR_MUST_BE_SEPARATE');
  const environment=tenantRepo?{...process.env,FACTORY_ADULT_PILOT_MODE:'false',FACTORY_PREMIUM_BUILDER_APPROVED:'false'}:process.env;
  const adult=adultPilotFlags(environment);
  // The existing public frontend is shared. Only a server-verified, recently
  // unlocked adult profile may use the temporary pilot's paid API routes.
- if(adult.enabled&&!adultPilotConfigured(adult))
+ if((adult.enabled||dev)&&!adultPilotConfigured(adult))
   throw Error('ADULT_PILOT_PROFILE_ACCESS_REQUIRED');
  const paidEnabled=paidExecutionAllowed(config.active,process.env.FACTORY_ACTIONS_APPROVED)&&
   (policy?.providerMode!=='funded'||environment.FACTORY_PREMIUM_BUILDER_APPROVED==='true'&&adultPilotConfigured(adult));
@@ -107,29 +120,32 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
   mapped=mappedHouseholdRepository(firestoreStore(databaseFor(config)),b,
    config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,b.workspace):undefined,encoding);
  }
+ const iap=dev?new DevIapVerifier(dev,fixtures?.iapKeys):undefined;
+ if(dev&&!config.localFile){if(process.env.K_SERVICE!=='jems-dev-gateway')throw Error('DEV_GATEWAY_SERVICE_REQUIRED');await assertDevProjectBinding(dev);}
  const repo=tenantRepo??mapped??(config.localFile?await FileRepository.open(config.localFile):new FirestoreRepository(databaseFor(config),config.workspace,config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,config.workspace):undefined,encoding));
  await reconcilePaidReceipts(repo);
  const jobPolicy=policy?{...policy,workerSha:config.workerApprovedSha!}:undefined;
  const agent={kind:'metered-api' as const,testFixture:fixture,get available(){return (!policy||Date.now()<policy.expiresAt)&&(paidEnabled||fixture);},generate:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}};
  if(policy?.providerMode==='funded'&&!premiumPilot)premiumUnavailable=true;
- const service=new JobService(repo,agent,{test:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}},{allowMock:fixture,syntheticFixture:fixture,testExecution:jobPolicy,maxUnits:config.maxJobMicroUsd,premiumMaxJobMicroUsd:config.premiumMaxJobMicroUsd,timeoutMs:900000,maxRetries:2,requireVerifiedParentPrivacy:!adult.enabled,adultPilotMode:adult.enabled,premiumPilot,premiumConfigured:!!config.premiumApproval,premiumUnavailable});
+ const service=new JobService(repo,agent,{test:async()=>{throw Error('ACTIONS_WORKER_REQUIRED');}},{allowMock:fixture,syntheticFixture:fixture,testExecution:jobPolicy,maxUnits:config.maxJobMicroUsd,premiumMaxJobMicroUsd:config.premiumMaxJobMicroUsd,timeoutMs:900000,maxRetries:2,requireVerifiedParentPrivacy:!adult.enabled,adultPilotMode:adult.enabled,premiumPilot,premiumConfigured:!!config.premiumApproval,premiumUnavailable,devTestPolicy:dev});
  const privateWorker=Boolean(config.workerRepository||config.workerRepositoryId||config.workerWorkflow||config.workerApprovedSha);
- if(privateWorker&&!policy&&(!config.workerRepository||!config.workerRepositoryId||!config.workerWorkflow||!config.workerApprovedSha||config.workerRepository===config.repository||config.repository!=='jzwyrzyk/family-game-factory'||config.repositoryId!=='1458033181'||config.approvedSha!=='dcb887e6a51ba000fda1ccc42b9d198f8b9895f9'||config.workerRepositoryId!=='1458899834'||!Number.isSafeInteger(Number(config.workerRepositoryId))||Number(config.workerRepositoryId)<1||config.workerRepository!=='family-game-factory-lab/family-game-factory-worker'||config.workerWorkflow!=='factory-private.yml'||config.workerApprovedSha.length!==40||![...config.workerApprovedSha].every(c=>'0123456789abcdef'.includes(c))))throw Error('PRIVATE_WORKER_CONFIG_REQUIRED');
+ if(privateWorker&&!policy&&!dev&&(!config.workerRepository||!config.workerRepositoryId||!config.workerWorkflow||!config.workerApprovedSha||config.workerRepository===config.repository||config.repository!=='jzwyrzyk/family-game-factory'||config.repositoryId!=='1458033181'||config.approvedSha!=='dcb887e6a51ba000fda1ccc42b9d198f8b9895f9'||config.workerRepositoryId!=='1458899834'||!Number.isSafeInteger(Number(config.workerRepositoryId))||Number(config.workerRepositoryId)<1||config.workerRepository!=='family-game-factory-lab/family-game-factory-worker'||config.workerWorkflow!=='factory-private.yml'||config.workerApprovedSha.length!==40||![...config.workerApprovedSha].every(c=>'0123456789abcdef'.includes(c))))throw Error('PRIVATE_WORKER_CONFIG_REQUIRED');
+ if(dev&&(!privateWorker||!config.workerRepository||!config.workerRepositoryId||!config.workerWorkflow||!config.workerApprovedSha||config.repository!=='jzwyrzyk/family-game-factory'||config.repositoryId!=='1458033181'||!/^[a-f0-9]{40}$/.test(config.approvedSha)))throw Error('DEV_PRIVATE_WORKER_REQUIRED');
  if(config.active&&!privateWorker)throw Error('PRIVATE_WORKER_REQUIRED_FOR_ACTIVATION');
  const target={repository:config.workerRepository||config.repository,repositoryId:config.workerRepositoryId||config.repositoryId,workflow:config.workerWorkflow||config.workflow,approvedSha:config.workerApprovedSha||config.approvedSha,privateWorker};
  const token=installationTokenProvider({appId:config.githubAppId,installationId:config.githubInstallationId,repositoryId:Number(target.repositoryId)},()=>config.githubPrivateKey);
- const dispatcher=new GitHubDispatcher({enabled:paidEnabled||fixture,testExecution:policy,repository:target.repository,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker,callbackRoute:policy?'beta-test':tenantRepo?config.beta?.workerRoute:undefined},token),coordinator=new ActionCoordinator(repo,dispatcher,{...config.approval,enabled:fixture||paidEnabled&&config.approval.enabled},900000,!adult.enabled,adult.enabled,premiumPilot,config.premiumMaxJobMicroUsd,jobPolicy);
- const verifier=new GitHubOIDCVerifier({audience:config.gatewayOrigin,repository:target.repository,repositoryId:target.repositoryId,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker,testExecution:policy});
+ const dispatcher=new GitHubDispatcher({enabled:paidEnabled||fixture,testExecution:policy,repository:target.repository,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker,development:dev,callbackRoute:policy?'beta-test':tenantRepo?config.beta?.workerRoute:undefined},token),coordinator=new ActionCoordinator(repo,dispatcher,{...config.approval,enabled:fixture||paidEnabled&&config.approval.enabled},900000,!adult.enabled,adult.enabled,premiumPilot,config.premiumMaxJobMicroUsd,jobPolicy,dev);
+ const verifier=new GitHubOIDCVerifier({audience:config.gatewayOrigin,repository:target.repository,repositoryId:target.repositoryId,workflow:target.workflow,approvedSha:target.approvedSha,privateWorker,testExecution:policy,...(dev?{development:{owner:dev.workerOwner,ownerId:dev.workerOwnerId}}:{})});
  const worker=workerHandler(coordinator,verifier),http={protectedHousehold:!!config.householdPrivateHost,sessionKey:config.sessionKey,previewKey:config.previewKey,appOrigin:config.appOrigin,previewOrigin:config.previewOrigin,dispatch:async(id:string)=>{await coordinator.enqueue(id);await coordinator.tick();},poll:()=>coordinator.tick()};
- const coachService=new CoachService(repo,{...coachConfig(environment),...(fixture?{fixtureExpiresAt:policy!.expiresAt,maxTurnMicroUsd:1}:{}),requireVerifiedParentPrivacy:!adult.enabled},
-   coachTarget?new PrivateCoachBridge(coachTarget,undefined,undefined,fixture):undefined);
+ const coachService=new CoachService(repo,{...coachConfig(environment),...(fixture?{fixtureExpiresAt:policy!.expiresAt,maxTurnMicroUsd:1}:{}),requireVerifiedParentPrivacy:!adult.enabled,devTestPolicy:dev},
+   coachTarget?new PrivateCoachBridge(coachTarget,undefined,undefined,fixture,devTarget):undefined);
  const coach=coachHandler(coachService,{appOrigin:config.appOrigin,sessionKey:config.sessionKey},repo);
  const offlineSpeech:SpeechProvider={readiness:async()=>false,transcribe:async()=>{throw Error('AUDIO_UNAVAILABLE');}};
- const audio=speechHttpHandler(new CoachAudioService(repo,{...speechConfig(environment),requireVerifiedParentPrivacy:!adult.enabled},
-   coachTarget?new PrivateSpeechBridge(coachTarget):offlineSpeech),{appOrigin:config.appOrigin,sessionKey:config.sessionKey},repo);
+ const audio=speechHttpHandler(new CoachAudioService(repo,{...speechConfig(environment),requireVerifiedParentPrivacy:!adult.enabled,devTestPolicy:dev},
+   coachTarget?new PrivateSpeechBridge(coachTarget,undefined,undefined,devTarget):offlineSpeech),{appOrigin:config.appOrigin,sessionKey:config.sessionKey},repo);
  const offlineNarration:NarrationProvider={readiness:async()=>false,read:async()=>{throw Error('NARRATION_UNAVAILABLE');}};
- const narration=narrationHttpHandler(new NarrationService(repo,{...narrationConfig(environment),requireVerifiedParentPrivacy:!adult.enabled},
-   coachTarget?new PrivateNarrationBridge(coachTarget):offlineNarration),{appOrigin:config.appOrigin,sessionKey:config.sessionKey},repo);
+ const narration=narrationHttpHandler(new NarrationService(repo,{...narrationConfig(environment),requireVerifiedParentPrivacy:!adult.enabled,devTestPolicy:dev},
+   coachTarget?new PrivateNarrationBridge(coachTarget,undefined,undefined,devTarget):offlineNarration),{appOrigin:config.appOrigin,sessionKey:config.sessionKey},repo);
  const api=apiHandler(service,http,repo),sessions=sessionHandler(repo,{hostCookies:!!config.householdPrivateHost,appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey}),trusted=trustedDeviceHandler(repo,{appOrigin:config.appOrigin,familyId:config.familyId,sessionKey:config.sessionKey,adultPilot:adult,firstParty:!!tenantRepo,hostCookies:!!config.householdPrivateHost,eraseCoachReceipts:session=>coachService.eraseFamilyReceipts(session)});
  const schedulerKeys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
  const householdRecovery=(()=>{
@@ -141,6 +157,7 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
   },async tx=>authorize({get:async<T>(path:string)=>{const row=await tx.get(db.doc(path));return row.exists?row.data() as T:undefined;}})));
  })();
  return {service,repo,coordinator,handler:async(req:Parameters<typeof api>[0],res:Parameters<typeof api>[1])=>{
+  if(dev&&req.headers.host!==new URL(config.gatewayOrigin).host){res.writeHead(403);res.end();return;}
   const url=new URL(req.url!,config.gatewayOrigin);
   if(policy?.providerMode==='funded'&&Date.now()>=policy.expiresAt&&
      (url.pathname==='/v1/coach'||url.pathname==='/v1/coach/status')){
@@ -187,12 +204,19 @@ export async function createGateway(config:GatewayConfig,tenantRepo?:Repository)
   if(url.pathname==='/v1/internal/dispatch'){
    try{if(req.method!=='POST'||!config.schedulerEmail)throw Error();const token=req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];if(!token)throw Error();const {payload}=await jwtVerify(token,schedulerKeys,{issuer:['https://accounts.google.com','accounts.google.com'],audience:config.gatewayOrigin,algorithms:['RS256']});if(payload.email!==config.schedulerEmail||payload.email_verified!==true)throw Error();await reconcilePaidReceipts(repo);await coordinator.tick();res.writeHead(204);res.end();}catch{res.writeHead(403);res.end();}return;
   }
+  const browser=async()=>{
   if(url.pathname==='/v1/coach/audio'||url.pathname==='/v1/coach/audio/status'){await audio(req,res);return;}
   if(url.pathname==='/v1/coach/narration'||url.pathname==='/v1/coach/narration/status'){await narration(req,res);return;}
   if(url.pathname==='/v1/coach'||url.pathname==='/v1/coach/status'||url.pathname==='/v1/coach/erase'){await coach(req,res);return;}
   if(url.pathname==='/v1/sessions'){await sessions(req,res);return;}
   if(['/v1/sessions/enroll','/v1/sessions/renew','/v1/sessions/status'].includes(url.pathname)||url.pathname.startsWith('/v1/sessions/adult/')||url.pathname==='/v1/devices'||url.pathname.startsWith('/v1/devices/')){await trusted(req,res);return;}
   await api(req,res);
+  };
+  if(dev&&iap){
+   let identity;try{identity=await iap.verify(req.headers['x-goog-iap-jwt-assertion']);}
+   catch{res.writeHead(403,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({errorCode:'DEV_ADULT_ACCESS_REQUIRED'}));return;}
+   await runWithDevAccess(dev,identity,browser);
+  }else await browser();
  }};
 }
 export async function privateBetaGateway(config:GatewayConfig,surface?:Surface){

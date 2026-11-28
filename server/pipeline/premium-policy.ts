@@ -96,7 +96,7 @@ export function committedGameUnits(state:PipelineState,familyId:string,profileId
 
 /** Called inside the same report transaction that consumes the previous attempt
  * and schedules its successor. A rejected or replayed report cannot add a hold. */
-export function fundPremiumEditRepair(state:PipelineState,job:Job,approval:PremiumApproval,configured:number|undefined,assetRepair:boolean):string|undefined {
+export function fundPremiumEditRepair(state:PipelineState,job:Job,approval:PremiumApproval,configured:number|undefined,assetRepair:boolean,admitExtra?:(amount:number)=>boolean):string|undefined {
  if(job.premiumEditCeilingMicroUsd===undefined)return; // original whole-job hold
  const required=job.usedUnits+premiumAttemptReserve(approval,'repair',assetRepair,assetRepair);
  const extra=required-job.maxUnits;
@@ -108,6 +108,7 @@ export function fundPremiumEditRepair(state:PipelineState,job:Job,approval:Premi
  if(committed+extra>ceiling)return 'GAME_BUDGET_REACHED';
  const ledger=state.ledgers[job.familyId];
  if(!ledger?.paidEnabled||ledger.month!==new Date().toISOString().slice(0,7)||ledger.used+ledger.reserved+extra>ledger.allowance)return 'SPENDING_CUTOFF';
+ if(admitExtra&&!admitExtra(extra))return 'SPENDING_CUTOFF';
  ledger.reserved+=extra;
  job.maxUnits=required;
 }

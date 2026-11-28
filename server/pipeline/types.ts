@@ -4,6 +4,7 @@ import type {CoachReceipt} from '../coach/service';
 import type {FamilyCoachConsent} from '../coach/consent';
 import type {ParentPrivacyChoice} from '../privacy/parent-consent';
 import type {AdultPilotPermit,AdultPilotSession} from '../adult-pilot';
+import type {DevTestGrant,DevSpend} from '../dev-test-policy';
 import type {AudioReceipt} from '../coach/speech';
 import type {NarrationReceipt} from '../coach/narration';
 import type {TrustedDevice,FamilyParentAuth} from '../trusted-devices';
@@ -52,16 +53,18 @@ export interface Job extends BuildRequest {
   /** Internal authorization and audience; never accepted in a BuildRequest. */
   adultPilotSessionId?:string;
   adultPilotProfileId?:string;
+  /** Separate DEV provenance; never accepted from client request JSON. */
+  devTestGrantId?:string;devTestDeviceId?:string;devTestPolicyId?:string;
   id:string;familyId:string;status:JobStatus;adapter:'mock'|'metered-api'|'codex-subscription'|'local-rule';
   maxUnits:number;usedUnits:number;attempts?:number;phase?:string;revisionId?:string;errorCode?:string;retryCount:number;
 }
 export interface RecoveryProvenance {sourceOrigin:string;sourceAudience:string;sourceRevisionId:string;sourceProjectId:string;sourceHash:string;playbackOnly:true}
-export interface BuiltRevision { id:string;familyId:string;parentId:string|null;game:PlayableGame|null;projectId:string;sourceGame?:string;config?:Record<string,number|boolean>;name?:string;sourceRevisionId?:string;copyRequestId?:string;adapter?:string;adultPilotProfileId?:string;recoveryProvenance?:RecoveryProvenance }
+export interface BuiltRevision { id:string;familyId:string;parentId:string|null;game:PlayableGame|null;projectId:string;sourceGame?:string;config?:Record<string,number|boolean>;name?:string;sourceRevisionId?:string;copyRequestId?:string;adapter?:string;adultPilotProfileId?:string;recoveryProvenance?:RecoveryProvenance;devTestPolicyId?:string }
 export interface AuditEvent {
  jobId:string;familyId:string;status:JobStatus;at:string;code?:string;
  /** Allowance accounting only; never request, response or recording content. */
  usage?:{kind:'coach'|'audio'|'narration';month:string;reservedMicroUsd:number;usedMicroUsd:number;outcome:'settled'|'interrupted'};
 }
 export interface Ledger { allowance:number;used:number;reserved:number;paidEnabled:boolean;month:string }
-export interface PipelineState { platformSpendingStopped?:boolean; /** Computed by the beta repository on every read. Never persisted. */ betaScopes?:Record<'conversation'|'generation'|'remoteSpeech',boolean>; narrationReceipts?:NarrationReceipt[]; parentPrivacyChoices?:ParentPrivacyChoice[]; adultPilotPermits?:AdultPilotPermit[]; adultPilotSessions?:AdultPilotSession[]; coachReceipts?:CoachReceipt[]; audioReceipts?:AudioReceipt[]; coachConsent?:FamilyCoachConsent[]; invitations?:Invitation[]; devices?:TrustedDevice[]; parentAuth?:Record<string,FamilyParentAuth>; version:1;jobs:Job[];revisions:BuiltRevision[];active:Record<string,string>;ledgers:Record<string,Ledger>;audit:AuditEvent[] }
+export interface PipelineState { devTestGrants?:DevTestGrant[];devSpend?:DevSpend; platformSpendingStopped?:boolean; /** Computed by the beta repository on every read. Never persisted. */ betaScopes?:Record<'conversation'|'generation'|'remoteSpeech',boolean>; narrationReceipts?:NarrationReceipt[]; parentPrivacyChoices?:ParentPrivacyChoice[]; adultPilotPermits?:AdultPilotPermit[]; adultPilotSessions?:AdultPilotSession[]; coachReceipts?:CoachReceipt[]; audioReceipts?:AudioReceipt[]; coachConsent?:FamilyCoachConsent[]; invitations?:Invitation[]; devices?:TrustedDevice[]; parentAuth?:Record<string,FamilyParentAuth>; version:1;jobs:Job[];revisions:BuiltRevision[];active:Record<string,string>;ledgers:Record<string,Ledger>;audit:AuditEvent[] }
 export interface Repository { transaction<T>(update:(state:PipelineState)=>T):Promise<T>; snapshot():Promise<PipelineState> }

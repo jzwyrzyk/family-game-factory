@@ -1,14 +1,24 @@
+import {requireDevPolicy,type DevAccessPolicy} from '../dev-access';
 import {testWorkerRepository,testWorkerWorkflow,type TestExecution} from './test-execution';
 export interface DispatchPort {dispatch(jobId:string,attempt:number):Promise<void>}
-export interface GitHubDispatchConfig {enabled:boolean;repository:string;workflow:string;approvedSha:string;privateWorker?:boolean;testExecution?:TestExecution;callbackRoute?:'beta-dev'|'beta-test'|'beta-prod'}
+export interface GitHubDispatchConfig {enabled:boolean;repository:string;workflow:string;approvedSha:string;privateWorker?:boolean;testExecution?:TestExecution;callbackRoute?:'beta-dev'|'beta-test'|'beta-prod';development?:DevAccessPolicy}
 /** Independent immutable code tag. The selected GitHub workflow runs from protected main. */
-export function workerTag(c:GitHubDispatchConfig){return (c.testExecution?'jems-test-execution-':c.privateWorker?'factory-execution-':'factory-worker-')+c.approvedSha;}
+export function workerTag(c:GitHubDispatchConfig){
+ if(c.development){
+  requireDevPolicy(c.development);
+  if(c.testExecution||c.callbackRoute||!c.privateWorker||c.workflow!=='factory-private-dev.yml'||
+   !new RegExp('^'+c.development.workerOwner+'/[A-Za-z0-9_.-]+-dev$').test(c.repository))throw Error('DEV_WORKER_DISPATCH_REQUIRED');
+  return 'jems-dev-execution-'+c.approvedSha;
+ }
+ if(c.workflow==='factory-private-dev.yml')throw Error('DEV_WORKER_DISPATCH_REQUIRED');
+ return (c.testExecution?'jems-test-execution-':c.privateWorker?'factory-execution-':'factory-worker-')+c.approvedSha;}
 /** Token must be an installation token scoped to ONLY the target private repository. */
 export class GitHubDispatcher implements DispatchPort {
  constructor(private config:GitHubDispatchConfig,private token:(signal?:AbortSignal)=>Promise<string>,private transport:typeof fetch=fetch){
   if(config.testExecution&&(!config.privateWorker||config.repository!==testWorkerRepository||config.workflow!==testWorkerWorkflow||config.callbackRoute!=='beta-test'))throw Error('TEST_WORKER_ROUTE_REQUIRED');
   if(config.callbackRoute!==undefined&&(!config.privateWorker||!['beta-dev','beta-test','beta-prod'].includes(config.callbackRoute)))throw Error('WORKER_ROUTE_REQUIRED');
   if(config.enabled&&(!/^[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+$/.test(config.repository)||!/^[A-Za-z0-9_.-]+[.]yml$/.test(config.workflow)||!/^[a-f0-9]{40}$/.test(config.approvedSha)))throw Error('ACTIONS_APPROVAL_REQUIRED');
+  workerTag(config);
  }
  async dispatch(jobId:string,attempt:number){
   if(!this.config.enabled||this.config.testExecution&&Date.now()>=this.config.testExecution.expiresAt||!/^[A-Za-z0-9_-]{1,100}$/.test(jobId)||!Number.isInteger(attempt)||attempt<0||attempt>2)throw Error('ACTIONS_UNAVAILABLE');

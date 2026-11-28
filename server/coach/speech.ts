@@ -10,13 +10,15 @@ import {adultPilotAllowed,adultPilotConfigured,adultPilotFlags,type AdultPilotFl
 import {assertActiveTrustedDevice} from '../trusted-devices';
 import {randomUUID} from 'node:crypto';
 import {PAID_RECEIPT_LEASE_MS,expirePaidReceipts,reconcilePaidReceipts,settlePaidReceipt,type PaidReceipt} from './receipts';
+import {devTestAllowed,hasAdultSession,devCapacityAvailable,reserveDevSpend} from '../dev-test-policy';
+import type {DevAccessPolicy} from '../dev-access';
 
 export type AudioMime='audio/webm'|'audio/mp4'|'audio/ogg';
 export const AUDIO_MAX_BYTES=320000;
 export interface AudioReceipt extends PaidReceipt {}
 export interface SpeechConfig {
  approved:boolean;privacyApproved:boolean;providerApproved:boolean;parentConsentApproved:boolean;
- requireVerifiedParentPrivacy?:boolean;adultPilot?:AdultPilotFlags;
+ requireVerifiedParentPrivacy?:boolean;adultPilot?:AdultPilotFlags;devTestPolicy?:DevAccessPolicy;
  projectId:string;maxMicroUsd:number;pricesReviewedAt:string;
 }
 export function audioMime(raw:string):AudioMime|null {
@@ -65,8 +67,11 @@ export class CoachAudioService {
  enabled(){return speechApproved(this.config);}
  private permitted(state:PipelineState,session:VerifiedSession,now=Date.now()):boolean{
   try{assertActiveTrustedDevice(state,session,now);}catch{return false;}
+  if(this.config.devTestPolicy&&now>=this.config.devTestPolicy.allowanceExpiresAt)return false;
+  if(session.devTestGrantId!==undefined)return devTestAllowed(state,session,this.config.devTestPolicy,now);
+  if(this.config.devTestPolicy&&!hasAdultSession(session))return false;
   if(this.config.adultPilot?.enabled===true)return adultPilotAllowed(state,session,now);
-  if(session.adultSessionId||session.adultProfileId)return false;
+  if(hasAdultSession(session))return false;
   return allowedCoachFamily(state,session,'audio',now)&&
    (!this.config.requireVerifiedParentPrivacy||verifiedParentScope(state,session.familyId,'remoteSpeech',now));
  }
@@ -80,6 +85,7 @@ export class CoachAudioService {
   const permitted=this.permitted(state,session);
   if(!permitted||!ledger?.paidEnabled||ledger.month!==month||
     ledger.used+ledger.reserved+this.config.maxMicroUsd>ledger.allowance)return false;
+  if(!devCapacityAvailable(state,this.config.devTestPolicy,this.config.maxMicroUsd))return false;
   if(this.provider.readiness){
    try{if(!await this.provider.readiness(AbortSignal.timeout(9000)))return false;}catch{return false;}
   }
@@ -91,7 +97,7 @@ export class CoachAudioService {
   if(!input||typeof input.id!=='string'||!/^[A-Za-z0-9_-]{8,100}$/.test(input.id))throw Error('INVALID_AUDIO');
   const mime=validateAudio(input.audio,input.mime);
   const id='audio-'+input.id;
-  const subject=session.adultSessionId?`${session.subject}:adult:${session.adultSessionId}`:session.subject;
+  const subject=session.adultSessionId?`${session.subject}:adult:${session.adultSessionId}`:session.devTestGrantId?`${session.subject}:dev:${session.devTestGrantId}`:session.subject;
   await reconcilePaidReceipts(this.repo,session);
   const reservationId=randomUUID();
   await this.repo.transaction(state=>{
@@ -108,6 +114,7 @@ export class CoachAudioService {
    const ledger=state.ledgers[session.familyId];
    if(!ledger?.paidEnabled||ledger.month!==month||
     ledger.used+ledger.reserved+this.config.maxMicroUsd>ledger.allowance)throw Error('SPENDING_CUTOFF');
+   reserveDevSpend(state,this.config.devTestPolicy,this.config.maxMicroUsd);
    ledger.reserved+=this.config.maxMicroUsd;
    receipts.push({id,familyId:session.familyId,subject,month,at:now,
     reserved:this.config.maxMicroUsd,state:'running',reservationId,leaseUntil:now+PAID_RECEIPT_LEASE_MS});

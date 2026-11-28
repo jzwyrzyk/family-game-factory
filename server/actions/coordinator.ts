@@ -2,6 +2,8 @@ import {safeProviderFailure} from './provider-failure';
 import {createHash,randomUUID} from 'node:crypto';
 import {verifiedParentScope} from '../privacy/parent-consent';
 import {adultPilotJobAllowed} from '../adult-pilot';
+import {devTestJobAllowed,hasAdultJob,hasDevJob,reserveDevRepair} from '../dev-test-policy';
+import type {DevAccessPolicy} from '../dev-access';
 import {draftChildIntentContract} from '../quality/child-intent';
 import {chooseGameForm} from '../quality/game-form';
 import {validateFunctionalGameContract} from '../quality/functional-game-contract';
@@ -39,7 +41,7 @@ export interface ActionExecution {
 const WORKFLOW_STAGE_MS=12*60*1000,WORKFLOW_PREPARE_MS=18*60*1000,MAX_ATTEMPTS=3;
 
 export class ActionCoordinator {
- constructor(private repo:Repository,private dispatcher:DispatchPort,private approval:AgentApproval,private leaseMs=900000,private requireVerifiedParentPrivacy=false,private adultPilotMode=false,private premiumPilot?:PremiumPilot,private premiumGameCeiling?:number,private testExecution?:Job['testExecution']){
+ constructor(private repo:Repository,private dispatcher:DispatchPort,private approval:AgentApproval,private leaseMs=900000,private requireVerifiedParentPrivacy=false,private adultPilotMode=false,private premiumPilot?:PremiumPilot,private premiumGameCeiling?:number,private testExecution?:Job['testExecution'],private devTestPolicy?:DevAccessPolicy){
   if(isPremiumApproval(approval))throw Error('LEGACY_APPROVAL_REQUIRED');
  }
  private get stageMs(){return Math.min(this.leaseMs,WORKFLOW_STAGE_MS);}
@@ -83,13 +85,15 @@ export class ActionCoordinator {
     pin.workerSha!==policy.workerSha||pin.expiresAt!==policy.expiresAt||pin.authorizationSha256!==policy.authorizationSha256||
     Date.now()>=pin.expiresAt||pin.providerMode==='funded'&&!j.premiumPolicy||pin.providerMode==='fixture'&&(j.adapter!=='mock'||j.premiumPolicy))return 'TEST_EXECUTION_POLICY_REQUIRED';
   }
-  if(s.platformSpendingStopped)return 'SPENDING_CUTOFF';
+  if(s.platformSpendingStopped||this.devTestPolicy&&Date.now()>=this.devTestPolicy.allowanceExpiresAt)return 'SPENDING_CUTOFF';
+  if(hasDevJob(j)){if(j.premiumPolicy||this.testExecution)return 'DEV_TEST_ACCESS_REQUIRED';return devTestJobAllowed(s,j,this.devTestPolicy)?undefined:'DEV_TEST_ACCESS_REQUIRED';}
+  if(this.devTestPolicy&&!hasAdultJob(j))return 'DEV_TEST_ACCESS_REQUIRED';
   if(j.premiumPolicy){
    if(!this.adultPilotMode)return 'ADULT_PILOT_ACCESS_REQUIRED';
    try{requirePinnedPremium(j,this.premiumPilot);}catch(error){return (error as Error).message;}
   }
   if(this.requireVerifiedParentPrivacy&&!verifiedParentScope(s,j.familyId,'generation'))return 'GUARDIAN_CONSENT_REQUIRED';
-  if((this.adultPilotMode||j.adultPilotDeviceId||j.adultPilotSessionId||j.adultPilotProfileId)&&
+  if((this.adultPilotMode||hasAdultJob(j))&&
     (!this.adultPilotMode||!adultPilotJobAllowed(s,j)))return 'ADULT_PILOT_ACCESS_REQUIRED';
  }
  private failure(s:PipelineState,j:Job,code:string){
@@ -110,7 +114,7 @@ export class ActionCoordinator {
   // expired while its artifact and screenshot bindings were being validated.
   const denied=this.permissionError(s,j);if(denied){this.failure(s,j,denied);return;}
   const base=s.revisions.find(r=>r.id===j.baseRevisionId);
-  const revision={id:randomUUID(),familyId:j.familyId,parentId:j.baseRevisionId,projectId:base?.projectId||randomUUID(),game,adapter:j.adapter,...(j.adultPilotProfileId?{adultPilotProfileId:j.adultPilotProfileId}:{})};
+  const revision={id:randomUUID(),familyId:j.familyId,parentId:j.baseRevisionId,projectId:base?.projectId||randomUUID(),game,adapter:j.adapter,...(j.adultPilotProfileId?{adultPilotProfileId:j.adultPilotProfileId}:{}),...(j.devTestPolicyId?{devTestPolicyId:j.devTestPolicyId}:{})};
   s.revisions.push(revision);j.revisionId=revision.id;j.status='ready';j.phase='ready';
   if(j.execution){delete j.execution.candidate;delete j.execution.qualityEvidence;}
   const ledger=s.ledgers[j.familyId];ledger.reserved-=j.maxUnits;ledger.used+=j.usedUnits;
@@ -128,7 +132,7 @@ export class ActionCoordinator {
   const maxRepairAttempts=premium?.maxRepairAttempts??2;
   if(e.attempt>=maxRepairAttempts){this.failure(s,j,safeFinalRepairCode(diagnostics,j.independentIntentPlan));return;}
   if(premium){
-   const denied=fundPremiumEditRepair(s,j,premium,this.premiumGameCeiling,needsAssetRepair(safe.feedback));
+   const denied=fundPremiumEditRepair(s,j,premium,this.premiumGameCeiling,needsAssetRepair(safe.feedback),extra=>reserveDevRepair(s,this.devTestPolicy,j,extra));
    if(denied){this.failure(s,j,denied);return;}
   }
   e.attempt++;e.queuedAt=Date.now();e.runId=undefined;e.stage=undefined;e.generateReport=undefined;e.testReport=undefined;e.reviewReport=undefined;

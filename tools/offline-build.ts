@@ -1,9 +1,12 @@
 import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';import {execFileSync} from 'node:child_process';import type {Plugin} from 'vite';
-export function offlineBuild():Plugin{
- let dir='dist';
- return {name:'reviewed-offline-shell',configResolved(config){dir=path.resolve(config.root,config.build.outDir);},closeBundle(){
+export interface OfflineBuildOptions {outDir?:string;buildInfo?:{sha:string;dirty:boolean;[key:string]:unknown}}
+export function offlineBuild(options:OfflineBuildOptions={}):Plugin{
+ let dir=options.outDir??'dist';
+ return {name:'reviewed-offline-shell',configResolved(config){dir=path.resolve(config.root,options.outDir??config.build.outDir);},closeBundle(){
  const files=(base:string):string[]=>fs.readdirSync(path.join(dir,base),{withFileTypes:true}).flatMap(f=>f.isDirectory()?files(path.join(base,f.name)):[path.join(base,f.name)]);
- const sha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();const dirty=!!execFileSync('git',['status','--porcelain','--untracked-files=no'],{encoding:'utf8'}).trim();fs.writeFileSync(path.join(dir,'build-info.json'),JSON.stringify({sha,dirty}));
+ const buildInfo=options.buildInfo??{sha:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),dirty:!!execFileSync('git',['status','--porcelain','--untracked-files=no'],{encoding:'utf8'}).trim()};
+ if(!/^[0-9a-f]{40}$/.test(buildInfo.sha)||typeof buildInfo.dirty!=='boolean')throw Error('INVALID_OFFLINE_BUILD_IDENTITY');
+ fs.writeFileSync(path.join(dir,'build-info.json'),JSON.stringify(buildInfo));
  const list=files('').filter(f=>!['sw.js','factory-config.json'].includes(f)).sort();const hash=createHash('sha256');for(const f of list)hash.update(f).update(fs.readFileSync(path.join(dir,f)));const version=hash.digest('hex');
  // Ship the reusable library without downloading every unused cover and pose on
  // first visit. Current UI art remains in the offline shell; optional static art

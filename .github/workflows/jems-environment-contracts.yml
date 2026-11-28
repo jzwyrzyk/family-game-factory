@@ -2,9 +2,9 @@ name: Jems environment contracts
 on:
   push:
     branches: [main]
-    paths: ['scripts/environments/**', 'scripts/beta/**', 'scripts/ops/integrated_test_stack.py', '.github/actions/integrated-test/**', 'tests/test_environment_*.py', 'tests/environments/**', 'infra/nonproduction/**', 'ops/environments.json', '.github/workflows/jems-*', 'package.json']
+    paths: ['server/**', 'tests/dev-*.test.ts', 'scripts/deployment/dev*', 'scripts/deployment/test_dev*', 'scripts/development/**', 'tools/offline-build.ts', 'scripts/environments/**', 'scripts/beta/**', 'scripts/ops/integrated_test_stack.py', '.github/actions/integrated-test/**', 'tests/test_environment_*.py', 'tests/environments/**', 'infra/nonproduction/**', 'ops/environments.json', '.github/workflows/jems-*', 'package.json']
   pull_request:
-    paths: ['scripts/environments/**', 'scripts/beta/**', 'scripts/ops/integrated_test_stack.py', '.github/actions/integrated-test/**', 'tests/test_environment_*.py', 'tests/environments/**', 'infra/nonproduction/**', 'ops/environments.json', '.github/workflows/jems-*', 'package.json']
+    paths: ['server/**', 'tests/dev-*.test.ts', 'scripts/deployment/dev*', 'scripts/deployment/test_dev*', 'scripts/development/**', 'tools/offline-build.ts', 'scripts/environments/**', 'scripts/beta/**', 'scripts/ops/integrated_test_stack.py', '.github/actions/integrated-test/**', 'tests/test_environment_*.py', 'tests/environments/**', 'infra/nonproduction/**', 'ops/environments.json', '.github/workflows/jems-*', 'package.json']
 permissions:
   contents: read
 concurrency:
@@ -25,6 +25,10 @@ jobs:
       - run: python3 -m unittest discover -s tests -p 'test_environment_*.py'
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: node --test tests/environments/*.test.cjs
+      - name: Check persistent DEV isolation and shared spending boundaries
+        run: |
+          node --import tsx --test tests/dev-*.test.ts
+          python3 -m unittest discover -s scripts/deployment -p 'test_dev*.py'
       - name: Check TEST-only premium admission and ledger settlement
         run: node --import tsx --test tests/environments/test-trial.test.ts
       - name: Validate and rehearse the pinned TEST Terraform without credentials
@@ -45,3 +49,38 @@ jobs:
           "$local_tools/terraform" -chdir="$root" test -no-color
       - name: Existing complete regression partition remains intact
         run: python3 scripts/deployment/regressions.py --check
+
+  dev-package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with: {node-version: 22, cache: npm}
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Package the exact authenticated DEV site without cloud credentials
+        env: {REVIEWED_SOURCE_SHA: '${{ github.sha }}'}
+        run: node --import tsx scripts/development/package-site.ts --expected-sha "$REVIEWED_SOURCE_SHA" --out .factory-deployment/dev-site/ci
+      - name: Build the existing committed-source DEV image recipe
+        env: {REVIEWED_SOURCE_SHA: '${{ github.sha }}'}
+        run: |
+          python3 - <<'PYTHON'
+          import os
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, str(Path.cwd() / 'scripts/deployment'))
+          from dev_images import app_source_archive
+          destination = Path('.factory-deployment/dev-site/source-ci')
+          destination.mkdir(parents=True)
+          archive, digest = app_source_archive(Path.cwd(), destination, os.environ['REVIEWED_SOURCE_SHA'])
+          print('Committed DEV archive SHA256: ' + digest)
+          PYTHON
+          docker build --build-arg "REVIEWED_SOURCE_SHA=$REVIEWED_SOURCE_SHA" --tag jems-dev-site:ci --file server/Dockerfile.dev-site-source - < .factory-deployment/dev-site/source-ci/source.tgz
+      - name: Import the non-root runtime without network access
+        run: |
+          docker run --rm --network none --entrypoint node jems-dev-site:ci --input-type=module -e '
+            if (process.getuid() === 0) throw new Error("Non-root runtime required");
+            await import("/app/dev-site.mjs");
+          '

@@ -1,10 +1,11 @@
+import type {DevCloudTarget} from '../dev-access';
 /** Keyless gateway bridge; only the private service contacts the TTS provider. */
 import {privateCoachOrigin,metadataIdentityToken,type IdentityTokenSource} from './private-bridge';
 import {validateNarrationText,validateNarrationAudio,NARRATION_MAX_AUDIO_BYTES,type NarrationProvider} from './narration';
 import {readNarrationResponse,readNarrationJson} from './narration-transport';
 export class PrivateNarrationBridge implements NarrationProvider {
  readonly endpoint:string;
- constructor(origin:string,private identity:IdentityTokenSource=metadataIdentityToken(),private transport:typeof fetch=fetch){this.endpoint=privateCoachOrigin(origin);}
+ constructor(origin:string,private identity:IdentityTokenSource=metadataIdentityToken(),private transport:typeof fetch=fetch,development?:DevCloudTarget){this.endpoint=privateCoachOrigin(origin,process.env,development);}
  async readiness(signal:AbortSignal):Promise<boolean> {
   try {
    const token=await this.identity(this.endpoint,signal);

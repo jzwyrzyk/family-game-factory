@@ -85,6 +85,10 @@ Consult the [feature index](docs/README.md) for API, family isolation, learning,
 
 `src/design-system/` owns semantic foundations, extracted headers/dashboard/destination cards, native actions, Journey contextual navigation, collection layout and the existing Menu focus-containment utility. Six actual secondary pages use the collection template; legacy brand imports delegate for active-branch compatibility. Studio, Creation, Art, Pals, Rewards and Parent CSS consume exact semantic aliases. Feature controllers retain all domain authority. The review-only `tools/design-system/` gallery imports production exports and is embedded by the existing standalone review build; it is not a second deployed frontend. [Guide and interfaces](docs/design-system/README.md) · [remaining archetypes and dependencies](docs/design-system/INVENTORY.md).
 
+## Persistent DEV release preparation
+
+The consolidated release candidate adds the existing isolated DEV contract to the current gateway, preview, private coach and worker adapters. Exact adult IAP plus trusted-device authorization bounds a synthetic workspace; actual adult operation retains permit and tab proof. Its separate durable expiring allowance includes generation, coach, dictation, narration and extra premium repair holds. DEV configuration cannot select TEST or production destinations. The [runtime contract](docs/development/DEV-WORKBENCH.md) distinguishes source qualification from live activation and acceptance. Existing static preview and TEST controllers remain operational.
+
 <details>
 <summary>Previous section links</summary>
 

@@ -697,7 +697,8 @@
         "server/README.md",
         "docs/adult-pilot/*.md",
         "docs/privacy/*.md",
-        "docs/family-beta/*.md"
+        "docs/family-beta/*.md",
+        "docs/development/DEV-WORKBENCH.md"
       ],
       "sources": [
         "server/*.ts",
@@ -708,13 +709,15 @@
         "server/storage/**",
         "docs/auth/*.md",
         "server/privacy/**",
-        "server/beta/**"
+        "server/beta/**",
+        "server/Dockerfile.dev-site",
+        "server/Dockerfile.dev-site-source"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:45:10.561Z",
-      "sourceDigest": "793230bdbffd37f58c95745b89a9171471d017e76dc9f1f32ce4bd7ef28204bd",
+      "reviewedAt": "2026-11-28T06:14:10.433Z",
+      "sourceDigest": "866ecb90d10df4c796fca1bb782423bc57c7a0cdb1238901857288e47919a840",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed dedicated TEST Cloud Run identities, Secret Manager versions, database selection, isolation, verified build provenance and worker transport.",
+      "reviewReason": "Reconciled current gateway, preview, device and storage interfaces with opt-in DEV IAP; documented exact origins, independent project binding and synthetic grants without changing family or TEST defaults.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -751,7 +754,8 @@
         "docs/privacy/*.md",
         "docs/game-intelligence/premium-benchmark/*.md",
         "docs/game-art/*.md",
-        "docs/game-art/evidence/*.md"
+        "docs/game-art/evidence/*.md",
+        "docs/development/DEV-WORKBENCH.md"
       ],
       "sources": [
         "server/actions/**",
@@ -770,10 +774,10 @@
         "tools/game-art-review/**"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:45:10.653Z",
-      "sourceDigest": "bb7f23f50ceb5ead3f44523c8e0266a313917955fb63daeb432b3d7261a2a33b",
+      "reviewedAt": "2026-11-28T06:14:10.840Z",
+      "sourceDigest": "9fceae690b440f8118c3f01022e13f82a683e904b18d95b283f3825060191508",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed TEST fixture and separately funded workflow admission, private worker callbacks, signed sandbox selection and preserved cumulative reservations.",
+      "reviewReason": "Preserved current request recovery, premium lineage and settlement; documented DEV cumulative allowance, expiry, worker namespace and additional repair admission. Reviewed coordinator and pipeline diff against consolidated source.",
       "reviewHistory": [
         {
           "reviewedAt": "2026-11-21T18:37:24.930Z",
@@ -793,7 +797,8 @@
         "docs/issue-28/*.md",
         "docs/adult-pilot/*.md",
         "docs/privacy/*.md",
-        "docs/speech/NATURAL_NARRATION.md"
+        "docs/speech/NATURAL_NARRATION.md",
+        "docs/development/DEV-WORKBENCH.md"
       ],
       "sources": [
         "server/coach/**",
@@ -802,10 +807,10 @@
         "docs/issue-28/*.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:45:10.786Z",
-      "sourceDigest": "dcaad40e69756a9963d89c8736d769bf76c77b1102885851b2bdf5fd0aa9ffc9",
+      "reviewedAt": "2026-11-28T06:14:11.263Z",
+      "sourceDigest": "3762d4f19f6b097b0741af4d5ecd4c959a5d73d697327636c6097550429992dc",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed the TEST-only synthetic Coach scenario, private identity-token boundary, expiring funded model access and the default unpaid route.",
+      "reviewReason": "Documented DEV caller/project isolation and shared permanent reservations across coach, speech and narration; retained receipt leases, rechecks and provider approval defaults.",
       "reviewHistory": [
         {
           "sourceCommit": "212209dbc11be8d1a3dd0ac7de678497ed7bea80",
@@ -851,7 +856,8 @@
         "DELIVERY-STATE.md",
         "docs/decisions/0005-temporary-adult-profile.md",
         "docs/adult-pilot/*.md",
-        "docs/privacy/*.md"
+        "docs/privacy/*.md",
+        "docs/development/DEV-WORKBENCH.md"
       ],
       "sources": [
         "src/adult-pilot/**",
@@ -866,10 +872,10 @@
         "docs/privacy/*.md"
       ],
       "reviewAfterDays": 14,
-      "sourceDigest": "42bb41aa28afe027b83dc046d34b7c7c8879ccdfbd050033fca60d23d33314af",
-      "reviewedAt": "2026-11-26T23:45:10.872Z",
+      "sourceDigest": "6a42f6a4779123f44b2eb9ba0c2ba7514ce0c1e238c2f5628e91b4859449459e",
+      "reviewedAt": "2026-11-28T06:14:11.609Z",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed private IAP subject binding, synthetic device sessions, administrator separation and rejection of unauthorized household spending or recovery.",
+      "reviewReason": "Documented that adult IAP synthetic grants are distinct from actual adult permits/tab proof and guardian consent. Ambient cookies cannot supply DEV grants; production and TEST authorization remain unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "90743ab2b1da098188db15dc5e40c3dfd799e291",
@@ -929,10 +935,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-28T05:57:53.429Z",
-      "sourceDigest": "cdf15b95e2922f46b616c7d684a40c107e913e5be6b7e12621cb9ada82d69854",
+      "reviewedAt": "2026-11-28T06:14:11.978Z",
+      "sourceDigest": "d9bf19d414efb8cdf30c2be9fc6773550d5e91a9134414298d840ea388a2c237",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled #226 with protected main #234. Retained the static marker, browser-drain and tag-retention negative tests; kept all 150 application commands and separate TEST fixture/live and production receipt gates. Current evidence and unqualified live boundaries are recorded in the coordinated execution package.",
+      "reviewReason": "Added DEV fixture and exact-source packaging qualification to existing environment contracts; documented CI limits, required live provider and owner/device evidence. 257 focused regression tests passed; local Actions browser fixture hit a score timing timeout pending hosted verification.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1172,13 +1178,14 @@
         "scripts/environments/**",
         "infra/nonproduction/**",
         "scripts/environments/ci_evidence.py",
-        "scripts/beta/**"
+        "scripts/beta/**",
+        "scripts/development/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-28T05:57:53.903Z",
-      "sourceDigest": "91a6b56f418a2ec6f77ddb7f117b9e9dd6f6dfc6b68115441fd4251a6e945a9a",
+      "reviewedAt": "2026-11-28T06:14:12.385Z",
+      "sourceDigest": "b69e32a115ba5bdd3b043df2c947f4ad9b2cfb87f2bfb5acd26412faf9c62f4e",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed unchanged current-main static controller/configuration and native diagnostics alongside #226 TEST and exact-manifest source. Recorded successful static and read-only production runs, separate persistent DEV/TEST costs, settings-read limitations and missing GitHub infrastructure transport; superseded routine Cloud Shell instructions without claiming activation.",
+      "reviewReason": "Updated coordinated package and delivery state for persistent DEV source port; retained operational static controller bytes and explicit unapproved infrastructure, spending, private bindings and live acceptance gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
