@@ -82,7 +82,8 @@ def query_scope(env, now):
             data = stream.read(256 * 1024 + 1)
         require(len(data) <= 256 * 1024)
         inputs = json.loads(data)["inputs"]
-        require(isinstance(inputs, dict) and set(inputs) <= set(INPUT_KEYS))
+        require(isinstance(inputs, dict) and inputs.pop("operation", "request-evidence") == "request-evidence"
+                and inputs.pop("challenge", "") == "" and set(inputs) <= set(INPUT_KEYS))
     else:
         inputs = {key: env.get("INPUT_" + key.upper(), "") for key in INPUT_KEYS}
     service = inputs["service"]

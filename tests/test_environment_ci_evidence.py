@@ -261,3 +261,164 @@ class FullCITests(unittest.TestCase):
         for commands, scripts in [(['node a; true'], {}), (['npm run test:a'], {'test:a': 'npm run test:a'}),
                                   (['npm run test:a'], {'test:a': 'node a', 'pretest:a': 'node prep'})]:
             with self.assertRaises(ci.EvidenceError): ci.commands(commands, scripts)
+
+class ReviewedPolicyTests(unittest.TestCase):
+    """The two receipts describe distinct checkouts after protected policy integration."""
+    def setUp(self):
+        self.api = API()
+        api = self.api
+        self.head = API(event='workflow_dispatch')
+        head = self.head
+        head.run.update(id=51, run_started_at=date(-100), pull_requests=[])
+        for job in head.jobs:
+            job['run_id'] = 51
+        head.tested = HEAD
+        head.receipt.update(runId=51, sourceSha=HEAD)
+        head.receipt['identity']['sourceSha'] = HEAD
+        for row in head.receipt['suites']:
+            row['sourceSha'] = HEAD
+        head.archive()
+        head.artifacts[0].update(id=201)
+        head.artifacts[0]['workflow_run']['id'] = 51
+        api.runs.append(head.run)
+        # The merged tree contains the protected operational change.
+        new_tree = 'f' * 40
+        api.commits[MERGE]['tree']['sha'] = new_tree
+        api.trees[new_tree] = copy.deepcopy(api.trees[TREE])
+        api.receipt['identity']['sourceTree'] = new_tree
+        api.archive()
+        self.merged_tree = new_tree
+        # Main uses a different, still runnable package. Anchor the held package
+        # and complete command expansion in protected policy data.
+        base_package = b'{"scripts":{"test:baseline":"node old.js"}}'
+        next(row for row in api.trees[MAIN_TREE]['tree'] if row['path'] == 'package.json')['sha'] = blob(base_package)
+        def projection(key):
+            return {r['path']:[r['mode'],r['type'],r['sha']] for r in api.trees[key]['tree'] if ci.policy_path(r['path'])}
+        self.profile = {'schemaVersion':1,'repository':ci.REPOSITORY,'pr':12,'source':HEAD,'tree':TREE,
+                        'installedPolicySha256':ci.policy_digest(projection(MAIN_TREE)),
+                        'reviewedPolicySha256':ci.policy_digest(projection(TREE)),
+                        'reviewedBlobs':{'package.json':projection(TREE)['package.json']},
+                        'reviewedCommandsSha256':ci.policy_digest({r['id']:[c['command'] for c in r['commands']] for r in api.receipt['suites']})}
+        self.install()
+        request = api.request
+        pages = api.pages
+        download = api.download
+        api.request = lambda endpoint: copy.deepcopy(head.artifacts[0]) if endpoint.endswith('artifacts/201') else request(endpoint)
+        api.pages = lambda endpoint,key: copy.deepcopy(head.jobs if key=='jobs' else head.artifacts) if '/actions/runs/51/' in endpoint else pages(endpoint,key)
+        api.download = lambda identifier,target: target.write_bytes(head.zip_bytes) if identifier==201 else download(identifier,target)
+
+    def install(self):
+        data=json.dumps(self.profile).encode()
+        entry={'path':'scripts/environments/reviewed-dev-policy.json','mode':'100644','type':'blob','sha':blob(data)}
+        rows=self.api.trees[MAIN_TREE]['tree']
+        rows[:]=[r for r in rows if r['path'] != entry['path']]+[entry]
+        self.api.blobs[entry['sha']]={'sha':entry['sha'],'encoding':'base64','content':base64.b64encode(data).decode()}
+
+    def test_distinct_current_merge_and_exact_head_both_pass(self):
+        proof=verify(self.api)
+        self.assertEqual((proof['runId'],proof['testedSha'],proof['sourceTree']),(51,HEAD,TREE))
+        self.assertEqual((proof['prospectiveMerge']['runId'],proof['prospectiveMerge']['testedSha']),(50,MERGE))
+
+    def test_source_or_candidate_supplied_profile_cannot_install_trust(self):
+        profile=self.api.trees[MAIN_TREE]['tree'].pop()
+        self.api.trees[TREE]['tree'].append(profile)
+        with self.assertRaisesRegex(ci.EvidenceError,'REBASE_REQUIRED'):
+            verify(self.api)
+
+    def test_changed_or_stale_policy_is_rejected(self):
+        for field,value in [('pr',21),('source','1'*40),('tree',MAIN_TREE),('installedPolicySha256','2'*64),
+                            ('reviewedPolicySha256','2'*64),('reviewedCommandsSha256','2'*64),('reviewedBlobs',{})]:
+            original=self.profile[field];self.profile[field]=value;self.install()
+            with self.subTest(field=field), self.assertRaises(ci.EvidenceError): verify(self.api)
+            self.profile[field]=original;self.install()
+
+    def test_changed_writer_on_either_checkout_is_rejected(self):
+        for tree in [TREE,self.merged_tree,MAIN_TREE]:
+            row=next(r for r in self.api.trees[tree]['tree'] if r['path']==ci.WORKFLOW)
+            original=row['sha'];row['sha']='1'*40
+            with self.subTest(tree=tree), self.assertRaises(ci.EvidenceError): verify(self.api)
+            row['sha']=original
+
+    def test_missing_failed_wrong_branch_or_older_exact_head_rejected(self):
+        self.api.runs.remove(self.head.run)
+        with self.assertRaisesRegex(ci.EvidenceError,'RUN_MISSING'): verify(self.api)
+        self.api.runs.append(self.head.run)
+        for k,v in [('run_started_at',date(-140)),('head_branch','other'),('conclusion','failure'),('run_attempt',2)]:
+            previous=self.head.run[k];self.head.run[k]=v
+            with self.subTest(field=k), self.assertRaises(ci.EvidenceError): verify(self.api)
+            self.head.run[k]=previous
+
+    def test_head_success_cannot_replace_failed_pr_run(self):
+        self.api.run['conclusion']='failure'
+        with self.assertRaisesRegex(ci.EvidenceError,'NOT_SUCCESSFUL'): verify(self.api)
+
+    def conflicted(self):
+        api = self.api
+        base, resolved, landed, base_tree = ('1'*40,'2'*40,'3'*40,'4'*40)
+        api.pr.update(mergeable=False, mergeable_state='dirty', merge_commit_sha=None)
+        self.profile.update(baseline=base, resolutionBranch='ops/dev-resolution-223',resolvedBlobs={})
+        self.install()
+        api.commits[base] = {'sha':base,'tree':{'sha':base_tree}}
+        api.trees[base_tree] = copy.deepcopy(api.trees[MAIN_TREE])
+        api.trees[base_tree]['tree'].pop()
+        # Only the protected policy record is new on main.
+        addition = copy.deepcopy(api.trees[MAIN_TREE]['tree'][-1])
+        api.trees[self.merged_tree]['tree'].append(addition)
+        api.commits[resolved] = {'sha':resolved,'parents':[{'sha':HEAD},{'sha':MAIN}],'tree':{'sha':self.merged_tree}}
+        api.commits[landed] = {'sha':landed,'parents':[{'sha':MAIN},{'sha':resolved}],'tree':{'sha':self.merged_tree}}
+        companion=copy.deepcopy(api.pr)
+        companion.update(number=23,merge_commit_sha=landed,mergeable=True,mergeable_state='clean')
+        companion['head'].update(sha=resolved,ref=self.profile['resolutionBranch'])
+        api.run.update(head_branch=companion['head']['ref'],head_sha=resolved,
+                       pull_requests=[{'number':23,'head':{'sha':resolved},'base':{'sha':MAIN}}])
+        for job in api.jobs: job['head_sha']=resolved
+        api.tested=landed
+        api.receipt['sourceSha']=landed;api.receipt['identity']['sourceSha']=landed
+        for row in api.receipt['suites']: row['sourceSha']=landed
+        api.archive()
+        api.artifacts[0]['workflow_run']['head_sha']=resolved
+        request=api.request;pages=api.pages
+        api.request=lambda endpoint: copy.deepcopy(companion) if endpoint.endswith('/pulls/23') else request(endpoint)
+        api.pages=lambda endpoint,key=None: [companion] if '/pulls?' in endpoint else pages(endpoint,key)
+        return resolved,companion
+
+    def test_conflicted_source_requires_verified_resolution_and_two_complete_runs(self):
+        resolved,companion=self.conflicted()
+        proof=verify(self.api)
+        self.assertEqual(proof['sourceHeadSha'],HEAD)
+        self.assertEqual(proof['resolutionHeadSha'],resolved)
+        self.assertEqual(proof['resolutionPr'],23)
+        self.assertEqual(proof['prospectiveMerge']['testedSha'],companion['merge_commit_sha'])
+
+    def test_conflicted_source_denies_unreviewed_resolutions_and_stale_parents(self):
+        resolved,companion=self.conflicted()
+        api=self.api
+        rows=api.trees[self.merged_tree]['tree']
+        rows.append({'path':'src/new.ts','mode':'100644','type':'blob','sha':HEAD})
+        with self.assertRaisesRegex(ci.EvidenceError,'RESOLUTION_TREE_MISMATCH'):verify(api)
+        rows.pop()
+        api.commits[resolved]['parents'].reverse()
+        with self.assertRaisesRegex(ci.EvidenceError,'RESOLUTION_PARENTS'):verify(api)
+        api.commits[resolved]['parents'].reverse()
+        companion['base']['sha']=HEAD
+        with self.assertRaisesRegex(ci.EvidenceError,'RESOLUTION_PR_CHANGED'):verify(api)
+
+    def test_activation_overlap_rejects_uninstalled_or_public_owner_config(self):
+        path = 'ops/environments.json'
+        old = {path: ('100644', 'blob', '1' * 40)}
+        active = {path: ('100644', 'blob', '2' * 40)}
+        held = {path: ('100644', 'blob', '3' * 40)}
+        with self.assertRaisesRegex(ci.EvidenceError, 'CONFIG_CHANGED'):
+            ci.verify_resolution_tree(self.api, {}, old, active, held, held)
+        with patch.object(ci, 'policy_json', return_value=({'enabled':True, 'ownerIapMembers':['user:redacted']}, '')):
+            with self.assertRaisesRegex(ci.EvidenceError, 'PRIVATE_BINDING_REQUIRED'):
+                ci.verify_resolution_tree(self.api, {}, old, active, held, active)
+
+    def test_resolution_blob_requires_both_integrated_and_result_ids(self):
+        path = 'scripts/environments/cloud.py'
+        old, active, held, resolved = ({path: ('100644', 'blob', ch * 40)} for ch in '1234')
+        policy = {'resolvedBlobs': {path: {'installed': ['2' * 40], 'resolved': '4' * 40}}}
+        ci.verify_resolution_tree(self.api, policy, old, active, held, resolved)
+        active[path] = ('100644', 'blob', '5' * 40)
+        with self.assertRaisesRegex(ci.EvidenceError, 'TREE_MISMATCH'):
+            ci.verify_resolution_tree(self.api, policy, old, active, held, resolved)
