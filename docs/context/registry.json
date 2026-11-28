@@ -87,7 +87,8 @@
     "docs/ui-review/README.md",
     "docs/history/2026-11-26/PRODUCT-DOCTRINE.md",
     "docs/history/2026-11-26/ARCHITECTURE-CURRENT.md",
-    "docs/history/2026-11-26/DELIVERY-STATE.md"
+    "docs/history/2026-11-26/DELIVERY-STATE.md",
+    "docs/operations/DEV-FIRST-ADMIN-SETUP.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -1142,10 +1143,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-28T05:06:40.246Z",
-      "sourceDigest": "fe4c5232703ef801b6040ca0e1a017ec483a5272e25085bda9444f0bfac35e69",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The controller uses the existing repository writer and the two established TEST retention tags. The environment evidence record identifies the serving revision and pending browser gate.",
+      "reviewedAt": "2026-11-28T13:13:03.679Z",
+      "sourceDigest": "2c9dfaf7323b2bc7d98cadfc69ac8e063b20ca5d4965e3d44bd1a5f6d895d0b6",
+      "reviewOutcome": "updated",
+      "reviewReason": "Prepared an operations-only read-only DEV foundation planning workflow and minimum administrator bootstrap guide; reused the qualified foundation helpers unchanged, disclosed private plan storage, exact identities and approval gaps, and preserved held application/static/production sources.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1400,10 +1401,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:43:54.709Z",
-      "sourceDigest": "6a82d9e760b2acf553296077219283a0611744977077ef029b48a4dadba0fce0",
+      "reviewedAt": "2026-11-28T13:13:04.066Z",
+      "sourceDigest": "2b1e967313af09668b0492c550cb0376c92a97e5dd86bfb66ad1cce3765be9cd",
       "reviewOutcome": "updated",
-      "reviewReason": "The maintenance instructions now explain comparison with the preceding independently committed source so future additions remain protected without manual count maintenance.",
+      "reviewReason": "Registered and linked the DEV-first administrator handoff and dated prepared-only delivery evidence. No application integration or cloud acceptance is inferred.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

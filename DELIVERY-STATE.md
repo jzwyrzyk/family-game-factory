@@ -1,5 +1,9 @@
 # Jems delivery state
 
+## DEV-first planning preparation — November 28
+
+The [administrator handoff](docs/operations/DEV-FIRST-ADMIN-SETUP.md) separates DEV from TEST DNS and prepares a protected-main, read-only DEV foundation planner. The planner reuses the qualified #226 helpers, stores raw plans only in a separate private DEV bucket, and has no apply/build/inference path. Actual DEV project identity, bootstrap approval, private trust and live plans remain missing. No deployment, AI allowance or production state changed; #223/#226 remain held.
+
 ## Native diagnostic acceptance
 
 The administrator verified 27 nonproduction resources and a zero-change recovery plan. The GitHub diagnostics workflow on protected main verified four native permissions in [run 46056038814](https://github.com/jzwyrzyk/family-game-factory/actions/runs/46056038814). The complete IAM audit passed all 77 checks. The private broker serves `jems-request-evidence-c-b51ec464f42c61a4c8ad` using image digest `sha256:9b4ea06f03b0725182fa123898d8ab536dcabebe604affee88aaefe23e983143`. The preceding native broker and original rollback revision are retained.

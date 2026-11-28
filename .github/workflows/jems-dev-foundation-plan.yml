@@ -1,0 +1,43 @@
+name: Jems DEV foundation plan
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: Exact current protected-main operations SHA; planning only
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: jems-dev-foundation-plan
+  cancel-in-progress: false
+jobs:
+  plan:
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && github.run_attempt == 1 && inputs.source == github.sha
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    environment: jems-dev-foundation-plan
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      DEV_PLAN_SOURCE: ${{ inputs.source }}
+      DEV_PLAN_ENVIRONMENT: jems-dev-foundation-plan
+      DEV_PROJECT_NUMBER: ${{ vars.DEV_PROJECT_NUMBER }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify protected source before authentication
+        run: python3 scripts/ops/dev_foundation_plan.py --preflight
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          workload_identity_provider: projects/${{ vars.DEV_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/jems-dev-operations/providers/github-dev-foundation-plan
+          service_account: jems-dev-infra-plan@jems-jzw-dev.iam.gserviceaccount.com
+          create_credentials_file: true
+          export_environment_variables: true
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f
+      - name: Inventory DEV and save private review proposal
+        run: python3 scripts/ops/dev_foundation_plan.py
