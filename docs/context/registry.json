@@ -1182,10 +1182,10 @@
         "scripts/development/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-28T06:30:04.419Z",
-      "sourceDigest": "9a12acced7f2dc3d0d9a6fe4ed8bb57ebeea29956acb2e3927e7637aa9c0f943",
-      "reviewOutcome": "updated",
-      "reviewReason": "Prepared GitHub TEST transport preserves native GCS state and saved-plan guards; only byte-equivalent operator/workflow/root main advances can replan, with old plans invalidated. Documented fixed bootstrap names and separate IAM/approval gates; no cloud operation executed.",
+      "reviewedAt": "2026-11-28T06:37:21.950Z",
+      "sourceDigest": "0537d5baa96472882929a5b15be4c73cbe60a0a29b216cd83efbe8ee1e5df929",
+      "reviewOutcome": "unchanged",
+      "reviewReason": "The complete deployment suite exposed an outdated synthetic archive fixture after the private coach gained DEV imports. Added the two reviewed module names to that fixture; actual archive filtering, release authority, deployed behavior and documented contracts are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
