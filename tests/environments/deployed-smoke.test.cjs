@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { createHash } = require('node:crypto');
-const { configuration, identity, requestAllowed, anonymousDenied, INCOMPLETE } = require('./deployed-smoke.cjs');
+const { configuration, identity, requestAllowed, anonymousDenied, closeJourneyContext, INCOMPLETE } = require('./deployed-smoke.cjs');
 const SOURCE = 'a'.repeat(40);
 const env = overrides => ({ JEMS_UAT_BASE_URL: 'https://jems-dev.example.test/',
   JEMS_UAT_ALLOWED_ORIGIN: 'https://jems-dev.example.test', JEMS_UAT_SOURCE_SHA: SOURCE, ...overrides });
@@ -54,4 +54,35 @@ test('ordinary redirects do not prove a private authentication boundary', () => 
   assert.equal(anonymousDenied(response(200)), false);
   assert.equal(anonymousDenied(response(301, 'https://jems-dev.example.test/')), false);
   assert.equal(anonymousDenied(response(302, 'https://evil.example.test/login')), false);
+});
+
+test('teardown keeps the browser offline and waits for active authenticated routes before closing', async () => {
+  const calls = [];
+  const pending = Promise.withResolvers();
+  const draining = Promise.withResolvers();
+  const closing = closeJourneyContext({
+    async setOffline(value) { assert.equal(value, true); calls.push('offline'); },
+    async unrouteAll({ behavior }) {
+      assert.equal(behavior, 'wait');
+      calls.push('draining');
+      draining.resolve();
+      await pending.promise;
+    },
+    async close() { calls.push('closed'); },
+  });
+  await draining.promise;
+  assert.deepEqual(calls, ['offline', 'draining']);
+  pending.resolve();
+  await closing;
+  assert.deepEqual(calls, ['offline', 'draining', 'closed']);
+});
+
+test('teardown propagates drain failures and closes the context', async () => {
+  let closed = false;
+  await assert.rejects(closeJourneyContext({
+    async setOffline() {},
+    async unrouteAll() { throw Error('fixture drain failure'); },
+    async close() { closed = true; },
+  }), /fixture drain failure/);
+  assert.equal(closed, true);
 });

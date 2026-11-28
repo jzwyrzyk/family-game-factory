@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "repository": "jzwyrzyk/family-game-factory",
+  "pr": 223,
+  "source": "b1169673050a8be83ed5ba69a27b04c23a87903f",
+  "tree": "b062326859954b50424a7e3fd286781f70f144fb",
+  "installedPolicySha256": "e8a336bce6388a3e89ce2bf152d6f35cb95df8f5b95d2b4f3df0d2c9b0a9484a",
+  "reviewedPolicySha256": "1eaab62f85a118d15e5855f4de4f8f230effe82d3a42def52c6e1b830697a981",
+  "reviewedCommandsSha256": "881cb84f3288dff9c9ef7a53c76950d2dbbe9e9e8b61d88b09329bc8ae66d47f",
+  "reviewedBlobs": {
+    "package.json": [
+      "100644",
+      "blob",
+      "6c4c8a1a30c77313660f0ec90cdc57ceaf8cc5a5"
+    ],
+    "scripts/ci/pipeline.test.mjs": [
+      "100644",
+      "blob",
+      "a418398661fa534e8f9e89ed5da190ce4481a11f"
+    ]
+  },
+  "baseline": "652bf9e312fc0776e37b7ef7893835e0fd8136d4",
+  "resolutionBranch": "ops/dev-resolution-223",
+  "resolvedBlobs": {
+    "scripts/environments/github.py": {
+      "installed": [
+        "3f36b398ae163a0effc655b7473a147338d9785c",
+        "177f917eb85b6dcf56d8ba3b41ddb5f4d3eb3f7f"
+      ],
+      "resolved": "177f917eb85b6dcf56d8ba3b41ddb5f4d3eb3f7f"
+    },
+    "scripts/environments/cloud.py": {
+      "installed": [
+        "78425028126237f51644a14643f5f150f5218cd1"
+      ],
+      "resolved": "78425028126237f51644a14643f5f150f5218cd1"
+    },
+    "tests/test_environment_cloud.py": {
+      "installed": [
+        "b0a71274c33753a9d1c232dff4f53bcfdcef9c75"
+      ],
+      "resolved": "b0a71274c33753a9d1c232dff4f53bcfdcef9c75"
+    },
+    "docs/development/DEV-TEST-PROD.md": {
+      "installed": [
+        "e222fa3e58f295791a1cdcdc3e45bb53ea86c785"
+      ],
+      "resolved": "6da5c046763979d40f46b4b3be719d1acf5b9eb2"
+    },
+    ".github/workflows/jems-production-diagnostics.yml": {
+      "installed": [
+        "0c3e0a7cf5c0779baeb24dedc01289ea816116d7"
+      ],
+      "resolved": "0c3e0a7cf5c0779baeb24dedc01289ea816116d7"
+    },
+    "ops/request-broker/main.py": {
+      "installed": [
+        "d098654cfa863e89a9658bc9fa05418d5714af0c"
+      ],
+      "resolved": "d098654cfa863e89a9658bc9fa05418d5714af0c"
+    },
+    "scripts/ops/test_request_evidence_workflow.py": {
+      "installed": [
+        "2764e83fa7877033ec591ea61b81302c63a36fd1"
+      ],
+      "resolved": "2764e83fa7877033ec591ea61b81302c63a36fd1"
+    },
+    "DELIVERY-STATE.md": {
+      "installed": [
+        "60b7c169fa1eb4b9abd69220bd58658d4c04e62a"
+      ],
+      "resolved": "edeb77341eab426cc8f90d025be76df0b0e85fbc"
+    }
+  }
+}

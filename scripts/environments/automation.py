@@ -34,7 +34,7 @@ def run(args):
 
 def read_config():
     config = json.loads(Path("ops/environments.json").read_text())
-    cloud.validate_config(config, require_enabled=False)
+    cloud.validate_config(config, require_enabled=False, public_record=True)
     return config
 
 
@@ -53,7 +53,7 @@ def output(**values):
 
 def configuration():
     config = read_config()
-    cloud.validate_config(config)
+    cloud.validate_config(config, public_record=True)
     output(provider=config["wifProvider"], deployer=config["deployServiceAccount"],
            uat=config["uatServiceAccount"], audience=config["iapAudience"])
 
@@ -99,7 +99,7 @@ def prepare(root, api=None):
 
 def recheck(root, api=None):
     config = read_config()
-    cloud.validate_config(config)
+    cloud.validate_config(config, public_record=True)
     api = api or gh.GitHub()
     candidate = json.loads((root / "jems-candidate.json").read_text())
     policy = gh.required_checks(json.loads(Path("ops/github-main-ruleset.json").read_text()))
@@ -117,8 +117,59 @@ def current_controller(api):
         raise AutomationError("TRUSTED_CONTROLLER_MAIN_CHANGED")
 
 
+def retain_test_images(config, client, image, prior_image):
+    cloud.validate_image(config, image)
+    if prior_image:
+        cloud.validate_image(config, prior_image)
+    current, previous = "keep-test-current", "keep-test-previous"
+    scope = ("--location=" + config["region"], "--repository=jems-environments", "--package=site")
+    package_suffix = f"/locations/{config['region']}/repositories/jems-environments/packages/site"
+    packages = {"projects/" + str(config[key]) + package_suffix for key in ("projectId", "projectNumber")}
+
+    def read_tags():
+        rows = client.run("artifacts", "tags", "list", *scope)
+        if not isinstance(rows, list):
+            raise AutomationError("TEST_TAG_LIST_INVALID")
+        retained = {}
+        for row in rows:
+            if not isinstance(row, dict) or not isinstance(row.get("name"), str):
+                raise AutomationError("TEST_TAG_LIST_INVALID")
+            package, _, tag = row["name"].rpartition("/tags/")
+            if package not in packages or not tag:
+                raise AutomationError("TEST_TAG_PACKAGE_INVALID")
+            if tag in (previous, current):
+                version = row.get("version")
+                prefix = package + "/versions/"
+                if tag in retained or not isinstance(version, str) or not version.startswith(prefix):
+                    raise AutomationError("TEST_TAG_VERSION_INVALID")
+                digest = version[len(prefix):]
+                cloud.validate_image(config, config["registry"] + "/site@" + digest)
+                retained[tag] = digest
+        return retained
+
+    tags = read_tags()
+    target = image.split("@")[1]
+    wanted = dict(tags)
+    if tags.get(current) != target:
+        # A deployed revision can precede a failed tag rotation. Keep the last
+        # successfully published current digest as rollback across that retry.
+        rollback = tags.get(current) or (prior_image and prior_image.split("@")[1])
+        if rollback:
+            wanted[previous] = rollback
+    wanted[current] = target
+    for tag in (previous, current):
+        if wanted.get(tag) != tags.get(tag):
+            action = "update" if tag in tags else "create"
+            client.run("artifacts", "tags", action, tag, "--version=" + wanted[tag], *scope)
+            # Confirm the rollback pointer before moving the current pointer.
+            tags[tag] = wanted[tag]
+            if read_tags() != tags:
+                raise AutomationError("TEST_RETENTION_READBACK_MISMATCH")
+
+
 def deploy(root):
     config, candidate = recheck(root)
+    config = cloud.bind_private_members(config, os.environ.get("JEMS_OWNER_IAP_BINDING"))
     client = cloud.Cloud(config)
     cloud.preflight(config, client)
     prior_test_image = None
@@ -150,12 +201,7 @@ def deploy(root):
     receipt["prNumber"] = receipt.pop("pr")
     (root / "jems-deployment.json").write_text(json.dumps(receipt, indent=2) + "\n")
     if candidate['environment'] == 'test':
-        # Retain only current and previous TEST images. These mutable retention
-        # tags are never release identities; deployment always uses the digest.
-        for image, tag_name in ((prior_test_image, 'keep-test-previous'), (receipt['image'], 'keep-test-current')):
-            if image:
-                run(['gcloud', 'artifacts', 'docker', 'tags', 'add', image,
-                     f"{config['registry']}/site:{tag_name}", '--project=' + config['projectId'], '--quiet'])
+        retain_test_images(config, client, receipt["image"], prior_test_image)
     api = gh.GitHub()
     # If source advanced during deployment, do not publish it as the current preview.
     if not gh.current_target(api, candidate):
@@ -168,8 +214,7 @@ def deploy(root):
 
 
 def cleanup(root):
-    config = read_config()
-    cloud.validate_config(config)
+    config = cloud.bind_private_members(read_config(), os.environ.get("JEMS_OWNER_IAP_BINDING"))
     client, api = cloud.Cloud(config), gh.GitHub()
     current_controller(api)
     cloud.preflight(config, client)

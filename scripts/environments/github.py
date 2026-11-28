@@ -174,7 +174,7 @@ def check_provenance(api: GitHub, check: dict, source: str) -> bool:
             and _valid_run(parent, source, CHECK_WORKFLOWS.get(check.get("name"))))
 
 
-def check_source(api: GitHub, source: str, policy: list[dict], kind: str, pr: int | None) -> dict | bool:
+def required_checks_pass(api: GitHub, source: str, policy: list[dict]) -> bool:
     checks = api.pages(f"{PREFIX}/commits/{source}/check-runs?filter=all", "check_runs")
     for requirement in policy:
         matching = [c for c in checks if c.get("name") == requirement["context"]
@@ -188,8 +188,18 @@ def check_source(api: GitHub, source: str, policy: list[dict], kind: str, pr: in
             return False
         if not check_provenance(api, current, source):
             return False
+    return True
+
+
+def check_source(api: GitHub, source: str, policy: list[dict], kind: str, pr: int | None) -> dict | bool:
+    if not required_checks_pass(api, source, policy):
+        return False
     try:
-        return ci_evidence.verify_full_ci(api, source, kind, pr)
+        proof = ci_evidence.verify_full_ci(api, source, kind, pr)
+        resolved = proof.get("resolutionHeadSha")
+        if resolved is not None and not required_checks_pass(api, resolved, policy):
+            return False
+        return proof
     except (ci_evidence.EvidenceError, OSError, KeyError, TypeError, ValueError):
         # No old branch-push or narrowed-main success can substitute a full receipt.
         return False
@@ -465,7 +475,7 @@ def directory(api: GitHub, issue_number: int) -> dict:
         lines.append(f"| {row['environment']} | {link} | {state} |")
     if not data["environments"]:
         lines.append("| DEV / TEST | Not deployed | Setup pending |")
-    lines += ["", "[Production website](https://jzwyrzyk.github.io/arcade/) — production release status is not inferred from merges or nonproduction deployments.",
+    lines += ["", "[Production website](https://jzwyrzyk.github.io/family-game-factory/) — production release status is not inferred from merges or nonproduction deployments.",
               "[Current release evidence](https://github.com/jzwyrzyk/family-game-factory/blob/main/DELIVERY-STATE.md)",
               "", "Complete TEST journeys, live-provider acceptance and exact-release production approval are separate gates."]
     api.request(f"{PREFIX}/issues/{issue_number}", "PATCH", {"body": "\n".join(lines) + "\n"})
