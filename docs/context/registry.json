@@ -897,10 +897,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-28T04:31:38.289Z",
-      "sourceDigest": "a70c60fa4e4e453688217500e3576dd329c5a0c2c07f948744084d7496993048",
+      "reviewedAt": "2026-11-28T05:06:39.790Z",
+      "sourceDigest": "c2138da1c1699f0f75f5a5dbbc5f648df7a9d3f22da530e99822aa7718147b1d",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The required hosted checks and browser journeys remain intact. The environment evidence README records the teardown change and live verification limits.",
+      "reviewReason": "The static TEST tag fixtures exercise rollback retention, failed readback, and retry. Required browser checks and source gates are unchanged.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-28T04:31:38.793Z",
-      "sourceDigest": "612a049b71af332d5def34359589e75413b2debfa41ba424665ef1a642ecc2c1",
+      "reviewedAt": "2026-11-28T05:06:40.246Z",
+      "sourceDigest": "fe4c5232703ef801b6040ca0e1a017ec483a5272e25085bda9444f0bfac35e69",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The existing protected TEST acceptance contract applies. The environment evidence README records the verified deployment and missing browser report.",
+      "reviewReason": "The controller uses the existing repository writer and the two established TEST retention tags. The environment evidence record identifies the serving revision and pending browser gate.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
