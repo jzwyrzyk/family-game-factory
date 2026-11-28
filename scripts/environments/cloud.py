@@ -236,7 +236,12 @@ def inspect(config, cloud, *, kind, pr, source_sha, bundle_sha256, image):
     env = containers[0].get("env", [])
     expected = {"JEMS_ENVIRONMENT": kind, "JEMS_SOURCE_SHA": source_sha,
                 "JEMS_BUNDLE_SHA256": bundle_sha256, "JEMS_PR_NUMBER": str(pr or "")}
-    require(all(set(item) == {"name", "value"} for item in env) and
+    # Cloud Run v1 EnvVar.value defaults to the empty string. The PR marker
+    # on the permanent TEST site is the only configured empty literal.
+    if kind == "test" and pr is None:
+        env = [{"name": "JEMS_PR_NUMBER", "value": ""} if item == {"name": "JEMS_PR_NUMBER"} else item
+               for item in env]
+    require(all(isinstance(item, dict) and set(item) == {"name", "value"} for item in env) and
             {item["name"]: item["value"] for item in env} == expected and len(env) == len(expected),
             "RUNTIME_ENVIRONMENT_DRIFT")
     revision = status.get("latestReadyRevisionName")
