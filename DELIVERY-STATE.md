@@ -4,6 +4,8 @@
 
 The [administrator handoff](docs/operations/DEV-FIRST-ADMIN-SETUP.md) separates DEV from TEST DNS and prepares a protected-main, read-only DEV foundation planner. The planner reuses the qualified #226 helpers, stores raw plans only in a separate private DEV bucket, and has no apply/build/inference path. Actual DEV project identity, bootstrap approval, private trust and live plans remain missing. No deployment, AI allowance or production state changed; #223/#226 remain held.
 
+The owner selected `test.myjems.com`, registered through Wix, while DEV remains on authenticated `run.app`. The handoff now supplies exact host labels, distinguishes Wix's whole-domain nameserver switch from unverified child delegation, and provides the conditional external-record fallback. Actual allocated DNS values and Wix account capability remain unverified. Protected main is still `4aec7aa67129ca074671c3cc9e1ae7e23f679fd0`; the prior operations candidate `f418488ccb3bdbd996db13cc8d4525fef5083583` passed all 31 active hosted checks (one legacy shadow skipped). The DNS handoff changes documentation only and has no live acceptance receipt.
+
 ## Native diagnostic acceptance
 
 The administrator verified 27 nonproduction resources and a zero-change recovery plan. The GitHub diagnostics workflow on protected main verified four native permissions in [run 46056038814](https://github.com/jzwyrzyk/family-game-factory/actions/runs/46056038814). The complete IAM audit passed all 77 checks. The private broker serves `jems-request-evidence-c-b51ec464f42c61a4c8ad` using image digest `sha256:9b4ea06f03b0725182fa123898d8ab536dcabebe604affee88aaefe23e983143`. The preceding native broker and original rollback revision are retained.

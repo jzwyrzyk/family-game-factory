@@ -6,9 +6,65 @@
 
 1. In **Google Cloud Console → project selector**, look for `jems-jzw-dev`. If visible, report its **project ID and project number**. If not visible, report that; it does not prove the ID is globally available. Confirm whether your account can create a project and link an existing billing account. **Do not create it or change billing yet.** Keep billing-account IDs private.
 2. In **GitHub → family-game-factory-lab organization → repositories/settings**, verify whether a private DEV worker repository already exists and whether your administrator can manage its GitHub Apps and restricted runner group. The current connection received 404 for the proposed DEV and TEST repository names; that is insufficient evidence to create duplicates. Report only existing/not visible and whether administrator access is available; do not send App keys or tokens.
-3. Be ready to approve the bound setup plan and select the authorized adult Google account through the protected setup. Later, install the separate DEV provider key directly into its approved private destination. **Never paste credentials, private configuration or billing details into chat or the public PR.** There is no need to decide TEST DNS now.
+3. Be ready to approve the bound setup plan and select the authorized adult Google account through the protected setup. Later, install the separate DEV provider key directly into its approved private destination. **Never paste credentials, private configuration or billing details into chat or the public PR.** TEST's namespace is now selected: `test.myjems.com`, with registration at Wix. Its DNS capability check below is independent of DEV.
 
 A useful reply is: `DEV project: <ID / number, or not visible>; can create/link billing: yes/no; private DEV worker: exists/not visible; GitHub organization admin available: yes/no.` No Cloud Shell commands are requested.
+
+## TEST DNS: Wix verification and records
+
+The owner has selected `test.myjems.com` and reserved `myjems.com` for eventual production. This supersedes the unselected-domain assumption in the November 28 held release package; it does not authorize DNS changes or paid resource creation. DEV keeps its native authenticated Cloud Run URL and requires none of these records.
+
+### What Wix supports and what still needs verification
+
+Wix's [nameserver instructions](https://support.wix.com/en/article/changing-nameserver-ns-records-for-a-wix-domain) document switching the **whole domain** to custom nameservers. Do not use that option or unassign the domain from its site for this task. It is not child-zone delegation.
+
+The [Wix DNS API](https://dev.wix.com/docs/api-reference/account-level/domains/domain-dns/update-dns-zone) lists `NS` additions, a `hostName` that can be a subdomain, and multiple values in a record set. It requires an account-level API key with Manage Domains permission. However, the dashboard documentation does not establish a child-NS editing flow, and the API's hostname description also contains an ambiguous domain-name restriction. **The schema is evidence of a possible supported API route, not proof that this account can delegate a child zone.** Do not assert that Wix categorically forbids delegation, create a new Wix integration, or request a broad API key merely to test it.
+
+The one Wix administrator verification is to open **Domains → myjems.com → Domain Actions → Manage DNS records**, inspect the current nameservers, and ask Wix support if child NS editing is unavailable:
+
+> Can you add an NS record set at `test.myjems.com` containing all nameservers assigned to a Google Cloud DNS child zone, while preserving the existing authoritative nameservers and every other record for `myjems.com`? Is this supported through this account's DNS editor, your support team, or the Domain DNS API? If not, can this account add `*.hub.test` as a wildcard A record and three Google-generated certificate-validation CNAME records under `hub.test`, `home.test`, and `preview.test`? Please confirm capability only; do not change records yet.
+
+Registration at Wix does not establish that Wix is currently authoritative. If custom nameservers are already in use, the existing authoritative DNS provider owns this step. Local public DNS lookups failed (resolver errors and an HTTPS resolver proxy rejection); no live NS, CAA or record-absence claim is made. Export the current DNS records before an approved change and preserve them for readback. No root migration, registration transfer or domain purchase is proposed.
+
+### Preferred delegation: exact names, values pending approved allocation
+
+Proposed Cloud DNS managed-zone ID: `jems-test-myjems-com`; public DNS name: `test.myjems.com.`; project: existing `jems-jzw-nonprod`. Neither the zone nor its availability is independently confirmed. After approved creation, obtain the zone's **entire assigned nameserver set**. These values cannot be derived from the zone name and must not be guessed.
+
+| Where | Type | Record name / host | Value | TTL |
+| --- | --- | --- | --- | --- |
+| Existing parent DNS provider, Wix if authoritative | NS | `test` (full name `test.myjems.com.`) | Every name in the approved child zone's returned `nameServers` set; one record set, retaining all values | 300 if supported, otherwise provider default recorded in the receipt |
+| Google child zone, GitHub-managed | A | `hub.test.myjems.com.` | Reviewed TEST edge global IPv4 | 300 |
+| Google child zone, GitHub-managed | A | `home.test.myjems.com.` | Same IPv4 | 300 |
+| Google child zone, GitHub-managed | A | `preview.test.myjems.com.` | Same IPv4 | 300 |
+| Google child zone, GitHub-managed | A | `*.hub.test.myjems.com.` | Same IPv4 | 300 |
+| Google child zone, GitHub-managed | CNAME, three records | Exact generated owners from DNS authorizations `jems-test-hub`, `jems-test-household`, `jems-test-preview` | Exact corresponding generated targets | 300 |
+
+The wildcard is deliberately `*.hub.test.myjems.com`, as implemented by the existing workshop router; it is not `*.workshop.test.myjems.com`. The hub DNS authorization also covers its wildcard, so no fourth authorization record is needed. Google uses `PER_PROJECT_RECORD`; copy each returned `dns_resource_record.name`, `.type` and `.data` exactly, including its generated suffix. Do not substitute a guessed `_acme-challenge` name, an A record or a serving CNAME for a validation record. Source: [Google DNS authorization](https://docs.cloud.google.com/certificate-manager/docs/dns-authorizations).
+
+These are exact chosen hostnames, **not yet copy-ready record values**: the global IPv4, assigned nameservers and three validation pairs require actual approved resource allocation/readback. No record is needed at `test.myjems.com` to serve the application. Cloud DNS supplies its zone apex SOA/NS. No new AAAA or DS record is proposed. Check effective CAA, including `issuewild`, before certificate issuance; `PER_PROJECT_RECORD` uses Google Trust Services (`pki.goog`). If restrictive CAA prevents issuance, present the minimal TEST-only addition for approval rather than changing root policy.
+
+### Simplest fallback if Wix cannot delegate this child zone
+
+Keep DNS at its current provider and use Wix's documented [external-subdomain A/CNAME pointing](https://support.wix.com/en/article/connecting-a-subdomain-to-an-external-resource). The existing Google load balancer, hosts, certificate and application routing stay the same. In **Manage DNS records → A → Add Record**, the Wix-relative host fields would be:
+
+| Wix Host Name | Type | Value |
+| --- | --- | --- |
+| `hub.test` | A | Reviewed TEST global IPv4 |
+| `home.test` | A | Same IPv4 |
+| `preview.test` | A | Same IPv4 |
+| `*.hub.test` | A | Same IPv4; verify Wix accepts this wildcard before choosing the fallback |
+
+Under **CNAME → Add Record**, add the same three generated validation pairs. For each Host Name, remove only the final `.myjems.com.` from the returned full owner; paste the exact target into Value. Check the displayed full name before saving to avoid doubling the domain suffix. Use TTL 300 if offered, otherwise record Wix's default; allow for Wix's documented propagation window of up to 48 hours. Do not add a broad CNAME at `test` or `hub.test`, which would conflict with the required records.
+
+This is a proposed compatibility fallback, not already-qualified automation: #226's current Terraform requires an existing dedicated Cloud DNS zone and writes the A/CNAME records there. An undelegated Cloud DNS zone would not make Wix authoritative records appear. If needed, make only the narrow change that supplies these DNS records for external administration and verifies their public answers; qualify it before TEST apply. Wildcard support remains an account verification item. Do not change hosting or implement that conditional adjustment while delegation remains unresolved.
+
+### Administrator actions after the applicable approval
+
+1. **Operator:** verify existing resources/records, obtain the account capability result, and bind the exact additive setup plan to the protected source, TEST project and cost envelope. The child zone is a prerequisite to the existing TEST plan, not permission to apply the entire TEST stack. Its cost remains about $0.24/month at 100,000 queries, within the existing TEST estimate; no domain purchase is needed. A Wix-hosted fallback avoids this Cloud DNS line only if no child zone is retained. Do not assume a Wix upgrade is needed or authorized.
+2. **Administrator, once:** approve the observed setup delta and establish missing narrowly scoped cloud/GitHub trust through existing approved administration. If delegation is supported, after approved zone creation add only the returned NS set at `test` using the confirmed Wix/provider method. With the fallback, enter the four A and three CNAME records only after their actual values and the narrow automation adjustment are approved. Never replace the root nameserver set.
+3. **Operator, through protected GitHub automation:** manage the Google child-zone records in the preferred route, verify delegation and every serving/validation answer, certificate readiness, adult authentication and origin separation; record before/after evidence proving unrelated root records are unchanged. Reuse the existing TEST controller and finite acceptance mechanism. DEV activation and acceptance proceed independently on `run.app`.
+
+No DNS mutation, resource allocation, AI activation, application merge or production promotion occurred as part of this verification. External family invitations remain disabled.
 
 ## Work owned by the release operator
 
