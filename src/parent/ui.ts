@@ -1,3 +1,4 @@
+import {createAction} from '../design-system/components/action';
 import {CreationWorkspace} from '../storage/creation-workspace';
 import {profileStorage} from '../adult-pilot/storage';
 import {gradeLabel} from '../learning/grades';
@@ -14,7 +15,7 @@ const node = <K extends keyof HTMLElementTagNameMap>(tag: K, cls = '', text = ''
   const n = document.createElement(tag); n.className = cls; if (text) n.textContent = text; return n;
 };
 const button = (text: string, action: () => void, cls = 'pd-button') => {
-  const b = node('button', cls, text); b.type = 'button'; b.onclick = action; return b;
+  return createAction({label: text, className: cls, onPress: action});
 };
 const date = (at: number) => new Date(at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 const number = (value: number) => value.toLocaleString();

@@ -3,7 +3,8 @@
 const host=parent.__jemsReview, cfg=host.config, nativeURL=window.URL, nativeFetch=window.fetch.bind(window);
 window.__reviewConfig=cfg;
 const log=(type,detail)=>parent.postMessage({type:'review-event',kind:type,detail},'*');
-const keyFor=value=>{try{const u=new nativeURL(String(value),document.baseURI);for(const key of host.assetKeys)if(u.pathname.endsWith('/'+key))return key;}catch{}return null;};
+const packagedKeys=new Set(host.assetKeys);
+const keyFor=value=>{const direct=String(value).replace(/^(?:\.\/|\/)/,'');if(packagedKeys.has(direct))return direct;try{const u=new nativeURL(String(value),document.baseURI);for(const key of host.assetKeys)if(u.pathname.endsWith('/'+key))return key;}catch{}return null;};
 const resolve=value=>{if(!value||String(value).startsWith('data:')||String(value).startsWith('blob:')||String(value).startsWith('#'))return value;const key=keyFor(value);return key?host.asset(key):value;};
 const rewrite=text=>String(text).replace(/((?:src|href)\s*=\s*["'])([^"']+)(["'])/gi,(m,a,v,b)=>a+resolve(v)+b).replace(/url\(\s*(["']?)([^)"']+)\1\s*\)/g,(m,q,v)=>`url("${resolve(v)}")`);
 class ReviewURL extends nativeURL {constructor(value,base){super(resolve(value),base);}}
@@ -87,6 +88,7 @@ Object.defineProperty(HTMLIFrameElement.prototype,'src',{...frameSrc,set(value){
  if(/^(https?:|file:)/.test(String(value)))throw Error('External frame disabled in review');return frameSrc.set.call(this,value);
 }});
 window.__reviewNavigate=async action=>{
+ document.getElementById('design-system-gallery')?.remove();
  const FG=window.FG,click=id=>document.getElementById(id)?.click();
  const enterParent=()=>new Promise((resolve,reject)=>{
   const opened=event=>{if(event.detail==='parent'){clearTimeout(timeout);window.removeEventListener('factory-page',opened);resolve();}};
@@ -94,16 +96,36 @@ window.__reviewNavigate=async action=>{
   window.addEventListener('factory-page',opened);click('studioMenuParent');
  });
  FG.learning?.dispose();for(const d of document.querySelectorAll('dialog[open]'))d.close();
- if(action==='home')FG.studio.home();
+ if(action.startsWith('learn:')){
+  const sample=host.learningSamples.find(sample=>sample.action===action);
+  if(!sample)throw Error('Unknown review sample');
+  window.__openLearningSample(sample,host.learningTheme,host.config.grade);
+ }else if(action==='design-system'){await FG.studio.home();window.__reviewDesignSystem();}
+ else if(action==='home')FG.studio.home();
  else if(action==='create')click('studioNavCreate');
  else if(action==='creations'){FG.studio.home();click('studioSavedIdeas');}
  else if(action==='coding')FG.creation.open();
+ else if(action==='creative-picker'){await FG.artStudio.open();click('artBrowseAssets');}
+ else if(action==='world-builder')await window.__reviewCreative('world-plate-forest');
+ else if(action.startsWith('creative:'))await window.__reviewCreative(action.slice(9));
  else if(action==='art')await FG.artStudio.open();
  else if(action==='art-draw'){await FG.artStudio.open();click('artDrawButton');}
  else if(action==='coding-make'){FG.creation.open();await delay(80);click('creationIntroSkip');click('creationFreeMode');}
  else if(action==='coding-intro'){FG.creation.openIntroduction();}
  else if(action==='coding-editor'){FG.creation.open();await delay(80);click('creationIntroSkip');click('creationFreeMode');document.querySelector('[data-creation-starter="robot"]')?.click();}
  else if(action==='coding-challenge'){FG.creation.openChallenges();await delay(80);document.querySelector('[data-challenge]')?.click();}
+ else if(action==='review-recovery') {
+  await enterParent();
+  const section=document.getElementById('jemsRecovery');
+  if(!section)throw Error('The recovery controls are unavailable.');
+  const origin=section.parentNode,next=section.nextSibling,dialog=document.createElement('dialog');
+  dialog.setAttribute('aria-label','Synthetic family recovery');
+  dialog.style.cssText='max-width:min(680px,95vw);max-height:86vh;overflow:auto;border-radius:16px';
+  const close=document.createElement('button');close.textContent='Back to parent view';close.onclick=()=>dialog.close();
+  dialog.append(close,section);
+  dialog.addEventListener('close',()=>{origin.insertBefore(section,next?.parentNode===origin?next:null);dialog.remove();},{once:true});
+  document.body.append(dialog);dialog.showModal();section.scrollIntoView();
+ }
  else if(action==='privacy'){await enterParent();FG.parentDashboard.openTab('settings');document.getElementById('builderParentUnlockPassphrase').value='review-demo-only';document.getElementById('builderParentUnlock')?.requestSubmit();}
 
  else if(action==='powers'||action==='math'||action==='english'){if(action!=='powers'){FG.store.current().learningSubject=action==='math'?'math':'language';FG.store.current().allowSubjectSwitch=true;}FG.app.page('lab');}

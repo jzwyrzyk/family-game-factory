@@ -1,3 +1,4 @@
+import {assertQuestionEntry} from './learning-entry-viewport.cjs';
 import {authorizeLearningParent} from './learning-parent-fixture.cjs';
 /** Production-shell integration; all game content here is a named local fixture. No model calls. */
 import assert from 'node:assert/strict';
@@ -80,6 +81,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
 
     // A real Math Lab item, including a first error, help request, and abandoned activity.
     await nav(page,'My Powers');await activity(page).waitFor({state:'visible'});
+    await assertQuestionEntry(activity(page));
     const first=await activeItem(page),firstId=await page.evaluate(()=>window.FG.learning.activeAttemptId),owner=(await profile(page)).id;
     await submitWritten(page,first,wrongAnswer(first));
     const savedWrong=await page.evaluate(({key,owner,id})=>JSON.parse(localStorage.getItem(key)!).profiles.find((p:any)=>p.id===owner).learning.attempts.find((a:any)=>a.id===id),{key:STORE,owner,id:firstId});
@@ -91,7 +93,7 @@ async function applicationJourney(browser:Browser,base:string,device:typeof devi
     await activity(page).locator('[data-action="hint"]').click();
     const hinted=(await attempts(page)).find((a:any)=>a.id===firstId);assert.equal(hinted.hintLevel,1);
     await page.screenshot({path:`test-results/math-lab-help-${name}.png`,fullPage:true});
-    await nav(page,'Play');
+    await activity(page).locator('[data-action="leave-game"]').click();
     const ended=(await attempts(page)).find((a:any)=>a.id===firstId);
     assert.equal(ended.outcome,'interrupted');assert.equal(ended.answers.length,1);assert.equal(ended.hintEvents.length,1);
     await page.reload();await page.waitForFunction(()=>window.FG?.learning);
@@ -217,7 +219,7 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
       const frame=document.createElement('iframe');frame.id='math-fixture-frame';frame.title='Audited learning preview fixture';frame.sandbox.add('allow-scripts');frame.style.cssText='width:100%;height:760px;border:0;';
       host.append(frame);document.getElementById('page-home')!.prepend(host);
       window.addEventListener('message',event=>{if(event.source===frame.contentWindow&&event.data?.type==='factory-preview')w.previewMessages.push(event.data);});
-      w.previewBridge=w.PreviewLearningTest.attachPreviewLearning(frame,{channel,artifactId,ownerId:window.FG.store.current().id,gameId:`fixture-${kind}`,projectId:`fixture-${kind}`,mode:'checkpoint',onRound(result:any){w.previewRounds.push(result);}});
+      w.previewBridge=w.PreviewLearningTest.attachPreviewLearning(frame,{channel,artifactId,ownerId:window.FG.store.current().id,gameId:`fixture-${kind}`,projectId:`fixture-${kind}`,mode:'checkpoint',onLeave(){w.previewBridge.dispose();host.remove();},onRound(result:any){w.previewRounds.push(result);}});
       frame.srcdoc=html;
     },{html,channel,artifactId,kind});
     const frame=page.frameLocator('#math-fixture-frame');
@@ -297,6 +299,18 @@ async function previewJourney(browser:Browser,base:string,bridge:string,device:t
       assert.equal((await attempts(page)).length,3,'the checkpoint and its pending completion share one learning opportunity');
       assert.equal(await page.locator('.learning-preview-cover').count(),0);
     }
+    await advanceBudget(page);
+    if(kind==='declarative') await playRound(true);
+    else {
+      await frame.locator('body').evaluate((_el,packet)=>parent.postMessage(packet,'*'),{type:'factory-preview',channel,artifactId,event:'math-checkpoint',roundId:3,checkpointId:2});
+      await page.waitForSelector('.learning-preview-cover .math-activity');
+    }
+    const abandoned=await page.evaluate(()=>window.FG.learning.activeAttemptId);
+    const roundsBeforeExit=await page.evaluate(()=>(window as any).previewRounds.length);
+    await activity(page).locator('[data-action="leave-game"]').click();
+    assert.equal(await page.locator('#math-fixture-frame').count(),0);
+    assert.equal((await attempts(page)).find((a:any)=>a.id===abandoned).outcome,'interrupted');
+    assert.equal(await page.evaluate(()=>(window as any).previewRounds.length),roundsBeforeExit);
     assert.deepEqual(errors,[]);
     console.log(`PASS ${kind} preview ${name}: source/channel validation, sandbox isolation, host-owned math, pause/resume, duplicate suppression, fresh replay and in-flight outcome handling`);
   }catch(error){

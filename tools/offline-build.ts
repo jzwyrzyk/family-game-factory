@@ -1,16 +1,19 @@
 import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';import {execFileSync} from 'node:child_process';import type {Plugin} from 'vite';
-export function offlineBuild():Plugin{
- let dir='dist';
- return {name:'reviewed-offline-shell',configResolved(config){dir=path.resolve(config.root,config.build.outDir);},closeBundle(){
+export interface OfflineBuildOptions {outDir?:string;buildInfo?:{sha:string;dirty:boolean;[key:string]:unknown}}
+export function offlineBuild(options:OfflineBuildOptions={}):Plugin{
+ let dir=options.outDir??'dist';
+ return {name:'reviewed-offline-shell',configResolved(config){dir=path.resolve(config.root,options.outDir??config.build.outDir);},closeBundle(){
  const files=(base:string):string[]=>fs.readdirSync(path.join(dir,base),{withFileTypes:true}).flatMap(f=>f.isDirectory()?files(path.join(base,f.name)):[path.join(base,f.name)]);
- const sha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();const dirty=!!execFileSync('git',['status','--porcelain','--untracked-files=no'],{encoding:'utf8'}).trim();fs.writeFileSync(path.join(dir,'build-info.json'),JSON.stringify({sha,dirty}));
+ const buildInfo=options.buildInfo??{sha:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),dirty:!!execFileSync('git',['status','--porcelain','--untracked-files=no'],{encoding:'utf8'}).trim()};
+ if(!/^[0-9a-f]{40}$/.test(buildInfo.sha)||typeof buildInfo.dirty!=='boolean')throw Error('INVALID_OFFLINE_BUILD_IDENTITY');
+ fs.writeFileSync(path.join(dir,'build-info.json'),JSON.stringify(buildInfo));
  const list=files('').filter(f=>!['sw.js','factory-config.json'].includes(f)).sort();const hash=createHash('sha256');for(const f of list)hash.update(f).update(fs.readFileSync(path.join(dir,f)));const version=hash.digest('hex');
  // Ship the reusable library without downloading every unused cover and pose on
  // first visit. Current UI art remains in the offline shell; optional static art
  // is cached only when requested. The native-resolution Gem Pal WebPs are
  // also on-demand; their small manifest remains in the shell so offline image
  // selection can resolve already-viewed assets. Private APIs stay excluded.
- const coreArt=new Set(['hero_workshop','spot_first_idea','character_spark_wave','character_spark_think','character_spark_rest','character_spark_celebrate','character_spark_recover','spot_work_in_progress','spot_reconnect','spot_safe_storage'].map(id=>'jems-art/'+id+'.webp'));
+ const coreArt=new Set(['gem_blue','gem_gold','gem_mint','hero_workshop','spot_first_idea','character_spark_wave','character_spark_think','character_spark_rest','character_spark_celebrate','character_spark_recover','spot_work_in_progress','spot_reconnect','spot_safe_storage'].map(id=>'jems-art/'+id+'.webp'));
  coreArt.add('jems-art/icons/jems-icons.svg');
  const precache=list.filter(f=>(!f.startsWith('jems-art/')||coreArt.has(f))&&(!f.startsWith('jems-pals/')||f==='jems-pals/manifest.json')&&!f.startsWith('jems-pals-extra/'));
  fs.writeFileSync(path.join(dir,'sw.js'),`const paths=${JSON.stringify(list)},precachePaths=${JSON.stringify(precache)},version=${JSON.stringify(version)};

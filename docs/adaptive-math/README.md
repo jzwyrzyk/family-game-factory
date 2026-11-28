@@ -152,7 +152,7 @@ Those sources motivate principles; they do not validate this product's exact fou
 
 ## Child presentation refinement
 
-The actual question appears first. Redundant purpose/skill labels and generic encouragement are removed; necessary representation guidance, diagrams, hints and worked examples remain. Ordinary child labels/controls use an 18px floor and main instructional text uses 20px. The dark Math palette remains independent of pale Language cards and dark game-result wrappers. The [shared child-interface contract](../brand/CHILD_INTERFACE.md) sets the target; source evidence and required-checkpoint behavior are unchanged.
+The actual question appears first. Redundant purpose/skill labels and generic encouragement are removed; necessary representation guidance, diagrams, hints and worked examples remain. Ordinary child labels/controls use an 18px floor and main instructional text uses 20px. Both subjects use the shared light learning surface with separate accents. Game results retain their own palette. See the [learning workspace standard](../learning/LEARNING_WORKSPACE_STANDARD.md). The [shared child-interface contract](../brand/CHILD_INTERFACE.md) sets the target; source evidence and required-checkpoint behavior are unchanged.
 
 
 ## Optional question and help narration

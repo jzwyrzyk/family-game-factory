@@ -38,6 +38,8 @@ Use actual physics when weight, contact, balance, momentum, suspension or anothe
 
 ### Original drawings belong to the child across creations
 
+A child's drawing is the finished artistic creation. Keeping or importing it preserves the exact original bytes. Never send private art or its rendered captures to a generative model, redraw it, beautify it, synthesize a substitute or change its appearance to match a game. Explicit deterministic preparation saves a traceable derivative. New games use 2D sprites and environments. The same original can play different roles in different adventures, each pinned to the version the child chose. [Creative Asset & World Design Standard](docs/creative-universe/STANDARD.md)
+
 The [Art Studio](docs/drawings/ART_STUDIO.md) is a dedicated place to import or draw pictures, prepare separate derivatives, develop meaningful parts and motion, and reuse chosen versions in games and scenes. Preserve original pixels and the child’s decisions. A saved use pins the chosen image or movement revision; later library edits cannot silently change an earlier adventure. Keep local storage, export/restore and missing-asset recovery explicit. Supported physical and block-scene adapters do not imply arbitrary generated-game compatibility, universal recognition or cloud synchronization. [The accepted decision](docs/decisions/2026-11-19-private-art-studio.md) records this extension.
 
 ## 4. Experiments are recoverable; choosing a favorite is explicit
@@ -57,6 +59,8 @@ The approved voice interaction is **Speak → finish/transcribe → editable dra
 Read-aloud stays discoverable across child interactions, including saved replies, questions, revealed help and Creator. A speaker requests reading; a microphone requests dictation. The target voice is natural, caring and clearly spoken by a young adult female voice. Hosted narration has separate approval and spending boundaries; choosing a device voice cannot authorize it. [The reading contract](docs/speech/READ_ALOUD.md) records implementation and its device-listening limits.
 
 ## 6. Learning belongs to the trusted host and needs honest evidence
+
+The child can explore a model or passage, try an answer, revise it and resume play in one shared Math and English workspace. Match the presentation to the child's configured grade and the tools to the selected skill. Preserve the distinction between solving a task using its normal representation and receiving a scaffold that teaches a solution. [Learning workspace standard](docs/learning/LEARNING_WORKSPACE_STANDARD.md)
 
 The parent-selected subject, grade boundary and learning settings travel with the child across games and versions. Game difficulty is separate from learning difficulty. The selected Math or Language Arts host controls activities, answers, assistance and progress; generated code cannot grade the child, bypass checkpoints or award proficiency. Additional practice while waiting is optional and does not replace ordinary required checkpoints.
 

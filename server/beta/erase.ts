@@ -1,4 +1,5 @@
-import {Firestore} from '@google-cloud/firestore';
+import type {Firestore} from '@google-cloud/firestore';
+import {databaseFor} from '../storage/database';
 import {Storage} from '@google-cloud/storage';
 import {readFile} from 'node:fs/promises';
 import {uuid,workspaceOf,defaultCapabilities,type Family} from './model';
@@ -57,7 +58,7 @@ async function main(){
  if(!['--check','--apply-verified-case'].includes(mode)||!process.env.JEMS_PRIVACY_OPERATIONS_CONFIG)throw Error('OPERATIONS_CONFIGURATION_REQUIRED');
  const cfg=JSON.parse(await readFile(process.env.JEMS_PRIVACY_OPERATIONS_CONFIG,'utf8'));
  if(typeof cfg.projectId!=='string'||typeof cfg.artifactBucket!=='string'||!cfg.projectId||!cfg.artifactBucket)throw Error('OPERATIONS_CONFIGURATION_REQUIRED');
- const result=await processDeletion(new Firestore({projectId:cfg.projectId}),new Storage({projectId:cfg.projectId}),cfg,id,requestId,mode==='--apply-verified-case');
+ const result=await processDeletion(databaseFor(cfg),new Storage({projectId:cfg.projectId}),cfg,id,requestId,mode==='--apply-verified-case');
  console.log(JSON.stringify({verified:result.authorized,applied:result.apply,pendingStorageOperations:result.pendingStorageOperations}));
 }
 if(process.argv[1]?.endsWith('/beta/erase.ts'))void main().catch(()=>{console.error('Privacy case incomplete. The case can be checked and retried.');process.exitCode=1;});

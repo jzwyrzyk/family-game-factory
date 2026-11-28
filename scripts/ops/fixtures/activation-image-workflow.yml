@@ -1,0 +1,144 @@
+name: Jems immutable service images
+on:
+  workflow_dispatch:
+    inputs:
+      verify_identity:
+        description: Verify GitHub OIDC claims only while production flags are off
+        type: boolean
+        default: false
+      verify_access:
+        description: Read-only federated access proof after reviewed flag-absence check
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths: ['ops/publish-images.txt']
+
+permissions:
+  contents: read
+concurrency:
+  group: jems-service-images-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  verify-identity:
+    if: >-
+      github.repository == 'jzwyrzyk/family-game-factory' &&
+      github.event_name == 'workflow_dispatch' &&
+      github.ref == 'refs/heads/main' && github.ref_protected &&
+      inputs.verify_identity && !inputs.verify_access &&
+      vars.JEMS_IMAGE_PUBLISH_ENABLED != 'true' &&
+      vars.JEMS_CLOUD_RUN_RELEASE_ENABLED != 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: jems-image-publication
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - run: python3 scripts/ops/oidc_claims.py publish
+  verify-access:
+    if: >-
+      github.repository == 'jzwyrzyk/family-game-factory' &&
+      github.event_name == 'workflow_dispatch' &&
+      github.ref == 'refs/heads/main' && github.ref_protected &&
+      inputs.verify_access && !inputs.verify_identity &&
+      vars.JEMS_IMAGE_PUBLISH_ENABLED == '' &&
+      vars.JEMS_CLOUD_RUN_RELEASE_ENABLED == ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: jems-image-publication
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - id: access-auth
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          workload_identity_provider: ${{ vars.JEMS_PUBLISH_WIF_PROVIDER }}
+          service_account: ${{ vars.JEMS_PUBLISH_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_lifetime: 600s
+          access_token_scopes: https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/userinfo.email
+          create_credentials_file: false
+          export_environment_variables: false
+      - name: Verify federated production access
+        env:
+          JEMS_GOOGLE_ACCESS_TOKEN: ${{ steps.access-auth.outputs.access_token }}
+          JEMS_ACCESS_PROVIDER: ${{ vars.JEMS_PUBLISH_WIF_PROVIDER }}
+          JEMS_ACCESS_SERVICE_ACCOUNT: ${{ vars.JEMS_PUBLISH_SERVICE_ACCOUNT }}
+          JEMS_VERIFY_ACCESS: ${{ inputs.verify_access }}
+          JEMS_VERIFY_IDENTITY: ${{ inputs.verify_identity }}
+          JEMS_IMAGE_PUBLISH_ENABLED: ${{ vars.JEMS_IMAGE_PUBLISH_ENABLED }}
+          JEMS_CLOUD_RUN_RELEASE_ENABLED: ${{ vars.JEMS_CLOUD_RUN_RELEASE_ENABLED }}
+        run: python3 scripts/ops/verify_release_access.py publish
+  build:
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && !inputs.verify_identity && !inputs.verify_access && vars.JEMS_IMAGE_PUBLISH_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Build from existing publication archive
+        run: |
+          set -euo pipefail
+          PYTHONPATH=scripts/deployment python3 -c 'import build, os; build.source_archive(os.getcwd(), os.environ["RUNNER_TEMP"], os.environ["GITHUB_SHA"])'
+          for kind in gateway preview coach; do
+            docker build --pull --file "server/Dockerfile.$kind" --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+              --tag "jems-$kind:ci" - < "$RUNNER_TEMP/source.tgz"
+          done
+          docker save jems-gateway:ci jems-preview:ci jems-coach:ci | gzip -1 > "$RUNNER_TEMP/images.tar.gz"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: service-images
+          path: ${{ runner.temp }}/images.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: jems-image-publication
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: service-images
+          path: ${{ runner.temp }}
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          workload_identity_provider: ${{ vars.JEMS_PUBLISH_WIF_PROVIDER }}
+          service_account: ${{ vars.JEMS_PUBLISH_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f
+      - name: Push immutable candidates without running image code
+        run: |
+          set -euo pipefail
+          registry=us-east5-docker.pkg.dev/family-game-factory-jzw/jems-release-images
+          gcloud artifacts repositories describe jems-release-images \
+            --project=family-game-factory-jzw --location=us-east5 --format=json |
+            jq -e '.format == "DOCKER" and .dockerConfig.immutableTags == true' >/dev/null
+          gcloud auth configure-docker us-east5-docker.pkg.dev --quiet
+          docker load --input "$RUNNER_TEMP/images.tar.gz"
+          : > "$RUNNER_TEMP/subjects"
+          for kind in gateway preview coach; do
+            tag="$registry/$kind:ci-$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+            docker tag "jems-$kind:ci" "$tag"
+            docker push "$tag"
+            digest="$(docker buildx imagetools inspect --format '{{json .Manifest.Digest}}' "$tag" | jq -er 'select(test("^sha256:[a-f0-9]{64}$"))')"
+            printf "%s  %s\n" "${digest#sha256:}" "$registry/$kind" >> "$RUNNER_TEMP/subjects"
+            echo "$registry/$kind@$digest" >> "$GITHUB_STEP_SUMMARY"
+          done
+          mv "$RUNNER_TEMP/subjects" "$RUNNER_TEMP/subject-checksums.txt"
+      - uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a
+        with:
+          subject-checksums: ${{ runner.temp }}/subject-checksums.txt

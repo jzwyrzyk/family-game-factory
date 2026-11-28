@@ -1,3 +1,5 @@
+import {devTestAllowed,hasAdultSession,devCapacityAvailable,reserveDevSpend} from '../dev-test-policy';
+import type {DevAccessPolicy} from '../dev-access';
 /** Optional text-to-speech. Authorization, accounting and transient audio stay
  * separate from microphone dictation and model conversation. Disabled by default. */
 import {randomUUID} from 'node:crypto';
@@ -16,7 +18,7 @@ export const NARRATION_LEASE_MS=60_000;
 export const NATURAL_NARRATION_VOICE='en-US-Chirp3-HD-Aoede';
 export interface NarrationConfig {
  approved:boolean;privacyApproved:boolean;providerApproved:boolean;parentConsentApproved:boolean;
- requireVerifiedParentPrivacy?:boolean;adultPilot?:AdultPilotFlags;
+ requireVerifiedParentPrivacy?:boolean;adultPilot?:AdultPilotFlags;devTestPolicy?:DevAccessPolicy;
  projectId:string;voice:string;maxMicroUsd:number;priceMicroUsdPerMillionChars:number;pricesReviewedAt:string;
 }
 export interface NarrationReceipt {
@@ -85,6 +87,9 @@ export class NarrationService {
  private permitted(state:PipelineState,session:VerifiedSession,now=Date.now()):boolean {
   if(!session||session.expiresAt<=now||!['parent','designer'].includes(session.role))return false;
   try{assertActiveTrustedDevice(state,session,now);}catch{return false;}
+  if(this.config.devTestPolicy&&now>=this.config.devTestPolicy.allowanceExpiresAt)return false;
+  if(session.devTestGrantId!==undefined)return devTestAllowed(state,session,this.config.devTestPolicy,now);
+  if(this.config.devTestPolicy&&!hasAdultSession(session))return false;
   if(this.config.adultPilot?.enabled===true)return adultPilotAllowed(state,session,now);
   if(session.adultSessionId||session.adultProfileId)return false;
   return allowedCoachFamily(state,session,'narration',now)&&
@@ -96,7 +101,7 @@ export class NarrationService {
    reconcileNarrationReceipts(state);
    const ledger=state.ledgers[session.familyId];
    return this.permitted(state,session)&&!!ledger?.paidEnabled&&ledger.month===new Date().toISOString().slice(0,7)&&
-    ledger.used+ledger.reserved+this.config.maxMicroUsd<=ledger.allowance;
+    ledger.used+ledger.reserved+this.config.maxMicroUsd<=ledger.allowance&&devCapacityAvailable(state,this.config.devTestPolicy,this.config.maxMicroUsd);
   });
   if(!allowed)return false;
   if(this.provider.readiness&&!await this.provider.readiness(AbortSignal.timeout(4000)).catch(()=>false))return false;
@@ -108,7 +113,8 @@ export class NarrationService {
    typeof input.id!=='string'||!/^[A-Za-z0-9_-]{8,100}$/.test(input.id))throw Error('INVALID_NARRATION');
   const text=validateNarrationText(input.text);
   if(cancel?.aborted)throw Error('NARRATION_UNAVAILABLE');
-  const subject=session?.adultSessionId?`${session.subject}:adult:${session.adultSessionId}`:session?.subject;
+  const subject=session?.adultSessionId?`${session.subject}:adult:${session.adultSessionId}`:
+   session?.devTestGrantId?`${session.subject}:dev:${session.devTestGrantId}`:session?.subject;
   const reservationId=randomUUID();
   await this.repo.transaction(state=>{
    const now=Date.now();reconcileNarrationReceipts(state,now);
@@ -123,6 +129,7 @@ export class NarrationService {
    const month=new Date(now).toISOString().slice(0,7),ledger=state.ledgers[session.familyId];
    if(reserved>this.config.maxMicroUsd||!ledger?.paidEnabled||ledger.month!==month||
     ledger.used+ledger.reserved+reserved>ledger.allowance)throw Error('SPENDING_CUTOFF');
+   reserveDevSpend(state,this.config.devTestPolicy,reserved);
    ledger.reserved+=reserved;
    receipts.push({id:input.id,familyId:session.familyId,subject,month,at:now,leaseUntil:now+NARRATION_LEASE_MS,
     reservationId,reserved,state:'running'});

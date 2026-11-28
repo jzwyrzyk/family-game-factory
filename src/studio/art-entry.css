@@ -34,3 +34,11 @@
 @media(max-width:650px) {
   .studio-review #studioArt { padding: 9px 11px; }
 }
+.studio-art-plan {margin:12px 0;padding:14px;background:#f6f1fc;color:#352447;border-radius:14px}
+.studio-art-plan h3,.studio-art-plan p {margin:5px 0 10px}
+.studio-art-plan div {display:flex;align-items:center;justify-content:space-between;gap:8px}
+.studio-art-plan span {overflow-wrap:anywhere}
+.studio-art-plan p {font-size:20px}
+.studio-art-plan button,.game-art-review button {min-height:44px;font-size:18px}
+.game-art-review {width:min(940px,96vw);padding:10px;border:0;border-radius:16px}
+.game-art-review iframe {width:100%;height:min(76vh,730px);border:0}

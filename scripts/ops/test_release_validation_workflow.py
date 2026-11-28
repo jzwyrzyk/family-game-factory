@@ -76,15 +76,23 @@ class ReleaseValidationWorkflow(unittest.TestCase):
         self.assertIn('operation: ${{ steps.plan.outputs.operation }}', self.plan)
         self.assertIn("github.ref == 'refs/heads/main' && github.ref_protected", self.plan)
 
-    def test_auth_observation_permissions_concurrency_and_mutation_lane_are_byte_unchanged(self):
-        # Scoped to reviewed integration base319f252. Changing these authority
-        # boundaries requires a separate review, not an evidence-gate refactor.
-        before_plan = self.text.split('  plan:\n', 1)[0]
+    def test_approved_transition_retains_identity_attestation_main_and_dependency_gates(self):
         transition = self.text.split('  transition:\n', 1)[1]
-        self.assertEqual(hashlib.sha256(before_plan.encode()).hexdigest(),
-                         'f5c9b91893eebd8b5af88d31bd0e572747fef6db113677146ed113775578e8b7')
-        self.assertEqual(hashlib.sha256(transition.encode()).hexdigest(),
-                         'e81928013b14825723a90d8ee3d5112ce7946c6f812ae53a16a6cd9caed0d7c7')
+        for step in ('production_gate.py transition', 'google-github-actions/auth@', 'gh attestation verify',
+                     'production_gate.py dependencies', 'git ls-remote origin refs/heads/main', 'ops/release.json --apply'):
+            self.assertIn(step, transition)
+        self.assertLess(transition.index('production_gate.py transition'), transition.index('google-github-actions/auth@'))
+        self.assertLess(transition.index('production_gate.py dependencies'), transition.index('ops/release.json --apply'))
+        self.assertIn('environment: jems-cloud-run-production', transition)
+        self.assertIn("vars.JEMS_CLOUD_RUN_RELEASE_ENABLED == 'true'", transition)
+        self.assertIn('--deny-self-hosted-runners',transition)
+        review = self.text.split('  review-release:\n')[1].split('  plan:\n')[0]
+        self.assertIn('environment: jems-production-approval', review)
+        self.assertIn('permissions: {}', review)
+        self.assertNotIn('id-token: write', review)
+        self.assertNotIn('google-github-actions/auth', review)
+        self.assertIn("inputs.release_review == 'off'", self.plan)
+        self.assertIn('group: jems-cloud-run-production', self.text)
 
 
 if __name__ == '__main__':

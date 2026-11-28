@@ -1,3 +1,4 @@
+import {fundPremiumEditRepair} from '../server/pipeline/premium-policy';
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {ActionCoordinator} from '../server/actions/coordinator';
@@ -363,4 +364,20 @@ test('approved art on a saved revision stays within its immutable family and adu
  const state=await repo.snapshot();
  assert.equal(state.jobs.length,0);assert.equal(state.ledgers[familyId].reserved,0);
  assert.equal(state.revisions.length,2);
+});
+
+test('additional repair allowance denial leaves the existing job and family reservation unchanged',async()=>{
+ const h=await admitted();
+ await h.repo.transaction(state=>{
+  const job=state.jobs.find(j=>j.id===h.id)!;
+  job.status='testing';job.maxUnits=10000;job.usedUnits=10000;job.premiumEditCeilingMicroUsd=5000000;
+  state.ledgers[familyId].reserved=10000;
+  let admissions=0;
+  assert.equal(fundPremiumEditRepair(state,job,approval,5000000,false,()=>{admissions++;return false;}),'SPENDING_CUTOFF');
+  assert.equal(job.maxUnits,10000);assert.equal(state.ledgers[familyId].reserved,10000);
+  assert.equal(fundPremiumEditRepair(state,job,approval,5000000,false,()=>{admissions++;return true;}),undefined);
+  const admitted=job.maxUnits;assert.ok(admitted>10000);assert.equal(state.ledgers[familyId].reserved,admitted);
+  assert.equal(fundPremiumEditRepair(state,job,approval,5000000,false,()=>{throw Error('Must not re-admit a covered repair');}),undefined);
+  assert.equal(job.maxUnits,admitted);assert.equal(admissions,2);return true;
+ });
 });

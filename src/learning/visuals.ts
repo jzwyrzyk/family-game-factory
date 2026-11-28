@@ -1,14 +1,15 @@
+import {pointsAttribute, polygonVertices} from './workspace/math-geometry-points';
 import type { MathItem, MathVisual } from './types';
 
 const SVG = 'http://www.w3.org/2000/svg';
-const BLUE = '#78b9ff', GOLD = '#ffe28a', INK = '#f3f7ff', EDGE = '#8ea1c8';
+const BLUE = '#3869bb', GOLD = '#99711a', INK = '#0b1e3b', EDGE = '#696d86';
 function svg<K extends keyof SVGElementTagNameMap>(name: K, attrs: Record<string, string | number> = {}) {
   const element = document.createElementNS(SVG, name);
   for (const [key, value] of Object.entries(attrs)) element.setAttribute(key, String(value));
   return element;
 }
 function label(root: SVGElement, x: number, y: number, value: string, size = 15) {
-  const node = svg('text', {x, y, fill: INK, 'text-anchor': 'middle', 'font-size': size, 'font-family': 'system-ui, sans-serif'});
+  const node = svg('text', {x, y, fill: INK, 'text-anchor': 'middle', 'font-size': size, 'font-family': 'Nunito, system-ui, sans-serif'});
   node.textContent = value; root.append(node); return node;
 }
 function line(root: SVGElement, x1: number, y1: number, x2: number, y2: number, color = EDGE, width = 2) {
@@ -25,14 +26,27 @@ function fractionLabel(value: number) {
   return fmt(value);
 }
 
-/** A verbal equivalent, including the full quantities, accompanies every diagram. */
+// Bounded, countable data give nonvisual readers the observations without announcing a frequency.
+function unitMarks(value:number) {
+  const count=Math.max(0, Math.trunc(finite(value)));
+  if(count>24)return String(count)+' units';
+  return Array(count).fill('mark').join(', ') || 'empty';
+}
+/** A verbal equivalent accompanies every diagram. */
 export function describeVisual(visual: MathVisual): string {
   switch (visual.kind) {
     case 'ten-frame': return `${visual.count} counters${visual.extra ? ` and ${visual.extra} more counters` : ''}, arranged in frames of ten.`;
     case 'number-line': return `Number line from ${fractionLabel(visual.min)} to ${fractionLabel(visual.max)}, starting at ${fractionLabel(visual.start)}${visual.jumps.length ? ` with jumps of ${visual.jumps.map(fractionLabel).join(', ')}` : ''}.`;
     case 'array': return `${visual.rows} rows, with ${visual.columns} objects in every row${visual.splitAfter ? `; divided after row ${visual.splitAfter}` : ''}.`;
     case 'groups': return `${visual.groups} equal groups, with ${visual.each} objects in each group.`;
-    case 'fraction': return `${visual.whole ? `${visual.whole} whole${visual.whole === 1 ? '' : 's'} and ` : ''}${visual.numerator} of ${visual.denominator} equal parts.`;
+    case 'fraction': {
+      const parts=visual.denominator,n=visual.numerator;
+      if(!Number.isInteger(parts)||parts<1||parts>16||n<0||n>96)return 'Fraction bars divided into equal parts.';
+      const units=Math.max(1,(visual.whole||0)+Math.ceil(n/parts));
+      if(units>6)return 'Fraction with '+n+' parts of size one over '+parts+'.';
+      const shaded=(visual.whole||0)*parts+n;
+      return 'Each bar is one whole. '+Array.from({length:units},(_,u)=>'Bar '+(u+1)+'. '+Array.from({length:parts},(_,i)=>u*parts+i<shaded?'shaded':'empty').join(', ')).join('. ')+'.';
+    }
     case 'place-value': return `Place-value model for ${fmt(visual.value)}${visual.highlight !== undefined ? `; the ${fmt(visual.highlight)} place is highlighted` : ''}.`;
     case 'clock': {
       const hour=((visual.hours-1)%12+12)%12+1, next=hour%12+1, minute=((visual.minutes%60)+60)%60;
@@ -42,16 +56,20 @@ export function describeVisual(visual: MathVisual): string {
       return `Analog clock. The short hand points ${short}. The long hand points ${long}.`;
     }
     case 'shape': return `${visual.shape.replaceAll('-', ' ')}${visual.width !== undefined ? `, width ${visual.width}` : ''}${visual.height !== undefined ? `, height ${visual.height}` : ''}${visual.labels?.length ? `. ${visual.labels.join('. ')}` : ''}.`;
-    case 'chart': return `Bar chart. ${visual.labels.map((name, i) => `${name}: ${visual.values[i]}${visual.unit ? ` ${visual.unit}` : ''}`).join('; ')}.`;
-    case 'line-plot': return `Line plot. Each X represents one observation. ${visual.labels.map((name, i) => `${name}: ${visual.values[i]} observations`).join('; ')}${visual.unit ? `. ${visual.unit}` : ''}.`;
+    case 'chart': return `Bar chart, counted in ${visual.unit || 'units'}. ${visual.labels.map((name,i)=>name+': '+unitMarks(visual.values[i])).join('. ')}.`;
+    case 'line-plot': return `Line plot. Each mark is one observation. ${visual.labels.map((name, i) => name + ': ' + (unitMarks(visual.values[i]))).join('. ')}.`;
     case 'angle': return `Two rays form the given ${visual.degrees}° angle; the curved mark shows the angle between them.`;
   }
 }
 
 /** Creates diagrams with DOM APIs only. No curriculum text is interpreted as HTML. */
-export function renderMathVisual(visual: MathVisual): HTMLElement {
+export function renderMathVisual(visual: MathVisual, options:{divisions?:number} = {}): HTMLElement {
   const figure = document.createElement('figure'); figure.className = 'math-visual'; figure.dataset.visualKind = visual.kind;
   const caption = document.createElement('figcaption'); caption.textContent = describeVisual(visual);
+  if(visual.kind==='fraction')caption.textContent='Each bar is one whole.';
+  if(visual.kind==='chart')caption.textContent=visual.unit || 'Each bar begins at zero.';
+  if(visual.kind==='line-plot')caption.textContent='Each × stands for one observation.';
+  caption.setAttribute('aria-hidden','true');
   const drawing = svg('svg', {viewBox: '0 0 360 220', role: 'img', 'aria-label': describeVisual(visual)});
   // A real caption is always available. Reading a clock or angle is itself the task,
   // so those captions describe its structure without announcing the answer.
@@ -66,7 +84,7 @@ export function renderMathVisual(visual: MathVisual): HTMLElement {
         const ox = 12 + (f % 2) * 178, oy = 24 + Math.floor(f / 2) * 95;
         for (let j = 0; j < 10; j++) {
           const x = ox + j % 5 * (size + 3), y = oy + Math.floor(j / 5) * (size + 3), index = f * 10 + j;
-          drawing.append(svg('rect', {x, y, width: size, height: size, rx: 4, fill: '#172443', stroke: EDGE}));
+          drawing.append(svg('rect', {x, y, width: size, height: size, rx: 4, fill: '#ffffff', stroke: EDGE}));
           if (index < total) dot(drawing, x + size / 2, y + size / 2, size / 3, index < first ? BLUE : GOLD);
         }
       }
@@ -77,7 +95,8 @@ export function renderMathVisual(visual: MathVisual): HTMLElement {
       line(drawing, 25, 145, 335, 145, INK, 3);
       const fractionalStep=visual.jumps.find(j=>Math.abs(j)>0&&Math.abs(j)<1);
       const parts=fractionalStep?Math.round(span/Math.abs(fractionalStep)):0;
-      const ticks = parts>=2&&parts<=16&&Math.abs(parts*Math.abs(fractionalStep!)-span)<1e-8 ? parts : span <= 20 && Number.isInteger(span) ? Math.max(1, span) : 10;
+      const specified=options.divisions;
+      const ticks = specified!==undefined&&Number.isInteger(specified)&&specified>=1&&specified<=20?specified:parts>=2&&parts<=16&&Math.abs(parts*Math.abs(fractionalStep!)-span)<1e-8 ? parts : span <= 20 && Number.isInteger(span) ? Math.max(1, span) : 10;
       const tickLabels=Array.from({length:ticks+1},(_,i)=>{const v=min+span*i/ticks;return span<=2?fractionLabel(v):fmt(v);});
       // Keep every value and its exact position. Dense labels use alternating
       // rows, with guides to their ticks, instead of shrinking into a number string.
@@ -117,7 +136,7 @@ export function renderMathVisual(visual: MathVisual): HTMLElement {
       const across = Math.min(4,Math.max(1,groups)), rows = Math.ceil(groups/across), width = 320/across, height = 160/Math.max(1,rows);
       for(let g=0;g<groups;g++) {
         const x=20+g%across*width,y=12+Math.floor(g/across)*height;
-        drawing.append(svg('rect',{x:x+3,y:y+3,width:width-8,height:height-8,rx:10,fill:'#172443',stroke:EDGE}));
+        drawing.append(svg('rect',{x:x+3,y:y+3,width:width-8,height:height-8,rx:10,fill:'#ffffff',stroke:EDGE}));
         const perRow=Math.min(5,Math.max(1,each)), gap=Math.min((width-20)/perRow,(height-15)/Math.max(1,Math.ceil(each/perRow)));
         for(let i=0;i<each;i++) dot(drawing,x+12+(i%perRow+.5)*gap,y+9+(Math.floor(i/perRow)+.5)*gap,Math.max(2,gap*.27));
       }
@@ -130,36 +149,35 @@ export function renderMathVisual(visual: MathVisual): HTMLElement {
       const rowHeight=Math.min(46,160/units);
       for(let unit=0;unit<units;unit++) {
         const shaded=unit<whole?denominator:Math.min(denominator,Math.max(0,numerator-(unit-whole)*denominator));
-        for(let part=0;part<denominator;part++) drawing.append(svg('rect',{x:20+part*320/denominator,y:15+unit*rowHeight,width:320/denominator,height:rowHeight-8,fill:part<shaded?BLUE:'#182444',stroke:EDGE,'stroke-width':1.4}));
+        for(let part=0;part<denominator;part++) drawing.append(svg('rect',{x:20+part*320/denominator,y:15+unit*rowHeight,width:320/denominator,height:rowHeight-8,fill:part<shaded?BLUE:'#ffffff',stroke:EDGE,'stroke-width':1.4}));
       }
-      label(drawing,180,204,'Each bar is one whole.',14);break;
+      break;
     }
     case 'place-value': {
       const value=finite(visual.value), text=String(Math.abs(value)), [integer,fraction='']=text.split('.');
       const cells=[...integer].map((digit,i)=>({digit,place:10**(integer.length-i-1)})).concat([...fraction].map((digit,i)=>({digit,place:10**(-i-1)})));
       const width=Math.min(64,330/Math.max(1,cells.length));
       cells.forEach((cell,i)=>{const x=180-cells.length*width/2+i*width;
-        drawing.append(svg('rect',{x:x+2,y:55,width:width-4,height:100,rx:8,fill:cell.place===visual.highlight?'#435777':'#192b4a',stroke:cell.place===visual.highlight?GOLD:EDGE}));
+        drawing.append(svg('rect',{x:x+2,y:55,width:width-4,height:100,rx:8,fill:cell.place===visual.highlight?'#ffe8ad':'#faf7ff',stroke:cell.place===visual.highlight?GOLD:EDGE}));
         label(drawing,x+width/2,82,fmt(cell.place),width<45?10:13);label(drawing,x+width/2,128,cell.digit,28);
       });
       label(drawing,180,194,'A digit’s place changes its value.',14);break;
     }
     case 'clock': {
       const cx=180,cy=105,r=85,hours=finite(visual.hours)%12,minutes=finite(visual.minutes);
-      drawing.append(svg('circle',{cx,cy,r,fill:'#192b4a',stroke:EDGE,'stroke-width':3}));
+      drawing.append(svg('circle',{cx,cy,r,fill:'#faf7ff',stroke:EDGE,'stroke-width':3}));
       for(let i=0;i<60;i++){const a=i*Math.PI/30-Math.PI/2;line(drawing,cx+Math.cos(a)*(r-5),cy+Math.sin(a)*(r-5),cx+Math.cos(a)*(r-(i%5?9:14)),cy+Math.sin(a)*(r-(i%5?9:14)),EDGE,i%5?1:2);}
       for(let i=1;i<=12;i++){const a=i*Math.PI/6-Math.PI/2;label(drawing,cx+Math.cos(a)*(r-27),cy+Math.sin(a)*(r-27)+5,String(i),15);}
       const hourAngle=(hours+minutes/60)*Math.PI/6-Math.PI/2,minuteAngle=minutes*Math.PI/30-Math.PI/2;
       line(drawing,cx,cy,cx+Math.cos(hourAngle)*39,cy+Math.sin(hourAngle)*39,GOLD,6);line(drawing,cx,cy,cx+Math.cos(minuteAngle)*65,cy+Math.sin(minuteAngle)*65,BLUE,4);dot(drawing,cx,cy,5,INK);break;
     }
     case 'shape': {
-      const name=visual.shape.toLowerCase(), attrs={fill:'#294e74',stroke:BLUE,'stroke-width':3};
-      const paths:Record<string,string>={triangle:'180,25 90,180.8846 270,180.8846',square:'100,25 260,25 260,185 100,185',rectangle:'60,45 300,45 300,165 60,165',pentagon:'180,20 270,80 235,180 125,180 90,80',hexagon:'110,35 250,35 295,105 250,175 110,175 65,105',parallelogram:'110,45 300,45 250,175 60,175',rhombus:'180,25 295,105 180,185 65,105',trapezoid:'120,45 240,45 300,175 60,175'};
-      if(name==='rectangle'&&visual.width&&visual.height){const scale=Math.min(260/visual.width,150/visual.height),w=visual.width*scale,h=visual.height*scale;paths.rectangle=`${180-w/2},${105-h/2} ${180+w/2},${105-h/2} ${180+w/2},${105+h/2} ${180-w/2},${105+h/2}`;}
+      const name=visual.shape.toLowerCase(), attrs={fill:'#b7cff8',stroke:BLUE,'stroke-width':3};
+      const vertices=polygonVertices(name,visual.width,visual.height);
       if(name==='circle')drawing.append(svg('circle',{cx:180,cy:105,r:80,...attrs}));
       else if(name==='cube'){
-        drawing.append(svg('polygon',{points:'100,65 225,65 225,185 100,185',...attrs}));drawing.append(svg('polygon',{points:'100,65 150,25 275,25 225,65',...attrs,fill:'#3f7093'}));drawing.append(svg('polygon',{points:'225,65 275,25 275,145 225,185',...attrs,fill:'#23405f'}));
-      }else if(paths[name])drawing.append(svg('polygon',{points:paths[name],...attrs}));
+        drawing.append(svg('polygon',{points:'100,65 225,65 225,185 100,185',...attrs}));drawing.append(svg('polygon',{points:'100,65 150,25 275,25 225,65',...attrs,fill:'#e3edff'}));drawing.append(svg('polygon',{points:'225,65 275,25 275,145 225,185',...attrs,fill:'#809fd6'}));
+      }else if(vertices.length)drawing.append(svg('polygon',{points:pointsAttribute(vertices),...attrs}));
       else label(drawing,180,105,visual.shape,24);
       if(visual.width!==undefined)label(drawing,180,211,String(visual.width),17);
       if(visual.height!==undefined)label(drawing,30,112,String(visual.height),17);
@@ -168,8 +186,16 @@ export function renderMathVisual(visual: MathVisual): HTMLElement {
     case 'chart': {
       const count=Math.min(8,visual.labels.length,visual.values.length), maximum=Math.max(1,...visual.values.slice(0,count).map(n=>Math.max(0,finite(n)))),width=290/Math.max(1,count);
       line(drawing,40,20,40,172);line(drawing,40,172,340,172);
-      for(let i=0;i<count;i++) {const value=Math.max(0,finite(visual.values[i])),height=value/maximum*120,x=46+i*width;
-        drawing.append(svg('rect',{x,y:172-height,width:width-10,height,rx:3,fill:i%2?GOLD:BLUE}));label(drawing,x+(width-10)/2,164-height,fmt(value),13);label(drawing,x+(width-10)/2,194,visual.labels[i],count>5?10:13);
+      const intervals=maximum<=14?maximum:Math.min(10,maximum);
+      for(let mark=1;mark<=intervals;mark++){
+        const y=172-120*mark/intervals;
+        line(drawing,38,y,340,y,'#cdd3e2',1);
+        if(mark===intervals||mark===1||mark%2===0)label(drawing,22,y+5,fmt(maximum*mark/intervals),16);
+      }
+      for(let i=0;i<count;i++) {
+        const value=Math.max(0,finite(visual.values[i])),height=value/maximum*120,x=46+i*width;
+        drawing.append(svg('rect',{x,y:172-height,width:width-10,height,fill:i%2?GOLD:BLUE}));
+        label(drawing,x+(width-10)/2,194,visual.labels[i],count>5?14:17);
       }
       if(visual.unit)label(drawing,180,216,visual.unit,12);break;
     }

@@ -1,6 +1,6 @@
 # Early learning curriculum crosswalk
 
-Each row identifies an observable practice task. A correct response is one formative observation. The current catalogs contain 40 math skills and 27 language skills. Existing grade 1–4 packs retain their identifiers and answer keys.
+Each row identifies an observable practice task. A correct response is one formative observation. The early v2 catalogs contain 40 math skills and 27 language skills. The workspace v3 pack adds two Kindergarten language skills. Existing grade 1–4 packs retain their identifiers and answer keys.
 
 | Grade | Domain | Skill | Standard or objective | Activity | Tier | Scope | Evidence |
 |---|---|---|---|---|---|---|---|
@@ -71,7 +71,9 @@ Each row identifies an observable practice task. A correct response is one forma
 | Kindergarten | phonics | Match a spoken onset to a letter | RF.K.3a | Which letter starts sun? | 4/4/4 items | Practiced | phonics choice |
 | Kindergarten | early-reading | Recognize a printed CVC word | RF.K.3 | Look at the word. Tap its picture. | 5/5/6 items | Partially supported | early-reading choice |
 | Kindergarten | early-reading | Read a common position word | RF.K.3c | Read the word. Tap its picture. | 4/4/4 items | Partially supported | early-reading choice |
- 
+| Kindergarten | Phonological awareness | Match ending sounds | RF.K.2d | Hear a whole-word anchor and choose a picture with the same final sound | 3/3/3 v3 items | Practiced | Chosen picture |
+| Kindergarten | Phonological awareness | Segment familiar spoken words | RF.K.2d | Hear a whole word and tap once per sound | 3/3/3 v3 items | Practiced | Submitted sound count |
+
 ## Reference editions
 
 Michigan's Early Childhood Standards of Quality for Birth to Kindergarten were approved November 15, 2022. The early tasks contribute to the mathematics and communication/language/literacy strands. Row-level preschool codes above are the Head Start ELOF preschool goals from the federal Ages Birth to Five framework. Kindergarten codes refer to Common Core. The local pattern extension has no claimed kindergarten Common Core pattern standard. Numeral recognition only covers the recognition portion of writing-number objectives. Printed word choices sample recognition. They do not measure reading fluency.

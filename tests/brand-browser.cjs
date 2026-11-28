@@ -2,6 +2,7 @@ const {exploreWelcome,navigate}=require('./studio-entry.cjs');
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright');
 const {start}=require('./browser-server.cjs');
+const {assertTextContrast}=require('./helpers/text-contrast.cjs');
 const fs=require('node:fs');
 const SECONDARY_DESTINATIONS=[['studioNavScenes','Creative Studio'],['studioNavNotifications',/^Notifications, \d+ new, \d+ in progress$/],['studioNavJourney','My Journey']];
 async function approvedIcons(page,basePath){
@@ -203,8 +204,8 @@ async function currentNavigation(page,id){
    await navigate(page,'#studioNavPowers');
    await currentNavigation(page,'studioNavPowers');
    assert.equal(await page.locator('#page-lab').isVisible(),true);
-   const mathHead=page.locator('#page-lab .math-activity h2');
-   if(await mathHead.count())assert.equal(await mathHead.first().evaluate(e=>getComputedStyle(e).color),'rgb(255, 255, 255)','Math question must stay readable on dark lesson');
+   const [question]=await assertTextContrast(page,'#page-lab .math-activity h2','My Powers Math question');
+   assert.equal(question.foreground,'rgb(11, 30, 59)','Math uses approved Ink on the learning surface');
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
    await page.screenshot({path:'test-results/jems-powers-'+label+'.png',fullPage:false});
    console.log('jems brand '+label+': learning screen verified');

@@ -42,11 +42,13 @@ async function solve(page,scope){
   return {id:a?.id,outcome:a?.outcome,answers:a?.answers?.length,delivery:a?.promptDelivery,independent:a?.independent};
  },attemptId);
  const before=await records();assert.equal(before.id,attemptId);
- const story=item.kind==='picture-order',check=story?scope.locator('[data-action=check-tiles]'):scope.locator('.early-check');
+ const story=item.kind==='picture-order',beats=scope.locator('[data-action=check-beats]');
+ const check=story?scope.locator('[data-action=check-tiles]'):await beats.count()?beats:scope.locator('.early-check');
 
  const answer=String(item.answer);
  if(await check.count()){
   if(story){for(const token of answer.split(' '))await scope.getByRole('button',{name:token,exact:true}).click();}
+  else if(await beats.count()){for(let i=0;i<Number(answer);i++)await scope.locator('.language-beat-tap').click();}
   else if(item.parameters?.style==='sort'){for(const [i,bit] of [...answer].entries())if(bit==='1')await scope.locator('.early-counter button').nth(i).click();}
   else for(let i=0;i<Number(answer);i++)await scope.locator('.early-counter button').nth(i).click();
   await check.click();

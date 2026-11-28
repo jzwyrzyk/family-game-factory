@@ -20,10 +20,10 @@ export class StudioGames {
     const before=p.constructionStates;p.constructionStates={...before,[to]:JSON.parse(JSON.stringify(state))};
     if(!this.fg.store.save()){p.constructionStates=before;throw Error('Could not preserve the construction. Your original is unchanged.');}
   }
-  keep(owner:string,projectId:string,baseId:string,config:Mechanics,prompt:string,hypothesis:string,stateKey:string){
+  keep(owner:string,projectId:string,baseId:string,config:Mechanics,prompt:string,hypothesis:string,stateKey:string,selectedRigId?:string){
     const store=this.store();
     const p=this.fg.store.current();if(p.id!==owner)throw Error('Player changed. Reopen your game.');
-    const revision=store.commit(projectId,owner,config,prompt,hypothesis,undefined,baseId);
+    const revision=store.commit(projectId,owner,config,prompt,hypothesis,undefined,baseId,selectedRigId);
     try {this.clonePlayState(owner,stateKey,revision.id);store.keep(projectId,owner,revision.id);} catch(err) {
       // Undo only this operation's pointer; preserve a newer writer's revision.
       if(store.project(projectId,owner).headId===revision.id)store.checkout(projectId,owner,baseId,revision.id);

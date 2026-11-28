@@ -1,3 +1,4 @@
+import {devServiceOrigin,type DevCloudTarget} from '../dev-access';
 /** Keyless gateway -> owner-approved private inference executor.
  * No model secret, prompt, transcript or child identifier is persisted here.
  * The gateway obtains a short-lived Google-signed ID token for an exact,
@@ -10,16 +11,19 @@ import type {CoachProvider} from './service';
 import {readMetadataText} from './metadata-body';
 
 const METADATA_BASE='http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity';
-export function privateCoachOrigin(raw:string):string {
+import {testCoachOrigin} from './test-identity';
+export function privateCoachOrigin(raw:string,env:NodeJS.ProcessEnv=process.env,development?:DevCloudTarget):string {
  let u:URL;try{u=new URL(raw);}catch{throw Error('PRIVATE_COACH_ORIGIN_REQUIRED');}
  // An operator typo must not turn the audience-bound bearer token and a child's
  // design context into an HTTP request to an unrelated host. Only the exact
  // dedicated service's canonical Cloud Run URL family is authorized.
  if(u.protocol!=='https:'||u.href!==u.origin+'/'||u.username||u.password||u.search||u.hash||u.port||
-  !u.hostname.startsWith('factory-coach-private-')||!u.hostname.endsWith('.run.app')||
+  (development?u.origin!==devServiceOrigin(development,'coach'):['jems-test-gateway','jems-test-household','jems-test-coach'].includes(env.K_SERVICE??'')?
+   u.origin!==testCoachOrigin(env):!u.hostname.startsWith('factory-coach-private-')||!u.hostname.endsWith('.run.app'))||
   !/^[a-z0-9.-]+$/.test(u.hostname))throw Error('PRIVATE_COACH_ORIGIN_REQUIRED');
  return u.origin;
 }
+import {requireSyntheticContext} from './synthetic-scenario';
 export type IdentityTokenSource=(audience:string,signal:AbortSignal)=>Promise<string>;
 export function metadataIdentityToken(transport:typeof fetch=fetch):IdentityTokenSource{
  return async(audience,signal)=>{
@@ -35,8 +39,9 @@ export function metadataIdentityToken(transport:typeof fetch=fetch):IdentityToke
 }
 export class PrivateCoachBridge implements CoachProvider{
  readonly endpoint:string;
- constructor(origin:string,private identity:IdentityTokenSource=metadataIdentityToken(),private transport:typeof fetch=fetch){
-  this.endpoint=privateCoachOrigin(origin);
+ constructor(origin:string,private identity:IdentityTokenSource=metadataIdentityToken(),private transport:typeof fetch=fetch,private fixture=false,development?:DevCloudTarget){
+  this.endpoint=privateCoachOrigin(origin,process.env,development);
+  if(this.fixture&&process.env.K_SERVICE!=='jems-test-gateway')throw Error('TEST_FIXTURE_BOUNDARY_REQUIRED');
  }
  /** This is only a reachability/configuration check, not a live model test.
   * No child prompt, family ID, transcript, audio or API key is included.
@@ -44,23 +49,24 @@ export class PrivateCoachBridge implements CoachProvider{
  async readiness(signal:AbortSignal):Promise<boolean>{
   try{
    const token=await this.identity(this.endpoint,signal);
-   const response=await this.transport(this.endpoint+'/v1/private-coach/status',{
+   const response=await this.transport(this.endpoint+(this.fixture?'/v1/private-coach/synthetic/status':'/v1/private-coach/status'),{
     method:'GET',headers:{Authorization:'Bearer '+token,'X-Factory-Request':'1'},
     redirect:'error',cache:'no-store',signal
    });
    if(!response.ok||Number(response.headers.get('content-length')||0)>1000)return false;
    const raw=await response.text();if(raw.length>1000)return false;
    const data=JSON.parse(raw);
-   return !!data&&data.available===true&&data.mode==='model';
+   return !!data&&data.available===true&&data.mode===(this.fixture?'fixture':'model');
   }catch{return false;}
  }
  async complete(context:CoachContext,signal:AbortSignal):Promise<{reply:unknown;usedMicroUsd:number}>{
+  if(this.fixture)requireSyntheticContext(context);
   const serialized=JSON.stringify(context);
   if(serialized.length>24000)throw Error('INVALID_REQUEST');
   const token=await this.identity(this.endpoint,signal);
-  const response=await this.transport(this.endpoint+'/v1/private-coach/complete',{
+  const response=await this.transport(this.endpoint+(this.fixture?'/v1/private-coach/synthetic':'/v1/private-coach/complete'),{
    method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json','X-Factory-Request':'1'},
-   body:JSON.stringify({version:1,context}),redirect:'error',cache:'no-store',signal
+   body:JSON.stringify(this.fixture?{version:1,scenario:'moon-hopper'}:{version:1,context}),redirect:'error',cache:'no-store',signal
   });
   if(response.status===403||response.status===401)throw Error('COACH_UNAVAILABLE');
   if(response.status===429)throw Error('RATE_LIMIT');
@@ -82,8 +88,8 @@ export class PrivateCoachBridge implements CoachProvider{
  */
 export class PrivateSpeechBridge implements SpeechProvider{
  readonly endpoint:string;
- constructor(origin:string,private identity:IdentityTokenSource=metadataIdentityToken(),private transport:typeof fetch=fetch){
-  this.endpoint=privateCoachOrigin(origin);
+ constructor(origin:string,private identity:IdentityTokenSource=metadataIdentityToken(),private transport:typeof fetch=fetch,development?:DevCloudTarget){
+  this.endpoint=privateCoachOrigin(origin,process.env,development);
  }
  async readiness(signal:AbortSignal):Promise<boolean>{
   try{

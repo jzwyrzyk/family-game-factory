@@ -2,6 +2,8 @@
 
 **Planning model, November 23, 2026 (America/New_York).** These figures are estimates, not observed bills, a provider quote or approval to spend. They cover the proposed separate nonproduction project. Existing production charges remain separate. Recalculate from the selected regional SKUs and the actual provider/worker design before activation.
 
+**Superseding live DEV / integrated TEST proposal:** the [November 28 coordinated approval package](../operations/RELEASE-EXECUTION-2026-11-28.md#completed-planning-cost-model) includes the owner's $40 DEV / $60 TEST infrastructure planning ceilings, existing static charges, complete resource-class pricing, finite AI allowances and minimum administrator actions. This older static-only scenario remains historical planning evidence, not a complete live-stack quote.
+
 ## Assumptions
 
 Each static frontend uses request-based Cloud Run billing, 1 vCPU, 512 MiB, zero minimum instances and one maximum instance. Multiple idle previews do not each incur a permanently running VM. The workload estimate uses **aggregate billable instance-hours**, not browser-open hours. Image/artwork retention is bounded; the prior PR106 build measured about 234 MB of artwork, so retaining every build indefinitely would dominate this small application's storage.

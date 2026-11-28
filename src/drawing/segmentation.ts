@@ -1,4 +1,4 @@
-import {type DrawingPiece,type Region,type DrawingKind} from './model';
+import {type DrawingAssembly,type DrawingPiece,type Region,type DrawingKind} from './model';
 
 /** Conservative, offline suggestions. This is geometry/contrast analysis, not semantic AI recognition. */
 export interface Proposal {pieces:DrawingPiece[]; method:'image-contrast'|'layout-guess'|'foreground'; explanation:string}
@@ -10,11 +10,12 @@ const region=(x:number,y:number,w:number,h:number,shape:'rect'|'ellipse'='rect')
 export function sampleInk(data:ImageData){
  const {width:w,height:h}=data,raw=data.data;
  const indexes=[0,4*(w-1),4*w*(h-1),4*(w*h-1)];
+ const clearBorder=indexes.filter(i=>raw[i+3]<16).length>=3;
  const bg=[0,1,2].map(k=>indexes.reduce((t,i)=>t+raw[i+k],0)/indexes.length);
  const ink=new Uint8Array(w*h);let minX=w,minY=h,maxX=0,maxY=0,count=0;
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
   const i=y*w+x,p=i*4,d=Math.hypot(raw[p]-bg[0],raw[p+1]-bg[1],raw[p+2]-bg[2]);
-  if(raw[p+3]>60&&d>46){ink[i]=1;count++;minX=Math.min(minX,x);minY=Math.min(minY,y);maxX=Math.max(maxX,x);maxY=Math.max(maxY,y);}
+  if(raw[p+3]>60&&(clearBorder||d>46)){ink[i]=1;count++;minX=Math.min(minX,x);minY=Math.min(minY,y);maxX=Math.max(maxX,x);maxY=Math.max(maxY,y);}
  }
  return {ink,bg,bounds:count>40?region(Math.max(0,minX/w-.02),Math.max(0,minY/h-.02),Math.min(1,(maxX-minX+1)/w+.04),Math.min(1,(maxY-minY+1)/h+.04)):region(.07,.1,.86,.8),count};
 }
@@ -67,7 +68,7 @@ export function suggestParts(data:ImageData,kind:DrawingKind):Proposal{
  * The body is explicitly punched out beneath separately moving wheel layers.
  * Segmentation boundaries are editable proposals; the original is never modified.
  */
-export function layerCanvas(image:CanvasImageSource,w:number,h:number,piece:DrawingPiece,pieces:DrawingPiece[]){
+export function layerCanvas(image:CanvasImageSource,w:number,h:number,piece:DrawingPiece,pieces:DrawingPiece[],legacy=true){
  const r=piece.region,canvas=document.createElement('canvas');
  canvas.width=Math.max(1,Math.ceil(r.w*w));canvas.height=Math.max(1,Math.ceil(r.h*h));
  const ctx=canvas.getContext('2d',{willReadFrequently:true})!;
@@ -81,12 +82,12 @@ export function layerCanvas(image:CanvasImageSource,w:number,h:number,piece:Draw
  // Only flood-connected background is removed: enclosed white details remain visible.
  const source=(image as HTMLCanvasElement).getContext?.('2d',{willReadFrequently:true});
  let paper:[number,number,number]=[255,255,255];
- if(source){
+ if(legacy&&source){
   const probes=[[1,1],[w-2,1],[1,h-2],[w-2,h-2],[w*.5,1],[w*.5,h-2],[1,h*.5],[w-2,h*.5]];
   const samples=probes.map(([x,y])=>Array.from(source.getImageData(Math.max(0,Math.min(w-1,Math.floor(x))),Math.max(0,Math.min(h-1,Math.floor(y))),1,1).data).slice(0,3));
   paper=[0,1,2].map(k=>samples.map(s=>s[k]).sort((a,b)=>a-b)[Math.floor(samples.length/2)]) as [number,number,number];
  }
- const eligible=paper.every(c=>c>=105);
+ const eligible=legacy&&paper.every(c=>c>=105);
  const W=canvas.width,H=canvas.height,seen=new Uint8Array(W*H),queue=new Int32Array(W*H);
  let head=0,tail=0;
  const isPaper=(index:number)=>{const p=index*4;
@@ -109,7 +110,7 @@ export function layerCanvas(image:CanvasImageSource,w:number,h:number,piece:Draw
     const nx=(x+.5)/W*2-1,ny=(y+.5)/H*2-1;
     if(nx*nx+ny*ny>1)d[p+3]=0;
   }
-  if(piece.role==='body'){
+  if(legacy&&piece.role==='body'){
    const ax=r.x+(x+.5)/W*r.w,ay=r.y+(y+.5)/H*r.h;
    for(const other of pieces)if(other.id!==piece.id&&other.role==='wheel'){
     const q=other.region,nx=(ax-q.x-q.w/2)/(q.w/2),ny=(ay-q.y-q.h/2)/(q.h/2);
@@ -145,4 +146,39 @@ export function layerCanvas(image:CanvasImageSource,w:number,h:number,piece:Draw
   }
  }
  ctx.putImageData(pixels,0,0);return canvas;
+}
+
+
+/** A new articulated design assigns overlapping ink to a single moving layer.
+ * Corrections apply first so ink excluded from a wing can stay on the body.
+ * Earlier designs keep their historical paper and wheel extraction. */
+export function assemblyLayers(source: HTMLCanvasElement, assembly: DrawingAssembly) {
+  const layers = new Map<string, HTMLCanvasElement>();
+  const selected = assembly.cutoutMode === 'selected-parts';
+  const occupied = selected ? new Uint8Array(source.width * source.height) : undefined;
+  // The first piece is normally the body. Later selected pieces have priority
+  // over the body and over earlier siblings when their outlines overlap.
+  for (const piece of assembly.pieces.slice().reverse()) {
+    const layer = layerCanvas(source, source.width, source.height, piece, assembly.pieces, !selected);
+    if (occupied) {
+      const ctx = layer.getContext('2d')!;
+      const pixels = ctx.getImageData(0, 0, layer.width, layer.height);
+      const region = piece.region;
+      const layerIndex = layers.size + 1;
+      for (let y = 0; y < layer.height; y++) {
+        const row = Math.min(source.height - 1, Math.floor((region.y + (y + .5) / layer.height * region.h) * source.height)) * source.width;
+        for (let x = 0; x < layer.width; x++) {
+          const alpha = 4 * (y * layer.width + x) + 3;
+          if (!pixels.data[alpha]) continue;
+          const column = Math.min(source.width - 1, Math.floor((region.x + (x + .5) / layer.width * region.w) * source.width));
+          const index = row + column;
+          if (occupied[index] && occupied[index] !== layerIndex) pixels.data[alpha] = 0;
+          else occupied[index] = layerIndex;
+        }
+      }
+      ctx.putImageData(pixels, 0, 0);
+    }
+    layers.set(piece.id, layer);
+  }
+  return layers;
 }

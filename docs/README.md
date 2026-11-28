@@ -1,5 +1,7 @@
 # jems documentation map
 
+[Workstream E game bindings and review evidence](game-art/README.md)
+
 For current release status and the evidence for each gate, start with [delivery state](../DELIVERY-STATE.md). The [November 24 cutover](operations/PRODUCTION_ACTIVATION.md) records the prior household release. Private preview, integrated TEST and production follow the [environment contract](development/DEV-TEST-PROD.md).
 
 Private family operating procedures are in the [owner guide](family-beta/OWNER.md) and the [consolidated activation and rollback checklist](family-beta/ACTIVATION.md).
@@ -16,8 +18,12 @@ The [standalone UI review](ui-review/README.md) packages the real UI for offline
 
 ## Canonical references
 
+The [Drawing Workspace and connected-activity receipt](creative-universe/DRAWING_WORKSPACE_ACCEPTANCE.md) ties each workstream to its reviewed source, screenshots, offline sandbox and release state.
+
+
 | Reference | Question it answers | Update when |
 | --- | --- | --- |
+| [Creative Asset & World Design Standard](creative-universe/STANDARD.md) | How does one child-owned artwork retain identity, versions, movement and roles across activities? | Creative storage, picker, worlds, games or destination support changes |
 | [Agent entry point](../AGENTS.md) | What should an assistant read and preserve before answering or developing? | Working method or context-loading rules change |
 | [Product doctrine](../PRODUCT-DOCTRINE.md) | Why are we building jems, and what must remain true? | An accepted product principle or tradeoff changes |
 | [Current architecture](../ARCHITECTURE-CURRENT.md) | What is implemented, where does it live, and how do boundaries interact? | Components, APIs, storage, trust or version contracts change |
@@ -32,9 +38,9 @@ The [standalone UI review](ui-review/README.md) packages the real UI for offline
 | Task | Intent and detailed contracts | Implementation/evidence entry points |
 | --- | --- | --- |
 | Adult Private premium generation | [Completion and consolidated activation](game-intelligence/premium-benchmark/COMPLETION.md), [artwork prototypes](game-intelligence/premium-benchmark/ARTWORK-PILOT.md), [Model, evidence and budget contract](game-intelligence/PREMIUM-BUILDER.md), [stage-policy decision](decisions/2026-11-23-premium-builder.md) | Private Responses agent, authenticated job admission, isolated gameplay and independent review. The [post-cutover sequence](game-intelligence/PREMIUM-BUILDER.md#post-cutover-activation-and-rollback) covers worker compatibility and recovery. |
-| Automated DEV → TEST → PROD | [Authoritative environment method](development/DEV-TEST-PROD.md), [one-time setup](development/SETUP.md), [cost assumptions](development/COSTS.md), [accepted decision](decisions/2026-11-23-dev-test-prod.md) | `scripts/environments/`, `tests/environments/`, `infra/nonproduction/`, nonproduction workflows; private PR previews, permanent TEST and exact approval; deployed completion remains separately evidenced |
+| Automated DEV → TEST → PROD | [Authoritative environment method](development/DEV-TEST-PROD.md), [one-time setup](development/SETUP.md), [persistent private DEV](development/DEV-WORKBENCH.md), [GitHub TEST infrastructure transport](operations/GITHUB-TEST-INFRASTRUCTURE.md), [cost assumptions](development/COSTS.md), [accepted decision](decisions/2026-11-23-dev-test-prod.md) | `scripts/environments/`, `tests/environments/`, `infra/nonproduction/`, nonproduction workflows; private PR previews, permanent TEST and exact approval; deployed completion remains separately evidenced |
 | Direct assistant diagnostics and one-time cloud connection | [Assistant access](operations/ASSISTANT_ACCESS.md), [accepted operating decision](decisions/2026-11-20-direct-operations.md) | `scripts/ops/diagnose.py`, `scripts/ops/bootstrap_diagnostics.py`; service/revision metadata through documented managed selectors; effective account and denied-write access require live acceptance |
-| Production HTTP request evidence | [Diagnostic queries and ChatGPT retrieval](operations/PRODUCTION_DIAGNOSTICS.md), [browser setup and privacy proof](operations/PRODUCTION_DIAGNOSTICS_SETUP.md) | Dedicated GitHub workflow, private broker and [strict artifact schema](../ops/request-evidence.schema.json) |
+| Production HTTP request evidence | [Consolidated permanent setup](operations/PERMANENT_CLOUD_SETUP.md), [autonomous triage](operations/AUTONOMOUS_TRIAGE.md), [diagnostic queries and ChatGPT retrieval](operations/PRODUCTION_DIAGNOSTICS.md), [browser setup and privacy proof](operations/PRODUCTION_DIAGNOSTICS_SETUP.md) | Dedicated GitHub workflow, private broker and [strict artifact schema](../ops/request-evidence.schema.json) |
 | Operational policy checks and production release access | [Policy foundation](operations/POLICY_FOUNDATION.md), [Phase 2 runbook](operations/PHASE_2.md), [historical setup review](operations/ACTIVATION_REVIEW.md), [current production activation and source sequence](operations/PRODUCTION_ACTIVATION.md), [release continuity](assignment-006/RELEASE-CONTINUITY.md) | `scripts/ops/`, `ops/`, merged publication/rollout workflow definitions; fresh IAM collection and explicit approval of additional activation scope precede enabling the lanes |
 | Coach, reliability and storage release control | [Current release assessment](operations/COACH_RELIABILITY_RELEASE_CONTROL.md), [five-component verification and F06 limits](child-continuity/RELIABILITY-2026-11-23.md), [preserved PR87/117 receipts](evidence/pr87-pr117-historical-receipts.md) | Exact source and hosted-check receipts, saved-data and rollback compatibility, blocked Cloud Shell inventory handoff, deployment evidence and remaining operational gates |
 | Child creation, conversation and experiments | [Design-coach gold standard](design-coach/GOLD_STANDARD.md), [guided chat and build handoff](decisions/2026-11-20-guided-chat-creation.md), [child journey](child-journey/README.md), [creation release gate](jems-creation/RELEASE_GATE.md) | `src/studio/`, `src/factory/`, `tests/guided-*`, `tests/build-handoff-browser.cjs`, [child acceptance](child-journey/acceptance.md) |
@@ -48,6 +54,7 @@ The [standalone UI review](ui-review/README.md) packages the real UI for offline
 | Game archetypes and creative differentiation (research only) | [Archetype engine charter](archetypes/README.md), [Game Intelligence](game-intelligence/README.md) | `src/archetypes/`, `tests/archetype*`; 22 archetype records, 77 proposed mechanics, 88 design-only play patterns and headless prototypes; no production composition engine |
 | Optional build-wait game | [Mind Your Jems design and validation](mind-your-jems/README.md), [recovery checkpoint](mind-your-jems/RECOVERY-CHECKPOINT.md) | `src/games/mind-your-jems*`, `public/art/mind-your-jems/`, `public/fonts/fredoka/`, `tests/mind-your-jems*` |
 | Generated-game quality, intent and repair | [Game Intelligence](game-intelligence/README.md), [presentation quality](game-intelligence/PRESENTATION-QUALITY.md), [cross-vertical standard](game-intelligence/cross-vertical-standard.md), [merge handoff](game-intelligence/merge-handoff.md) | `server/quality/`, `server/actions/`, `server/sandbox/`; distinct visual styles, captured play, separate review and bounded repair |
+| Shared Math and English presentation | [Learning workspace standard](learning/LEARNING_WORKSPACE_STANDARD.md) and [decision](decisions/2026-11-26-unified-learning-workspace.md) | Profile bands, interaction matrices, narration, assistance evidence, trusted themes and review |
 | Math | [Math overview](adaptive-math/README.md), [curriculum](adaptive-math/curriculum.md), [integration](adaptive-math/integration.md), [acceptance](adaptive-math/acceptance.md) | `src/learning/`, host integration and learning tests |
 | Language Arts | [Language overview](adaptive-language/README.md), [curriculum](adaptive-language/curriculum.md), [integration](adaptive-language/integration.md), [acceptance](adaptive-language/acceptance.md) | `src/language/`, language integration tests |
 | Background problem solving and optional reasoning practice | [Formative feature contract](problem-solving/README.md), [standards and assessment comparisons](problem-solving/BENCHMARKS.md), [implementation and acceptance](problem-solving/IMPLEMENTATION.md), [accepted decision](decisions/0011-formative-problem-solving-evidence.md) | `src/problem-solving/`, trusted-host source adapters and `tests/problem-solving-*`; separate context from structured observations and from PR54 independent research |
@@ -83,3 +90,7 @@ Prefer a link to the detailed contract over a copied version. Add new feature fa
 [PR166 storage report](storage/README.md) · [complete source inventory](storage/INVENTORY.md) · [migration, retention and activation boundaries](storage/ROLLOUT.md). Integrated local recovery is distinct from the disabled indexed/cloud preparation and remaining application migration.
 
 For private family operations, use the [owner guide](family-beta/OWNER.md) and [privacy review](family-beta/PRIVACY.md).
+
+## Shared frontend design
+
+[Design-system guide](design-system/README.md) documents canonical foundations, component contracts and editing checks. [Migration inventory](design-system/INVENTORY.md) maps actual pages, selected integration candidates, exceptions and pending acceptance. Consult these before introducing a new host header, action, palette or page layout.

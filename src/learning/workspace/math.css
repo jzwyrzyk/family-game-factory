@@ -1,0 +1,113 @@
+.math-activity .math-model {
+  color:var(--jems-ink,#0b1e3b);
+  width:100%;
+  min-width:0;
+  margin:12px auto;
+  text-align:center;
+}
+.math-model .model-title { font:800 clamp(20px,2.3vw,26px)/1.25 var(--jems-round,system-ui); margin:0 0 12px; }
+.math-model .model-stage {
+  padding:clamp(8px,2vw,20px);
+  border-radius:var(--jems-radius-card,21px);
+  background:var(--jems-surface-lilac,#f2ebff);
+  min-width:0;
+}
+.math-model .model-tools,.math-model .model-control-group,.math-model .model-steppers {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.math-model .model-tools {margin-top:12px;}
+.math-model .model-stage > * + * {margin-top:10px;}
+.math-activity .math-model button {
+  min-width:44px;
+  min-height:var(--workspace-target,48px);
+  font:750 18px/1.25 var(--jems-round,system-ui);
+  padding:7px 12px;
+  color:var(--jems-ink,#0b1e3b);
+  background:#fff;
+  border:1.5px solid var(--jems-control-line,#74819b);
+  border-radius:12px;
+}
+.math-activity .math-model button[aria-pressed=true] {
+  background:#e6dcff;
+  color:#35235c;
+  border:2px solid #62438f;
+  box-shadow:inset 0 -2px #62438f;
+}
+.math-activity .math-model .math-primary {color:white;background:#514099;border-color:#48367e;}
+.math-activity .math-model button:disabled {color:#535a6c;background:#efeef4;border-color:#acaaba;}
+.math-model :is(button,input):focus-visible {outline:3px solid #1751a3;outline-offset:2px;}
+.math-model .model-stepper {display:grid;grid-template-columns:44px minmax(30px,auto) 44px;gap:5px;}
+.math-model .model-step-label {grid-column:1/-1;font-weight:700;font-size:18px;}
+.math-model .model-step-value {font-size:23px;font-weight:850;font-variant-numeric:tabular-nums;}
+.math-model .model-frames {display:flex;justify-content:center;align-items:start;flex-wrap:wrap;gap:12px;}
+.math-model .model-frame {width:min(100%,350px);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:2px solid #735e96;border-radius:14px;overflow:hidden;gap:2px;background:#8b799f;}
+.math-activity .math-model .model-cell {min-width:0;min-height:44px;aspect-ratio:1;width:100%;padding:2px;border-radius:0;border:0;display:grid;grid-template-columns:minmax(0,1fr);justify-content:stretch;place-items:center;background:white;}
+.math-activity .math-model .model-cell[aria-pressed=true] {box-shadow:none;border:0;background:#fdfbff;}
+.math-activity .math-model .model-cell:disabled {background:#faf6ff;opacity:1;filter:none;}
+.math-model .model-cell.picked {outline:4px dashed #3e307e;outline-offset:-5px;}
+.math-model .model-counter {width:75%;aspect-ratio:1;display:block;background:#8260b6;border-radius:50%;}
+.learning-workspace .math-model .model-counter {background:var(--learning-counter-image) center/contain no-repeat;border-radius:0;}
+.math-model .model-counter.given {opacity:1;}
+.math-model [data-piece] {touch-action:none;}
+.math-model .model-line,.math-model .model-ruler {position:relative;width:min(100%,600px);margin-inline:auto;}
+.math-model .model-line svg,.math-model .model-ruler svg {display:block;width:100%;height:92px;}
+.math-model .model-line .model-rail-input {position:absolute;inset:42px 2% 0;width:96%;height:48px;opacity:0;margin:0;cursor:ew-resize;}
+.math-model .model-line:focus-within {outline:3px solid #1751a3;outline-offset:2px;border-radius:8px;}
+.math-model .model-line-labels,.math-model .model-ruler-labels {display:flex;justify-content:space-between;margin:0 auto;width:min(94%,580px);font-weight:750;font-size:20px;}
+.math-model .model-columns {display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:stretch;}
+.math-model .model-column {display:flex;flex-direction:column;align-items:center;gap:5px;flex:1 1 128px;max-width:220px;min-width:0;background:#fff;border-radius:13px;padding:8px;}
+.math-model .model-column-title {font-size:18px;}
+.math-model .model-column output {font-size:22px;font-weight:800;}
+.math-model .model-block-source {display:flex;align-items:center;gap:4px;}
+.math-model .model-block-source svg,.math-model .model-built-block svg {width:38px;height:38px;display:block;}
+.math-model .model-block-tray {display:flex;flex-wrap:wrap;align-content:start;justify-content:center;gap:2px;min-height:12px;}
+.math-activity .math-model .model-built-block {padding:2px;min-width:44px;min-height:44px;border:0;}
+.math-model .math-built-number {color:#382563;font-size:27px;display:block;margin:.4em 0;font-weight:850;}
+.math-model .model-strip,.math-model .model-disc,.math-model .model-array,.math-model .model-compose {margin-inline:auto;touch-action:manipulation;cursor:pointer;}
+.math-model .model-strip {width:min(100%,500px);height:76px;}
+.math-model .model-disc {width:min(100%,190px);aspect-ratio:1;}
+.math-model :is(.model-strip,.model-disc,.model-array,.model-compose) svg {width:100%;height:100%;display:block;}
+.math-model .model-comparison {display:grid;gap:10px;}
+.math-model .model-array {width:min(100%,305px);aspect-ratio:1;background:#fff;border-radius:12px;}
+.math-model .model-compose {width:min(100%,360px);aspect-ratio:3/2;background:repeating-linear-gradient(90deg,transparent 0 calc(33.333% - 1px),#82759a calc(33.333% - 1px) 33.333%),repeating-linear-gradient(0deg,white 0 calc(50% - 1px),#82759a calc(50% - 1px) 50%);border:2px solid #82759a;}
+.math-model .model-ruler svg {height:64px;background:#fff1c4;border-radius:10px 10px 0 0;}
+.math-model .model-ruler-labels {font-variant-numeric:tabular-nums;}
+.math-model .model-coins {display:flex;flex-wrap:wrap;justify-content:center;align-items:start;gap:8px;}
+.math-model .model-coin-group {flex:1 1 92px;display:grid;justify-items:center;}
+.math-activity .math-model :is(.model-coin,.model-coin-small) {border-radius:100%;background:#e3e7ef;border:3px double #55627a;display:grid;place-content:center;color:#1c2e48;}
+.math-activity .math-model [data-coin=Penny] {background:#e8b8a0;color:#51372b;border-color:#855b49;}
+.math-model .model-coin {width:82px;height:82px;}
+.math-model .model-coin b {font-size:22px;}
+.math-model .model-coin-pile {display:flex;justify-content:center;align-content:start;gap:2px;flex-wrap:wrap;}
+.math-activity .math-model .model-coin-small {width:46px;height:46px;padding:0;}
+.math-model .model-chart {display:flex;align-items:stretch;justify-content:center;gap:6px;margin:auto;max-width:520px;}
+.math-model .model-chart-column {flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:end;}
+.math-model .model-chart-marks {display:flex;flex:1;flex-direction:column-reverse;align-items:center;border-bottom:2px solid var(--jems-ink,#0b1e3b);}
+.math-model .model-chart-label {font-size:18px;font-weight:750;overflow-wrap:anywhere;padding-top:6px;}
+.math-activity .math-model .model-observation {font-size:32px;padding:0;width:min(100%,70px);border:0;background:transparent;}
+.math-activity .math-model .model-chart-bar {width:100%;height:200px;border:0;padding:0;display:flex;align-items:end;justify-content:center;background:transparent;}
+.math-model .model-chart-stack {width:72%;display:flex;flex-direction:column;}
+.math-model .model-chart-segment {flex:1;background:#aa94dd;border:1px solid #524088;}
+.math-model .model-chart-bar[aria-pressed=true] .model-chart-segment {background:#58418d;box-shadow:inset 0 0 0 1px white;}
+.math-model .model-chart-unit {text-transform:capitalize;}
+@media(max-width:400px) {
+  .math-model .model-column {flex-basis:100px;}
+  .math-model .model-stepper {grid-template-columns:44px minmax(22px,auto) 44px;}
+}
+
+.math-activity .math-visual {background:var(--jems-surface-blue,#edf3ff);border:0;color:var(--jems-ink,#0b1e3b);}
+.math-activity .math-visual figcaption {color:var(--jems-ink,#0b1e3b);font-size:18px;}
+.math-model .model-comparison-groups {display:flex;justify-content:center;gap:8px;flex-wrap:wrap;}
+.math-model .model-group-column {flex:1 1 180px;background:#fff;border-radius:14px;padding:8px;}
+.math-model .model-group-column h4 {font-size:20px;margin:0 0 6px;}
+.math-model .model-group-tray {display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:3px;min-height:70px;}
+.math-activity .math-model .model-group-tray button {width:50px;height:50px;padding:0;border:0;}
+.math-model .model-group-tray .model-counter {display:inline-block;width:38px;}
+.math-model .model-line svg {touch-action:pan-y;cursor:ew-resize;}
+.math-model .model-line .model-rail-input {pointer-events:none;}
+.math-model .model-line-labels {width:min(100%,600px);height:1.5em;position:relative;}
+.math-model .model-line-labels span {position:absolute;transform:translateX(-50%);}

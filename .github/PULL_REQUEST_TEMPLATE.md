@@ -6,7 +6,11 @@
 
 <!-- Summarize the approach, important tradeoff and affected components. Identify overlapping/stacked PRs, base/source SHA, compatibility or saved-data implications. Preserve newer merged behavior when reconciling old branches. -->
 
+For a creative asset change, identify the original-byte authority, pinned revisions, cleanup on owner change and the rendered evidence. An art-delivery change also needs an independent review of worker access and model-facing captures before activation.
+
 ## Evidence
+
+<!-- For creative asset and world changes, list affected workstreams and shared-module owners. Bind each applicable assertion to an exact source, synthetic screenshot or playback capture, integrity/restore test and negative owner or generated-game boundary test. Identify prior-reader rollback compatibility and unresolved independent release gates. -->
 
 | Claim / acceptance criterion | Check or observation | Exact SHA / run / artifact | Result and limits |
 | --- | --- | --- | --- |
@@ -17,6 +21,8 @@
 <!-- Include relevant negative/recovery cases. Distinguish mocks/fixtures, real providers, real devices, visual review and observed play/learning evidence. Unrun checks and remaining gaps belong here. -->
 
 <!-- For child-facing UI, apply docs/brand/CHILD_INTERFACE.md: remove redundant copy, retain 18px labels / 20px task text, verify actual-surface contrast at phone sizes and in help/error states, and preserve explicit friendly narration and cancellation. State observed coverage, not a site-wide claim from one screenshot. -->
+
+<!-- Learning changes use docs/learning/LEARNING_WORKSPACE_STANDARD.md. Identify the skill family, profile band, response serialization and evidence impact. Link a rendered child interaction, accessible tap/keyboard route and a retry/help/return case. Report which delivery gates and real-device observations remain open. -->
 
 ## Preview and acceptance
 
@@ -50,3 +56,5 @@
 - Follow-up issue(s), if needed:
 
 <!-- Before reporting a merge, release, activation or rollback, update DELIVERY-STATE.md with the exact evidence and observation time. Never commit credentials, child content or private consent records. -->
+
+<!-- Host UI: identify the existing feature owner, archetype and reused design-system components/tokens. Explain legitimate specialist exceptions, run design:check/design:test and relevant rendered checks, and report actual pages migrated. Library/gallery existence alone is not migration completion. See docs/design-system/README.md. -->

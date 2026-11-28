@@ -5,12 +5,15 @@ import {verifiedParentScope} from '../privacy/parent-consent';
 import {adultPilotAllowed,adultPilotConfigured,type AdultPilotFlags} from '../adult-pilot';
 import {assertActiveTrustedDevice} from '../trusted-devices';
 import {PAID_RECEIPT_LEASE_MS,expirePaidReceipts,reconcilePaidReceipts,settlePaidReceipt,type PaidReceipt} from './receipts';
+import {devTestAllowed,hasAdultSession,devCapacityAvailable,reserveDevSpend} from '../dev-test-policy';
+import type {DevAccessPolicy} from '../dev-access';
 import {freshDesign,validateDesign,validateCoachReply,type CoachContext,type CoachReply} from '../../src/studio/design';
 import type {Repository,PipelineState} from '../pipeline/types';
 import type {VerifiedSession} from '../contracts/api';
+import {requireSyntheticContext} from './synthetic-scenario';
 export interface CoachConfig {
  enabled:boolean;privacyApproved:boolean;moderationApproved:boolean;zdrVerified:boolean;privateExecutionApproved:boolean;model:string;
- requireVerifiedParentPrivacy?:boolean;adultPilot?:AdultPilotFlags;
+ fixtureExpiresAt?:number;requireVerifiedParentPrivacy?:boolean;adultPilot?:AdultPilotFlags;devTestPolicy?:DevAccessPolicy;
  maxInputChars:number;maxOutputTokens:number;maxTurnMicroUsd:number;
  inputMicroUsdPerMillion:number;outputMicroUsdPerMillion:number;pricesReviewedAt:string;
 }
@@ -34,11 +37,18 @@ export function approved(c:CoachConfig):boolean {
 }
 export class CoachService {
  constructor(private repo:Repository,private config:CoachConfig,private provider?:CoachProvider){}
- available(){return approved(this.config)&&!!this.provider;}
+ mode(){return this.config.fixtureExpiresAt===undefined?'model' as const:'fixture' as const;}
+ available(){
+  if(this.config.fixtureExpiresAt!==undefined)return !this.config.enabled&&Date.now()<this.config.fixtureExpiresAt&&this.config.maxTurnMicroUsd===1&&!!this.provider;
+  return approved(this.config)&&!!this.provider;
+ }
  private permitted(state:PipelineState,session:VerifiedSession,now=Date.now()):boolean{
   try{assertActiveTrustedDevice(state,session,now);}catch{return false;}
+  if(this.config.devTestPolicy&&now>=this.config.devTestPolicy.allowanceExpiresAt)return false;
+  if(session.devTestGrantId!==undefined)return devTestAllowed(state,session,this.config.devTestPolicy,now);
+  if(this.config.devTestPolicy&&!hasAdultSession(session))return false;
   if(this.config.adultPilot?.enabled===true)return adultPilotAllowed(state,session,now);
-  if(session.adultSessionId||session.adultProfileId)return false;
+  if(hasAdultSession(session))return false;
   return allowedCoachFamily(state,session,'model',now)&&
    (!this.config.requireVerifiedParentPrivacy||verifiedParentScope(state,session.familyId,'conversation',now));
  }
@@ -54,6 +64,7 @@ export class CoachService {
    const permitted=this.permitted(state,session);
    if(!permitted||!ledger?.paidEnabled||ledger.month!==month||
     ledger.used+ledger.reserved+this.config.maxTurnMicroUsd>ledger.allowance)return false;
+   if(!devCapacityAvailable(state,this.config.devTestPolicy,this.config.maxTurnMicroUsd))return false;
    if(this.provider?.readiness&&!await this.provider.readiness(AbortSignal.timeout(3000)))return false;
    return this.permitted(await this.repo.snapshot(),session);
   }catch{return false;}
@@ -80,18 +91,19 @@ export class CoachService {
    return {erased:prior.length-state.coachReceipts.length+audio.length-state.audioReceipts.length+narration.length-state.narrationReceipts.length};
   });
  }
- async respond(session:VerifiedSession,input:any):Promise<{reply:CoachReply;mode:'model'}>{
+ async respond(session:VerifiedSession,input:any):Promise<{reply:CoachReply;mode:'model'|'fixture'}>{
   if(!this.available())throw Error('COACH_UNAVAILABLE');
   if(!session||session.expiresAt<=Date.now()||!['parent','designer'].includes(session.role))throw Error('UNAUTHENTICATED');
   if(!input||Object.keys(input).some(k=>!['requestId','context'].includes(k))||typeof input.requestId!=='string'||!/^[\w-]{1,100}$/.test(input.requestId))throw Error('INVALID_REQUEST');
   const context=validateCoachContext(input.context),serialized=JSON.stringify(context);
+  if(this.mode()==='fixture')requireSyntheticContext(context);
   if(serialized.length>this.config.maxInputChars)throw Error('INVALID_REQUEST');
   // Defense in depth, not a privacy guarantee or replacement for approved ZDR/minor safeguards.
   if(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:sk-|ghp_|github_pat_)\S+|\b\d{3}[- .]\d{3}[- .]\d{4}\b/i.test(serialized))throw Error('PRIVATE_INFORMATION');
   const hash=createHash('sha256').update(serialized).digest('hex');
   // Never reuse a child's cache entry in an adult session, or revive a reply
   // admitted by an adult session that was subsequently locked.
-  const subject=session.adultSessionId?`${session.subject}:adult:${session.adultSessionId}`:session.subject;
+  const subject=session.adultSessionId?`${session.subject}:adult:${session.adultSessionId}`:session.devTestGrantId?`${session.subject}:dev:${session.devTestGrantId}`:session.subject;
   // Recovery commits separately so a duplicate/cutoff rejection below cannot
   // roll back the settlement of an interrupted request.
   await reconcilePaidReceipts(this.repo,session);
@@ -110,15 +122,17 @@ export class CoachService {
    if(list.filter(x=>x.familyId===session.familyId&&x.at>now-60000).length>=10)throw Error('RATE_LIMIT');
    if(list.length>=500)throw Error('COACH_HISTORY_FULL');
    const ledger=state.ledgers[session.familyId];if(!ledger?.paidEnabled||ledger.month!==month||ledger.used+ledger.reserved+this.config.maxTurnMicroUsd>ledger.allowance)throw Error('SPENDING_CUTOFF');
+   reserveDevSpend(state,this.config.devTestPolicy,this.config.maxTurnMicroUsd);
    ledger.reserved+=this.config.maxTurnMicroUsd;list.push({id:input.requestId,familyId:session.familyId,subject,hash,month,reserved:this.config.maxTurnMicroUsd,at:now,state:'running',reservationId,leaseUntil:now+PAID_RECEIPT_LEASE_MS});
    return {cached:null};
   });
-  if(reservation.cached)return {reply:reservation.cached,mode:'model'};
-  let usage=this.config.maxTurnMicroUsd,candidate:CoachReply|undefined,failure:unknown;
+  if(reservation.cached)return {reply:reservation.cached,mode:this.mode()};
+  let usage=this.mode()==='fixture'?0:this.config.maxTurnMicroUsd,candidate:CoachReply|undefined,failure:unknown;
   try{
    const signal=AbortSignal.timeout(25000);
    const result=await this.provider!.complete(context,signal);
    if(signal.aborted)throw Error('COACH_UNAVAILABLE');
+   if(this.mode()==='fixture'&&result.usedMicroUsd!==0)throw Error('COACH_PROVIDER_FAILED');
    if(!Number.isSafeInteger(result.usedMicroUsd)||result.usedMicroUsd<0||result.usedMicroUsd>this.config.maxTurnMicroUsd)throw Error('COACH_PROVIDER_FAILED');
    usage=result.usedMicroUsd;candidate=validateCoachReply(result.reply,context);
   }catch(error){failure=error;}
@@ -141,6 +155,6 @@ export class CoachService {
   // and usage accounting; throwing inside the transaction would roll them back.
   if(!completion.authenticated)throw Error('UNAUTHENTICATED');
   if(!completion.reply)throw Error('COACH_UNAVAILABLE');
-  return {reply:completion.reply,mode:'model'};
+  return {reply:completion.reply,mode:this.mode()};
  }
 }

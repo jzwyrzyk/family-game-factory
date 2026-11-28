@@ -2,6 +2,48 @@
 
 The browser owns play, local creation and the learning host. The family gateway owns authorization and durable job admission. A separate preview origin runs generated content. The private worker and private coach have independent credentials, consent and spending boundaries. The family beta adds per-family workspaces and isolated origins. [Family architecture](docs/family-beta/ARCHITECTURE.md) · [Deployment and acceptance](DELIVERY-STATE.md)
 
+
+## Unified Learning Workspace
+
+The trusted Math and English activity entry points present a common light workspace. The active profile supplies its age band. The authored item supplies its stimulus, answer contract and subject-specific interactions. Host adapters handle admission, saves, interruption, profile scope, pause and continuation. A child can change tools or revise an answer within the same attempt. Dark game-result surfaces retain their own styles. [Learning workspace standard](docs/learning/LEARNING_WORKSPACE_STANDARD.md) · [Child interface](docs/brand/CHILD_INTERFACE.md)
+
+[The workspace shell](src/learning/workspace/shell.ts) accepts the subject, captured owner, profile grade, trusted game identity, leave action and lifetime signal. The host owns its navigation boundary. [Math model routing](src/learning/workspace/math.ts) distinguishes answer construction from exploration. [English interaction routing](src/language/reading-workspace.ts) binds passages, tiles and local writing to the declared content pack. The host injects the equipped Pal portrait through the [theme registry](src/learning/workspace/theme.ts). Games receive the existing pause/continue protocol. Workspace gestures, scratch marks and portrait reactions have no storage or reward writer.
+
+## Connected creative workspace
+
+The trusted My Art host stores one exact PNG per kept sketch revision in the existing private drawings database. Its private ancillary chunk carries the ordered, bounded paper document. The raster remains readable without that editor. Explicit Keep recovery uses the same database, owner and capacity controls. Existing image and rig pins remain the unit of saved playback. Drawing input and history can run without a store. [Drawing Workspace](docs/drawings/ART_STUDIO.md)
+
+Creative Studio reads the private library through its owner-scoped picker. The scene owns the actor role, pinned world and framing. A saved path can become editable movement actions. Generated V2 playback has a local synthetic qualification adapter with an explicit actor slot, bounded raster re-encoding and frame revocation. Production workers and generated clients have no route to My Art. [Creative Asset & World Design Standard](docs/creative-universe/STANDARD.md) · [Secure local game qualification](docs/game-intelligence/PREMIUM-BUILDER.md)
+
+
+Workstream E adds owner-notebook game-art plans and immutable local review tests on the existing My Art store. The synthetic review packager uses the archived premium worker and its trusted raster renderer. Online construction with selected art is held before dispatch. [Binding protocol](docs/game-art/README.md)
+
+The owner-scoped drawing, rig, native game and scene authorities implement separate parts of the [creative asset standard](docs/creative-universe/STANDARD.md). A family workshop's reviewed import verifies format, digest approval and the active profile before persisting the exact permitted PNG. Metadata-bearing files require another eligible file and exact operator review. Previously stored workshop reconstructions remain the recoverable copies available for those imports. The private game worker has no library access.
+
+The nonproduction partial-recovery operator preserves the original evidence and
+plans against a private successor state. It accepts only the two remaining
+provider/budget creations or exact no-op imports, with all 25 existing instances
+unchanged. The IAP controller retains per-service invocation grants. Source
+implementation and actual cloud acceptance remain separate.
+[Recovery contract](docs/operations/NONPRODUCTION_RECOVERY.md)
+
+## Integrated TEST release infrastructure
+
+The isolated TEST candidate connects the existing family gateway, household, untrusted preview and private Coach to dedicated service identities, the named Firestore database `jems-test`, a versioned private bucket and an independent signed-sandbox worker. Gateway, preview, recovery and household administration select the named database only for its exact TEST project/bucket. The existing release controller qualifies the same numeric configuration versions, immutable images and protected routes. An approved funded window adds expiring private Coach permissions and separately enrolled adult spending admission. Infrastructure, identity and authenticated UAT receipts remain live acceptance gates. [Plan phases and operating boundaries](infra/nonproduction/family-beta/TEST.md)
+
+## Operational access and recovery
+
+The PR #222 source candidate keeps direct managed identity qualification fail-closed
+while independent GitHub diagnostics and nonproduction setup advance. Broker setup
+requires source/archive/build/image provenance and accepts only Cloud Build's exact
+image-list mirror. Static DEV/TEST use distinct zero-role runtime accounts; the
+baseline leaves federation disabled and the $15 project budget is notification-only.
+Source-only preflight does not select credentials. Historical cleanup requires
+remote recoverability, unchanged file hashes and explicit deletion approval; unique
+records/Git/Terraform are preserved. Handoffs use sparse temporary source and private
+minimal recovery journals. [Setup](docs/operations/PERMANENT_CLOUD_SETUP.md) ·
+[Recovery](docs/operations/OPERATIONS_RECOVERY.md).
+
 ## Component and source map
 
 | Component | Responsibility and source of truth |
@@ -38,6 +80,14 @@ Speak creates an editable draft. Send requests coaching. Build submits the selec
 The production browser bundle, disconnected DEV/TEST bundle, offline HTML reviewer and published Pages artifact have separate source and configuration identities. Required Arcade aggregates verify immutable build and command receipts. Release consumers enforce exact reviewed source, artifacts, configuration and environment. The private environment controller reconciles protected source and validates downloaded data before privileged deployment. [Environment contract](docs/development/DEV-TEST-PROD.md) · [CI evidence](docs/evidence/README.md#ci-architecture-and-performance)
 
 Consult the [feature index](docs/README.md) for API, family isolation, learning, drawing, gameplay and operations contracts. The [November 26 architecture record](docs/history/2026-11-26/ARCHITECTURE-CURRENT.md) preserves the full subsystem notes, prior integrations and source identities.
+
+## Shared design-system increment
+
+`src/design-system/` owns semantic foundations, extracted headers/dashboard/destination cards, native actions, Journey contextual navigation, collection layout and the existing Menu focus-containment utility. Six actual secondary pages use the collection template; legacy brand imports delegate for active-branch compatibility. Studio, Creation, Art, Pals, Rewards and Parent CSS consume exact semantic aliases. Feature controllers retain all domain authority. The review-only `tools/design-system/` gallery imports production exports and is embedded by the existing standalone review build; it is not a second deployed frontend. [Guide and interfaces](docs/design-system/README.md) · [remaining archetypes and dependencies](docs/design-system/INVENTORY.md).
+
+## Persistent DEV release preparation
+
+The consolidated release candidate adds the existing isolated DEV contract to the current gateway, preview, private coach and worker adapters. Exact adult IAP plus trusted-device authorization bounds a synthetic workspace; actual adult operation retains permit and tab proof. Its separate durable expiring allowance includes generation, coach, dictation, narration and extra premium repair holds. DEV configuration cannot select TEST or production destinations. The [runtime contract](docs/development/DEV-WORKBENCH.md) distinguishes source qualification from live activation and acceptance. Existing static preview and TEST controllers remain operational.
 
 <details>
 <summary>Previous section links</summary>

@@ -106,7 +106,7 @@ class ServiceBuildTests(unittest.TestCase):
             reviewed=['package.json','package-lock.json','.dockerignore','server/Dockerfile.gateway','server/Dockerfile.preview',
                    'server/gateway.ts','server/private-config.ts','src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts',
                    'src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/builder/submission.ts','src/storage/record-contract.ts','src/storage/sync-contract.ts','src/storage/cloud-recovery.ts','src/storage/recovery-format.ts','src/learning/grades.ts',
-                   'src/creation/model.ts','src/creation/projects.ts',
+                   'src/drawing/animation-path.ts','src/creation/movement-worlds.ts','src/creation/illustrated-art.ts','src/creation/model.ts','src/creation/projects.ts',
                    'src/pals/catalog.ts','src/pals/catalog-artwork.generated.ts','src/pals/historical-scene-art.json']
             files=reviewed+['server/key.pem','server/config.json','server/config.private.json','server/service-account.json','server/credentials.json',
                    'server/token.json','server/api-key.json','server/.env','server/.private/config.json','server/node_modules/p/index.js',
@@ -143,11 +143,11 @@ class ServiceBuildTests(unittest.TestCase):
             git('init','-q')
             inputs=['package.json','package-lock.json','.dockerignore','server/gateway.ts','server/preview-server.ts',
                     'server/coach/private-executor.ts','server/trusted-devices.ts','server/http-json.ts','server/privacy/parent-consent.ts',
-                    'server/adult-pilot.ts','server/pipeline/auth.ts',
+                    'server/adult-pilot.ts','server/pipeline/auth.ts','server/dev-access.ts','server/dev-test-policy.ts',
                     'src/runtime/types.ts','src/runtime/manifests.ts','src/studio/design.ts',
                     'src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/builder/submission.ts','src/storage/record-contract.ts','src/storage/sync-contract.ts','src/storage/cloud-recovery.ts','src/storage/recovery-format.ts','src/learning/grades.ts',
                     'src/pals/catalog.ts','src/pals/catalog-artwork.generated.ts','src/pals/historical-scene-art.json',
-                    'src/creation/model.ts','src/creation/projects.ts']
+                    'src/drawing/animation-path.ts','src/creation/movement-worlds.ts','src/creation/illustrated-art.ts','src/creation/model.ts','src/creation/projects.ts']
             for name in inputs:write(name,'reviewed '+name)
             write('.dockerignore',dockerignore)
             for kind,content in dockerfiles.items():write('server/Dockerfile.'+kind,content)
@@ -172,7 +172,7 @@ class ServiceBuildTests(unittest.TestCase):
                                     self.assertIn('!'+name,patterns,(kind,name,'Docker context excludes this COPY input'))
                                     for parent in Path(name).parents:
                                         if parent!=Path('.'):self.assertIn('!'+parent.as_posix()+'/',patterns)
-                    for name in inputs[-2:]:self.assertEqual(tar.extractfile(name).read(),('reviewed '+name).encode())
+                    for name in inputs[-5:]:self.assertEqual(tar.extractfile(name).read(),('reviewed '+name).encode())
 
             # A future Dockerfile dependency outside the narrow source allowlist
             # must fail locally instead of starting a billable doomed build.
@@ -189,8 +189,8 @@ class ServiceBuildTests(unittest.TestCase):
             # must stay publishable; its own Dockerfiles determine the inputs.
             for kind,content in dockerfiles.items():
                 if kind=='coach':(root/'server/Dockerfile.coach').unlink();continue
-                write('server/Dockerfile.'+kind,'\n'.join(line for line in content.splitlines() if 'src/builder/' not in line and 'src/creation/' not in line and 'src/pals/' not in line and 'src/studio/creation-readiness.ts' not in line)+'\n')
-            for name in [*inputs[-2:],'src/builder/submission.ts','src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/pals/catalog.ts','src/pals/catalog-artwork.generated.ts','src/pals/historical-scene-art.json']:(root/name).unlink()
+                write('server/Dockerfile.'+kind,'\n'.join(line for line in content.splitlines() if 'src/builder/' not in line and 'src/creation/' not in line and 'src/drawing/' not in line and 'src/pals/' not in line and 'src/studio/creation-readiness.ts' not in line)+'\n')
+            for name in [*inputs[-5:],'src/builder/submission.ts','src/studio/creation-readiness.ts','src/studio/conversation-view.ts','src/pals/catalog.ts','src/pals/catalog-artwork.generated.ts','src/pals/historical-scene-art.json']:(root/name).unlink()
             older=commit()
             with tempfile.TemporaryDirectory() as staged:
                 archive,_=b.source_archive(root,staged,older)

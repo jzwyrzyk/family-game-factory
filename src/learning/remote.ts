@@ -4,6 +4,8 @@ interface PreviewLearningOptions extends LearningContext {
   channel:string; artifactId:string; ownerId:string;
   onRound?:(result:{won:boolean;score:number})=>void;
   onReadyChange?:(ready:boolean)=>void;
+  onLeave?:()=>void;
+  leaveLabel?:string;
 }
 type PreviewEvent = {event:'round-complete'|'math-checkpoint';roundId:number;checkpointId?:number;won?:boolean;score?:number};
 const boundedId=(value:unknown):value is number=>Number.isInteger(value)&&(value as number)>=1&&(value as number)<=1_000_000;
@@ -34,12 +36,16 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
   }
   function remember(token:string){seen.add(token);if(seen.size>500)seen.delete(seen.values().next().value!);}
   function pause(roundId:number){waiting=true;waitingRound=roundId;tell('pause');inert();makeCover();notifyReady();}
+  // The embedding app alone supplies navigation. Frame messages carry only
+  // the existing game protocol and cannot choose an exit destination.
+  const leave = options.onLeave ? () => { if (owns()) options.onLeave!(); } : undefined;
   function failed(message:string,retry?:()=>void){
     inert();tell('pause');if(!waiting)connectionPaused=true;notifyReady();const target=makeCover();target.replaceChildren();
     const box=document.createElement('section');box.className='math-activity';
     const title=document.createElement('h2');title.textContent='Your game is paused';title.tabIndex=-1;
     const text=document.createElement('p');text.setAttribute('role','alert');text.textContent=message;box.append(title,text);
     if(retry){const button=document.createElement('button');button.className='math-primary';button.textContent=waiting?'Try learning again':'Try opening the game again';button.onclick=retry;box.append(button);}
+    if(leave){const back=document.createElement('button');back.type='button';back.textContent=options.leaveLabel||'Back to Games';back.onclick=leave;box.append(back);}
     target.append(box);if(owns()&&visible()){title.focus({preventScroll:true});title.scrollIntoView({block:'nearest'});}
   }
   function handshake(){
@@ -61,7 +67,7 @@ export function attachPreviewLearning(frame:HTMLIFrameElement,options:PreviewLea
       if(completed)options.onRound?.({won:completed.won!,score:completed.score!});
     };
     try{
-      const asked=FG.learning.checkpoint(cover,{gameId:options.gameId||'generated',versionId:options.versionId,projectId:options.projectId||options.gameId||'generated',mode:options.mode,opportunity:d.event==='round-complete'?'round-end':'mid-play'},complete,{roundId:`${instanceId}:${token}`});
+      const asked=FG.learning.checkpoint(cover,{gameId:options.gameId||'generated',versionId:options.versionId,projectId:options.projectId||options.gameId||'generated',mode:options.mode,opportunity:d.event==='round-complete'?'round-end':'mid-play'},complete,{roundId:`${instanceId}:${token}`,onLeave:leave,leaveLabel:options.leaveLabel});
       if(!asked)complete();
     }catch{
       failed('Learning activity could not open, so this game is paused. Try again, or leave the game and ask a grown-up to check saved progress.',()=>begin(d,token));
