@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-27T20:52:10.832Z",
-      "sourceDigest": "c1d589a056ce8e8564bb333e7a7432ba1108213699981b76e1bc90c8e9d370db",
+      "reviewedAt": "2026-11-28T02:04:20.490Z",
+      "sourceDigest": "6f833a19879bac6c10149d767ce24d12ac178ea939951983282ea0505767dd55",
       "reviewOutcome": "updated",
-      "reviewReason": "Document the single administrator session for the protected private DEV membership binding, with console client selection, existing-secret checks and deployment disabled.",
+      "reviewReason": "Record completed private binding installation, the unmerged activation proposal and outstanding Google IAP configuration and live access gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
