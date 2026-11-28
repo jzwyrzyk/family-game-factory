@@ -1143,10 +1143,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-28T13:57:20.731Z",
-      "sourceDigest": "c00a005edfd1f16fc4e66e2a4c53b1afb970971d2d70c3cf9966ff697d322114",
+      "reviewedAt": "2026-11-28T14:09:59.100Z",
+      "sourceDigest": "ceedea72f949711442f2eedfdece9f0cc457cdcc66d843281ba123f105225578",
       "reviewOutcome": "updated",
-      "reviewReason": "Reviewed TEST edge record generation against held source; bound owner-selected Wix namespace, conditional child delegation and manual pointing fallback while preserving independent DEV setup and all activation holds.",
+      "reviewReason": "Recorded owner-confirmed child-only Wix delegation and observed dashboard records; removed the repeated capability prerequisite while preserving exact-value, setup and spending approvals and independent DEV activation.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
