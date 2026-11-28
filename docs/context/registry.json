@@ -1143,10 +1143,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-28T14:09:59.100Z",
-      "sourceDigest": "ceedea72f949711442f2eedfdece9f0cc457cdcc66d843281ba123f105225578",
+      "reviewedAt": "2026-11-28T14:22:24.481Z",
+      "sourceDigest": "e42b2d54ebadb0d314f09d04d25aa9d02b42e6094c8c9ffaa0913991e7ac0df2",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded owner-confirmed child-only Wix delegation and observed dashboard records; removed the repeated capability prerequisite while preserving exact-value, setup and spending approvals and independent DEV activation.",
+      "reviewReason": "Reconciled owner-created DEV project 300049441641 and repository observations; recorded verified repository admin and denied organization reads, exact bootstrap scope and federation bindings, and separate billing/runtime/AI approval boundaries.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
