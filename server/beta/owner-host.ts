@@ -48,6 +48,7 @@ export function protectedHousehold(config:Pick<GatewayConfig,'platformMode'|'hou
     html=html.replace('<html lang="en">','<html lang="en" data-household-protected>').replace(/<link rel="manifest"[^>]*>/g,'').replace('</head>','<script defer src="/owner-session.js"></script></head>');
     res.setHeader('Content-Type',types['.html']);res.end(html);return;
    }else if(path==='/owner-session.js')file='entry/owner-session.js';
+   else if(/^play\/(?:fonts|art)\/[\w/-]+\.(?:webp|gif|svg|jpg|png|woff2?)$/.test(file))file=file.slice(5);
    else if(!/^(?:assets\/index-[\w-]+\.(?:js|css)|[\w/-]+\.(?:webp|gif|svg|jpg|png|mp3|wav|woff2?)|jems-pals\/manifest\.json)$/.test(file))throw Error();
    const name=resolve(root,file);
    if(!name.startsWith(root+sep)||!types[extname(name)]||!(await stat(name)).isFile())throw Error();

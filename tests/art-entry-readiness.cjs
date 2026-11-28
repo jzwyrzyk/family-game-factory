@@ -96,7 +96,7 @@ async function delayedConfig(browser,base){
   assert.equal(await page.locator('#studioMoreChoices').evaluate(node=>node.open),false,'new-game tools start collapsed');
   await page.locator('#studioMoreChoices > summary').click();
   assert.equal(await page.locator('#studioUseDrawing').isVisible(),true,'the same guarded picture entrance is available in More choices');
-  assert.equal(await page.locator('#studioUseDrawing').textContent().then(value=>value.trim()),'Use my picture');
+  assert.equal(await page.locator('#studioUseDrawing').textContent().then(value=>value.trim()),'Use my art');
   const draft='A kite catches purple bubbles for this player.';
   await page.locator('#studioPrompt').fill(draft);
   releaseConfig();
@@ -148,7 +148,7 @@ async function rejectedConfig(browser,base){
   await drawing.waitFor({state:'visible'});
   await drawing.locator('[data-paper]').press('Enter');
   await drawing.locator('[data-title]').fill('My offline dot');
-  await drawing.getByRole('button',{name:'Keep my drawing',exact:true}).click();
+  await drawing.getByRole('button',{name:'Keep my art',exact:true}).click();
   await drawing.waitFor({state:'detached'});await selectedArtOnscreen(page);
   assert.equal(await page.locator('#artDetailTitle').textContent(),'My offline dot','a saved canvas drawing reveals its own details after the modal closes');
   const originals=await artRecords(page);assert.equal(originals.length,2);
@@ -213,6 +213,16 @@ async function savedPreviewAfterConfig(browser,base){
   assert.equal(previewGets,1,'one explicit Play retry uses the newly available remote configuration');
   const after=await page.evaluate(()=>FG.studio.exportNotebook().sessions.find(session=>session.id==='saved-remote-fixture'));
   for(const key of ['id','owner','name','remoteId','draft','candidate','job'])assert.deepEqual(after[key],session[key],'retry preserves saved '+key);
+  if(!await page.locator('#studioUseDrawing').isVisible())await page.locator('#studioMore > summary').click();
+  await page.locator('#studioUseDrawing').click();await upload(page,'My comet.png');
+  await page.selectOption('#artGameRole','vehicle');await page.click('#artPlanGame');await page.locator('#studioArtPlan').waitFor();
+  const planned=await page.evaluate(()=>FG.studio.exportNotebook().sessions);
+  assert.equal(planned.length,1);assert.equal(planned[0].id,session.id);assert.equal(planned[0].remoteId,session.remoteId);
+  assert.equal(planned[0].draft,session.draft);assert.equal(planned[0].gameArt.pins[0].name,'My comet');
+  assert.ok(await page.locator('#studioSend').isDisabled());assert.equal(await page.getByRole('button',{name:'Try art in a sample game'}).count(),0);
+  assert.equal(await page.locator('.game-art-review iframe').count(),0);
+  await page.getByRole('button',{name:'Remove My comet as Vehicle'}).click();
+  await page.waitForFunction(()=>FG.studio.exportNotebook().sessions[0].gameArt.pins.length===0);
   assert.deepEqual(posts,[],'configuration recovery and saved-game preview make no POST or generation request');
   assert.deepEqual(errors,[],'no browser exception while replacing an unconfigured client');
   console.log('PASS saved remote game after delayed configuration: initial unavailable preview, explicit read-only retry, unchanged saved work and no paid replay');

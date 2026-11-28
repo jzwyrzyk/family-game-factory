@@ -1,5 +1,6 @@
-import { createPageHeader } from '../brand/page-header';
-import { createDashboardCard } from '../brand/dashboard-card';
+import {createAction} from '../design-system/components/action';
+import { createCollectionHeader as createPageHeader } from '../design-system/templates/collection';
+import { createDashboardCard } from '../design-system/components/dashboard-card';
 import { PAL_CATALOG, palArtworkPath, palDefinition, palLine, type PalId, type PalLineKind } from './catalog';
 import type { PalsView, PalPreferences, OwnedPalView, PalStage } from './model';
 import type { PalArtworkExpression } from './artwork';
@@ -34,8 +35,7 @@ const el = <K extends keyof HTMLElementTagNameMap>(tag: K, className = '', text 
   return result;
 };
 const button = (label: string, key: string, className = 'pals-button') => {
-  const result = el('button', className, label);
-  result.type = 'button';
+  const result = createAction({label, className});
   result.dataset.palsFocus = key;
   return result;
 };
@@ -45,7 +45,7 @@ const count = (value: number) => new Intl.NumberFormat('en-US').format(value);
 const portraitRequests = new WeakMap<HTMLElement, number>();
 const portraitTimeouts = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
 
-function retirePortrait(portrait: HTMLElement) {
+export function retirePortrait(portrait: HTMLElement) {
   portraitRequests.set(portrait, (portraitRequests.get(portrait) ?? 0) + 1);
   clearTimeout(portraitTimeouts.get(portrait));
   portraitTimeouts.delete(portrait);

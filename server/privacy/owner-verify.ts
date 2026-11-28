@@ -2,7 +2,7 @@
  * This command cannot itself validate age, identity or parental relationship.
  */
 import {readFile} from 'node:fs/promises';
-import {Firestore} from '@google-cloud/firestore';
+import {databaseFor} from '../storage/database';
 import {FirestoreRepository} from '../pipeline/firestore';
 import {FileRepository} from '../pipeline/repository';
 import {GcsPrivateArtifacts} from '../storage/artifacts';
@@ -22,7 +22,7 @@ async function main(){
   !/^[A-Za-z0-9_-]{1,100}$/.test(c.workspace)||
   (!c.localFile&&!c.projectId))throw Error('PRIVATE_FAMILY_CONFIG_REQUIRED');
  const repo=c.localFile?await FileRepository.open(c.localFile):
-  new FirestoreRepository(new Firestore({projectId:c.projectId}),c.workspace,
+  new FirestoreRepository(databaseFor(c),c.workspace,
    c.artifactBucket?new GcsPrivateArtifacts(c.artifactBucket,c.workspace):undefined);
  const result=await recordExternalGuardianVerification(repo,{
   familyId:c.familyId,choiceId:id,receipt,verifiedByOwner:true

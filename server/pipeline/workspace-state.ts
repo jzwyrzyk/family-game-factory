@@ -16,7 +16,9 @@ export async function readWorkspace(tx:Documents,workspace:string,artifacts?:Pri
  return {root,chunks,state,originalParts:parts.map(v=>v!.json)};
 }
 export async function writeWorkspace(tx:Documents,workspace:Awaited<ReturnType<typeof readWorkspace>>,artifacts?:PrivateArtifacts,encoding:{splitGamePayloads?:boolean}={}){
- const serialized=await encodeArtifacts(workspace.state,artifacts,encoding);
+ return writeSerializedWorkspace(tx,workspace,await encodeArtifacts(workspace.state,artifacts,encoding));
+}
+export function writeSerializedWorkspace(tx:Documents,workspace:Awaited<ReturnType<typeof readWorkspace>>,serialized:string){
  if(Buffer.byteLength(serialized)>3*1024*1024)throw Error('WORKSPACE_CAPACITY_REACHED');
  const points=Array.from(serialized);
  const chunks=Math.ceil(points.length/250000);

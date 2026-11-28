@@ -16,6 +16,8 @@ from test_production_activation import fixture
 
 
 FROZEN_ACTIVATION_INPUTS = {
+    '.github/workflows/jems-service-images.yml': (
+        Path(__file__).with_name('fixtures') / 'activation-image-workflow.yml').read_bytes(),
     'scripts/ops/release.py': (Path(__file__).with_name('fixtures') / 'activation-release-controller.py').read_bytes(),
     'ops/compatibility.json': b'{}\n',
     'ops/release.json': b'{}\n',

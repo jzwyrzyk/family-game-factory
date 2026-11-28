@@ -1,0 +1,11 @@
+.creative-picker { grid-column: 1/-1; min-width: 0; color: #37244b; }
+.creative-picker-tools { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.creative-picker-tools input,.creative-picker-tools select { font:inherit; min-height:44px; padding:8px 12px; color:#37244b; background:white; border:1px solid #8b779b; border-radius:12px; max-width:100%; }
+.creative-picker-tools input { flex:1 1 140px; min-width:0; }
+.creative-picker p { margin:8px 0; }
+.creative-picker-results { display:grid; gap:10px; grid-template-columns:repeat(auto-fill,minmax(min(140px,100%),1fr)); }
+.creative-picker-results .creation-character-choice { overflow-wrap:anywhere; min-width:0; }
+.creative-picker-results .creation-character-choice > img { width:80px; height:80px; object-fit:contain; }
+.creative-picker-results .creation-character-choice > canvas,
+.creative-picker-results .creation-character-choice > .pal-portrait { width:80px; height:80px; object-fit:contain; }
+.creative-picker-dialog .creative-picker + button { margin-top:12px; }

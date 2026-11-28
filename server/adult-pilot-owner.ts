@@ -3,7 +3,7 @@
  * Requires an externally reviewed adult/owner receipt, stored only as hash.
  */
 import {readFile} from 'node:fs/promises';
-import {Firestore} from '@google-cloud/firestore';
+import {databaseFor} from './storage/database';
 import {FirestoreRepository} from './pipeline/firestore';
 import {FileRepository} from './pipeline/repository';
 import {GcsPrivateArtifacts} from './storage/artifacts';
@@ -24,7 +24,7 @@ async function main(){
  const deviceId=process.env.FACTORY_ADULT_PILOT_DEVICE_ID||'';
  if(!/^[0-9a-f-]{36}$/.test(deviceId))throw Error('ADULT_PILOT_DEVICE_ID_REQUIRED');
  const repo=config.localFile?await FileRepository.open(config.localFile):
-  new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace,
+  new FirestoreRepository(databaseFor(config),config.workspace,
    config.artifactBucket?new GcsPrivateArtifacts(config.artifactBucket,config.workspace):undefined);
  if(args.has('--revoke')){
   await revokeAdultPilot(repo,config.familyId,deviceId);

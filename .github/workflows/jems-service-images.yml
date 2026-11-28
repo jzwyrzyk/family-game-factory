@@ -2,6 +2,10 @@ name: Jems immutable service images
 on:
   workflow_dispatch:
     inputs:
+      mirror_release:
+        description: Promote the approved, digest-identical TEST images
+        type: boolean
+        default: false
       verify_identity:
         description: Verify GitHub OIDC claims only while production flags are off
         type: boolean
@@ -79,7 +83,7 @@ jobs:
           JEMS_CLOUD_RUN_RELEASE_ENABLED: ${{ vars.JEMS_CLOUD_RUN_RELEASE_ENABLED }}
         run: python3 scripts/ops/verify_release_access.py publish
   build:
-    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && !inputs.verify_identity && !inputs.verify_access && vars.JEMS_IMAGE_PUBLISH_ENABLED == 'true'
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && !inputs.verify_identity && !inputs.verify_access && !inputs.mirror_release && vars.JEMS_IMAGE_PUBLISH_ENABLED == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -142,3 +146,48 @@ jobs:
       - uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a
         with:
           subject-checksums: ${{ runner.temp }}/subject-checksums.txt
+  mirror:
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.ref_protected && inputs.mirror_release && !inputs.verify_identity && !inputs.verify_access && vars.JEMS_IMAGE_PUBLISH_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment: jems-image-publication
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Require the exact owner-approved release before requesting credentials
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JEMS_WORKER_REFS_READ_TOKEN: ${{ secrets.JEMS_WORKER_REFS_READ_TOKEN }}
+        run: python3 scripts/environments/production_gate.py mirror
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          workload_identity_provider: ${{ vars.JEMS_PUBLISH_WIF_PROVIDER }}
+          service_account: ${{ vars.JEMS_PUBLISH_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f
+      - name: Verify TEST Cloud Build, mirror immutable manifests, verify registry readback
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if ! command -v skopeo >/dev/null; then sudo apt-get update -qq && sudo apt-get install -y skopeo; fi
+          gcloud artifacts repositories describe jems-release-images --project=family-game-factory-jzw --location=us-east5 --format=json |
+            jq -e '.format == "DOCKER" and .dockerConfig.immutableTags == true' >/dev/null
+          gcloud auth print-access-token | skopeo login --username oauth2accesstoken --password-stdin us-east5-docker.pkg.dev
+          trap 'skopeo logout us-east5-docker.pkg.dev >/dev/null' EXIT
+          python3 scripts/environments/mirror_images.py
+      - uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a
+        with:
+          subject-checksums: ${{ runner.temp }}/subject-checksums.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: registry-promotion-${{ github.run_id }}
+          path: ${{ runner.temp }}/receipt.json
+          if-no-files-found: error
+          retention-days: 30

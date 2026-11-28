@@ -174,3 +174,5 @@ approved source URLs and art bytes remain unchanged. Preparation failure is
 visible and recoverable, never an opaque-paper success. Journey's column card
 resets the horizontal widget's flex basis so phone whitespace follows content.
 [Audit and acceptance evidence](../evidence/child-modernization/pal-fidelity/README.md).
+
+Shared host presentation now consumes the [central design-system foundations](../design-system/README.md). Existing feature controllers, ownership, saves, original artwork, assessment and rewards remain authoritative; the [migration inventory](../design-system/INVENTORY.md) distinguishes adopted components from pending template work.

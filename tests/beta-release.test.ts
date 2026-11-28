@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
+import {databaseFor} from '../server/storage/database';
 import {mkdtemp,readdir,readFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import vm from 'node:vm';
-import {environmentRelease,verifyBackend} from '../scripts/beta/environment-release.mjs';
+import {candidateRevisionSuffix,environmentRelease,verifyBackend} from '../scripts/beta/environment-release.mjs';
 import {hostingPlan} from '../scripts/beta/prepare-hosting.mjs';
 import {BuilderClient} from '../src/builder/client';
 import {identifyBuildRequest} from '../src/builder/submission';
@@ -123,4 +124,37 @@ test('manual lost-response recovery resends only the original durable build iden
  assert.equal((await client.resendSavedSubmission(request))?.jobId,'same-job');
  assert.deepEqual(writes,[{gameId:request.gameId,baseRevisionId:null,prompt:request.prompt,clientRequestId:id}]);
  await assert.rejects(client.resendSavedSubmission({...request,prompt:'changed'}));
+});
+
+test('integrated TEST isolates fixture access, approved private spend and immutable policy revisions',()=>{
+ const project='jems-jzw-nonprod';
+ const base={...cfg,project,gatewayImage:cfg.gatewayImage.replace(cfg.project,project),previewImage:cfg.previewImage.replace(cfg.project,project),
+  services:Object.fromEntries(Object.entries(cfg.services).map(([role,s])=>[role,{...s,identity:'jems-test-'+role+'@'+project+'.iam.gserviceaccount.com'}]))};
+ const approvals=['JEMS_TEST_FUNDED_HOUSEHOLD','FACTORY_ADULT_PILOT_MODE','FACTORY_ADULT_PILOT_OWNER_APPROVED','FACTORY_ADULT_PILOT_PROFILE_ACCESS_VERIFIED','FACTORY_COACH_APPROVED','FACTORY_COACH_PRIVACY_APPROVED','FACTORY_COACH_SAFEGUARDS_APPROVED','FACTORY_COACH_PRIVATE_EXECUTION_APPROVED'];
+ const trial={...Object.fromEntries(approvals.map(k=>[k,'true'])),JEMS_TEST_TRIAL_AUTHORIZATION_SHA256:'c'.repeat(64),JEMS_TEST_TRIAL_EXPIRES_AT:new Date(Date.now()+3600000).toISOString(),FACTORY_COACH_PRICES_REVIEWED:new Date(Date.now()-3600000).toISOString(),
+  FACTORY_COACH_MODEL:'fixture',FACTORY_COACH_MAX_MICRO_USD:'10000',FACTORY_COACH_INPUT_PRICE:'1000',FACTORY_COACH_OUTPUT_PRICE:'2000'};
+ const before=hostingPlan(base) as Record<string,any>,after=hostingPlan({...base,testTrial:trial}) as Record<string,any>;
+ const env=(service:any)=>Object.fromEntries(service.spec.template.spec.containers[0].env.map((e:any)=>[e.name,e.value]));
+ assert.equal(env(before.household).FACTORY_ADULT_PILOT_MODE,'true');assert.equal(env(before.household).FACTORY_ACTIONS_APPROVED,'false');
+ assert.equal(env(after.household).FACTORY_ACTIONS_APPROVED,'true');assert.equal(env(after.household).FACTORY_COACH_APPROVED,'true');
+ assert.equal(env(after.household).FACTORY_COACH_PRIVATE_OPENAI_API_KEY,undefined);
+ for(const role of ['preview','gateway'])assert.deepEqual(before[role],after[role]);
+ for(const invalid of [{JEMS_TEST_TRIAL_EXPIRES_AT:'2020-01-01T00:00:00Z'},{FACTORY_COACH_APPROVED:'false'},{FACTORY_COACH_MAX_MICRO_USD:'100001'},{FACTORY_COACH_PRIVATE_OPENAI_API_KEY:'forbidden'}])
+  assert.throws(()=>hostingPlan({...base,testTrial:{...trial,...invalid}}));
+ const suffix=(s:any)=>candidateRevisionSuffix(base,'household','a'.repeat(40),s);
+ assert.notEqual(suffix(before.household),suffix(after.household));
+ const reordered=structuredClone(after.household);reordered.spec.template.spec.containers[0].env.reverse();
+ assert.equal(suffix(reordered),suffix(after.household));
+});
+
+test('TEST service and administrator bindings select one named SDK database',async()=>{
+ const projectId='jems-jzw-nonprod',artifactBucket=projectId+'-jems-test-artifacts';
+ for(const service of [undefined,'jems-test-gateway','jems-test-household','jems-test-preview']){
+  const db=databaseFor({projectId,artifactBucket},service);assert.equal(db.databaseId,'jems-test');await db.terminate();
+ }
+ for(const role of ['gateway','household','preview'])assert.throws(()=>databaseFor({projectId,artifactBucket:'other'},'jems-test-'+role),/TEST_DATABASE_BINDING/);
+ assert.throws(()=>databaseFor({projectId:'different-project',artifactBucket}),/TEST_DATABASE_BINDING/);
+ for(const value of [{projectId:'family-game-factory-jzw',artifactBucket:'different'},{projectId,artifactBucket:'dev'}]){
+  const db=databaseFor(value,'some-other-service');assert.equal(db.databaseId,'(default)');await db.terminate();
+ }
 });

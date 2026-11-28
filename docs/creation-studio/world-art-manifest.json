@@ -1,0 +1,1138 @@
+{
+  "schema": "jems.illustrated-worlds.v1",
+  "approval": "Candidate for product-owner visual review",
+  "provenance": "Original product illustrations generated with OpenAI ImageGen for Jems on 2026-11-26 using text-only environment and prop briefs. Source digests identify the eight master images. Stage layers and previews are local deterministic compositions. No child artwork used.",
+  "worlds": [
+    {
+      "id": "world-forest-v1",
+      "name": "Enchanted Gem Forest",
+      "artBrief": "Enchanted Gem Forest: intimate ancient crystal woodland, framing rounded copper bark trees draped with teal and jade leaves, late-afternoon sun shafts, vibrant waxcap mushrooms and low clusters of pink and violet crystals at the outer edges; a small crooked footbridge over a brook in the back left and a winding honey-colored path opening into a wide uncluttered, level clearing across the bottom center.",
+      "propSheet": [
+        "Tree",
+        "Mossy rock",
+        "Flowers",
+        "Mushrooms",
+        "Amethyst crystals",
+        "Hollow log",
+        "Bridge",
+        "Treasure chest"
+      ]
+    },
+    {
+      "id": "world-workshop-v1",
+      "name": "Inventor’s Workshop",
+      "artBrief": "Inventor's Workshop: interior of a cheerful eccentric industrial atelier, golden oak beams, softly polished turquoise enamel/brass machinery and coil springs, small colorful gem sorter and inventing workbench on left, porthole high at right with sunlight falling diagonally onto an open honey parquet workshop floor across the bottom center. Brilliant brass joinery, round handwheels, no big front conveyor.",
+      "propSheet": [
+        "Workbench",
+        "Crate",
+        "Gear",
+        "Gem polisher",
+        "Button",
+        "Wrench",
+        "Copper pipe",
+        "Spring"
+      ]
+    },
+    {
+      "id": "world-cloud-v1",
+      "name": "Cloud Kingdom",
+      "artBrief": "Cloud Kingdom: broad, open-air sky, a sweeping curved rainbow and airy pearl pink cumulus clouds, a whimsical turreted citadel on one distant floating island high right, thin waterfalls cascade past the cloud bank on left. A broad grassy sky-island terrace in the lower third, lilac stone edges, clear walking surface at center.",
+      "propSheet": [
+        "Cloud platform",
+        "Floating island",
+        "Balloon",
+        "Golden star",
+        "Rainbow",
+        "Castle tower",
+        "Floating gem",
+        "Cloud steps"
+      ]
+    },
+    {
+      "id": "world-moon-v1",
+      "name": "Moon Adventure",
+      "artBrief": "Moon Adventure: playful lavender lunar terrain, gently scalloped shallow craters and blue jewel geodes framing the edges, a tiny domed exploratory station on the far left horizon, gigantic warm ringed apricot planet diagonally across the far right sky, tiny stars, turquoise/coral space lighting, bright dusk, broad walkable gently lit moon-dust clearing across the lower middle.",
+      "propSheet": [
+        "Moon rock",
+        "Rocket",
+        "Satellite",
+        "Crater",
+        "Space station",
+        "Space crystal",
+        "Meteorite",
+        "Moon rover"
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "id": "world-prop-tree-v1",
+      "name": "Tree",
+      "worlds": [
+        "world-forest-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        263
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/tree.webp",
+      "sha256": "1d5a073675697af3d9038620bfef64eb9006744f09ad418301c063fb0f073655",
+      "bytes": 31532,
+      "source": "imagegen:e7da280fb80c73d77e0ba9e5fcf49586b1b600524328dfb089e86d7d7324f81f#cell-1"
+    },
+    {
+      "id": "world-prop-mossy-rock-v1",
+      "name": "Mossy rock",
+      "worlds": [
+        "world-forest-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        172
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/mossy-rock.webp",
+      "sha256": "42dae76db85f4dcfce879e4aee947f5f65004479f9935f51642fe5d9b82a6b66",
+      "bytes": 24012,
+      "source": "imagegen:e7da280fb80c73d77e0ba9e5fcf49586b1b600524328dfb089e86d7d7324f81f#cell-2"
+    },
+    {
+      "id": "world-prop-flowers-v1",
+      "name": "Flowers",
+      "worlds": [
+        "world-forest-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        233
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/flowers.webp",
+      "sha256": "275051a6bb29d6d14a1899da2e9ab8e4c218b76cfa9643872f5e3fb5863198a2",
+      "bytes": 37852,
+      "source": "imagegen:e7da280fb80c73d77e0ba9e5fcf49586b1b600524328dfb089e86d7d7324f81f#cell-3"
+    },
+    {
+      "id": "world-prop-mushrooms-v1",
+      "name": "Mushrooms",
+      "worlds": [
+        "world-forest-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        246
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/mushrooms.webp",
+      "sha256": "baeef833e1408e40f989a1d0735320740342ea870ed992f270ae255f0a839bb8",
+      "bytes": 30988,
+      "source": "imagegen:e7da280fb80c73d77e0ba9e5fcf49586b1b600524328dfb089e86d7d7324f81f#cell-4"
+    },
+    {
+      "id": "world-prop-amethyst-v1",
+      "name": "Amethyst crystals",
+      "worlds": [
+        "world-forest-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        244
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/amethyst.webp",
+      "sha256": "c42cd2ee3e6cd1aa4bade11c53b9131256ef77d9ab885378ad09ddb238bc4ce5",
+      "bytes": 28710,
+      "source": "imagegen:e7da280fb80c73d77e0ba9e5fcf49586b1b600524328dfb089e86d7d7324f81f#cell-5"
+    },
+    {
+      "id": "world-prop-log-v1",
+      "name": "Hollow log",
+      "worlds": [
+        "world-forest-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        173
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/log.webp",
+      "sha256": "07f178d1291d48795afb13ad7d1395fdcb02cdee16e075cab7aed74fd71086fd",
+      "bytes": 26414,
+      "source": "imagegen:e7da280fb80c73d77e0ba9e5fcf49586b1b600524328dfb089e86d7d7324f81f#cell-6"
+    },
+    {
+      "id": "world-prop-bridge-v1",
+      "name": "Bridge",
+      "worlds": [
+        "world-forest-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        166
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/bridge.webp",
+      "sha256": "708dfc0fc369f53f405459c0b4f81bec9dfa2408c5b2249fd4488eca2a883470",
+      "bytes": 24002,
+      "source": "imagegen:e7da280fb80c73d77e0ba9e5fcf49586b1b600524328dfb089e86d7d7324f81f#cell-7"
+    },
+    {
+      "id": "world-prop-treasure-chest-v1",
+      "name": "Treasure chest",
+      "worlds": [
+        "world-forest-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        216
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/treasure-chest.webp",
+      "sha256": "f22c9f28edddd989da8fcfa4643293481ea9faccecad2f7d15d41cab18257db1",
+      "bytes": 27100,
+      "source": "imagegen:e7da280fb80c73d77e0ba9e5fcf49586b1b600524328dfb089e86d7d7324f81f#cell-8"
+    },
+    {
+      "id": "world-forest-v1-background",
+      "name": "Enchanted Gem Forest",
+      "worlds": [
+        "world-forest-v1"
+      ],
+      "layer": "back",
+      "intendedScale": "full frame",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "alpha": "opaque",
+      "uses": [
+        "stage"
+      ],
+      "file": "art/creative-worlds/v1/forest-background.webp",
+      "sha256": "929ff3bc1d7741f2d17f9edf944da616fce21c08deeb8cbb6e209c544e1eb512",
+      "bytes": 210570,
+      "source": "imagegen:a7a2cfc3dac0f72c1b86db8126bcac8f0ab497c130130c2e0b355a75c5dc7657"
+    },
+    {
+      "id": "world-forest-v1-middle",
+      "name": "Enchanted Gem Forest middle",
+      "worlds": [
+        "world-forest-v1"
+      ],
+      "layer": "middle",
+      "intendedScale": "full frame",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "alpha": "straight",
+      "uses": [
+        "stage"
+      ],
+      "file": "art/creative-worlds/v1/forest-middle.webp",
+      "sha256": "3343342bd4adad2abff437fba05e3e516f1ff170dfb3f185e99af82060c36d4d",
+      "bytes": 18646,
+      "source": [
+        "world-prop-mushrooms-v1",
+        "world-prop-bridge-v1"
+      ]
+    },
+    {
+      "id": "world-forest-v1-foreground",
+      "name": "Enchanted Gem Forest foreground",
+      "worlds": [
+        "world-forest-v1"
+      ],
+      "layer": "foreground",
+      "intendedScale": "full frame",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "alpha": "straight",
+      "uses": [
+        "stage"
+      ],
+      "file": "art/creative-worlds/v1/forest-foreground.webp",
+      "sha256": "95aac40d5ccf2df6a8b51fdb30a7aabbb23e90a08b098fe90f714c462ce30961",
+      "bytes": 12444,
+      "source": [
+        "world-prop-amethyst-v1",
+        "world-prop-flowers-v1"
+      ]
+    },
+    {
+      "id": "world-forest-v1-preview",
+      "name": "Enchanted Gem Forest preview",
+      "worlds": [
+        "world-forest-v1"
+      ],
+      "layer": "preview",
+      "intendedScale": "world picker or shelf",
+      "dimensions": [
+        384,
+        216
+      ],
+      "alpha": "opaque",
+      "uses": [
+        "picker",
+        "shelf"
+      ],
+      "file": "art/creative-worlds/v1/forest-preview.webp",
+      "sha256": "a46136a0fd20b872556b85f2c652765241e97d8ab922906b16f42aecaaa8f33e",
+      "bytes": 39322,
+      "source": "world-forest-v1"
+    },
+    {
+      "id": "world-prop-workbench-v1",
+      "name": "Workbench",
+      "worlds": [
+        "world-workshop-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        245
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/workbench.webp",
+      "sha256": "932a5ed4e41b4b1f1278c8887bde0b00614fec203ca88c0069a1ddb2b8644cf2",
+      "bytes": 30856,
+      "source": "imagegen:744a661435a456fd1127c670993df8e2183b88c03e87a10a09670f3099930a2e#cell-1"
+    },
+    {
+      "id": "world-prop-crate-v1",
+      "name": "Crate",
+      "worlds": [
+        "world-workshop-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        220
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/crate.webp",
+      "sha256": "ea0ade82339f8fc5db71a4521f55a6f100afb0539f8cd2ef37fbf31ce9ec2ea8",
+      "bytes": 24992,
+      "source": "imagegen:744a661435a456fd1127c670993df8e2183b88c03e87a10a09670f3099930a2e#cell-2"
+    },
+    {
+      "id": "world-prop-gear-v1",
+      "name": "Gear",
+      "worlds": [
+        "world-workshop-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        271
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/gear.webp",
+      "sha256": "2ea3836dce0004eaa1214ce832d6ae968d5a57718b4c2c5d8f32755ead063c97",
+      "bytes": 36904,
+      "source": "imagegen:744a661435a456fd1127c670993df8e2183b88c03e87a10a09670f3099930a2e#cell-3"
+    },
+    {
+      "id": "world-prop-polisher-v1",
+      "name": "Gem polisher",
+      "worlds": [
+        "world-workshop-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        279
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/polisher.webp",
+      "sha256": "61820392062177e3c91fcc3838d555446652cdc4ebc8efd5463e0a200c6e2014",
+      "bytes": 33358,
+      "source": "imagegen:744a661435a456fd1127c670993df8e2183b88c03e87a10a09670f3099930a2e#cell-4"
+    },
+    {
+      "id": "world-prop-button-v1",
+      "name": "Button",
+      "worlds": [
+        "world-workshop-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        222
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/button.webp",
+      "sha256": "780dc211cb564b952cb42b94e9a30ef4ed87535de5e0d8fc2e26c0bc85545496",
+      "bytes": 21152,
+      "source": "imagegen:744a661435a456fd1127c670993df8e2183b88c03e87a10a09670f3099930a2e#cell-5"
+    },
+    {
+      "id": "world-prop-wrench-v1",
+      "name": "Wrench",
+      "worlds": [
+        "world-workshop-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        134
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/wrench.webp",
+      "sha256": "a338a11789decf44c09fa615f5e8aa7b40a40013ea95abdbdfc65ea0455435c0",
+      "bytes": 15052,
+      "source": "imagegen:744a661435a456fd1127c670993df8e2183b88c03e87a10a09670f3099930a2e#cell-6"
+    },
+    {
+      "id": "world-prop-pipe-v1",
+      "name": "Copper pipe",
+      "worlds": [
+        "world-workshop-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        259
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/pipe.webp",
+      "sha256": "68bb854a50a87e6fec2c8866fedc7d98123806e7bb81bbca9d36357bb362aeaa",
+      "bytes": 26128,
+      "source": "imagegen:744a661435a456fd1127c670993df8e2183b88c03e87a10a09670f3099930a2e#cell-7"
+    },
+    {
+      "id": "world-prop-spring-v1",
+      "name": "Spring",
+      "worlds": [
+        "world-workshop-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        217,
+        280
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/spring.webp",
+      "sha256": "e233a409a9cb954028e3161c5ebd91f6db42eae775c3c7e4835be1dc2dda541e",
+      "bytes": 30960,
+      "source": "imagegen:744a661435a456fd1127c670993df8e2183b88c03e87a10a09670f3099930a2e#cell-8"
+    },
+    {
+      "id": "world-workshop-v1-background",
+      "name": "Inventor’s Workshop",
+      "worlds": [
+        "world-workshop-v1"
+      ],
+      "layer": "back",
+      "intendedScale": "full frame",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "alpha": "opaque",
+      "uses": [
+        "stage"
+      ],
+      "file": "art/creative-worlds/v1/workshop-background.webp",
+      "sha256": "fd64c12985efa099110515c69ab5ca47a33be17e91d452154a149a77f7e7a6bf",
+      "bytes": 198394,
+      "source": "imagegen:52b700fae0bf0778fa2d17931b596d45f82e809db83ab5827b230816c66bf4df"
+    },
+    {
+      "id": "world-workshop-v1-middle",
+      "name": "Inventor’s Workshop middle",
+      "worlds": [
+        "world-workshop-v1"
+      ],
+      "layer": "middle",
+      "intendedScale": "full frame",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "alpha": "straight",
+      "uses": [
+        "stage"
+      ],
+      "file": "art/creative-worlds/v1/workshop-middle.webp",
+      "sha256": "653aafdafde421077c3db0330af19f70b2ab79e693c27e97ac637b1cf2fef2e8",
+      "bytes": 15322,
+      "source": [
+        "world-prop-crate-v1",
+        "world-prop-spring-v1"
+      ]
+    },
+    {
+      "id": "world-workshop-v1-foreground",
+      "name": "Inventor’s Workshop foreground",
+      "worlds": [
+        "world-workshop-v1"
+      ],
+      "layer": "foreground",
+      "intendedScale": "full frame",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "alpha": "straight",
+      "uses": [
+        "stage"
+      ],
+      "file": "art/creative-worlds/v1/workshop-foreground.webp",
+      "sha256": "3042ff1f106b413d6d6104787a4d68d122f7c6ab35d7526391334f27596ce0e1",
+      "bytes": 10304,
+      "source": [
+        "world-prop-pipe-v1",
+        "world-prop-gear-v1"
+      ]
+    },
+    {
+      "id": "world-workshop-v1-preview",
+      "name": "Inventor’s Workshop preview",
+      "worlds": [
+        "world-workshop-v1"
+      ],
+      "layer": "preview",
+      "intendedScale": "world picker or shelf",
+      "dimensions": [
+        384,
+        216
+      ],
+      "alpha": "opaque",
+      "uses": [
+        "picker",
+        "shelf"
+      ],
+      "file": "art/creative-worlds/v1/workshop-preview.webp",
+      "sha256": "6dfe1d1c3c3e728a0cd86e22b4b73a7a9561628cf2b5137b0742e7059223fca1",
+      "bytes": 36008,
+      "source": "world-workshop-v1"
+    },
+    {
+      "id": "world-prop-cloud-platform-v1",
+      "name": "Cloud platform",
+      "worlds": [
+        "world-cloud-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        178
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/cloud-platform.webp",
+      "sha256": "5c33cf0a6791ea83cec345fbb58b9b51433ca87d159c6bf6a861d6e990dc8d05",
+      "bytes": 13386,
+      "source": "imagegen:437ee97ff305c31f9b3e1637c04cf39a0ff8f4d75927e3ad3303026f631b534f#cell-1"
+    },
+    {
+      "id": "world-prop-sky-island-v1",
+      "name": "Floating island",
+      "worlds": [
+        "world-cloud-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        212
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/sky-island.webp",
+      "sha256": "4678b00cc070093635d858479902ae35594a1385a6a3fef22940298126450601",
+      "bytes": 21514,
+      "source": "imagegen:437ee97ff305c31f9b3e1637c04cf39a0ff8f4d75927e3ad3303026f631b534f#cell-2"
+    },
+    {
+      "id": "world-prop-balloon-v1",
+      "name": "Balloon",
+      "worlds": [
+        "world-cloud-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        215,
+        280
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/balloon.webp",
+      "sha256": "5048350698989f8919b5b65ec9181d2b4a24739d2516af29834f6470d8c332cd",
+      "bytes": 25394,
+      "source": "imagegen:437ee97ff305c31f9b3e1637c04cf39a0ff8f4d75927e3ad3303026f631b534f#cell-3"
+    },
+    {
+      "id": "world-prop-star-v1",
+      "name": "Golden star",
+      "worlds": [
+        "world-cloud-v1",
+        "world-moon-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        263
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/star.webp",
+      "sha256": "3a2e05473cce09d83864d7c4999d6b30223006390f1dd6cfd0e4d14dec366577",
+      "bytes": 19994,
+      "source": "imagegen:437ee97ff305c31f9b3e1637c04cf39a0ff8f4d75927e3ad3303026f631b534f#cell-4"
+    },
+    {
+      "id": "world-prop-rainbow-v1",
+      "name": "Rainbow",
+      "worlds": [
+        "world-cloud-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        205
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/rainbow.webp",
+      "sha256": "048f63719263bf099dd22e50f11672a4145da75382b8ecbd1efb3d0b013ad282",
+      "bytes": 20092,
+      "source": "imagegen:437ee97ff305c31f9b3e1637c04cf39a0ff8f4d75927e3ad3303026f631b534f#cell-5"
+    },
+    {
+      "id": "world-prop-turret-v1",
+      "name": "Castle tower",
+      "worlds": [
+        "world-cloud-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        217,
+        280
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/turret.webp",
+      "sha256": "f353d292ff424883a056345eea52960d3d03cbe1c6d0b912c9acf7e0d1c0593a",
+      "bytes": 22334,
+      "source": "imagegen:437ee97ff305c31f9b3e1637c04cf39a0ff8f4d75927e3ad3303026f631b534f#cell-6"
+    },
+    {
+      "id": "world-prop-floating-gem-v1",
+      "name": "Floating gem",
+      "worlds": [
+        "world-cloud-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        233
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/floating-gem.webp",
+      "sha256": "863d48d7edfd8aeb4d22625dd4cc67aa67e6a7d0e3b6c5f4ce5dbb4239868732",
+      "bytes": 18340,
+      "source": "imagegen:437ee97ff305c31f9b3e1637c04cf39a0ff8f4d75927e3ad3303026f631b534f#cell-7"
+    },
+    {
+      "id": "world-prop-cloud-stairs-v1",
+      "name": "Cloud steps",
+      "worlds": [
+        "world-cloud-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        248
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/cloud-stairs.webp",
+      "sha256": "4286374dc3c4a2d1f38734724393deea1c2dd5524d19c71ef50bcf8034948fef",
+      "bytes": 20282,
+      "source": "imagegen:437ee97ff305c31f9b3e1637c04cf39a0ff8f4d75927e3ad3303026f631b534f#cell-8"
+    },
+    {
+      "id": "world-cloud-v1-background",
+      "name": "Cloud Kingdom",
+      "worlds": [
+        "world-cloud-v1"
+      ],
+      "layer": "back",
+      "intendedScale": "full frame",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "alpha": "opaque",
+      "uses": [
+        "stage"
+      ],
+      "file": "art/creative-worlds/v1/cloud-background.webp",
+      "sha256": "eff8af17bdc39acd5b97a18e5090392028207d436c13778596b41831013515fa",
+      "bytes": 136770,
+      "source": "imagegen:5681a2430d461d8e2e92bf8aa4dab7184776eacb81adb6ebfb925749d0cc5edd"
+    },
+    {
+      "id": "world-cloud-v1-middle",
+      "name": "Cloud Kingdom middle",
+      "worlds": [
+        "world-cloud-v1"
+      ],
+      "layer": "middle",
+      "intendedScale": "full frame",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "alpha": "straight",
+      "uses": [
+        "stage"
+      ],
+      "file": "art/creative-worlds/v1/cloud-middle.webp",
+      "sha256": "b6029e3b5b56d5f929632671dbd7d4bb951d1e06e22f42f803191845f7cfe01b",
+      "bytes": 11488,
+      "source": [
+        "world-prop-balloon-v1",
+        "world-prop-sky-island-v1"
+      ]
+    },
+    {
+      "id": "world-cloud-v1-foreground",
+      "name": "Cloud Kingdom foreground",
+      "worlds": [
+        "world-cloud-v1"
+      ],
+      "layer": "foreground",
+      "intendedScale": "full frame",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "alpha": "straight",
+      "uses": [
+        "stage"
+      ],
+      "file": "art/creative-worlds/v1/cloud-foreground.webp",
+      "sha256": "6f7d467fefa10a01d6ffb12e89bdd307fe9739910e02667eb4e46482021750f5",
+      "bytes": 7276,
+      "source": [
+        "world-prop-cloud-platform-v1",
+        "world-prop-rainbow-v1"
+      ]
+    },
+    {
+      "id": "world-cloud-v1-preview",
+      "name": "Cloud Kingdom preview",
+      "worlds": [
+        "world-cloud-v1"
+      ],
+      "layer": "preview",
+      "intendedScale": "world picker or shelf",
+      "dimensions": [
+        384,
+        216
+      ],
+      "alpha": "opaque",
+      "uses": [
+        "picker",
+        "shelf"
+      ],
+      "file": "art/creative-worlds/v1/cloud-preview.webp",
+      "sha256": "4146bea7cf09f6c1c534e782134e9521d7cb8bee69a3263073b0bc97ba9c1da5",
+      "bytes": 28740,
+      "source": "world-cloud-v1"
+    },
+    {
+      "id": "world-prop-moon-rock-v1",
+      "name": "Moon rock",
+      "worlds": [
+        "world-moon-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        203
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/moon-rock.webp",
+      "sha256": "b3c546a2228bab452169b6665ec8c7be020e78809f7d18fc8bc211e7daba5ab5",
+      "bytes": 20640,
+      "source": "imagegen:2b14b321aa805e41b9eb2d0ae2a452cbe56f0fbf7f57f641a4c60783c09a4513#cell-1"
+    },
+    {
+      "id": "world-prop-rocket-v1",
+      "name": "Rocket",
+      "worlds": [
+        "world-moon-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        215,
+        280
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/rocket.webp",
+      "sha256": "5ab27ab9d77f70bc3a156b1950c271ccc0f1666c9175c96a8773db0edb69c293",
+      "bytes": 23762,
+      "source": "imagegen:2b14b321aa805e41b9eb2d0ae2a452cbe56f0fbf7f57f641a4c60783c09a4513#cell-2"
+    },
+    {
+      "id": "world-prop-satellite-v1",
+      "name": "Satellite",
+      "worlds": [
+        "world-moon-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        198
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/satellite.webp",
+      "sha256": "dbdf91aa49736e76410d2a45ec3d09fd15be5c8703606cb009aff6b24f3a8297",
+      "bytes": 24814,
+      "source": "imagegen:2b14b321aa805e41b9eb2d0ae2a452cbe56f0fbf7f57f641a4c60783c09a4513#cell-3"
+    },
+    {
+      "id": "world-prop-crater-v1",
+      "name": "Crater",
+      "worlds": [
+        "world-moon-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        143
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/crater.webp",
+      "sha256": "ec8617e3bc2ce3cdf2bb544ba85c8ea7daa92d693b8bd2e3d19bfe060a099aa4",
+      "bytes": 17198,
+      "source": "imagegen:2b14b321aa805e41b9eb2d0ae2a452cbe56f0fbf7f57f641a4c60783c09a4513#cell-4"
+    },
+    {
+      "id": "world-prop-station-v1",
+      "name": "Space station",
+      "worlds": [
+        "world-moon-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        250
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/station.webp",
+      "sha256": "17a7ccc6999aa3358632449f6e582893b2a05a9f91499fd3a397407fccdba630",
+      "bytes": 27682,
+      "source": "imagegen:2b14b321aa805e41b9eb2d0ae2a452cbe56f0fbf7f57f641a4c60783c09a4513#cell-5"
+    },
+    {
+      "id": "world-prop-space-crystal-v1",
+      "name": "Space crystal",
+      "worlds": [
+        "world-moon-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        273,
+        280
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/space-crystal.webp",
+      "sha256": "1fabb3d97debf5b460eba4d67e31e1e1cbb9b9e3c6909f5495b119ad34027057",
+      "bytes": 32672,
+      "source": "imagegen:2b14b321aa805e41b9eb2d0ae2a452cbe56f0fbf7f57f641a4c60783c09a4513#cell-6"
+    },
+    {
+      "id": "world-prop-meteorite-v1",
+      "name": "Meteorite",
+      "worlds": [
+        "world-moon-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        242
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/meteorite.webp",
+      "sha256": "3b60677d624a6801ac025426711d08dfbad2dab20c510f8c2417d86c44ab751a",
+      "bytes": 26154,
+      "source": "imagegen:2b14b321aa805e41b9eb2d0ae2a452cbe56f0fbf7f57f641a4c60783c09a4513#cell-7"
+    },
+    {
+      "id": "world-prop-rover-v1",
+      "name": "Moon rover",
+      "worlds": [
+        "world-moon-v1"
+      ],
+      "layer": "actor",
+      "intendedScale": "child-selected size",
+      "dimensions": [
+        280,
+        226
+      ],
+      "alpha": "straight",
+      "uses": [
+        "scene prop",
+        "layer composition"
+      ],
+      "file": "art/creative-worlds/v1/rover.webp",
+      "sha256": "eb666cb4082c6d97eb67cad56a3c95ac6a20648648d29fec1debee6489e6b760",
+      "bytes": 27856,
+      "source": "imagegen:2b14b321aa805e41b9eb2d0ae2a452cbe56f0fbf7f57f641a4c60783c09a4513#cell-8"
+    },
+    {
+      "id": "world-moon-v1-background",
+      "name": "Moon Adventure",
+      "worlds": [
+        "world-moon-v1"
+      ],
+      "layer": "back",
+      "intendedScale": "full frame",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "alpha": "opaque",
+      "uses": [
+        "stage"
+      ],
+      "file": "art/creative-worlds/v1/moon-background.webp",
+      "sha256": "a7f86bf0b5f448306721776a017c3280180eb082b5cda2292b8d97f823f4c9a7",
+      "bytes": 139352,
+      "source": "imagegen:747fb56c072927f56245a4e71bceedec6c589dc2b78db87e281093d2bbdc2557"
+    },
+    {
+      "id": "world-moon-v1-middle",
+      "name": "Moon Adventure middle",
+      "worlds": [
+        "world-moon-v1"
+      ],
+      "layer": "middle",
+      "intendedScale": "full frame",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "alpha": "straight",
+      "uses": [
+        "stage"
+      ],
+      "file": "art/creative-worlds/v1/moon-middle.webp",
+      "sha256": "5b2cf4940497c352db0dd51a72a4572e649bcc775cc257f3f713f590792d63a1",
+      "bytes": 12286,
+      "source": [
+        "world-prop-satellite-v1",
+        "world-prop-moon-rock-v1"
+      ]
+    },
+    {
+      "id": "world-moon-v1-foreground",
+      "name": "Moon Adventure foreground",
+      "worlds": [
+        "world-moon-v1"
+      ],
+      "layer": "foreground",
+      "intendedScale": "full frame",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "alpha": "straight",
+      "uses": [
+        "stage"
+      ],
+      "file": "art/creative-worlds/v1/moon-foreground.webp",
+      "sha256": "07359ec073716a04454f94528f639f87013a67d7bcd7e7365cabd65d2c5be25e",
+      "bytes": 10712,
+      "source": [
+        "world-prop-space-crystal-v1",
+        "world-prop-meteorite-v1"
+      ]
+    },
+    {
+      "id": "world-moon-v1-preview",
+      "name": "Moon Adventure preview",
+      "worlds": [
+        "world-moon-v1"
+      ],
+      "layer": "preview",
+      "intendedScale": "world picker or shelf",
+      "dimensions": [
+        384,
+        216
+      ],
+      "alpha": "opaque",
+      "uses": [
+        "picker",
+        "shelf"
+      ],
+      "file": "art/creative-worlds/v1/moon-preview.webp",
+      "sha256": "59c0c990d8743775bef894bb1cf37e070245e53e7a5ab7505098e817e75f7ad5",
+      "bytes": 27338,
+      "source": "world-moon-v1"
+    }
+  ]
+}

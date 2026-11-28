@@ -381,6 +381,13 @@ def verify_full_ci(api, source, kind, pr_number=None, now=None):
             require(api.request(f'{PREFIX}/git/ref/heads/main').get('object', {}).get('sha') == main, 'CI_MAIN_MOVED')
             return proof
         tested = sha(current_pr.get('merge_commit_sha'))
+    elif kind == 'release':
+        require(pr_number is None, 'CI_RELEASE_SOURCE_INVALID')
+        comparison = api.request(f'{PREFIX}/compare/{source}...{main}')
+        require(comparison.get('status') in ('ahead', 'identical')
+                and comparison.get('merge_base_commit', {}).get('sha') == source,
+                'CI_RELEASE_SOURCE_NOT_MERGED')
+        tested = source
     else:
         require(kind == 'test' and pr_number is None and source == main, 'CI_TEST_NOT_CURRENT_MAIN')
         tested = source

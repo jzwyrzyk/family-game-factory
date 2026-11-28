@@ -4,11 +4,11 @@
  * device-local child notebooks, remote game revisions, backups or provider logs.
  */
 import {readFile} from 'node:fs/promises';
-import {Firestore} from '@google-cloud/firestore';
+import {databaseFor} from '../storage/database';
 import {FirestoreRepository} from '../pipeline/firestore';
 import {FileRepository} from '../pipeline/repository';
 import {CoachService,type CoachConfig} from './service';
-interface OwnerConfig {familyId:string;workspace:string;projectId?:string;localFile?:string}
+interface OwnerConfig {familyId:string;workspace:string;projectId?:string;artifactBucket?:string;localFile?:string}
 async function main(){
  if(!process.env.FACTORY_PRIVATE_CONFIG||process.env.GITHUB_ACTIONS||process.env.K_SERVICE)
   throw Error('TRUSTED_OWNER_MACHINE_REQUIRED');
@@ -21,7 +21,7 @@ async function main(){
  if(!config||config.familyId!==requested||
   !/^[A-Za-z0-9_-]{1,100}$/.test(config.workspace))throw Error('ERASURE_FAMILY_MISMATCH');
  const repo=config.localFile?await FileRepository.open(config.localFile):
-  new FirestoreRepository(new Firestore({projectId:config.projectId}),config.workspace);
+  new FirestoreRepository(databaseFor(config),config.workspace);
  const disabled:CoachConfig={
   enabled:false,privacyApproved:false,moderationApproved:false,zdrVerified:false,
   privateExecutionApproved:false,model:'',maxInputChars:16000,maxOutputTokens:500,

@@ -162,3 +162,5 @@ separate capabilities, not implied by this dashboard.
 Early grade labels follow the shared grade table. Historical math and language skills with recorded evidence remain reportable after the parent lowers a ceiling.
 
 Early listening, vocabulary, phonological awareness and printed-word recognition have different skill IDs. A completed instruction recording is a presentation accommodation. Explicit grown-up reading records a supported completion. The dashboard exposes the declared support in the retained activity, excludes it from first-unaided responses, and keeps interrupted work separate from wrong answers. No automatic inference about adult presence is made.
+
+Shared host presentation now consumes the [central design-system foundations](../design-system/README.md). Existing feature controllers, ownership, saves, original artwork, assessment and rewards remain authoritative; the [migration inventory](../design-system/INVENTORY.md) distinguishes adopted components from pending template work.

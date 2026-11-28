@@ -2,13 +2,14 @@ const {chromium}=require('playwright');
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const artifact=path.resolve(process.env.UI_REVIEW_FILE||'dist-review/jems-ui-review.html');
 const manifest=JSON.parse(fs.readFileSync('tools/ui-review/coverage.json','utf8'));
-const harness=process.env.UI_REVIEW_INLINE_HARNESS==='1';
+const {standaloneInput}=require('./standalone-input.cjs');
 (async()=>{const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||(!process.env.CI&&fs.existsSync('/usr/bin/chromium')?'/usr/bin/chromium':undefined),args:['--no-sandbox']});
+ const input=await standaloneInput(artifact);
  const context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true}),page=await context.newPage();const errors=[],network=[],overflows=[],visited=[];
- page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url())&&r.url()!=='http://localhost:43199/')network.push(r.url());});page.on('dialog',d=>d.accept());page.setDefaultTimeout(12000);
+ page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url())&&r.url()!==input.url)network.push(r.url());});page.on('dialog',d=>d.accept());page.setDefaultTimeout(12000);
  fs.mkdirSync('test-results/ui-review',{recursive:true});
  try{
- if(harness){await page.route('http://localhost:43199/',r=>r.fulfill({contentType:'text/html',path:artifact}));await page.goto('http://localhost:43199/',{timeout:120000});}else await page.goto('file://'+artifact,{timeout:120000});
+ await page.goto(input.url,{waitUntil:'domcontentloaded',timeout:120000});
  await page.waitForFunction(()=>document.querySelector('#loading').hidden,{timeout:60000});
  const app=()=>page.frames().find(f=>f.parentFrame()===page.mainFrame());
  const go=async action=>{await page.selectOption('#destination',action);await page.waitForTimeout(350);};
@@ -39,6 +40,6 @@ await page.selectOption('#experience','adult');await app().waitForFunction(()=>F
  await page.locator('[data-close="findingsDialog"]').click();await page.click('#hide');assert(await page.locator('#toolbar').isHidden());assert(await page.locator('#return').isVisible());await page.click('#return');
  const broken=await app().locator('img').evaluateAll(es=>es.filter(e=>e.offsetWidth&&e.complete&&!e.naturalWidth).map(e=>e.src));assert.deepEqual(broken,[]);
  assert.deepEqual(network,[],'No external network requests');assert.deepEqual(errors,[],'No browser exceptions');
- const report={artifact,mode:harness?'in-memory transport harness; file:// unverified locally':'file://, no server',pages:visited,viewports:process.env.UI_REVIEW_FOCUS?0:4,overflows,errors,network};fs.writeFileSync('test-results/ui-review/results.json',JSON.stringify(report,null,2));console.log('PASS UI review',JSON.stringify(report));
- }catch(e){console.log('BROWSER ERRORS',errors);await page.screenshot({path:'test-results/ui-review/failure.png'});throw e;}finally{await browser.close();}
+ const report={artifact,mode:input.url.startsWith('file:')?'file://, no server':'Single standalone file served on loopback',pages:visited,viewports:process.env.UI_REVIEW_FOCUS?0:4,overflows,errors,network};fs.writeFileSync('test-results/ui-review/results.json',JSON.stringify(report,null,2));console.log('PASS UI review',JSON.stringify(report));
+ }catch(e){console.log('BROWSER ERRORS',errors);await page.screenshot({path:'test-results/ui-review/failure.png'});throw e;}finally{await browser.close();await input.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

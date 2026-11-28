@@ -1,10 +1,16 @@
 name: Jems Cloud Run release
+run-name: ${{ inputs.release_review == 'candidate' && 'Review production manifest' || inputs.release_review == 'recovery' && 'Review recovery manifest' || github.workflow }}
 on:
   push:
     branches: [main]
     paths: ['ops/release.json']
   workflow_dispatch:
     inputs:
+      release_review:
+        description: Verify the protected package for an exact owner decision
+        type: choice
+        options: ['off', candidate, recovery]
+        default: 'off'
       verify_identity:
         description: Verify GitHub OIDC claims only while production flags are off
         type: boolean
@@ -124,9 +130,45 @@ jobs:
           JEMS_VERIFY_ACCESS: ${{ inputs.verify_access }}
           JEMS_VERIFY_IDENTITY: ${{ inputs.verify_identity }}
           JEMS_CLOUD_RUN_RELEASE_ENABLED: ${{ vars.JEMS_CLOUD_RUN_RELEASE_ENABLED }}
-        run: python3 scripts/ops/observe_release.py
+        run: |
+          set -euo pipefail
+          python3 scripts/ops/observe_release.py | tee "$RUNNER_TEMP/receipt.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: serving-observation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/receipt.json
+          if-no-files-found: error
+          retention-days: 1
+  review-release:
+    environment: jems-production-evidence
+    permissions:
+      contents: read
+      actions: read
+      attestations: read
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && github.event_name == 'workflow_dispatch' && (inputs.release_review == 'candidate' || inputs.release_review == 'recovery') && !inputs.observe && !inputs.verify_access && !inputs.verify_identity
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify release evidence and show digest for the review comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JEMS_WORKER_REFS_READ_TOKEN: ${{ secrets.JEMS_WORKER_REFS_READ_TOKEN }}
+          CHECK_MODE: ${{ inputs.release_review == 'recovery' && 'review-recovery' || 'review' }}
+        run: |
+          set -euo pipefail
+          python3 scripts/environments/production_gate.py "$CHECK_MODE" | tee -a "$GITHUB_STEP_SUMMARY"
+  owner-approval:
+    needs: review-release
+    runs-on: ubuntu-24.04
+    environment: jems-production-approval
+    permissions: {}
+    steps:
+      - run: echo 'The release controller independently verifies the environment reviewer and exact approval comment.'
   plan:
-    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && !inputs.verify_identity && !inputs.verify_access && !inputs.observe
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && !inputs.verify_identity && !inputs.verify_access && !inputs.observe && (!inputs.release_review || inputs.release_review == 'off')
     runs-on: ubuntu-24.04
     outputs:
       operation: ${{ steps.plan.outputs.operation }}
@@ -181,12 +223,19 @@ jobs:
     environment: jems-cloud-run-production
     permissions:
       contents: read
+      actions: read
       attestations: read
       id-token: write
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
+          fetch-depth: 0
+      - name: Validate authenticated owner grant and complete TEST record
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JEMS_WORKER_REFS_READ_TOKEN: ${{ secrets.JEMS_WORKER_REFS_READ_TOKEN }}
+        run: python3 scripts/environments/production_gate.py transition
       - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
         with:
           workload_identity_provider: ${{ vars.JEMS_RELEASE_WIF_PROVIDER }}
@@ -199,11 +248,16 @@ jobs:
         run: |
           set -euo pipefail
           image="$(jq -er .image ops/release.json)"
-          source="$(jq -er .source ops/release.json)"
+          source="$(jq -er .signerSha ops/release-mirror.json)"
           gcloud auth configure-docker us-east5-docker.pkg.dev --quiet
           gh attestation verify "oci://$image" --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/jems-service-images.yml" \
             --source-ref refs/heads/main --source-digest "$source" --deny-self-hosted-runners
+      - name: Recheck release, recovery tuple and dependency traffic before mutation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JEMS_WORKER_REFS_READ_TOKEN: ${{ secrets.JEMS_WORKER_REFS_READ_TOKEN }}
+        run: python3 scripts/environments/production_gate.py dependencies
       - name: Check current main and execute reviewed transition
         run: |
           set -euo pipefail

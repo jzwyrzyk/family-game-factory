@@ -22,7 +22,7 @@ fieldset{border:0;padding:0;margin:0;min-width:0}legend{font-size:25px;font-weig
 @media(prefers-reduced-motion:reduce){.construction-stage.launch [data-part],.construction-stage.launch svg{animation:none!important;transition:none!important;translate:none!important}}
 
 /* Shared learning controls and evidence, separate from game difficulty. */
-.learning-mode-control{display:flex;flex-direction:column;gap:6px;margin:10px 0}.learning-mode-control label{font-size:13px;font-weight:700;display:flex;flex-wrap:wrap;align-items:center;gap:8px}.learning-mode-control select{max-width:100%;min-height:48px;font:inherit;font-size:18px;border:2px solid #94a6bd;border-radius:10px;background:#fff;color:#18334b;padding:8px 10px}.learning-mode-control small{font-size:12px;color:var(--muted)}.learning-progress-card{display:flex;flex-direction:column;gap:6px;padding:15px 0;border-top:1px solid var(--edge)}.learning-state{color:var(--aqua);font-size:14px}.learning-progress-card small{color:var(--muted);font-size:12px;line-height:1.5}.learning-save-warning{padding:14px;border:2px solid #a95319;border-radius:12px;background:#fff3df;color:#743611;font-size:18px;line-height:1.5}.learning-save-warning p{color:inherit}.stage-overlay:has(.math-activity)>.learning-modal-card{max-width:620px;padding:0;border:0;background:transparent;box-shadow:none;margin:auto 0}.game-bottom .learning-mode-control{flex-basis:100%}
+.learning-mode-control{display:flex;flex-direction:column;gap:6px;margin:10px 0}.learning-mode-control label{font-size:13px;font-weight:700;display:flex;flex-wrap:wrap;align-items:center;gap:8px}.learning-mode-control select{max-width:100%;min-height:48px;font:inherit;font-size:18px;border:2px solid #94a6bd;border-radius:10px;background:#fff;color:#18334b;padding:8px 10px}.learning-mode-control small{font-size:12px;color:var(--muted)}.learning-progress-card{display:flex;flex-direction:column;gap:6px;padding:15px 0;border-top:1px solid var(--edge)}.learning-state{color:var(--aqua);font-size:14px}.learning-progress-card small{color:var(--muted);font-size:12px;line-height:1.5}.learning-save-warning{padding:14px;border:2px solid #a95319;border-radius:12px;background:#fff3df;color:#743611;font-size:18px;line-height:1.5}.learning-save-warning p{color:inherit}.game-bottom .learning-mode-control{flex-basis:100%}
 /* Four starter games; the two physical toys share their actual local artwork. */
 #game-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.quality-card-art{display:block;width:100%;height:100%;object-fit:cover}.game-card.hill .game-picture{background:#d8e9d7}@media(max-width:600px){#game-grid{grid-template-columns:1fr}}
 
@@ -36,65 +36,15 @@ fieldset{border:0;padding:0;margin:0;min-width:0}legend{font-size:25px;font-weig
 .learning-modal-card:not(:has(.math-activity,.language-activity))>h2{color:#fff;font-size:28px}
 .learning-modal-card:not(:has(.math-activity,.language-activity))>p{color:#e6ecff}
 
-/* Language quests are an accessible learning surface, not a tiny stage widget.
- * Game physics remains frozen/inert while the child reads or constructs words.
- * The global navigation is not the only escape: native quests offer Back to Play.
- */
-.stage-overlay:has(.language-activity){
-  position:fixed;
-  inset:0;
-  z-index:3000;
-  width:100vw;
-  height:100dvh;
-  padding:clamp(12px,2vh,24px);
-  overflow-y:auto;
-  overflow-x:hidden;
-  overscroll-behavior:contain;
-  align-items:flex-start;
-  justify-content:center;
-  background:rgba(13,25,52,.91);
+/* The overlay owns scrolling, including short and fullscreen game stages. */
+.stage-overlay:has(.learning-workspace) {
+  position: fixed; inset: 0; z-index: 3000; width: 100%; height: 100dvh;
+  padding: clamp(6px, 1.8vw, 24px); overflow: auto; overscroll-behavior: contain;
+  align-items: flex-start; justify-content: center; background: #f0e9e3;
 }
-.stage-overlay:has(.language-activity) > .learning-modal-card{
-  width:min(100%,700px);
-  max-width:700px;
-  margin:auto 0;
-  padding:0;
-  border:0;
-  border-radius:0;
-  box-shadow:none;
-  background:transparent;
-  text-align:left;
-}
-.stage-overlay:has(.language-activity) .language-activity{
-  width:100%;
-  max-width:700px;
-  min-height:0;
-  margin:0;
-  font-family:system-ui,-apple-system,sans-serif;
-}
-.stage-overlay:has(.language-activity) .language-activity h2 {
-  font-size:clamp(24px,3.2vw,32px);
-  line-height:1.23;
-  margin:6px 0 12px;
-  color:#18334b;
-}
-.stage-overlay:has(.language-activity) .language-activity p{color:#48657b}
-.stage-overlay:has(.language-activity) .language-activity .language-story-text{color:#223f57}
-.stage-overlay:has(.language-activity) .language-activity .language-eyebrow{color:#136c73}
-.stage-overlay:has(.language-activity) .language-activity .language-feedback[data-state=incorrect]{color:#9b3d19}
-.stage-overlay:has(.language-activity) .language-activity .language-feedback[data-state=correct]{color:#136846}
-.stage-overlay:has(.language-activity) .language-activity .language-hint p{color:#53421b}
-.stage-overlay:has(.language-activity) .language-activity input{
-  max-width:none;
-  background:#fff;
-  border:2px solid #8db9c6;
-  color:#18334b;
-  text-align:left;
-  font:inherit;
-}
-@media(max-width:600px){
-  .stage-overlay:has(.language-activity){padding:12px 9px 22px}
-  .stage-overlay:has(.language-activity) .language-activity{border-radius:18px}
+.stage-overlay:has(.learning-workspace) > .learning-modal-card {
+  width: min(100%, 1080px); max-width: none; margin: auto 0;
+  border: 0; padding: 0; background: transparent; box-shadow: none;
 }
 
 /* Two fully local, curated games. Controls are comfortable on a tablet. */

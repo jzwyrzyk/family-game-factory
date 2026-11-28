@@ -1,0 +1,725 @@
+{
+  "before": "bc602f1ede502f398308ad56f973c4bf7997ff08",
+  "after": "bdaf7170492593aa5c94c2699e5817483c25b04e",
+  "captures": [
+    {
+      "capture": "desktop-art.png",
+      "beforeSize": [
+        1440,
+        1737
+      ],
+      "afterSize": [
+        1440,
+        1737
+      ],
+      "identical": true
+    },
+    {
+      "capture": "desktop-creative-studio.png",
+      "beforeSize": [
+        1440,
+        1179
+      ],
+      "afterSize": [
+        1440,
+        1179
+      ],
+      "identical": true
+    },
+    {
+      "capture": "desktop-draw.png",
+      "beforeSize": [
+        1440,
+        1737
+      ],
+      "afterSize": [
+        1440,
+        1737
+      ],
+      "identical": true
+    },
+    {
+      "capture": "desktop-experiment.png",
+      "beforeSize": [
+        1440,
+        1061
+      ],
+      "afterSize": [
+        1440,
+        1061
+      ],
+      "identical": true
+    },
+    {
+      "capture": "desktop-home.png",
+      "beforeSize": [
+        1440,
+        1777
+      ],
+      "afterSize": [
+        1440,
+        1777
+      ],
+      "identical": false,
+      "changedPixelPercentAbove8": 0.0739
+    },
+    {
+      "capture": "desktop-introduction.png",
+      "beforeSize": [
+        1440,
+        1116
+      ],
+      "afterSize": [
+        1440,
+        1116
+      ],
+      "identical": true
+    },
+    {
+      "capture": "desktop-journey.png",
+      "beforeSize": [
+        1440,
+        1273
+      ],
+      "afterSize": [
+        1440,
+        1273
+      ],
+      "identical": true
+    },
+    {
+      "capture": "desktop-make-scene.png",
+      "beforeSize": [
+        1440,
+        1389
+      ],
+      "afterSize": [
+        1440,
+        1389
+      ],
+      "identical": true
+    },
+    {
+      "capture": "desktop-maker-ranks.png",
+      "beforeSize": [
+        1440,
+        1598
+      ],
+      "afterSize": [
+        1440,
+        1598
+      ],
+      "identical": true
+    },
+    {
+      "capture": "desktop-menu.png",
+      "beforeSize": [
+        1440,
+        1777
+      ],
+      "afterSize": [
+        1440,
+        1777
+      ],
+      "identical": true
+    },
+    {
+      "capture": "desktop-pals.png",
+      "beforeSize": [
+        1440,
+        3080
+      ],
+      "afterSize": [
+        1440,
+        3080
+      ],
+      "identical": true
+    },
+    {
+      "capture": "desktop-powers.png",
+      "beforeSize": [
+        1440,
+        2935
+      ],
+      "afterSize": [
+        1440,
+        2894
+      ]
+    },
+    {
+      "capture": "desktop-rebuild-scene.png",
+      "beforeSize": [
+        1440,
+        1000
+      ],
+      "afterSize": [
+        1440,
+        1000
+      ],
+      "identical": true
+    },
+    {
+      "capture": "desktop-rewards.png",
+      "beforeSize": [
+        1440,
+        1756
+      ],
+      "afterSize": [
+        1440,
+        1756
+      ],
+      "identical": true
+    },
+    {
+      "capture": "desktop-scene-editor.png",
+      "beforeSize": [
+        1440,
+        1000
+      ],
+      "afterSize": [
+        1440,
+        1000
+      ],
+      "identical": true
+    },
+    {
+      "capture": "landscape-art.png",
+      "beforeSize": [
+        1180,
+        1766
+      ],
+      "afterSize": [
+        1180,
+        1766
+      ],
+      "identical": true
+    },
+    {
+      "capture": "landscape-creative-studio.png",
+      "beforeSize": [
+        1180,
+        1174
+      ],
+      "afterSize": [
+        1180,
+        1174
+      ],
+      "identical": true
+    },
+    {
+      "capture": "landscape-draw.png",
+      "beforeSize": [
+        1180,
+        1766
+      ],
+      "afterSize": [
+        1180,
+        1766
+      ],
+      "identical": true
+    },
+    {
+      "capture": "landscape-experiment.png",
+      "beforeSize": [
+        1180,
+        1061
+      ],
+      "afterSize": [
+        1180,
+        1061
+      ],
+      "identical": true
+    },
+    {
+      "capture": "landscape-home.png",
+      "beforeSize": [
+        1180,
+        1796
+      ],
+      "afterSize": [
+        1180,
+        1796
+      ],
+      "identical": true
+    },
+    {
+      "capture": "landscape-introduction.png",
+      "beforeSize": [
+        1180,
+        1095
+      ],
+      "afterSize": [
+        1180,
+        1095
+      ],
+      "identical": true
+    },
+    {
+      "capture": "landscape-journey.png",
+      "beforeSize": [
+        1180,
+        1271
+      ],
+      "afterSize": [
+        1180,
+        1271
+      ],
+      "identical": true
+    },
+    {
+      "capture": "landscape-make-scene.png",
+      "beforeSize": [
+        1180,
+        1384
+      ],
+      "afterSize": [
+        1180,
+        1384
+      ],
+      "identical": true
+    },
+    {
+      "capture": "landscape-maker-ranks.png",
+      "beforeSize": [
+        1180,
+        1596
+      ],
+      "afterSize": [
+        1180,
+        1596
+      ],
+      "identical": true
+    },
+    {
+      "capture": "landscape-menu.png",
+      "beforeSize": [
+        1180,
+        1796
+      ],
+      "afterSize": [
+        1180,
+        1796
+      ],
+      "identical": true
+    },
+    {
+      "capture": "landscape-pals.png",
+      "beforeSize": [
+        1180,
+        3080
+      ],
+      "afterSize": [
+        1180,
+        3080
+      ],
+      "identical": true
+    },
+    {
+      "capture": "landscape-powers.png",
+      "beforeSize": [
+        1180,
+        2894
+      ],
+      "afterSize": [
+        1180,
+        2921
+      ]
+    },
+    {
+      "capture": "landscape-rebuild-scene.png",
+      "beforeSize": [
+        1180,
+        828
+      ],
+      "afterSize": [
+        1180,
+        828
+      ],
+      "identical": true
+    },
+    {
+      "capture": "landscape-rewards.png",
+      "beforeSize": [
+        1180,
+        1777
+      ],
+      "afterSize": [
+        1180,
+        1777
+      ],
+      "identical": true
+    },
+    {
+      "capture": "landscape-scene-editor.png",
+      "beforeSize": [
+        1180,
+        828
+      ],
+      "afterSize": [
+        1180,
+        828
+      ],
+      "identical": true
+    },
+    {
+      "capture": "phone-art.png",
+      "beforeSize": [
+        390,
+        2770
+      ],
+      "afterSize": [
+        390,
+        2770
+      ],
+      "identical": true
+    },
+    {
+      "capture": "phone-creative-studio.png",
+      "beforeSize": [
+        390,
+        1597
+      ],
+      "afterSize": [
+        390,
+        1597
+      ],
+      "identical": true
+    },
+    {
+      "capture": "phone-draw.png",
+      "beforeSize": [
+        390,
+        2770
+      ],
+      "afterSize": [
+        390,
+        2770
+      ],
+      "identical": true
+    },
+    {
+      "capture": "phone-experiment.png",
+      "beforeSize": [
+        390,
+        1347
+      ],
+      "afterSize": [
+        390,
+        1347
+      ],
+      "identical": true
+    },
+    {
+      "capture": "phone-home.png",
+      "beforeSize": [
+        390,
+        2673
+      ],
+      "afterSize": [
+        390,
+        2673
+      ],
+      "identical": true
+    },
+    {
+      "capture": "phone-introduction.png",
+      "beforeSize": [
+        390,
+        1585
+      ],
+      "afterSize": [
+        390,
+        1585
+      ],
+      "identical": true
+    },
+    {
+      "capture": "phone-journey.png",
+      "beforeSize": [
+        390,
+        1776
+      ],
+      "afterSize": [
+        390,
+        1776
+      ],
+      "identical": true
+    },
+    {
+      "capture": "phone-make-scene.png",
+      "beforeSize": [
+        390,
+        1983
+      ],
+      "afterSize": [
+        390,
+        1983
+      ],
+      "identical": true
+    },
+    {
+      "capture": "phone-maker-ranks.png",
+      "beforeSize": [
+        390,
+        2322
+      ],
+      "afterSize": [
+        390,
+        2322
+      ],
+      "identical": true
+    },
+    {
+      "capture": "phone-menu.png",
+      "beforeSize": [
+        390,
+        2673
+      ],
+      "afterSize": [
+        390,
+        2673
+      ],
+      "identical": true
+    },
+    {
+      "capture": "phone-pals.png",
+      "beforeSize": [
+        390,
+        4914
+      ],
+      "afterSize": [
+        390,
+        4914
+      ],
+      "identical": true
+    },
+    {
+      "capture": "phone-powers.png",
+      "beforeSize": [
+        390,
+        4675
+      ],
+      "afterSize": [
+        390,
+        4675
+      ],
+      "identical": false,
+      "changedPixelPercentAbove8": 0.065
+    },
+    {
+      "capture": "phone-rebuild-scene.png",
+      "beforeSize": [
+        390,
+        897
+      ],
+      "afterSize": [
+        390,
+        897
+      ],
+      "identical": true
+    },
+    {
+      "capture": "phone-rewards.png",
+      "beforeSize": [
+        390,
+        2494
+      ],
+      "afterSize": [
+        390,
+        2494
+      ],
+      "identical": true
+    },
+    {
+      "capture": "phone-scene-editor.png",
+      "beforeSize": [
+        390,
+        897
+      ],
+      "afterSize": [
+        390,
+        897
+      ],
+      "identical": true
+    },
+    {
+      "capture": "portrait-art.png",
+      "beforeSize": [
+        820,
+        1879
+      ],
+      "afterSize": [
+        820,
+        1879
+      ],
+      "identical": true
+    },
+    {
+      "capture": "portrait-creative-studio.png",
+      "beforeSize": [
+        820,
+        1349
+      ],
+      "afterSize": [
+        820,
+        1349
+      ],
+      "identical": true
+    },
+    {
+      "capture": "portrait-draw.png",
+      "beforeSize": [
+        820,
+        1879
+      ],
+      "afterSize": [
+        820,
+        1879
+      ],
+      "identical": true
+    },
+    {
+      "capture": "portrait-experiment.png",
+      "beforeSize": [
+        820,
+        1188
+      ],
+      "afterSize": [
+        820,
+        1188
+      ],
+      "identical": true
+    },
+    {
+      "capture": "portrait-home.png",
+      "beforeSize": [
+        820,
+        2117
+      ],
+      "afterSize": [
+        820,
+        2117
+      ],
+      "identical": true
+    },
+    {
+      "capture": "portrait-introduction.png",
+      "beforeSize": [
+        820,
+        1495
+      ],
+      "afterSize": [
+        820,
+        1495
+      ],
+      "identical": true
+    },
+    {
+      "capture": "portrait-journey.png",
+      "beforeSize": [
+        820,
+        1314
+      ],
+      "afterSize": [
+        820,
+        1314
+      ],
+      "identical": true
+    },
+    {
+      "capture": "portrait-make-scene.png",
+      "beforeSize": [
+        820,
+        1669
+      ],
+      "afterSize": [
+        820,
+        1669
+      ],
+      "identical": true
+    },
+    {
+      "capture": "portrait-maker-ranks.png",
+      "beforeSize": [
+        820,
+        1609
+      ],
+      "afterSize": [
+        820,
+        1609
+      ],
+      "identical": true
+    },
+    {
+      "capture": "portrait-menu.png",
+      "beforeSize": [
+        820,
+        2117
+      ],
+      "afterSize": [
+        820,
+        2117
+      ],
+      "identical": true
+    },
+    {
+      "capture": "portrait-pals.png",
+      "beforeSize": [
+        820,
+        3751
+      ],
+      "afterSize": [
+        820,
+        3751
+      ],
+      "identical": true
+    },
+    {
+      "capture": "portrait-powers.png",
+      "beforeSize": [
+        820,
+        2831
+      ],
+      "afterSize": [
+        820,
+        2804
+      ]
+    },
+    {
+      "capture": "portrait-rebuild-scene.png",
+      "beforeSize": [
+        820,
+        1180
+      ],
+      "afterSize": [
+        820,
+        1180
+      ],
+      "identical": true
+    },
+    {
+      "capture": "portrait-rewards.png",
+      "beforeSize": [
+        820,
+        1738
+      ],
+      "afterSize": [
+        820,
+        1738
+      ],
+      "identical": true
+    },
+    {
+      "capture": "portrait-scene-editor.png",
+      "beforeSize": [
+        820,
+        1180
+      ],
+      "afterSize": [
+        820,
+        1180
+      ],
+      "identical": true
+    }
+  ]
+}

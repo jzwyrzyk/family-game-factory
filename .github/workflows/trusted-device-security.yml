@@ -42,9 +42,16 @@ jobs:
         run: node --import tsx tests/trusted-devices.test.ts
       - name: Browser-session renewal and paid POST idempotency
         run: node --import tsx tests/session-client.test.ts
+      - name: Prepare browsers for synthetic family journeys
+        id: browsers
+        if: steps.beta.outputs.selected == 'true'
+        run: npx playwright install --with-deps chromium webkit
       - name: Private family beta isolation and authorization
         if: steps.beta.outputs.selected == 'true'
-        run: node --import tsx --test tests/beta-*.test.ts
+        run: |
+          export CHROMIUM_PATH="$(node -p "require('playwright').chromium.executablePath()")"
+          test -x "$CHROMIUM_PATH"
+          node --import tsx --test tests/beta-*.test.ts
       - name: Exercise Firestore transaction contention against the local emulator
         if: steps.beta.outputs.selected == 'true'
         run: |
@@ -54,10 +61,9 @@ jobs:
         id: privatebuild
         if: steps.beta.outputs.selected == 'true'
         run: npm run build && npm run build:family-beta && node scripts/beta/build.mjs --early-preview
-      - name: Prepare browsers for synthetic family journeys
-        id: browsers
+      - name: Exact original bytes in the reviewed workshop import
         if: steps.beta.outputs.selected == 'true'
-        run: npx playwright install --with-deps chromium webkit
+        run: node tests/beta-reviewed-art-browser.cjs
       - name: Chromium and WebKit private entry and responsive acceptance
         if: steps.beta.outputs.selected == 'true'
         run: node --import tsx tests/beta-browser.ts

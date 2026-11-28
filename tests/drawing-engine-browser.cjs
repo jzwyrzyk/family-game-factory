@@ -4,8 +4,80 @@ const fs=require('node:fs');
 const {build}=require('esbuild');
 const {exploreWelcome,navigate}=require('./studio-entry.cjs');
 const readArt=(page,store)=>page.evaluate(name=>new Promise((resolve,reject)=>{const request=indexedDB.open('family-private-drawings-v1');request.onerror=()=>reject(request.error);request.onsuccess=()=>{const db=request.result,tx=db.transaction(name),r=tx.objectStore(name).getAll();r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);tx.oncomplete=()=>db.close();};}),store);
+async function tryArticulatedWings(page,server,touch,device=touch?'tablet':'desktop'){
+ await page.goto('http://127.0.0.1:'+server.address().port+'/arcade/?art=1');
+ await page.locator('#page-art-studio').waitFor({state:'visible'});
+ const png=await page.evaluate(()=>{
+  const paper=document.createElement('canvas');paper.width=240;paper.height=180;
+  const g=paper.getContext('2d');g.lineWidth=5;g.lineCap='round';g.lineJoin='round';g.strokeStyle='#4b345d';
+  for(const [path,fill] of [
+   ['M114 84 Q70 16 21 23 Q7 64 54 92 Q16 98 45 140 Q87 158 114 96Z','#b88be0'],
+   ['M122 84 Q175 13 217 23 Q235 70 181 90 Q223 112 188 141 Q158 152 123 97Z','#ea96b8'],
+   ['M111 66 Q118 55 124 68 L126 112 Q120 135 113 113Z','#f5bc5b']
+  ]){
+   const shape=new Path2D(path);g.fillStyle=fill;g.fill(shape);g.stroke(shape);
+  }
+  for(const mark of ['M115 68 L103 47','M121 67 L134 48','M55 49 Q74 52 84 74','M189 48 Q166 57 156 73'])g.stroke(new Path2D(mark));
+  return paper.toDataURL().split(',')[1];
+ });
+ await page.setInputFiles('#artUpload',{name:'Crayon butterfly.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')});
+ await page.locator('#artEditMovement').click();
+ const lab=page.locator('dialog.drawing-lab'),canvas=lab.locator('.dl-canvas');
+ await lab.waitFor({state:'visible'});
+ assert.equal(await lab.locator('[data-kind]').inputValue(),'machine','an unknown object starts with one intact body');
+ assert.equal(await lab.locator('.dl-advanced').getAttribute('open'),null);
+ if(touch){
+  await lab.locator('[data-add]').click();await canvas.scrollIntoViewIfNeeded();
+  const bounds=await canvas.boundingBox(),session=await page.context().newCDPSession(page);
+  const point={x:bounds.x+bounds.width*.5,y:bounds.y+bounds.height*.5};
+  await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point]});
+  await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:point.x+35,y:point.y+25}]});
+  await session.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
+  await session.detach();
+  assert.equal(await lab.locator('[data-piece-list] button').count(),1);
+  assert.equal(await lab.locator('[data-piece-name]').inputValue(),'My drawing','cancel restores the previous selection');
+ }
+ await lab.locator('[data-add]').click();await canvas.press('Enter');
+ await lab.locator('[data-role]').selectOption('wing');
+ await lab.locator('[data-piece-name]').fill('Right wing');await lab.locator('[data-piece-name]').press('Tab');
+ await lab.locator('.dl-advanced summary').click();
+ for(const [field,value] of Object.entries({x:51,y:10,w:44,h:71})){
+  const input=lab.locator('[data-region="'+field+'"]');await input.fill(String(value));await input.press('Tab');
+ }
+ await lab.locator('.dl-advanced summary').click();await lab.locator('[data-mode="play"]').click();
+ const pause=lab.locator('[data-pause]');await pause.click();
+ const held=await canvas.evaluate(c=>c.toDataURL());
+ await page.waitForTimeout(120);assert.equal(await canvas.evaluate(c=>c.toDataURL()),held);
+ await pause.click();await page.waitForFunction(previous=>document.querySelector('.dl-canvas').toDataURL()!==previous,held);
+ assert.ok(await lab.evaluate(el=>el.scrollWidth<=el.clientWidth+1),'parts editor fits '+device);
+ if(device==='phone'){
+  await pause.click();
+  await canvas.scrollIntoViewIfNeeded();
+  await page.screenshot({path:'test-results/articulated-butterfly-phone.png'});
+ }
+ if(device==='tablet'){
+  await canvas.scrollIntoViewIfNeeded();
+  await canvas.screenshot({path:'test-results/articulated-butterfly-tablet.png'});
+  const recording=await canvas.evaluate(async c=>{
+   const stream=c.captureStream(24),recorder=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp8',videoBitsPerSecond:400000});
+   const chunks=[];recorder.ondataavailable=e=>chunks.push(e.data);
+   const done=new Promise(resolve=>recorder.onstop=resolve);recorder.start();
+   await new Promise(resolve=>setTimeout(resolve,1600));recorder.stop();await done;
+   stream.getTracks().forEach(t=>t.stop());
+   const blob=new Blob(chunks,{type:'video/webm'});
+   return new Promise(resolve=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result.split(',')[1]);reader.readAsDataURL(blob);});
+  });
+  fs.writeFileSync('test-results/articulated-butterfly.webm',Buffer.from(recording,'base64'));
+ }
+ await lab.locator('[data-save]').click();await page.waitForFunction(()=>document.querySelector('[data-draft-status]')?.textContent.includes('Version 1 saved'));
+ await lab.locator('[data-close]').click();await lab.waitFor({state:'detached'});
+ await page.locator('#artEditMovement').click();await lab.waitFor({state:'visible'});
+ assert.equal(await lab.locator('[data-piece-list] button').count(),2);
+ await lab.locator('[data-piece-list] button').last().click();assert.equal(await lab.locator('[data-role]').inputValue(),'wing');
+ await lab.locator('[data-close]').click();await lab.waitFor({state:'detached'});
+}
 (async()=>{
- const contract=await build({stdin:{contents:"export {createCarArtwork,drawCarBody,drawCarWheel} from './src/drawing/rally';",resolveDir:process.cwd()},bundle:true,write:false,format:'iife',globalName:'drawingContracts',platform:'browser'});
+ const contract=await build({stdin:{contents:"export {assemblyLayers} from './src/drawing/segmentation';export {createCarArtwork,drawCarBody,drawCarWheel} from './src/drawing/rally';",resolveDir:process.cwd()},bundle:true,write:false,format:'iife',globalName:'drawingContracts',platform:'browser'});
  const server=require('./browser-server.cjs').start();
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox']});
  fs.mkdirSync('test-results',{recursive:true});
@@ -46,6 +118,26 @@ const readArt=(page,store)=>page.evaluate(name=>new Promise((resolve,reject)=>{c
     assert.ok(pixels.tireEdgeWheel>0,'the wheel still owns its outer tire pixels');
     assert.equal(pixels.squareCornerBody,0,'rectangular wheel outlines remove the same complete selected region from the body');
     assert.ok(pixels.squareCornerWheel>0,'the rectangular wheel retains its selected corner pixels');
+    const cutout=await page.evaluate(()=>{
+     const source=document.createElement('canvas');source.width=source.height=100;
+     const ctx=source.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,100,100);
+     ctx.clearRect(40,30,40,20);ctx.fillStyle='rgba(180,60,30,.5)';ctx.fillRect(40,30,40,20);
+     const before=source.toDataURL();
+     const body={id:'body',region:{x:0,y:0,w:1,h:1,shape:'rect'},role:'body'};
+     const arm={id:'arm',region:{x:.4,y:.3,w:.4,h:.2,shape:'rect'},role:'limb',parentId:'body',
+       maskStrokes:[{action:'exclude',radius:.04,points:[{x:.5,y:.4}]}]};
+     const layers=drawingContracts.assemblyLayers(source,{pieces:[body,arm],cutoutMode:'selected-parts'});
+     const rgba=(layer,x,y)=>Array.from(layer.getContext('2d').getImageData(x,y,1,1).data);
+     return {same:before===source.toDataURL(),paper:rgba(layers.get('body'),10,10),moving:rgba(layers.get('arm'),20,10),
+      source:rgba(source,60,40),body:rgba(layers.get('body'),60,40),masked:rgba(layers.get('arm'),10,10),
+      returned:rgba(layers.get('body'),50,40)};
+    });
+    assert.ok(cutout.same);
+    assert.deepEqual(cutout.paper,[255,255,255,255],'selected-parts does not strip paper or pale artwork');
+    assert.deepEqual(cutout.moving,cutout.source,'moving part preserves its original translucent mark');
+    assert.equal(cutout.body[3],0,'no second arm is left behind');
+    assert.equal(cutout.masked[3],0);
+    assert.deepEqual(cutout.returned,cutout.source,'manual exclusion returns the original mark to the body');
     const aspect=await page.evaluate(()=>{
      const source=document.createElement('canvas');source.width=600;source.height=420;const c=source.getContext('2d');
      c.fillStyle='#53bfab';c.fillRect(60,63,480,168);c.fillStyle='#293958';
@@ -116,8 +208,14 @@ const readArt=(page,store)=>page.evaluate(name=>new Promise((resolve,reject)=>{c
    await shelf();
    await openCar();await page.evaluate(()=>{if(!FG.store.choose('player2'))throw Error('Missing fixture player');window.dispatchEvent(new Event('factory-profile'));});await lab.waitFor({state:'detached'});await page.waitForFunction(()=>document.querySelectorAll('#drawingList article').length===0);
    await page.locator('#studioProfileSummary').click();await page.locator('.profile-choice').first().click();await page.waitForFunction(()=>document.querySelectorAll('#drawingList article').length===2);
+   await tryArticulatedWings(page,server,touch);
    assert.deepEqual(sent,[],'drawing flow uses no image uploads or paid requests');assert.deepEqual(errors,[]);
    console.log('PASS drawing '+(touch?'tablet':'desktop')+': draft, drag-to-add, Undo/Redo, pixel masks, actual physics, immutable game binding, unavailable art, painting and profile isolation');await context.close();
   }
+  const phone=await browser.newContext({viewport:{width:390,height:844},hasTouch:true});
+  try{
+   await tryArticulatedWings(await phone.newPage(),server,true,'phone');
+   console.log('PASS drawing phone: touch cancellation, cutout correction, physics playback, pause, save and reopen');
+  }finally{await phone.close();}
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1});

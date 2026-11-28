@@ -2,6 +2,8 @@
 
 ## Ownership
 
+The [workspace standard](../learning/LEARNING_WORKSPACE_STANDARD.md) covers shared presentation, profile bands, model selection and the distinction between access and instructional help.
+
 The host owns learner records, grade eligibility, item selection, exact evaluation, evidence, persistence, question budget, and allowed presentation modes. Games own their ordinary mechanics and run outcome. A new game must integrate with the shared host; it must not implement a parallel learner score or remove math in response to a child prompt.
 
 ```mermaid
@@ -114,3 +116,13 @@ For a new game: choose a stable project key, pass version/session provenance, wi
 For a bespoke in-world mathematical action: submit the same `MathItem`/attempt through the shared engine, record the actual visual/choice representation, expose equivalent hints and supported continuation, and prevent the game's speed or motor-control result from being graded as mathematical knowledge. Use a new adapter rather than a second mastery model.
 
 The grade scope comes from the shared six-value profile table. Admission and response handling recheck the active ceiling, including stale saved items. Existing Grades 1–4 profiles keep their original learning progression.
+
+### Shared learning workspace
+
+The Math controller mounts the shared presentation in `src/learning/workspace/shell.ts`. The child's profile grade sets the presentation band, while the selected item keeps its own grade and assessment contract. The host supplies the optional exit action and trusted game ID. A local allowlist selects counter artwork. The Pal host supplies only an owned portrait for the active owner and form. Feedback and hints can change its expression.
+
+The number pad edits the ordinary answer field. Finishing uses the existing checked submission. Blank scratch paper supports touch, pen, mouse, keyboard, undo and redo within one open activity. Paper and number-pad interactions create no assessment or storage events. Interrupting or completing the activity disposes its controls.
+
+The host selects a manipulative by skill, givens, response kind and original representation. An answer model serializes the child's construction into the existing checker. An exploration model keeps the original question and answer controls. An authored visual checkpoint may offer its matching model. Symbolic checkpoints retain symbolic entry and can open a scaffold through the recorded hint pathway. Hints, wrong answers and worked examples still follow the attempt's existing evidence rules.
+
+The workspace includes editable frames, integer and fractional number lines, place-value exchanges, fraction bars and circles, arrays, coin groups, rulers, clocks, chart marks and shape/angle exploration. Switches between typing and building use the same attempt. Numeric model defaults require the child to make an edit or deliberately select zero before submitting. All six grades and deterministic generated responses are exercised by the learning suites.

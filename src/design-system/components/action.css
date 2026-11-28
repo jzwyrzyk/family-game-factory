@@ -1,0 +1,16 @@
+@import '../tokens.css';
+.jems-action {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--jems-space-2);
+  min-height: var(--jems-target-primary); min-width: var(--jems-target-primary);
+  max-width: 100%; padding: var(--jems-space-3) var(--jems-space-4);
+  border: 1px solid var(--jems-color-control-border); border-radius: var(--jems-radius-control);
+  background: var(--jems-color-surface); color: var(--jems-color-heading);
+  font: 800 var(--jems-child-label)/1.3 var(--jems-round); cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.jems-action[data-variant=primary] { background: var(--jems-color-action-primary); color: var(--jems-color-surface); border-color: var(--jems-color-action-primary); }
+.jems-action[data-variant=quiet] { background: transparent; border-color: transparent; color: var(--jems-color-action-back); }
+.jems-action:hover:not(:disabled) { box-shadow: var(--jems-shadow-card-hover); text-decoration: underline; }
+.jems-action:focus-visible { outline: var(--jems-focus-width) solid var(--jems-color-focus); outline-offset: var(--jems-focus-offset); }
+.jems-action:disabled { opacity: 1; background: var(--jems-color-disabled-surface); color: var(--jems-color-disabled-text); cursor: default; }
+.jems-action[aria-pressed=true] { border-color: var(--jems-color-selected-border); box-shadow: inset 0 0 0 2px var(--jems-color-selected-border); }

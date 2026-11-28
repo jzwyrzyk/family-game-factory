@@ -4,6 +4,8 @@ The review build packages the selected Jems source into one downloadable `jems-u
 
 The toolbar selects an experience, supported learning grade, effective iframe viewport, page/journey state and synthetic scenario. Fit display scales the live frame; the frame's CSS viewport still matches the selected dimensions and uses the product's responsive rules. Choose 100% to inspect physical text size, or hide the toolbar. Flag concerns after clicking an affected control, edit/delete findings, mark pages reviewed, and export Markdown or JSON. Findings use a separate browser-local key with an in-memory fallback. Export before closing if persistence is unavailable.
 
+The **Math workspace**, **English workspace**, and **Learning feedback and recovery** groups open deterministic curriculum samples through My Powers. The grade and game-context controls let reviewers compare presentations. Choose **Populated** to include an owned starter Pal. [Learning gallery walkthrough, screenshots and browser receipts](../evidence/learning-workspace/README.md)
+
 ## Regenerate
 
 From a clean checkout with Node 24+, Python 3 and Pillow:
@@ -41,7 +43,7 @@ Scenario scope is explicit: first-time/empty clear records, populated adds sampl
 
 `review:test` opens the HTML using `file://` in Chromium with no server. It checks route reachability, four live iframe viewport sizes, representative creation/build/play/learning, welcome, grades, adult profile, feedback downloads, toolbar visibility, broken images and unexpected network requests. It records overflow observations separately because the review must preserve product UI defects. Existing product tests are not replaced or reduced.
 
-A managed local browser can prohibit `file://` by administrator policy. `UI_REVIEW_INLINE_HARNESS=1 npm run review:test` is an explicit development fallback that fulfills one loopback navigation from memory (no server). That result is only DOM/interaction evidence, not proof that file navigation succeeded. GitHub Actions runs the actual `file://` check on stock Chromium and uploads the HTML, manifest and test evidence without deployment credentials.
+A managed local browser can prohibit `file://` by administrator policy. `UI_REVIEW_INLINE_HARNESS=1 npm run review:test` is an explicit development fallback that serves the single downloaded HTML file from a temporary loopback address. That result is only DOM/interaction evidence, not proof that file navigation succeeded. GitHub Actions runs the actual `file://` check on stock Chromium and uploads the HTML, manifest and test evidence without deployment credentials.
 
 The workflow is additive, read-only, and independent of production releases. It runs on relevant main changes and application/sandbox-tool PRs. Review findings never upload automatically. Real-device, Edge-specific, speech/audio, accessibility and owner acceptance remain separate evidence. The HTML's coverage dialog is the authoritative per-artifact list of known deviations.
 
@@ -62,3 +64,25 @@ The modernization candidate includes the consolidated My Journey sections, Make/
 Choose **My Journey** in the destination selector to inspect the three dashboard cards. Check **Empty** for starter selection and **Unlocked** for an equipped companion and earned gems. Follow each card into the corresponding live section, then return through My Journey.
 
 The Journey, Pals, rewards and Powers destinations render the shared production header and cards. Use the empty scenario to review the two starter choices. Compare the same application viewport on each page and use Shift+Tab from the announced heading to check the back action’s visible keyboard focus.
+
+The learning review CI download embeds exact artwork bytes. Its application journeys open the single downloaded file directly in the hosted browser. The gallery uses a loopback server that streams only that same file so a fresh browser context can exercise native zoom and fullscreen. The managed-browser option uses the same single-file server. The shell decodes original assets with native base64 decoding where available, with a byte-for-byte typed-array fallback.
+
+The offline Pal capture shares the full review’s single-file input helper. The hosted browser opens the downloaded file directly. When a managed browser needs the loopback option, the same file streams from the temporary local address and the capture checks each of its four viewports.
+
+For a smaller offline review of My Art, run `node tools/ui-review/build.mjs --drawing` and open `dist-review/jems-drawing-review.html`. It opens the production My Art workspace in a synthetic single-profile host and packages the exact drawing-page art, stamp images, icon sheet and fonts. Choose **Draw here**, keep a sketch, select **Keep drawing** and save a second version. This focused file retains its synthetic art library across reopening the same file in the same browser where local storage is available. Resetting demo data starts a new synthetic library. Other destinations belong in the full review file.
+
+The notebook flight review drives the original game with keyboard events and waits for processed simulation ticks. It checks the point awarded for the collectible, collision with the obstacle, the win and the kept notebook version. The full download decodes exact source assets using native base64 decoding where available and a byte-preserving fallback.
+
+In the mixed-grade family, the first learner uses the toolbar grade. The sibling uses Grade 4, or Grade 1 when the first learner uses Grade 4. Both profiles retain distinct, supported curriculum settings for the review.
+
+[Review the combined learning and creative journeys](../creative-universe/REHEARSAL.md)
+
+## Production design-system gallery
+
+Choose **Design system** under Page or journey state to inspect real production tokens, headers, cards, actions, icons and the collection template. Gallery links open the actual synthetic application journeys. `/tools/design-system/` on the existing Vite server supplies fast component iteration. `design:browser` joins the existing standalone test chain; it checks four viewport sizes, contrast, touch/focus/dialog behavior and a single-token change propagating to six actual page headers. [Guide and limits](../design-system/README.md).
+
+The exact-source build guard now includes `tools/ui-review` and `tools/design-system` alongside application source and assets, and rejects untracked files in those source paths. A locally edited gallery cannot be labelled with an unrelated clean commit SHA. Documentation/evidence outside those build inputs retains its own commit identity.
+
+The collection gallery shares the standalone file reader with the Learning and Creative checks. The managed-browser loopback mode streams the full original file without duplicating its payload in a browser automation message. Hosted acceptance opens the file directly.
+
+The gallery and drawing checks allow two minutes to open the full original-asset download. The notebook flight uses the toolbar’s full-size play view for its pointer start and arrow-key round. The separate gallery and learning checks cover fitted viewports and zoom.
