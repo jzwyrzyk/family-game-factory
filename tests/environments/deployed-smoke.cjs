@@ -122,6 +122,17 @@ async function geometry(page) {
   assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2), 'UAT_HORIZONTAL_OVERFLOW');
 }
 
+async function closeJourneyContext(context) {
+  try {
+    // Keep the browser offline while removing the authenticated route guard.
+    // Its in-flight API requests can finish against their already-checked origin.
+    await context.setOffline(true);
+    await context.unrouteAll({ behavior: 'wait' });
+  } finally {
+    await context.close();
+  }
+}
+
 async function journey(browser, config, device) {
   const context = await browser.newContext({ viewport: device.viewport, hasTouch: device.hasTouch });
   // Playwright 1.56's serviceWorkers:'block' init script reads this getter
@@ -234,10 +245,6 @@ async function journey(browser, config, device) {
     await page.locator('#page-studio-library').waitFor({ state: 'visible' });
     assert.equal(await page.locator('#studioWelcome').isVisible(), false);
     result.checks.push('synthetic local character preference survives one reload');
-    assert.equal(result.runtimeErrors, 0, 'UAT_RUNTIME_ERRORS');
-    assert.equal(result.failedResponses, 0, 'UAT_FAILED_RESOURCE_RESPONSES');
-    assert.equal(result.blockedRequests, 0, 'UAT_UNEXPECTED_NETWORK_REQUESTS');
-    result.status = 'passed';
   } catch (error) {
     result.status = 'failed';
     // Do not publish arbitrary page text, token-bearing URLs or response bodies.
@@ -245,7 +252,15 @@ async function journey(browser, config, device) {
       afterCheck: result.checks.at(-1) || 'initial navigation' };
     await capture('failure').catch(() => {});
   } finally {
-    await context.close();
+    await closeJourneyContext(context);
+  }
+  if (result.status === 'running') {
+    if (result.runtimeErrors || result.failedResponses || result.blockedRequests) {
+      result.status = 'failed';
+      result.failure = { type: 'runtime-or-network-error', afterCheck: result.checks.at(-1) };
+    } else {
+      result.status = 'passed';
+    }
   }
   return result;
 }
@@ -293,5 +308,5 @@ async function main() {
   if (report.status !== 'passed') process.exitCode = 1;
 }
 
-module.exports = { configuration, identity, requestAllowed, anonymousDenied, INCOMPLETE };
+module.exports = { configuration, identity, requestAllowed, anonymousDenied, closeJourneyContext, INCOMPLETE };
 if (require.main === module) main().catch(() => { console.error('UAT_CONFIGURATION_FAILED'); process.exitCode = 1; });

@@ -92,6 +92,10 @@ def plan(*, source: str, base: str, kind: str, repo: Path = Path.cwd(), api=None
         selected = selection.select(paths)
     except ValueError:
         raise BuildPlanError("INVALID_CHANGED_SOURCE_PATH") from None
+    if kind == "test" and "tests/environments/deployed-smoke.cjs" in paths:
+        # A successful deployment record precedes its browser acceptance. Run a
+        # changed live verifier on an exact main-source bundle through this lane.
+        selected.update(previewRequired=True, reason="TEST_BROWSER_VERIFIER_CHANGED")
     if kind == "dev" and not selected["previewRequired"] and pr_number is not None:
         # A cumulative docs-only diff can be the result of reverting an app
         # change already served by this PR's preview. Compare with that actual
