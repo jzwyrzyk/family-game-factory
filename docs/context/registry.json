@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-28T04:05:28.161Z",
-      "sourceDigest": "7f150f6689c4ff419b148cd5ae62a5e76f8a9afaaf2002d381bdb2313ba80cd8",
+      "reviewedAt": "2026-11-28T04:34:16.478Z",
+      "sourceDigest": "9538f7f8bdc224a31423788c5d2f7c0f0af5da4d8dbd532a2abd4c6c0ed10fef",
       "reviewOutcome": "updated",
-      "reviewReason": "Record protected activation, DEV service and authenticated plus anonymous browser receipts, pending owner sign-in and static TEST readback failure.",
+      "reviewReason": "Record protected #232, the live static TEST service and policy readback, the retained deployment and both incomplete browser attempts.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
