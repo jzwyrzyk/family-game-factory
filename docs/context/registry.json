@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-28T05:06:40.246Z",
-      "sourceDigest": "fe4c5232703ef801b6040ca0e1a017ec483a5272e25085bda9444f0bfac35e69",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The controller uses the existing repository writer and the two established TEST retention tags. The environment evidence record identifies the serving revision and pending browser gate.",
+      "reviewedAt": "2026-11-28T14:16:00Z",
+      "sourceDigest": "3551b2466eb5f2bce15f3c9f80ffdf1cf0af63dca72422eb5c5dd92f262c54d0",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed protected #225/#228–234 controller and recovery source, exact static config and current-target guard, directory and actual deployed-browser and failed deployment logs; updated architecture, environment contract, delivery ledger and dated static evidence. Inspected #223/#226/#235 draft dispositions, latest hosted Arcade/package/review results and exact private workflow pins. Preserved both parent review histories; the exact delivery fingerprint was printed by hosted documentation job 141005658480 (18 checker tests passed, only expected delivery digest stale). No runtime, owner/device, paid or integrated TEST acceptance inferred.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1398,6 +1398,13 @@
           "sourceDigest": "006ec0cc098f77a89afc1ebcc15b29aa131c0adce9bc3b06074089888e4625e8",
           "reviewOutcome": "updated",
           "reviewReason": "Reviewed exact #223 held application, #225 protected policy and #226 operational sources and contracts, actual Arcade and production observation jobs, private main, frozen candidate and operational overlay workflow pins, plus skipped November 27 environment deployment jobs. Preserved historical rehearsal and reported Terraform results separately from actual readback, no activation or approval inferred. Hosted documentation job 140536963581 printed this exact delivery source digest; unrelated area sources and review records are unchanged."
+        },
+        {
+          "sourceCommit": "4aec7aa67129ca074671c3cc9e1ae7e23f679fd0",
+          "reviewedAt": "2026-11-28T05:06:40.246Z",
+          "sourceDigest": "fe4c5232703ef801b6040ca0e1a017ec483a5272e25085bda9444f0bfac35e69",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "The controller uses the existing repository writer and the two established TEST retention tags. The environment evidence record identifies the serving revision and pending browser gate."
         }
       ]
     },
