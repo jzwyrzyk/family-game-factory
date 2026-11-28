@@ -142,6 +142,28 @@ class CloudTrustTests(unittest.TestCase):
         with self.assertRaisesRegex(cloud.EnvironmentError, 'RUNTIME_IDENTITY_DRIFT'):
             cloud.inspect(config(), fake, kind='test', pr=None, source_sha=SOURCE, bundle_sha256=BUNDLE, image=image())
 
+    def test_omitted_literal_value_is_empty_only_for_test_pr_marker(self):
+        for entry, valid in (({"name": "JEMS_PR_NUMBER"}, True),
+                             ({"name": "JEMS_PR_NUMBER", "value": None}, False),
+                             ({"name": "JEMS_PR_NUMBER", "value": "223"}, False),
+                             ({"name": "JEMS_PR_NUMBER", "valueFrom": {}}, False),
+                             ({"name": "JEMS_SOURCE_SHA"}, False)):
+            with self.subTest(entry=entry):
+                site = service(None, kind="test")
+                env = site["spec"]["template"]["spec"]["containers"][0]["env"]
+                env[-1] = entry
+                args = dict(kind="test", pr=None, source_sha=SOURCE, bundle_sha256=BUNDLE, image=image())
+                if valid:
+                    self.assertEqual(cloud.inspect(config(), FakeCloud([site]), **args)["service"], "jems-test")
+                else:
+                    with self.assertRaisesRegex(cloud.EnvironmentError, "RUNTIME_ENVIRONMENT_DRIFT"):
+                        cloud.inspect(config(), FakeCloud([site]), **args)
+        dev = service(223)
+        del dev["spec"]["template"]["spec"]["containers"][0]["env"][-1]["value"]
+        with self.assertRaisesRegex(cloud.EnvironmentError, "RUNTIME_ENVIRONMENT_DRIFT"):
+            cloud.inspect(config(), FakeCloud([dev]), kind="dev", pr=223,
+                          source_sha=SOURCE, bundle_sha256=BUNDLE, image=image())
+
     def test_disabled_template_can_plan_but_cannot_access_cloud(self):
         c = config()
         c.update(enabled=False, ownerIapMembers=[])

@@ -897,10 +897,10 @@
         "scripts/environments/ci_evidence.py"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-28T02:03:03.026Z",
-      "sourceDigest": "c901be841d784b56f8785aef37f2388f50db55ca0dc300ed1ec5790e73a20dfa",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The disabled site fixture continues to prove no credentials, network or deployment. The active public-record configuration has a separate schema and private-membership check. The required Arcade gates and validation methodology remain the same.",
+      "reviewedAt": "2026-11-28T03:55:30.298Z",
+      "sourceDigest": "44310a11ac32b062baefe006118b44c79c109da7e8a2763c7bdc60de1d0351b0",
+      "reviewOutcome": "updated",
+      "reviewReason": "Record Cloud Run v1 empty literal semantics and negative controls for service environment verification.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-28T02:03:03.548Z",
-      "sourceDigest": "83d345f282566eeaeddda571c8eb65ab2b8b17c1b38d0679c7ae55a93a43fd43",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The candidate supplies the previously documented public site identifiers and salted membership commitment. The existing DEV and static TEST deployment, private IAP, TTL and recovery procedures still apply. Service OAuth configuration and owner and service-account invocation are pending.",
+      "reviewedAt": "2026-11-28T03:55:30.847Z",
+      "sourceDigest": "19ebdd8da510a23a575a482bb8c48d235bbbb22c220974d3103a7c4f9520549c",
+      "reviewOutcome": "updated",
+      "reviewReason": "Record the verified protected source and the static TEST readback failure before service IAM and browser acceptance.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

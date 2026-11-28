@@ -31,15 +31,15 @@
     },
     "scripts/environments/cloud.py": {
       "installed": [
-        "eee4c7cda712fe31bcd0a4a1ff7bfd34331615f8"
+        "78425028126237f51644a14643f5f150f5218cd1"
       ],
-      "resolved": "eee4c7cda712fe31bcd0a4a1ff7bfd34331615f8"
+      "resolved": "78425028126237f51644a14643f5f150f5218cd1"
     },
     "tests/test_environment_cloud.py": {
       "installed": [
-        "9d2ca062855e4be1211b31bcf31b6ed5d9b5b01f"
+        "b0a71274c33753a9d1c232dff4f53bcfdcef9c75"
       ],
-      "resolved": "9d2ca062855e4be1211b31bcf31b6ed5d9b5b01f"
+      "resolved": "b0a71274c33753a9d1c232dff4f53bcfdcef9c75"
     },
     "docs/development/DEV-TEST-PROD.md": {
       "installed": [

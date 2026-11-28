@@ -32,3 +32,9 @@ Terraform 1.9.8 provider validation passed with locked Google/Google Beta 7.46.2
 no authenticated plan or apply ran. The actual fixed Docker image built and its
 server imported as a non-root user with networking disabled. These checks do
 not establish live federation, deployment, IAP, full TEST or production promotion.
+
+## Nonproduction site activation after #230
+
+The protected controller selected the static TEST bundle for main `653a7e56ae05e443af419465be82a13325d9ff9f`, authenticated from GitHub, and reached service inspection. The image, source label, runtime identity, scaling and IAP flag passed. Environment comparison stopped with `RUNTIME_ENVIRONMENT_DRIFT` before the final IAM and browser checks. The run did not capture the live environment entries. [Deployment job](https://github.com/jzwyrzyk/family-game-factory/actions/runs/46104696982/job/140854951803)
+
+Cloud Run v1 defaults an omitted literal environment value to the empty string. TEST sets an empty `JEMS_PR_NUMBER`. The readback accepts a name-only entry for that exact variable on TEST. DEV still requires its numeric PR, and both lanes require the complete expected set of literal entries. The fixture checks omitted values, nulls, other names, nonempty values and secret references. Service-level access and a real browser request still require live evidence. [Cloud Run EnvVar](https://cloud.google.com/run/docs/reference/rest/v1/Container#EnvVar)
