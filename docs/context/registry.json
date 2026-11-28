@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-28T05:08:45.381Z",
-      "sourceDigest": "9098417ae830cdd7776644ae57c4e05c0e107935023acfe4cffd4698703dfce6",
+      "reviewedAt": "2026-11-28T05:42:52.291Z",
+      "sourceDigest": "7cdd133c180fb51734a88de9943e08ad1d5018d0dbea6521ebc22eb496198ba5",
       "reviewOutcome": "updated",
-      "reviewReason": "Recorded the exact #233 protected deployment and verified private revision, the interruption before browser and directory publication, and the draft #234 tag update.",
+      "reviewReason": "Recorded the merged protected #234 source, retained rollback tags, private static TEST revision, first browser failure and authenticated browser-only acceptance. Integrated TEST UAT and actual adult access remain open.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
