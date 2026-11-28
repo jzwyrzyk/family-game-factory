@@ -125,6 +125,17 @@ class BuildPlanTests(unittest.TestCase):
         self.assertFalse(result["previewRequired"])
         self.assertEqual(result["baselineSha"], application)
 
+    def test_live_browser_verifier_change_requalifies_static_test(self):
+        fixture = self.commit("tests/environments/deployed-smoke.test.cjs", "fixture only")
+        verifier = self.commit("tests/environments/deployed-smoke.cjs", "live verifier")
+        with patch.object(build_plan.github, "inventory", return_value=self.inventory(self.initial)):
+            self.assertFalse(build_plan.plan(source=fixture, base=self.initial, kind="test",
+                                             repo=self.repo, api=object())["previewRequired"])
+            result = build_plan.plan(source=verifier, base=fixture, kind="test", repo=self.repo, api=object())
+        self.assertTrue(result["previewRequired"])
+        self.assertEqual(result["reason"], "TEST_BROWSER_VERIFIER_CHANGED")
+        self.assertFalse(build_plan.plan(source=verifier, base=fixture, kind="dev", repo=self.repo)["previewRequired"])
+
     def test_missing_failed_or_unavailable_baseline_always_builds_current_source(self):
         docs = self.commit("docs/example.md", "docs on unknown state")
         for inventory in (self.inventory(), self.inventory(self.initial, "failure"),
