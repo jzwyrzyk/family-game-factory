@@ -13,7 +13,10 @@ def env():
             'GITHUB_REPOSITORY_OWNER_ID':'356692244','GITHUB_REF':'refs/heads/main','GITHUB_REF_PROTECTED':'true',
             'GITHUB_EVENT_NAME':'workflow_dispatch','GITHUB_RUN_ATTEMPT':'1','GITHUB_WORKFLOW_REF':p.WORKFLOW,
             'GITHUB_WORKFLOW_SHA':'a'*40,'GITHUB_SHA':'a'*40,'DEV_PLAN_SOURCE':'a'*40,
-            'DEV_PLAN_ENVIRONMENT':'jems-dev-foundation-plan','GITHUB_RUN_ID':'1234','DEV_PROJECT_NUMBER':'1234567890123'}
+            'GITHUB_ACTOR':'fixture-dev-plan[bot]','GITHUB_ACTOR_ID':'900000001',
+            'GITHUB_TRIGGERING_ACTOR':'fixture-dev-plan[bot]',
+            'DEV_PLAN_DISPATCHER_LOGIN':'fixture-dev-plan[bot]','DEV_PLAN_DISPATCHER_ID':'900000001',
+            'DEV_PLAN_ENVIRONMENT':'jems-dev-foundation-plan','GITHUB_RUN_ID':'1234','DEV_PROJECT_NUMBER':'300049441641'}
 
 
 class PlanTests(unittest.TestCase):
@@ -22,7 +25,7 @@ class PlanTests(unittest.TestCase):
         for key,value in [('GITHUB_EVENT_NAME','pull_request'),('GITHUB_REF','refs/heads/feature'),
                           ('GITHUB_RUN_ATTEMPT','2'),('GITHUB_REF_PROTECTED','false'),
                           ('GITHUB_REPOSITORY_ID','123'),('GITHUB_WORKFLOW_SHA','b'*40),
-                          ('DEV_PROJECT_NUMBER','1092405124984'),('DEV_PROJECT_NUMBER','1054529152893'),
+                          ('DEV_PROJECT_NUMBER','1234567890123'),('DEV_PROJECT_NUMBER','1092405124984'),('DEV_PROJECT_NUMBER','1054529152893'),
                           ('DEV_PLAN_SOURCE','b'*40),('DEV_PLAN_ENVIRONMENT','jems-nonproduction'),
                           ('GITHUB_WORKFLOW_REF',p.WORKFLOW.replace('plan.yml','apply.yml'))]:
             with self.subTest(key=key), self.assertRaises(p.DevError): p.context({**env(),key:value})
@@ -39,8 +42,29 @@ class PlanTests(unittest.TestCase):
                 self.assertEqual(run.call_count,1)
                 self.assertEqual(run.call_args.args[0][0],'gh')
 
+    def test_unapproved_dispatchers_stop_before_github_or_cloud_access(self):
+        cases = [
+            {'DEV_PLAN_DISPATCHER_ID': ''}, {'DEV_PLAN_DISPATCHER_LOGIN': ''},
+            {'GITHUB_ACTOR': 'jzwyrzyk', 'GITHUB_ACTOR_ID': '356692244'},
+            {'GITHUB_ACTOR': 'other-app[bot]'}, {'GITHUB_ACTOR_ID': '900000002'},
+            {'GITHUB_TRIGGERING_ACTOR': 'jzwyrzyk'},
+            {'DEV_PLAN_DISPATCHER_ID': '356692244', 'GITHUB_ACTOR_ID': '356692244'},
+            {'DEV_PLAN_DISPATCHER_ID': '41898282', 'GITHUB_ACTOR_ID': '41898282'},
+            {'DEV_PLAN_DISPATCHER_LOGIN': 'github-actions[bot]',
+             'GITHUB_ACTOR': 'github-actions[bot]', 'GITHUB_TRIGGERING_ACTOR': 'github-actions[bot]'},
+            {'DEV_PLAN_DISPATCHER_LOGIN': 'jzwyrzyk'},
+            {'GITHUB_RUN_ATTEMPT': '2'},
+        ]
+        for changes in cases:
+            with self.subTest(changes=changes), patch.dict(os.environ,{**env(),**changes},clear=True), \
+                 patch.object(sys,'argv',['plan','--preflight']), patch.object(p,'command') as run, \
+                 patch.object(p,'credentials') as auth:
+                with self.assertRaises(p.DevError): p.main()
+                run.assert_not_called()
+                auth.assert_not_called()
+
     def test_inventory_adapter_rejects_mutating_commands(self):
-        cloud=p.ReadOnlyCloud(p.target('1234567890123'))
+        cloud=p.ReadOnlyCloud(p.target('300049441641'))
         for args in [('services','enable','run.googleapis.com'),('secrets','versions','access','1'),
                      ('projects','add-iam-policy-binding',p.PROJECT),('storage','cp','x','y'),
                      ('run','deploy','jems-dev-app'),('compute','instances','create','x')]:
@@ -58,7 +82,7 @@ class PlanTests(unittest.TestCase):
                 if args[:4]==('iam','service-accounts','keys','list'):return []
                 if args[:2]==('services','list'):return []
                 raise AssertionError('Unexpected inventory or mutation: '+str(args))
-        m=p.target('1234567890123');cloud=Fake(m)
+        m=p.target('300049441641');cloud=Fake(m)
         proposal=p.build_plan(m,'a'*40,'1234',cloud)
         self.assertEqual(len(proposal['pendingCommands']),1)
         self.assertEqual(proposal['stage'],'api-enablement')
@@ -68,7 +92,7 @@ class PlanTests(unittest.TestCase):
         self.assertEqual(len(cloud.calls),4)
 
     def test_private_storage_and_readback(self):
-        m=p.target('1234567890123');plan={'runId':'1234','operatorSource':'a'*40,'kind':'dev-foundation-proposal',
+        m=p.target('300049441641');plan={'runId':'1234','operatorSource':'a'*40,'kind':'dev-foundation-proposal',
          'stage':'foundation','pendingCommands':[['private-command','adult@example.invalid']], 'reviewBy':'later'}
         calls=[];raw=None
         def run(args):
@@ -90,25 +114,25 @@ class PlanTests(unittest.TestCase):
     def test_foreign_or_public_bucket_cannot_receive_plan(self):
         for extra in [{'project_number':'1092405124984'},{'public_access_prevention':'inherited'},
                       {'uniform_bucket_level_access':False},{'location':'EU'}]:
-            metadata={'project_number':'1234567890123','location':'US-EAST5',
+            metadata={'project_number':'300049441641','location':'US-EAST5',
                       'uniform_bucket_level_access':True,'public_access_prevention':'enforced',**extra}
             with patch.object(p,'command',return_value=json.dumps(metadata).encode()) as command:
-                with self.assertRaises(p.DevError):p.store_plan(p.target('1234567890123'),{}, {})
+                with self.assertRaises(p.DevError):p.store_plan(p.target('300049441641'),{}, {})
                 self.assertEqual(command.call_count,1)
 
     def test_upload_failure_does_not_replay(self):
-        metadata={'project_number':'1234567890123','location':'US-EAST5',
+        metadata={'project_number':'300049441641','location':'US-EAST5',
                   'uniform_bucket_level_access':True,'public_access_prevention':'enforced'}
         with patch.object(p,'command',side_effect=[json.dumps(metadata).encode(),p.DevError('uncertain')]) as command:
-            with self.assertRaises(p.DevError):p.store_plan(p.target('1234567890123'),{'runId':'1234'}, {})
+            with self.assertRaises(p.DevError):p.store_plan(p.target('300049441641'),{'runId':'1234'}, {})
             self.assertEqual(command.call_count,2)
 
     def test_credentials_reject_wrong_project_account_and_user_adc(self):
         with tempfile.TemporaryDirectory() as tmp:
             path=Path(tmp)/'gha-creds-abc123.json'
-            m=p.target('1234567890123');settings={**env(),'GITHUB_WORKSPACE':tmp,
+            m=p.target('300049441641');settings={**env(),'GITHUB_WORKSPACE':tmp,
                 'GOOGLE_APPLICATION_CREDENTIALS':str(path),'CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE':str(path)}
-            good={'type':'external_account','audience':'//iam.googleapis.com/projects/1234567890123/locations/global/workloadIdentityPools/jems-dev-operations/providers/github-dev-foundation-plan',
+            good={'type':'external_account','audience':'//iam.googleapis.com/projects/300049441641/locations/global/workloadIdentityPools/jems-dev-operations/providers/github-dev-foundation-plan',
                   'service_account_impersonation_url':'https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/'+p.ACCOUNT+':generateAccessToken',
                   'token_url':'https://sts.googleapis.com/v1/token','subject_token_type':'urn:ietf:params:oauth:token-type:jwt'}
             path.write_text(json.dumps(good))

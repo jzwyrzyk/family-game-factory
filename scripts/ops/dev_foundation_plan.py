@@ -23,6 +23,7 @@ from dev_contract import DevError, require
 REPOSITORY = 'jzwyrzyk/family-game-factory'
 WORKFLOW = REPOSITORY + '/.github/workflows/jems-dev-foundation-plan.yml@refs/heads/main'
 PROJECT = 'jems-jzw-dev'
+PROJECT_NUMBER = '300049441641'
 BUCKET = PROJECT + '-infrastructure-plans'
 ACCOUNT = 'jems-dev-infra-plan@' + PROJECT + '.iam.gserviceaccount.com'
 READ_PREFIXES = (
@@ -45,8 +46,7 @@ def digest(value):
 
 
 def target(number):
-    require(isinstance(number, str) and re.fullmatch('[1-9][0-9]{5,15}', number)
-            and number not in {'1054529152893', '1092405124984'}, 'ACTUAL_SEPARATE_DEV_PROJECT_NUMBER_REQUIRED')
+    require(number == PROJECT_NUMBER, 'ACTUAL_SEPARATE_DEV_PROJECT_NUMBER_REQUIRED')
     return {'projectId': PROJECT, 'projectNumber': number, 'region': 'us-east5'}
 
 
@@ -59,6 +59,18 @@ def context(env):
             and env.get('GITHUB_RUN_ATTEMPT') == '1'
             and env.get('GITHUB_WORKFLOW_REF') == WORKFLOW
             and env.get('DEV_PLAN_ENVIRONMENT') == 'jems-dev-foundation-plan', 'PROTECTED_DEV_PLAN_WORKFLOW_REQUIRED')
+    # Installation-token dispatch and human environment approval are distinct.
+    # Missing/unallocated identity pins never fall back to the owner or GITHUB_TOKEN.
+    actor = env.get('DEV_PLAN_DISPATCHER_LOGIN', '')
+    actor_id = env.get('DEV_PLAN_DISPATCHER_ID', '')
+    require(isinstance(actor, str) and re.fullmatch(r'[a-z0-9][a-z0-9-]*\[bot\]', actor)
+            and isinstance(actor_id, str) and re.fullmatch(r'[1-9][0-9]*', actor_id)
+            and actor_id not in {'356692244', '41898282'}
+            and actor != 'github-actions[bot]'
+            and env.get('GITHUB_ACTOR') == actor
+            and env.get('GITHUB_ACTOR_ID') == actor_id
+            and env.get('GITHUB_TRIGGERING_ACTOR') == actor,
+            'PINNED_DEV_DISPATCHER_REQUIRED')
     sha = env.get('GITHUB_SHA', '')
     require(re.fullmatch('[a-f0-9]{40}', sha) and env.get('DEV_PLAN_SOURCE') == sha
             and env.get('GITHUB_WORKFLOW_SHA') == sha, 'EXACT_PROTECTED_OPERATOR_SOURCE_REQUIRED')

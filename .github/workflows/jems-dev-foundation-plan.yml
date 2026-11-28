@@ -25,6 +25,8 @@ jobs:
       DEV_PLAN_SOURCE: ${{ inputs.source }}
       DEV_PLAN_ENVIRONMENT: jems-dev-foundation-plan
       DEV_PROJECT_NUMBER: ${{ vars.DEV_PROJECT_NUMBER }}
+      DEV_PLAN_DISPATCHER_ID: ${{ vars.DEV_PLAN_DISPATCHER_ID }}
+      DEV_PLAN_DISPATCHER_LOGIN: ${{ vars.DEV_PLAN_DISPATCHER_LOGIN }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
