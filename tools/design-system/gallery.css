@@ -1,0 +1,20 @@
+@import '../../src/design-system/tokens.css';
+.ds-gallery { display:grid; gap:var(--jems-space-6); padding-bottom:var(--jems-space-8); font:var(--jems-child-label)/1.5 var(--jems-body); color:var(--jems-color-text); }
+.ds-gallery *, .ds-dialog { box-sizing:border-box; }
+.ds-section { min-width:0; padding:var(--jems-space-5); background:var(--jems-color-surface); border:1px solid var(--jems-color-border); border-radius:var(--jems-radius-card); }
+.ds-gallery h2 { font:900 28px/1.2 var(--jems-round); color:var(--jems-color-heading); margin-top:0; }
+.ds-gallery h3 { font:800 22px/1.2 var(--jems-round); }
+.ds-gallery p { max-width:var(--jems-reading-width); }
+.ds-index,.ds-row,.ds-spacing { display:flex; flex-wrap:wrap; gap:var(--jems-space-3); }
+.ds-index a { display:inline-flex; align-items:center; min-height:var(--jems-target-primary); color:var(--jems-color-action-back); }
+.ds-index a:focus-visible { outline:3px solid var(--jems-color-focus); outline-offset:3px; }
+.ds-swatches,.ds-archetypes,.ds-icons { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:var(--jems-space-4); }
+.ds-swatch { display:grid; gap:var(--jems-space-2); min-width:0; }
+.ds-swatch>span { height:64px; border:1px solid var(--jems-color-control-border); border-radius:var(--jems-radius-small); }
+.ds-swatch code { overflow-wrap:anywhere; font-size:var(--jems-child-label); }
+.ds-spacing { align-items:center; margin-block:var(--jems-space-6); }
+.ds-spacing span { border:1px solid var(--jems-color-border); background:var(--jems-color-selected-surface); }
+.ds-gallery summary { min-height:var(--jems-target-primary); padding:var(--jems-space-3); cursor:pointer; }
+.ds-icons span { display:flex; align-items:center; gap:var(--jems-space-2); padding:var(--jems-space-2); }
+.ds-dialog { max-width: min(600px,calc(100% - 32px)); padding:var(--jems-space-6); border:1px solid var(--jems-color-border); border-radius:var(--jems-radius-card); background:var(--jems-color-surface); color:var(--jems-color-text); font:var(--jems-child-label)/1.5 var(--jems-body); }
+.ds-dialog::backdrop { background:var(--jems-color-heading); opacity:.5; }

@@ -13,7 +13,7 @@ import { validateQualityEvidence } from '../server/quality/game-quality';
 import { draftChildIntentContract } from '../server/quality/child-intent';
 import { chooseGameForm } from '../server/quality/game-form';
 import { createFunctionalGameContract } from '../server/quality/functional-game-contract';
-import { createStarterProject,validateGeneratedCreationManifest } from '../src/creation/projects';
+import { createStarterProject,validateEditableProject,validateGeneratedCreationManifest,validateSavedCreationManifest } from '../src/creation/projects';
 import { DockerArtifactGate } from '../server/sandbox/docker-gate';
 import { MemoryRepository } from '../server/pipeline/repository';
 import { JobService } from '../server/pipeline/service';
@@ -46,6 +46,28 @@ test('generated companion is optional, data-only, asset-bound and always attribu
   assert.throws(()=>validateGenerated({...hopper,creationManifest:{...scene,source:'not allowed'}}),/Unknown field/);
   assert.throws(()=>validateGenerated({...hopper,creationManifest:{...scene,actors:[{...scene.actors[0],assetId:'unreviewed-asset'}]}}));
   assert.throws(()=>validateGenerated({...hopper,creationManifest:{...scene,actors:[{...scene.actors[0],url:'https://example.invalid/image.png'}]}}),/Unknown field/);
+});
+
+test('local creative roles preserve private draft aliases and historical public readers', () => {
+  for (const [alias, role] of Object.entries({character:'character', scenery:'environment', decoration:'decoration', collectible:'collectible', obstacle:'obstacle'})) {
+    const original = createStarterProject('blank');
+    const withRole = (field: 'role' | 'creativeRole', value: string) => ({
+      ...original, actors: original.actors.map(actor => ({...actor, [field]:value})),
+    });
+    const draft = withRole('creativeRole', alias);
+    const migrated = validateEditableProject(draft);
+    assert.equal(migrated.actors[0].role, role);
+    assert.equal('creativeRole' in migrated.actors[0], false);
+    assert.equal('role' in draft.actors[0], false);
+    assert.deepEqual(migrated.programs, original.programs);
+    assert.throws(() => validateGeneratedCreationManifest(draft), /Unknown field/);
+    assert.throws(() => validateSavedCreationManifest(draft), /Unknown field/);
+    const canonical = withRole('role', role);
+    assert.equal(validateSavedCreationManifest(canonical).actors[0].role, role);
+    assert.throws(() => validateGeneratedCreationManifest(canonical), /roles/);
+    assert.throws(() => validateEditableProject({...draft, actors:[{...draft.actors[0],role:'player'}]}), /conflicting roles/);
+    assert.deepEqual(validateEditableProject({...draft, actors:[{...draft.actors[0],role}]}).actors, migrated.actors);
+  }
 });
 
 test('v2 candidates validate companion, raster assets, production plan and ordinary playthrough together',()=>{

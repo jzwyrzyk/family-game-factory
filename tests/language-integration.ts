@@ -1,3 +1,5 @@
+import {assertQuestionEntry} from './learning-entry-viewport.cjs';
+import {answerLanguageChoice} from './language-choice-fixture.cjs';
 import {authorizeLearningParent} from './learning-parent-fixture.cjs';
 /** Production Family Game Factory ELA journeys; only audited local games and fixtures. */
 import assert from 'node:assert/strict';
@@ -16,14 +18,7 @@ const errorsFor=(page:Page)=>{const errors:string[]=[];page.on('pageerror',error
 async function answer(page:Page){
   const question=await page.evaluate(()=>window.FG.learning.activeItem);
   if(question.kind==='choice'){
-    // Text-substring matching can choose the WRONG tile when options share
-    // words (for example "run" versus "running"). The reviewed question's
-    // answer is a choice VALUE, not a fuzzy human-visible caption.
-    const choices=active(page).locator('.language-choice');
-    const values=await choices.evaluateAll(nodes=>nodes.map(node=>(node as HTMLElement).dataset.value||''));
-    const index=values.indexOf(String(question.answer));
-    assert.ok(index>=0,'reviewed English item must contain an exact matching answer value');
-    await choices.nth(index).click();
+    await answerLanguageChoice(active(page), question.answer);
     await page.waitForFunction(()=>!window.FG.learning.active,null,{timeout:8000});
     return;
   }
@@ -69,6 +64,7 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     assert.equal(await page.evaluate(()=>window.FG.learning.subject),'language');
     await page.getByRole('button',{name:'My Powers',exact:true}).click();
     await active(page).waitFor({state:'visible'});
+    await assertQuestionEntry(active(page));
     const item=await page.evaluate(()=>window.FG.learning.activeItem);
     assert.equal(item.source,'reviewed-local');
     assert.equal(item.grade<=2,true);
@@ -106,7 +102,9 @@ async function subjectAndNative(browser:Browser,base:string,device:typeof device
     assert.ok(geometry.questWidth>=Math.min(330,viewport.width-30),'child has usable reading width on mobile');
     assert.ok(geometry.questLeft>=0&&geometry.questRight<=viewport.width+1);
     assert.ok(!/rgb\(213, 222, 243\)|rgb\(255, 255, 255\)/.test(geometry.text),'the question must not inherit pale text from a dark result card');
-    assert.equal(await page.locator('[data-action="leave-game"]').isVisible(),true,'the child can leave without solving or cheating');
+    const exit = page.locator('#stage-overlay .language-activity [data-action="leave-game"]');
+    assert.equal(await exit.isVisible(),true,'the active native checkpoint shows its exit');
+    assert.equal(await exit.isEnabled(),true,'the child can leave without solving or cheating');
     assert.equal(await game.evaluate(el=>(el as HTMLElement).inert),true);
     await page.keyboard.press('ArrowLeft');
     assert.equal(await page.evaluate(()=>window.FG.runtime.snapshot().state.parts[0].x),before,'paused game cannot change while reading');

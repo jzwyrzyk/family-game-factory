@@ -6,7 +6,7 @@ const {build}=require('esbuild'),{chromium,webkit}=require('playwright');
  const server=http.createServer((req,res)=>{res.setHeader('Content-Type',req.url==='/test.js'?'text/javascript':'text/html');res.end(req.url==='/test.js'?bundle.outputFiles[0].text:'<!doctype html><body><script src="/test.js"></script></body>');}).listen(0,'127.0.0.1');await new Promise(resolve=>server.listening?resolve():server.once('listening',resolve));
  let browser;try{
   const engine=process.env.STORAGE_BROWSER==='webkit'?webkit:chromium;browser=await engine.launch({...(engine===chromium?{executablePath:process.env.CHROMIUM_PATH,args:['--no-sandbox']}:{}),headless:true});const context=await browser.newContext(),page=await context.newPage();await page.goto(`http://127.0.0.1:${server.address().port}`);
-  const result=await page.evaluate(async()=>{
+  const result=await page.evaluate(async png=>{
    const checks=[];const expect=async(fn,message)=>{let failure=false;try{await fn();}catch{failure=true;}if(!failure)throw Error(message);};
    const scope={family:'synthetic-domain',profile:'player1'},records=await domainTest.IndexedRecords.open(scope,()=>{});
    const operation=(id,version)=>({id,scope,changes:[{collection:'draft',id:'one',expectedVersion:version,value:{text:id}}]});
@@ -57,12 +57,21 @@ const {build}=require('esbuild'),{chromium,webkit}=require('playwright');
    const broken=structuredClone(full);broken.revisions.find(r=>r.id===newest).parentId=newest;await expect(()=>destination.restoreSnapshot(broken,'cyclic-large-restore'),'large malformed ancestry accepted');
    if((await destination.project(games[0].id)).headId!==newest)throw Error('rejected large restore changed live pointer');large.close();destination.close();checks.push('owner-scoped atomic recovery beyond legacy game, revision and play limits');
    // Real original records remain byte-for-byte inline; page only lightweight cards.
-   await domainTest.withArtTransaction(['drawings'],'readwrite',tx=>{for(let i=0;i<30;i++){const item={id:'art-'+String(i).padStart(3,'0'),owner:'player1',name:'Original '+i,mime:'image/png',bytes:new ArrayBuffer(4096),preview:new ArrayBuffer(24),sha256:'a'.repeat(64),createdAt:new Date(1700000000000+i).toISOString()};tx.objectStore('drawings').put(item);domainTest.saveDrawingMetadata(tx,item);}const other={id:'other-art',owner:'player2',name:'Private other',mime:'image/png',bytes:new ArrayBuffer(4096),sha256:'b'.repeat(64),createdAt:new Date().toISOString()};tx.objectStore('drawings').put(other);domainTest.saveDrawingMetadata(tx,other);});
+   const bytes=Uint8Array.from(atob(png), char => char.charCodeAt(0));
+   const verified=await domainTest.prepareDrawing('player1','Storage sample',new Blob([bytes],{type:'image/png'}));
+   await domainTest.withArtTransaction(['drawings'],'readwrite',tx=>{
+    for(let i=0;i<30;i++){
+     const item={...verified,id:'art-'+String(i).padStart(3,'0'),name:'Original '+i,createdAt:new Date(1700000000000+i).toISOString()};
+     tx.objectStore('drawings').put(item);domainTest.saveDrawingMetadata(tx,item);
+    }
+    const other={...verified,id:'other-art',owner:'player2',name:'Private other'};
+    tx.objectStore('drawings').put(other);domainTest.saveDrawingMetadata(tx,other);
+   });
    const a=await domainTest.drawingPage('player1',{limit:24}),b=await domainTest.drawingPage('player1',{limit:24,after:a.next});if(a.items.length!==24||b.items.length!==6||a.total!==30||a.items.some(i=>'bytes'in i))throw Error('art catalog hydrated originals or leaked owner');
-   const original=await domainTest.drawing('player1',a.items[0].id);if(original.bytes.byteLength!==4096)throw Error('original missing');await expect(()=>domainTest.drawing('player2',original.id),'cross-profile original read');
+   const original=await domainTest.drawing('player1',a.items[0].id);const retained=new Uint8Array(original.bytes);if(retained.length!==4096||!bytes.every((byte,index)=>retained[index]===byte))throw Error('original missing or changed');await expect(()=>domainTest.drawing('player2',original.id),'cross-profile original read');
    await domainTest.updateDrawing('player1',original.id,{name:'Changed details'});if((await domainTest.drawingPage('player1',{search:'Changed details'})).items.length!==1)throw Error('catalog update missing');checks.push('24-card artwork paging and exact scoped original retrieval');
    return checks;
-  });
+  },require('node:fs').readFileSync(require.resolve('./fixtures/storage-original-4k.png'),'base64'));
   assert.equal(result.length,4);console.log(JSON.stringify({browser:process.env.STORAGE_BROWSER??'chromium',checks:result}));await context.close();
  }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});

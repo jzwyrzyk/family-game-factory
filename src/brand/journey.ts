@@ -1,4 +1,4 @@
-import { createPageHeader } from './page-header';
+import { createCollectionHeader as createPageHeader } from '../design-system/templates/collection';
 import {createIcon,setIconLabel} from './icons';
 import {createMakerIdentity, MAKER_ARTWORK, setMakerSprite, type MakerAtlas, type MakerCharacter} from './maker-identity';
 

@@ -1,0 +1,316 @@
+{
+  "main": "bc602f1ede502f398308ad56f973c4bf7997ff08",
+  "observed": "2026-11-25 America/New_York",
+  "selected": {
+    "learning": 218,
+    "creative": 220,
+    "engineering": 219
+  },
+  "inventory": [
+    {
+      "pr": 220,
+      "title": "Connected Creative Universe integration and fidelity qualification",
+      "head": "integration/jems-connected-creative-20261126",
+      "sha": "e61faded4b15ed9b6cc1eac9a40fd8e8b5bc677f",
+      "base": "main",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 219,
+      "title": "Phase 2: shorten Jems validation and development handoff",
+      "head": "ci/phase2-velocity",
+      "sha": "d8c8cd31309f98ce0bec39331d2fed93a5f2b231",
+      "base": "main",
+      "state": "open",
+      "draft": false,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 218,
+      "title": "Integration A \u00b7 Unified Learning Workspace and game continuity",
+      "head": "integration/jems-unified-learning-20261126",
+      "sha": "22e8424ceb1146670aa3b5913aa1f98169a5a4f6",
+      "base": "main",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 217,
+      "title": "Creative Studio \u00b7 Build, keep and reuse personalized 2D worlds",
+      "head": "feat/customizable-scene-worlds",
+      "sha": "aea3cead13d164b7ce93fbded5fee6ecd9896eca",
+      "base": "feature/creative-studio-worlds",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 216,
+      "title": "Workstream E: pin original artwork to playable 2D game tests",
+      "head": "feat/workstream-e-pinned-game-art",
+      "sha": "1ac8f5b55caaec57dbd9fe637a46e6b8c8aaea0a",
+      "base": "feat/connected-creative-universe",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 215,
+      "title": "Reuse a child\u2019s pinned artwork across My Art, movement, worlds and local 2D games",
+      "head": "feat/creative-universe-picker",
+      "sha": "ca76b5b151d4de61a5da0d66f64093530fdc1f78",
+      "base": "integration/creative-universe-dependencies",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 214,
+      "title": "Workstream B \u00b7 Four illustrated worlds in Creative Studio",
+      "head": "feature/creative-worlds-on-207",
+      "sha": "c88fd2800010a9600c66a0fdf42297403ad9c85b",
+      "base": "integration/creative-art-inputs",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 213,
+      "title": "Build the Jems Drawing Workspace and connect retained artwork across 2D activities",
+      "head": "feat/connected-creative-universe",
+      "sha": "c4214a037088d589557edb401b1fbf6ae29cf108",
+      "base": "feat/qualified-local-game-art",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 212,
+      "title": "Qualify a child-selected sprite in the localhost 2D Gem Hunt game",
+      "head": "feature/creative-game-host-review",
+      "sha": "f8d49082e528e449792cfc15adbe6a5e1990f524",
+      "base": "feature/draw-to-animation",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 211,
+      "title": "Creative Universe 3 \u00b7 Render illustrated worlds and animate original artwork in 2D",
+      "head": "feature/creative-studio-worlds",
+      "sha": "e4ea7063af5cf109d616bba3e4fe6aa7243ed205",
+      "base": "feature/creative-asset-library",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 210,
+      "title": "Make original artwork move, save its design and reuse it in illustrated worlds",
+      "head": "feature/draw-to-animation",
+      "sha": "b9843081251ef61abfa52541e8e868688dae5007",
+      "base": "integration/creative-art-inputs",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 209,
+      "title": "Reconcile creative library prerequisites and original world artwork",
+      "head": "integration/creative-universe-dependencies",
+      "sha": "e370770e3ad757bc13308c0f19b36e8c98832d80",
+      "base": "main",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 208,
+      "title": "Creative Universe 2 \u00b7 Keep editable drawings and reuse pinned private assets",
+      "head": "feature/creative-asset-library",
+      "sha": "0e58853773ee6873db9384048f4bcaa36047711b",
+      "base": "feature/creative-world-art-v1",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 207,
+      "title": "Integrate editable drawing revisions, coded paths, reviewed PNGs and four illustrated worlds",
+      "head": "integration/creative-art-inputs",
+      "sha": "16c4132d92e8c9d21ae20b604238656184e42fa7",
+      "base": "feature/creative-asset-standard",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 206,
+      "title": "Qualify scoped drawing slots in isolated 2D game playback",
+      "head": "feat/qualified-local-game-art",
+      "sha": "897ac9301b0424ea163dceb22fcd0903eb3f1779",
+      "base": "feature/creative-asset-standard",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 205,
+      "title": "Workstream F: verify private artwork across retained worlds before editor integration",
+      "head": "feat/world-composition-compatibility",
+      "sha": "ac5bc7942e40057013f316440574122ad95a8c48",
+      "base": "feature/creative-asset-standard",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 204,
+      "title": "Validate reviewed PNG scanlines before preserving exact originals",
+      "head": "fix/creative-reviewed-png-validation",
+      "sha": "ba220630d229ad5cf46ceca3dcb8fc3afc3a2223",
+      "base": "feature/creative-asset-standard",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 203,
+      "title": "Reuse My Art pointer input on transient learning paper",
+      "head": "feat/learning-paper-shared-input",
+      "sha": "33d608602e584ad532aa0a15eb6709f3a70302d4",
+      "base": "feat/learning-workspace-review",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 202,
+      "title": "Qualify a pinned private sprite slot with the offline 2D sandbox",
+      "head": "test/creative-slot-qualification",
+      "sha": "80fab162842b2cc99bb9e0dfdae5e7ed17ab2b10",
+      "base": "docs/creative-universe-contract",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 201,
+      "title": "Draw and reuse movement paths for private artwork in Creative Studio",
+      "head": "feat/creative-motion-path",
+      "sha": "114e03b44253f85a715fe6f0d84e868c8b573f55",
+      "base": "feat/creative-drawing-source",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 200,
+      "title": "Creative Universe 1 \u00b7 Preserve authentic child art and illustrate four Jems worlds",
+      "head": "feature/creative-world-art-v1",
+      "sha": "19189bf436369bd6deca26b9fa6fd635b04c1317",
+      "base": "docs/creative-universe-contract",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 199,
+      "title": "Creative Universe A: keep editable original drawings and revision history",
+      "head": "feat/creative-drawing-source",
+      "sha": "5a0970e487d8630eeafd8f8792b092c17936c425",
+      "base": "docs/creative-universe-contract",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 198,
+      "title": "Set the creative asset and world standard and preserve exact reviewed originals",
+      "head": "feature/creative-asset-standard",
+      "sha": "81767273becb93bd9bae9a46725b26af644e4578",
+      "base": "main",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 197,
+      "title": "Establish the Jems Creative Asset and World Design Standard",
+      "head": "docs/creative-asset-world-standard",
+      "sha": "637914ba850d42cb64ee7a45e071b88573c80716",
+      "base": "main",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 196,
+      "title": "Adopt authentic artwork and shared creative-world contracts",
+      "head": "docs/creative-universe-contract",
+      "sha": "6c38b2507abf355bfe351d51a375165ec0c54ca3",
+      "base": "main",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 195,
+      "title": "Learning workspace 4: game continuity, owner gallery and acceptance evidence",
+      "head": "feat/learning-workspace-review",
+      "sha": "04341b0d529dbc3eec88de4d06d679e03168203b",
+      "base": "feat/learning-workspace-english",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 194,
+      "title": "Learning workspace 3: literacy construction, passage evidence and listening",
+      "head": "feat/learning-workspace-english",
+      "sha": "6262e95ac9e5f033e5c9de621b319334da133940",
+      "base": "feat/learning-workspace-math",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 193,
+      "title": "Learning workspace 2: interactive Math models and assessment contracts",
+      "head": "feat/learning-workspace-math",
+      "sha": "22ddfcadeb944e06b8d4d5cb12b1caa3a1c0438c",
+      "base": "feat/learning-workspace-foundation",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 192,
+      "title": "Learning workspace 1: shared surface, working tools and owned companions",
+      "head": "feat/learning-workspace-foundation",
+      "sha": "a42cd2ac5cbc9b20cfb4b0aa83f680457414a56f",
+      "base": "main",
+      "state": "open",
+      "draft": true,
+      "account": "jzwyrzyk"
+    },
+    {
+      "pr": 188,
+      "title": "Unify the child experience, Creative Studio journeys and saved-concept Build",
+      "sha": "f813052c20d03f2872c32204f6820b91c970a578",
+      "merged": true,
+      "merge": "7059b8cdee6aae088f1fba0d8011e64f2b511ae6"
+    },
+    {
+      "pr": 190,
+      "title": "Standardize Journey cards and secondary headers, and migrate retired Pals",
+      "sha": "d5c2cfaff8e3941667fdc6d4d5426c341ab009ad",
+      "merged": true,
+      "merge": "7059b8cdee6aae088f1fba0d8011e64f2b511ae6"
+    }
+  ],
+  "selectedCreativeRecheck": "48e9ae9d0f1b2b5d5224ed95fb7bd3bb695b960b"
+}

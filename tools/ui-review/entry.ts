@@ -1,4 +1,11 @@
+import {seedCreativeFixtures} from './creative-fixtures';
+import {creativeDestination,seedCreativeReview} from './creative-fixture';
+
+import {mountDesignSystemGallery} from '../design-system/gallery';
 import '../../src/style.css';
+import {openLearningSample} from './learning';
+
+import {parseGradeOption} from '../../src/learning/grades';
 import {parentDashboardFixture} from '../../tests/parent-dashboard-fixture';
 import {StudioNotebook} from '../../src/studio/notebook';
 import {CREATION_KEY} from '../../src/creation/storage';
@@ -11,10 +18,19 @@ import {PAL_CATALOG} from '../../src/pals/catalog';
 import {palSnapshotFromRewards} from '../../src/pals/service';
 import {PROBLEM_SOLVING_KEY} from '../../src/problem-solving/model';
 const w=window as any,config=w.__reviewConfig;
+w.__openLearningSample=openLearningSample;
 const fixture=parentDashboardFixture(Date.now());
 const empty=['first-time','empty'].includes(config.scenario);
 if(!localStorage.getItem('family-game-factory-state-v1')){
- for(const p of fixture.state.profiles as any[]){p.name=p.id==='player1'?'Demo Explorer':'Demo Sibling';p.grade=Number(config.grade);p.learningSetupComplete=config.scenario!=='first-time';p.allowSubjectSwitch=true;if(empty){delete p.learning;delete p.language;p.skills={};p.stats={};}}
+ const grade=parseGradeOption(String(config.grade));
+ const siblingGrade=grade===4?1:4;
+ for(const p of fixture.state.profiles as any[]){
+  p.name=p.id==='player1'?'Demo Explorer':'Demo Sibling';
+  p.grade=config.scenario==='mixed-grades' && p.id==='player2'?siblingGrade:grade;
+  p.learningSetupComplete=config.scenario!=='first-time';
+  p.allowSubjectSwitch=true;
+  if(empty){delete p.learning;delete p.language;p.skills={};p.stats={};}
+ }
  localStorage.setItem('family-game-factory-state-v1',JSON.stringify(fixture.state));
  if(!empty){localStorage.setItem(CREATION_KEY,JSON.stringify(fixture.creation));localStorage.setItem(PROBLEM_SOLVING_KEY,JSON.stringify(fixture.problemSolving));}
  const book=new StudioNotebook(localStorage);
@@ -36,7 +52,11 @@ async function boot(){
   await rewards.project('player1',facts);
   await pals.sync('player1',palSnapshotFromRewards(await rewards.export(),'player1'));
  }
+ if(['populated','unlocked'].includes(config.scenario))await seedCreativeFixtures();
+ if(['creative-library','mixed-grades'].includes(config.scenario))await seedCreativeReview('player1');
+ w.__reviewCreative=creativeDestination;
  await import('../../src/main');
+ w.__reviewDesignSystem=()=>{ for(const page of document.querySelectorAll('.page'))page.classList.add('hidden'); const gallery=mountDesignSystemGallery(document.querySelector('main')!,route=>w.__reviewNavigate(route)); gallery.page.classList.remove('hidden'); gallery.page.querySelector<HTMLElement>('.jems-page-title')?.focus(); };
  const timer=setInterval(()=>{if(w.FG?.studio&&w.FG?.creation){clearInterval(timer);parent.postMessage({type:'review-ready'},'*');}},40);
 }
 void boot();

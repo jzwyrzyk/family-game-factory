@@ -2,9 +2,9 @@ name: Standalone UI review
 on:
   push:
     branches: [main]
-    paths: ['src/**', 'public/**', 'index.html', 'tools/ui-review/**', 'tests/parent-dashboard-fixture.ts', 'package*.json', '.github/workflows/ui-review.yml']
+    paths: ['src/**', 'public/**', 'index.html', 'tools/ui-review/**', 'tools/design-system/**', 'tests/parent-dashboard-fixture.ts', 'package*.json', '.github/workflows/ui-review.yml']
   pull_request:
-    paths: ['src/**', 'public/**', 'index.html', 'tools/ui-review/**', 'docs/ui-review/**', 'tests/parent-dashboard-fixture.ts', 'package*.json', '.github/workflows/ui-review.yml']
+    paths: ['src/**', 'public/**', 'index.html', 'tools/ui-review/**', 'tools/design-system/**', 'docs/ui-review/**', 'tests/parent-dashboard-fixture.ts', 'package*.json', '.github/workflows/ui-review.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,7 +14,7 @@ concurrency:
 jobs:
   offline-review:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,9 +32,18 @@ jobs:
       - name: Identify exact represented candidate or main source
         shell: bash
         run: echo "UI_REVIEW_BASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - run: npm run design:check && npm run design:test
       - run: npm run review:build
         env:
-          UI_REVIEW_SOURCE_KIND: ${{ github.event_name == 'pull_request' && 'candidate branch' || github.ref == 'refs/heads/main' && 'merged main' || 'candidate branch' }}
+          UI_REVIEW_SOURCE_KIND: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'merged main' || 'candidate branch' }}
+          UI_REVIEW_EXACT_ASSETS: '1'
+      - name: Build focused My Art download
+        run: node tools/ui-review/build.mjs --drawing
+        env:
+          UI_REVIEW_SOURCE_KIND: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'merged main' || 'candidate branch' }}
+          UI_REVIEW_EXACT_ASSETS: '1'
+      - name: Compare every bundled public resource with the checked out source
+        run: python tools/ui-review/verify-exact-assets.py . dist-review/exact-source-artifact.json
       - name: Upload the standalone download
         id: download
         uses: actions/upload-artifact@v4
@@ -60,6 +69,14 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
       - run: npx playwright install --with-deps chromium
       - run: npm run review:test
+      - name: Check retained picker, legacy worlds, landscape pixels and recorded output
+        run: |
+          node tools/ui-review/creative-picker.cjs
+          node tools/ui-review/notebook-game.cjs
+          node tools/ui-review/world-compatibility.cjs
+          node tools/ui-review/connected-learning.cjs
+      - name: Open the drawing download, save, reload and keep a new version
+        run: node tools/ui-review/drawing-smoke.cjs
       - name: Capture complete candidate journeys
         run: npm run build && npm run test:child-modernization && npm run test:pals-fidelity && node tests/pals-fidelity-browser.cjs --offline
       - uses: actions/upload-artifact@v4
@@ -68,6 +85,7 @@ jobs:
           name: jems-ui-review-evidence-${{ env.UI_REVIEW_BASE_SHA }}
           path: |
             test-results/ui-review/
+            test-results/design-system/
             test-results/child-modernization/
             test-results/pal-fidelity/
           retention-days: 14

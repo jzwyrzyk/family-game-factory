@@ -84,3 +84,16 @@ test('local-only family work cannot become a server-side creative record',async(
  await assert.rejects(service.fork(session,original,'Workshop copy'),/GUARDIAN_CONSENT_REQUIRED/);
  assert.equal((await repo.snapshot()).revisions.length,1);
 });
+
+test('reviewed private uploads require the complete metadata-free pixel stream', async () => {
+  const {checkReviewedPng} = await import('../src/family-beta/reviewed-png');
+  const {twoColorPNG, animatedPNG} = await import('./generated-art-fixtures');
+  const array = (bytes: Buffer) => Uint8Array.from(bytes).buffer;
+  const clean = twoColorPNG();
+  await checkReviewedPng(array(clean));
+  const damaged = Buffer.from(clean);
+  damaged[damaged.length - 1] ^= 1;
+  for (const invalid of [animatedPNG(), twoColorPNG(6, 6), damaged, clean.subarray(0, 33), Buffer.concat([clean, Buffer.from('extra')])]) {
+    await assert.rejects(checkReviewedPng(array(invalid)), /reviewed PNG/);
+  }
+});

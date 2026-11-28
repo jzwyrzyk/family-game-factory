@@ -1,9 +1,12 @@
+import {createHash} from 'node:crypto';
+import {readFileSync} from 'node:fs';
+import {SCENE_WORLDS} from '../src/creation/model';
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {createStarterProject,parsePrivateArtId,privateArtId,validateEditableProject,validateGeneratedCreationManifest} from '../src/creation/projects';
 import {CreationStore,CREATION_KEY,validateCreationWorkspace} from '../src/creation/storage';
 import {SceneEngine} from '../src/creation/engine';
-import {unionOriginalArtPixels} from '../src/creation/private-art';
+import {privateArtReferences,unionOriginalArtPixels} from '../src/creation/private-art';
 
 class MemoryStorage {
   private data=new Map<string,string>();
@@ -89,4 +92,103 @@ test('private art does not grant profile access, challenge credit, or an interpr
   assert.equal(engine.snapshot().actors[0].assetId,image);
   const invalid=sceneWith();(invalid.actors[0] as any).url='https://example.invalid/private.png';
   assert.throws(()=>store.create('player1',invalid),/Unknown field/);
+});
+
+test('a scene role survives storage without assigning physics or changing the original pin', () => {
+  const source = sceneWith();
+  const tagged = structuredClone(source);
+  tagged.actors[0].role = 'obstacle';
+  assert.equal(validateEditableProject(tagged).actors[0].role, 'obstacle');
+  const run = (scene: typeof tagged) => {
+    const engine = new SceneEngine(scene);
+    engine.start();
+    engine.advance(400);
+    const actor = engine.snapshot().actors[0];
+    return [actor.x, actor.y, actor.assetId];
+  };
+  assert.deepEqual(run(tagged), run(source));
+  assert.throws(() => validateEditableProject({...tagged, actors: [{...tagged.actors[0], role:'force-field'}]}));
+});
+
+test('a derivative traces to its original across exact owner and parent hashes', async () => {
+  const { originalFor } = await import('../src/assets/art-lineage');
+  const root = {id:'root', owner:'maker', sha256:'a'.repeat(64)};
+  const parent = {...root,id:'parent',sha256:'b'.repeat(64),sourceId:root.id,sourceSha256:root.sha256};
+  const child = {...parent,id:'child',sourceId:parent.id,sourceSha256:parent.sha256};
+  const images = new Map<string, Pick<import('../src/assets/private-drawings').Drawing, 'id'|'owner'|'sha256'|'sourceId'|'sourceSha256'>>([root,parent,child].map(image => [image.id,image]));
+  assert.equal(originalFor(child,images).id,root.id);
+  assert.throws(() => originalFor({...child,owner:'another'},images));
+  assert.throws(() => originalFor({...child,sourceSha256:root.sha256},images));
+  assert.throws(() => originalFor({...child,sourceId:child.id},images));
+});
+
+test('world illustrations pin approved bytes and legacy scenes retain their saved background',()=>{
+  const byFile:Record<string,string>={
+    './jems-journey/background.webp':'1b1460063ff8d1d3c353b0952731f3a73059c500800d3118ba558fd76300be84',
+    './art/mind-your-jems/scene-sky.webp':'9b2446de258abe52782287ea620d65a0ac7abd5bbc210938439b02658d4d132f',
+    './art/creative-worlds/moon-garden-v1.webp':'914d0bf6ca36ec41475aa3239c2c703b09f4eb367202601cf93656aeffcb5754',
+    './gem-factory-workshop.webp':'b6e81f59ab4d1e05475b85817264645ecda30ed105eb7934fcc69b956f065afe',
+  };
+  const manifest=JSON.parse(readFileSync(new URL('../docs/creation-studio/world-art-manifest.json',import.meta.url),'utf8'));
+  for(const {file,sha256} of manifest.assets)byFile['./'+file]=sha256;
+  for(const world of SCENE_WORLDS){
+    const bytes=readFileSync(new URL('../public/'+world.url.slice(2),import.meta.url));
+    const actual=createHash('sha256').update(bytes).digest('hex');
+    assert.equal(actual,byFile[world.url],world.id);
+    const suffix=world.id.match(/-([a-f0-9]{12})$/);
+    if(suffix)assert.ok(actual.startsWith(suffix[1]),world.id);
+  }
+  const scene=createStarterProject('robot');
+  assert.equal(scene.world?.assetId,SCENE_WORLDS[1].id);
+  delete scene.world;
+  assert.equal(validateEditableProject(scene).world,undefined);
+  assert.equal(validateEditableProject(scene).background,'workshop');
+});
+
+test('a private world uses the same pinned source without adding an actor or granting generated access',()=>{
+  const scene=createStarterProject('blank');
+  scene.world={assetId:image,framing:'fit'};
+  assert.deepEqual(privateArtReferences(scene),[image]);
+  assert.equal(validateEditableProject(scene).actors.length,1);
+  assert.throws(()=>validateGeneratedCreationManifest(scene),/Private world/);
+  for(const bad of [{assetId:rig,framing:'fit'},{assetId:'https://example.invalid/art.png',framing:'fill'},{assetId:image,framing:'stretch'}]){
+    assert.throws(()=>validateEditableProject({...scene,world:bad}));
+  }
+  const store=new CreationStore(new MemoryStorage()),entry=store.create('player1',scene);
+  const initial=store.load(entry.id,'player1');
+  scene.world={assetId:SCENE_WORLDS[0].id,framing:'fill'};
+  store.save(entry.id,'player1',scene,initial.revision.id);
+  assert.equal(store.history(entry.id,'player1').find(r=>r.id===initial.revision.id)?.scene.world?.assetId,image);
+});
+
+test('a PR201 named drawing path survives Keep and plays its saved relative moves with its exact art pin',()=>{
+  const scene=sceneWith(rig), actor=scene.actors[0];
+  actor.x=100;actor.y=100;
+  const path = {type:'repeat' as const,id:'child-path',origin:'child' as const,count:1,pathName:'Moon walk',actions:[
+    {type:'move' as const,id:'a',origin:'child' as const,dx:20,dy:30,durationMs:180},
+    {type:'move' as const,id:'b',origin:'child' as const,dx:-25,dy:-16,durationMs:150},
+  ]};
+  scene.programs[0].actions=[path];
+  const storage=new MemoryStorage(), store=new CreationStore(storage);
+  const entry=store.create('player1',scene);store.keep(entry.id,'player1',entry.headId);
+  const restored=new CreationStore(storage).load(entry.id,'player1').scene;
+  assert.deepEqual(restored.programs[0].actions,[path]);
+  const engine=new SceneEngine(restored);engine.start();engine.advance(330);
+  const end=engine.snapshot().actors[0];
+  assert.deepEqual([end.x,end.y,end.assetId],[95,114,rig]);
+  assert.throws(()=>validateGeneratedCreationManifest(restored),/Private path names/);
+  const onlyPrivateArt=structuredClone(restored);
+  delete (onlyPrivateArt.programs[0].actions[0] as {pathName?:string}).pathName;
+  assert.throws(()=>validateGeneratedCreationManifest(onlyPrivateArt),/artwork/);
+  const onlyPrivateName=structuredClone(restored);
+  onlyPrivateName.actors[0].assetId='dragon';
+  assert.throws(()=>validateGeneratedCreationManifest(onlyPrivateName),/Private path names/);
+  for(const name of ['', ' ', 'x'.repeat(41), '\u0000', 42]){
+    const bad=structuredClone(scene);
+    Object.assign(bad.programs[0].actions[0],{pathName:name});
+    assert.throws(()=>validateEditableProject(bad),/path name/);
+  }
+  const wronglyNamed=sceneWith(rig);
+  Object.assign(wronglyNamed.programs[0].actions[0],{pathName:'On a Move'});
+  assert.throws(()=>validateEditableProject(wronglyNamed),/Unknown field/);
 });

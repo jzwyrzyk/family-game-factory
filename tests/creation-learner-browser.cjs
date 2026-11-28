@@ -211,6 +211,13 @@ const complexScene={
         await page.evaluate(()=>document.fonts.ready);
         const actions=['move','jump','say','dance','wait','repeat'];
         for(const action of actions) await reach(page.locator(`[data-add-block="${action}"]`),false);
+        const jumpIcon=page.locator('[data-add-block="jump"] .creation-pose-jump');
+        const gap=await jumpIcon.evaluate(async icon=>{
+          const image=icon.querySelector('img');
+          await image.decode();
+          return icon.querySelector('.creation-jump-arrow').getBoundingClientRect().left-image.getBoundingClientRect().right;
+        });
+        assert.ok(gap>=3, name+': the jump arrow is visibly separated from the character');
         const pane=await page.locator('#creationCodePane').boundingBox();
         const grid=await page.locator('.creation-workspace-grid').boundingBox();
         const compact=await page.locator('#creationCodeView').isVisible();
@@ -402,11 +409,12 @@ const complexScene={
         const attempt=await page.evaluate(()=>FG.learning.activeAttemptId);
         await reach(page.locator('#creationLearning [data-action="read-aloud"]'));
         if(compact) {
-          await tap(page.locator('#creationCodeView'));
+          assert.equal(await page.locator('#creationLearning').evaluate(dialog=>dialog.matches(':modal')),true);
+          await page.keyboard.press('Escape');
           assert.equal(await page.locator('#creationPlayView').getAttribute('aria-pressed'),'true');
         }
         assert.deepEqual(await scene(),beforeLearning);
-        await tap(page.locator('#creationHome'));
+        await tap(page.locator('#creationLearning [data-action="leave-game"]'));
         assert.equal(await page.evaluate(id=>FG.store.current().learning.attempts.find(a=>a.id===id)?.outcome,attempt),'interrupted');
         assert.equal(await page.locator('#page-creation').isVisible(),false,'exit remains usable');
         const navigation=page.locator('#studioNavScenes');

@@ -7,7 +7,7 @@ import {generateLanguageItem} from '../src/language/content';
 import type {LanguageItem} from '../src/language/types';
 
 let browser:Browser,bundle:string;
-const styles=readFileSync('src/language/activity.css','utf8')+'\n'+readFileSync('src/brand/icons.css','utf8')+'\n'+readFileSync('src/speech/read-aloud.css','utf8');
+const styles=readFileSync('src/learning/workspace/shell.css','utf8')+'\n'+readFileSync('src/language/activity.css','utf8')+'\n'+readFileSync('src/brand/icons.css','utf8')+'\n'+readFileSync('src/speech/read-aloud.css','utf8');
 const iconSprite=readFileSync('public/jems-art/icons/jems-icons.svg','utf8');
 before(async()=>{
   mkdirSync('test-results',{recursive:true});
@@ -73,7 +73,7 @@ test('letter tiles allow undo and checked construction',async()=>{
     assert.equal(item.kind,'word-tiles');
     await page.locator('.language-tile:not([disabled])').first().click();
     await page.getByRole('button',{name:'Undo last'}).click();
-    assert.equal(await page.locator('.language-built').textContent(),'Your word will appear here');
+    assert.equal(await page.locator('.language-built').textContent(),'Tap a letter to start.');
     for(const char of item.answer!.split('')){
       const available=page.locator('.language-tile:not([disabled])');
       const tiles=await available.all();
@@ -89,7 +89,7 @@ test('letter tiles allow undo and checked construction',async()=>{
   }finally{await page.close();}
 });
 test('sentence construction and exact editing produce truthful evidence',async()=>{
-  const sentence=generateLanguageItem('g3-agreement',{tier:2,random:()=>.999999}),page=await mount(sentence);
+  const sentence=generateLanguageItem('g3-agreement',{tier:2,random:()=>0}),page=await mount(sentence);
   try{
     assert.equal(sentence.kind,'sentence-tiles');
     for(const word of sentence.answer!.split(/\s+/)){
@@ -138,7 +138,7 @@ test('creative writing persists unscored and abandoning a separate task is not f
 test('supported read-aloud includes displayed choices and never counts as independent reading',async()=>{
   const item=generateLanguageItem('g1-short-i-o-u',{tier:1,random:()=>.1}),page=await mount(item);
   try{
-    const speak=page.locator('[data-action="read-aloud"]');
+    const speak=page.locator('[data-action="read-target"]');
     assert.equal(await speak.count(),1,'read-aloud stays visible even before device voices load');
     await page.evaluate(()=>{
       const w=window as any;w.spoken='';
@@ -175,7 +175,7 @@ test('supported read-aloud includes displayed choices and never counts as indepe
 test('unavailable friendly voice stays readable and does not record listening support',async()=>{
   const item=generateLanguageItem('g1-short-i-o-u',{tier:1,random:()=>.1}),page=await mount(item);
   try{
-    const speak=page.locator('[data-action="read-aloud"]');
+    const speak=page.locator('[data-action="read-target"]');
     assert.equal(await speak.count(),1,'read-aloud remains discoverable even if voice is unavailable');
     await page.evaluate(()=>{
       const w=window as any;w.spokenCount=0;
@@ -198,7 +198,7 @@ test('unavailable friendly voice stays readable and does not record listening su
 test('leaving while voice choices load prevents delayed read-aloud or assistance credit',async()=>{
   const item=generateLanguageItem('g1-short-i-o-u',{tier:1,random:()=>.1}),page=await mount(item);
   try{
-    const speak=page.locator('[data-action="read-aloud"]');
+    const speak=page.locator('[data-action="read-target"]');
     assert.equal(await speak.count(),1,'read-aloud remains discoverable even if voice is unavailable');
     await page.evaluate(()=>{
       const w=window as any;w.spokenCount=0;
@@ -218,4 +218,123 @@ test('leaving while voice choices load prevents delayed read-aloud or assistance
     assert.equal(result.p.language.attempts[0].readTargetAt,undefined);
     assert.equal(result.p.language.attempts[0].outcome,'interrupted');
   }finally{await page.close();}
+});
+
+test('passage and word selection preserve the reviewed text and grade only on Check',async()=>{
+  for(const skill of ['g3-text-evidence','g4-evidence-inference','g2-adjectives']){
+    const item=generateLanguageItem(skill,{tier:1,random:()=>.99});
+    const page=await mount(item,{width:320,height:667});
+    try{
+      assert.equal(item.contentPack,'v3');
+      assert.equal((await page.locator('.language-story-text').textContent())?.trim(),item.passage);
+      assert.equal(await page.locator('.language-evidence-line[aria-pressed=true]').count(),0);
+      const check=page.locator('[data-action=check-evidence]');
+      assert.ok(await check.isDisabled());
+      const line=page.getByRole('button',{name:item.answer!,exact:true});
+      await line.focus();await page.keyboard.press('Space');
+      assert.equal((await state(page)).p.language.attempts[0].answers.length,0);
+      assert.equal(await line.getAttribute('aria-pressed'),'true');
+      await check.tap();
+      await page.waitForFunction(()=>(window as any).results.length===1);
+      assert.equal((await state(page)).results[0].independent,true);
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+    }finally{await page.close();}
+  }
+});
+
+test('gap filling previews changes and preserves the answer on retry',async()=>{
+  for(const [skill,tier] of [['g1-punctuation',0],['g2-vowel-ai-ay',1],['g3-agreement',1]] as const){
+    const item=generateLanguageItem(skill,{tier,random:()=>.99}),page=await mount(item);
+    try{
+      const check=page.locator('[data-action=check-gap]');
+      assert.ok(await check.isDisabled());
+      const wrong=item.choices!.find(choice=>choice.value!==item.answer)!;
+      await page.getByRole('button',{name:wrong.value,exact:true}).tap();
+      assert.equal(await page.locator('.language-gap').textContent(),wrong.value);
+      assert.equal((await state(page)).p.language.attempts[0].answers.length,0);
+      await check.tap();
+      assert.equal(await page.locator('.language-gap').textContent(),wrong.value);
+      await page.getByRole('button',{name:item.answer!,exact:true}).tap();
+      await check.tap();
+      await page.waitForFunction(()=>(window as any).results.length===1);
+      assert.equal((await state(page)).p.language.totals.assisted,1);
+    }finally{await page.close();}
+  }
+});
+
+test('Grade 2 syllable choices submit the authored word or split', async () => {
+  for (const tier of [0, 1]) {
+    const item = generateLanguageItem('g2-two-syllables', {tier, random: () => 0});
+    const page = await mount(item);
+    try {
+      assert.equal(await page.locator('[data-action=check-beats]').count(), 0);
+      await page.getByRole('button', {name: item.answer!, exact: true}).click();
+      await page.waitForFunction(() => (window as any).results.length === 1);
+      const result = await state(page);
+      assert.equal(result.p.language.attempts[0].answers[0].raw, item.answer);
+      assert.equal(result.results[0].independent, true);
+    } finally { await page.close(); }
+  }
+});
+
+test('tapping beats keeps audio admission, bounds and corrections',async()=>{
+  const item=generateLanguageItem('k-ela-segment',{tier:1,random:()=>.1}),page=await mount(item);
+  try{
+    const tap=page.getByRole('button',{name:'Tap a sound'});
+    for(let n=0;n<4;n++)await tap.tap();
+    assert.ok(await tap.isDisabled());
+    const undo=page.getByRole('button',{name:'Undo last'});
+    await undo.tap();
+    const check=page.locator('[data-action=check-beats]');
+    await check.tap();
+    assert.equal((await state(page)).p.language.attempts[0].answers.length,0);
+    await page.getByRole('button',{name:'A grown-up read the instruction'}).tap();
+    await check.tap();
+    await page.waitForFunction(()=>(window as any).results.length===1);
+    assert.equal((await state(page)).results[0].independent,false);
+    assert.equal((await state(page)).p.language.attempts[0].answers[0].raw,'3');
+  }finally{await page.close();}
+});
+
+test('drag, tap and keyboard edit indexed tiles without recording another answer',async()=>{
+  const item=generateLanguageItem('g1-plural-s',{tier:0,random:()=>.999999}),page=await mount(item,{width:1024,height:768});
+  try{
+    const tray=page.locator('.language-tile');
+    const first=await tray.nth(0).getAttribute('data-piece');
+    await tray.nth(0).dragTo(page.locator('.language-built'));
+    assert.equal(await page.locator('.language-placed').count(),1);
+    await tray.nth(1).click();
+    await page.locator('.language-placed').first().click();
+    await page.getByRole('button',{name:'Move later'}).focus();await page.keyboard.press('Enter');
+    assert.equal(await page.locator('.language-placed').last().getAttribute('data-piece'),first);
+    await page.locator('.language-placed').last().click();
+    await page.getByRole('button',{name:'Take out'}).click();
+    assert.ok(await tray.nth(0).isEnabled());
+    await page.getByRole('button',{name:'Undo last'}).click();
+    assert.equal(await page.locator('.language-placed').count(),2);
+    await page.getByRole('button',{name:'Clear',exact:true}).click();
+    assert.equal(await page.locator('.language-placed').count(),0);
+    assert.equal((await state(page)).p.language.attempts[0].answers.length,0);
+  }finally{await page.close();}
+});
+
+test('identical letters and words can trade locations and still submit a valid sentence or word',async()=>{
+  for(const skill of ['g1-plural-s','g2-complete-sentences']){
+    const item=generateLanguageItem(skill,{tier:0,random:()=>.99});
+    const page=await mount(item,{width:768,height:1024});
+    try{
+      const tokens=item.answer!.split(item.kind==='word-tiles'?'':' ');
+      const repeated=tokens.find((token,index)=>tokens.indexOf(token)!==index)!;
+      assert.ok(repeated);
+      for(const token of tokens){
+        const unused=page.locator('.language-tile:enabled').filter({hasText:new RegExp('^'+token.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'$')});
+        await unused.last().click();
+      }
+      const placed=await page.locator('.language-placed').evaluateAll(nodes=>nodes.map(el=>el.textContent));
+      assert.deepEqual(placed,tokens);
+      await page.locator('[data-action="check-tiles"]').click();
+      await page.waitForFunction(()=>(window as any).results.length===1);
+      assert.ok((await state(page)).results[0].independent);
+    }finally{await page.close();}
+  }
 });

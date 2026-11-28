@@ -195,3 +195,26 @@ test('generated game import needs an actual validated manifest, never inferred J
   assert.notEqual(scene.id,source.id);assert.equal(scene.provenance?.sourceRevisionId,'remote-revision');assert.equal(scene.provenance?.createdBy,'assisted');
   const injected=copy(source);(injected as any).source='console.log("not executed")';assert.throws(()=>createProjectFromStudio(session,undefined,injected),/Unknown field/);
 });
+
+test('using a kept world pins the selected revision while later edits and drafts stay with the source', () => {
+  const {store, project, scene} = fixture();
+  store.keep(project.id, project.owner, project.headId);
+  const changed = copy(scene);
+  changed.background = 'night';
+  changed.actors[0].size = 52;
+  const later = store.save(project.id, project.owner, changed, project.headId);
+  store.autosave(project.id, project.owner, {...changed, title:'Working draft'}, later.id);
+
+  const reused = store.copy(project.id, project.owner, undefined, {keptRevisionId:project.headId, detachChallenge:true});
+  const reopened = store.load(reused.id, project.owner);
+  assert.equal(reopened.scene.provenance?.sourceRevisionId, project.headId);
+  assert.equal(reopened.scene.background, scene.background);
+  assert.deepEqual(reopened.scene.actors, scene.actors);
+  assert.deepEqual(reopened.scene.programs, scene.programs);
+  assert.equal(reopened.project.keptId, null);
+  assert.equal(store.load(project.id, project.owner).draft?.scene.title, 'Working draft');
+  assert.throws(() => store.copy(project.id, 'another-owner', undefined, {keptRevisionId:project.headId}));
+
+  store.keep(project.id, project.owner, later.id);
+  assert.throws(() => store.copy(project.id, project.owner, undefined, {keptRevisionId:project.headId}), /kept world changed/);
+});

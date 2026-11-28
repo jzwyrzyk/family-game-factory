@@ -13,6 +13,7 @@ The development author owns the documentation impact of a change; the reviewer c
 | A PR merges, is superseded, is closed, changes its dependency, or enters/leaves release scope | Refresh affected entries in [delivery state](../../DELIVERY-STATE.md); preserve the distinction between integration and live operation. |
 | Deploy, activate, rollback, incident or live acceptance | Record environment, audience, exact source/image/config identity, observed result, evidence link/time and remaining gaps in delivery state. A failed or unverified attempt is also a result. |
 | A Gem Pal direction, selected asset, growth rule, or recurring quality lesson changes | Update the established character-reference index and applicable [Studio guide](../pals/STUDIO.md); preserve superseded references and scope corrections. Review the `pal-design` area. Keep personal skill distributions routed to the repository or explicitly dated. |
+| A learning presentation, manipulative, response pathway, narration scope or game theme changes | Review the [workspace standard](../learning/LEARNING_WORKSPACE_STANDARD.md), update the applicable capability row and subject integration contract, and record the actual answer, assistance and viewport evidence in the PR. |
 | A new document or code area is introduced | Add its entry point to [the index](../README.md) and route the new source paths in [the registry](registry.json). |
 
 Make code and document changes in the same PR where possible. Post-merge or external operational facts necessarily arise later: add a small documentation follow-up promptly rather than pretending a premerge record knew the outcome. Do not rewrite historical test results or old deployment evidence to look current.
@@ -22,6 +23,8 @@ Make code and document changes in the same PR where possible. Post-merge or exte
 The [DEV → TEST → PROD contract](../development/DEV-TEST-PROD.md) governs preview, TEST, approval and release reporting. Route environment scripts, workflows, tests, infrastructure and these contracts through the review registry. Automated summaries may update factual deployment states only from validated run, artifact and resource receipts for the exact source. They must not infer owner acceptance from CI, approval from a merge, or production deployment from integration. Keep failed, expired, stale and unknown states visible. A generated directory/PR summary complements delivery state; it does not silently rewrite doctrine or historical receipts.
 
 After setup, two-preview acceptance, complete TEST acceptance, production promotion or recovery, record the actual observation and remaining definition-of-done gaps. Do not mark the method complete merely because source or infrastructure exists.
+
+Creative asset PRs identify the workstream responsible for the shared interface, affected consumers, and the exact base of each dependent PR. Review reference remapping, archive behavior and parent backups when adding a new destination. The [Creative Asset & World Design Standard](../creative-universe/STANDARD.md) defines the shared contract.
 
 ## 2. Use the review registry
 

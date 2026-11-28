@@ -1,22 +1,92 @@
-import {drawingHash,inspectDrawingBytes,saveDrawing} from '../assets/private-drawings';
-// Only exact operator-reviewed bytes are eligible. Persist a raster re-encoding, never file metadata.
-const file=document.querySelector<HTMLInputElement>('#betaReviewedArt');
-if(file)file.onchange=async()=>{
- const out=document.getElementById('familyExitStatus')!;
- try{
-  const image=file.files?.[0];if(!image||image.type!=='image/png'||image.size>5*1024*1024)throw Error('Choose a reviewed PNG up to 5 MB.');
-  const pass=document.querySelector<HTMLInputElement>('#reviewedArtPassphrase')!;
-  const unlocked=await fetch('/v1/devices/unlock',{method:'POST',headers:{'Content-Type':'application/json','X-Factory-Request':'1'},body:JSON.stringify({parentPassphrase:pass.value})});
-  pass.value='';if(!unlocked.ok)throw Error('A grown-up must authorize this upload.');
-  const owner=(window as any).FG.store.current().id,bytes=await image.arrayBuffer();
-  const {width,height}=inspectDrawingBytes(bytes,'image/png');
-  const response=await fetch('/entry/review-art',{method:'POST',headers:{'Content-Type':'application/json','X-Factory-Request':'1'},body:JSON.stringify({digest:await drawingHash(bytes)})});
-  if(!response.ok)throw Error('Unlock Grown-ups and confirm the operator has reviewed this exact image.');
-  const bitmap=await createImageBitmap(image),canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
-  canvas.getContext('2d')!.drawImage(bitmap,0,0);bitmap.close();
-  const raster=await new Promise<Blob>((ok,no)=>canvas.toBlob(b=>b?ok(b):no(Error('Drawing unavailable.')),'image/png'));
-  const guard=()=>(window as any).FG.store.current().id===owner;
-  if(!guard())throw Error('The explorer changed. Open the image again.');
-  await saveDrawing(owner,'Reviewed workshop artwork',raster,undefined,guard);out.textContent='Your reviewed drawing is ready.';
- }catch(e){out.textContent=(e as Error).message;}finally{file.value='';}
-};
+import { drawingHash, saveDrawing } from '../assets/private-drawings';
+import { checkReviewedPng, SuggestedPaletteError } from './reviewed-png';
+import { ART_LIMITS } from '../drawing/library';
+
+function installReviewedArtwork(file: HTMLInputElement) {
+  const status = document.getElementById('familyExitStatus')!;
+  const pass = document.querySelector<HTMLInputElement>('#reviewedArtPassphrase')!;
+  const prepare = document.querySelector<HTMLInputElement>('#prepareReviewedArt');
+  const currentOwner = () => (window as any).FG?.store?.current()?.id;
+  let selection = 0;
+  let copyUrl: string | undefined;
+  let copyLink: HTMLAnchorElement | undefined;
+
+  function clearSelection() {
+    selection++;
+    pass.value = '';
+    file.value = '';
+    file.disabled = false;
+    if (copyUrl) URL.revokeObjectURL(copyUrl);
+    copyUrl = undefined;
+    copyLink?.remove();
+    copyLink = undefined;
+    status.textContent = '';
+  }
+  function resetProfile() {
+    if (prepare) prepare.checked = false;
+    clearSelection();
+  }
+  function offerCopy(blob:Blob, label:string) {
+    copyUrl = URL.createObjectURL(blob);
+    copyLink = document.createElement('a');
+    copyLink.href = copyUrl;
+    copyLink.download = 'workshop-picture.png';
+    copyLink.textContent = label;
+    status.after(copyLink);
+  }
+  window.addEventListener('factory-profile-changing', resetProfile);
+  window.addEventListener('factory-profile', resetProfile);
+  window.addEventListener('pagehide', resetProfile);
+
+  file.onchange = async () => {
+    const owner = currentOwner(), image = file.files?.[0], passphrase = pass.value;
+    const prepareCopy = prepare?.checked;
+    clearSelection();
+    const attempt = selection;
+    const current = () => attempt === selection && owner === currentOwner();
+    file.disabled = true;
+    try {
+      if (!owner || !image || image.type !== 'image/png' || image.size > ART_LIMITS.imageBytes)
+        throw Error('Choose a reviewed PNG up to 5 MB.');
+      const bytes = await image.arrayBuffer();
+      const reviewed = await checkReviewedPng(bytes);
+      const digest = await drawingHash(bytes);
+      if (!current()) return;
+      const headers = { 'Content-Type': 'application/json', 'X-Factory-Request': '1' };
+      const unlocked = await fetch('/v1/devices/unlock', {
+        method: 'POST', headers, body: JSON.stringify({ parentPassphrase: passphrase }),
+      });
+      if (!current()) return;
+      if (!unlocked.ok) throw Error('A grown-up must authorize this upload.');
+      const approval = await fetch('/entry/review-art', {
+        method: 'POST', headers, body: JSON.stringify({ digest }),
+      });
+      if (!current()) return;
+      if (!approval.ok) throw Error('Ask the operator to review and approve this exact PNG for your family.');
+
+      if (prepareCopy) {
+        const copy = await reviewed.prepareImageOnlyCopy();
+        if (!current()) return;
+        if (copy.size > ART_LIMITS.imageBytes) throw Error('The prepared picture is over the file size limit.');
+        status.textContent = 'Download your image-only copy. Have its exact file approved, then choose it here.';
+        offerCopy(copy, 'Download prepared PNG');
+        if (prepare) prepare.checked = false;
+        return;
+      }
+      await saveDrawing(owner, 'Reviewed workshop artwork', new Blob([bytes], { type: 'image/png' }), undefined, current);
+      if (current()) status.textContent = 'Your reviewed drawing is ready.';
+    } catch (error) {
+      if (!current()) return;
+      status.textContent = (error as Error).message;
+      if (error instanceof SuggestedPaletteError) {
+        offerCopy(error.imageOnlyCopy, 'Download image-only PNG for separate review');
+        if (prepare) prepare.checked = false;
+      }
+    } finally {
+      if (current()) file.disabled = false;
+    }
+  };
+}
+
+const input = document.querySelector<HTMLInputElement>('#betaReviewedArt');
+if (input) installReviewedArtwork(input);

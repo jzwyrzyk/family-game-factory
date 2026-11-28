@@ -1,6 +1,6 @@
 /* A shared rewards destination. Earned artwork and clear labels carry the meaning. */
 .jems-rewards {
-  --rewards-ink: #0b1e3b;
+  --rewards-ink: var(--jems-color-heading);
   --rewards-muted: #52627e;
   --rewards-line: #e5dff0;
   max-width: 1182px;
@@ -20,31 +20,31 @@
   font-size: 13px;
   font-weight: 750;
 }
-.jems-rewards button:focus-visible, .jems-rewards-widget:focus-visible { outline: 3px solid #7136c9; outline-offset: 4px; }
+.jems-rewards button:focus-visible, .jems-rewards-widget:focus-visible { outline: 3px solid var(--jems-color-action-primary); outline-offset: 4px; }
 .jems-rewards-back, .jems-rewards-text-action { min-height: 44px; padding: 8px 0; border: 0; color: #6231a7; background: none; }
 .jems-rewards-back { justify-self: start; }
 .jems-rewards-primary, .jems-rewards-secondary {
   display: inline-flex; align-items: center; justify-content: center; gap: 18px;
   min-height: 48px; padding: 12px 19px; border-radius: 15px;
-  border: 1px solid #d9cbed; background: #fff; color: #6231a7;
+  border: 1px solid #d9cbed; background: var(--jems-color-surface); color: #6231a7;
 }
-.jems-rewards-primary { background: linear-gradient(110deg, #195fd0, #7136c9); border-color: #6334b5; color: #fff; box-shadow: 0 6px 18px #6d42bc20; }
+.jems-rewards-primary { background: linear-gradient(110deg, #195fd0, var(--jems-color-action-primary)); border-color: #6334b5; color: var(--jems-color-surface); box-shadow: 0 6px 18px #6d42bc20; }
 .jems-rewards-primary:hover { background: linear-gradient(110deg, #1454bd, #6230b7); }
 .jems-rewards-secondary:hover { background: #f7f2ff; border-color: #b9a0dc; }
 .jems-rewards-back:hover, .jems-rewards-text-action:hover { text-decoration: underline; text-underline-offset: 4px; }
 .jems-rewards-arrow { font-size: 22px; line-height: 1; }
-.jems-rewards-status { display: flex; align-items: center; justify-content: space-between; gap: 16px; border: 1px solid #eed49f; background: #fff8e9; color: #704900; padding: 13px 18px; border-radius: 16px; margin-bottom: 18px; font-size: 14px; }
+.jems-rewards-status { display: flex; align-items: center; justify-content: space-between; gap: 16px; border: 1px solid #eed49f; background: #fff8e9; color: var(--jems-color-warning); padding: 13px 18px; border-radius: 16px; margin-bottom: 18px; font-size: 14px; }
 .jems-rewards-status .jems-rewards-secondary { min-height: 44px; flex: none; }
 .jems-rewards-hero {
   display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr);
   border: 1px solid var(--rewards-line); border-radius: 29px; overflow: hidden;
-  background: #fff; box-shadow: 0 14px 42px #42256508;
+  background: var(--jems-color-surface); box-shadow: 0 14px 42px #42256508;
 }
 .jems-rewards-hero-copy { padding: 24px 18px 24px 28px; min-width: 0; }
 .jems-rewards-total-row { display: flex; align-items: center; gap: 18px; margin-top: 0; }
 .jems-rewards-mark { display: block; width: 70px; height: 70px; object-fit: contain; flex: none; }
 .jems-rewards-total-row > div { display: flex; flex-direction: column; min-width: 0; }
-.jems-rewards-total { font: 950 clamp(46px, 6vw, 70px)/1.02 var(--jems-round, system-ui); color: #0b1e3b; letter-spacing: -2px; overflow-wrap: anywhere; }
+.jems-rewards-total { font: 950 clamp(46px, 6vw, 70px)/1.02 var(--jems-round, system-ui); color: var(--jems-color-heading); letter-spacing: -2px; overflow-wrap: anywhere; }
 .jems-rewards-total-label { font: 850 18px/1.5 var(--jems-round, system-ui); color: #3c4d6a; }
 .jems-rewards .jems-rewards-encouragement { color: var(--rewards-muted); font-size: 14px; line-height: 1.6; margin-top: 15px; }
 .jems-rewards-next { max-width: 440px; margin-top: 25px; }
@@ -63,7 +63,7 @@
 .jems-rewards-maker {
   display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0;
   padding: 15px 20px 23px; text-align: center;
-  background: radial-gradient(ellipse at 50% 48%, #e8dbfb8a, transparent 69%), linear-gradient(130deg, #fff, #fcf9ff);
+  background: radial-gradient(ellipse at 50% 48%, #e8dbfb8a, transparent 69%), linear-gradient(130deg, var(--jems-color-surface), #fcf9ff);
 }
 .jems-rewards-maker-art { display: flex; justify-content: center; width: 100%; }
 .jems-rewards-maker-art > .jems-rank-thumbnail {
@@ -83,19 +83,19 @@
 .jems-rewards-milestones { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 11px; list-style: none; margin: 0; padding: 0; }
 .jems-rewards-milestone {
   position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0;
-  padding: 13px 10px; border: 1px solid #e8e1ef; border-radius: 18px; background: #fff;
+  padding: 13px 10px; border: 1px solid #e8e1ef; border-radius: 18px; background: var(--jems-color-surface);
 }
 .jems-rewards-milestone.is-next { border: 2px solid #ad88df; padding: 12px 9px; background: #fcf9ff; }
 .jems-rewards-milestone.is-earned { border-color: #c5e9de; background: #f6fffb; }
 .jems-rewards-milestone > strong { color: #344967; font: 850 16px/1.4 var(--jems-round, system-ui); margin-top: 1px; text-align: center; }
 .jems-rewards-milestone-gem { width: 42px; height: 56px; }
 .jems-rewards-milestone-state { color: #64718a; font-size: 10px; font-weight: 750; line-height: 1.5; margin-top: 4px; }
-.jems-rewards-milestone.is-earned .jems-rewards-milestone-state { color: #07684f; }
+.jems-rewards-milestone.is-earned .jems-rewards-milestone-state { color: var(--jems-color-success); }
 .jems-rewards-milestone.is-next .jems-rewards-milestone-state { color: #6231a7; }
 .jems-rewards-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 23px; }
-.jems-rewards-ways, .jems-rewards-recent { min-width: 0; border: 1px solid var(--rewards-line); border-radius: 22px; background: #fff; padding: 23px; }
+.jems-rewards-ways, .jems-rewards-recent { min-width: 0; border: 1px solid var(--rewards-line); border-radius: 22px; background: var(--jems-color-surface); padding: 23px; }
 .jems-rewards-ways-list, .jems-rewards-recent-list { list-style: none; margin: 17px 0 0; padding: 0; }
-.jems-rewards-way { display: flex; gap: 12px; align-items: center; width: 100%; min-height: 64px; margin: 7px 0; padding: 10px 8px; border: 1px solid #e8e1ef; border-radius: 12px; background: #fcfaff; text-align: left; }
+.jems-rewards-way { display: flex; gap: 12px; align-items: center; width: 100%; min-height: 64px; margin: 7px 0; padding: 10px 8px; border: 1px solid #e8e1ef; border-radius: 12px; background: var(--jems-color-hover-surface); text-align: left; }
 .jems-rewards-way:hover { border-color: #d9cbed; background: #f8f4ff; }
 .jems-rewards-way-symbol { display: grid; place-items: center; flex: none; width: 39px; height: 39px; border-radius: 12px; background: #edf3ff; }
 .jems-rewards-way.is-coral .jems-rewards-way-symbol { background: #fff0f3; }
@@ -110,7 +110,7 @@
 .jems-rewards-bonus > strong { font-weight: 800; }
 .jems-rewards-grant { display: flex; align-items: center; gap: 11px; min-height: 57px; padding: 10px 0; border-bottom: 1px solid #f0ecf5; }
 .jems-rewards-grant:last-child { border: none; }
-.jems-rewards-grant-check { display: grid; place-items: center; flex: none; width: 25px; height: 25px; border-radius: 50%; background: #e8f8f1; color: #07684f; font-size: 12px; font-weight: 900; }
+.jems-rewards-grant-check { display: grid; place-items: center; flex: none; width: 25px; height: 25px; border-radius: 50%; background: #e8f8f1; color: var(--jems-color-success); font-size: 12px; font-weight: 900; }
 .jems-rewards-grant-copy { display: flex; flex-direction: column; min-width: 0; flex: 1; gap: 4px; }
 .jems-rewards-grant-copy > strong { color: #344967; font-size: 12px; line-height: 1.45; font-weight: 650; overflow-wrap: anywhere; }
 .jems-rewards-grant-copy > time { color: #6b7890; font-size: 10px; }
@@ -123,7 +123,7 @@
 .jems-rewards-widget {
   display: inline-flex; align-items: center; justify-content: center; gap: 5px; flex: none; min-height: 44px;
   max-width: 100%; padding: 5px 12px 5px 8px; border: 1px solid #d9caed; border-radius: 999px;
-  background: #fff; color: #4e2a82; white-space: nowrap;
+  background: var(--jems-color-surface); color: #4e2a82; white-space: nowrap;
 }
 .jems-rewards-widget:hover { background: #f8f3ff; border-color: #bfa2e3; }
 .jems-rewards-widget .jems-gem-art { width: 24px; }
@@ -133,8 +133,8 @@
 .jems-rewards-toast {
   pointer-events: none; display: flex; align-items: center; gap: 13px; box-sizing: border-box;
   max-width: min(360px, calc(100vw - 28px)); padding: 14px 21px 14px 15px;
-  border: 1px solid #ddccef; border-radius: 20px; background: #fff;
-  color: #0b1e3b; box-shadow: 0 8px 40px #39205424;
+  border: 1px solid #ddccef; border-radius: 20px; background: var(--jems-color-surface);
+  color: var(--jems-color-heading); box-shadow: 0 8px 40px #39205424;
   animation: jems-rewards-arrive 260ms ease-out both;
   font-family: var(--jems-body, system-ui);
 }

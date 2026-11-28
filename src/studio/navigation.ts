@@ -1,3 +1,4 @@
+import {containDialogFocus} from '../design-system/interactions/dialog';
 import { setIconLabel, type IconName } from '../brand/icons';
 import './navigation.css';
 
@@ -122,22 +123,7 @@ export function installStudioNavigation(options: StudioNavigationOptions) {
   dismiss.onclick = close;
   dialog.addEventListener('cancel', event => { event.preventDefault(); close(); });
   dialog.addEventListener('close', closed);
-  dialog.addEventListener('keydown', event => {
-    event.stopPropagation();
-    if (event.key !== 'Tab') return;
-    const controls = [...dialog.querySelectorAll<HTMLElement>(
-      'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), summary, [tabindex]:not([tabindex="-1"])',
-    )].filter(element => element.tabIndex >= 0 && element.getClientRects().length > 0 && getComputedStyle(element).visibility !== 'hidden');
-    const first = controls[0], last = controls.at(-1);
-    if (!first || !last) { event.preventDefault(); dismiss.focus(); return; }
-    // Keep keyboard traversal in the drawer, including browsers that otherwise
-    // send Shift+Tab from a native dialog's first control to browser chrome.
-    if (event.shiftKey && (document.activeElement === first || !dialog.contains(document.activeElement))) {
-      event.preventDefault(); last.focus();
-    } else if (!event.shiftKey && (document.activeElement === last || !dialog.contains(document.activeElement))) {
-      event.preventDefault(); first.focus();
-    }
-  });
+  const releaseKeyboard = containDialogFocus(dialog, dismiss);
   dialog.addEventListener('click', event => {
     const target = (event.target as Element | null)?.closest('button');
     // Close before the original click handler runs. That handler can then focus
@@ -172,7 +158,7 @@ export function installStudioNavigation(options: StudioNavigationOptions) {
       window.removeEventListener('factory-profile-before-change', close);
       document.removeEventListener('fullscreenchange', close);
       for (const { element, marker } of moved) { marker.replaceWith(element); }
-      dialog.remove(); menu.remove();
+      releaseKeyboard(); dialog.remove(); menu.remove();
       nav.classList.remove('studio-shell-navigation');
       headerTools.classList.remove('studio-shell-tools');
       document.body.classList.remove('jems-compact-navigation');
