@@ -4,7 +4,7 @@ The private family beta candidate adds dedicated service definitions for authent
 
 **Authority:** the owner's November 23, 2026 (America/New_York) assignment, “Jems — Automated DEV / TEST / PROD Architecture,” authorizes assessment and implementation through reviewed PRs. [The decision](../decisions/2026-11-23-dev-test-prod.md) records the method and supersession. This is the authoritative development and release contract; its requirements are not a claim of completed deployment.
 
-**Implementation baseline:** main `28fe3311036f8ef9f3bfc623c522432499c08113`. The new environment tools are a disabled source foundation pending reviewed setup and deployed acceptance. [Delivery state](../../DELIVERY-STATE.md) records actual observations. [Setup](SETUP.md) identifies the additional authority required; [costs](COSTS.md) distinguishes estimates from spending approval.
+**Implementation baseline:** main `28fe3311036f8ef9f3bfc623c522432499c08113`. This is the historical disabled source foundation. The November 27–28 protected controller changes install the bound static preview lane; the [static evidence record](evidence/README.md) distinguishes deployment readback, failed browser gates and the current directory from complete acceptance. Persistent DEV and integrated TEST remain separately gated; see [delivery state](../../DELIVERY-STATE.md). [Delivery state](../../DELIVERY-STATE.md) records actual observations. [Setup](SETUP.md) identifies the additional authority required; [costs](COSTS.md) distinguishes estimates from spending approval.
 
 [Local evidence and screenshots](evidence/README.md) validate the current narrow preview/browser foundation and preserve its incomplete acceptance scope.
 

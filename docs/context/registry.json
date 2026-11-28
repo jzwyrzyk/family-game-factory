@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-28T05:06:40.246Z",
-      "sourceDigest": "fe4c5232703ef801b6040ca0e1a017ec483a5272e25085bda9444f0bfac35e69",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The controller uses the existing repository writer and the two established TEST retention tags. The environment evidence record identifies the serving revision and pending browser gate.",
+      "reviewedAt": "2026-11-28T14:16:00Z",
+      "sourceDigest": "3551b2466eb5f2bce15f3c9f80ffdf1cf0af63dca72422eb5c5dd92f262c54d0",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed protected #225/#228–234 controller and recovery source, exact static config and current-target guard, directory and actual deployed-browser and failed deployment logs; updated architecture, environment contract, delivery ledger and dated static evidence. Inspected #223/#226/#235 draft dispositions, latest hosted Arcade/package/review results and exact private workflow pins. Preserved both parent review histories; the exact delivery fingerprint was printed by hosted documentation job 141005658480 (18 checker tests passed, only expected delivery digest stale). No runtime, owner/device, paid or integrated TEST acceptance inferred.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1377,6 +1377,34 @@
           "reviewOutcome": "updated",
           "reviewReason": "Reconciled daec8cf Mining setup adjustment and both parent review histories with the unchanged second-stage release-evidence policy. Guide and ledger retain the exact 559-second Arcade pass, successful Bubble Gum setup improvement and GitHub-confirmed Mining timeout, separating all prior-source results from pending follow-up validation. Existing 228-operation results cover unchanged operations code; no release transition, authority, approval or activation changed.",
           "sourceCommit": "2b170306c4ce5596742c72c69819399dcf4022a1"
+        },
+        {
+          "sourceCommit": "652bf9e312fc0776e37b7ef7893835e0fd8136d4",
+          "reviewedAt": "2026-11-26T05:28:44.476Z",
+          "sourceDigest": "2a3f91df028a7a8f3038f80e187a1c4b9ade3c706824ffdfd0e1b9b320b27e98",
+          "reviewOutcome": "updated",
+          "reviewReason": "Linked the concurrent review-only Creative Universe integration and retained separate Learning, engineering and frozen application sources."
+        },
+        {
+          "sourceCommit": "e21dbd86cbacf4daa67ac4cfb2d973bf020f88d8",
+          "reviewedAt": "2026-11-26T13:47:32.000Z",
+          "sourceDigest": "2ed24f789b5e58d2d232af88b3d0658e62b7b17b6f2c857e11dc422c4308bd73",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed #219 protected-main Arcade jobs, read-only Cloud Run metadata receipt, exact frozen sandbox and private worker workflow pins, joined #223 rehearsal contracts and owner-reported Cloud Shell setup. Updated delivery gates without claiming live settings or release approval. Exact integrated-tree fingerprint independently printed by documentation job 139952725686; unrelated review records preserved."
+        },
+        {
+          "sourceCommit": "8903dee1d20686e327447cd628b4ae36822dd41a",
+          "reviewedAt": "2026-11-27T13:35:00.000Z",
+          "sourceDigest": "006ec0cc098f77a89afc1ebcc15b29aa131c0adce9bc3b06074089888e4625e8",
+          "reviewOutcome": "updated",
+          "reviewReason": "Reviewed exact #223 held application, #225 protected policy and #226 operational sources and contracts, actual Arcade and production observation jobs, private main, frozen candidate and operational overlay workflow pins, plus skipped November 27 environment deployment jobs. Preserved historical rehearsal and reported Terraform results separately from actual readback, no activation or approval inferred. Hosted documentation job 140536963581 printed this exact delivery source digest; unrelated area sources and review records are unchanged."
+        },
+        {
+          "sourceCommit": "4aec7aa67129ca074671c3cc9e1ae7e23f679fd0",
+          "reviewedAt": "2026-11-28T05:06:40.246Z",
+          "sourceDigest": "fe4c5232703ef801b6040ca0e1a017ec483a5272e25085bda9444f0bfac35e69",
+          "reviewOutcome": "unchanged",
+          "reviewReason": "The controller uses the existing repository writer and the two established TEST retention tags. The environment evidence record identifies the serving revision and pending browser gate."
         }
       ]
     },
