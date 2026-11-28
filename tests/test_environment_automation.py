@@ -14,7 +14,8 @@ import automation
 
 class AutomationTests(unittest.TestCase):
     def test_disabled_template_never_reads_github_or_invokes_cloud(self):
-        config = json.loads((ROOT / 'ops/environments.json').read_text())
+        config = json.loads((ROOT / 'tests/fixtures/environments/disabled.json').read_text())
+        automation.cloud.validate_config(config, require_enabled=False, public_record=True)
         self.assertFalse(config['enabled'])
         api = Mock()
         with tempfile.TemporaryDirectory() as directory, patch.object(automation, 'read_config', return_value=config), \
@@ -23,6 +24,13 @@ class AutomationTests(unittest.TestCase):
             api.request.assert_not_called()
             command.assert_not_called()
             outputs.assert_called_once_with(enabled=False, eligible=False)
+
+    def test_checked_in_site_config_is_valid_for_protected_use(self):
+        config = json.loads((ROOT / 'ops/environments.json').read_text())
+        automation.cloud.validate_config(config, require_enabled=False, public_record=True)
+        self.assertEqual(config['ownerIapMembers'], [])
+        if config['enabled']:
+            self.assertEqual(len(config['ownerIapBindingSha256']), 64)
 
     def test_changed_controller_stops_before_mutation(self):
         api = Mock()
