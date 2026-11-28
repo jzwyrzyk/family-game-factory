@@ -1,0 +1,28 @@
+{
+  "title": "Jems DEV foundation metadata planner",
+  "description": "Read-only metadata needed by the reviewed DEV foundation planner; no secret payloads, application data, resource writes or impersonation.",
+  "stage": "GA",
+  "includedPermissions": [
+    "resourcemanager.projects.get",
+    "resourcemanager.projects.getIamPolicy",
+    "serviceusage.services.get",
+    "serviceusage.services.list",
+    "serviceusage.services.use",
+    "iam.serviceAccounts.get",
+    "iam.serviceAccounts.list",
+    "iam.serviceAccountKeys.list",
+    "iam.roles.get",
+    "iam.roles.list",
+    "iam.workloadIdentityPools.list",
+    "datastore.databases.getMetadata",
+    "datastore.databases.list",
+    "storage.buckets.get",
+    "storage.buckets.list",
+    "storage.buckets.getIamPolicy",
+    "artifactregistry.repositories.get",
+    "artifactregistry.repositories.list",
+    "artifactregistry.repositories.getIamPolicy",
+    "secretmanager.secrets.list",
+    "secretmanager.secrets.getIamPolicy"
+  ]
+}

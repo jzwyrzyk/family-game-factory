@@ -87,7 +87,8 @@
     "docs/ui-review/README.md",
     "docs/history/2026-11-26/PRODUCT-DOCTRINE.md",
     "docs/history/2026-11-26/ARCHITECTURE-CURRENT.md",
-    "docs/history/2026-11-26/DELIVERY-STATE.md"
+    "docs/history/2026-11-26/DELIVERY-STATE.md",
+    "docs/operations/DEV-FIRST-ADMIN-SETUP.md"
   ],
   "linkCheckPatterns": [
     "README.md",
@@ -1142,10 +1143,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-28T05:06:40.246Z",
-      "sourceDigest": "fe4c5232703ef801b6040ca0e1a017ec483a5272e25085bda9444f0bfac35e69",
-      "reviewOutcome": "unchanged",
-      "reviewReason": "The controller uses the existing repository writer and the two established TEST retention tags. The environment evidence record identifies the serving revision and pending browser gate.",
+      "reviewedAt": "2026-11-28T15:08:40.989Z",
+      "sourceDigest": "58a5d6a794c97973867b09cad5317434764f90a144acc293f67f774628d609a1",
+      "reviewOutcome": "updated",
+      "reviewReason": "Reviewed final single-owner setup handoff and delivery evidence: completed billing/admin checks are closed, API inventory remains explicitly denied, the pinned App initiator retains owner approval and the repository-wide Actions-write risk, custody and missing-only bootstrap gates are explicit.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1400,10 +1401,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T04:43:54.709Z",
-      "sourceDigest": "6a82d9e760b2acf553296077219283a0611744977077ef029b48a4dadba0fce0",
+      "reviewedAt": "2026-11-28T13:13:04.066Z",
+      "sourceDigest": "2b1e967313af09668b0492c550cb0376c92a97e5dd86bfb66ad1cce3765be9cd",
       "reviewOutcome": "updated",
-      "reviewReason": "The maintenance instructions now explain comparison with the preceding independently committed source so future additions remain protected without manual count maintenance.",
+      "reviewReason": "Registered and linked the DEV-first administrator handoff and dated prepared-only delivery evidence. No application integration or cloud acceptance is inferred.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
