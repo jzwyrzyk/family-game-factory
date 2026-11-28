@@ -61,7 +61,10 @@ def recipe(m: dict, selected: list[str], operation: str) -> dict:
 
 APP_SCOPE = ["package.json", "package-lock.json", "index.html", "src", "public",
     "server/dev-access.ts", "server/dev-site.ts", "server/Dockerfile.dev-site-source",
-    "tools/offline-build.ts", "scripts/development/build-site-image.ts"]
+    "tools/offline-build.ts", "scripts/development/build-site-image.ts",
+    "tools/creative-game-art/raster.ts", "tools/creative-art-review/gem-hunt.ts",
+    "tools/creative-art-review/gem-hunt-frame.ts", "tools/creative-art-review/gem-hunt.css",
+    "tools/creative-art-review/workshop-v1.js", "server/sandbox/trusted/quality-runtime-v2.1.0/worker.js"]
 
 
 def app_source_archive(root: Path, directory: Path, sha: str) -> tuple[Path, str]:

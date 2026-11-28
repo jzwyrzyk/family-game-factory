@@ -9,6 +9,9 @@ COPY src ./src
 COPY public ./public
 COPY server/dev-access.ts server/dev-site.ts ./server/
 COPY tools/offline-build.ts ./tools/offline-build.ts
+COPY tools/creative-game-art/raster.ts ./tools/creative-game-art/raster.ts
+COPY tools/creative-art-review ./tools/creative-art-review
+COPY server/sandbox/trusted/quality-runtime-v2.1.0/worker.js ./server/sandbox/trusted/quality-runtime-v2.1.0/worker.js
 COPY scripts/development/build-site-image.ts ./scripts/development/build-site-image.ts
 ARG REVIEWED_SOURCE_SHA
 RUN JEMS_DEV_BUILD_SOURCE_SHA="$REVIEWED_SOURCE_SHA" node --import tsx scripts/development/build-site-image.ts

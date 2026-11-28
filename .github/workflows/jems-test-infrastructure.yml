@@ -1,0 +1,86 @@
+name: Jems integrated TEST infrastructure
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Read-only observation, saved plan, or separately approved exact saved-plan apply
+        type: choice
+        options: [observe, plan, apply]
+        default: observe
+      source:
+        description: Exact current protected-main operator SHA
+        type: string
+        required: true
+      attempt:
+        description: Planned attempt ID, required only for approved apply
+        type: string
+      approval:
+        description: Exact reviewed approval SHA256, required only for approved apply
+        type: string
+      close_trial:
+        description: Plan only the existing narrowly permitted funded-trial closure
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: jems-integrated-test-infrastructure
+  cancel-in-progress: false
+jobs:
+  infrastructure:
+    if: github.repository == 'jzwyrzyk/family-game-factory' && github.ref == 'refs/heads/main' && github.ref_protected && github.run_attempt == 1 && inputs.source == github.sha
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    environment:
+      name: ${{ inputs.operation == 'apply' && 'jems-test-infrastructure-apply' || 'jems-test-infrastructure-plan' }}
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      TEST_STACK_OPERATION: ${{ inputs.operation }}
+      TEST_STACK_ENVIRONMENT: ${{ inputs.operation == 'apply' && 'jems-test-infrastructure-apply' || 'jems-test-infrastructure-plan' }}
+      TEST_STACK_SOURCE: ${{ inputs.source }}
+      TEST_STACK_ATTEMPT: ${{ inputs.attempt }}
+      TEST_STACK_APPROVAL: ${{ inputs.approval }}
+      TEST_STACK_CLOSE_TRIAL: ${{ inputs.close_trial }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify protected execution context before authentication
+        run: |
+          python3 - <<'PY'
+          import os, sys
+          sys.path.insert(0, 'scripts/ops')
+          from github_test_stack import workflow_identity
+          workflow_identity(os.environ)
+          PY
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed
+        with:
+          workload_identity_provider: projects/1092405124984/locations/global/workloadIdentityPools/jems-nonproduction/providers/github-test-infrastructure
+          service_account: ${{ inputs.operation == 'apply' && 'jems-test-infra-apply@jems-jzw-nonprod.iam.gserviceaccount.com' || 'jems-test-infra-plan@jems-jzw-nonprod.iam.gserviceaccount.com' }}
+          create_credentials_file: true
+          export_environment_variables: true
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f
+      - name: Install the existing pinned Terraform version
+        shell: bash
+        run: |
+          set -euo pipefail
+          local_tools="$RUNNER_TEMP/test-terraform-cli"
+          mkdir "$local_tools"
+          archive="$local_tools/terraform.zip"
+          curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 \
+            https://releases.hashicorp.com/terraform/1.13.5/terraform_1.13.5_linux_amd64.zip -o "$archive"
+          printf '%s  %s\n' 0dbe3fcc268eb670801af6a6456799d1ae26e72e73797f6c6167e18aafd1fd9a "$archive" | sha256sum --check --status
+          unzip -q "$archive" terraform -d "$local_tools"
+          echo "$local_tools" >> "$GITHUB_PATH"
+      - name: Run the existing operator with private durable state
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TEST_STACK_VARIABLES: ${{ secrets.TEST_STACK_VARIABLES }}
+          TF_VAR_iap_oauth_secret: ${{ secrets.TEST_IAP_OAUTH_SECRET }}
+          TF_IN_AUTOMATION: 'true'
+          TF_INPUT: 'false'
+        run: python3 scripts/ops/github_test_stack.py

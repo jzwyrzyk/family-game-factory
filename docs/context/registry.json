@@ -714,10 +714,10 @@
         "server/Dockerfile.dev-site-source"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-28T06:14:10.433Z",
-      "sourceDigest": "866ecb90d10df4c796fca1bb782423bc57c7a0cdb1238901857288e47919a840",
+      "reviewedAt": "2026-11-28T06:26:37.967Z",
+      "sourceDigest": "aa96fb7a049eea783469b382d5224b6403edd801ccfbfe503a7996a92332043a",
       "reviewOutcome": "updated",
-      "reviewReason": "Reconciled current gateway, preview, device and storage interfaces with opt-in DEV IAP; documented exact origins, independent project binding and synthetic grants without changing family or TEST defaults.",
+      "reviewReason": "Preserved the keyless DEV runtime and fixed its committed-source container archive to include current raster and isolated Gem Hunt dependencies; no frontend behavior or art changed.",
       "reviewHistory": [
         {
           "sourceCommit": "407b9b4cfaeca197709dc98618ad7a36e47a02a3",
@@ -935,10 +935,10 @@
         "scripts/connected-universe-browser.cjs"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-28T06:14:11.978Z",
+      "reviewedAt": "2026-11-28T06:26:38.371Z",
       "sourceDigest": "d9bf19d414efb8cdf30c2be9fc6773550d5e91a9134414298d840ea388a2c237",
       "reviewOutcome": "updated",
-      "reviewReason": "Added DEV fixture and exact-source packaging qualification to existing environment contracts; documented CI limits, required live provider and owner/device evidence. 257 focused regression tests passed; local Actions browser fixture hit a score timing timeout pending hosted verification.",
+      "reviewReason": "Qualified the restored DEV archive dependency closure and documented credential-free GitHub transport fault tests, native remote-state durability and limits. Hosted package and aggregate failures from the first port checkpoint remain recorded pending the corrected run.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1182,10 +1182,10 @@
         "scripts/development/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-28T06:14:12.385Z",
-      "sourceDigest": "b69e32a115ba5bdd3b043df2c947f4ad9b2cfb87f2bfb5acd26412faf9c62f4e",
+      "reviewedAt": "2026-11-28T06:30:04.419Z",
+      "sourceDigest": "9a12acced7f2dc3d0d9a6fe4ed8bb57ebeea29956acb2e3927e7637aa9c0f943",
       "reviewOutcome": "updated",
-      "reviewReason": "Updated coordinated package and delivery state for persistent DEV source port; retained operational static controller bytes and explicit unapproved infrastructure, spending, private bindings and live acceptance gates.",
+      "reviewReason": "Prepared GitHub TEST transport preserves native GCS state and saved-plan guards; only byte-equivalent operator/workflow/root main advances can replan, with old plans invalidated. Documented fixed bootstrap names and separate IAM/approval gates; no cloud operation executed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
@@ -1440,10 +1440,10 @@
         "docs/context/CHATGPT-PROJECT-INSTRUCTIONS.md"
       ],
       "reviewAfterDays": 30,
-      "reviewedAt": "2026-11-26T23:41:39.454Z",
-      "sourceDigest": "c41ca15dbe4e9ffc35e89f7a556bc94de145d25d794af68ecea3d28caa1bfe6c",
+      "reviewedAt": "2026-11-28T06:26:37.578Z",
+      "sourceDigest": "5945b459bce7eeb92e64170102a222d5e08d5a470d6104d893e242ff256ab6b7",
       "reviewOutcome": "unchanged",
-      "reviewReason": "The existing feature index and review process still route release evidence through the delivery ledger and operations contracts.",
+      "reviewReason": "Reviewed normalized registry changes: route the reused DEV source, Dockerfiles and workbench into their existing service/delivery/authorization areas. No checker policy, required coverage, review interval or historical evidence was removed.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",

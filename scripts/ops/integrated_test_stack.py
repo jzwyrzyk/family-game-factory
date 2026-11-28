@@ -48,7 +48,7 @@ def environment():
     return os.environ.get('TF_VAR_iap_oauth_secret', '')
 
 
-def initialize(home, source, files):
+def initialize(home, source, files, init_args=(), state_reader=None):
     # Require creation of a new directory so another root's state can never be adopted.
     need(not any(p.is_symlink() for p in (home, *home.parents)), 'UNSAFE_SYMLINK')
     need(not any((p / 'terraform.tfstate').exists() or (p / 'apply-started').exists()
@@ -67,9 +67,9 @@ def initialize(home, source, files):
         fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
         tf = validate_root(home, source, files)
         if not (home / 'initialized.json').exists():
-            need(state_hash(tf) is None and not any((home / 'attempts').iterdir()),
+            need(state_hash(tf, state_reader) is None and not any((home / 'attempts').iterdir()),
                  'EXISTING_STATE_BOUNDARY')
-            command(['terraform', 'init', '-input=false', '-lockfile=readonly'], tf, 'TERRAFORM_INIT', home)
+            command(['terraform', 'init', '-input=false', '-lockfile=readonly', *init_args], tf, 'TERRAFORM_INIT', home)
             write_new(home / 'initialized.json', {'source': source})
         need(read_json(private_path(home / 'initialized.json')) == {'source': source}, 'STACK_IDENTITY_CHANGED')
     return {'status': 'INITIALIZED', 'privateState': str(tf / 'terraform.tfstate')}
@@ -87,9 +87,16 @@ def validate_root(home, source, files):
     return tf
 
 
-def state_hash(tf):
+def state_bytes(tf, state_reader=None):
+    if state_reader is not None:
+        return state_reader()
     state = tf / 'terraform.tfstate'
-    return sha(private_path(state).read_bytes()) if state.exists() else None
+    return private_path(state).read_bytes() if state.exists() else None
+
+
+def state_hash(tf, state_reader=None):
+    value = state_bytes(tf, state_reader)
+    return sha(value) if value is not None else None
 
 
 TRIAL_GRANTS = {
@@ -147,11 +154,11 @@ def unresolved(home):
 def history_hash(home):
     events = {str(f.relative_to(home)): sha(private_path(f).read_bytes())
               for f in (home / 'attempts').glob('*/*.json')
-              if f.name in {'started.json', 'completed.json', 'reconciled.json'}}
+              if f.name in {'started.json', 'completed.json', 'reconciled.json', 'source-transition.json'}}
     return digest(events)
 
 
-def prepare(home, tf, source, args, secret):
+def prepare(home, tf, source, args, secret, state_reader=None):
     variables = read_json(private_path(args.variables))
     need(isinstance(variables, dict) and variables.get('stage') in STAGES[1:] and
          'iap_oauth_secret' not in variables and len(secret) >= 12, 'PRIVATE_STAGE_INPUTS_REQUIRED')
@@ -159,7 +166,7 @@ def prepare(home, tf, source, args, secret):
     attempt = home / 'attempts' / uuid.uuid4().hex
     attempt.mkdir(mode=0o700)
     write_new(attempt / 'inputs.tfvars.json', variables)
-    state = state_hash(tf)
+    state = state_hash(tf, state_reader)
     previous = None
     if state:
         for path in (home / 'attempts').glob('*/completed.json'):
@@ -176,9 +183,9 @@ def prepare(home, tf, source, args, secret):
     need(not closing or previous and previous.get('funded_trial') and not variables.get('funded_trial'),
          'NO_MATCHING_FUNDED_TRIAL')
     if state:
-        write_new(attempt / 'before.tfstate', (tf / 'terraform.tfstate').read_bytes())
+        write_new(attempt / 'before.tfstate', state_bytes(tf, state_reader))
     rows, binary = tf_plan(tf, attempt, attempt / 'inputs.tfvars.json', 'review', closing)
-    need(state_hash(tf) == state, 'STATE_CHANGED_DURING_PLAN')
+    need(state_hash(tf, state_reader) == state, 'STATE_CHANGED_DURING_PLAN')
     record = {'source': source, 'attempt': attempt.name, 'root': TF_ROOT, 'project': PROJECT,
               'reviewedAt': int(time.time()), 'stage': variables['stage'], 'closeFundedTrial': closing, 'workerFederation': variables.get('enable_worker_federation', False),
               'changes': rows, 'historySha256': history_hash(home), 'beforeStateSha256': state, 'planSha256': sha(binary.read_bytes()),
@@ -190,7 +197,7 @@ def prepare(home, tf, source, args, secret):
             'changedResources': rows, 'privatePlan': str(attempt / 'review.json')}
 
 
-def apply(home, tf, source, args, secret):
+def apply(home, tf, source, args, secret, state_reader=None, checkpoint=None):
     need(re.fullmatch('[a-f0-9]{32}', args.attempt), 'INVALID_ATTEMPT')
     attempt = private_path(home / 'attempts' / args.attempt, directory=True)
     r = read_json(private_path(attempt / 'receipt.json'))
@@ -201,7 +208,7 @@ def apply(home, tf, source, args, secret):
         need(sha(private_path(attempt / name).read_bytes()) == r[field], 'REVIEWED_FILE_CHANGED')
     need(r['ephemeralBinding'] == hmac.new(private_path(home / 'key').read_bytes(), secret.encode(), hashlib.sha256).hexdigest(),
          'EPHEMERAL_INPUT_CHANGED')
-    need(state_hash(tf) == r['beforeStateSha256'] and history_hash(home) == r['historySha256'], 'STATE_ADVANCED')
+    need(state_hash(tf, state_reader) == r['beforeStateSha256'] and history_hash(home) == r['historySha256'], 'STATE_ADVANCED')
     need(0 <= time.time() - r['reviewedAt'] <= 3600, 'PLAN_APPROVAL_EXPIRED')
     # A saved plan alone does not detect out-of-band changes to IAM or traffic.
     # Compare a fresh read with the complete effects and starting state approved.
@@ -213,18 +220,20 @@ def apply(home, tf, source, args, secret):
     fields = ('resource_changes', 'resource_drift', 'output_changes', 'checks', 'prior_state',
               'deferred_changes', 'planned_values', 'proposed_unknown', 'applyable', 'complete')
     need(all(old_plan.get(k) == fresh_plan.get(k) for k in fields) and
-         r['beforeStateSha256'] == state_hash(tf), 'LIVE_PLAN_NO_LONGER_MATCHES')
+         r['beforeStateSha256'] == state_hash(tf, state_reader), 'LIVE_PLAN_NO_LONGER_MATCHES')
     write_new(attempt / 'started.json', {'approval': digest(r)})
+    if checkpoint is not None:
+        checkpoint()  # Durable remote write-ahead receipt must succeed before cloud mutation.
     command(['terraform', 'apply', '-input=false', '-lock-timeout=30s', '-parallelism=1',
              str(attempt / 'review.tfplan')], tf, 'TERRAFORM_APPLY', attempt)
     rows, _ = tf_plan(tf, attempt, attempt / 'inputs.tfvars.json', 'readback')
     readback = read_json(attempt / 'readback.json')
     need(not rows and all(c.get('actions') == ['no-op'] for c in readback.get('output_changes', {}).values())
          and all(c.get('status') == 'pass' for c in readback.get('checks', [])), 'POST_APPLY_DRIFT')
-    need(state_hash(tf), 'POST_APPLY_STATE_MISSING')
+    need(state_hash(tf, state_reader), 'POST_APPLY_STATE_MISSING')
     outputs = command(['terraform', 'output', '-json'], tf, 'TERRAFORM_OUTPUT', attempt)
     write_new(attempt / 'outputs.json', outputs)
-    write_new(attempt / 'completed.json', {'approval': digest(r), 'successorStateSha256': state_hash(tf)})
+    write_new(attempt / 'completed.json', {'approval': digest(r), 'successorStateSha256': state_hash(tf, state_reader)})
     return {'status': 'APPLIED_READBACK_CLEAN', 'outputs': str(attempt / 'outputs.json')}
 
 

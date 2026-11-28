@@ -1,5 +1,7 @@
 # Isolated TEST operator
 
+**Current execution transport:** [protected GitHub TEST infrastructure workflow](GITHUB-TEST-INFRASTRUCTURE.md). The saved-plan operator below is reused with native private GCS state and durable approval/history receipts. Its historical local shell examples describe the underlying contract; they are not routine owner actions. Setup, costs and authority remain governed by the [coordinated package](RELEASE-EXECUTION-2026-11-28.md).
+
 **Current execution route (November 28):** [Coordinated release package](RELEASE-EXECUTION-2026-11-28.md) supersedes the Cloud Shell transport below. Static DEV/TEST is operational and must be preserved. The commands below describe the original operator's state and approval semantics; they are not current owner instructions. GitHub transport and persistent adult DEV integration remain explicit release blockers until implemented and qualified. No infrastructure or paid activation is authorized here.
 
 Use the original recovery operator and Cloud Shell state for the partially applied nonproduction controller. Its corrective plan creates the GitHub provider and budget, retains 25 instances and has no replacements. Check the effective IAM and diagnostic broker receipts, then authorize the existing controller's federation separately. Keep its state, saved plans, approvals, backup files and original markers in place. [Original recovery](NONPRODUCTION_RECOVERY.md)
