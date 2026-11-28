@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-28T04:34:16.478Z",
-      "sourceDigest": "9538f7f8bdc224a31423788c5d2f7c0f0af5da4d8dbd532a2abd4c6c0ed10fef",
+      "reviewedAt": "2026-11-28T05:08:45.381Z",
+      "sourceDigest": "9098417ae830cdd7776644ae57c4e05c0e107935023acfe4cffd4698703dfce6",
       "reviewOutcome": "updated",
-      "reviewReason": "Record protected #232, the live static TEST service and policy readback, the retained deployment and both incomplete browser attempts.",
+      "reviewReason": "Recorded the exact #233 protected deployment and verified private revision, the interruption before browser and directory publication, and the draft #234 tag update.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
