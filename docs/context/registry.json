@@ -1142,10 +1142,10 @@
         "scripts/beta/**"
       ],
       "reviewAfterDays": 7,
-      "reviewedAt": "2026-11-28T03:31:03.472Z",
-      "sourceDigest": "3f61af1ae0a0c2d79a7637b61d4af5b725ccdc28930a3afefef2580a6a479b05",
+      "reviewedAt": "2026-11-28T03:35:40.885Z",
+      "sourceDigest": "df3bb0ea09dffc2a03ad98c7ffa08e60c48ef6d5a3270c84b0bfa804078389ef",
       "reviewOutcome": "updated",
-      "reviewReason": "Record approved project web OAuth setting scope, inheritance, bounded field mask and outstanding live gates.",
+      "reviewReason": "Record the administrator OAuth readback and the remaining protected website activation and service acceptance gates.",
       "reviewHistory": [
         {
           "sourceCommit": "c6576c16e005ae58ce8c706801414be4d864242e",
